@@ -1,0 +1,33 @@
+name: "✨ Feature"
+description: 새 기능 개발
+title: "[FE] feat: "
+labels: ["feat"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: 작업 내용
+      placeholder: |
+        - 구현할 기능 설명
+        - 관련 화면/컴포넌트
+    validations:
+      required: true
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: 세부 작업
+      placeholder: |
+        - [ ] 컴포넌트 구현
+        - [ ] API 연동
+        - [ ] 타입 정의
+    validations:
+      required: false
+
+  - type: textarea
+    id: references
+    attributes:
+      label: 참고 사항
+      placeholder: 디자인 링크, 관련 이슈 등
+    validations:
+      required: false
