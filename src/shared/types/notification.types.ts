@@ -3,7 +3,7 @@
  * 출처: notification.ts
  */
 
-import type { PaginationResponse } from './api.types';
+import type { PaginationResponse } from './api.types'
 
 export type NotificationType =
   | 'BREEDER_APPROVED'
@@ -13,34 +13,34 @@ export type NotificationType =
   | 'NEW_REVIEW_REGISTERED'
   | 'CONSULT_COMPLETED'
   | 'NEW_PET_REGISTERED'
-  | 'DOCUMENT_REMINDER';
+  | 'DOCUMENT_REMINDER'
 
 export interface NotificationResponseDto {
-  notificationId: string;
-  userId: string;
-  userRole: 'adopter' | 'breeder';
-  type: NotificationType;
-  title: string;
-  body: string;
-  metadata?: Record<string, unknown>;
-  targetUrl?: string;
-  isRead: boolean;
-  readAt?: string;
-  createdAt: string;
+  notificationId: string
+  userId: string
+  userRole: 'adopter' | 'breeder'
+  type: NotificationType
+  title: string
+  body: string
+  metadata?: Record<string, unknown>
+  targetUrl?: string
+  isRead: boolean
+  readAt?: string
+  createdAt: string
 }
 
 export interface UnreadCountResponseDto {
-  unreadCount: number;
+  unreadCount: number
 }
 
 export interface MarkAsReadResponseDto {
-  notificationId: string;
-  isRead: boolean;
-  readAt: string;
+  notificationId: string
+  isRead: boolean
+  readAt: string
 }
 
 export interface MarkAllAsReadResponseDto {
-  updatedCount: number;
+  updatedCount: number
 }
 
-export type NotificationListResponse = PaginationResponse<NotificationResponseDto>;
+export type NotificationListResponse = PaginationResponse<NotificationResponseDto>

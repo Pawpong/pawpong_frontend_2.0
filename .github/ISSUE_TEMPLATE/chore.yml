@@ -1,7 +1,7 @@
-name: "🔧 Chore"
+name: '🔧 Chore'
 description: 빌드·설정·의존성·기타 작업
-title: "[FE] chore: "
-labels: ["chore"]
+title: '[FE] chore: '
+labels: ['chore']
 body:
   - type: textarea
     id: description

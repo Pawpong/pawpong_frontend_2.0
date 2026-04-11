@@ -1,7 +1,7 @@
-name: "♻️ Refactor"
+name: '♻️ Refactor'
 description: 리팩토링 (기능 변경 없음)
-title: "[FE] refactor: "
-labels: ["refactor"]
+title: '[FE] refactor: '
+labels: ['refactor']
 body:
   - type: textarea
     id: description
