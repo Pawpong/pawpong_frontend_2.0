@@ -3,53 +3,53 @@
  * 출처: feed.ts
  */
 
-import type { ApiResponseFull, PaginatedApiResponse } from './api.types';
+import type { ApiResponseFull, PaginatedApiResponse } from './api.types'
 
 export interface FeedVideo {
-  _id: string;
-  uploaderId: string;
-  uploaderName: string;
-  uploaderProfileImage?: string;
-  title: string;
-  description?: string;
-  videoUrl: string;
-  thumbnailUrl?: string;
-  hlsUrl?: string;
-  duration: number;
-  viewCount: number;
-  likeCount: number;
-  commentCount: number;
-  tags: string[];
-  createdAt: string;
-  updatedAt: string;
-  isLiked?: boolean;
+  _id: string
+  uploaderId: string
+  uploaderName: string
+  uploaderProfileImage?: string
+  title: string
+  description?: string
+  videoUrl: string
+  thumbnailUrl?: string
+  hlsUrl?: string
+  duration: number
+  viewCount: number
+  likeCount: number
+  commentCount: number
+  tags: string[]
+  createdAt: string
+  updatedAt: string
+  isLiked?: boolean
 }
 
 export interface FeedComment {
-  _id: string;
-  commentId: string;
-  videoId: string;
-  userId: string;
-  userName: string;
-  userProfileImage?: string;
-  content: string;
-  likeCount: number;
-  replyCount: number;
-  isOwner: boolean;
-  createdAt: string;
-  updatedAt?: string;
+  _id: string
+  commentId: string
+  videoId: string
+  userId: string
+  userName: string
+  userProfileImage?: string
+  content: string
+  likeCount: number
+  replyCount: number
+  isOwner: boolean
+  createdAt: string
+  updatedAt?: string
 }
 
-export type FeedVideosResponse = PaginatedApiResponse<FeedVideo>;
+export type FeedVideosResponse = PaginatedApiResponse<FeedVideo>
 
 export interface LikeData {
-  videoId: string;
-  isLiked: boolean;
-  likeCount: number;
+  videoId: string
+  isLiked: boolean
+  likeCount: number
 }
-export type LikeResponse = ApiResponseFull<LikeData>;
+export type LikeResponse = ApiResponseFull<LikeData>
 
 export interface TagSearchData {
-  tags: string[];
+  tags: string[]
 }
-export type TagSearchResponse = ApiResponseFull<TagSearchData>;
+export type TagSearchResponse = ApiResponseFull<TagSearchData>

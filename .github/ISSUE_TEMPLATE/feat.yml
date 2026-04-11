@@ -1,7 +1,7 @@
-name: "✨ Feature"
+name: '✨ Feature'
 description: 새 기능 개발
-title: "[FE] feat: "
-labels: ["feat"]
+title: '[FE] feat: '
+labels: ['feat']
 body:
   - type: textarea
     id: description
