@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: 'Pawpong',
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="ko">
       <body>
@@ -16,3 +16,5 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   )
 }
+
+export default RootLayout

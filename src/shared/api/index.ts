@@ -1,9 +1,9 @@
-export { apiClient } from './client'
-export type { ApiRequestConfig } from './client'
-export { unwrap, ApiError } from './unwrap'
+export { apiClient } from './Client'
+export type { ApiRequestConfig } from './Client'
+export { unwrap, ApiError } from './Unwrap'
 export {
   createQuery,
   createInfiniteQuery,
   createInfiniteQueryWithHasMore,
   STALE_TIME,
-} from './query-factory'
+} from './QueryFactory'

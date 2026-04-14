@@ -1,3 +1,3 @@
-export * from './api'
-export * from './queries'
-export * from './hooks'
+export * from './Api'
+export * from './Queries'
+export * from './Hooks'
