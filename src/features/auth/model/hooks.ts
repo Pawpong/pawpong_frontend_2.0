@@ -12,7 +12,7 @@ import {
   uploadBreederDocuments,
   uploadProfileImage,
   logout,
-} from './Api'
+} from '../api'
 import type { AdopterRegistrationDto, BreederRegistrationDto } from '@/shared/types'
 
 export const useCheckEmailDuplicate = () =>

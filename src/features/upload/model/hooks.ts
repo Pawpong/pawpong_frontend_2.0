@@ -8,7 +8,7 @@ import {
   uploadSingleFile,
   uploadMultipleFiles,
   deleteFile,
-} from './Api'
+} from '../api'
 
 export const useUploadRepresentativePhotos = () =>
   useMutation({ mutationFn: (files: File[]) => uploadRepresentativePhotos(files) })

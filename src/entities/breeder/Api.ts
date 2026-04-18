@@ -1,4 +1,4 @@
-import { apiClient, unwrap } from '@/shared/api'
+import { apiClient, unwrap, unwrapNullable } from '@/shared/api'
 import type { ApiRequestConfig } from '@/shared/api'
 import type {
   BreederProfileResponseDto,
@@ -85,7 +85,10 @@ export const getBreederPets = (breederId: string, page = 1, limit = 20) =>
       success: boolean
       data: PaginationResponse<AvailablePetSummaryDto>
       message?: string
-    }>(`/api/breeder/${breederId}/pets`, { params: { page, limit }, skipAuth: true } as ApiRequestConfig)
+    }>(`/api/breeder/${breederId}/pets`, {
+      params: { page, limit },
+      skipAuth: true,
+    } as ApiRequestConfig)
     .then(unwrap)
 
 /** 부모견/묘 목록 */
@@ -95,7 +98,10 @@ export const getParentPets = (breederId: string, page = 1, limit = 4) =>
       success: boolean
       data: PaginationResponse<ParentPetSummaryDto>
       message?: string
-    }>(`/api/breeder/${breederId}/parent-pets`, { params: { page, limit }, skipAuth: true } as ApiRequestConfig)
+    }>(`/api/breeder/${breederId}/parent-pets`, {
+      params: { page, limit },
+      skipAuth: true,
+    } as ApiRequestConfig)
     .then(unwrap)
 
 /** 브리더 후기 목록 */
@@ -105,7 +111,10 @@ export const getBreederReviews = (breederId: string, page = 1, limit = 10) =>
       success: boolean
       data: PaginationResponse<PublicReviewDto>
       message?: string
-    }>(`/api/breeder/${breederId}/reviews`, { params: { page, limit }, skipAuth: true } as ApiRequestConfig)
+    }>(`/api/breeder/${breederId}/reviews`, {
+      params: { page, limit },
+      skipAuth: true,
+    } as ApiRequestConfig)
     .then(unwrap)
 
 /** 입양 신청 폼 조회 (공개) */
@@ -176,4 +185,4 @@ export const sendApplicationChatMessage = (applicationId: string, data: SendChat
       data: ChatMessageDto | null
       message?: string
     }>(`/api/breeder-management/applications/${applicationId}/chat/messages`, data)
-    .then((res) => res.data.data ?? null)
+    .then((res) => unwrapNullable(res, '채팅 메시지 전송에 실패했습니다.'))

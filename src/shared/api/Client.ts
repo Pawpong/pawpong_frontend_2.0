@@ -4,6 +4,7 @@ import axios, {
   AxiosRequestConfig,
   InternalAxiosRequestConfig,
 } from 'axios'
+import { ApiError, normalizeApiError } from './Unwrap'
 
 export interface ApiRequestConfig extends AxiosRequestConfig {
   skipAuth?: boolean
@@ -54,7 +55,7 @@ function createApiClient(): AxiosInstance {
   instance.interceptors.response.use(
     (res) => res,
     async (error: AxiosError) => {
-      const originalRequest = error.config as InternalAxiosRequestConfig & {
+      const originalRequest = (error.config ?? {}) as InternalAxiosRequestConfig & {
         _retry?: boolean
         skipAuth?: boolean
       }
@@ -68,12 +69,14 @@ function createApiClient(): AxiosInstance {
           : ''
 
       if (errorMessage.includes('탈퇴')) {
-        return Promise.reject(new Error(errorMessage))
+        return Promise.reject(
+          new ApiError(errorMessage, error.response?.status, undefined, errorData),
+        )
       }
 
       if (error.response?.status === 401 && !originalRequest._retry) {
         if (originalRequest.url?.includes('/api/auth/refresh')) {
-          return Promise.reject(new Error('세션이 만료되었습니다. 다시 로그인해주세요.'))
+          return Promise.reject(new ApiError('세션이 만료되었습니다. 다시 로그인해주세요.', 401))
         }
 
         if (isRefreshing) {
@@ -99,7 +102,7 @@ function createApiClient(): AxiosInstance {
           }
 
           if (!refreshResponse.ok || !refreshData.success) {
-            throw new Error('토큰 갱신 실패')
+            throw new ApiError('토큰 갱신 실패', refreshResponse.status, undefined, refreshData)
           }
 
           if (refreshData.data?.accessToken && refreshData.data?.refreshToken) {
@@ -116,7 +119,9 @@ function createApiClient(): AxiosInstance {
           processQueue(null)
           return instance(originalRequest)
         } catch (refreshError) {
-          processQueue(refreshError as Error)
+          processQueue(
+            normalizeApiError(refreshError, '세션이 만료되었습니다. 다시 로그인해주세요.'),
+          )
 
           if (typeof window !== 'undefined') {
             fetch('/api/auth/clear-cookie', { method: 'POST' }).catch(() => {})
@@ -131,7 +136,7 @@ function createApiClient(): AxiosInstance {
             }
           }
 
-          return Promise.reject(new Error('세션이 만료되었습니다. 다시 로그인해주세요.'))
+          return Promise.reject(new ApiError('세션이 만료되었습니다. 다시 로그인해주세요.', 401))
         } finally {
           isRefreshing = false
         }
@@ -145,7 +150,7 @@ function createApiClient(): AxiosInstance {
         error.message ??
         'Unknown error'
 
-      return Promise.reject(new Error(message))
+      return Promise.reject(new ApiError(message, error.response?.status, undefined, errorData))
     },
   )
 

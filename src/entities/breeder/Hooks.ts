@@ -1,18 +1,10 @@
 'use client'
 
-import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
 import { breederQueries } from './Queries'
-import {
-  updateBreederProfile,
-  updateBreederApplicationStatus,
-  sendApplicationChatMessage,
-} from './Api'
 import type {
   SearchBreederParams,
-  ProfileUpdateRequestDto,
-  ApplicationStatusUpdateRequest,
 } from '@/shared/types'
-import type { SendChatMessageRequest } from '@/shared/types'
 
 export const useBreederProfile = (breederId: string) => useQuery(breederQueries.profile(breederId))
 
@@ -45,39 +37,3 @@ export const useReceivedApplicationDetail = (applicationId: string) =>
 
 export const useApplicationChatMessages = (applicationId: string) =>
   useQuery(breederQueries.chatMessages(applicationId))
-
-export const useUpdateBreederProfile = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (data: ProfileUpdateRequestDto) => updateBreederProfile(data),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: breederQueries.all() })
-    },
-  })
-}
-
-export const useUpdateBreederApplicationStatus = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: ({
-      applicationId,
-      data,
-    }: {
-      applicationId: string
-      data: ApplicationStatusUpdateRequest
-    }) => updateBreederApplicationStatus(applicationId, data),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: breederQueries.all() })
-    },
-  })
-}
-
-export const useSendChatMessage = (applicationId: string) => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (data: SendChatMessageRequest) => sendApplicationChatMessage(applicationId, data),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: breederQueries.chatMessages(applicationId).queryKey })
-    },
-  })
-}

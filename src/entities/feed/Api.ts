@@ -1,4 +1,4 @@
-import { apiClient } from '@/shared/api'
+import { apiClient, unwrap } from '@/shared/api'
 import type { FeedVideo, FeedComment, PaginationResponse } from '@/shared/types'
 
 /** 백엔드 원본 비디오 타입 */
@@ -103,7 +103,7 @@ export const toggleVideoLike = (videoId: string) =>
       success: boolean
       data: { videoId: string; isLiked: boolean; likeCount: number }
     }>(`/api/feed/like/${videoId}`)
-    .then((res) => res.data.data)
+    .then((res) => unwrap(res, '좋아요 처리에 실패했습니다.'))
 
 /** 비디오 댓글 목록 조회 */
 export const getVideoComments = async (
@@ -116,10 +116,11 @@ export const getVideoComments = async (
     data: { comments: BackendComment[]; totalCount: number; hasNextPage: boolean }
   }>(`/api/feed/comment/${videoId}?page=${page}&limit=${limit}`)
 
+  const data = unwrap(response, '댓글 목록 조회에 실패했습니다.')
   return {
-    items: response.data.data.comments.map((c) => transformComment(c, videoId)),
-    totalCount: response.data.data.totalCount,
-    hasNextPage: response.data.data.hasNextPage,
+    items: data.comments.map((c) => transformComment(c, videoId)),
+    totalCount: data.totalCount,
+    hasNextPage: data.hasNextPage,
   }
 }
 
@@ -134,7 +135,7 @@ export const searchTags = (query: string) =>
       success: boolean
       data: { tags: string[] }
     }>(`/api/feed/tag/search?q=${encodeURIComponent(query)}`)
-    .then((res) => res.data.data.tags)
+    .then((res) => unwrap(res, '태그 검색에 실패했습니다.').tags)
 
 /** HLS 스트리밍 URL 생성 */
 export const getHlsStreamUrl = (videoId: string, filename: string): string => {
