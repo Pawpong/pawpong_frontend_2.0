@@ -1,4 +1,5 @@
 export * from './Avatar'
+export * from './Badge'
 export * from './Checkbox'
 export * from './Dialog'
 export * from './DropdownMenu'
