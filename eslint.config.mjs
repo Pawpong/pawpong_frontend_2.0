@@ -14,7 +14,8 @@ const eslintConfig = defineConfig([
           patterns: [
             {
               group: ['@/components/*'],
-              message: 'Use shared, entities, features, widgets, or app layers instead of components.',
+              message:
+                'Use shared, entities, features, widgets, or app layers instead of components.',
             },
           ],
         },

@@ -24,8 +24,8 @@ export function ErrorBoundaryUI({
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4">
       <div className="mx-auto max-w-md text-center">
-        <h2 className="mb-4 text-2xl font-bold text-grayscale-gray9">{title}</h2>
-        <p className="mb-6 text-body-m text-grayscale-gray5">
+        <h2 className="text-grayscale-gray9 mb-4 text-2xl font-bold">{title}</h2>
+        <p className="text-body-m text-grayscale-gray5 mb-6">
           죄송합니다. {description}
           <br />
           잠시 후 다시 시도해주세요.
@@ -33,13 +33,13 @@ export function ErrorBoundaryUI({
         <div className="flex justify-center gap-3">
           <button
             onClick={reset}
-            className="rounded-lg bg-primary px-6 py-3 text-white transition-opacity hover:opacity-90"
+            className="bg-primary rounded-lg px-6 py-3 text-white transition-opacity hover:opacity-90"
           >
             다시 시도
           </button>
           <Link
             href="/"
-            className="rounded-lg border border-grayscale-gray3 px-6 py-3 text-grayscale-gray7 transition-colors hover:bg-grayscale-gray1"
+            className="border-grayscale-gray3 text-grayscale-gray7 hover:bg-grayscale-gray1 rounded-lg border px-6 py-3 transition-colors"
           >
             홈으로 가기
           </Link>

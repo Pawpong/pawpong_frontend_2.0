@@ -36,13 +36,13 @@ export const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        'fixed top-1/2 left-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 border border-zinc-200 bg-white p-6 shadow-lg duration-200 data-[state=closed]:opacity-0 data-[state=open]:opacity-100 dark:border-zinc-800 dark:bg-zinc-950 sm:rounded-lg',
+        'fixed top-1/2 left-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 border border-zinc-200 bg-white p-6 shadow-lg duration-200 data-[state=closed]:opacity-0 data-[state=open]:opacity-100 sm:rounded-lg dark:border-zinc-800 dark:bg-zinc-950',
         className,
       )}
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute top-4 right-4 rounded-sm opacity-70 ring-offset-white transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-zinc-400 focus:ring-offset-2 disabled:pointer-events-none dark:ring-offset-zinc-950">
+      <DialogPrimitive.Close className="absolute top-4 right-4 rounded-sm opacity-70 ring-offset-white transition-opacity hover:opacity-100 focus:ring-2 focus:ring-zinc-400 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none dark:ring-offset-zinc-950">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"

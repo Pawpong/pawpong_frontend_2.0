@@ -12,12 +12,11 @@ export const Pagination = ({ className, ...props }: React.ComponentProps<'nav'>)
   />
 )
 
-export const PaginationContent = React.forwardRef<
-  HTMLUListElement,
-  React.ComponentProps<'ul'>
->(({ className, ...props }, ref) => (
-  <ul ref={ref} className={cn('flex flex-row items-center gap-1', className)} {...props} />
-))
+export const PaginationContent = React.forwardRef<HTMLUListElement, React.ComponentProps<'ul'>>(
+  ({ className, ...props }, ref) => (
+    <ul ref={ref} className={cn('flex flex-row items-center gap-1', className)} {...props} />
+  ),
+)
 PaginationContent.displayName = 'PaginationContent'
 
 export const PaginationItem = React.forwardRef<HTMLLIElement, React.ComponentProps<'li'>>(
@@ -37,7 +36,7 @@ export const PaginationLink = React.forwardRef<HTMLAnchorElement, PaginationLink
       aria-current={isActive ? 'page' : undefined}
       className={cn(
         'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors',
-        'focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 focus-visible:outline-none focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-950',
+        'focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white focus-visible:outline-none dark:focus-visible:ring-offset-zinc-950',
         size === 'default' && 'h-9 min-w-9 px-4 py-2',
         size === 'sm' && 'h-8 min-w-8 gap-1 px-3 text-xs',
         size === 'lg' && 'h-10 min-w-10 px-6',
@@ -104,11 +103,7 @@ export const PaginationNext = ({
 )
 
 export const PaginationEllipsis = ({ className, ...props }: React.ComponentProps<'span'>) => (
-  <span
-    aria-hidden
-    className={cn('flex size-9 items-center justify-center', className)}
-    {...props}
-  >
+  <span aria-hidden className={cn('flex size-9 items-center justify-center', className)} {...props}>
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
