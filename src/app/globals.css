@@ -1,5 +1,11 @@
 @import 'tailwindcss';
 
+@theme {
+  --breakpoint-mo: 375px;
+  --breakpoint-tab: 768px;
+  --breakpoint-pc: 1440px;
+}
+
 @font-face {
   font-family: 'Pretendard';
   src: url('/fonts/PretendardVariable.woff2') format('woff2-variations');

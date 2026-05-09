@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { QueryProvider } from '@/shared/lib/QueryProvider'
+import { Container } from '@/shared/ui'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -11,7 +12,9 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="ko">
       <body>
-        <QueryProvider>{children}</QueryProvider>
+        <QueryProvider>
+          <Container>{children}</Container>
+        </QueryProvider>
       </body>
     </html>
   )
