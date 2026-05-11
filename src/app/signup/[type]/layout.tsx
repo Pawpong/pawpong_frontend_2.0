@@ -1,6 +1,6 @@
 'use client'
 
-import { notFound } from 'next/navigation'
+import { notFound, usePathname } from 'next/navigation'
 import { use } from 'react'
 import { OnboardingProvider, ONBOARDING_STEPS } from '@/features/onboarding'
 import type { UserType } from '@/features/onboarding'
@@ -15,12 +15,27 @@ const OnboardingLayout = ({
   params: Promise<{ type: string }>
 }) => {
   const { type } = use(params)
+  const pathname = usePathname()
 
   if (!VALID_TYPES.includes(type as UserType)) {
     notFound()
   }
 
-  return <OnboardingProvider userType={type as UserType}>{children}</OnboardingProvider>
+  const steps = ONBOARDING_STEPS[type as UserType]
+  const currentStepId = pathname.split('/').pop()
+  const initialStepIndex = Math.max(
+    steps.findIndex((s) => s.id === currentStepId),
+    0,
+  )
+
+  return (
+    <OnboardingProvider
+      userType={type as UserType}
+      initialStepIndex={initialStepIndex}
+    >
+      {children}
+    </OnboardingProvider>
+  )
 }
 
 export default OnboardingLayout

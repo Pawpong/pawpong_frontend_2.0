@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { ArrowRightIcon } from '@/shared/assets/icons'
 import { Checkbox } from '@/shared/ui'
-import { cn } from '@/shared/lib/Cn'
 import { useOnboarding } from '../model/OnboardingContext'
 import { StepIndicator } from './StepIndicator'
 
@@ -27,9 +26,6 @@ const ProfileStep = () => {
 
   const allAgreementsChecked = AGREEMENTS.every((a) => agreements[a.id]) && isOver14
 
-  const requiredAgreementsChecked =
-    AGREEMENTS.filter((a) => a.required).every((a) => agreements[a.id]) && isOver14
-
   const handleToggleAll = () => {
     const nextValue = !allAgreementsChecked
     const nextAgreements: Record<string, boolean> = {}
@@ -43,8 +39,6 @@ const ProfileStep = () => {
   const handleToggle = (id: string) => {
     setAgreements((prev) => ({ ...prev, [id]: !prev[id] }))
   }
-
-  const canProceed = email && phone && requiredAgreementsChecked
 
   return (
     <div className="flex flex-col items-center pb-[8rem] tab:pb-0">
@@ -192,12 +186,8 @@ const ProfileStep = () => {
         </button>
         <button
           type="button"
-          disabled={!canProceed}
           onClick={goNext}
-          className={cn(
-            'h-[3rem] w-full rounded-full text-[1rem] font-semibold transition-colors',
-            canProceed ? 'bg-[#FFD84D] text-black' : 'bg-[#d4d4d4] text-[#5d5d5d]',
-          )}
+          className="h-[3rem] w-full rounded-full bg-[#d4d4d4] text-[1rem] font-semibold text-[#5d5d5d] transition-colors"
         >
           다음
         </button>
