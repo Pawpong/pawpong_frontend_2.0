@@ -1,6 +1,7 @@
 export { ArrowRightIcon } from './ArrowRightIcon'
 export { AttachmentIcon } from './AttachmentIcon'
 export { CheckboxIcon } from './CheckboxIcon'
+export { FavoriteIcon } from './FavoriteIcon'
 export { HomeIcon } from './HomeIcon'
 export { ImageIcon } from './ImageIcon'
 export { MenuIcon } from './MenuIcon'

@@ -10,6 +10,7 @@ export * from './AuthTypes'
 export * from './ApplicationTypes'
 
 // 기능 도메인
+export * from './AdoptionTypes'
 export * from './ChatTypes'
 export * from './HomeTypes'
 export * from './FeedTypes'
