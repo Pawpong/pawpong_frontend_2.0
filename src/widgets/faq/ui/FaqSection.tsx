@@ -31,7 +31,7 @@ const FaqSection = ({ userType = 'adopter' }: FaqSectionProps) => {
         {/* 서비스 소개 카드 */}
         <div className="flex flex-col justify-between rounded-[1.0625rem] bg-[#ebebeb] p-[1.375rem] tab:h-[15.875rem] tab:w-[18.9375rem] tab:shrink-0">
           <div className="flex items-center gap-[0.5rem] tab:flex-col tab:items-start tab:gap-0">
-            <p className="text-[1rem] font-bold text-[#5d5d5d] tab:text-[1.25rem]">
+            <p className="font-[Cafe24Proup] text-[1rem] text-[#5d5d5d] tab:text-[1.25rem]">
               신뢰할 수 있는 입양자
             </p>
             <p className="text-[1rem] font-bold text-[#999] tab:text-[1.25rem]">
