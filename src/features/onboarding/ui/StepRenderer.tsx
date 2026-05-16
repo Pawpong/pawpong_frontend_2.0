@@ -3,15 +3,19 @@
 import { ProfileStep } from './ProfileStep'
 import { InfoStep } from './InfoStep'
 import { SurveyStep } from './SurveyStep'
+import { AnimalSelectStep } from './AnimalSelectStep'
 import { KennelInfoStep } from './KennelInfoStep'
 import { DocumentsStep } from './DocumentsStep'
+import { CompleteStep } from './CompleteStep'
 
 const STEP_COMPONENTS: Record<string, React.ComponentType> = {
+  'animal-select': AnimalSelectStep,
   profile: ProfileStep,
   info: InfoStep,
   survey: SurveyStep,
   'kennel-info': KennelInfoStep,
   documents: DocumentsStep,
+  complete: CompleteStep,
 }
 
 interface StepRendererProps {
