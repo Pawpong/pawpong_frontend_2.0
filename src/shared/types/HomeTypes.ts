@@ -4,6 +4,9 @@
  *
  */
 
+/** 홈 화면 사용자 유형 */
+export type HomeUserType = 'adopter' | 'breeder'
+
 /** 배너 DTO */
 export interface BannerDto {
   bannerId: string
@@ -25,7 +28,7 @@ export interface FaqDto {
   question: string
   answer: string
   category: string
-  userType: 'adopter' | 'breeder'
+  userType: HomeUserType
   order: number
 }
 
