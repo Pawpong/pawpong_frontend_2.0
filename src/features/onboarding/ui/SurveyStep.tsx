@@ -1,10 +1,10 @@
 'use client'
 
 import { useForm, Controller } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+// import { zodResolver } from '@hookform/resolvers/zod'
 import { Checkbox } from '@/shared/ui'
 import { useOnboarding } from '../model/OnboardingContext'
-import { surveySchema, type SurveyFormData, EMAIL_DOMAINS } from '../model/schema'
+import { type SurveyFormData, EMAIL_DOMAINS } from '../model/schema'
 import { StepLayout } from './StepLayout'
 import { StepTitle } from './StepTitle'
 import { StepIndicator } from './StepIndicator'
@@ -15,7 +15,7 @@ const SurveyStep = () => {
   const { goNext, goBack, formData, setFormData } = useOnboarding()
 
   const { register, control, handleSubmit } = useForm<SurveyFormData>({
-    resolver: zodResolver(surveySchema),
+    // resolver: zodResolver(surveySchema),
     defaultValues: (formData.survey as SurveyFormData) ?? {
       privacyAgreed: false as unknown as true,
       name: '',
@@ -42,10 +42,7 @@ const SurveyStep = () => {
       </div>
 
       {/* 콘텐츠 영역 */}
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="mt-[2.4375rem] flex w-full flex-col px-[1.25rem] tab:mt-[3.125rem] tab:w-[59.4375rem] tab:px-0"
-      >
+      <div className="mt-[2.4375rem] flex w-full flex-col px-[1.25rem] tab:mt-[3.125rem] tab:w-[59.4375rem] tab:px-0">
         {/* 섹션 1: 개인정보 수집 동의 */}
         <div className="flex flex-col gap-[0.4375rem]">
           <div className="flex items-center gap-[0.625rem] tab:gap-[1.25rem]">
@@ -174,21 +171,21 @@ const SurveyStep = () => {
             </div>
           </div>
         </div>
+      </div>
 
-        <StepNavButtons
-          onNext={() => handleSubmit(onSubmit)()}
-          onBack={goBack}
-          className="bg-white tab:mt-[9.03rem] tab:bg-transparent"
-          extraButtons={
-            <button
-              type="button"
-              className="h-[3rem] w-full rounded-full border border-[#d4d4d4] text-[1rem] font-semibold text-[#5d5d5d] tab:hidden"
-            >
-              다음에 하기
-            </button>
-          }
-        />
-      </form>
+      <StepNavButtons
+        onNext={() => handleSubmit(onSubmit)()}
+        onBack={goBack}
+        className="bg-white tab:mt-[9.03rem] tab:bg-transparent"
+        extraButtons={
+          <button
+            type="button"
+            className="h-[3rem] w-full rounded-full border border-[#d4d4d4] text-[1rem] font-semibold text-[#5d5d5d] tab:hidden"
+          >
+            다음에 하기
+          </button>
+        }
+      />
     </StepLayout>
   )
 }

@@ -1,10 +1,10 @@
 'use client'
 
 import { useForm, Controller } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+// import { zodResolver } from '@hookform/resolvers/zod'
 import { cn } from '@/shared/lib/Cn'
 import { useOnboarding } from '../model/OnboardingContext'
-import { animalSelectSchema, type AnimalSelectFormData, ANIMAL_TYPES } from '../model/schema'
+import { type AnimalSelectFormData, ANIMAL_TYPES } from '../model/schema'
 import { StepLayout } from './StepLayout'
 import { StepTitle } from './StepTitle'
 import { StepIndicator } from './StepIndicator'
@@ -20,7 +20,7 @@ const AnimalSelectStep = () => {
   const { goNext, formData, setFormData } = useOnboarding()
 
   const { control, handleSubmit, watch } = useForm<AnimalSelectFormData>({
-    resolver: zodResolver(animalSelectSchema),
+    // resolver: zodResolver(animalSelectSchema),
     defaultValues: (formData['animal-select'] as AnimalSelectFormData) ?? {
       selected: undefined as unknown as (typeof ANIMAL_TYPES)[number],
     },

@@ -1,11 +1,11 @@
 'use client'
 
 import { useForm, Controller } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+// import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowRightIcon, AttachmentIcon } from '@/shared/assets/icons'
 import { Checkbox } from '@/shared/ui'
 import { useOnboarding } from '../model/OnboardingContext'
-import { documentsSchema, type DocumentsFormData } from '../model/schema'
+import { type DocumentsFormData } from '../model/schema'
 import { StepLayout } from './StepLayout'
 import { StepTitle } from './StepTitle'
 import { StepIndicator } from './StepIndicator'
@@ -15,7 +15,7 @@ const DocumentsStep = () => {
   const { goNext, goBack, formData, setFormData } = useOnboarding()
 
   const { control, handleSubmit } = useForm<DocumentsFormData>({
-    resolver: zodResolver(documentsSchema),
+    // resolver: zodResolver(documentsSchema),
     defaultValues: (formData.documents as DocumentsFormData) ?? {
       idDocument: undefined,
       registrationCert: undefined,
@@ -37,10 +37,7 @@ const DocumentsStep = () => {
       </div>
 
       {/* 서류 영역 */}
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="mt-[4rem] flex w-full flex-col px-[1.25rem] tab:mt-[6rem] tab:w-[53.8125rem] tab:px-0"
-      >
+      <div className="mt-[4rem] flex w-full flex-col px-[1.25rem] tab:mt-[6rem] tab:w-[53.8125rem] tab:px-0">
         {/* 신분증 사본 */}
         <button
           type="button"
@@ -95,9 +92,9 @@ const DocumentsStep = () => {
             </label>
           )}
         />
+      </div>
 
-        <StepNavButtons onNext={() => handleSubmit(onSubmit)()} onBack={goBack} className="tab:mt-[9.9375rem]" />
-      </form>
+      <StepNavButtons onNext={() => handleSubmit(onSubmit)()} onBack={goBack} className="tab:mt-[9.9375rem]" />
     </StepLayout>
   )
 }

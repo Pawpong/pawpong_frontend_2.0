@@ -1,11 +1,11 @@
 'use client'
 
 import { useForm, Controller } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+// import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowRightIcon } from '@/shared/assets/icons'
 import { Checkbox } from '@/shared/ui'
 import { useOnboarding } from '../model/OnboardingContext'
-import { profileSchema, type ProfileFormData, EMAIL_DOMAINS } from '../model/schema'
+import { type ProfileFormData, EMAIL_DOMAINS } from '../model/schema'
 import { StepLayout } from './StepLayout'
 import { StepTitle } from './StepTitle'
 import { StepIndicator } from './StepIndicator'
@@ -24,8 +24,8 @@ const CHECKBOX_CLASS =
 const ProfileStep = () => {
   const { goNext, goBack, formData, setFormData } = useOnboarding()
 
-  const { register, control, handleSubmit, watch, setValue, getValues } = useForm<ProfileFormData>({
-    resolver: zodResolver(profileSchema),
+  const { register, control, handleSubmit, watch, setValue } = useForm<ProfileFormData>({
+    // resolver: zodResolver(profileSchema),
     defaultValues: (formData.profile as ProfileFormData) ?? {
       email: '',
       emailDomain: EMAIL_DOMAINS[0],
@@ -47,10 +47,10 @@ const ProfileStep = () => {
 
   const handleToggleAll = () => {
     const nextValue = !allAgreementsChecked
-    setValue('serviceAgreed', nextValue as unknown as true, { shouldValidate: true })
-    setValue('privacyAgreed', nextValue as unknown as true, { shouldValidate: true })
-    setValue('marketingAgreed', nextValue, { shouldValidate: true })
-    setValue('isOver14', nextValue as unknown as true, { shouldValidate: true })
+    setValue('serviceAgreed', nextValue as unknown as true)
+    setValue('privacyAgreed', nextValue as unknown as true)
+    setValue('marketingAgreed', nextValue)
+    setValue('isOver14', nextValue as unknown as true)
   }
 
   const onSubmit = (data: ProfileFormData) => {
@@ -67,10 +67,7 @@ const ProfileStep = () => {
       </div>
 
       {/* 폼 영역 */}
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="mt-[2.625rem] flex w-full flex-col px-[1.25rem] tab:mt-[7.1875rem] tab:w-[59.4375rem] tab:px-0"
-      >
+      <div className="mt-[2.625rem] flex w-full flex-col px-[1.25rem] tab:mt-[7.1875rem] tab:w-[59.4375rem] tab:px-0">
         {/* 이메일 */}
         <div className="flex gap-[0.25rem] tab:gap-[1.25rem]">
           <StepInput
@@ -180,9 +177,9 @@ const ProfileStep = () => {
             </label>
           )}
         />
+      </div>
 
-        <StepNavButtons onNext={() => handleSubmit(onSubmit)()} onBack={goBack} className="tab:mt-[3.375rem]" />
-      </form>
+      <StepNavButtons onNext={() => handleSubmit(onSubmit)()} onBack={goBack} className="tab:mt-[3.375rem]" />
     </StepLayout>
   )
 }

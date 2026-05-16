@@ -1,10 +1,10 @@
 'use client'
 
 import { useForm, Controller } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+// import { zodResolver } from '@hookform/resolvers/zod'
 import { ImageIcon } from '@/shared/assets/icons'
 import { useOnboarding } from '../model/OnboardingContext'
-import { kennelInfoSchema, type KennelInfoFormData, REGIONS } from '../model/schema'
+import { type KennelInfoFormData, REGIONS } from '../model/schema'
 import { StepLayout } from './StepLayout'
 import { StepTitle } from './StepTitle'
 import { StepIndicator } from './StepIndicator'
@@ -23,7 +23,7 @@ const KennelInfoStep = () => {
   const { goNext, goBack, formData, setFormData } = useOnboarding()
 
   const { register, control, handleSubmit } = useForm<KennelInfoFormData>({
-    resolver: zodResolver(kennelInfoSchema),
+    // resolver: zodResolver(kennelInfoSchema),
     defaultValues: (formData['kennel-info'] as KennelInfoFormData) ?? {
       breederName: '',
       region: undefined,
@@ -55,10 +55,7 @@ const KennelInfoStep = () => {
       </div>
 
       {/* 폼 영역 */}
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="mt-[2.04rem] flex w-full flex-col gap-[0.625rem] px-[1.25rem] tab:mt-[3.0625rem] tab:w-[59.4375rem] tab:gap-0 tab:px-0"
-      >
+      <div className="mt-[2.04rem] flex w-full flex-col gap-[0.625rem] px-[1.25rem] tab:mt-[3.0625rem] tab:w-[59.4375rem] tab:gap-0 tab:px-0">
         {/* 브리더명 + 중복검사 */}
         <div className="flex gap-[0.25rem] tab:gap-[1.1875rem]">
           <StepInput
@@ -111,9 +108,9 @@ const KennelInfoStep = () => {
             )}
           />
         </div>
+      </div>
 
-        <StepNavButtons onNext={() => handleSubmit(onSubmit)()} onBack={goBack} className="tab:mt-[9.9375rem]" />
-      </form>
+      <StepNavButtons onNext={() => handleSubmit(onSubmit)()} onBack={goBack} className="tab:mt-[9.9375rem]" />
     </StepLayout>
   )
 }

@@ -1,10 +1,10 @@
 'use client'
 
 import { useForm, Controller } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+// import { zodResolver } from '@hookform/resolvers/zod'
 import { ImageIcon } from '@/shared/assets/icons'
 import { useOnboarding } from '../model/OnboardingContext'
-import { infoSchema, type InfoFormData } from '../model/schema'
+import { type InfoFormData } from '../model/schema'
 import { StepLayout } from './StepLayout'
 import { StepTitle } from './StepTitle'
 import { StepIndicator } from './StepIndicator'
@@ -23,7 +23,7 @@ const InfoStep = () => {
   const { goNext, goBack, formData, setFormData } = useOnboarding()
 
   const { register, control, handleSubmit } = useForm<InfoFormData>({
-    resolver: zodResolver(infoSchema),
+    // resolver: zodResolver(infoSchema),
     defaultValues: (formData.info as InfoFormData) ?? {
       nickname: '',
       selectedKeywords: [],
@@ -54,15 +54,12 @@ const InfoStep = () => {
       </div>
 
       {/* 폼 영역 */}
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="mt-[2.04rem] flex w-full flex-col px-[1.25rem] tab:mt-[3.0625rem] tab:w-[59.4375rem] tab:px-0"
-      >
+      <div className="mt-[2.04rem] flex w-full flex-col px-[1.25rem] tab:mt-[3.0625rem] tab:w-[59.4375rem] tab:px-0">
         {/* 닉네임 + 중복검사 */}
         <div className="flex gap-[0.25rem] tab:gap-[1.1875rem]">
           <StepInput
             type="text"
-            placeholder="닉넴"
+            placeholder="닉네임"
             {...register('nickname')}
             className="flex-1 tab:flex-[731]"
           />
@@ -89,9 +86,9 @@ const InfoStep = () => {
             )}
           />
         </div>
+      </div>
 
-        <StepNavButtons onNext={() => handleSubmit(onSubmit)()} onBack={goBack} className="tab:mt-[9.9375rem]" />
-      </form>
+      <StepNavButtons onNext={() => handleSubmit(onSubmit)()} onBack={goBack} className="tab:mt-[9.9375rem]" />
     </StepLayout>
   )
 }
