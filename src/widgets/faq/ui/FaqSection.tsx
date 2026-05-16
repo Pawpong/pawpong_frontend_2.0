@@ -22,21 +22,7 @@ const FAQ_ITEMS: Record<HomeUserType, string[]> = {
   ],
 }
 
-const CARD_CONTENT: Record<HomeUserType, { title: string; buttonLabel: string; buttonHref: string }> = {
-  adopter: {
-    title: '신뢰할 수 있는 브리더',
-    buttonLabel: '서비스 소개',
-    buttonHref: '/about',
-  },
-  breeder: {
-    title: '신뢰할 수 있는 입양자',
-    buttonLabel: '분양 페이지',
-    buttonHref: '/adoption',
-  },
-}
-
 const FaqSection = ({ userType = 'adopter' }: FaqSectionProps) => {
-  const card = CARD_CONTENT[userType]
   const faqItems = FAQ_ITEMS[userType]
 
   return (
@@ -46,7 +32,7 @@ const FaqSection = ({ userType = 'adopter' }: FaqSectionProps) => {
         <div className="flex flex-col justify-between rounded-[1.0625rem] bg-[#ebebeb] p-[1.375rem] tab:h-[15.875rem] tab:w-[18.9375rem] tab:shrink-0">
           <div className="flex items-center gap-[0.5rem] tab:flex-col tab:items-start tab:gap-0">
             <p className="text-[1rem] font-bold text-[#5d5d5d] tab:text-[1.25rem]">
-              {card.title}
+              신뢰할 수 있는 입양자
             </p>
             <p className="text-[1rem] font-bold text-[#999] tab:text-[1.25rem]">
               포퐁에서 만나요!
@@ -54,7 +40,7 @@ const FaqSection = ({ userType = 'adopter' }: FaqSectionProps) => {
           </div>
           <div className="mt-[1rem] flex h-[3rem] items-center justify-center gap-[0.625rem] rounded-full bg-[#d4d4d4] tab:mt-0">
             <span className="text-[1rem] font-semibold text-[#5d5d5d]">
-              {card.buttonLabel}
+              분양 페이지
             </span>
             <span className="text-[#5d5d5d]">{`>`}</span>
           </div>
