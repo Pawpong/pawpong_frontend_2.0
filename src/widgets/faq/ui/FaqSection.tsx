@@ -53,7 +53,7 @@ const FaqSection = ({ userType = 'adopter' }: FaqSectionProps) => {
             linkText="자세히 보기"
             linkHref="/faq"
           />
-          <div className="mt-[2rem] grid grid-cols-1 tab:mt-[3rem] tab:grid-cols-2 tab:gap-x-[2.5rem]">
+          <div className="mt-[0.721rem] grid grid-cols-1 tab:mt-[1.6525rem] tab:grid-cols-2 tab:gap-x-[2.5rem]">
             {faqItems.map((item, i) => (
               <div
                 key={i}
