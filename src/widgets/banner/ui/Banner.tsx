@@ -38,7 +38,7 @@ const Banner = () => {
       {BANNER_SLIDES.map((slide, i) => (
         <SwiperSlide key={i}>
           <section className="flex w-full flex-col items-center gap-[1.25rem] bg-[#d9d9d9] px-[1.25rem] py-[2.5rem] text-center text-black tab:px-[3rem] tab:py-[6.25rem] pc:px-[6.25rem]">
-            <h2 className="text-[1.5rem] leading-[1.5] tab:text-[2.5rem] tab:font-bold">
+            <h2 className="font-[Cafe24Proup] text-[1.5rem] leading-[1.5] tab:text-[2.5rem]">
               {slide.title.map((line, j) => (
                 <span key={j} className="hidden tab:block">{line}</span>
               ))}
@@ -46,7 +46,7 @@ const Banner = () => {
                 <span key={j} className="block tab:hidden">{line}</span>
               ))}
             </h2>
-            <p className="text-[1.25rem] font-semibold leading-[1.5] tab:text-[1.5rem]">
+            <p className="text-[1.25rem] font-bold leading-[1.5] tab:text-[1.5rem]">
               <span className="hidden tab:inline">{slide.subtitle}</span>
               {slide.subtitleMobile.map((line, j) => (
                 <span key={j} className="block tab:hidden">{line}</span>
