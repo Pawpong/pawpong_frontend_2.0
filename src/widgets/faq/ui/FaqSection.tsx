@@ -53,11 +53,11 @@ const FaqSection = ({ userType = 'adopter' }: FaqSectionProps) => {
             linkText="자세히 보기"
             linkHref="/faq"
           />
-          <div className="mt-[0.75rem] grid grid-cols-1 tab:mt-[1rem] tab:grid-cols-2 tab:gap-x-[2.5rem]">
+          <div className="mt-[2rem] grid grid-cols-1 tab:mt-[3rem] tab:grid-cols-2 tab:gap-x-[2.5rem]">
             {faqItems.map((item, i) => (
               <div
                 key={i}
-                className="border-b border-[#a8a8a8] py-[0.75rem] tab:py-[1.25rem]"
+                className="border-t border-[#a8a8a8] py-[0.625rem] tab:py-[1.44rem]"
               >
                 <p className="text-[0.875rem] font-semibold text-[#818181] tab:text-[1rem]">
                   {item}
