@@ -11,6 +11,7 @@ import { HealthInfoCard } from './HealthInfoCard'
 import { ParentInfoCard } from './ParentInfoCard'
 import { BreedingEnvironmentCard } from './BreedingEnvironmentCard'
 import { OtherListingCard } from './OtherListingCard'
+import { ImageModal } from './ImageModal'
 
 interface AdoptionDetailContentProps {
   detail: AdoptionDetailDto
@@ -24,6 +25,7 @@ interface AdoptionDetailContentProps {
 const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
   const router = useRouter()
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [imageModalOpen, setImageModalOpen] = useState(false)
 
   return (
     <div className="pb-[6rem] tab:pb-[6rem]">
@@ -51,7 +53,11 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
         <div className="tab:flex tab:gap-[2rem]">
           {/* ── 이미지 영역 ── */}
           <div className="relative tab:w-[27.5rem] tab:shrink-0">
-            <div className="relative aspect-[375/279] w-full overflow-hidden tab:aspect-[440/443] tab:rounded-[1rem]">
+            <button
+              type="button"
+              onClick={() => setImageModalOpen(true)}
+              className="relative aspect-[375/279] w-full overflow-hidden tab:aspect-[440/443] tab:rounded-[1rem]"
+            >
               <Image
                 src={detail.imageUrls[currentImageIndex]}
                 alt={detail.name}
@@ -71,7 +77,7 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
                   {currentImageIndex + 1} / {detail.imageUrls.length}
                 </span>
               </div>
-            </div>
+            </button>
           </div>
 
           {/* ── 우측 기본 정보 (데스크탑에서는 이미지 옆) ── */}
@@ -259,6 +265,14 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
           </button>
         </div>
       </div>
+
+      {/* ═══ 이미지 모달 ═══ */}
+      <ImageModal
+        images={detail.imageUrls}
+        initialIndex={currentImageIndex}
+        open={imageModalOpen}
+        onOpenChange={setImageModalOpen}
+      />
     </div>
   )
 }
