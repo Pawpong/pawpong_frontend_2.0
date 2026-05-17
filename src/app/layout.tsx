@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { QueryProvider } from '@/shared/lib/QueryProvider'
+import { cafe24Proup, pretendard } from '@/shared/lib/fonts'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="ko">
-      <body>
+      <body className={`${pretendard.variable} ${cafe24Proup.variable}`}>
         <QueryProvider>{children}</QueryProvider>
       </body>
     </html>

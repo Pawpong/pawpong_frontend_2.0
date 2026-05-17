@@ -1,3 +1,5 @@
+import { cn } from '@/shared/lib/Cn'
+import { cafe24Proup } from '@/shared/lib/fonts'
 import { Container, SectionHeader } from '@/shared/ui'
 import type { HomeUserType } from '@/shared/types'
 
@@ -31,7 +33,12 @@ const FaqSection = ({ userType = 'adopter' }: FaqSectionProps) => {
         {/* 서비스 소개 카드 */}
         <div className="flex flex-col gap-[0.5rem] rounded-[1.0625rem] bg-[#ebebeb] px-[1.375rem] py-[0.825rem] tab:h-[15.875rem] tab:w-[18.9375rem] tab:shrink-0 tab:justify-between tab:gap-0 tab:p-[1.375rem]">
           <div className="flex flex-col items-start">
-            <p className="font-[Cafe24Proup] text-[1rem] text-[#5d5d5d] tab:text-[1.25rem]">
+            <p
+              className={cn(
+                cafe24Proup.className,
+                'font-cafe24 text-[1rem] text-[#5d5d5d] tab:text-[1.25rem]',
+              )}
+            >
               신뢰할 수 있는 입양자
             </p>
             <p className="text-[1rem] font-bold text-[#999] tab:text-[1.25rem]">
