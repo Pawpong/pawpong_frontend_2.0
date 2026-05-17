@@ -1,23 +1,18 @@
 'use client'
 
 import Image from 'next/image'
-import { tv } from 'tailwind-variants'
 import { cn } from '@/shared/lib/Cn'
+
 import { FavoriteIcon } from '@/shared/assets/icons'
 import { Badge } from '@/shared/ui'
 import type { AdoptionListingCard } from '@/shared/types'
 import { ADOPTION_STATUS_LABEL } from '@/shared/types'
 
-const statusBadgeVariants = tv({
-  base: 'shrink-0 rounded-full font-semibold text-white whitespace-nowrap',
-  variants: {
-    status: {
-      available: 'bg-[#5d5d5d]',
-      reserved: 'bg-[#5d5d5d]',
-      completed: 'bg-[#a4a4a4]',
-    },
-  },
-})
+const STATUS_BG: Record<AdoptionListingCard['status'], string> = {
+  available: 'bg-[#5d5d5d]',
+  reserved: 'bg-[#5d5d5d]',
+  completed: 'bg-[#a4a4a4]',
+}
 
 interface AdoptionCardProps {
   listing: AdoptionListingCard
@@ -60,14 +55,15 @@ const AdoptionCard = ({ listing, className }: AdoptionCardProps) => {
             <p className="line-clamp-2 min-w-0 flex-1 text-[0.875rem] font-semibold leading-normal text-[#5d5d5d]">
               {listing.name}
             </p>
-            <span
+            <Badge
+              variant="status"
               className={cn(
-                statusBadgeVariants({ status: listing.status }),
-                'inline-flex h-[1.1875rem] w-[3.5rem] items-center justify-center px-[0.625rem] py-[0.25rem] text-[0.625rem] leading-[1.375rem]',
+                STATUS_BG[listing.status],
+                'h-[1.1875rem] w-[3.5rem] shrink-0 px-[0.625rem] py-[0.25rem] text-[0.625rem] leading-[1.375rem]',
               )}
             >
               {ADOPTION_STATUS_LABEL[listing.status]}
-            </span>
+            </Badge>
           </div>
           {/* 문의/관심/조회 (gap 6px, text 12px) */}
           <div className="flex items-center gap-[0.375rem] text-[0.75rem] font-medium leading-normal text-[#8e8e8e]">
@@ -114,14 +110,15 @@ const AdoptionCard = ({ listing, className }: AdoptionCardProps) => {
             <p className="line-clamp-2 min-w-0 flex-1 text-[1rem] font-semibold leading-[1.286rem] text-[#5d5d5d]">
               {listing.name}
             </p>
-            <span
+            <Badge
+              variant="status"
               className={cn(
-                statusBadgeVariants({ status: listing.status }),
-                'px-[0.585rem] py-[0.234rem] text-[0.819rem] leading-[1.286rem]',
+                STATUS_BG[listing.status],
+                'shrink-0 px-[0.585rem] py-[0.234rem] text-[0.819rem] leading-[1.286rem]',
               )}
             >
               {ADOPTION_STATUS_LABEL[listing.status]}
-            </span>
+            </Badge>
           </div>
           {/* 성별 + 나이 (top 330.02, gap 7.484) */}
           <div className="mt-[0.162rem] flex items-center gap-[0.468rem] text-[1rem] font-semibold leading-[1.286rem] text-[#5d5d5d]">
@@ -185,9 +182,15 @@ const AdoptionCardHorizontal = ({ listing, className }: AdoptionCardProps) => {
             {listing.name}
           </p>
           <div className="flex items-center">
-            <span className="rounded-full bg-[#5d5d5d] px-[0.5rem] py-[0.125rem] text-[0.75rem] font-semibold leading-normal text-white">
+            <Badge
+              variant="status"
+              className={cn(
+                STATUS_BG[listing.status],
+                'px-[0.5rem] py-[0.125rem] text-[0.75rem] leading-normal',
+              )}
+            >
               {ADOPTION_STATUS_LABEL[listing.status]}
-            </span>
+            </Badge>
           </div>
         </div>
 
@@ -210,9 +213,12 @@ const AdoptionCardHorizontal = ({ listing, className }: AdoptionCardProps) => {
 
       {/* 인기 배지: left16 top13.76 h22 px8 py2 text12 */}
       {listing.isPopular && (
-        <span className="absolute left-[1rem] top-[0.86rem] rounded-full border border-[#a8a8a8] bg-white px-[0.5rem] py-[0.125rem] text-[0.75rem] font-semibold leading-normal text-[#a8a8a8]">
+        <Badge
+          variant="outline"
+          className="absolute left-[1rem] top-[0.86rem] bg-white px-[0.5rem] py-[0.125rem] text-[0.75rem] leading-normal"
+        >
           인기🔥
-        </span>
+        </Badge>
       )}
     </div>
   )
