@@ -57,7 +57,11 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
   } = useBrowserNavigationGuard({ hasChanges: isDirty, enabled: true })
 
   const handleCloseClick = () => {
-    promptBrowserNavigation()
+    if (isDirty) {
+      promptBrowserNavigation()
+    } else {
+      router.back()
+    }
   }
 
   const onSubmit = (data: ApplicationFormValues) => {
