@@ -73,19 +73,19 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
                 fill
                 className="object-cover"
               />
-              {/* 공유 버튼 (모바일) */}
-              <button
-                type="button"
-                className="absolute right-[0.75rem] top-[0.75rem] tab:hidden"
-              >
-                <ShareIcon className="size-[2rem] text-white" />
-              </button>
               {/* 이미지 카운터 */}
               <div className="absolute bottom-[1rem] left-1/2 -translate-x-1/2 rounded-full bg-[#2f2f2f] px-[0.625rem] tab:bottom-[1.5rem]">
                 <span className="text-[0.75rem] leading-[1.375rem] text-white tab:text-[0.875rem]">
                   {currentImageIndex + 1} / {detail.imageUrls.length}
                 </span>
               </div>
+            </button>
+            {/* 공유 버튼 (모바일) */}
+            <button
+              type="button"
+              className="absolute right-[0.75rem] top-[0.75rem] tab:hidden"
+            >
+              <ShareIcon className="size-[2rem] text-white" />
             </button>
           </div>
 
