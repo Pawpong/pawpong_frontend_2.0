@@ -18,6 +18,8 @@ const useBrowserNavigationGuard = ({
 }: UseBrowserNavigationGuardOptions) => {
   const [showBrowserGuard, setShowBrowserGuard] = useState(false)
   const allowNavigationRef = useRef(false)
+  const hasChangesRef = useRef(false)
+  const isGuardSeededRef = useRef(false)
 
   const checkHasChanges = useCallback(
     () => (typeof hasChanges === 'function' ? hasChanges() : hasChanges),
@@ -25,19 +27,33 @@ const useBrowserNavigationGuard = ({
   )
 
   useEffect(() => {
+    hasChangesRef.current = checkHasChanges()
+  }, [checkHasChanges])
+
+  useEffect(() => {
     if (!enabled) return
 
-    window.history.pushState(null, '', window.location.href)
+    if (!isGuardSeededRef.current) {
+      window.history.pushState(window.history.state, '', window.location.href)
+      isGuardSeededRef.current = true
+    }
 
     const handlePopState = (event: PopStateEvent) => {
-      if (!checkHasChanges() || allowNavigationRef.current) return
+      if (allowNavigationRef.current) return
+
+      if (!hasChangesRef.current) {
+        allowNavigationRef.current = true
+        window.history.back()
+        return
+      }
+
       event.preventDefault()
-      window.history.pushState(null, '', window.location.href)
+      window.history.pushState(window.history.state, '', window.location.href)
       setShowBrowserGuard(true)
     }
 
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (!checkHasChanges()) return
+      if (!hasChangesRef.current) return
       event.preventDefault()
       event.returnValue = ''
     }
@@ -49,20 +65,33 @@ const useBrowserNavigationGuard = ({
       window.removeEventListener('popstate', handlePopState)
       window.removeEventListener('beforeunload', handleBeforeUnload)
     }
-  }, [checkHasChanges, enabled])
+  }, [enabled])
 
-  const handleBrowserConfirm = () => {
+  const promptBrowserNavigation = useCallback(() => {
+    if (!hasChangesRef.current) {
+      allowNavigationRef.current = true
+      window.history.back()
+      return
+    }
+
+    setShowBrowserGuard(true)
+  }, [])
+
+  const handleBrowserConfirm = useCallback(() => {
     allowNavigationRef.current = true
     setShowBrowserGuard(false)
-    window.history.back()
-  }
+    // The first back press moves from the guard entry to the real page entry.
+    // Confirming should skip both entries and return to the previous page.
+    window.history.go(-2)
+  }, [])
 
-  const handleBrowserCancel = () => {
+  const handleBrowserCancel = useCallback(() => {
     allowNavigationRef.current = false
     setShowBrowserGuard(false)
-  }
+  }, [])
 
   return {
+    promptBrowserNavigation,
     showBrowserGuard,
     handleBrowserConfirm,
     handleBrowserCancel,

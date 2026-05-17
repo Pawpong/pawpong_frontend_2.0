@@ -50,6 +50,7 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
   } = useFormGuard({ hasChanges: isDirty })
 
   const {
+    promptBrowserNavigation,
     showBrowserGuard,
     handleBrowserConfirm,
     handleBrowserCancel,
@@ -57,10 +58,7 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
 
   const handleCloseClick = () => {
     if (isDirty) {
-      handleBrowserCancel()
-      // X 버튼은 브라우저 가드와 동일한 모달을 재사용하되,
-      // 직접 history.back()을 트리거해야 하므로 popstate를 발생시킴
-      window.history.back()
+      promptBrowserNavigation()
     } else {
       router.back()
     }
