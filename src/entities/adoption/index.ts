@@ -1,1 +1,1 @@
-export { AdoptionCard } from './ui/AdoptionCard'
+export { AdoptionCard, AdoptionCardHorizontal } from './ui/AdoptionCard'

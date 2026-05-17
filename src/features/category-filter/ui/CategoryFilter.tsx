@@ -6,8 +6,9 @@ import type { AnimalCategory } from '@/shared/types'
 
 const CATEGORIES: AnimalCategory[] = ['전체', '강아지', '고양이', '도마뱀']
 
+/* 모바일: h78 w158 rounded6 gap17(1.0625rem), 데스크탑: h124 flex-1 rounded16 gap12(0.75rem) */
 const tabVariants = tv({
-  base: 'flex flex-1 items-center justify-center rounded-[1rem] px-[0.625rem] py-[0.625rem] text-[0.875rem] font-semibold text-[#5d5d5d] transition-colors tab:h-[7.75rem]',
+  base: 'flex items-center justify-center text-[0.875rem] font-semibold text-[#5d5d5d] transition-colors rounded-[0.375rem] h-[4.875rem] tab:rounded-[1rem] tab:h-[7.75rem]',
   variants: {
     active: {
       true: 'bg-[#c6c6c6]',
@@ -24,7 +25,13 @@ interface CategoryFilterProps {
 
 const CategoryFilter = ({ selected, onChange, className }: CategoryFilterProps) => {
   return (
-    <div className={cn('flex gap-[0.75rem]', className)}>
+    /* 모바일: 2열 2행 그리드 gap 10/17px, 데스크탑: 4열 1행 gap 12px */
+    <div
+      className={cn(
+        'grid grid-cols-2 gap-x-[1.0625rem] gap-y-[0.625rem] tab:grid-cols-4 tab:gap-[0.75rem]',
+        className,
+      )}
+    >
       {CATEGORIES.map((category) => (
         <button
           key={category}

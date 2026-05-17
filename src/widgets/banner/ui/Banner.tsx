@@ -2,6 +2,8 @@
 
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Autoplay, Pagination } from 'swiper/modules'
+import { cn } from '@/shared/lib/Cn'
+import { cafe24Proup } from '@/shared/lib/fonts'
 import 'swiper/css'
 import 'swiper/css/pagination'
 
@@ -38,7 +40,12 @@ const Banner = () => {
       {BANNER_SLIDES.map((slide, i) => (
         <SwiperSlide key={i}>
           <section className="flex w-full flex-col items-center gap-[1.25rem] bg-[#d9d9d9] px-[1.25rem] py-[2.5rem] text-center text-black tab:px-[3rem] tab:py-[6.25rem] pc:px-[6.25rem]">
-            <h2 className="font-[Cafe24Proup] text-[1.5rem] leading-[1.5] tab:text-[2.5rem]">
+            <h2
+              className={cn(
+                cafe24Proup.className,
+                'font-cafe24 text-[1.5rem] leading-[1.5] tab:text-[2.5rem]',
+              )}
+            >
               {slide.title.map((line, j) => (
                 <span key={j} className="hidden tab:block">{line}</span>
               ))}

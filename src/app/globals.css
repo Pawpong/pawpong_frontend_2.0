@@ -4,24 +4,10 @@
   --breakpoint-mo: 375px;
   --breakpoint-tab: 768px;
   --breakpoint-pc: 1440px;
-}
-
-@font-face {
-  font-family: 'Pretendard';
-  src: url('/fonts/PretendardVariable.woff2') format('woff2-variations');
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Cafe24Proup';
-  src: url('/fonts/Cafe24PROUP.woff2') format('woff2');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
+  --font-sans: var(--font-pretendard), sans-serif;
+  --font-cafe24: var(--font-cafe24proup), sans-serif;
 }
 
 :root {
-  font-family: 'Pretendard', sans-serif;
+  font-family: var(--font-pretendard), sans-serif;
 }
