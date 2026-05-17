@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { cn } from '@/shared/lib/Cn'
 import { cafe24Proup } from '@/shared/lib/fonts'
 import { SectionHeader } from '@/shared/ui'
@@ -8,13 +9,39 @@ import { SearchBar, PopularKeywords } from '@/features/search'
 import { CategoryFilter } from '@/features/category-filter'
 import { AdoptionCard, AdoptionCardHorizontal } from '@/entities/adoption'
 import { createMockListings } from '@/shared/mocks/adoption'
+import { CATEGORY_DESCRIPTION } from '@/shared/types'
 import type { AnimalCategory } from '@/shared/types'
+
+const VALID_CATEGORIES: AnimalCategory[] = ['all', 'dog', 'cat', 'lizard']
 
 const mockListings = createMockListings()
 const popularListings = mockListings.filter((l) => l.isPopular)
 
 const ExploreContent = () => {
-  const [selectedCategory, setSelectedCategory] = useState<AnimalCategory>('전체')
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
+
+  const categoryParam = searchParams.get('category')
+  const selectedCategory: AnimalCategory =
+    categoryParam && VALID_CATEGORIES.includes(categoryParam as AnimalCategory)
+      ? (categoryParam as AnimalCategory)
+      : 'all'
+
+  const handleCategoryChange = useCallback(
+    (category: AnimalCategory) => {
+      const params = new URLSearchParams(searchParams.toString())
+      if (category === 'all') {
+        params.delete('category')
+      } else {
+        params.set('category', category)
+      }
+      const query = params.toString()
+      router.replace(`${pathname}${query ? `?${query}` : ''}`, { scroll: false })
+    },
+    [searchParams, router, pathname],
+  )
+
   const [popularCollapsed, setPopularCollapsed] = useState(false)
   const [allCollapsed, setAllCollapsed] = useState(false)
 
@@ -50,24 +77,24 @@ const ExploreContent = () => {
             'font-cafe24 text-center text-[0.875rem] leading-[1.5] text-[#5d5d5d]',
           )}
         >
-          입양상담까지 안전하게 이어가세요
+          {CATEGORY_DESCRIPTION[selectedCategory]}
         </p>
         <CategoryFilter
           selected={selectedCategory}
-          onChange={setSelectedCategory}
+          onChange={handleCategoryChange}
         />
       </div>
 
       {/* ══════ 데스크탑: 카테고리 (top146 → mt ~98px from header) ══════ */}
       <CategoryFilter
         selected={selectedCategory}
-        onChange={setSelectedCategory}
+        onChange={handleCategoryChange}
         className="mt-[2.188rem] hidden tab:grid"
       />
 
       {/* 데스크탑 타이틀 — Pretendard Bold 20px, px100, h52, 중앙 정렬 (gap 35px from category) */}
       <p className="hidden px-[6.25rem] py-[0.625rem] text-center text-[1.25rem] font-bold leading-[1.375rem] text-[#5d5d5d] tab:mt-[2.188rem] tab:block">
-        입양 상담까지 안전하게 이어가세요
+        {CATEGORY_DESCRIPTION[selectedCategory]}
       </p>
 
       {/* 검색바 + 인기 검색어 */}

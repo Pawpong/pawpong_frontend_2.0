@@ -7,7 +7,7 @@ export const MOCK_ADOPTION_LISTING: AdoptionListingCard = {
   ageText: '6개월',
   thumbnailUrl: '/images/mock-pet.jpg',
   status: 'available',
-  category: '도마뱀',
+  category: 'lizard',
   inquiryCount: 1,
   favoriteCount: 10,
   viewCount: 20,

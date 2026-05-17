@@ -2,9 +2,10 @@
 
 import { tv } from 'tailwind-variants'
 import { cn } from '@/shared/lib/Cn'
+import { CATEGORY_LABEL } from '@/shared/types'
 import type { AnimalCategory } from '@/shared/types'
 
-const CATEGORIES: AnimalCategory[] = ['전체', '강아지', '고양이', '도마뱀']
+const CATEGORIES: AnimalCategory[] = ['all', 'dog', 'cat', 'lizard']
 
 /* 모바일: h78 w158 rounded6 gap17(1.0625rem), 데스크탑: h124 flex-1 rounded16 gap12(0.75rem) */
 const tabVariants = tv({
@@ -39,7 +40,7 @@ const CategoryFilter = ({ selected, onChange, className }: CategoryFilterProps) 
           className={tabVariants({ active: selected === category })}
           onClick={() => onChange(category)}
         >
-          {category}
+          {CATEGORY_LABEL[category]}
         </button>
       ))}
     </div>
