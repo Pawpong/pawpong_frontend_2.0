@@ -1,12 +1,13 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { cn } from '@/shared/lib/Cn'
 
 import { FavoriteIcon } from '@/shared/assets/icons'
-import { Badge } from '@/shared/ui'
+import { Badge, FavoriteButton, ListingStats } from '@/shared/ui'
 import type { AdoptionListingCard } from '@/shared/types'
-import { ADOPTION_STATUS_LABEL } from '@/shared/types'
+import { ADOPTION_STATUS_LABEL, GENDER_LABEL } from '@/shared/types'
 
 const STATUS_BG: Record<AdoptionListingCard['status'], string> = {
   available: 'bg-[#5d5d5d]',
@@ -28,7 +29,7 @@ const AdoptionCard = ({ listing, className }: AdoptionCardProps) => {
   const isCompleted = listing.status === 'completed'
 
   return (
-    <div className={cn('', className)}>
+    <Link href={`/adoption/${listing.listingId}`} className={cn('block', className)}>
       {/* ══════ 모바일 카드 ══════ */}
       <div className="flex flex-col gap-[0.25rem] tab:hidden">
         {/* 이미지: h164, rounded-6, bg #d4d4d4 */}
@@ -66,11 +67,13 @@ const AdoptionCard = ({ listing, className }: AdoptionCardProps) => {
             </Badge>
           </div>
           {/* 문의/관심/조회 (gap 6px, text 12px) */}
-          <div className="flex items-center gap-[0.375rem] text-[0.75rem] font-medium leading-normal text-[#8e8e8e]">
-            <span>문의 {listing.inquiryCount}</span>
-            <span>관심 {listing.favoriteCount}</span>
-            <span>조회 {listing.viewCount}</span>
-          </div>
+          <ListingStats
+            inquiryCount={listing.inquiryCount}
+            favoriteCount={listing.favoriteCount}
+            viewCount={listing.viewCount}
+            size="md"
+            className="gap-[0.375rem]"
+          />
           {/* 게시날짜 (gap 7px, text 12px) */}
           <div className="flex items-center gap-[0.438rem] text-[0.75rem] leading-normal text-[#a3a3a3]">
             <span>게시날짜</span>
@@ -122,15 +125,16 @@ const AdoptionCard = ({ listing, className }: AdoptionCardProps) => {
           </div>
           {/* 성별 + 나이 (top 330.02, gap 7.484) */}
           <div className="mt-[0.162rem] flex items-center gap-[0.468rem] text-[1rem] font-semibold leading-[1.286rem] text-[#5d5d5d]">
-            <span>{listing.gender === 'male' ? '남자' : '여자'}</span>
+            <span>{GENDER_LABEL[listing.gender]}</span>
             <span>{listing.ageText}</span>
           </div>
           {/* 문의/관심/조회 (top 368, gap 18.71) */}
-          <div className="mt-[1.088rem] flex items-center gap-[1.169rem] text-[0.819rem] font-medium leading-[1.286rem] text-[#8e8e8e]">
-            <span>문의 {listing.inquiryCount}</span>
-            <span>관심 {listing.favoriteCount}</span>
-            <span>조회 {listing.viewCount}</span>
-          </div>
+          <ListingStats
+            inquiryCount={listing.inquiryCount}
+            favoriteCount={listing.favoriteCount}
+            viewCount={listing.viewCount}
+            className="mt-[1.088rem] gap-[1.169rem] text-[0.819rem] leading-[1.286rem]"
+          />
           {/* 게시날짜(top 393.72) + 관심있어요(left 229.7, top 381.09) */}
           <div className="mt-[0.321rem] flex items-center justify-between">
             <div className="flex items-center gap-[0.438rem] text-[0.75rem] text-[#a3a3a3]">
@@ -138,17 +142,11 @@ const AdoptionCard = ({ listing, className }: AdoptionCardProps) => {
               <span className="size-[0.188rem] rounded-full bg-[#a3a3a3]" />
               <span>{listing.postedAt}</span>
             </div>
-            <button
-              type="button"
-              className="flex items-center gap-[0.585rem] rounded-full p-[0.585rem] text-[0.819rem] font-medium text-[#5d5d5d]"
-            >
-              <FavoriteIcon className="size-[1.403rem]" />
-              <span>관심있어요</span>
-            </button>
+            <FavoriteButton size="md" />
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   )
 }
 
@@ -158,7 +156,8 @@ const AdoptionCard = ({ listing, className }: AdoptionCardProps) => {
    ═══════════════════════════════════════════════ */
 const AdoptionCardHorizontal = ({ listing, className }: AdoptionCardProps) => {
   return (
-    <div
+    <Link
+      href={`/adoption/${listing.listingId}`}
       className={cn(
         'relative flex items-center gap-[0.5625rem] rounded-[0.375rem] bg-[#f0f0f0] px-[0.5rem] py-[0.4375rem]',
         className,
@@ -196,18 +195,14 @@ const AdoptionCardHorizontal = ({ listing, className }: AdoptionCardProps) => {
 
         {/* 문의/관심/조회 + 관심있어요 */}
         <div className="flex flex-col items-end">
-          <div className="flex w-full items-center justify-end gap-[0.5rem] text-[0.625rem] font-medium leading-[1.286rem] text-[#8e8e8e]">
-            <span>문의 {listing.inquiryCount}</span>
-            <span>관심 {listing.favoriteCount}</span>
-            <span>조회 {listing.viewCount}</span>
-          </div>
-          <button
-            type="button"
-            className="flex items-center gap-[0.25rem] rounded-full text-[0.75rem] font-medium text-[#5d5d5d]"
-          >
-            <FavoriteIcon className="size-[1.403rem]" />
-            <span>관심있어요</span>
-          </button>
+          <ListingStats
+            inquiryCount={listing.inquiryCount}
+            favoriteCount={listing.favoriteCount}
+            viewCount={listing.viewCount}
+            size="sm"
+            className="w-full justify-end"
+          />
+          <FavoriteButton size="sm" />
         </div>
       </div>
 
@@ -220,7 +215,7 @@ const AdoptionCardHorizontal = ({ listing, className }: AdoptionCardProps) => {
           인기🔥
         </Badge>
       )}
-    </div>
+    </Link>
   )
 }
 
