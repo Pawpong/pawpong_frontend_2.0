@@ -42,7 +42,7 @@ export const createMockListings = (): AdoptionListingCard[] => {
 export const MOCK_ADOPTION_DETAIL: AdoptionDetailDto = {
   listingId: '1',
   name: '레오파드 개코도마뱀 (만다린)',
-  status: 'reserved',
+  status: 'available',
   price: '20,0000',
   birthDate: '2025년 6월 20일',
   gender: 'female',

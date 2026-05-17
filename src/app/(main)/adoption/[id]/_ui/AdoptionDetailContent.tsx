@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Badge, FavoriteButton, ListingStats, Separator } from '@/shared/ui'
@@ -265,12 +266,12 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
           <button type="button" className="shrink-0 tab:hidden">
             <FavoriteIcon className="size-[2rem] text-[#5d5d5d]" />
           </button>
-          <button
-            type="button"
+          <Link
+            href={`/adoption/${detail.listingId}/apply`}
             className="flex h-12 flex-1 items-center justify-center rounded-full bg-[#d4d4d4] text-[1rem] font-semibold text-[#5d5d5d] tab:w-[33.0625rem] tab:flex-initial"
           >
             입양 신청
-          </button>
+          </Link>
         </div>
       </div>
 
