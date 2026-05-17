@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import Image from 'next/image'
 import {
   Dialog,
@@ -24,6 +24,10 @@ const ImageModal = ({
   onOpenChange,
 }: ImageModalProps) => {
   const [currentIndex, setCurrentIndex] = useState(initialIndex)
+
+  useEffect(() => {
+    setCurrentIndex(initialIndex)
+  }, [initialIndex])
 
   const handlePrev = useCallback(() => {
     setCurrentIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1))

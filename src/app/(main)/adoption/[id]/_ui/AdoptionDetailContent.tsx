@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Badge, FavoriteButton, ListingStats, Separator } from '@/shared/ui'
 import { ArrowBackIcon, FavoriteIcon, ShareIcon } from '@/shared/assets/icons'
@@ -26,6 +26,14 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
   const router = useRouter()
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [imageModalOpen, setImageModalOpen] = useState(false)
+  const [modalImages, setModalImages] = useState<string[]>(detail.imageUrls)
+  const [modalInitialIndex, setModalInitialIndex] = useState(0)
+
+  const openImageModal = useCallback((images: string[], index = 0) => {
+    setModalImages(images)
+    setModalInitialIndex(index)
+    setImageModalOpen(true)
+  }, [])
 
   return (
     <div className="pb-[6rem] tab:pb-[6rem]">
@@ -55,7 +63,7 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
           <div className="relative tab:w-[27.5rem] tab:shrink-0">
             <button
               type="button"
-              onClick={() => setImageModalOpen(true)}
+              onClick={() => openImageModal(detail.imageUrls, currentImageIndex)}
               className="relative aspect-[375/279] w-full overflow-hidden tab:aspect-[440/443] tab:rounded-[1rem]"
             >
               <Image
@@ -229,12 +237,12 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
         {/* 건강 정보 카드 */}
         <HealthInfoCard detail={detail} />
         {/* 부모 정보 카드 */}
-        <ParentInfoCard detail={detail} />
+        <ParentInfoCard detail={detail} onImageClick={openImageModal} />
       </div>
 
       {/* ═══ 사육 환경 섹션 ═══ */}
       <div className="mt-[1.25rem] px-[1.25rem] tab:mt-[2rem] tab:px-[3rem] pc:px-[6.25rem]">
-        <BreedingEnvironmentCard detail={detail} />
+        <BreedingEnvironmentCard detail={detail} onImageClick={openImageModal} />
       </div>
 
       {/* ═══ 브리더의 다른 분양 동물 ═══ */}
@@ -268,8 +276,8 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
 
       {/* ═══ 이미지 모달 ═══ */}
       <ImageModal
-        images={detail.imageUrls}
-        initialIndex={currentImageIndex}
+        images={modalImages}
+        initialIndex={modalInitialIndex}
         open={imageModalOpen}
         onOpenChange={setImageModalOpen}
       />

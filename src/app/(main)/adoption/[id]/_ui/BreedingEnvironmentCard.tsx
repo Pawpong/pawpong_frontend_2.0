@@ -7,11 +7,15 @@ import 'swiper/css'
 import 'swiper/css/pagination'
 import type { AdoptionDetailDto } from '@/shared/types'
 
+interface BreedingEnvironmentCardProps {
+  detail: AdoptionDetailDto
+  onImageClick?: (images: string[], index?: number) => void
+}
+
 const BreedingEnvironmentCard = ({
   detail,
-}: {
-  detail: AdoptionDetailDto
-}) => {
+  onImageClick,
+}: BreedingEnvironmentCardProps) => {
   return (
     <div className="overflow-hidden rounded-[1rem] bg-[#f5f5f5] p-[0.875rem] tab:p-[1.75rem]">
       {/* 모바일: 세로 레이아웃 */}
@@ -24,12 +28,14 @@ const BreedingEnvironmentCard = ({
         </p>
         <div className="mt-[0.75rem] flex gap-[0.6875rem] overflow-x-auto">
           {detail.breedingEnvironment.imageUrls.map((url, i) => (
-            <div
+            <button
+              type="button"
               key={`env-mo-${i}`}
+              onClick={() => onImageClick?.(detail.breedingEnvironment.imageUrls, i)}
               className="relative h-[8.125rem] w-[11.9375rem] shrink-0 overflow-hidden rounded-[0.5rem] bg-[#c6c6c6]"
             >
               <Image src={url} alt={`사육 환경 ${i + 1}`} fill className="object-cover" />
-            </div>
+            </button>
           ))}
         </div>
       </div>
@@ -44,14 +50,18 @@ const BreedingEnvironmentCard = ({
           >
             {detail.breedingEnvironment.imageUrls.map((url, i) => (
               <SwiperSlide key={`env-pc-${i}`}>
-                <div className="relative size-full">
+                <button
+                  type="button"
+                  onClick={() => onImageClick?.(detail.breedingEnvironment.imageUrls, i)}
+                  className="relative size-full"
+                >
                   <Image
                     src={url}
                     alt={`사육 환경 ${i + 1}`}
                     fill
                     className="object-cover"
                   />
-                </div>
+                </button>
               </SwiperSlide>
             ))}
           </Swiper>
