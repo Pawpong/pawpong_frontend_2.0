@@ -4,7 +4,10 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { CloseIcon } from '@/shared/assets/icons'
+import { ExitConfirmDialog } from '@/shared/ui'
 import { useCreateApplication } from '@/features/application/model/hooks'
+import { useFormGuard } from '@/shared/lib/useFormGuard'
+import { useBrowserNavigationGuard } from '@/shared/lib/useBrowserNavigationGuard'
 import type { AdoptionDetailDto } from '@/shared/types'
 import { GENDER_LABEL } from '@/shared/types'
 import { cn } from '@/shared/lib/Cn'
@@ -25,7 +28,7 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
     register,
     control,
     handleSubmit,
-    formState: { isValid },
+    formState: { isValid, isDirty },
   } = useForm<ApplicationFormValues>({
     resolver: zodResolver(applicationSchema),
     mode: 'onChange',
@@ -38,6 +41,30 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
       allFamilyConsent: false,
     },
   })
+
+  /* ── 네비게이션 가드 ── */
+  const {
+    showNavigationDialog,
+    handleNavigationConfirm,
+    handleNavigationCancel,
+  } = useFormGuard({ hasChanges: isDirty })
+
+  const {
+    showBrowserGuard,
+    handleBrowserConfirm,
+    handleBrowserCancel,
+  } = useBrowserNavigationGuard({ hasChanges: isDirty, enabled: true })
+
+  const handleCloseClick = () => {
+    if (isDirty) {
+      handleBrowserCancel()
+      // X 버튼은 브라우저 가드와 동일한 모달을 재사용하되,
+      // 직접 history.back()을 트리거해야 하므로 popstate를 발생시킴
+      window.history.back()
+    } else {
+      router.back()
+    }
+  }
 
   const onSubmit = (data: ApplicationFormValues) => {
     createApplication(
@@ -69,7 +96,7 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
     <div className="pb-[5.5rem] tab:pb-0">
       {/* ═══ 서브헤더 ═══ */}
       <div className="flex items-center gap-[0.625rem] px-[1.25rem] py-[0.75rem] tab:h-[5.5rem] tab:justify-center tab:px-[6.25rem] tab:py-[0.625rem]">
-        <button type="button" onClick={() => router.back()} className="tab:absolute tab:left-[6.25rem]">
+        <button type="button" onClick={handleCloseClick} className="tab:absolute tab:left-[6.25rem]">
           <CloseIcon className="size-[1.25rem] text-[#5d5d5d] tab:size-[1.5rem]" />
         </button>
         <p className="text-[0.875rem] font-semibold leading-[1.5] text-[#5d5d5d] tab:text-[1.25rem]">
@@ -189,6 +216,13 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
           </button>
         </div>
       </form>
+
+      {/* ═══ 나가기 확인 모달 ═══ */}
+      <ExitConfirmDialog
+        open={showBrowserGuard || showNavigationDialog}
+        onConfirm={showBrowserGuard ? handleBrowserConfirm : handleNavigationConfirm}
+        onCancel={showBrowserGuard ? handleBrowserCancel : handleNavigationCancel}
+      />
     </div>
   )
 }
