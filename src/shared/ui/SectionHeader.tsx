@@ -1,5 +1,5 @@
-import Link from 'next/link'
 import { ArrowRightIcon } from '@/shared/assets/icons'
+import { DetailLink } from './DetailLink'
 import { cn } from '@/shared/lib/Cn'
 
 interface SectionHeaderProps {
@@ -26,12 +26,7 @@ const SectionHeader = ({
         {title}
       </p>
       {linkText && linkHref && (
-        <Link
-          href={linkHref}
-          className="text-[0.75rem] font-semibold text-[#5d5d5d] tab:text-[0.875rem]"
-        >
-          {`${linkText} >`}
-        </Link>
+        <DetailLink href={linkHref} label={linkText} size="sm" className="tab:text-[0.875rem]" />
       )}
       {collapsible && (
         <button

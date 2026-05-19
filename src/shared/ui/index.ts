@@ -1,5 +1,7 @@
 export * from './Avatar'
+export * from './AvatarGroup'
 export * from './Container'
+export * from './DetailLink'
 export * from './Badge'
 export * from './Checkbox'
 export * from './Dialog'
