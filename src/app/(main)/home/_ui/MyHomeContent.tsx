@@ -8,6 +8,7 @@ import { ProfileCard } from './ProfileCard'
 import { MyHomeTabs, TabsContent, type TabType } from './MyHomeTabs'
 import { PostCreateBar } from './PostCreateBar'
 import { PostCard } from './PostCard'
+import { FavoriteBreedersContent } from './FavoriteBreedersContent'
 
 const MyHomeContent = () => {
   const [activeTab, setActiveTab] = useState<TabType>('posts')
@@ -62,13 +63,7 @@ const MyHomeContent = () => {
         </TabsContent>
 
         <TabsContent value="breeders" className="mt-0">
-          <Container className="pc:px-[10rem]">
-            <div className="py-20">
-              <p className="text-center text-base font-medium text-text-secondary">
-                즐겨찾는 브리더가 없습니다
-              </p>
-            </div>
-          </Container>
+          <FavoriteBreedersContent />
         </TabsContent>
       </MyHomeTabs>
 
