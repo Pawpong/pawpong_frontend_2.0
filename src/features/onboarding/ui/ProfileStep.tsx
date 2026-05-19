@@ -2,8 +2,7 @@
 
 import { useForm, Controller } from 'react-hook-form'
 // import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowRightIcon } from '@/shared/assets/icons'
-import { Checkbox } from '@/shared/ui'
+import { Checkbox, DetailLink } from '@/shared/ui'
 import { useOnboarding } from '../model/OnboardingContext'
 import { type ProfileFormData, EMAIL_DOMAINS } from '../model/schema'
 import { StepLayout } from './StepLayout'
@@ -146,13 +145,7 @@ const ProfileStep = () => {
                     {agreement.label}
                   </span>
                   {agreement.hasDetail && (
-                    <button
-                      type="button"
-                      className="flex shrink-0 items-center gap-[0.375rem] text-[1rem] leading-[1.375rem] font-medium text-[#5d5d5d]"
-                    >
-                      자세히 보기
-                      <ArrowRightIcon className="size-[1.25rem] shrink-0 text-[#5d5d5d]" aria-hidden />
-                    </button>
+                    <DetailLink variant="button" size="lg" />
                   )}
                 </label>
               )}

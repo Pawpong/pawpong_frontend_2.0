@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui'
+import { Avatar, AvatarFallback, AvatarImage, DetailLink } from '@/shared/ui'
 import { FavoriteIcon, MessageIcon } from '@/shared/assets/icons'
 import type { MyHomePost } from '@/shared/mocks/myHome'
 
@@ -21,26 +21,24 @@ const PostCard = ({ post }: PostCardProps) => {
               {post.author.avatarUrl ? (
                 <AvatarImage src={post.author.avatarUrl} alt={post.author.nickname} />
               ) : (
-                <AvatarFallback className="bg-[#d4d4d4]" />
+                <AvatarFallback className="bg-fill-muted" />
               )}
             </Avatar>
-            <span className="text-sm font-bold text-[#5d5d5d]">
+            <span className="text-sm font-bold text-text-primary">
               {post.author.nickname}
             </span>
           </div>
-          <span className="text-xs font-bold text-[#959595]">
+          <span className="text-xs font-bold text-text-secondary">
             {post.createdAt}
           </span>
         </div>
 
         {/* Description */}
         <div className="flex items-center justify-between pl-[3.0625rem]">
-          <p className="text-sm font-bold text-[#959595]">
+          <p className="text-sm font-bold text-text-secondary">
             {post.description}
           </p>
-          <span className="hidden shrink-0 text-sm font-semibold leading-[1.375rem] text-[#959595] tab:inline">
-            {`자세히 보기 >`}
-          </span>
+          <DetailLink href="#" size="md" className="hidden text-text-secondary tab:inline-flex" />
         </div>
       </div>
 
@@ -49,7 +47,7 @@ const PostCard = ({ post }: PostCardProps) => {
         {post.images.map((image, index) => (
           <div
             key={index}
-            className="relative h-[8.995rem] w-[14.6147rem] shrink-0 overflow-hidden rounded-[0.67rem] bg-[#c6c6c6] tab:aspect-4/3 tab:h-auto tab:w-[22.55rem] tab:rounded-2xl"
+            className="relative h-[8.995rem] w-[14.6147rem] shrink-0 overflow-hidden rounded-[0.67rem] bg-fill-placeholder tab:aspect-4/3 tab:h-auto tab:w-[22.55rem] tab:rounded-2xl"
           >
             {image && (
               <Image
@@ -65,18 +63,17 @@ const PostCard = ({ post }: PostCardProps) => {
 
       {/* Like & Comment */}
       <div className="mt-[0.763rem] flex items-center gap-[1.3125rem] tab:mt-[0.96rem]">
-        <div className="flex items-center gap-1.5">
-          <FavoriteIcon className="size-6 text-[#5d5d5d]" />
-          <span className="text-sm font-semibold leading-[1.375rem] text-[#5d5d5d]">
-            {post.likeCount}
-          </span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <MessageIcon className="size-6 text-[#5d5d5d]" />
-          <span className="text-sm font-semibold leading-[1.375rem] text-[#5d5d5d]">
-            {post.commentCount}
-          </span>
-        </div>
+        {[
+          { Icon: FavoriteIcon, count: post.likeCount },
+          { Icon: MessageIcon, count: post.commentCount },
+        ].map(({ Icon, count }) => (
+          <div key={Icon.name} className="flex items-center gap-1.5">
+            <Icon className="size-6 text-text-primary" />
+            <span className="text-sm font-semibold leading-[1.375rem] text-text-primary">
+              {count}
+            </span>
+          </div>
+        ))}
       </div>
     </div>
   )

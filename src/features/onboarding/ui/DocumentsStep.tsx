@@ -2,8 +2,8 @@
 
 import { useForm, Controller } from 'react-hook-form'
 // import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowRightIcon, AttachmentIcon } from '@/shared/assets/icons'
-import { Checkbox } from '@/shared/ui'
+import { AttachmentIcon } from '@/shared/assets/icons'
+import { Checkbox, DetailLink } from '@/shared/ui'
 import { useOnboarding } from '../model/OnboardingContext'
 import { type DocumentsFormData } from '../model/schema'
 import { StepLayout } from './StepLayout'
@@ -79,16 +79,7 @@ const DocumentsStep = () => {
               <span className="flex-1 text-[0.875rem] font-medium leading-[1.375rem] text-[#5d5d5d] tab:text-[1rem]">
                 (필수) 브리더 입점 서약서
               </span>
-              <button
-                type="button"
-                onClick={(e) => e.preventDefault()}
-                className="flex shrink-0 items-center gap-[0.375rem]"
-              >
-                <span className="text-[0.875rem] font-medium leading-[1.375rem] text-[#5d5d5d] whitespace-nowrap tab:text-[1rem]">
-                  자세히 보기
-                </span>
-                <ArrowRightIcon className="size-[1.25rem] text-[#5d5d5d]" />
-              </button>
+              <DetailLink variant="button" size="md" onClick={(e) => e.preventDefault()} className="tab:text-[1rem]" />
             </label>
           )}
         />
