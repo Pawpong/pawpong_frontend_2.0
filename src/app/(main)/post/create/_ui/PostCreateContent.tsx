@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import { Container } from '@/shared/ui'
 import { PostCreateHeader } from './PostCreateHeader'
 import { ImageUploadArea } from './ImageUploadArea'
 import { PostTextArea } from './PostTextArea'
@@ -31,22 +32,24 @@ const PostCreateContent = () => {
       <PostCreateHeader />
 
       {/* Body */}
-      <div className="flex flex-1 flex-col gap-6 px-5 pb-[7.5rem] pt-10 tab:flex-row tab:gap-0 tab:px-[6.25rem] tab:pt-[5.5rem]">
-        {/* Left — Image Upload */}
-        <div className="tab:w-[26.256rem] tab:shrink-0">
-          <ImageUploadArea
-            images={images}
-            onAdd={handleAddImages}
-            onRemove={handleRemoveImage}
-          />
-        </div>
+      <Container className="flex-1 pb-[7.5rem] pt-6 tab:px-[6.25rem] tab:pt-[5.5rem]">
+        <div className="flex flex-col gap-6 tab:flex-row tab:gap-0">
+          {/* Left — Image Upload */}
+          <div className="tab:w-[26.256rem] tab:shrink-0">
+            <ImageUploadArea
+              images={images}
+              onAdd={handleAddImages}
+              onRemove={handleRemoveImage}
+            />
+          </div>
 
-        {/* Right — Text + Toolbar */}
-        <div className="flex flex-1 flex-col gap-[1.125rem] tab:ml-[2.5rem]">
-          <PostTextArea value={text} onChange={setText} />
-          <PostToolbar />
+          {/* Right — Text + Toolbar */}
+          <div className="flex flex-1 flex-col gap-[1.125rem] tab:ml-[2.5rem]">
+            <PostTextArea value={text} onChange={setText} />
+            <PostToolbar />
+          </div>
         </div>
-      </div>
+      </Container>
 
       <PostCreateCTA
         onSaveDraft={() => {}}
