@@ -15,6 +15,7 @@ interface ImageModalProps {
   initialIndex?: number
   open: boolean
   onOpenChange: (open: boolean) => void
+  onDelete?: (index: number) => void
 }
 
 const ImageModal = ({
@@ -22,6 +23,7 @@ const ImageModal = ({
   initialIndex = 0,
   open,
   onOpenChange,
+  onDelete,
 }: ImageModalProps) => {
   const [currentIndex, setCurrentIndex] = useState(initialIndex)
 
@@ -85,6 +87,22 @@ const ImageModal = ({
                 className="absolute right-[3rem] z-10 size-[3rem] rounded-full bg-[#8e8e8e] transition-opacity hover:opacity-80"
                 aria-label="다음 이미지"
               />
+            )}
+
+            {/* 이미지 삭제 */}
+            {onDelete && (
+              <button
+                type="button"
+                onClick={() => {
+                  onDelete(currentIndex)
+                  onOpenChange(false)
+                }}
+                className="absolute bottom-[2.188rem] flex w-[9.438rem] items-center justify-center rounded-full border border-[#d4d4d4] p-[0.625rem]"
+              >
+                <span className="text-sm font-medium text-white">
+                  이미지 삭제
+                </span>
+              </button>
             )}
           </div>
         </DialogPrimitive.Content>

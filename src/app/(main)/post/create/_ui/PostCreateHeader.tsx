@@ -9,7 +9,7 @@ const PostCreateHeader = () => {
 
   return (
     <Container className="tab:px-[6.25rem]">
-      <header className="flex h-[3rem] items-center justify-between tab:h-[5.5rem]">
+      <header className="flex h-[3rem] items-center gap-[0.625rem] tab:h-[5.5rem] tab:justify-between tab:gap-0">
         <button
           type="button"
           onClick={() => router.back()}
@@ -17,11 +17,12 @@ const PostCreateHeader = () => {
         >
           <CloseIcon className="size-5 text-text-primary" />
         </button>
-        <h1 className="flex-1 text-center text-xl font-semibold leading-[1.375rem] text-text-primary">
-          글 작성
+        <h1 className="text-sm font-semibold leading-[1.5] text-text-primary tab:flex-1 tab:text-center tab:text-xl tab:leading-[1.375rem]">
+          <span className="tab:hidden">게시글 작성</span>
+          <span className="hidden tab:inline">글 작성</span>
         </h1>
-        {/* Spacer for center alignment */}
-        <div className="size-5" />
+        {/* Spacer for center alignment — desktop only */}
+        <div className="hidden size-5 tab:block" />
       </header>
     </Container>
   )
