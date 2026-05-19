@@ -33,12 +33,12 @@ const ImageUploadArea = ({ images, onAdd, onRemove }: ImageUploadAreaProps) => {
         <span className="font-medium">선택</span>
       </p>
 
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-x-[1.438rem] gap-y-3">
         {/* Upload Button */}
         <button
           type="button"
           onClick={handleClick}
-          className="flex h-[12.626rem] w-[12.363rem] flex-col items-center justify-center gap-[0.188rem] rounded-[0.596rem] border border-fill-placeholder tab:h-[12.626rem] tab:w-[12.363rem]"
+          className="flex h-[12.623rem] w-[12.363rem] flex-col items-center justify-center gap-[0.188rem] rounded-[0.596rem] border border-fill-placeholder"
         >
           <ImageIcon className="size-[3.285rem] text-text-primary" />
           <span className="text-[1.642rem] font-medium text-text-primary">
@@ -59,7 +59,7 @@ const ImageUploadArea = ({ images, onAdd, onRemove }: ImageUploadAreaProps) => {
         {images.map((src, index) => (
           <div
             key={src}
-            className="relative h-[12.626rem] w-[12.363rem] overflow-hidden rounded-[0.596rem] border border-fill-placeholder"
+            className="relative h-[12.623rem] w-[12.363rem] overflow-hidden rounded-[0.596rem] bg-fill-placeholder"
           >
             <Image
               src={src}
@@ -67,13 +67,24 @@ const ImageUploadArea = ({ images, onAdd, onRemove }: ImageUploadAreaProps) => {
               fill
               className="object-cover"
             />
+
+            {/* 순번 */}
+            <div className="absolute left-0 top-0 flex size-[2.822rem] items-center justify-center">
+              <span className="text-[1.562rem] font-bold leading-[1.552rem] text-white">
+                {index + 1}
+              </span>
+            </div>
+
+            {/* 삭제 버튼 */}
             <button
               type="button"
               onClick={() => onRemove(index)}
-              className="absolute right-1.5 top-1.5 flex size-6 items-center justify-center rounded-full bg-black/50"
+              className="absolute right-[0.323rem] top-[0.323rem] flex size-[2.5rem] items-center justify-center"
               aria-label={`이미지 ${index + 1} 삭제`}
             >
-              <CloseIcon className="size-3.5 text-white" />
+              <div className="flex size-6 items-center justify-center rounded-full bg-text-primary/60">
+                <CloseIcon className="size-3.5 text-white" />
+              </div>
             </button>
           </div>
         ))}
