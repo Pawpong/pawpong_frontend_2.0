@@ -11,13 +11,13 @@ interface PostCardProps {
 
 const PostCard = ({ post }: PostCardProps) => {
   return (
-    <div className="flex flex-col py-8">
+    <div className="flex flex-col pb-[0.671rem] pt-[1.176rem] tab:py-8">
       {/* Author + Description */}
       <div className="flex flex-col">
         {/* Author Row */}
         <div className="flex items-center gap-2.5">
           <div className="flex items-center gap-3">
-            <Avatar size="sm">
+            <Avatar size="sm" className="size-[2.3125rem]">
               {post.author.avatarUrl ? (
                 <AvatarImage src={post.author.avatarUrl} alt={post.author.nickname} />
               ) : (
@@ -33,23 +33,23 @@ const PostCard = ({ post }: PostCardProps) => {
           </span>
         </div>
 
-        {/* Description + 자세히 보기 */}
-        <div className="mt-2 flex items-center justify-between pl-[3.0625rem]">
+        {/* Description */}
+        <div className="flex items-center justify-between pl-[3.0625rem]">
           <p className="text-sm font-bold text-[#959595]">
             {post.description}
           </p>
-          <span className="shrink-0 text-sm font-semibold leading-[1.375rem] text-[#959595]">
+          <span className="hidden shrink-0 text-sm font-semibold leading-[1.375rem] text-[#959595] tab:inline">
             {`자세히 보기 >`}
           </span>
         </div>
       </div>
 
       {/* Image Grid */}
-      <div className="-mx-[3.125rem] mt-[2.179rem] flex gap-3 overflow-hidden pl-[3.125rem]">
+      <div className="-mx-[1.25rem] mt-[1.097rem] flex gap-3 overflow-hidden pl-[1.25rem] tab:-mx-[3.125rem] tab:mt-[2.179rem] tab:pl-[3.125rem]">
         {post.images.map((image, index) => (
           <div
             key={index}
-            className="relative aspect-4/3 w-[22.55rem] shrink-0 overflow-hidden rounded-2xl bg-[#c6c6c6]"
+            className="relative h-[8.995rem] w-[14.6147rem] shrink-0 overflow-hidden rounded-[0.67rem] bg-[#c6c6c6] tab:aspect-4/3 tab:h-auto tab:w-[22.55rem] tab:rounded-2xl"
           >
             {image && (
               <Image
@@ -64,7 +64,7 @@ const PostCard = ({ post }: PostCardProps) => {
       </div>
 
       {/* Like & Comment */}
-      <div className="mt-[0.96rem] flex items-center gap-[1.3125rem]">
+      <div className="mt-[0.763rem] flex items-center gap-[1.3125rem] tab:mt-[0.96rem]">
         <div className="flex items-center gap-1.5">
           <FavoriteIcon className="size-6 text-[#5d5d5d]" />
           <span className="text-sm font-semibold leading-[1.375rem] text-[#5d5d5d]">

@@ -12,20 +12,20 @@ interface MyHomeTabsProps {
 
 const MyHomeTabs = ({ activeTab, onTabChange }: MyHomeTabsProps) => {
   return (
-    <div className="flex w-full items-center gap-8">
+    <div className="flex h-8 w-full items-center gap-4 tab:h-auto tab:gap-8">
       <button
         type="button"
         onClick={() => onTabChange('posts')}
         className={cn(
-          'relative flex flex-1 items-center justify-center p-2.5',
+          'relative flex h-full flex-1 min-w-px items-center justify-center px-1.5 py-2.5',
           activeTab === 'posts'
-            ? 'after:absolute after:absolute after:bottom-[-2px] after:left-0 after:h-[3px] after:w-full after:bg-[#5d5d5d]'
+            ? 'border-b-2 border-[#5d5d5d] tab:border-b-0 tab:after:absolute tab:after:bottom-[-2px] tab:after:left-0 tab:after:h-[3px] tab:after:w-full tab:after:bg-[#5d5d5d]'
             : '',
         )}
       >
         <span
           className={cn(
-            'text-base leading-[1.375rem] text-[#5d5d5d] whitespace-nowrap',
+            'text-sm leading-[1.375rem] text-[#5d5d5d] whitespace-nowrap tab:text-base',
             activeTab === 'posts' ? 'font-bold' : 'font-medium',
           )}
         >
@@ -36,15 +36,15 @@ const MyHomeTabs = ({ activeTab, onTabChange }: MyHomeTabsProps) => {
         type="button"
         onClick={() => onTabChange('breeders')}
         className={cn(
-          'relative flex flex-1 items-center justify-center gap-2.5 p-2.5',
+          'relative flex h-full flex-1 min-w-px items-center justify-center gap-2.5 px-1.5 py-2.5',
           activeTab === 'breeders'
-            ? 'after:absolute after:absolute after:bottom-[-1px] after:left-0 after:h-[3px] after:w-full after:bg-[#5d5d5d]'
+            ? 'border-b-2 border-[#5d5d5d] tab:border-b-0 tab:after:absolute tab:after:bottom-[-1px] tab:after:left-0 tab:after:h-[3px] tab:after:w-full tab:after:bg-[#5d5d5d]'
             : '',
         )}
       >
         <span
           className={cn(
-            'text-base leading-[1.375rem] text-[#5d5d5d] whitespace-nowrap',
+            'text-sm leading-[1.375rem] text-[#5d5d5d] whitespace-nowrap tab:text-base',
             activeTab === 'breeders' ? 'font-bold' : 'font-medium',
           )}
         >
