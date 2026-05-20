@@ -32,6 +32,9 @@ const UserHomeContent = ({ userId: _userId }: UserHomeContentProps) => {
         <ProfileCard profile={profile} mode="other" />
       </Container>
 
+      {/* Separator — full width */}
+      <Separator className="bg-border-light" />
+
       {/* Posts Section */}
       <Container className="pc:px-[10rem]">
         <div className="tab:mt-[2.959rem] tab:overflow-hidden tab:rounded-2xl tab:border tab:border-border-light">

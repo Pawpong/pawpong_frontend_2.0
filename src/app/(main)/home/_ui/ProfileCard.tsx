@@ -93,8 +93,10 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
         textClassName="text-xs"
       />
 
-      {/* Separator — desktop only */}
-      <div className="my-5 hidden h-px w-full bg-border-light tab:block" />
+      {/* Separator — desktop only (mine) */}
+      {mode === 'mine' && (
+        <div className="my-5 hidden h-px w-full bg-border-light tab:block" />
+      )}
 
       {/* Action Buttons */}
       {mode === 'mine' ? (
@@ -107,23 +109,25 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
           </button>
         </div>
       ) : (
-        <div className="flex items-center gap-3 pt-[0.7rem] pb-[1.854rem] tab:px-10 tab:pb-[1.275rem]">
-          <button
-            type="button"
-            className="flex h-10 items-center justify-center gap-1.5 rounded-full bg-fill-muted p-2.5 tab:w-[12.5rem]"
-          >
-            <Image src="/chat.svg" alt="메시지" width={24} height={24} />
-            <span className="text-sm font-semibold leading-[1.375rem] text-text-primary">
-              메시지 보내기
-            </span>
-          </button>
-          <button
-            type="button"
-            className="flex h-10 flex-1 items-center justify-center rounded-full bg-fill-muted p-2.5 text-sm font-medium text-white"
-          >
-            팔로우
-          </button>
-        </div>
+        <>
+          <div className="flex items-center justify-center gap-3 py-5 tab:justify-start tab:px-10 tab:pb-[1.275rem]">
+            <button
+              type="button"
+              className="flex h-10 w-[9.375rem] items-center justify-center rounded-full bg-fill-muted p-2.5 text-sm font-medium text-white tab:order-2 tab:w-auto tab:flex-1"
+            >
+              팔로우
+            </button>
+            <button
+              type="button"
+              className="flex h-10 w-[8.75rem] items-center justify-center gap-1.5 rounded-full bg-fill-muted p-2.5 tab:order-1 tab:w-[12.5rem]"
+            >
+              <Image src="/chat.svg" alt="메시지" width={24} height={24} />
+              <span className="text-sm font-semibold leading-[1.375rem] text-text-primary">
+                메시지 보내기
+              </span>
+            </button>
+          </div>
+        </>
       )}
     </div>
   )
