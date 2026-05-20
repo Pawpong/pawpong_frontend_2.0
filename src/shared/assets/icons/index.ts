@@ -1,5 +1,6 @@
 export { ArrowBackIcon } from './ArrowBackIcon'
 export { ArrowRightIcon } from './ArrowRightIcon'
+export { ChatBubbleIcon } from './ChatBubbleIcon'
 export { AttachmentIcon } from './AttachmentIcon'
 export { BookmarkIcon } from './BookmarkIcon'
 export { CheckIcon } from './CheckIcon'

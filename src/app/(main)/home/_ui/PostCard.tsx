@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { Avatar, AvatarFallback, AvatarImage, DetailLink } from '@/shared/ui'
 import { FavoriteIcon, MessageIcon } from '@/shared/assets/icons'
 import type { MyHomePost } from '@/shared/mocks/myHome'
@@ -16,7 +17,7 @@ const PostCard = ({ post }: PostCardProps) => {
       <div className="flex flex-col">
         {/* Author Row */}
         <div className="flex items-center gap-2.5">
-          <div className="flex items-center gap-3">
+          <Link href={`/home/${post.author.userId}`} className="flex items-center gap-3">
             <Avatar size="sm" className="size-[2.3125rem]">
               {post.author.avatarUrl ? (
                 <AvatarImage src={post.author.avatarUrl} alt={post.author.nickname} />
@@ -27,7 +28,7 @@ const PostCard = ({ post }: PostCardProps) => {
             <span className="text-sm font-bold text-text-primary">
               {post.author.nickname}
             </span>
-          </div>
+          </Link>
           <span className="text-xs font-bold text-text-secondary">
             {post.createdAt}
           </span>

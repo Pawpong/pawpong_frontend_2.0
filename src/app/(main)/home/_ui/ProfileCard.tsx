@@ -2,11 +2,13 @@
 
 import { Avatar, AvatarFallback, AvatarImage, AvatarGroup, Badge } from '@/shared/ui'
 import type { AvatarItem } from '@/shared/ui'
+import Image from 'next/image'
 import { cn } from '@/shared/lib/Cn'
 import type { MyHomeProfile } from '@/shared/mocks/myHome'
 
 interface ProfileCardProps {
   profile: MyHomeProfile
+  mode?: 'mine' | 'other'
 }
 
 const FOLLOWER_AVATARS: AvatarItem[] = [
@@ -44,14 +46,13 @@ const Bio = ({
   </p>
 )
 
-const ProfileCard = ({ profile }: ProfileCardProps) => {
+const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
   return (
     <div className="tab:overflow-hidden tab:rounded-2xl tab:bg-surface-primary">
       {/* Content Area */}
       <div className="flex items-end justify-between pt-[0.659rem] tab:items-stretch tab:px-10 tab:pt-8">
-        {/* Left: Text Info */}
+        {/* Section 1: Badges + Nickname + Bio */}
         <div className="flex flex-col gap-2 tab:flex-1 tab:gap-0">
-          {/* Badges */}
           <div className="flex items-center gap-1 tab:gap-3">
             {profile.badges.map((badge) => (
               <Badge key={badge} variant="outline" className="h-6 text-xs leading-[1.375rem] tab:text-sm">
@@ -59,20 +60,19 @@ const ProfileCard = ({ profile }: ProfileCardProps) => {
               </Badge>
             ))}
           </div>
-
-          {/* Nickname */}
           <p className="text-base font-bold text-text-primary tab:mt-[0.804rem] tab:text-2xl tab:font-semibold tab:leading-[1.375rem]">
             {profile.nickname}
           </p>
+          <Bio text={profile.bio} className="mt-3 hidden max-w-[26.1rem] tab:block" />
         </div>
 
-        {/* Middle: Follower — desktop only */}
-        <div className="hidden shrink-0 flex-col justify-end tab:flex">
+        {/* Section 2: Follower — desktop only */}
+        <div className="hidden shrink-0 items-end tab:flex">
           <FollowerSection followerCount={profile.followerCount} textClassName="text-sm" />
         </div>
 
-        {/* Right: Avatar */}
-        <div className="shrink-0 tab:pl-2.5">
+        {/* Section 3: Avatar */}
+        <div className="shrink-0">
           <Avatar size="lg" className="size-[4.0625rem] tab:h-[7.3125rem] tab:w-[7.4375rem]">
             {profile.avatarUrl ? (
               <AvatarImage src={profile.avatarUrl} alt={profile.nickname} />
@@ -86,11 +86,6 @@ const ProfileCard = ({ profile }: ProfileCardProps) => {
       {/* Bio — mobile */}
       <Bio text={profile.bio} className="mt-[1.097rem] tab:hidden" />
 
-      {/* Bio — desktop */}
-      <div className="hidden tab:block tab:px-10">
-        <Bio text={profile.bio} className="mt-3 max-w-[26.1rem]" />
-      </div>
-
       {/* Follower — mobile */}
       <FollowerSection
         followerCount={profile.followerCount}
@@ -101,15 +96,35 @@ const ProfileCard = ({ profile }: ProfileCardProps) => {
       {/* Separator — desktop only */}
       <div className="my-5 hidden h-px w-full bg-border-light tab:block" />
 
-      {/* Profile Edit Button */}
-      <div className="flex justify-center pt-[0.7rem] pb-[1.854rem] tab:justify-start tab:pb-[1.275rem] tab:pl-[4.9375rem] tab:pr-[8.5rem]">
-        <button
-          type="button"
-          className="flex h-10 w-[16.4375rem] items-center justify-center rounded-full bg-fill-muted p-2.5 text-sm font-medium text-white tab:w-full"
-        >
-          프로필 편집
-        </button>
-      </div>
+      {/* Action Buttons */}
+      {mode === 'mine' ? (
+        <div className="flex justify-center pt-[0.7rem] pb-[1.854rem] tab:justify-start tab:pb-[1.275rem] tab:pl-[4.9375rem] tab:pr-[8.5rem]">
+          <button
+            type="button"
+            className="flex h-10 w-[16.4375rem] items-center justify-center rounded-full bg-fill-muted p-2.5 text-sm font-medium text-white tab:w-full"
+          >
+            프로필 편집
+          </button>
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 pt-[0.7rem] pb-[1.854rem] tab:px-10 tab:pb-[1.275rem]">
+          <button
+            type="button"
+            className="flex h-10 items-center justify-center gap-1.5 rounded-full bg-fill-muted p-2.5 tab:w-[12.5rem]"
+          >
+            <Image src="/chat.svg" alt="메시지" width={24} height={24} />
+            <span className="text-sm font-semibold leading-[1.375rem] text-text-primary">
+              메시지 보내기
+            </span>
+          </button>
+          <button
+            type="button"
+            className="flex h-10 flex-1 items-center justify-center rounded-full bg-fill-muted p-2.5 text-sm font-medium text-white"
+          >
+            팔로우
+          </button>
+        </div>
+      )}
     </div>
   )
 }

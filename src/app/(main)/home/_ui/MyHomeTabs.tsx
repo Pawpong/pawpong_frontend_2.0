@@ -30,8 +30,9 @@ const MyHomeTabs = ({ activeTab, onTabChange, children }: MyHomeTabsProps) => {
       value={activeTab}
       onValueChange={(v) => onTabChange(v as TabType)}
     >
-      <Container className="border-b border-border-light tab:mt-[2.719rem]">
-        <TabsList className="flex h-8 w-full items-center gap-4 tab:h-auto tab:gap-8">
+      <div className="border-b border-border-light tab:mt-[2.719rem]">
+        <Container>
+          <TabsList className="flex h-8 w-full items-center gap-4 tab:h-auto tab:gap-8">
           {TAB_CONFIG.map((tab) => (
             <TabsTrigger
               key={tab.id}
@@ -52,7 +53,8 @@ const MyHomeTabs = ({ activeTab, onTabChange, children }: MyHomeTabsProps) => {
             </TabsTrigger>
           ))}
         </TabsList>
-      </Container>
+        </Container>
+      </div>
       {children}
     </Tabs>
   )

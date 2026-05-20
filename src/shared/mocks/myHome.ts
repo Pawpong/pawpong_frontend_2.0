@@ -11,6 +11,7 @@ export interface MyHomeProfile {
 export interface MyHomePost {
   id: string
   author: {
+    userId: string
     nickname: string
     avatarUrl: string | null
   }
@@ -62,6 +63,7 @@ export const MOCK_MY_HOME_POSTS: MyHomePost[] = [
   {
     id: '1',
     author: {
+      userId: 'user-1',
       nickname: '파이리귀여워',
       avatarUrl: null,
     },
@@ -79,6 +81,7 @@ export const MOCK_MY_HOME_POSTS: MyHomePost[] = [
   {
     id: '2',
     author: {
+      userId: 'user-1',
       nickname: '파이리귀여워',
       avatarUrl: null,
     },
@@ -96,6 +99,7 @@ export const MOCK_MY_HOME_POSTS: MyHomePost[] = [
   {
     id: '3',
     author: {
+      userId: 'user-1',
       nickname: '파이리귀여워',
       avatarUrl: null,
     },
