@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { LockIcon, ChevronDownIcon } from '@/shared/assets/icons'
 import {
+  Container,
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
@@ -28,7 +29,7 @@ const FavoriteBreedersContent = () => {
   return (
     <div className="flex flex-col">
       {/* Filter Dropdown */}
-      <div className="px-4 pt-4 tab:px-[6.25rem] tab:pt-6">
+      <Container className="pt-4 tab:pt-6">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
@@ -59,14 +60,16 @@ const FavoriteBreedersContent = () => {
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
-      </div>
+      </Container>
 
       {/* Breeder Cards */}
-      <div className="mt-4 flex flex-wrap justify-between gap-y-4 px-4 pb-4 tab:mt-[1.423rem] tab:flex-nowrap tab:justify-start tab:gap-[1.156rem] tab:overflow-x-auto tab:px-[6.25rem]">
-        {breeders.map((breeder) => (
-          <BreederCard key={breeder.id} breeder={breeder} />
-        ))}
-      </div>
+      <Container className="mt-4 pb-4 tab:mt-[1.423rem]">
+        <div className="flex flex-wrap justify-between gap-y-4 tab:flex-nowrap tab:justify-start tab:gap-[1.156rem] tab:overflow-x-auto">
+          {breeders.map((breeder) => (
+            <BreederCard key={breeder.id} breeder={breeder} />
+          ))}
+        </div>
+      </Container>
     </div>
   )
 }
