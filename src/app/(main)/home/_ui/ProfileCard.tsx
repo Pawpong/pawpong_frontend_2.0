@@ -4,12 +4,20 @@ import { Avatar, AvatarFallback, AvatarImage, AvatarGroup, Badge } from '@/share
 import type { AvatarItem } from '@/shared/ui'
 import Image from 'next/image'
 import { cn } from '@/shared/lib/Cn'
-import type { MyHomeProfile } from '@/shared/mocks/myHome'
+import { LocationIcon } from '@/shared/assets/icons'
+import type { MyHomeProfile, BreederProfile } from '@/shared/mocks/myHome'
 
-interface ProfileCardProps {
+interface ProfileCardBaseProps {
   profile: MyHomeProfile
   mode?: 'mine' | 'other'
 }
+
+interface ProfileCardBreederProps {
+  profile: BreederProfile
+  mode: 'breeder'
+}
+
+type ProfileCardProps = ProfileCardBaseProps | ProfileCardBreederProps
 
 const FOLLOWER_AVATARS: AvatarItem[] = [
   { id: 1, imageUrl: '' },
@@ -26,7 +34,7 @@ const FollowerSection = ({
   className?: string
   textClassName?: string
 }) => (
-  <div className={cn('flex items-center gap-2.5 p-2.5', className)}>
+  <div className={cn('flex items-center gap-2.5 py-2.5', className)}>
     <AvatarGroup avatars={FOLLOWER_AVATARS} ringClassName="ring-[3px] ring-white tab:ring-surface-primary" />
     <span className={cn('font-medium text-text-primary', textClassName)}>
       팔로워 {followerCount}
@@ -54,6 +62,11 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
         {/* Section 1: Badges + Nickname + Bio */}
         <div className="flex flex-col gap-2 tab:flex-1 tab:gap-0">
           <div className="flex items-center gap-1 tab:gap-3">
+            {mode === 'breeder' && (
+              <Badge variant="outline" className="h-6 text-xs leading-[1.375rem] tab:text-sm">
+                브리더
+              </Badge>
+            )}
             {profile.badges.map((badge) => (
               <Badge key={badge} variant="outline" className="h-6 text-xs leading-[1.375rem] tab:text-sm">
                 {badge}
@@ -63,6 +76,15 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
           <p className="text-base font-bold text-text-primary tab:mt-[0.804rem] tab:text-2xl tab:font-semibold tab:leading-[1.375rem]">
             {profile.nickname}
           </p>
+          {/* Location — breeder, mobile only (below nickname) */}
+          {mode === 'breeder' && (
+            <div className="mt-1 flex items-center gap-1.5 tab:hidden">
+              <LocationIcon className="size-5 text-text-secondary" />
+              <span className="text-sm font-medium text-text-secondary">
+                {(profile as BreederProfile).location}
+              </span>
+            </div>
+          )}
           <Bio text={profile.bio} className="mt-3 hidden max-w-[26.1rem] tab:block" />
         </div>
 
@@ -93,8 +115,19 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
         textClassName="text-xs"
       />
 
-      {/* Separator — desktop only (mine) */}
-      {mode === 'mine' && (
+
+      {/* Location — breeder, desktop only */}
+      {mode === 'breeder' && (
+        <div className="hidden items-center gap-1.5 py-2 tab:flex tab:px-10">
+          <LocationIcon className="size-5 text-text-secondary" />
+          <span className="text-sm font-medium text-text-secondary">
+            {(profile as BreederProfile).location}
+          </span>
+        </div>
+      )}
+
+      {/* Separator — desktop only (breeder) */}
+      {mode === 'breeder' && (
         <div className="my-5 hidden h-px w-full bg-border-light tab:block" />
       )}
 
@@ -108,26 +141,54 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
             프로필 편집
           </button>
         </div>
+      ) : mode === 'breeder' ? (
+        <div className="flex items-center justify-center gap-3 pt-2.5 pb-[1.854rem] tab:justify-start tab:gap-3 tab:px-10 tab:pb-[1.275rem]">
+          {/* 즐겨찾기 등록 — desktop only */}
+          <button
+            type="button"
+            className="hidden h-10 items-center justify-center gap-1.5 rounded-full bg-fill-muted p-2.5 tab:order-1 tab:flex tab:w-[12.5rem]"
+          >
+            <Image src="/star.svg" alt="즐겨찾기" width={20} height={20} />
+            <span className="text-sm font-semibold leading-[1.375rem] text-text-primary">
+              즐겨찾기 등록
+            </span>
+          </button>
+          {/* 팔로우 */}
+          <button
+            type="button"
+            className="flex h-10 flex-1 items-center justify-center rounded-full bg-fill-muted p-2.5 text-sm font-medium text-white tab:order-3 tab:flex-1"
+          >
+            팔로우
+          </button>
+          {/* 상담하기 */}
+          <button
+            type="button"
+            className="flex h-10 flex-1 items-center justify-center gap-1.5 rounded-full bg-fill-muted p-2.5 tab:order-2 tab:flex-none tab:w-[12.5rem]"
+          >
+            <Image src="/chat.svg" alt="상담" width={20} height={20} />
+            <span className="text-sm font-semibold leading-[1.375rem] text-text-primary">
+              상담하기
+            </span>
+          </button>
+        </div>
       ) : (
-        <>
-          <div className="flex items-center justify-center gap-3 py-5 tab:justify-start tab:px-10 tab:pb-[1.275rem]">
-            <button
-              type="button"
-              className="flex h-10 w-[9.375rem] items-center justify-center rounded-full bg-fill-muted p-2.5 text-sm font-medium text-white tab:order-2 tab:w-auto tab:flex-1"
-            >
-              팔로우
-            </button>
-            <button
-              type="button"
-              className="flex h-10 w-[8.75rem] items-center justify-center gap-1.5 rounded-full bg-fill-muted p-2.5 tab:order-1 tab:w-[12.5rem]"
-            >
-              <Image src="/chat.svg" alt="메시지" width={24} height={24} />
-              <span className="text-sm font-semibold leading-[1.375rem] text-text-primary">
-                메시지 보내기
-              </span>
-            </button>
-          </div>
-        </>
+        <div className="flex items-center justify-center gap-3 pb-[1.854rem] tab:justify-start tab:px-10 tab:pb-[1.275rem]">
+          <button
+            type="button"
+            className="flex h-10 w-[9.375rem] items-center justify-center rounded-full bg-fill-muted p-2.5 text-sm font-medium text-white tab:order-2 tab:w-auto tab:flex-1"
+          >
+            팔로우
+          </button>
+          <button
+            type="button"
+            className="flex h-10 w-[8.75rem] items-center justify-center gap-1.5 rounded-full bg-fill-muted p-2.5 tab:order-1 tab:w-[12.5rem]"
+          >
+            <Image src="/chat.svg" alt="메시지" width={24} height={24} />
+            <span className="text-sm font-semibold leading-[1.375rem] text-text-primary">
+              메시지 보내기
+            </span>
+          </button>
+        </div>
       )}
     </div>
   )

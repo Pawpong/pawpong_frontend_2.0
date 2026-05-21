@@ -59,6 +59,23 @@ export const MOCK_FAVORITE_BREEDERS: FavoriteBreeder[] = Array.from(
   }),
 )
 
+export interface BreederProfile extends MyHomeProfile {
+  location: string
+  isBreeder: true
+}
+
+export const MOCK_BREEDER_PROFILE: BreederProfile = {
+  nickname: 'CityLizard',
+  bio: '안녕하세요 감사해요 잘있어요 다시만나요 아침해가 뜨면 아침해가 뜨면 안녕하세요 감사해요 잘있어요 다시만나요 아침해가 뜨면 아침해가 뜨면 ',
+  avatarUrl: null,
+  badges: ['초보집사', '50 BPM'],
+  bpm: 50,
+  followerCount: 100,
+  pawprintIcons: 3,
+  location: '사업장 위치를 작성해주세요',
+  isBreeder: true,
+}
+
 export const MOCK_MY_HOME_POSTS: MyHomePost[] = [
   {
     id: '1',
