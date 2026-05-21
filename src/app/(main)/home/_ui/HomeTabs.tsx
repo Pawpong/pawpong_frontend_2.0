@@ -1,36 +1,29 @@
 'use client'
 
+import type { SVGProps } from 'react'
 import { Container, Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui'
 import { cn } from '@/shared/lib/Cn'
 
-type BreederTabType = 'listings' | 'posts'
-
-interface BreederTabConfig {
-  id: BreederTabType
+interface HomeTabConfig {
+  id: string
   label: string
+  Icon?: (props: SVGProps<SVGSVGElement>) => React.ReactElement
 }
 
-const TAB_CONFIG: BreederTabConfig[] = [
-  { id: 'listings', label: '분양목록' },
-  { id: 'posts', label: '게시글' },
-]
-
-interface BreederHomeTabsProps {
-  activeTab: BreederTabType
-  onTabChange: (tab: BreederTabType) => void
+interface HomeTabsProps {
+  tabs: HomeTabConfig[]
+  activeTab: string
+  onTabChange: (tab: string) => void
   children: React.ReactNode
 }
 
-const BreederHomeTabs = ({ activeTab, onTabChange, children }: BreederHomeTabsProps) => {
+const HomeTabs = ({ tabs, activeTab, onTabChange, children }: HomeTabsProps) => {
   return (
-    <Tabs
-      value={activeTab}
-      onValueChange={(v) => onTabChange(v as BreederTabType)}
-    >
+    <Tabs value={activeTab} onValueChange={onTabChange}>
       <div className="border-b border-border-light tab:mt-[2.719rem]">
         <Container>
           <TabsList className="flex h-8 w-full items-center gap-4 tab:h-auto tab:gap-8">
-            {TAB_CONFIG.map((tab) => (
+            {tabs.map((tab) => (
               <TabsTrigger
                 key={tab.id}
                 value={tab.id}
@@ -38,11 +31,15 @@ const BreederHomeTabs = ({ activeTab, onTabChange, children }: BreederHomeTabsPr
                   'group relative flex h-full flex-1 min-w-px items-center justify-center px-1.5 py-2.5',
                   'data-[state=active]:border-b-2 data-[state=active]:border-text-primary',
                   'tab:data-[state=active]:border-b-0 tab:data-[state=active]:after:absolute tab:data-[state=active]:after:bottom-[-2px] tab:data-[state=active]:after:left-0 tab:data-[state=active]:after:h-[3px] tab:data-[state=active]:after:w-full tab:data-[state=active]:after:bg-text-primary',
+                  tab.Icon ? 'gap-2.5' : '',
                 )}
               >
                 <span className="text-sm font-medium leading-[1.375rem] text-text-primary whitespace-nowrap group-data-[state=active]:font-bold tab:text-base">
                   {tab.label}
                 </span>
+                {tab.Icon && (
+                  <tab.Icon className="size-5 shrink-0 -translate-y-px text-text-primary" />
+                )}
               </TabsTrigger>
             ))}
           </TabsList>
@@ -53,5 +50,5 @@ const BreederHomeTabs = ({ activeTab, onTabChange, children }: BreederHomeTabsPr
   )
 }
 
-export { BreederHomeTabs, TabsContent }
-export type { BreederTabType }
+export { HomeTabs, TabsContent }
+export type { HomeTabConfig }
