@@ -9,6 +9,7 @@ import { createMockListings } from '@/shared/mocks/adoption'
 import { ProfileCard } from '../../_ui/ProfileCard'
 import { PostCard } from '../../_ui/PostCard'
 import { BreederListingCard } from '../../_ui/BreederListingCard'
+import { AdoptionCard } from '@/entities/adoption'
 import {
   BreederHomeTabs,
   TabsContent,
@@ -53,9 +54,16 @@ const BreederHomeContent = ({ userId: _userId }: BreederHomeContentProps) => {
       <BreederHomeTabs activeTab={activeTab} onTabChange={setActiveTab}>
         <TabsContent value="listings" className="mt-0">
           <Container className="pc:px-[10rem]">
-            <div className="grid grid-cols-2 gap-[0.625rem] py-[1.25rem] tab:mt-[2.959rem] tab:grid-cols-3 tab:gap-6 tab:py-0">
+            {/* Mobile */}
+            <div className="grid grid-cols-2 gap-[0.625rem] py-[1.25rem] tab:hidden">
               {listings.map((listing) => (
                 <BreederListingCard key={listing.listingId} listing={listing} />
+              ))}
+            </div>
+            {/* Desktop */}
+            <div className="hidden tab:mt-[2.959rem] tab:grid tab:grid-cols-3 tab:gap-6">
+              {listings.map((listing) => (
+                <AdoptionCard key={listing.listingId} listing={listing} />
               ))}
             </div>
           </Container>
