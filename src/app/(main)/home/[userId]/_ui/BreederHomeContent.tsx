@@ -8,15 +8,11 @@ import { createMockListings } from '@/shared/mocks/adoption'
 import { ProfileCard } from '../../_ui/ProfileCard'
 import { BreederListingCard } from '../../_ui/BreederListingCard'
 import { AdoptionCard } from '@/entities/adoption'
-import { HomeTabs, TabsContent, type HomeTabConfig } from '../../_ui/HomeTabs'
+import { HomeTabs, TabsContent } from '../../_ui/HomeTabs'
 import { HomeTitle } from '../../_ui/HomeTitle'
 import { PostList } from '../../_ui/PostList'
 import { FooterPlaceholder } from '../../_ui/FooterPlaceholder'
-
-const BREEDER_HOME_TABS: HomeTabConfig[] = [
-  { id: 'listings', label: '분양목록' },
-  { id: 'posts', label: '게시글' },
-]
+import { BREEDER_HOME_TABS } from '../../_ui/constants'
 
 interface BreederHomeContentProps {
   userId: string

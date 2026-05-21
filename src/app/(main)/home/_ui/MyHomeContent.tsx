@@ -2,21 +2,16 @@
 
 import { useState } from 'react'
 import { BookmarkIcon } from '@/shared/assets/icons'
-import { LockIcon } from '@/shared/assets/icons'
 import { Container, Separator } from '@/shared/ui'
 import { MOCK_MY_HOME_PROFILE, MOCK_MY_HOME_POSTS } from '@/shared/mocks/myHome'
 import { ProfileCard } from './ProfileCard'
-import { HomeTabs, TabsContent, type HomeTabConfig } from './HomeTabs'
+import { HomeTabs, TabsContent } from './HomeTabs'
 import { HomeTitle } from './HomeTitle'
 import { PostList } from './PostList'
 import { FooterPlaceholder } from './FooterPlaceholder'
 import { PostCreateBar } from './PostCreateBar'
 import { FavoriteBreedersContent } from './FavoriteBreedersContent'
-
-const MY_HOME_TABS: HomeTabConfig[] = [
-  { id: 'posts', label: '게시글' },
-  { id: 'breeders', label: '즐겨찾는 브리더', Icon: LockIcon },
-]
+import { MY_HOME_TABS } from './constants'
 
 const MyHomeContent = () => {
   const [activeTab, setActiveTab] = useState('posts')
