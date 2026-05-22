@@ -35,7 +35,7 @@ const MyListingsContent = () => {
   }, [filteredListings, isGroupedView])
 
   return (
-    <div className="flex w-full flex-col">
+    <div className="flex w-full flex-col pb-12">
       {/* Navigation Header */}
       <Container>
         <div className="flex items-center py-3 tab:pb-[2rem] tab:pt-[1.5rem]">
@@ -77,13 +77,13 @@ const MyListingsContent = () => {
 
         {isGroupedView && groupedByDate ? (
           /* 예약중: 날짜 그룹 + 가로형 리스트 */
-          <div className="flex flex-col gap-[3.787rem] py-5 tab:py-8">
+          <div className="flex flex-col gap-3 py-5 tab:gap-[3.787rem] tab:py-8">
             {[...groupedByDate.entries()].map(([date, listings]) => (
-              <div key={date} className="flex flex-col gap-2.5">
+              <div key={date} className="flex flex-col gap-1.5">
                 <p className="text-sm font-medium leading-[1.375rem] text-text-primary">
                   {date}
                 </p>
-                <div className="flex flex-col gap-2.5">
+                <div className="flex flex-col gap-2">
                   {listings.map((listing) => (
                     <ReservedListingCard key={listing.listingId} listing={listing} />
                   ))}
