@@ -14,6 +14,9 @@ export const MOCK_ADOPTION_LISTING: AdoptionListingCard = {
   isFavorited: false,
   isPopular: true,
   postedAt: '2026.4.30',
+  description:
+    '경상남도 창원에 위치한 랙돌 캐터리 로지데이즈입니다.\n저희 캐터리는 평균 생후 4개월령에 중성화 수술을 완료한 후 입양을 진행하고 있으며,...',
+  chatCount: 2,
 }
 
 /** 탐색 페이지용 목데이터 생성 */

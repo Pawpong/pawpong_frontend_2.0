@@ -31,6 +31,8 @@ export interface AdoptionListingCard {
   isFavorited: boolean
   isPopular: boolean
   postedAt: string
+  description?: string
+  chatCount?: number
 }
 
 /** 입양 상태 한국어 매핑 */

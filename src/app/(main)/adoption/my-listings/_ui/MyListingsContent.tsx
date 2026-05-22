@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { ArrowBackIcon } from '@/shared/assets/icons'
 import { Container, Separator } from '@/shared/ui'
@@ -8,6 +8,7 @@ import { AdoptionCard } from '@/entities/adoption'
 import { createMockListings } from '@/shared/mocks/adoption'
 import type { AdoptionStatus } from '@/shared/types'
 import { StatusFilterChips } from './StatusFilterChips'
+import { ReservedListingCard } from './ReservedListingCard'
 import { BreederListingCard } from '@/app/(main)/home/_ui/BreederListingCard'
 
 const MyListingsContent = () => {
@@ -17,6 +18,21 @@ const MyListingsContent = () => {
   const filteredListings = activeStatus
     ? allListings.filter((l) => l.status === activeStatus)
     : allListings
+
+  const isReservedView = activeStatus === 'reserved'
+
+  // 예약중: 날짜별 그룹핑
+  const groupedByDate = useMemo(() => {
+    if (!isReservedView) return null
+    const groups = new Map<string, typeof filteredListings>()
+    for (const listing of filteredListings) {
+      const date = listing.postedAt
+      const existing = groups.get(date) ?? []
+      existing.push(listing)
+      groups.set(date, existing)
+    }
+    return groups
+  }, [filteredListings, isReservedView])
 
   return (
     <div className="flex w-full flex-col">
@@ -48,7 +64,7 @@ const MyListingsContent = () => {
       <Separator className="bg-border-light" />
 
       {/* 분양목록 헤더 + 필터 */}
-      <Container className="pc:px-[10rem]">
+      <Container>
         <div className="flex items-center justify-between pt-5 tab:pt-8">
           <p className="text-sm font-bold leading-[1.5] text-text-primary tab:text-xl">
             분양목록
@@ -59,19 +75,39 @@ const MyListingsContent = () => {
           />
         </div>
 
-        {/* Mobile: 2열 그리드 */}
-        <div className="grid grid-cols-2 gap-[0.625rem] py-[1.25rem] tab:hidden">
-          {filteredListings.map((listing) => (
-            <BreederListingCard key={listing.listingId} listing={listing} />
-          ))}
-        </div>
+        {isReservedView && groupedByDate ? (
+          /* 예약중: 날짜 그룹 + 가로형 리스트 */
+          <div className="flex flex-col gap-5 py-5 tab:gap-6 tab:py-8">
+            {[...groupedByDate.entries()].map(([date, listings]) => (
+              <div key={date} className="flex flex-col gap-2.5">
+                <p className="text-sm font-medium leading-[1.375rem] text-text-primary">
+                  {date}
+                </p>
+                <div className="flex flex-col gap-2.5">
+                  {listings.map((listing) => (
+                    <ReservedListingCard key={listing.listingId} listing={listing} />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <>
+            {/* Mobile: 2열 그리드 */}
+            <div className="grid grid-cols-2 gap-[0.625rem] py-[1.25rem] tab:hidden">
+              {filteredListings.map((listing) => (
+                <BreederListingCard key={listing.listingId} listing={listing} />
+              ))}
+            </div>
 
-        {/* Desktop: 3열 그리드 */}
-        <div className="hidden tab:mt-6 tab:grid tab:grid-cols-3 tab:gap-6 tab:pb-8">
-          {filteredListings.map((listing) => (
-            <AdoptionCard key={listing.listingId} listing={listing} />
-          ))}
-        </div>
+            {/* Desktop: 3열 그리드 */}
+            <div className="hidden tab:mt-6 tab:grid tab:grid-cols-3 tab:gap-6 tab:pb-8">
+              {filteredListings.map((listing) => (
+                <AdoptionCard key={listing.listingId} listing={listing} />
+              ))}
+            </div>
+          </>
+        )}
       </Container>
     </div>
   )
