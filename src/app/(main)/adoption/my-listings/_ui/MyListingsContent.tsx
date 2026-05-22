@@ -77,7 +77,7 @@ const MyListingsContent = () => {
 
         {isReservedView && groupedByDate ? (
           /* 예약중: 날짜 그룹 + 가로형 리스트 */
-          <div className="flex flex-col gap-5 py-5 tab:gap-6 tab:py-8">
+          <div className="flex flex-col gap-[3.787rem] py-5 tab:py-8">
             {[...groupedByDate.entries()].map(([date, listings]) => (
               <div key={date} className="flex flex-col gap-2.5">
                 <p className="text-sm font-medium leading-[1.375rem] text-text-primary">

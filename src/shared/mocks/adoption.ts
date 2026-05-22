@@ -21,22 +21,25 @@ export const MOCK_ADOPTION_LISTING: AdoptionListingCard = {
 
 /** 탐색 페이지용 목데이터 생성 */
 export const createMockListings = (): AdoptionListingCard[] => {
-  const statuses: AdoptionListingCard['status'][] = [
-    'available',
-    'available',
-    'available',
-    'completed',
-    'reserved',
-    'available',
-    'available',
-    'available',
-    'available',
+  const items: { status: AdoptionListingCard['status']; postedAt: string }[] = [
+    { status: 'available', postedAt: '2026.4.30' },
+    { status: 'available', postedAt: '2026.4.30' },
+    { status: 'available', postedAt: '2026.4.30' },
+    { status: 'completed', postedAt: '2026.4.30' },
+    { status: 'reserved', postedAt: '2026.4.30' },
+    { status: 'reserved', postedAt: '2026.4.30' },
+    { status: 'reserved', postedAt: '2026.4.29' },
+    { status: 'reserved', postedAt: '2026.4.29' },
+    { status: 'available', postedAt: '2026.4.29' },
+    { status: 'available', postedAt: '2026.4.29' },
+    { status: 'available', postedAt: '2026.4.28' },
   ]
 
-  return statuses.map((status, i) => ({
+  return items.map((item, i) => ({
     ...MOCK_ADOPTION_LISTING,
     listingId: String(i + 1),
-    status,
+    status: item.status,
+    postedAt: item.postedAt,
     isPopular: i < 3,
   }))
 }
