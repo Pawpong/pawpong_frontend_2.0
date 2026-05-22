@@ -17,12 +17,12 @@ const ReservedListingCard = ({ listing, className }: ReservedListingCardProps) =
     <Link
       href={`/adoption/${listing.listingId}`}
       className={cn(
-        'flex overflow-hidden rounded-2xl bg-[#e7e7e7]',
+        'relative flex overflow-hidden rounded-2xl bg-[#e7e7e7] tab:h-[19.063rem]',
         className,
       )}
     >
-      {/* 이미지 */}
-      <div className="relative w-[8.5rem] shrink-0 self-stretch tab:w-[13.647rem]">
+      {/* 이미지: 세로 센터, rounded-7px */}
+      <div className="relative w-[7rem] shrink-0 self-stretch tab:my-auto tab:ml-[1.719rem] tab:h-[14.124rem] tab:w-[13.647rem] tab:self-auto tab:overflow-hidden tab:rounded-[0.437rem]">
         <Image
           src={listing.thumbnailUrl}
           alt={listing.name}
@@ -32,70 +32,66 @@ const ReservedListingCard = ({ listing, className }: ReservedListingCardProps) =
         {listing.isPopular && (
           <Badge
             variant="outline"
-            className="absolute left-2.5 top-3 bg-white tab:left-[2.375rem] tab:top-[3.17rem]"
+            className="absolute left-2 top-2 bg-white tab:left-[0.625rem] tab:top-[1.125rem]"
           >
             인기🔥
           </Badge>
         )}
       </div>
 
-      {/* 정보 */}
-      <div className="flex flex-1 flex-col justify-between p-3 tab:px-6 tab:py-5">
-        {/* 상단: 이름 + 뱃지 */}
-        <div>
-          <div className="flex flex-wrap items-center gap-1.5 tab:gap-[1.125rem]">
-            <p className="text-sm font-semibold leading-[1.375rem] text-text-primary tab:text-xl">
-              {listing.name}
-            </p>
-            <span className="hidden size-1 rounded-full bg-text-primary tab:block" />
-            <span className="hidden text-xl font-semibold leading-[1.375rem] text-text-primary tab:block">
-              {GENDER_LABEL[listing.gender]}
-            </span>
-            <span className="hidden size-1 rounded-full bg-text-primary tab:block" />
-            <span className="hidden text-xl font-semibold leading-[1.375rem] text-text-primary tab:block">
-              {listing.ageText}
-            </span>
-            <Badge
-              variant="status"
-              className="bg-text-primary px-[0.585rem] py-[0.234rem] text-xs leading-[1.286rem] tab:text-sm"
-            >
-              예약중
-            </Badge>
-          </div>
-
-          {/* 설명 — 데스크탑만 */}
-          {listing.description && (
-            <p className="mt-2 hidden text-base font-semibold leading-[1.375rem] text-text-primary line-clamp-3 tab:block">
-              {listing.description}
-            </p>
-          )}
-
-          {/* 문의/관심/조회 */}
-          <ListingStats
-            inquiryCount={listing.inquiryCount}
-            favoriteCount={listing.favoriteCount}
-            viewCount={listing.viewCount}
-            size="md"
-            className="mt-1.5 gap-[0.375rem] tab:mt-3 tab:gap-5 tab:text-sm"
-          />
-
-          {/* 게시날짜 — 데스크탑만 */}
-          <div className="mt-1 hidden items-center gap-[0.438rem] text-sm text-[#a3a3a3] tab:flex">
-            <span>게시날짜</span>
-            <span className="size-[0.188rem] rounded-full bg-[#a3a3a3]" />
-            <span>{listing.postedAt}</span>
-          </div>
+      {/* 정보 영역 */}
+      <div className="flex flex-1 flex-col p-3 tab:py-[2.319rem] tab:pl-[1.5rem] tab:pr-[1.719rem]">
+        {/* 이름 · 성별 · 나이 + 뱃지 */}
+        <div className="flex flex-wrap items-center gap-1 tab:gap-[1.125rem]">
+          <p className="text-sm font-semibold leading-[1.375rem] text-text-primary tab:text-xl">
+            {listing.name}
+          </p>
+          <span className="hidden size-[0.253rem] rounded-full bg-text-primary tab:block" />
+          <span className="hidden text-xl font-semibold leading-[1.375rem] text-text-primary tab:block">
+            {GENDER_LABEL[listing.gender]}
+          </span>
+          <span className="hidden size-[0.253rem] rounded-full bg-text-primary tab:block" />
+          <span className="hidden text-xl font-semibold leading-[1.375rem] text-text-primary tab:block">
+            {listing.ageText}
+          </span>
+          <Badge
+            variant="status"
+            className="bg-text-primary px-[0.585rem] py-[0.234rem] text-xs leading-[1.286rem] tab:text-sm"
+          >
+            예약중
+          </Badge>
         </div>
 
-        {/* 하단: 채팅 버튼 — 데스크탑만 */}
-        {listing.chatCount !== undefined && listing.chatCount > 0 && (
-          <div className="mt-3 hidden justify-end tab:flex">
-            <span className="flex h-12 w-[11.938rem] items-center justify-center rounded-full bg-text-primary text-base font-semibold text-white">
-              대화중인 채팅 {listing.chatCount}
-            </span>
-          </div>
+        {/* 설명 */}
+        {listing.description && (
+          <p className="mt-2 line-clamp-2 text-xs leading-[1.375rem] text-text-primary tab:mt-[1.125rem] tab:line-clamp-3 tab:text-base tab:font-semibold">
+            {listing.description}
+          </p>
         )}
+
+        {/* 문의/관심/조회 */}
+        <ListingStats
+          inquiryCount={listing.inquiryCount}
+          favoriteCount={listing.favoriteCount}
+          viewCount={listing.viewCount}
+          size="md"
+          className="mt-1.5 gap-[0.375rem] tab:mt-[0.75rem] tab:gap-5 tab:text-sm"
+        />
+
+        {/* 게시날짜 */}
+        <div className="mt-auto flex items-center gap-[0.438rem] pt-2 text-xs text-[#a3a3a3] tab:text-sm">
+          <span>게시날짜</span>
+          <span className="size-[0.188rem] rounded-full bg-[#a3a3a3]" />
+          <span>{listing.postedAt}</span>
+        </div>
       </div>
+
+      {/* 대화중인 채팅 버튼: 우하단 */}
+      {listing.chatCount !== undefined && listing.chatCount > 0 && (
+        <span className="absolute bottom-3 right-3 flex h-8 items-center justify-center rounded-full bg-text-primary px-3 text-xs font-semibold text-white tab:bottom-[1.719rem] tab:right-[1.719rem] tab:h-12 tab:w-[11.938rem] tab:text-base">
+          대화중인 채팅 {listing.chatCount}
+        </span>
+      )}
     </Link>
   )
 }
