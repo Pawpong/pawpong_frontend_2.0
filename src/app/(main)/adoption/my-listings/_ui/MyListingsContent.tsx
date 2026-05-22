@@ -21,29 +21,29 @@ const MyListingsContent = () => {
   return (
     <div className="flex w-full flex-col">
       {/* Navigation Header */}
-      <div className="px-[1.25rem] tab:px-[6.25rem]">
-        <div className="flex items-center justify-center py-3 tab:pb-[2rem] tab:pt-[1.5rem]">
-          <Link href="/home" className="flex flex-1 items-center tab:flex-none">
+      <Container>
+        <div className="flex items-center py-3 tab:pb-[2rem] tab:pt-[1.5rem]">
+          <Link href="/home" className="flex flex-1 items-center">
             <ArrowBackIcon className="size-6 text-text-primary" />
           </Link>
-          <h1 className="text-sm font-semibold leading-[1.5] text-text-primary tab:flex-1 tab:text-center tab:text-xl tab:font-bold tab:leading-[1.375rem]">
+          <h1 className="text-sm font-semibold leading-[1.5] text-text-primary tab:text-xl tab:font-bold tab:leading-[1.375rem]">
             분양 페이지
           </h1>
-          <div className="hidden flex-1 tab:block" />
+          <div className="flex-1" />
         </div>
-      </div>
+      </Container>
 
       <Separator className="bg-border-light" />
 
       {/* CTA: 분양글 작성 */}
-      <div className="px-[1.25rem] tab:px-[6.25rem]">
+      <Container>
         <Link
           href="/adoption/create"
           className="block py-3 text-sm font-medium leading-[1.375rem] text-text-primary tab:py-4 tab:text-base"
         >
           {`분양할 아이가 있나요? 글 작성하러 가기 >`}
         </Link>
-      </div>
+      </Container>
 
       <Separator className="bg-border-light" />
 
