@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { Badge, ListingStats } from '@/shared/ui'
 import { cn } from '@/shared/lib/Cn'
 import type { AdoptionListingCard } from '@/shared/types'
-import { GENDER_LABEL } from '@/shared/types'
+import { ADOPTION_STATUS_LABEL, GENDER_LABEL } from '@/shared/types'
 
 interface ReservedListingCardProps {
   listing: AdoptionListingCard
@@ -13,6 +13,8 @@ interface ReservedListingCardProps {
 }
 
 const ReservedListingCard = ({ listing, className }: ReservedListingCardProps) => {
+  const isCompleted = listing.status === 'completed'
+
   return (
     <Link
       href={`/adoption/${listing.listingId}`}
@@ -29,6 +31,9 @@ const ReservedListingCard = ({ listing, className }: ReservedListingCardProps) =
           fill
           className="object-cover"
         />
+        {isCompleted && (
+          <div className="absolute inset-0 bg-white/70" />
+        )}
         {listing.isPopular && (
           <Badge
             variant="outline"
@@ -58,7 +63,7 @@ const ReservedListingCard = ({ listing, className }: ReservedListingCardProps) =
             variant="status"
             className="bg-text-primary px-[0.585rem] py-[0.234rem] text-xs leading-[1.286rem] tab:text-sm"
           >
-            예약중
+            {ADOPTION_STATUS_LABEL[listing.status]}
           </Badge>
         </div>
 
@@ -89,7 +94,7 @@ const ReservedListingCard = ({ listing, className }: ReservedListingCardProps) =
       {/* 대화중인 채팅 버튼: 우하단 */}
       {listing.chatCount !== undefined && listing.chatCount > 0 && (
         <span className="absolute bottom-3 right-3 flex h-8 items-center justify-center rounded-full bg-text-primary px-3 text-xs font-semibold text-white tab:bottom-[1.719rem] tab:right-[1.719rem] tab:h-12 tab:w-[11.938rem] tab:text-base">
-          대화중인 채팅 {listing.chatCount}
+          대화중인 채팅{isCompleted ? '' : ` ${listing.chatCount}`}
         </span>
       )}
     </Link>

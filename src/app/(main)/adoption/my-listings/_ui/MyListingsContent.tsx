@@ -19,11 +19,11 @@ const MyListingsContent = () => {
     ? allListings.filter((l) => l.status === activeStatus)
     : allListings
 
-  const isReservedView = activeStatus === 'reserved'
+  const isGroupedView = activeStatus === 'reserved' || activeStatus === 'completed'
 
-  // 예약중: 날짜별 그룹핑
+  // 예약중/분양완료: 날짜별 그룹핑
   const groupedByDate = useMemo(() => {
-    if (!isReservedView) return null
+    if (!isGroupedView) return null
     const groups = new Map<string, typeof filteredListings>()
     for (const listing of filteredListings) {
       const date = listing.postedAt
@@ -32,7 +32,7 @@ const MyListingsContent = () => {
       groups.set(date, existing)
     }
     return groups
-  }, [filteredListings, isReservedView])
+  }, [filteredListings, isGroupedView])
 
   return (
     <div className="flex w-full flex-col">
@@ -75,7 +75,7 @@ const MyListingsContent = () => {
           />
         </div>
 
-        {isReservedView && groupedByDate ? (
+        {isGroupedView && groupedByDate ? (
           /* 예약중: 날짜 그룹 + 가로형 리스트 */
           <div className="flex flex-col gap-[3.787rem] py-5 tab:py-8">
             {[...groupedByDate.entries()].map(([date, listings]) => (
