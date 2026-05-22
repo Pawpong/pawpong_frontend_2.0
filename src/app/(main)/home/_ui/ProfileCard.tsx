@@ -8,7 +8,7 @@ import { cn } from '@/shared/lib/Cn'
 import { LocationIcon } from '@/shared/assets/icons'
 import type { MyHomeProfile, BreederProfile } from '@/shared/mocks/myHome'
 
-type ProfileMode = 'mine' | 'other' | 'breeder'
+type ProfileMode = 'mine' | 'mine-breeder' | 'other' | 'breeder'
 
 interface ProfileCardBaseProps {
   profile: MyHomeProfile
@@ -17,7 +17,7 @@ interface ProfileCardBaseProps {
 
 interface ProfileCardBreederProps {
   profile: BreederProfile
-  mode: 'breeder'
+  mode: 'breeder' | 'mine-breeder'
 }
 
 type ProfileCardProps = ProfileCardBaseProps | ProfileCardBreederProps
@@ -144,6 +144,7 @@ const OtherActions = () => (
 
 const ACTION_MAP = {
   mine: MineActions,
+  'mine-breeder': MineActions,
   breeder: BreederActions,
   other: OtherActions,
 } satisfies Record<ProfileMode, ComponentType>
@@ -152,7 +153,8 @@ const ACTION_MAP = {
 
 const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
   const Actions = ACTION_MAP[mode]
-  const breederLocation = mode === 'breeder' ? (profile as BreederProfile).location : null
+  const isBreederProfile = mode === 'breeder' || mode === 'mine-breeder'
+  const breederLocation = isBreederProfile ? (profile as BreederProfile).location : null
 
   return (
     <div className="tab:overflow-hidden tab:rounded-2xl tab:bg-surface-primary">
@@ -161,7 +163,7 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
         {/* Section 1: Badges + Nickname + Bio */}
         <div className="flex flex-col gap-2 tab:flex-1 tab:gap-0">
           <div className="flex items-center gap-1 tab:gap-3">
-            {mode === 'breeder' && (
+            {isBreederProfile && (
               <Badge variant="outline" className="h-6 text-xs leading-[1.375rem] tab:text-sm">
                 브리더
               </Badge>
@@ -176,7 +178,7 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
             {profile.nickname}
           </p>
           {/* Location — breeder, mobile only */}
-          {mode === 'breeder' && (
+          {isBreederProfile && (
             <LocationInfo location={breederLocation!} className="mt-1 tab:hidden" />
           )}
           <Bio text={profile.bio} className="mt-3 hidden max-w-[26.1rem] tab:block" />
@@ -210,7 +212,7 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
       />
 
       {/* Location — breeder, desktop only */}
-      {mode === 'breeder' && (
+      {isBreederProfile && (
         <LocationInfo location={breederLocation!} className="hidden py-2 tab:flex tab:px-10" />
       )}
 
