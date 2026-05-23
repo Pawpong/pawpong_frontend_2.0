@@ -68,6 +68,7 @@ export const MOCK_ADOPTION_DETAIL: AdoptionDetailDto = {
   inquiryCount: 1,
   favoriteCount: 10,
   viewCount: 20,
+  chatCount: 3,
   isFavorited: false,
   isPopular: false,
   breeder: {

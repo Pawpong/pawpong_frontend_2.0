@@ -122,6 +122,7 @@ export interface AdoptionDetailDto {
   inquiryCount: number
   favoriteCount: number
   viewCount: number
+  chatCount: number
   isFavorited: boolean
   isPopular: boolean
   breeder: BreederSummary
