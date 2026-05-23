@@ -31,6 +31,7 @@ const VoteCard = ({ entry, onImageClick }: VoteCardProps) => {
       <div className="flex flex-col gap-1 tab:hidden">
         <button
           type="button"
+          onClick={onImageClick}
           className="flex h-10 w-full items-center justify-center rounded-full border border-[#5d5d5d] px-[0.875rem] py-1"
         >
           <span className="text-sm font-semibold leading-[1.375rem] text-[#5d5d5d]">

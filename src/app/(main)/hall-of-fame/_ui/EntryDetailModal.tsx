@@ -1,7 +1,5 @@
 'use client'
 
-import Image from 'next/image'
-import { ArrowRightIcon, VoteIcon } from '@/shared/assets/icons'
 import {
   Dialog,
   DialogPortal,
@@ -9,78 +7,15 @@ import {
 } from '@/shared/ui'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import type { ContestEntry } from '@/shared/types'
+import { EntryHeader } from './EntryHeader'
+import { EntryImage } from './EntryImage'
+import { EntryDescription } from './EntryDescription'
 
 interface EntryDetailModalProps {
   entry: ContestEntry | null
   open: boolean
   onOpenChange: (open: boolean) => void
 }
-
-/** 상단 헤더 (닫기 + 투표 상태) */
-const EntryHeader = ({
-  entry,
-  onClose,
-  className,
-}: {
-  entry: ContestEntry
-  onClose: () => void
-  className?: string
-}) => (
-  <div className={`flex shrink-0 items-center ${className ?? ''}`}>
-    <button
-      type="button"
-      className="flex w-[3.625rem] items-center justify-center rounded-full border border-[#d4d4d4] p-[0.625rem] tab:w-[5.75rem]"
-      onClick={onClose}
-    >
-      <span className="text-sm font-medium text-white">닫기</span>
-    </button>
-    {entry.isVoted && (
-      <div className="ml-auto flex items-center gap-1.5 tab:ml-0 tab:gap-2">
-        <span className="text-sm font-medium text-white tab:text-base">투표했습니다</span>
-        <VoteIcon className="size-6 text-white" />
-        <span className="text-sm font-semibold leading-[1.375rem] text-white">
-          {entry.voteCount}
-        </span>
-      </div>
-    )}
-  </div>
-)
-
-/** 이미지 + 참여자 정보 */
-const EntryImage = ({ entry, className }: { entry: ContestEntry; className?: string }) => (
-  <div className={`relative flex flex-col items-center justify-center ${className ?? ''}`}>
-    <div className="w-[20.9375rem] overflow-hidden rounded-[1.1rem] bg-[#c6c6c6] tab:w-full tab:max-w-[27.875rem]">
-      <Image
-        src={entry.imageUrl}
-        alt={entry.description}
-        width={446}
-        height={450}
-        className="aspect-square size-full object-cover"
-      />
-    </div>
-    <div className="absolute bottom-4 right-5 flex flex-col items-end tab:right-6">
-      <span className="text-base font-semibold text-white tab:text-xl">
-        {entry.participant.name}
-      </span>
-      <button
-        type="button"
-        className="flex items-center text-base font-semibold text-white tab:text-xl"
-      >
-        홈으로
-        <ArrowRightIcon className="size-6 text-white" />
-      </button>
-    </div>
-  </div>
-)
-
-/** 하단 설명 */
-const EntryDescription = ({ entry }: { entry: ContestEntry }) => (
-  <div className="shrink-0 bg-[#2f2f2f] px-5 py-3 tab:px-16 tab:py-8">
-    <p className="text-sm font-medium leading-relaxed text-white">
-      {entry.description}
-    </p>
-  </div>
-)
 
 const EntryDetailModal = ({ entry, open, onOpenChange }: EntryDetailModalProps) => {
   if (!entry) return null
