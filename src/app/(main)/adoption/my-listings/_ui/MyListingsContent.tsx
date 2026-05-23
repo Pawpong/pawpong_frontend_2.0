@@ -1,38 +1,24 @@
 'use client'
 
-import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { ArrowBackIcon } from '@/shared/assets/icons'
 import { Container, Separator } from '@/shared/ui'
 import { AdoptionCard } from '@/entities/adoption'
 import { createMockListings } from '@/shared/mocks/adoption'
-import type { AdoptionStatus } from '@/shared/types'
+import { useListingsFilter } from '../_lib/useListingsFilter'
 import { StatusFilterChips } from './StatusFilterChips'
 import { ReservedListingCard } from './ReservedListingCard'
 import { BreederListingCard } from '@/app/(main)/home/_ui/BreederListingCard'
 
 const MyListingsContent = () => {
-  const [activeStatus, setActiveStatus] = useState<AdoptionStatus | null>('available')
   const allListings = createMockListings()
-
-  const filteredListings = activeStatus
-    ? allListings.filter((l) => l.status === activeStatus)
-    : allListings
-
-  const isGroupedView = activeStatus === 'reserved' || activeStatus === 'completed'
-
-  // 예약중/분양완료: 날짜별 그룹핑
-  const groupedByDate = useMemo(() => {
-    if (!isGroupedView) return null
-    const groups = new Map<string, typeof filteredListings>()
-    for (const listing of filteredListings) {
-      const date = listing.postedAt
-      const existing = groups.get(date) ?? []
-      existing.push(listing)
-      groups.set(date, existing)
-    }
-    return groups
-  }, [filteredListings, isGroupedView])
+  const {
+    activeStatus,
+    setActiveStatus,
+    filteredListings,
+    isGroupedView,
+    groupedByDate,
+  } = useListingsFilter(allListings)
 
   return (
     <div className="flex w-full flex-col pb-12">

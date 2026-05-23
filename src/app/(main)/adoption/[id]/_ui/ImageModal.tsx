@@ -1,6 +1,5 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
 import Image from 'next/image'
 import {
   Dialog,
@@ -9,6 +8,7 @@ import {
   DialogClose,
 } from '@/shared/ui'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
+import { useImageCarousel } from '@/shared/lib/useImageCarousel'
 
 interface ImageModalProps {
   images: string[]
@@ -30,19 +30,7 @@ const ImageModal = ({
   onSetRepresentative,
   representativeIndex,
 }: ImageModalProps) => {
-  const [currentIndex, setCurrentIndex] = useState(initialIndex)
-
-  useEffect(() => {
-    setCurrentIndex(initialIndex)
-  }, [initialIndex])
-
-  const handlePrev = useCallback(() => {
-    setCurrentIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1))
-  }, [images.length])
-
-  const handleNext = useCallback(() => {
-    setCurrentIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0))
-  }, [images.length])
+  const { currentIndex, handlePrev, handleNext } = useImageCarousel(images, initialIndex)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

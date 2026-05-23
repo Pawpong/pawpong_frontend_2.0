@@ -1,16 +1,10 @@
 'use client'
 
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useRouter } from 'next/navigation'
 import { CloseIcon } from '@/shared/assets/icons'
 import { ExitConfirmDialog } from '@/shared/ui'
-import { useCreateApplication } from '@/features/application/model/hooks'
-import { useExitGuard } from '@/shared/lib/useExitGuard'
 import type { AdoptionDetailDto } from '@/shared/types'
-import { GENDER_LABEL } from '@/shared/types'
 import { cn } from '@/shared/lib/Cn'
-import { applicationSchema, getAgeText, type ApplicationFormValues } from '../_lib/schema'
+import { useApplicationForm } from '../_lib/useApplicationForm'
 import { BreederProfile } from './BreederProfile'
 import { PetInfoCard } from './PetInfoCard'
 import { FormSection, ReadonlyInput, CheckboxField } from './FormFields'
@@ -20,63 +14,19 @@ interface ApplicationFormProps {
 }
 
 const ApplicationForm = ({ detail }: ApplicationFormProps) => {
-  const router = useRouter()
-  const { mutate: createApplication, isPending } = useCreateApplication()
-
   const {
     register,
     control,
     handleSubmit,
-    formState: { isValid, isDirty },
-  } = useForm<ApplicationFormValues>({
-    resolver: zodResolver(applicationSchema),
-    mode: 'onChange',
-    defaultValues: {
-      adoptionPlan: '',
-      privacyConsent: false,
-      canProvideBasicCare: false,
-      canAffordMedicalExpenses: false,
-      familyMembers: '',
-      allFamilyConsent: false,
-    },
-  })
-
-  /* ── 네비게이션 가드 ── */
-  const { showGuard, requestExit, confirmExit, cancelExit } = useExitGuard({
-    hasChanges: isDirty,
-  })
-
-  const handleCloseClick = () => {
-    if (requestExit()) {
-      router.back()
-    }
-  }
-
-  const onSubmit = (data: ApplicationFormValues) => {
-    createApplication(
-      {
-        breederId: detail.breeder.id,
-        petId: detail.listingId,
-        privacyConsent: data.privacyConsent,
-        selfIntroduction: data.adoptionPlan,
-        familyMembers: data.familyMembers,
-        allFamilyConsent: data.allFamilyConsent,
-        canProvideBasicCare: data.canProvideBasicCare,
-        canAffordMedicalExpenses: data.canAffordMedicalExpenses,
-        allergyTestInfo: '',
-        timeAwayFromHome: '',
-        livingSpaceDescription: '',
-        previousPetExperience: '',
-      },
-      {
-        onSuccess: () => {
-          router.push(`/adoption/${detail.listingId}`)
-        },
-      },
-    )
-  }
-
-  const petSummary = `${detail.name} . ${GENDER_LABEL[detail.gender]} . ${getAgeText(detail.birthDate)}`
+    isValid,
+    isPending,
+    showGuard,
+    confirmExit,
+    cancelExit,
+    handleCloseClick,
+    onSubmit,
+    petSummary,
+  } = useApplicationForm(detail)
 
   return (
     <div className="pb-[5.5rem] tab:pb-0">
