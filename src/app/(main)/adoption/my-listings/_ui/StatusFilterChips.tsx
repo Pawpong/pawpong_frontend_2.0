@@ -2,12 +2,9 @@
 
 import { cn } from '@/shared/lib/Cn'
 import type { AdoptionStatus } from '@/shared/types'
+import { ADOPTION_STATUS_LABEL } from '@/shared/types'
 
-const BREEDER_STATUS_FILTERS: { id: AdoptionStatus; label: string }[] = [
-  { id: 'available', label: '분양가능' },
-  { id: 'reserved', label: '예약중' },
-  { id: 'completed', label: '분양 완료' },
-]
+const ADOPTION_STATUSES: AdoptionStatus[] = ['available', 'reserved', 'completed']
 
 interface StatusFilterChipsProps {
   activeStatus: AdoptionStatus | null
@@ -21,13 +18,13 @@ const StatusFilterChips = ({ activeStatus, onStatusChange }: StatusFilterChipsPr
 
   return (
     <div className="flex items-center gap-3 tab:gap-4">
-      {BREEDER_STATUS_FILTERS.map((filter) => {
-        const isActive = activeStatus === filter.id
+      {ADOPTION_STATUSES.map((status) => {
+        const isActive = activeStatus === status
         return (
           <button
-            key={filter.id}
+            key={status}
             type="button"
-            onClick={() => handleClick(filter.id)}
+            onClick={() => handleClick(status)}
             className={cn(
               'rounded-full px-2.5 py-1 text-sm font-semibold leading-[1.375rem] whitespace-nowrap',
               isActive
@@ -35,7 +32,7 @@ const StatusFilterChips = ({ activeStatus, onStatusChange }: StatusFilterChipsPr
                 : 'bg-[#e1e1e1] text-text-primary',
             )}
           >
-            {filter.label}
+            {ADOPTION_STATUS_LABEL[status]}
           </button>
         )
       })}

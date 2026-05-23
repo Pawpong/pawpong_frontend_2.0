@@ -10,15 +10,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui'
-
-const AddRowButton = ({ label }: { label: string }) => (
-  <button
-    type="button"
-    className="mx-auto h-7 rounded-[0.375rem] bg-[#a8a8a8] px-[0.625rem] text-sm font-medium text-white tab:h-auto tab:w-[28.75rem] tab:rounded-full tab:p-[0.625rem] tab:text-sm"
-  >
-    {label}
-  </button>
-)
+import { FormSection } from './FormSection'
+import { AddRowButton } from './AddRowButton'
 
 const HealthInfoSection = () => {
   const [vaccinationStatus, setVaccinationStatus] = useState<string>('')
@@ -28,17 +21,12 @@ const HealthInfoSection = () => {
   const isVaccinationIncomplete = vaccinationStatus === 'in-progress' || vaccinationStatus === 'not-started'
 
   return (
-    <div className="flex flex-col gap-[0.921rem] rounded-2xl bg-[#f5f5f5] p-3.5 tab:gap-[2.188rem] tab:p-[1.875rem]">
-      <div className="flex items-center gap-1.5">
-        <span className="text-xs font-medium leading-[1.375rem] text-text-primary tab:text-xl tab:font-semibold">
-          건강 정보
-        </span>
-        <span className="text-xs font-medium leading-[1.375rem] text-text-primary tab:text-base tab:leading-[1.5]">
-          필수
-        </span>
-        <InfoIcon className="size-4 text-text-primary" />
-      </div>
-
+    <FormSection
+      title="건강 정보"
+      required
+      icon={<InfoIcon className="size-4 text-text-primary" />}
+      className="gap-[0.921rem] tab:gap-[2.188rem]"
+    >
       {/* 예방 접종 현황 */}
       <div className="flex flex-col gap-3 tab:gap-3">
         <p className="text-sm font-semibold leading-[1.375rem] text-text-primary tab:px-0 tab:text-base">
@@ -97,9 +85,7 @@ const HealthInfoSection = () => {
               <SelectItem value="not-tested">미검사</SelectItem>
             </SelectContent>
           </Select>
-          {geneticTestStatus === 'not-tested' ? (
-            <Input placeholder="미완료한 이유작성 (예: 태어난지 한달도 안됨)" />
-          ) : geneticTestStatus === 'incomplete' ? (
+          {geneticTestStatus === 'not-tested' || geneticTestStatus === 'incomplete' ? (
             <Input placeholder="미완료한 이유작성 (예: 태어난지 한달도 안됨)" />
           ) : (
             <>
@@ -124,7 +110,7 @@ const HealthInfoSection = () => {
           )}
         </div>
       </div>
-    </div>
+    </FormSection>
   )
 }
 

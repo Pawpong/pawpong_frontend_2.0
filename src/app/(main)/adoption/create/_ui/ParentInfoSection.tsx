@@ -1,38 +1,23 @@
 'use client'
 
-import { useState, useCallback } from 'react'
 import { InfoIcon } from '@/shared/assets/icons'
 import { Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui'
+import { useImageUpload } from '@/shared/lib/useImageUpload'
 import { ImageUploadArea } from '@/app/(main)/post/create/_ui/ImageUploadArea'
+import { FormSection } from './FormSection'
+import { AddRowButton } from './AddRowButton'
 
 const ParentInfoSection = () => {
-  const [images, setImages] = useState<string[]>([])
-
-  const handleAddImages = useCallback((files: FileList) => {
-    const newImages = Array.from(files).map((file) => URL.createObjectURL(file))
-    setImages((prev) => [...prev, ...newImages].slice(0, 1))
-  }, [])
-
-  const handleRemoveImage = useCallback((index: number) => {
-    setImages((prev) => {
-      const removed = prev[index]
-      if (removed) URL.revokeObjectURL(removed)
-      return prev.filter((_, i) => i !== index)
-    })
-  }, [])
+  const { images, handleAddImages, handleRemoveImage } = useImageUpload({
+    maxImages: 1,
+  })
 
   return (
-    <div className="flex flex-col gap-1.5 rounded-2xl bg-[#f5f5f5] p-3.5 tab:p-[1.875rem]">
-      <div className="flex items-center gap-1.5">
-        <span className="text-xs font-medium leading-[1.375rem] text-text-primary tab:text-xl tab:font-semibold">
-          부모 정보
-        </span>
-        <span className="text-xs font-medium leading-[1.375rem] text-text-primary tab:text-base tab:leading-[1.5]">
-          선택
-        </span>
-        <InfoIcon className="size-4 text-text-primary" />
-      </div>
-
+    <FormSection
+      title="부모 정보"
+      icon={<InfoIcon className="size-4 text-text-primary" />}
+      className="gap-1.5"
+    >
       <div className="flex flex-col gap-1.5 tab:flex-row tab:gap-6">
         {/* 이미지 (데스크탑에서 좌측) */}
         <div className="hidden tab:block tab:pt-1.5">
@@ -85,13 +70,8 @@ const ParentInfoSection = () => {
         </div>
       </div>
 
-      <button
-        type="button"
-        className="mx-auto mt-1.5 h-7 rounded-[0.375rem] bg-[#a8a8a8] px-[0.625rem] text-sm font-medium text-white tab:h-auto tab:w-[28.625rem] tab:rounded-full tab:p-[0.625rem] tab:text-sm"
-      >
-        부모 정보 추가하기
-      </button>
-    </div>
+      <AddRowButton label="부모 정보 추가하기" />
+    </FormSection>
   )
 }
 

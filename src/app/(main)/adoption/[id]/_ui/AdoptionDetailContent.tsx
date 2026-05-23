@@ -299,11 +299,7 @@ const InfoItem = ({ label, value }: { label: string; value: string }) => (
 )
 
 /* ── 상태 변경 드롭다운 (브리더용) ── */
-const STATUS_OPTIONS: { value: AdoptionStatus; label: string }[] = [
-  { value: 'reserved', label: '입양 예약중' },
-  { value: 'available', label: '입양 가능' },
-  { value: 'completed', label: '분양 완료' },
-]
+const STATUS_OPTIONS: AdoptionStatus[] = ['reserved', 'available', 'completed']
 
 const StatusDropdown = ({ currentStatus }: { currentStatus: AdoptionStatus }) => (
   <DropdownMenu>
@@ -320,13 +316,13 @@ const StatusDropdown = ({ currentStatus }: { currentStatus: AdoptionStatus }) =>
       align="start"
       className="w-[7rem] rounded-[1rem] border-none bg-[#5d5d5d] px-[0.625rem] py-[0.5rem] shadow-[3px_3px_11px_0px_rgba(0,0,0,0.15)]"
     >
-      {STATUS_OPTIONS.map((option) => (
+      {STATUS_OPTIONS.map((status) => (
         <DropdownMenuItem
-          key={option.value}
+          key={status}
           className="flex items-center justify-between rounded-none px-0 py-0 text-[0.875rem] font-medium leading-[1.375rem] text-white hover:bg-transparent focus:bg-transparent"
         >
-          <span>{option.label}</span>
-          {option.value === currentStatus && (
+          <span>{ADOPTION_STATUS_LABEL[status]}</span>
+          {status === currentStatus && (
             <CheckIcon className="size-[1.25rem]" />
           )}
         </DropdownMenuItem>

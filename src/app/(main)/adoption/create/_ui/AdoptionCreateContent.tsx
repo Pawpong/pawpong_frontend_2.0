@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { CloseIcon } from '@/shared/assets/icons'
 import {
@@ -13,7 +13,8 @@ import {
   SelectValue,
   Textarea,
 } from '@/shared/ui'
-import { useBrowserNavigationGuard } from '@/shared/lib/useBrowserNavigationGuard'
+import { useExitGuard } from '@/shared/lib/useExitGuard'
+import { useImageUpload } from '@/shared/lib/useImageUpload'
 import { ImageUploadArea } from '@/app/(main)/post/create/_ui/ImageUploadArea'
 import { FormFieldLabel } from './FormFieldLabel'
 import { HealthInfoSection } from './HealthInfoSection'
@@ -23,47 +24,40 @@ import { AdoptionCreateExitDialog } from './AdoptionCreateExitDialog'
 
 const AdoptionCreateContent = () => {
   const router = useRouter()
-  const [images, setImages] = useState<string[]>([])
   const [representativeIndex, setRepresentativeIndex] = useState(0)
   const [isDirty, setIsDirty] = useState(false)
-  const [showExitDialog, setShowExitDialog] = useState(false)
-
-  const { showBrowserGuard, handleBrowserConfirm, handleBrowserCancel } =
-    useBrowserNavigationGuard({ hasChanges: isDirty, enabled: true })
-
-  const handleAddImages = useCallback((files: FileList) => {
-    const newImages = Array.from(files).map((file) => URL.createObjectURL(file))
-    setImages((prev) => [...prev, ...newImages].slice(0, 10))
-    setIsDirty(true)
-  }, [])
-
-  const handleRemoveImage = useCallback((index: number) => {
-    setImages((prev) => {
-      const removed = prev[index]
-      if (removed) URL.revokeObjectURL(removed)
-      return prev.filter((_, i) => i !== index)
-    })
-    setRepresentativeIndex((prev) => {
-      if (index === prev) return 0
-      if (index < prev) return prev - 1
-      return prev
-    })
-  }, [])
 
   const handleFormChange = useCallback(() => {
     setIsDirty(true)
   }, [])
 
+  const { images, handleAddImages, handleRemoveImage: baseRemoveImage } =
+    useImageUpload({ onDirty: handleFormChange })
+
+  const handleRemoveImage = useCallback(
+    (index: number) => {
+      baseRemoveImage(index)
+      setRepresentativeIndex((prev) => {
+        if (index === prev) return 0
+        if (index < prev) return prev - 1
+        return prev
+      })
+    },
+    [baseRemoveImage],
+  )
+
+  const { showGuard, requestExit, confirmExit, cancelExit } = useExitGuard({
+    hasChanges: isDirty,
+  })
+
   const handleCloseClick = () => {
-    if (isDirty) {
-      setShowExitDialog(true)
-    } else {
+    if (requestExit()) {
       router.push('/adoption/my-listings')
     }
   }
 
   const handleExitConfirm = () => {
-    setShowExitDialog(false)
+    confirmExit()
     router.push('/adoption/my-listings')
   }
 
@@ -74,11 +68,7 @@ const AdoptionCreateContent = () => {
 
   const handleSaveDraft = () => {
     // TODO: 임시저장 로직 구현
-    setShowExitDialog(false)
-  }
-
-  const handleExitCancel = () => {
-    setShowExitDialog(false)
+    cancelExit()
   }
 
   return (
@@ -180,10 +170,10 @@ const AdoptionCreateContent = () => {
       </div>
 
       <AdoptionCreateExitDialog
-        open={showExitDialog || showBrowserGuard}
-        onExit={showBrowserGuard ? handleBrowserConfirm : handleExitConfirm}
+        open={showGuard}
+        onExit={handleExitConfirm}
         onSaveDraft={handleSaveDraft}
-        onCancel={showBrowserGuard ? handleBrowserCancel : handleExitCancel}
+        onCancel={cancelExit}
       />
     </div>
   )
