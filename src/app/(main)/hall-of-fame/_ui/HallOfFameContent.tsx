@@ -13,9 +13,14 @@ import { ContestBanner } from './ContestBanner'
 import { RankingCard } from './RankingCard'
 import { VoteCard } from './VoteCard'
 
+type RankingPeriod = 'current' | 'previous'
+
 const HallOfFameContent = () => {
   const [isRankingOpen, setIsRankingOpen] = useState(true)
   const [isVoteOpen, setIsVoteOpen] = useState(true)
+  const [rankingPeriod, setRankingPeriod] = useState<RankingPeriod>('current')
+
+  const isCurrent = rankingPeriod === 'current'
 
   return (
     <div className="flex w-full flex-col pb-12">
@@ -41,7 +46,7 @@ const HallOfFameContent = () => {
       <Container className="mt-6 tab:mt-16">
         <div className="flex flex-col gap-3 tab:gap-5">
           <SectionHeader
-            title="실시간 랭킹 1위~3위"
+            title={isCurrent ? '실시간 랭킹 1위~3위' : '저번주 랭킹'}
             subtitle={MOCK_CONTEST_INFO.dateRange}
             collapsible
             collapsed={!isRankingOpen}
@@ -50,9 +55,10 @@ const HallOfFameContent = () => {
               <button
                 type="button"
                 className="hidden h-9 items-center justify-center rounded-full bg-[#a4a4a4] px-5 tab:flex"
+                onClick={() => setRankingPeriod(isCurrent ? 'previous' : 'current')}
               >
                 <span className="whitespace-nowrap text-base font-semibold text-white">
-                  {`< 저번주 랭킹`}
+                  {isCurrent ? '< 저번주 랭킹' : '이번주 실시간 랭킹>'}
                 </span>
               </button>
             }
