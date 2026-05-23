@@ -43,6 +43,9 @@ const ImageUploadArea = ({
   const [actionDialogOpen, setActionDialogOpen] = useState(false)
   const [actionIndex, setActionIndex] = useState(0)
 
+  const [desktopModalOpen, setDesktopModalOpen] = useState(false)
+  const [desktopModalIndex, setDesktopModalIndex] = useState(0)
+
   const hasRepresentative = representativeIndex !== undefined
 
   const handleClick = () => {
@@ -56,10 +59,17 @@ const ImageUploadArea = ({
     }
   }
 
+  const isDesktop = () => window.matchMedia('(min-width: 768px)').matches
+
   const handleImageClick = (index: number) => {
     if (hasRepresentative) {
-      setActionIndex(index)
-      setActionDialogOpen(true)
+      if (isDesktop()) {
+        setDesktopModalIndex(index)
+        setDesktopModalOpen(true)
+      } else {
+        setActionIndex(index)
+        setActionDialogOpen(true)
+      }
     } else {
       setModalIndex(index)
       setModalOpen(true)
@@ -125,8 +135,8 @@ const ImageUploadArea = ({
 
             {/* 대표사진 뱃지 */}
             {isRepresentative(index) && (
-              <div className="pointer-events-none absolute bottom-0 left-1/2 flex h-[1.125rem] w-[3.813rem] -translate-x-1/2 items-center justify-center bg-[#929292] tab:h-[2rem] tab:w-[5rem]">
-                <span className="text-[0.625rem] font-semibold text-white tab:text-xs">
+              <div className="pointer-events-none absolute bottom-0 left-1/2 flex h-[1.125rem] w-[3.813rem] -translate-x-1/2 items-center justify-center bg-[#929292] tab:left-0 tab:h-[2.188rem] tab:w-full tab:translate-x-0 tab:gap-[0.625rem] tab:bg-text-primary tab:p-[0.625rem]">
+                <span className="text-[0.625rem] font-semibold text-white tab:text-base tab:font-bold">
                   대표사진
                 </span>
               </div>
@@ -168,7 +178,7 @@ const ImageUploadArea = ({
         />
       )}
 
-      {/* 대표사진 액션 모달 */}
+      {/* 대표사진 모바일 액션 모달 */}
       {hasRepresentative && (
         <Dialog open={actionDialogOpen} onOpenChange={setActionDialogOpen}>
           <DialogPortal>
@@ -208,6 +218,19 @@ const ImageUploadArea = ({
             </DialogContent>
           </DialogPortal>
         </Dialog>
+      )}
+
+      {/* 대표사진 데스크탑 이미지 모달 */}
+      {hasRepresentative && (
+        <ImageModal
+          images={images}
+          initialIndex={desktopModalIndex}
+          open={desktopModalOpen}
+          onOpenChange={setDesktopModalOpen}
+          onDelete={onRemove}
+          onSetRepresentative={onSetRepresentative}
+          representativeIndex={representativeIndex}
+        />
       )}
     </div>
   )

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { CloseIcon } from '@/shared/assets/icons'
 import {
   Container,
@@ -13,19 +13,28 @@ import {
   SelectValue,
   Textarea,
 } from '@/shared/ui'
+import { useBrowserNavigationGuard } from '@/shared/lib/useBrowserNavigationGuard'
 import { ImageUploadArea } from '@/app/(main)/post/create/_ui/ImageUploadArea'
 import { FormFieldLabel } from './FormFieldLabel'
 import { HealthInfoSection } from './HealthInfoSection'
 import { ParentInfoSection } from './ParentInfoSection'
 import { BreedingEnvSection } from './BreedingEnvSection'
+import { AdoptionCreateExitDialog } from './AdoptionCreateExitDialog'
 
 const AdoptionCreateContent = () => {
+  const router = useRouter()
   const [images, setImages] = useState<string[]>([])
   const [representativeIndex, setRepresentativeIndex] = useState(0)
+  const [isDirty, setIsDirty] = useState(false)
+  const [showExitDialog, setShowExitDialog] = useState(false)
+
+  const { showBrowserGuard, handleBrowserConfirm, handleBrowserCancel } =
+    useBrowserNavigationGuard({ hasChanges: isDirty, enabled: true })
 
   const handleAddImages = useCallback((files: FileList) => {
     const newImages = Array.from(files).map((file) => URL.createObjectURL(file))
     setImages((prev) => [...prev, ...newImages].slice(0, 10))
+    setIsDirty(true)
   }, [])
 
   const handleRemoveImage = useCallback((index: number) => {
@@ -41,14 +50,40 @@ const AdoptionCreateContent = () => {
     })
   }, [])
 
+  const handleFormChange = useCallback(() => {
+    setIsDirty(true)
+  }, [])
+
+  const handleCloseClick = () => {
+    if (isDirty) {
+      setShowExitDialog(true)
+    } else {
+      router.push('/adoption/my-listings')
+    }
+  }
+
+  const handleExitConfirm = () => {
+    setShowExitDialog(false)
+    router.push('/adoption/my-listings')
+  }
+
+  const handleSaveDraft = () => {
+    // TODO: 임시저장 로직 구현
+    setShowExitDialog(false)
+  }
+
+  const handleExitCancel = () => {
+    setShowExitDialog(false)
+  }
+
   return (
-    <div className="flex min-h-screen w-full flex-col bg-white">
+    <div className="flex min-h-screen w-full flex-col bg-white" onChange={handleFormChange}>
       {/* 헤더: X + 제목 */}
       <Container>
         <div className="flex items-center gap-[0.625rem] py-3 tab:justify-between tab:py-6">
-          <Link href="/adoption/my-listings">
+          <button type="button" onClick={handleCloseClick}>
             <CloseIcon className="size-5 text-text-primary tab:size-6" />
-          </Link>
+          </button>
           <p className="text-sm font-semibold leading-[1.5] text-text-primary tab:flex-1 tab:text-center tab:text-xl">
             분양글 작성
           </p>
@@ -59,7 +94,7 @@ const AdoptionCreateContent = () => {
 
       {/* 본문 */}
       <Container className="flex-1 pb-24">
-        <div className="flex flex-col gap-[1.125rem] tab:flex-row tab:gap-[1.5rem] tab:pt-6">
+        <div className="flex flex-col gap-[1.125rem] tab:flex-row tab:gap-[1.5rem] tab:pt-[5.313rem]">
           {/* 좌측: 이미지 업로드 */}
           <div className="tab:w-[26.256rem] tab:shrink-0">
             <ImageUploadArea
@@ -127,7 +162,7 @@ const AdoptionCreateContent = () => {
       </Container>
 
       {/* 하단 CTA */}
-      <div className="bg-white pb-1유0 tab:pb-0">
+      <div className="sticky bottom-0 bg-white pb-10 tab:pb-0">
         <Container className="flex items-center justify-end py-5 tab:py-[1.438rem]">
           <button
             type="button"
@@ -138,6 +173,13 @@ const AdoptionCreateContent = () => {
           </button>
         </Container>
       </div>
+
+      <AdoptionCreateExitDialog
+        open={showExitDialog || showBrowserGuard}
+        onExit={showBrowserGuard ? handleBrowserConfirm : handleExitConfirm}
+        onSaveDraft={handleSaveDraft}
+        onCancel={showBrowserGuard ? handleBrowserCancel : handleExitCancel}
+      />
     </div>
   )
 }
