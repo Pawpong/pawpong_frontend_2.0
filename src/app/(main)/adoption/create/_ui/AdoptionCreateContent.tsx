@@ -67,6 +67,11 @@ const AdoptionCreateContent = () => {
     router.push('/adoption/my-listings')
   }
 
+  const handleUpload = () => {
+    // TODO: 실제 API 호출 구현
+    router.push('/adoption/create/success')
+  }
+
   const handleSaveDraft = () => {
     // TODO: 임시저장 로직 구현
     setShowExitDialog(false)
@@ -166,7 +171,7 @@ const AdoptionCreateContent = () => {
         <Container className="flex items-center justify-end py-5 tab:py-[1.438rem]">
           <button
             type="button"
-            disabled
+            onClick={handleUpload}
             className="h-12 w-full rounded-full bg-[#d4d4d4] text-base font-semibold text-text-primary tab:w-[17rem]"
           >
             업로드
