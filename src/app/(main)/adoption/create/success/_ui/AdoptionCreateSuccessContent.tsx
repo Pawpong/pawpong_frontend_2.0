@@ -3,8 +3,8 @@ import { Container } from '@/shared/ui'
 
 const AdoptionCreateSuccessContent = () => {
   return (
-    <Container className="flex flex-1 items-center justify-center py-10">
-      <div className="flex w-full flex-col items-center justify-center rounded-2xl bg-[#f5f5f5] px-6 py-40">
+    <Container className="flex min-h-screen flex-col py-10">
+      <div className="flex flex-1 flex-col items-center justify-center rounded-2xl bg-[#f5f5f5] px-6">
         <p className="text-xl font-bold leading-[1.375rem] text-text-primary tab:text-[1.875rem]">
           분양글이 성공적으로 업로드 되었습니다.
         </p>
