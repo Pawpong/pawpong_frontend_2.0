@@ -9,7 +9,9 @@ import {
   MOCK_RANKING_ENTRIES,
   MOCK_VOTE_ENTRIES,
 } from '@/shared/mocks/hallOfFame'
+import type { ContestEntry } from '@/shared/types'
 import { ContestBanner } from './ContestBanner'
+import { EntryDetailModal } from './EntryDetailModal'
 import { RankingCard } from './RankingCard'
 import { VoteCard } from './VoteCard'
 
@@ -19,6 +21,7 @@ const HallOfFameContent = () => {
   const [isRankingOpen, setIsRankingOpen] = useState(true)
   const [isVoteOpen, setIsVoteOpen] = useState(true)
   const [rankingPeriod, setRankingPeriod] = useState<RankingPeriod>('current')
+  const [selectedEntry, setSelectedEntry] = useState<ContestEntry | null>(null)
 
   const isCurrent = rankingPeriod === 'current'
 
@@ -68,7 +71,7 @@ const HallOfFameContent = () => {
           {isRankingOpen && (
             <div className="flex flex-col gap-3 tab:grid tab:grid-cols-3 tab:gap-5">
               {MOCK_RANKING_ENTRIES.map((entry) => (
-                <RankingCard key={entry.entryId} entry={entry} />
+                <RankingCard key={entry.entryId} entry={entry} onImageClick={() => setSelectedEntry(entry)} />
               ))}
             </div>
           )}
@@ -89,12 +92,18 @@ const HallOfFameContent = () => {
           {isVoteOpen && (
             <div className="grid grid-cols-2 gap-4 tab:grid-cols-3 tab:gap-5">
               {MOCK_VOTE_ENTRIES.map((entry) => (
-                <VoteCard key={entry.entryId} entry={entry} />
+                <VoteCard key={entry.entryId} entry={entry} onImageClick={() => setSelectedEntry(entry)} />
               ))}
             </div>
           )}
         </div>
       </Container>
+
+      <EntryDetailModal
+        entry={selectedEntry}
+        open={selectedEntry !== null}
+        onOpenChange={(open) => { if (!open) setSelectedEntry(null) }}
+      />
     </div>
   )
 }

@@ -6,20 +6,21 @@ import { VoteButton } from './VoteButton'
 
 interface VoteCardProps {
   entry: ContestEntry
+  onImageClick?: () => void
 }
 
-const VoteCard = ({ entry }: VoteCardProps) => {
+const VoteCard = ({ entry, onImageClick }: VoteCardProps) => {
   return (
     <div className="flex flex-col gap-1">
       {/* 이미지 */}
-      <div className="relative aspect-square w-full overflow-hidden rounded-[0.375rem] tab:aspect-[4/3] tab:rounded-2xl tab:bg-[#e7e7e7]">
+      <button type="button" onClick={onImageClick} className="relative aspect-square w-full overflow-hidden rounded-[0.375rem] tab:aspect-[4/3] tab:rounded-2xl tab:bg-[#e7e7e7]">
         <Image
           src={entry.imageUrl}
           alt={entry.description}
           fill
           className="object-cover"
         />
-      </div>
+      </button>
 
       {/* 설명 */}
       <p className="line-clamp-2 text-sm font-semibold leading-[1.5] text-[#959595] tab:px-5 tab:pt-4 tab:font-bold">

@@ -7,15 +7,16 @@ import type { ContestEntry } from '@/shared/types'
 
 interface RankingCardProps {
   entry: ContestEntry
+  onImageClick?: () => void
 }
 
-const RankingCard = ({ entry }: RankingCardProps) => {
+const RankingCard = ({ entry, onImageClick }: RankingCardProps) => {
   return (
     <>
       {/* 모바일: 가로형 리스트 카드 */}
       <div className="relative flex h-[7.125rem] gap-3 overflow-hidden rounded-[0.375rem] bg-[#f0f0f0] p-2 tab:hidden">
         {/* 이미지 */}
-        <div className="relative size-[6.25rem] shrink-0 overflow-hidden rounded-[0.375rem]">
+        <button type="button" onClick={onImageClick} className="relative size-[6.25rem] shrink-0 overflow-hidden rounded-[0.375rem]">
           <Image
             src={entry.imageUrl}
             alt={entry.description}
@@ -29,7 +30,7 @@ const RankingCard = ({ entry }: RankingCardProps) => {
               className="absolute left-0 top-0 size-10"
             />
           )}
-        </div>
+        </button>
 
         {/* 우측 텍스트 */}
         <div className="flex flex-1 flex-col justify-between py-0.5">
@@ -51,14 +52,14 @@ const RankingCard = ({ entry }: RankingCardProps) => {
 
       {/* PC: 세로형 카드 */}
       <div className="relative hidden overflow-hidden rounded-2xl bg-[#e7e7e7] tab:block">
-        <div className="relative aspect-[4/3] w-full">
+        <button type="button" onClick={onImageClick} className="relative aspect-[4/3] w-full">
           <Image
             src={entry.imageUrl}
             alt={entry.description}
             fill
             className="object-cover"
           />
-        </div>
+        </button>
 
         {/* 랭킹 뱃지 */}
         {entry.rank && (
