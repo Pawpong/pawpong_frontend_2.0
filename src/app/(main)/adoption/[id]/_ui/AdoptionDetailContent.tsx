@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState, useCallback } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Badge,
@@ -15,6 +15,7 @@ import {
   DropdownMenuItem,
 } from '@/shared/ui'
 import { ArrowBackIcon, CheckIcon, ShareIcon } from '@/shared/assets/icons'
+import { useImageModal } from '@/shared/lib/useImageModal'
 import type { AdoptionDetailDto, AdoptionStatus } from '@/shared/types'
 import { ADOPTION_STATUS_LABEL, GENDER_LABEL } from '@/shared/types'
 import { HealthInfoCard } from './HealthInfoCard'
@@ -35,15 +36,8 @@ interface AdoptionDetailContentProps {
 const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
   const router = useRouter()
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  const [imageModalOpen, setImageModalOpen] = useState(false)
-  const [modalImages, setModalImages] = useState<string[]>(detail.imageUrls)
-  const [modalInitialIndex, setModalInitialIndex] = useState(0)
-
-  const openImageModal = useCallback((images: string[], index = 0) => {
-    setModalImages(images)
-    setModalInitialIndex(index)
-    setImageModalOpen(true)
-  }, [])
+  const { imageModalOpen, setImageModalOpen, modalImages, modalInitialIndex, openImageModal } =
+    useImageModal(detail.imageUrls)
 
   return (
     <div className="pb-[6rem] tab:pb-[6rem]">
