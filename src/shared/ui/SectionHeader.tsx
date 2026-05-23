@@ -26,34 +26,38 @@ const SectionHeader = ({
   onToggle,
 }: SectionHeaderProps) => {
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex flex-col gap-0.5 tab:gap-1">
+    <div className="flex flex-col gap-0.5 tab:gap-1">
+      <div className="flex items-center justify-between">
         <p className="text-sm font-bold leading-[1.5] text-text-primary tab:text-xl">
           {title}
         </p>
-        {subtitle && (
-          <p className="text-xs font-bold text-[#898989] tab:text-base tab:font-semibold">
-            {subtitle}
-          </p>
+        {linkText && linkHref && (
+          <DetailLink href={linkHref} label={linkText} size="sm" className="tab:text-[0.875rem]" />
+        )}
+        {collapsible && (
+          <button
+            type="button"
+            onClick={onToggle}
+            className="tab:hidden"
+          >
+            <ArrowRightIcon
+              className={cn(
+                'size-[1.25rem] text-[#5d5d5d] transition-transform',
+                collapsed ? 'rotate-90' : '-rotate-90',
+              )}
+            />
+          </button>
         )}
       </div>
-      {linkText && linkHref && (
-        <DetailLink href={linkHref} label={linkText} size="sm" className="tab:text-[0.875rem]" />
-      )}
-      {rightSlot}
-      {collapsible && (
-        <button
-          type="button"
-          onClick={onToggle}
-          className="tab:hidden"
-        >
-          <ArrowRightIcon
-            className={cn(
-              'size-[1.25rem] text-[#5d5d5d] transition-transform',
-              collapsed ? 'rotate-90' : '-rotate-90',
-            )}
-          />
-        </button>
+      {(subtitle || rightSlot) && (
+        <div className="flex items-center justify-between">
+          {subtitle && (
+            <p className="text-xs font-bold text-[#898989] tab:text-base tab:font-semibold">
+              {subtitle}
+            </p>
+          )}
+          {rightSlot}
+        </div>
       )}
     </div>
   )

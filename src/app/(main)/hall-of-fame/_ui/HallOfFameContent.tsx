@@ -46,7 +46,7 @@ const HallOfFameContent = () => {
       <Container className="mt-6 tab:mt-16">
         <div className="flex flex-col gap-3 tab:gap-5">
           <SectionHeader
-            title={isCurrent ? '실시간 랭킹 1위~3위' : '저번주 랭킹'}
+            title={isCurrent ? '실시간 랭킹 1위~3위' : '저번주 랭킹 1위~3위'}
             subtitle={MOCK_CONTEST_INFO.dateRange}
             collapsible
             collapsed={!isRankingOpen}
@@ -54,11 +54,11 @@ const HallOfFameContent = () => {
             rightSlot={
               <button
                 type="button"
-                className="hidden h-9 items-center justify-center rounded-full bg-[#a4a4a4] px-5 tab:flex"
+                className="flex h-9 items-center justify-center rounded-full bg-[#a4a4a4] px-5"
                 onClick={() => setRankingPeriod(isCurrent ? 'previous' : 'current')}
               >
-                <span className="whitespace-nowrap text-base font-semibold text-white">
-                  {isCurrent ? '< 저번주 랭킹' : '이번주 실시간 랭킹>'}
+                <span className="whitespace-nowrap text-sm font-semibold text-white tab:text-base">
+                  {isCurrent ? '< 저번주 랭킹' : '이번주 랭킹>'}
                 </span>
               </button>
             }
