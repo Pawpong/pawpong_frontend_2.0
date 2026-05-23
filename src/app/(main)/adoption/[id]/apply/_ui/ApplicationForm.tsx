@@ -6,8 +6,7 @@ import { useRouter } from 'next/navigation'
 import { CloseIcon } from '@/shared/assets/icons'
 import { ExitConfirmDialog } from '@/shared/ui'
 import { useCreateApplication } from '@/features/application/model/hooks'
-import { useFormGuard } from '@/shared/lib/useFormGuard'
-import { useBrowserNavigationGuard } from '@/shared/lib/useBrowserNavigationGuard'
+import { useExitGuard } from '@/shared/lib/useExitGuard'
 import type { AdoptionDetailDto } from '@/shared/types'
 import { GENDER_LABEL } from '@/shared/types'
 import { cn } from '@/shared/lib/Cn'
@@ -43,23 +42,12 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
   })
 
   /* ── 네비게이션 가드 ── */
-  const {
-    showNavigationDialog,
-    handleNavigationConfirm,
-    handleNavigationCancel,
-  } = useFormGuard({ hasChanges: isDirty })
-
-  const {
-    promptBrowserNavigation,
-    showBrowserGuard,
-    handleBrowserConfirm,
-    handleBrowserCancel,
-  } = useBrowserNavigationGuard({ hasChanges: isDirty, enabled: true })
+  const { showGuard, requestExit, confirmExit, cancelExit } = useExitGuard({
+    hasChanges: isDirty,
+  })
 
   const handleCloseClick = () => {
-    if (isDirty) {
-      promptBrowserNavigation()
-    } else {
+    if (requestExit()) {
       router.back()
     }
   }
@@ -217,9 +205,9 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
 
       {/* ═══ 나가기 확인 모달 ═══ */}
       <ExitConfirmDialog
-        open={showBrowserGuard || showNavigationDialog}
-        onConfirm={showBrowserGuard ? handleBrowserConfirm : handleNavigationConfirm}
-        onCancel={showBrowserGuard ? handleBrowserCancel : handleNavigationCancel}
+        open={showGuard}
+        onConfirm={confirmExit}
+        onCancel={cancelExit}
       />
     </div>
   )

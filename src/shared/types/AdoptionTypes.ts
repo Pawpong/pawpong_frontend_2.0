@@ -31,6 +31,8 @@ export interface AdoptionListingCard {
   isFavorited: boolean
   isPopular: boolean
   postedAt: string
+  description?: string
+  chatCount?: number
 }
 
 /** 입양 상태 한국어 매핑 */
@@ -120,6 +122,7 @@ export interface AdoptionDetailDto {
   inquiryCount: number
   favoriteCount: number
   viewCount: number
+  chatCount: number
   isFavorited: boolean
   isPopular: boolean
   breeder: BreederSummary

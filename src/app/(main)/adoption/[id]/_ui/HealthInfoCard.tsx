@@ -2,6 +2,7 @@ import { cn } from '@/shared/lib/Cn'
 import { Badge } from '@/shared/ui'
 import { CheckIcon } from '@/shared/assets/icons'
 import type { AdoptionDetailDto } from '@/shared/types'
+import { BaseInfoCard } from './BaseInfoCard'
 
 const CompletionBadge = ({ completed }: { completed: boolean }) => (
   <Badge
@@ -17,12 +18,8 @@ const CompletionBadge = ({ completed }: { completed: boolean }) => (
 )
 
 const HealthInfoCard = ({ detail }: { detail: AdoptionDetailDto }) => (
-  <div className="overflow-hidden rounded-[1rem] bg-[#f5f5f5] p-[0.875rem] tab:flex-1 tab:p-[1.75rem]">
-    <p className="text-[0.75rem] font-medium leading-[1.375rem] text-[#5d5d5d] tab:text-[1.25rem] tab:font-semibold">
-      건강 정보
-    </p>
-
-    <div className="mt-[1rem] flex flex-col gap-[2.1875rem] tab:mt-[1.5rem] tab:gap-[2rem]">
+  <BaseInfoCard title="건강 정보" className="tab:flex-1">
+    <div className="flex flex-col gap-[2.1875rem] tab:gap-[2rem]">
       {/* 예방 접종 현황 */}
       <div className="flex flex-col gap-[0.6875rem]">
         <div className="flex items-center justify-between">
@@ -92,7 +89,7 @@ const HealthInfoCard = ({ detail }: { detail: AdoptionDetailDto }) => (
         </div>
       </div>
     </div>
-  </div>
+  </BaseInfoCard>
 )
 
 export { HealthInfoCard }

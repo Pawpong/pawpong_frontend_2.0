@@ -16,6 +16,8 @@ const BreedingEnvironmentCard = ({
   detail,
   onImageClick,
 }: BreedingEnvironmentCardProps) => {
+  const { description, imageUrls } = detail.breedingEnvironment
+
   return (
     <div className="overflow-hidden rounded-[1rem] bg-[#f5f5f5] p-[0.875rem] tab:p-[1.75rem]">
       {/* 모바일: 세로 레이아웃 */}
@@ -24,14 +26,14 @@ const BreedingEnvironmentCard = ({
           사육 환경
         </p>
         <p className="mt-[0.5rem] text-[0.875rem] font-semibold leading-[1.5] text-[#5d5d5d]">
-          {detail.breedingEnvironment.description}
+          {description}
         </p>
         <div className="mt-[0.75rem] flex gap-[0.6875rem] overflow-x-auto">
-          {detail.breedingEnvironment.imageUrls.map((url, i) => (
+          {imageUrls.map((url, i) => (
             <button
               type="button"
               key={`env-mo-${i}`}
-              onClick={() => onImageClick?.(detail.breedingEnvironment.imageUrls, i)}
+              onClick={() => onImageClick?.(imageUrls, i)}
               className="relative h-[8.125rem] w-[11.9375rem] shrink-0 overflow-hidden rounded-[0.5rem] bg-[#c6c6c6]"
             >
               <Image src={url} alt={`사육 환경 ${i + 1}`} fill className="object-cover" />
@@ -48,11 +50,11 @@ const BreedingEnvironmentCard = ({
             pagination={{ clickable: true }}
             className="size-full [&_.swiper-pagination-bullet-active]:bg-[#2f2f2f] [&_.swiper-pagination-bullet]:bg-white/70"
           >
-            {detail.breedingEnvironment.imageUrls.map((url, i) => (
+            {imageUrls.map((url, i) => (
               <SwiperSlide key={`env-pc-${i}`}>
                 <button
                   type="button"
-                  onClick={() => onImageClick?.(detail.breedingEnvironment.imageUrls, i)}
+                  onClick={() => onImageClick?.(imageUrls, i)}
                   className="relative size-full"
                 >
                   <Image
@@ -71,7 +73,7 @@ const BreedingEnvironmentCard = ({
             사육 환경
           </p>
           <p className="mt-[2rem] text-[1rem] font-semibold leading-[1.375rem] text-[#5d5d5d]">
-            {detail.breedingEnvironment.description}
+            {description}
           </p>
         </div>
       </div>

@@ -4,9 +4,18 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { Badge, FavoriteButton, ListingStats, Separator } from '@/shared/ui'
-import { ArrowBackIcon, FavoriteIcon, ShareIcon } from '@/shared/assets/icons'
-import type { AdoptionDetailDto } from '@/shared/types'
+import {
+  Badge,
+  FavoriteButton,
+  ListingStats,
+  Separator,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '@/shared/ui'
+import { ArrowBackIcon, CheckIcon, ShareIcon } from '@/shared/assets/icons'
+import type { AdoptionDetailDto, AdoptionStatus } from '@/shared/types'
 import { ADOPTION_STATUS_LABEL, GENDER_LABEL } from '@/shared/types'
 import { HealthInfoCard } from './HealthInfoCard'
 import { ParentInfoCard } from './ParentInfoCard'
@@ -59,7 +68,7 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
       {/* ═══ 히어로 섹션 (이미지 + 기본정보) ═══ */}
       <div className="tab:px-[3rem] pc:px-[6.25rem]">
         {/* 데스크탑: 이미지 + 우측 정보 2컬럼 */}
-        <div className="tab:flex tab:gap-[2rem]">
+        <div className="tab:flex tab:gap-[4.583rem]">
           {/* ── 이미지 영역 ── */}
           <div className="relative tab:w-[27.5rem] tab:shrink-0">
             <button
@@ -120,17 +129,12 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
               <Separator className="my-[0.625rem] bg-[#d4d4d4]" />
             </div>
 
-            {/* 이름 + 상태 배지 + 인기 배지 */}
+            {/* 이름 + 상태 배지(드롭다운) + 인기 배지 */}
             <div className="flex flex-wrap items-center gap-[0.4375rem] tab:gap-[0.5rem]">
               <p className="text-[0.875rem] font-bold leading-[1.375rem] text-[#5d5d5d] tab:text-[1.25rem]">
                 {detail.name}
               </p>
-              <Badge
-                variant="status"
-                className="h-[1.5rem] px-[0.625rem] py-[0.25rem] text-[0.75rem] leading-[1.375rem] tab:text-[0.875rem]"
-              >
-                {ADOPTION_STATUS_LABEL[detail.status]}
-              </Badge>
+              <StatusDropdown currentStatus={detail.status} />
               {detail.isPopular && (
                 <Badge
                   variant="outline"
@@ -142,7 +146,7 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
             </div>
 
             {/* 분양가 */}
-            <div className="mt-[0.25rem] flex items-center gap-[0.5rem] text-[#5d5d5d]">
+            <div className="flex items-center gap-[0.5rem] text-[#5d5d5d]">
               <span className="text-[0.75rem] font-bold leading-[1.375rem] tab:text-[1rem]">
                 분양가 :
               </span>
@@ -262,15 +266,11 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
       {/* ═══ CTA 하단 고정 바 ═══ */}
       <div className="fixed bottom-0 left-0 right-0 z-10 bg-white p-[1.25rem] tab:flex tab:items-center tab:justify-center tab:py-[1.4375rem]">
         <div className="flex items-center gap-[0.625rem] tab:w-auto">
-          {/* 관심 버튼 (모바일만) */}
-          <button type="button" className="shrink-0 tab:hidden">
-            <FavoriteIcon className="size-[2rem] text-[#5d5d5d]" />
-          </button>
           <Link
             href={`/adoption/${detail.listingId}/apply`}
-            className="flex h-12 flex-1 items-center justify-center rounded-full bg-[#d4d4d4] text-[1rem] font-semibold text-[#5d5d5d] tab:w-[33.0625rem] tab:flex-initial"
+            className="flex h-12 flex-1 items-center justify-center rounded-full bg-[#d4d4d4] text-[1rem] font-semibold text-[#5d5d5d] tab:w-[29.75rem] tab:flex-initial"
           >
-            입양 신청
+            대화중인 채팅 {detail.chatCount}
           </Link>
         </div>
       </div>
@@ -296,6 +296,39 @@ const InfoItem = ({ label, value }: { label: string; value: string }) => (
       {value}
     </p>
   </div>
+)
+
+/* ── 상태 변경 드롭다운 (브리더용) ── */
+const STATUS_OPTIONS: AdoptionStatus[] = ['reserved', 'available', 'completed']
+
+const StatusDropdown = ({ currentStatus }: { currentStatus: AdoptionStatus }) => (
+  <DropdownMenu>
+    <DropdownMenuTrigger asChild>
+      <button
+        type="button"
+        className="inline-flex items-center gap-[0.625rem] rounded-full bg-[#5d5d5d] px-[0.625rem] py-[0.25rem] text-[0.75rem] font-semibold leading-[1.375rem] text-white tab:text-[0.875rem]"
+      >
+        {ADOPTION_STATUS_LABEL[currentStatus]}
+        <CheckIcon className="size-[1.25rem]" />
+      </button>
+    </DropdownMenuTrigger>
+    <DropdownMenuContent
+      align="start"
+      className="w-[7rem] rounded-[1rem] border-none bg-[#5d5d5d] px-[0.625rem] py-[0.5rem] shadow-[3px_3px_11px_0px_rgba(0,0,0,0.15)]"
+    >
+      {STATUS_OPTIONS.map((status) => (
+        <DropdownMenuItem
+          key={status}
+          className="flex items-center justify-between rounded-none px-0 py-0 text-[0.875rem] font-medium leading-[1.375rem] text-white hover:bg-transparent focus:bg-transparent"
+        >
+          <span>{ADOPTION_STATUS_LABEL[status]}</span>
+          {status === currentStatus && (
+            <CheckIcon className="size-[1.25rem]" />
+          )}
+        </DropdownMenuItem>
+      ))}
+    </DropdownMenuContent>
+  </DropdownMenu>
 )
 
 export { AdoptionDetailContent }

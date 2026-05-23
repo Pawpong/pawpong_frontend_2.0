@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import type { AdoptionDetailDto } from '@/shared/types'
+import { BaseInfoCard } from './BaseInfoCard'
 
 interface ParentInfoCardProps {
   detail: AdoptionDetailDto
@@ -7,12 +8,11 @@ interface ParentInfoCardProps {
 }
 
 const ParentInfoCard = ({ detail, onImageClick }: ParentInfoCardProps) => (
-  <div className="mt-[0.75rem] overflow-hidden rounded-[1rem] bg-[#f5f5f5] p-[0.875rem] tab:mt-0 tab:w-[26.25rem] tab:shrink-0 tab:p-[1.75rem]">
-    <p className="text-[0.75rem] font-medium leading-[1.375rem] text-[#5d5d5d] tab:text-[1.25rem] tab:font-semibold">
-      부모 정보
-    </p>
-
-    <div className="mt-[1rem] flex flex-col gap-[1rem] tab:mt-[1.5rem] tab:gap-[2.5rem]">
+  <BaseInfoCard
+    title="부모 정보"
+    className="mt-[0.75rem] tab:mt-0 tab:w-[26.25rem] tab:shrink-0"
+  >
+    <div className="flex flex-col gap-[1rem] tab:gap-[2.5rem]">
       {detail.parents.map((parent, i) => (
         <div key={parent.role} className="flex flex-col gap-[0.8125rem]">
           <div className="flex items-center gap-[0.5625rem] tab:flex-col tab:items-start tab:gap-[0.8125rem]">
@@ -39,7 +39,7 @@ const ParentInfoCard = ({ detail, onImageClick }: ParentInfoCardProps) => (
         </div>
       ))}
     </div>
-  </div>
+  </BaseInfoCard>
 )
 
 export { ParentInfoCard }
