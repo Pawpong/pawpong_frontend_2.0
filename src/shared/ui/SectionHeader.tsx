@@ -4,8 +4,11 @@ import { cn } from '@/shared/lib/Cn'
 
 interface SectionHeaderProps {
   title: string
+  subtitle?: string
   linkText?: string
   linkHref?: string
+  /** PC 우측에 렌더링할 커스텀 요소 */
+  rightSlot?: React.ReactNode
   /** 모바일 접기/펼치기 */
   collapsible?: boolean
   collapsed?: boolean
@@ -14,20 +17,30 @@ interface SectionHeaderProps {
 
 const SectionHeader = ({
   title,
+  subtitle,
   linkText,
   linkHref,
+  rightSlot,
   collapsible,
   collapsed,
   onToggle,
 }: SectionHeaderProps) => {
   return (
     <div className="flex items-center justify-between">
-      <p className="text-[0.875rem] font-bold leading-[1.5] text-[#5d5d5d] tab:text-[1.25rem]">
-        {title}
-      </p>
+      <div className="flex flex-col gap-0.5 tab:gap-1">
+        <p className="text-sm font-bold leading-[1.5] text-text-primary tab:text-xl">
+          {title}
+        </p>
+        {subtitle && (
+          <p className="text-xs font-bold text-[#898989] tab:text-base tab:font-semibold">
+            {subtitle}
+          </p>
+        )}
+      </div>
       {linkText && linkHref && (
         <DetailLink href={linkHref} label={linkText} size="sm" className="tab:text-[0.875rem]" />
       )}
+      {rightSlot}
       {collapsible && (
         <button
           type="button"
