@@ -9,12 +9,11 @@ import { SearchBar, PopularKeywords } from '@/features/search'
 import { CategoryFilter } from '@/features/category-filter'
 import { AdoptionCard, AdoptionCardHorizontal } from '@/entities/adoption'
 import { createMockListings } from '@/shared/mocks/adoption'
-import { CATEGORY_DESCRIPTION } from '@/shared/types'
+import { CATEGORY_DESCRIPTION, ANIMAL_CATEGORIES } from '@/shared/types'
 import type { AnimalCategory } from '@/shared/types'
 import { BreederExploreContent } from './BreederExploreContent'
-
-type ExploreType = 'adoption' | 'breeder'
-const VALID_CATEGORIES: AnimalCategory[] = ['all', 'dog', 'cat', 'lizard']
+import { EXPLORE_TABS, SEARCH_PLACEHOLDERS } from '../_lib/constants'
+import type { ExploreType } from '../_lib/constants'
 
 const mockListings = createMockListings()
 const popularListings = mockListings.filter((l) => l.isPopular)
@@ -30,7 +29,7 @@ const ExploreContent = () => {
 
   const categoryParam = searchParams.get('category')
   const selectedCategory: AnimalCategory =
-    categoryParam && VALID_CATEGORIES.includes(categoryParam as AnimalCategory)
+    categoryParam && ANIMAL_CATEGORIES.includes(categoryParam as AnimalCategory)
       ? (categoryParam as AnimalCategory)
       : 'all'
 
@@ -67,32 +66,22 @@ const ExploreContent = () => {
     <div className="mx-auto flex w-full max-w-[67.5rem] flex-col">
       {/* 모바일 탭 — 입양 탐색 / 브리더 탐색 */}
       <div className="flex items-center tab:hidden">
-        <button
-          type="button"
-          onClick={() => handleTypeChange('adoption')}
-          className={cn(
-            cafe24Proup.className,
-            'flex flex-1 items-center justify-center border-b-2 p-[0.625rem] font-cafe24 leading-[1.375rem]',
-            selectedType === 'adoption'
-              ? 'border-[#5d5d5d] text-[0.875rem] text-[#5d5d5d]'
-              : 'border-transparent text-[0.75rem] text-[#a7a7a7]',
-          )}
-        >
-          입양 탐색
-        </button>
-        <button
-          type="button"
-          onClick={() => handleTypeChange('breeder')}
-          className={cn(
-            cafe24Proup.className,
-            'flex flex-1 items-center justify-center border-b-2 p-[0.625rem] font-cafe24 leading-[1.375rem]',
-            selectedType === 'breeder'
-              ? 'border-[#5d5d5d] text-[0.875rem] text-[#5d5d5d]'
-              : 'border-transparent text-[0.75rem] text-[#a7a7a7]',
-          )}
-        >
-          브리더 탐색
-        </button>
+        {EXPLORE_TABS.map((tab) => (
+          <button
+            key={tab.type}
+            type="button"
+            onClick={() => handleTypeChange(tab.type)}
+            className={cn(
+              cafe24Proup.className,
+              'flex flex-1 items-center justify-center border-b-2 p-[0.625rem] font-cafe24 leading-[1.375rem]',
+              selectedType === tab.type
+                ? 'border-[#5d5d5d] text-[0.875rem] text-[#5d5d5d]'
+                : 'border-transparent text-[0.75rem] text-[#a7a7a7]',
+            )}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       {/* ══════ 모바일: 타이틀 + 카테고리 ══════ */}
@@ -131,7 +120,7 @@ const ExploreContent = () => {
 
           {/* 검색바 + 인기 검색어 */}
           <div className="w-full tab:mx-auto tab:mt-[1.25rem] tab:max-w-[42.5rem]">
-            <SearchBar />
+            <SearchBar placeholder={SEARCH_PLACEHOLDERS.adoption} />
             <PopularKeywords />
           </div>
 

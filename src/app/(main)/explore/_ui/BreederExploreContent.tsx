@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { SectionHeader } from '@/shared/ui'
 import { SearchBar, PopularKeywords } from '@/features/search'
+import { SEARCH_PLACEHOLDERS } from '../_lib/constants'
 import { BreederCard } from '@/app/(main)/home/_ui/BreederCard'
 import { BreederCardHorizontal } from './BreederCardHorizontal'
 import {
@@ -23,12 +24,7 @@ const BreederExploreContent = () => {
 
       {/* 검색바 + 인기 검색어 */}
       <div className="w-full tab:mx-auto tab:mt-[1.25rem] tab:max-w-[42.5rem]">
-        <SearchBar
-          placeholder={{
-            mobile: '아무거나 검색해보세요',
-            desktop: '브리더를 통해 알고싶은게 있나요?',
-          }}
-        />
+        <SearchBar placeholder={SEARCH_PLACEHOLDERS.breeder} />
         <PopularKeywords />
       </div>
 

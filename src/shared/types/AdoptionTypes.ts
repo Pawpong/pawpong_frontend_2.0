@@ -5,6 +5,9 @@
 /** 동물 카테고리 필터 */
 export type AnimalCategory = 'all' | 'dog' | 'cat' | 'lizard'
 
+/** 유효한 카테고리 목록 */
+export const ANIMAL_CATEGORIES: AnimalCategory[] = ['all', 'dog', 'cat', 'lizard']
+
 /** 카테고리 한글 라벨 매핑 */
 export const CATEGORY_LABEL: Record<AnimalCategory, string> = {
   all: '전체',

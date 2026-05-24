@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { Badge, ListingStats } from '@/shared/ui'
+import { Badge, FavoriteButton, ListingStats } from '@/shared/ui'
 import type { ExploreBreeder } from '@/shared/mocks/breederExplore'
 
 interface BreederCardHorizontalProps {
@@ -62,15 +62,7 @@ const BreederCardHorizontal = ({ breeder }: BreederCardHorizontalProps) => {
             size="sm"
             className="w-full justify-end"
           />
-          <button
-            type="button"
-            className="flex items-center gap-1 rounded-full"
-          >
-            <Image src="/star.svg" alt="즐겨찾기" width={24} height={24} />
-            <span className="text-xs font-medium text-[#5d5d5d]">
-              즐겨찾기
-            </span>
-          </button>
+          <FavoriteButton size="sm" />
         </div>
       </div>
     </div>
