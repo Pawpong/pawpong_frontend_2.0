@@ -22,7 +22,7 @@ import { HealthInfoCard } from './HealthInfoCard'
 import { ParentInfoCard } from './ParentInfoCard'
 import { BreedingEnvironmentCard } from './BreedingEnvironmentCard'
 import { OtherListingCard } from './OtherListingCard'
-import { ImageModal } from './ImageModal'
+import { ImageModal } from '@/shared/ui'
 
 interface AdoptionDetailContentProps {
   detail: AdoptionDetailDto

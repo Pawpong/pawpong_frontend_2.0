@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react'
 import Image from 'next/image'
 import { ImageIcon, CloseIcon } from '@/shared/assets/icons'
-import { ImageModal } from '@/app/(main)/adoption/[id]/_ui/ImageModal'
+import { ImageModal } from '@/shared/ui'
 import {
   Dialog,
   DialogClose,
