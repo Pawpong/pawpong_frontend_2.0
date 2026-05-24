@@ -1,8 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { cn } from '@/shared/lib/Cn'
-import { cafe24Proup } from '@/shared/lib/fonts'
 import { SectionHeader } from '@/shared/ui'
 import { SearchBar, PopularKeywords } from '@/features/search'
 import { BreederCard } from '@/app/(main)/home/_ui/BreederCard'
@@ -18,15 +16,7 @@ const BreederExploreContent = () => {
 
   return (
     <>
-      {/* 타이틀 — 모바일: cafe24 14px, 데스크탑: Pretendard Bold 20px */}
-      <p
-        className={cn(
-          cafe24Proup.className,
-          'py-5 text-center font-cafe24 text-[0.875rem] leading-[1.5] text-[#5d5d5d] tab:hidden',
-        )}
-      >
-        신뢰있는 브리더들을 만나보세요
-      </p>
+      {/* 데스크탑 타이틀 */}
       <p className="hidden px-[6.25rem] py-[0.625rem] text-center text-[1.25rem] font-bold leading-[1.375rem] text-[#5d5d5d] tab:mt-[2.188rem] tab:block">
         신뢰있는 브리더들을 만나보세요
       </p>

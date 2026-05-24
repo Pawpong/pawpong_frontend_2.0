@@ -95,18 +95,18 @@ const ExploreContent = () => {
         </button>
       </div>
 
-      {/* ══════ 모바일: 카테고리 (브리더 탐색에서는 카테고리만, 입양 탐색에서는 타이틀 포함) ══════ */}
-      <div className="flex flex-col gap-[0.75rem] py-5 tab:hidden">
-        {selectedType === 'adoption' && (
-          <p
-            className={cn(
-              cafe24Proup.className,
-              'font-cafe24 text-center text-[0.875rem] leading-[1.5] text-[#5d5d5d]',
-            )}
-          >
-            {CATEGORY_DESCRIPTION[selectedCategory]}
-          </p>
-        )}
+      {/* ══════ 모바일: 타이틀 + 카테고리 ══════ */}
+      <div className="flex flex-col items-center gap-[0.75rem] p-5 tab:hidden">
+        <p
+          className={cn(
+            cafe24Proup.className,
+            'font-cafe24 text-center text-[0.875rem] leading-[1.5] text-[#5d5d5d]',
+          )}
+        >
+          {selectedType === 'breeder'
+            ? '신뢰있는 브리더들을 만나보세요'
+            : CATEGORY_DESCRIPTION[selectedCategory]}
+        </p>
         <CategoryFilter
           selected={selectedCategory}
           onChange={handleCategoryChange}
