@@ -68,11 +68,7 @@ const MyHomeContent = () => {
           <TabsContent value="listings" className="mt-0">
             <Container className="pc:px-[10rem]">
               <div className="pt-5 tab:pt-8">
-                <SectionHeader
-                  title="분양목록"
-                  linkText="분양페이지 가기"
-                  linkHref="/adoption"
-                />
+                <SectionHeader title="분양목록" linkText="분양페이지 가기" linkHref="/adoption" />
               </div>
               {/* Mobile */}
               <div className="grid grid-cols-2 gap-[0.625rem] py-[1.25rem] tab:hidden">

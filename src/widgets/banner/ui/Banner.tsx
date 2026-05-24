@@ -47,16 +47,22 @@ const Banner = () => {
               )}
             >
               {slide.title.map((line, j) => (
-                <span key={j} className="hidden tab:block">{line}</span>
+                <span key={j} className="hidden tab:block">
+                  {line}
+                </span>
               ))}
               {slide.titleMobile.map((line, j) => (
-                <span key={j} className="block tab:hidden">{line}</span>
+                <span key={j} className="block tab:hidden">
+                  {line}
+                </span>
               ))}
             </h2>
-            <p className="text-[1.25rem] font-bold leading-[1.5] tab:text-[1.5rem]">
+            <p className="text-[1.25rem] leading-[1.5] font-bold tab:text-[1.5rem]">
               <span className="hidden tab:inline">{slide.subtitle}</span>
               {slide.subtitleMobile.map((line, j) => (
-                <span key={j} className="block tab:hidden">{line}</span>
+                <span key={j} className="block tab:hidden">
+                  {line}
+                </span>
               ))}
             </p>
           </section>

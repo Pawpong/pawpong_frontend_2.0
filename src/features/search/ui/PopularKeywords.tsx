@@ -10,9 +10,7 @@ const POPULAR_KEYWORDS = ['강아지', '고양이', '비숑', '개코 도마뱀'
 const PopularKeywords = () => {
   return (
     <div className="mt-[1.125rem] flex items-center gap-[1.0625rem]">
-      <span className="shrink-0 text-[0.875rem] font-semibold text-[#a8a8a8]">
-        인기 검색어
-      </span>
+      <span className="shrink-0 text-[0.875rem] font-semibold text-[#a8a8a8]">인기 검색어</span>
       <Swiper
         style={{ overflow: 'clip', minWidth: 0 }}
         modules={[FreeMode]}

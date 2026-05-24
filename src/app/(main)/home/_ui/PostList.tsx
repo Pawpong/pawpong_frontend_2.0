@@ -13,7 +13,10 @@ const PostList = ({ posts }: PostListProps) => {
         <div key={post.id} className="tab:px-[3.125rem]">
           <PostCard post={post} />
           {index < posts.length - 1 && (
-            <Separator fullWidth className="bg-border-light tab:-mx-[3.125rem] tab:w-[calc(100%+6.25rem)]" />
+            <Separator
+              fullWidth
+              className="bg-border-light tab:-mx-[3.125rem] tab:w-[calc(100%+6.25rem)]"
+            />
           )}
         </div>
       ))}

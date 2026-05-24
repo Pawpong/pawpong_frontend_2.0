@@ -10,16 +10,13 @@ interface NavigationGuardContextType {
 const NavigationGuardContext = createContext<NavigationGuardContextType | null>(null)
 
 const NavigationGuardProvider = ({ children }: { children: ReactNode }) => {
-  const [guardNavigation, setGuardNavigation] = useState<
-    ((href: string) => void) | undefined
-  >(undefined)
-
-  const updateGuardNavigation = useCallback(
-    (fn: ((href: string) => void) | undefined) => {
-      setGuardNavigation(() => fn)
-    },
-    [],
+  const [guardNavigation, setGuardNavigation] = useState<((href: string) => void) | undefined>(
+    undefined,
   )
+
+  const updateGuardNavigation = useCallback((fn: ((href: string) => void) | undefined) => {
+    setGuardNavigation(() => fn)
+  }, [])
 
   return (
     <NavigationGuardContext.Provider

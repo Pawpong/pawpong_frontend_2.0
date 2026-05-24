@@ -20,19 +20,10 @@ const OtherListingCard = ({ listing }: { listing: AdoptionListingCard }) => {
   )
 }
 
-const DesktopOtherListingCard = ({
-  listing,
-}: {
-  listing: AdoptionListingCard
-}) => (
+const DesktopOtherListingCard = ({ listing }: { listing: AdoptionListingCard }) => (
   <div className="flex overflow-hidden rounded-[1rem] bg-[#e7e7e7]">
     <div className="relative h-[21.75rem] w-[20.1875rem] shrink-0 overflow-hidden rounded-[0.5rem] bg-[#c6c6c6]">
-      <Image
-        src={listing.thumbnailUrl}
-        alt={listing.name}
-        fill
-        className="object-cover"
-      />
+      <Image src={listing.thumbnailUrl} alt={listing.name} fill className="object-cover" />
     </div>
     <div className="flex flex-1 flex-col px-[1.5rem] py-[1.5rem]">
       {listing.isPopular && (
@@ -44,15 +35,15 @@ const DesktopOtherListingCard = ({
         </Badge>
       )}
       <div className="flex items-center gap-[1.125rem]">
-        <p className="text-[1.25rem] font-semibold leading-[1.375rem] text-[#5d5d5d]">
+        <p className="text-[1.25rem] leading-[1.375rem] font-semibold text-[#5d5d5d]">
           {listing.name}
         </p>
         <span className="size-[0.25rem] rounded-full bg-[#5d5d5d]" />
-        <span className="text-[1.25rem] font-semibold leading-[1.375rem] text-[#5d5d5d]">
+        <span className="text-[1.25rem] leading-[1.375rem] font-semibold text-[#5d5d5d]">
           {GENDER_LABEL[listing.gender]}
         </span>
         <span className="size-[0.25rem] rounded-full bg-[#5d5d5d]" />
-        <span className="text-[1.25rem] font-semibold leading-[1.375rem] text-[#5d5d5d]">
+        <span className="text-[1.25rem] leading-[1.375rem] font-semibold text-[#5d5d5d]">
           {listing.ageText}
         </span>
       </div>

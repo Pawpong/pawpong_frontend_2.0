@@ -1,11 +1,6 @@
 'use client'
 
-import {
-  Dialog,
-  DialogOverlay,
-  DialogPortal,
-  DialogTitle,
-} from '@/shared/ui/Dialog'
+import { Dialog, DialogOverlay, DialogPortal, DialogTitle } from '@/shared/ui/Dialog'
 
 interface ExitConfirmDialogProps {
   open: boolean
@@ -23,14 +18,14 @@ const ExitConfirmDialog = ({ open, onConfirm, onCancel }: ExitConfirmDialogProps
           <button
             type="button"
             onClick={onConfirm}
-            className="w-full py-[0.5rem] text-center text-[1.125rem] font-semibold leading-[1.5] text-white"
+            className="w-full py-[0.5rem] text-center text-[1.125rem] leading-[1.5] font-semibold text-white"
           >
             입양 신청 그만하기
           </button>
           <button
             type="button"
             onClick={onCancel}
-            className="mt-[0.5rem] w-full py-[0.5rem] text-center text-[1.125rem] font-semibold leading-[1.5] text-white/60"
+            className="mt-[0.5rem] w-full py-[0.5rem] text-center text-[1.125rem] leading-[1.5] font-semibold text-white/60"
           >
             닫기
           </button>

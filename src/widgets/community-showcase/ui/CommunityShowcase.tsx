@@ -18,12 +18,7 @@ const CommunityShowcase = () => {
 
         {/* 모바일: Swiper */}
         <div className="tab:hidden">
-          <Swiper
-            modules={[FreeMode]}
-            freeMode
-            slidesPerView="auto"
-            spaceBetween={13}
-          >
+          <Swiper modules={[FreeMode]} freeMode slidesPerView="auto" spaceBetween={13}>
             {Array.from({ length: 3 }, (_, i) => (
               <SwiperSlide key={i} className="!w-[10.5rem]">
                 <div className="h-[7rem] rounded-[0.5rem] bg-[#c6c6c6]" />
@@ -35,10 +30,7 @@ const CommunityShowcase = () => {
         {/* PC: 그리드 */}
         <div className="hidden tab:grid tab:grid-cols-3 tab:gap-[1.25rem]">
           {Array.from({ length: 3 }, (_, i) => (
-            <div
-              key={i}
-              className="h-[14rem] rounded-[1.0625rem] bg-[#c6c6c6]"
-            />
+            <div key={i} className="h-[14rem] rounded-[1.0625rem] bg-[#c6c6c6]" />
           ))}
         </div>
       </div>

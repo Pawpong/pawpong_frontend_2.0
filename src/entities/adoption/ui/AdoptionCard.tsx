@@ -34,17 +34,9 @@ const AdoptionCard = ({ listing, className }: AdoptionCardProps) => {
       <div className="flex flex-col gap-[0.25rem] tab:hidden">
         {/* 이미지: h164, rounded-6, bg #d4d4d4 */}
         <div className="relative h-[10.25rem] w-full overflow-hidden rounded-[0.375rem] bg-[#d4d4d4]">
-          <Image
-            src={listing.thumbnailUrl}
-            alt={listing.name}
-            fill
-            className="object-cover"
-          />
+          <Image src={listing.thumbnailUrl} alt={listing.name} fill className="object-cover" />
           {isCompleted && <div className="absolute inset-0 bg-white/70" />}
-          <button
-            type="button"
-            className="absolute bottom-[0.5rem] right-[0.625rem]"
-          >
+          <button type="button" className="absolute right-[0.625rem] bottom-[0.5rem]">
             <FavoriteIcon className="size-[1.403rem] text-[#5d5d5d]" />
           </button>
         </div>
@@ -52,8 +44,8 @@ const AdoptionCard = ({ listing, className }: AdoptionCardProps) => {
         {/* 텍스트: gap 4px, 배경 없음 */}
         <div className="flex flex-col gap-[0.25rem]">
           {/* 이름 + 상태배지 (gap 4px) */}
-          <div className="flex gap-[0.25rem] items-start">
-            <p className="line-clamp-2 min-w-0 flex-1 text-[0.875rem] font-semibold leading-normal text-[#5d5d5d]">
+          <div className="flex items-start gap-[0.25rem]">
+            <p className="line-clamp-2 min-w-0 flex-1 text-[0.875rem] leading-normal font-semibold text-[#5d5d5d]">
               {listing.name}
             </p>
             <Badge
@@ -83,29 +75,21 @@ const AdoptionCard = ({ listing, className }: AdoptionCardProps) => {
       <div className="hidden overflow-hidden rounded-[0.935rem] bg-[#e7e7e7] tab:block">
         {/* 이미지: aspect 348:287 */}
         <div className="relative aspect-[348/287] w-full overflow-hidden">
-          <Image
-            src={listing.thumbnailUrl}
-            alt={listing.name}
-            fill
-            className="object-cover"
-          />
+          <Image src={listing.thumbnailUrl} alt={listing.name} fill className="object-cover" />
           {isCompleted && <div className="absolute inset-0 bg-white/70" />}
           {/* 인기 배지 (left 19.64, top 16.06) */}
           {listing.isPopular && (
-            <Badge
-              variant="outline"
-              className="absolute left-[1.228rem] top-[1.004rem] bg-white"
-            >
+            <Badge variant="outline" className="absolute top-[1.004rem] left-[1.228rem] bg-white">
               인기🔥
             </Badge>
           )}
         </div>
 
         {/* 정보: px 19.65, pt 19.84,*/}
-        <div className="px-[1.228rem] pb-[0.68rem] pt-[1.103rem]">
+        <div className="px-[1.228rem] pt-[1.103rem] pb-[0.68rem]">
           {/* 이름 + 상태배지 */}
           <div className="flex items-start justify-between gap-[0.5rem]">
-            <p className="line-clamp-2 min-w-0 flex-1 text-[1rem] font-semibold leading-[1.286rem] text-[#5d5d5d]">
+            <p className="line-clamp-2 min-w-0 flex-1 text-[1rem] leading-[1.286rem] font-semibold text-[#5d5d5d]">
               {listing.name}
             </p>
             <Badge
@@ -119,7 +103,7 @@ const AdoptionCard = ({ listing, className }: AdoptionCardProps) => {
             </Badge>
           </div>
           {/* 성별 + 나이 (top 330.02, gap 7.484) */}
-          <div className="mt-[0.162rem] flex items-center gap-[0.468rem] text-[1rem] font-semibold leading-[1.286rem] text-[#5d5d5d]">
+          <div className="mt-[0.162rem] flex items-center gap-[0.468rem] text-[1rem] leading-[1.286rem] font-semibold text-[#5d5d5d]">
             <span>{GENDER_LABEL[listing.gender]}</span>
             <span>{listing.ageText}</span>
           </div>
@@ -156,19 +140,14 @@ const AdoptionCardHorizontal = ({ listing, className }: AdoptionCardProps) => {
     >
       {/* 이미지 100x100 */}
       <div className="relative size-[6.25rem] shrink-0 overflow-hidden">
-        <Image
-          src={listing.thumbnailUrl}
-          alt={listing.name}
-          fill
-          className="object-cover"
-        />
+        <Image src={listing.thumbnailUrl} alt={listing.name} fill className="object-cover" />
       </div>
 
       {/* 정보 */}
       <div className="flex min-w-0 flex-1 flex-col gap-[0.4375rem]">
         {/* 이름 + 상태배지 */}
         <div className="flex flex-col gap-px">
-          <p className="line-clamp-1 text-[0.875rem] font-bold leading-[1.5] text-[#5d5d5d]">
+          <p className="line-clamp-1 text-[0.875rem] leading-[1.5] font-bold text-[#5d5d5d]">
             {listing.name}
           </p>
           <div className="flex items-center">
@@ -201,7 +180,7 @@ const AdoptionCardHorizontal = ({ listing, className }: AdoptionCardProps) => {
       {listing.isPopular && (
         <Badge
           variant="outline"
-          className="absolute left-[1rem] top-[0.86rem] bg-white px-[0.5rem] py-[0.125rem] text-[0.75rem] leading-normal"
+          className="absolute top-[0.86rem] left-[1rem] bg-white px-[0.5rem] py-[0.125rem] text-[0.75rem] leading-normal"
         >
           인기🔥
         </Badge>

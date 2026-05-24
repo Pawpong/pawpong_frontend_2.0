@@ -37,7 +37,7 @@ const StepItem = ({ label, index, isActive, showArrowBefore }: StepItemProps) =>
       </div>
       <span
         className={cn(
-          'text-[0.75rem] font-bold leading-[1.5] whitespace-nowrap tab:text-[1rem]',
+          'text-[0.75rem] leading-[1.5] font-bold whitespace-nowrap tab:text-[1rem]',
           isActive ? 'text-white' : 'text-[#5d5d5d]',
         )}
       >
@@ -71,10 +71,7 @@ const StepIndicator = () => {
               showArrowBefore={index > 0}
             />
           ))}
-          <ArrowRightIcon
-            className="size-[0.75rem] shrink-0 text-[#5d5d5d]"
-            aria-hidden
-          />
+          <ArrowRightIcon className="size-[0.75rem] shrink-0 text-[#5d5d5d]" aria-hidden />
         </div>
         <div className="flex items-center tab:hidden">
           {secondRow.map((step, rowIndex) => {

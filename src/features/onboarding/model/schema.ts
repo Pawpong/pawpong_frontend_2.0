@@ -3,8 +3,23 @@ import { z } from 'zod'
 const PHONE_REGEX = /^01[016789]\d{7,8}$/
 const EMAIL_DOMAINS = ['gmail.com', 'naver.com', 'daum.net', 'kakao.com', 'hanmail.net'] as const
 const REGIONS = [
-  '서울', '경기', '인천', '부산', '대구', '대전', '광주', '울산', '세종',
-  '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주',
+  '서울',
+  '경기',
+  '인천',
+  '부산',
+  '대구',
+  '대전',
+  '광주',
+  '울산',
+  '세종',
+  '강원',
+  '충북',
+  '충남',
+  '전북',
+  '전남',
+  '경북',
+  '경남',
+  '제주',
 ] as const
 const ANIMAL_TYPES = ['cat', 'dog', 'lizard'] as const
 

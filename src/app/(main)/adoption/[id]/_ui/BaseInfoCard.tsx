@@ -14,7 +14,7 @@ const BaseInfoCard = ({ title, className, children }: BaseInfoCardProps) => (
       className,
     )}
   >
-    <p className="text-[0.75rem] font-medium leading-[1.375rem] text-[#5d5d5d] tab:text-[1.25rem] tab:font-semibold">
+    <p className="text-[0.75rem] leading-[1.375rem] font-medium text-[#5d5d5d] tab:text-[1.25rem] tab:font-semibold">
       {title}
     </p>
     <div className="mt-[1rem] tab:mt-[1.5rem]">{children}</div>

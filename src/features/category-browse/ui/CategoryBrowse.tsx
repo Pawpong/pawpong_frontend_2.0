@@ -19,9 +19,7 @@ const CategoryBrowse = () => {
             href={category.href}
             className="flex h-[4.875rem] items-center justify-center rounded-[0.375rem] bg-[#c6c6c6] tab:rounded-[1.0625rem]"
           >
-            <span className="text-[0.875rem] font-semibold text-[#5d5d5d]">
-              {category.label}
-            </span>
+            <span className="text-[0.875rem] font-semibold text-[#5d5d5d]">{category.label}</span>
           </Link>
         ))}
       </div>

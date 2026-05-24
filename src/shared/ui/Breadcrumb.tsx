@@ -5,7 +5,7 @@ interface BreadcrumbProps {
 
 const Breadcrumb = ({ items, className }: BreadcrumbProps) => {
   return (
-    <nav className={className ?? 'hidden text-sm font-medium leading-[1.375rem] tab:block'}>
+    <nav className={className ?? 'hidden text-sm leading-[1.375rem] font-medium tab:block'}>
       {items.map((item, index) => (
         <span
           key={item}

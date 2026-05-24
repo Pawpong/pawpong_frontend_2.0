@@ -23,7 +23,7 @@ const HealthInfoCard = ({ detail }: { detail: AdoptionDetailDto }) => (
       {/* 예방 접종 현황 */}
       <div className="flex flex-col gap-[0.6875rem]">
         <div className="flex items-center justify-between">
-          <p className="text-[0.875rem] font-semibold leading-[1.375rem] text-[#5d5d5d]">
+          <p className="text-[0.875rem] leading-[1.375rem] font-semibold text-[#5d5d5d]">
             예방 접종 현황
           </p>
           <CompletionBadge completed={detail.health.vaccinationCompleted} />
@@ -55,18 +55,16 @@ const HealthInfoCard = ({ detail }: { detail: AdoptionDetailDto }) => (
       {/* 유전병 검사 */}
       <div className="flex flex-col gap-[0.75rem]">
         <div className="flex items-center justify-between">
-          <p className="text-[0.875rem] font-semibold leading-[1.375rem] text-[#5d5d5d]">
+          <p className="text-[0.875rem] leading-[1.375rem] font-semibold text-[#5d5d5d]">
             유전병 검사
           </p>
           <CompletionBadge completed={detail.health.geneticTestCompleted} />
         </div>
 
-        <div className="flex flex-col gap-[0.75rem] text-[0.875rem] font-medium leading-[1.375rem] text-[#5d5d5d]">
+        <div className="flex flex-col gap-[0.75rem] text-[0.875rem] leading-[1.375rem] font-medium text-[#5d5d5d]">
           <div className="flex items-center border-b border-[#d4d4d4] pb-px">
             <span className="min-w-0 flex-1">검진일</span>
-            <span className="min-w-0 flex-1 text-right">
-              {detail.health.geneticTest.date}
-            </span>
+            <span className="min-w-0 flex-1 text-right">{detail.health.geneticTest.date}</span>
           </div>
           <div className="flex items-center border-b border-[#d4d4d4] pb-px">
             <span className="min-w-0 flex-1">검사기관</span>

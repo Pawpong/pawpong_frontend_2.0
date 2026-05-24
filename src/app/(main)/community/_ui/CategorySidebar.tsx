@@ -13,7 +13,7 @@ interface CategorySidebarProps {
 const CategorySidebar = ({ categories, selected, onSelect }: CategorySidebarProps) => {
   return (
     <aside className="hidden w-[13.5625rem] shrink-0 rounded-2xl border border-border-light tab:block">
-      <p className="px-[1.0625rem] pt-4 text-sm font-semibold leading-[1.375rem] text-text-primary">
+      <p className="px-[1.0625rem] pt-4 text-sm leading-[1.375rem] font-semibold text-text-primary">
         카테고리
       </p>
 

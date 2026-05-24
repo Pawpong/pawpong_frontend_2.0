@@ -27,7 +27,7 @@ const ContestEntryContent = () => {
     <div className="flex min-h-screen flex-col bg-white">
       <PostFormHeader title="명예의 전당 콘테스트 참여하기" />
 
-      <Container className="flex-1 pb-[7.5rem] pt-[0.719rem] tab:px-[6.25rem] tab:pt-[5.5rem]">
+      <Container className="flex-1 pt-[0.719rem] pb-[7.5rem] tab:px-[6.25rem] tab:pt-[5.5rem]">
         <div className="flex flex-col gap-[1.125rem] tab:flex-row tab:gap-0">
           <div className="tab:w-[26.256rem] tab:shrink-0">
             <ImageUploadArea
@@ -53,8 +53,8 @@ const ContestEntryContent = () => {
       </Container>
 
       <PostFormCTA
-        onSaveDraft={() => { }}
-        onSubmit={() => { }}
+        onSaveDraft={() => {}}
+        onSubmit={() => {}}
         submitLabel="참여하기"
         isValid={isValid}
       />

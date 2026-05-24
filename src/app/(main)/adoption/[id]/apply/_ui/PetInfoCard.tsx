@@ -14,12 +14,7 @@ const PetInfoCard = ({ detail }: PetInfoCardProps) => (
     <div className="flex gap-[1.5rem] bg-white px-[6.25rem] py-[0.8125rem] shadow-[1px_5px_3.75px_rgba(0,0,0,0.1)]">
       {/* 이미지 */}
       <div className="relative h-[14.6875rem] w-[14.1875rem] shrink-0 overflow-hidden rounded-[0.5725rem] bg-[#c6c6c6]">
-        <Image
-          src={detail.imageUrls[0]}
-          alt={detail.name}
-          fill
-          className="object-cover"
-        />
+        <Image src={detail.imageUrls[0]} alt={detail.name} fill className="object-cover" />
       </div>
 
       {/* 텍스트 정보 */}
@@ -27,26 +22,29 @@ const PetInfoCard = ({ detail }: PetInfoCardProps) => (
         <div className="flex flex-col gap-[0.875rem]">
           {/* 이름 · 성별 · 나이 */}
           <div className="flex items-center gap-[1.125rem]">
-            <span className="text-[1.25rem] font-semibold leading-[1.375rem] text-[#5d5d5d]">
+            <span className="text-[1.25rem] leading-[1.375rem] font-semibold text-[#5d5d5d]">
               {detail.name}
             </span>
             <span className="size-[0.25rem] rounded-full bg-[#5d5d5d]" />
-            <span className="text-[1.25rem] font-semibold leading-[1.375rem] text-[#5d5d5d]">
+            <span className="text-[1.25rem] leading-[1.375rem] font-semibold text-[#5d5d5d]">
               {GENDER_LABEL[detail.gender]}
             </span>
             <span className="size-[0.25rem] rounded-full bg-[#5d5d5d]" />
-            <span className="text-[1.25rem] font-semibold leading-[1.375rem] text-[#5d5d5d]">
+            <span className="text-[1.25rem] leading-[1.375rem] font-semibold text-[#5d5d5d]">
               {getAgeText(detail.birthDate)}
             </span>
           </div>
 
           {/* 상태 배지 */}
-          <Badge variant="status" className="w-fit px-[0.585rem] py-[0.234rem] text-[0.819rem] leading-[1.286rem]">
+          <Badge
+            variant="status"
+            className="w-fit px-[0.585rem] py-[0.234rem] text-[0.819rem] leading-[1.286rem]"
+          >
             {ADOPTION_STATUS_LABEL[detail.status]}
           </Badge>
 
           {/* 설명 */}
-          <p className="max-w-[34rem] text-[1.25rem] font-semibold leading-[1.375rem] text-[#5d5d5d]">
+          <p className="max-w-[34rem] text-[1.25rem] leading-[1.375rem] font-semibold text-[#5d5d5d]">
             {detail.description}
           </p>
         </div>

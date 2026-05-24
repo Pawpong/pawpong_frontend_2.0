@@ -4,11 +4,7 @@ import type { UserType } from '@/features/onboarding'
 
 const VALID_TYPES: UserType[] = ['general', 'breeder']
 
-const OnboardingTypePage = async ({
-  params,
-}: {
-  params: Promise<{ type: string }>
-}) => {
+const OnboardingTypePage = async ({ params }: { params: Promise<{ type: string }> }) => {
   const { type } = await params
 
   if (!VALID_TYPES.includes(type as UserType)) {

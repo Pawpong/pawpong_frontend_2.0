@@ -11,7 +11,7 @@ const PostCreateBar = ({
 }: PostCreateBarProps) => {
   return (
     <div className="flex items-center justify-between py-[0.531rem]">
-      <p className="text-sm font-medium leading-[1.375rem] text-text-primary tab:text-base">
+      <p className="text-sm leading-[1.375rem] font-medium text-text-primary tab:text-base">
         {label}
       </p>
       <Link

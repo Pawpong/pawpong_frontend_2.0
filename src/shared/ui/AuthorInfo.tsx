@@ -37,12 +37,8 @@ const AuthorInfo = ({
         </Link>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2.5">
-            <span className="text-sm font-bold text-text-primary">
-              {nickname}
-            </span>
-            <span className="text-xs font-bold text-text-secondary">
-              {createdAt}
-            </span>
+            <span className="text-sm font-bold text-text-primary">{nickname}</span>
+            <span className="text-xs font-bold text-text-secondary">{createdAt}</span>
           </div>
           {contentSlot}
         </div>
@@ -54,13 +50,9 @@ const AuthorInfo = ({
     <div className={className ?? 'flex items-center gap-2.5'}>
       <Link href={`/home/${authorId}`} className="flex items-center gap-3">
         {avatar}
-        <span className="text-sm font-bold text-text-primary">
-          {nickname}
-        </span>
+        <span className="text-sm font-bold text-text-primary">{nickname}</span>
       </Link>
-      <span className="text-xs font-bold text-text-secondary">
-        {createdAt}
-      </span>
+      <span className="text-xs font-bold text-text-secondary">{createdAt}</span>
     </div>
   )
 }

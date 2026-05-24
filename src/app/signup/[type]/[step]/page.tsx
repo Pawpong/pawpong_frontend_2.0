@@ -7,11 +7,7 @@ import type { UserType } from '@/features/onboarding'
 
 const VALID_TYPES: UserType[] = ['general', 'breeder']
 
-const OnboardingStepPage = ({
-  params,
-}: {
-  params: Promise<{ type: string; step: string }>
-}) => {
+const OnboardingStepPage = ({ params }: { params: Promise<{ type: string; step: string }> }) => {
   const { type, step } = use(params)
 
   if (!VALID_TYPES.includes(type as UserType)) {

@@ -12,16 +12,14 @@ interface BreederCardHorizontalProps {
 const BreederCardHorizontal = ({ breeder }: BreederCardHorizontalProps) => {
   // TODO: API 연동 후 실제 브리더 홈 경로로 변경
   return (
-    <Link href={`/home/${breeder.id}`} className="flex items-center gap-[0.563rem] rounded-[0.375rem] bg-[#f0f0f0] px-[0.5rem] py-[0.438rem]">
+    <Link
+      href={`/home/${breeder.id}`}
+      className="flex items-center gap-[0.563rem] rounded-[0.375rem] bg-[#f0f0f0] px-[0.5rem] py-[0.438rem]"
+    >
       {/* 이미지 100x100 */}
       <div className="relative size-[6.25rem] shrink-0 overflow-hidden">
         {breeder.imageUrl && (
-          <Image
-            src={breeder.imageUrl}
-            alt={breeder.nickname}
-            fill
-            className="object-cover"
-          />
+          <Image src={breeder.imageUrl} alt={breeder.nickname} fill className="object-cover" />
         )}
       </div>
 
@@ -29,7 +27,7 @@ const BreederCardHorizontal = ({ breeder }: BreederCardHorizontalProps) => {
       <div className="flex min-w-0 flex-1 flex-col gap-[0.438rem]">
         {/* 이름 + 분양중 + 뱃지 */}
         <div className="flex flex-col gap-px">
-          <p className="line-clamp-1 text-sm font-bold leading-[1.5] text-[#5d5d5d]">
+          <p className="line-clamp-1 text-sm leading-[1.5] font-bold text-[#5d5d5d]">
             {breeder.nickname}
           </p>
           <div className="flex items-center gap-[0.313rem]">
@@ -43,11 +41,7 @@ const BreederCardHorizontal = ({ breeder }: BreederCardHorizontalProps) => {
             )}
             <div className="flex items-center gap-1">
               {breeder.badges.map((badge) => (
-                <Badge
-                  key={badge}
-                  variant="outline"
-                  className="h-6 text-xs leading-[1.375rem]"
-                >
+                <Badge key={badge} variant="outline" className="h-6 text-xs leading-[1.375rem]">
                   {badge}
                 </Badge>
               ))}

@@ -1,8 +1,4 @@
-import type {
-  AdoptionListingCard,
-  AdoptionDetailDto,
-  AdoptedListingCard,
-} from '@/shared/types'
+import type { AdoptionListingCard, AdoptionDetailDto, AdoptedListingCard } from '@/shared/types'
 
 export const MOCK_ADOPTION_LISTING: AdoptionListingCard = {
   listingId: '1',
@@ -134,8 +130,7 @@ export const MOCK_ADOPTION_DETAIL: AdoptionDetailDto = {
     },
   ],
   breedingEnvironment: {
-    description:
-      '넓은 들판이 반겨주는 조용한 곳입니다.넓은 들판이 반겨주는 조용한 곳입니다.',
+    description: '넓은 들판이 반겨주는 조용한 곳입니다.넓은 들판이 반겨주는 조용한 곳입니다.',
     imageUrls: [
       '/images/mock-pet.jpg',
       '/images/mock-pet.jpg',

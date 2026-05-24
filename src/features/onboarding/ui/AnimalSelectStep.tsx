@@ -72,7 +72,7 @@ const AnimalSelectStep = () => {
       <StepNavButtons
         onNext={() => handleSubmit(onSubmit)()}
         nextDisabled={!selected}
-        className="static bottom-auto left-auto right-auto z-auto tab:mt-[4rem]"
+        className="static right-auto bottom-auto left-auto z-auto tab:mt-[4rem]"
       />
     </StepLayout>
   )

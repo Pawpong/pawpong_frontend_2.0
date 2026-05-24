@@ -5,8 +5,7 @@ const POST_BASE: Omit<CommunityPostCard, 'postId'> = {
   authorModel: 'Breeder',
   authorNickname: '파이리귀여워',
   authorProfileImageUrl: undefined,
-  bodyExcerpt:
-    '너무 이쁜 아이가 태어났어요~ 이름은 파이리!! 포캣몬 파이리랑 똑같이 생겼죠!?',
+  bodyExcerpt: '너무 이쁜 아이가 태어났어요~ 이름은 파이리!! 포캣몬 파이리랑 똑같이 생겼죠!?',
   primaryPhotoUrl: '/images/placeholder-1.jpg',
   photoUrls: [
     '/images/placeholder-1.jpg',
@@ -21,13 +20,10 @@ const POST_BASE: Omit<CommunityPostCard, 'postId'> = {
   createdAt: '20시간',
 }
 
-export const MOCK_COMMUNITY_POSTS: CommunityPostCard[] = Array.from(
-  { length: 4 },
-  (_, i) => ({
-    ...POST_BASE,
-    postId: `post-${i + 1}`,
-  }),
-)
+export const MOCK_COMMUNITY_POSTS: CommunityPostCard[] = Array.from({ length: 4 }, (_, i) => ({
+  ...POST_BASE,
+  postId: `post-${i + 1}`,
+}))
 
 export interface CommunityCategory {
   label: string
@@ -56,13 +52,10 @@ const COMMENT_BASE: Omit<CommunityComment, 'commentId'> = {
   createdAt: '20시간',
 }
 
-export const MOCK_COMMUNITY_COMMENTS: CommunityComment[] = Array.from(
-  { length: 4 },
-  (_, i) => ({
-    ...COMMENT_BASE,
-    commentId: `comment-${i + 1}`,
-  }),
-)
+export const MOCK_COMMUNITY_COMMENTS: CommunityComment[] = Array.from({ length: 4 }, (_, i) => ({
+  ...COMMENT_BASE,
+  commentId: `comment-${i + 1}`,
+}))
 
 export const MOCK_COMMUNITY_POST_DETAIL: CommunityPostDetail = {
   postId: 'post-1',

@@ -15,8 +15,17 @@ import { ChipSelect } from './ChipSelect'
 const REGION_OPTIONS = REGIONS.map((r) => ({ value: r, label: r }))
 
 const BREED_KEYWORDS = [
-  '비숑', '도베르만', '골든리트리버', '푸들', '시바이누', '말티즈',
-  '포메라니안', '코기', '허스키', '사모예드', '래브라도',
+  '비숑',
+  '도베르만',
+  '골든리트리버',
+  '푸들',
+  '시바이누',
+  '말티즈',
+  '포메라니안',
+  '코기',
+  '허스키',
+  '사모예드',
+  '래브라도',
 ]
 
 const KennelInfoStep = () => {
@@ -110,7 +119,11 @@ const KennelInfoStep = () => {
         </div>
       </div>
 
-      <StepNavButtons onNext={() => handleSubmit(onSubmit)()} onBack={goBack} className="tab:mt-[9.9375rem]" />
+      <StepNavButtons
+        onNext={() => handleSubmit(onSubmit)()}
+        onBack={goBack}
+        className="tab:mt-[9.9375rem]"
+      />
     </StepLayout>
   )
 }

@@ -12,9 +12,24 @@ import { StepInput, StepActionButton, StepSelect } from './StepInput'
 import { StepNavButtons } from './StepNavButtons'
 
 const AGREEMENTS = [
-  { id: 'serviceAgreed' as const, label: '(필수) 서비스 이용약관 동의', required: true, hasDetail: true },
-  { id: 'privacyAgreed' as const, label: '개인정보 수집 및 이용 동의', required: true, hasDetail: true },
-  { id: 'marketingAgreed' as const, label: '(선택) 마케팅 수신 동의', required: false, hasDetail: false },
+  {
+    id: 'serviceAgreed' as const,
+    label: '(필수) 서비스 이용약관 동의',
+    required: true,
+    hasDetail: true,
+  },
+  {
+    id: 'privacyAgreed' as const,
+    label: '개인정보 수집 및 이용 동의',
+    required: true,
+    hasDetail: true,
+  },
+  {
+    id: 'marketingAgreed' as const,
+    label: '(선택) 마케팅 수신 동의',
+    required: false,
+    hasDetail: false,
+  },
 ]
 
 const CHECKBOX_CLASS =
@@ -144,9 +159,7 @@ const ProfileStep = () => {
                   <span className="flex-1 text-[1rem] leading-[1.375rem] font-medium text-[#5d5d5d]">
                     {agreement.label}
                   </span>
-                  {agreement.hasDetail && (
-                    <DetailLink variant="button" size="lg" />
-                  )}
+                  {agreement.hasDetail && <DetailLink variant="button" size="lg" />}
                 </label>
               )}
             />
@@ -172,7 +185,11 @@ const ProfileStep = () => {
         />
       </div>
 
-      <StepNavButtons onNext={() => handleSubmit(onSubmit)()} onBack={goBack} className="tab:mt-[3.375rem]" />
+      <StepNavButtons
+        onNext={() => handleSubmit(onSubmit)()}
+        onBack={goBack}
+        className="tab:mt-[3.375rem]"
+      />
     </StepLayout>
   )
 }

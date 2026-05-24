@@ -44,14 +44,14 @@ const DocumentsStep = () => {
           className="flex h-[3.5625rem] w-full items-center gap-[0.75rem] rounded-[1rem] bg-[#a8a8a8] px-[1.25rem] py-[0.9375rem] tab:h-[4.375rem]"
         >
           <AttachmentIcon className="size-[1.5rem] shrink-0 text-white" />
-          <span className="text-[1rem] font-semibold leading-[1.375rem] text-white">
+          <span className="text-[1rem] leading-[1.375rem] font-semibold text-white">
             신분증 사본
           </span>
         </button>
 
         {/* 안내 문구 */}
-        <p className="mt-[0.375rem] text-[0.875rem] font-semibold leading-[1.375rem] text-[#a8a8a8] tab:mt-[0.75rem] tab:px-[2.875rem]">
-          이름과 생년월일 이외에  개인정보는 가려서 제출해주시 바랍니다.
+        <p className="mt-[0.375rem] text-[0.875rem] leading-[1.375rem] font-semibold text-[#a8a8a8] tab:mt-[0.75rem] tab:px-[2.875rem]">
+          이름과 생년월일 이외에 개인정보는 가려서 제출해주시 바랍니다.
         </p>
 
         {/* 동물생산업 등록증 */}
@@ -60,7 +60,7 @@ const DocumentsStep = () => {
           className="mt-[1rem] flex h-[3.625rem] w-full items-center gap-[0.75rem] rounded-[1rem] bg-[#d5d5d5] px-[1.25rem] py-[0.9375rem] tab:mt-[2rem] tab:h-[4.375rem]"
         >
           <AttachmentIcon className="size-[1.5rem] shrink-0 text-white" />
-          <span className="text-[1rem] font-semibold leading-[1.375rem] text-white">
+          <span className="text-[1rem] leading-[1.375rem] font-semibold text-white">
             동물생산업 등록증
           </span>
         </button>
@@ -76,16 +76,25 @@ const DocumentsStep = () => {
                 onCheckedChange={(checked) => field.onChange(checked)}
                 className="size-[1.5rem] rounded-[0.1875rem] border-2 border-[#a8a8a8] bg-white shadow-none data-[state=checked]:border-[#5d5d5d] data-[state=checked]:bg-white data-[state=checked]:text-[#5d5d5d]"
               />
-              <span className="flex-1 text-[0.875rem] font-medium leading-[1.375rem] text-[#5d5d5d] tab:text-[1rem]">
+              <span className="flex-1 text-[0.875rem] leading-[1.375rem] font-medium text-[#5d5d5d] tab:text-[1rem]">
                 (필수) 브리더 입점 서약서
               </span>
-              <DetailLink variant="button" size="md" onClick={(e) => e.preventDefault()} className="tab:text-[1rem]" />
+              <DetailLink
+                variant="button"
+                size="md"
+                onClick={(e) => e.preventDefault()}
+                className="tab:text-[1rem]"
+              />
             </label>
           )}
         />
       </div>
 
-      <StepNavButtons onNext={() => handleSubmit(onSubmit)()} onBack={goBack} className="tab:mt-[9.9375rem]" />
+      <StepNavButtons
+        onNext={() => handleSubmit(onSubmit)()}
+        onBack={goBack}
+        className="tab:mt-[9.9375rem]"
+      />
     </StepLayout>
   )
 }

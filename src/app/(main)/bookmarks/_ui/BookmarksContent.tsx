@@ -2,14 +2,7 @@
 
 import { useState } from 'react'
 import { cafe24Proup } from '@/shared/lib/fonts'
-import {
-  Container,
-  PageHeader,
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from '@/shared/ui'
+import { Container, PageHeader, Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui'
 import { createMockListings, MOCK_ADOPTED_LISTINGS } from '@/shared/mocks/adoption'
 import { MOCK_MY_HOME_POSTS } from '@/shared/mocks/myHome'
 import { cn } from '@/shared/lib/Cn'
@@ -39,7 +32,7 @@ const BookmarksContent = () => {
                   key={tab.id}
                   value={tab.id}
                   className={cn(
-                    'group flex flex-1 min-w-px items-center justify-center p-2.5',
+                    'group flex min-w-px flex-1 items-center justify-center p-2.5',
                     'data-[state=active]:border-b-2 data-[state=active]:border-text-primary',
                   )}
                 >
@@ -47,7 +40,7 @@ const BookmarksContent = () => {
                   <span
                     className={cn(
                       cafe24Proup.className,
-                      'font-cafe24 text-xs leading-[1.375rem] text-[#a7a7a7] whitespace-nowrap tab:hidden',
+                      'font-cafe24 text-xs leading-[1.375rem] whitespace-nowrap text-[#a7a7a7] tab:hidden',
                       'group-data-[state=active]:text-text-primary',
                     )}
                   >
@@ -56,7 +49,7 @@ const BookmarksContent = () => {
                   {/* PC: Pretendard */}
                   <span
                     className={cn(
-                      'hidden text-base font-medium leading-[1.375rem] text-[#a7a7a7] whitespace-nowrap tab:inline',
+                      'hidden text-base leading-[1.375rem] font-medium whitespace-nowrap text-[#a7a7a7] tab:inline',
                       'group-data-[state=active]:font-semibold group-data-[state=active]:text-text-primary',
                     )}
                   >

@@ -3,7 +3,10 @@ import type { HomeUserType } from '@/shared/types'
 /** 랭킹 기간 */
 export type RankingPeriod = 'current' | 'previous'
 
-export const RANKING_PERIOD_CONFIG: Record<RankingPeriod, { title: string; buttonLabel: string; next: RankingPeriod }> = {
+export const RANKING_PERIOD_CONFIG: Record<
+  RankingPeriod,
+  { title: string; buttonLabel: string; next: RankingPeriod }
+> = {
   current: { title: '실시간 랭킹 1위~3위', buttonLabel: '< 저번주 랭킹', next: 'previous' },
   previous: { title: '저번주 랭킹 1위~3위', buttonLabel: '이번주 랭킹>', next: 'current' },
 }

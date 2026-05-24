@@ -24,8 +24,7 @@ const ExploreContent = () => {
   const pathname = usePathname()
 
   const typeParam = searchParams.get('type')
-  const selectedType: ExploreType =
-    typeParam === 'breeder' ? 'breeder' : 'adoption'
+  const selectedType: ExploreType = typeParam === 'breeder' ? 'breeder' : 'adoption'
 
   const categoryParam = searchParams.get('category')
   const selectedCategory: AnimalCategory =
@@ -89,17 +88,14 @@ const ExploreContent = () => {
         <p
           className={cn(
             cafe24Proup.className,
-            'font-cafe24 text-center text-[0.875rem] leading-[1.5] text-[#5d5d5d]',
+            'text-center font-cafe24 text-[0.875rem] leading-[1.5] text-[#5d5d5d]',
           )}
         >
           {selectedType === 'breeder'
             ? '신뢰있는 브리더들을 만나보세요'
             : CATEGORY_DESCRIPTION[selectedCategory]}
         </p>
-        <CategoryFilter
-          selected={selectedCategory}
-          onChange={handleCategoryChange}
-        />
+        <CategoryFilter selected={selectedCategory} onChange={handleCategoryChange} />
       </div>
 
       {/* ══════ 데스크탑: 카테고리 ══════ */}
@@ -114,7 +110,7 @@ const ExploreContent = () => {
       ) : (
         <>
           {/* 데스크탑 타이틀 — Pretendard Bold 20px, px100, h52, 중앙 정렬 (gap 35px from category) */}
-          <p className="hidden px-[6.25rem] py-[0.625rem] text-center text-[1.25rem] font-bold leading-[1.375rem] text-[#5d5d5d] tab:mt-[2.188rem] tab:block">
+          <p className="hidden px-[6.25rem] py-[0.625rem] text-center text-[1.25rem] leading-[1.375rem] font-bold text-[#5d5d5d] tab:mt-[2.188rem] tab:block">
             {CATEGORY_DESCRIPTION[selectedCategory]}
           </p>
 
@@ -136,10 +132,7 @@ const ExploreContent = () => {
             {!popularCollapsed && (
               <div className="flex flex-col gap-[0.75rem] tab:hidden">
                 {popularListings.map((listing) => (
-                  <AdoptionCardHorizontal
-                    key={listing.listingId}
-                    listing={listing}
-                  />
+                  <AdoptionCardHorizontal key={listing.listingId} listing={listing} />
                 ))}
               </div>
             )}

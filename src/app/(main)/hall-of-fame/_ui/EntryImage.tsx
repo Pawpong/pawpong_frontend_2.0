@@ -19,7 +19,7 @@ const EntryImage = ({ entry, className }: EntryImageProps) => (
         className="aspect-square size-full object-cover"
       />
     </div>
-    <div className="absolute bottom-4 right-5 flex flex-col items-end tab:right-6">
+    <div className="absolute right-5 bottom-4 flex flex-col items-end tab:right-6">
       <span className="text-base font-semibold text-white tab:text-xl">
         {entry.participant.name}
       </span>

@@ -1,12 +1,6 @@
 import { forwardRef } from 'react'
 import { cn } from '@/shared/lib/Cn'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/ui'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui'
 
 type StepInputProps = React.InputHTMLAttributes<HTMLInputElement>
 
@@ -15,7 +9,7 @@ const StepInput = forwardRef<HTMLInputElement, StepInputProps>(({ className, ...
     ref={ref}
     {...props}
     className={cn(
-      'h-[2.5rem] w-full rounded-[0.375rem] border border-[#a8a8a8] bg-white p-[0.625rem] text-[0.875rem] leading-[1.375rem] font-medium text-[#333] placeholder:text-[#5d5d5d] outline-none tab:h-[3.25rem] tab:rounded-[1rem] tab:px-[1.25rem] tab:py-[0.9375rem] tab:text-[1rem]',
+      'h-[2.5rem] w-full rounded-[0.375rem] border border-[#a8a8a8] bg-white p-[0.625rem] text-[0.875rem] leading-[1.375rem] font-medium text-[#333] outline-none placeholder:text-[#5d5d5d] tab:h-[3.25rem] tab:rounded-[1rem] tab:px-[1.25rem] tab:py-[0.9375rem] tab:text-[1rem]',
       className,
     )}
   />
@@ -24,16 +18,18 @@ StepInput.displayName = 'StepInput'
 
 type StepTextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>
 
-const StepTextarea = forwardRef<HTMLTextAreaElement, StepTextareaProps>(({ className, ...props }, ref) => (
-  <textarea
-    ref={ref}
-    {...props}
-    className={cn(
-      'h-[4.5rem] w-full resize-none rounded-[0.375rem] border border-[#a8a8a8] bg-white p-[0.625rem] text-[0.875rem] font-medium leading-[1.375rem] text-[#333] placeholder:text-[#5d5d5d] outline-none tab:h-[7.8125rem] tab:rounded-[1rem] tab:px-[1.25rem] tab:py-[0.9375rem] tab:text-[1rem]',
-      className,
-    )}
-  />
-))
+const StepTextarea = forwardRef<HTMLTextAreaElement, StepTextareaProps>(
+  ({ className, ...props }, ref) => (
+    <textarea
+      ref={ref}
+      {...props}
+      className={cn(
+        'h-[4.5rem] w-full resize-none rounded-[0.375rem] border border-[#a8a8a8] bg-white p-[0.625rem] text-[0.875rem] leading-[1.375rem] font-medium text-[#333] outline-none placeholder:text-[#5d5d5d] tab:h-[7.8125rem] tab:rounded-[1rem] tab:px-[1.25rem] tab:py-[0.9375rem] tab:text-[1rem]',
+        className,
+      )}
+    />
+  ),
+)
 StepTextarea.displayName = 'StepTextarea'
 
 const StepActionButton = ({
@@ -65,7 +61,7 @@ const StepSelect = ({ value, onValueChange, options, placeholder, className }: S
   <Select value={value} onValueChange={onValueChange}>
     <SelectTrigger
       className={cn(
-        'h-[2.5rem] w-full rounded-[0.375rem] border border-[#a8a8a8] bg-white px-[0.625rem] text-[0.875rem] font-medium leading-[1.375rem] text-[#5d5d5d] shadow-none ring-0 ring-offset-0 focus:ring-0 focus:ring-offset-0 tab:h-[3.25rem] tab:rounded-[1rem] tab:px-[1.25rem] tab:py-[0.9375rem] tab:text-[1rem]',
+        'h-[2.5rem] w-full rounded-[0.375rem] border border-[#a8a8a8] bg-white px-[0.625rem] text-[0.875rem] leading-[1.375rem] font-medium text-[#5d5d5d] shadow-none ring-0 ring-offset-0 focus:ring-0 focus:ring-offset-0 tab:h-[3.25rem] tab:rounded-[1rem] tab:px-[1.25rem] tab:py-[0.9375rem] tab:text-[1rem]',
         className,
       )}
     >

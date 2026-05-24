@@ -23,9 +23,7 @@ const SavedFeedsTab = ({ feeds }: SavedFeedsTabProps) => (
       {feeds.map((post, index) => (
         <div key={post.id}>
           <PostCard post={post} />
-          {index < feeds.length - 1 && (
-            <Separator fullWidth className="bg-border-light" />
-          )}
+          {index < feeds.length - 1 && <Separator fullWidth className="bg-border-light" />}
         </div>
       ))}
     </div>

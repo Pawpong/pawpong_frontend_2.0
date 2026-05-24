@@ -38,15 +38,16 @@ const VisibilitySelect = ({ value, onChange }: VisibilitySelectProps) => {
         </button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="start" className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-[8rem] rounded-md p-0">
+      <DropdownMenuContent
+        align="start"
+        className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-[8rem] rounded-md p-0"
+      >
         {VISIBILITY_OPTIONS.map((option) => (
           <DropdownMenuItem
             key={option.id}
             onClick={() => onChange(option.id)}
             className={`px-4 py-2.5 text-sm font-medium ${
-              value === option.id
-                ? 'bg-surface-primary text-text-primary'
-                : 'text-text-secondary'
+              value === option.id ? 'bg-surface-primary text-text-primary' : 'text-text-secondary'
             }`}
           >
             {option.label}

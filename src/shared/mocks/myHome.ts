@@ -51,13 +51,10 @@ const FAVORITE_BREEDER_BASE: Omit<FavoriteBreeder, 'id'> = {
   date: '2026.4.30',
 }
 
-export const MOCK_FAVORITE_BREEDERS: FavoriteBreeder[] = Array.from(
-  { length: 2 },
-  (_, i) => ({
-    ...FAVORITE_BREEDER_BASE,
-    id: String(i + 1),
-  }),
-)
+export const MOCK_FAVORITE_BREEDERS: FavoriteBreeder[] = Array.from({ length: 2 }, (_, i) => ({
+  ...FAVORITE_BREEDER_BASE,
+  id: String(i + 1),
+}))
 
 export interface BreederProfile extends MyHomeProfile {
   location: string
@@ -85,13 +82,8 @@ export const MOCK_MY_HOME_POSTS: MyHomePost[] = [
       avatarUrl: null,
     },
     createdAt: '20시간',
-    description:
-      '너무 이쁜 아이가 태어났어요~ 이름은 파이리!! 포캣몬 파이리랑 똑같이 생겼죠!?',
-    images: [
-      '/images/placeholder-1.jpg',
-      '/images/placeholder-2.jpg',
-      '/images/placeholder-3.jpg',
-    ],
+    description: '너무 이쁜 아이가 태어났어요~ 이름은 파이리!! 포캣몬 파이리랑 똑같이 생겼죠!?',
+    images: ['/images/placeholder-1.jpg', '/images/placeholder-2.jpg', '/images/placeholder-3.jpg'],
     likeCount: 10,
     commentCount: 10,
   },
@@ -103,13 +95,8 @@ export const MOCK_MY_HOME_POSTS: MyHomePost[] = [
       avatarUrl: null,
     },
     createdAt: '20시간',
-    description:
-      '너무 이쁜 아이가 태어났어요~ 이름은 파이리!! 포캣몬 파이리랑 똑같이 생겼죠!?',
-    images: [
-      '/images/placeholder-1.jpg',
-      '/images/placeholder-2.jpg',
-      '/images/placeholder-3.jpg',
-    ],
+    description: '너무 이쁜 아이가 태어났어요~ 이름은 파이리!! 포캣몬 파이리랑 똑같이 생겼죠!?',
+    images: ['/images/placeholder-1.jpg', '/images/placeholder-2.jpg', '/images/placeholder-3.jpg'],
     likeCount: 10,
     commentCount: 10,
   },
@@ -121,13 +108,8 @@ export const MOCK_MY_HOME_POSTS: MyHomePost[] = [
       avatarUrl: null,
     },
     createdAt: '20시간',
-    description:
-      '너무 이쁜 아이가 태어났어요~ 이름은 파이리!! 포캣몬 파이리랑 똑같이 생겼죠!?',
-    images: [
-      '/images/placeholder-1.jpg',
-      '/images/placeholder-2.jpg',
-      '/images/placeholder-3.jpg',
-    ],
+    description: '너무 이쁜 아이가 태어났어요~ 이름은 파이리!! 포캣몬 파이리랑 똑같이 생겼죠!?',
+    images: ['/images/placeholder-1.jpg', '/images/placeholder-2.jpg', '/images/placeholder-3.jpg'],
     likeCount: 10,
     commentCount: 10,
   },

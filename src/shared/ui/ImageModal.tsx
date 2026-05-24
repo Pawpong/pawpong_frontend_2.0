@@ -1,12 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import {
-  Dialog,
-  DialogPortal,
-  DialogOverlay,
-  DialogClose,
-} from '@/shared/ui'
+import { Dialog, DialogPortal, DialogOverlay, DialogClose } from '@/shared/ui'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { useImageCarousel } from '@/shared/lib/useImageCarousel'
 
@@ -37,20 +32,16 @@ const ImageModal = ({
       <DialogPortal>
         <DialogOverlay className="bg-black/50" />
         <DialogPrimitive.Content
-          className="fixed left-1/2 top-1/2 z-50 w-[57.25rem] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[1rem] border border-[#c6c6c6] bg-black"
+          className="fixed top-1/2 left-1/2 z-50 w-[57.25rem] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[1rem] border border-[#c6c6c6] bg-black"
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
-          <DialogPrimitive.Title className="sr-only">
-            이미지 상세 보기
-          </DialogPrimitive.Title>
+          <DialogPrimitive.Title className="sr-only">이미지 상세 보기</DialogPrimitive.Title>
 
           <div className="flex h-[36.75rem] flex-col">
             {/* 닫기 버튼 */}
             <div className="relative h-[4.438rem] shrink-0">
-              <DialogClose className="absolute left-[2.5625rem] top-[1.0625rem] z-10 flex w-[5.75rem] items-center justify-center rounded-full border border-[#d4d4d4] p-[0.625rem]">
-                <span className="text-[0.875rem] font-medium text-white">
-                  닫기
-                </span>
+              <DialogClose className="absolute top-[1.0625rem] left-[2.5625rem] z-10 flex w-[5.75rem] items-center justify-center rounded-full border border-[#d4d4d4] p-[0.625rem]">
+                <span className="text-[0.875rem] font-medium text-white">닫기</span>
               </DialogClose>
             </div>
 
@@ -103,9 +94,7 @@ const ImageModal = ({
                   }}
                   className="flex w-[9.438rem] items-center justify-center rounded-full border border-[#d4d4d4] p-[0.625rem]"
                 >
-                  <span className="text-sm font-medium text-white">
-                    대표 이미지로 변경
-                  </span>
+                  <span className="text-sm font-medium text-white">대표 이미지로 변경</span>
                 </button>
               )}
               {onDelete && (
@@ -117,9 +106,7 @@ const ImageModal = ({
                   }}
                   className="flex w-[9.438rem] items-center justify-center rounded-full border border-[#d4d4d4] p-[0.625rem]"
                 >
-                  <span className="text-sm font-medium text-white">
-                    이미지 삭제
-                  </span>
+                  <span className="text-sm font-medium text-white">이미지 삭제</span>
                 </button>
               )}
             </div>

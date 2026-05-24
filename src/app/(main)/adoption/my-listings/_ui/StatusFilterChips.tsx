@@ -26,10 +26,8 @@ const StatusFilterChips = ({ activeStatus, onStatusChange }: StatusFilterChipsPr
             type="button"
             onClick={() => handleClick(status)}
             className={cn(
-              'rounded-full px-2.5 py-1 text-sm font-semibold leading-[1.375rem] whitespace-nowrap',
-              isActive
-                ? 'bg-text-primary text-white'
-                : 'bg-[#e1e1e1] text-text-primary',
+              'rounded-full px-2.5 py-1 text-sm leading-[1.375rem] font-semibold whitespace-nowrap',
+              isActive ? 'bg-text-primary text-white' : 'bg-[#e1e1e1] text-text-primary',
             )}
           >
             {ADOPTION_STATUS_LABEL[status]}

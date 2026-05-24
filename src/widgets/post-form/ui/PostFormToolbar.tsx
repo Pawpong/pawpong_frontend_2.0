@@ -48,7 +48,7 @@ const PostFormToolbar = ({ onEmojiSelect }: PostFormToolbarProps) => {
   }
 
   return (
-    <div className="relative inline-flex h-10 self-start items-center gap-5 rounded-full border border-[#d3d3d3] px-5 tab:h-auto tab:py-[0.625rem]">
+    <div className="relative inline-flex h-10 items-center gap-5 self-start rounded-full border border-[#d3d3d3] px-5 tab:h-auto tab:py-[0.625rem]">
       <button
         ref={buttonRef}
         type="button"

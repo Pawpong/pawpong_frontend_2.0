@@ -20,22 +20,16 @@ const BREEDER_BASE: Omit<ExploreBreeder, 'id'> = {
   viewCount: 20,
 }
 
-export const MOCK_FEATURED_BREEDERS: ExploreBreeder[] = Array.from(
-  { length: 3 },
-  (_, i) => ({
-    ...BREEDER_BASE,
-    id: `featured-${i + 1}`,
-    isPopular: true,
-  }),
-)
+export const MOCK_FEATURED_BREEDERS: ExploreBreeder[] = Array.from({ length: 3 }, (_, i) => ({
+  ...BREEDER_BASE,
+  id: `featured-${i + 1}`,
+  isPopular: true,
+}))
 
-export const MOCK_EXPLORE_BREEDERS: ExploreBreeder[] = Array.from(
-  { length: 9 },
-  (_, i) => ({
-    ...BREEDER_BASE,
-    id: `explore-${i + 1}`,
-  }),
-)
+export const MOCK_EXPLORE_BREEDERS: ExploreBreeder[] = Array.from({ length: 9 }, (_, i) => ({
+  ...BREEDER_BASE,
+  id: `explore-${i + 1}`,
+}))
 
 export const POPULAR_KEYWORDS = [
   '강아지 관리',

@@ -20,20 +20,18 @@ const STATUS_BG: Record<AdoptionListingCard['status'], string> = {
 
 const BreederListingCard = ({ listing, className }: BreederListingCardProps) => {
   return (
-    <Link href={`/adoption/${listing.listingId}`} className={cn('flex flex-col gap-[0.438rem]', className)}>
+    <Link
+      href={`/adoption/${listing.listingId}`}
+      className={cn('flex flex-col gap-[0.438rem]', className)}
+    >
       {/* Image */}
       <div className="relative size-[10.25rem] overflow-hidden rounded-[0.375rem] bg-[#d4d4d4]">
-        <Image
-          src={listing.thumbnailUrl}
-          alt={listing.name}
-          fill
-          className="object-cover"
-        />
+        <Image src={listing.thumbnailUrl} alt={listing.name} fill className="object-cover" />
         <Badge
           variant="status"
           className={cn(
             STATUS_BG[listing.status],
-            'absolute left-[0.625rem] top-[0.766rem] px-[0.625rem] py-[0.25rem] text-xs leading-[1.375rem]',
+            'absolute top-[0.766rem] left-[0.625rem] px-[0.625rem] py-[0.25rem] text-xs leading-[1.375rem]',
           )}
         >
           {ADOPTION_STATUS_LABEL[listing.status]}
@@ -42,9 +40,7 @@ const BreederListingCard = ({ listing, className }: BreederListingCardProps) => 
 
       {/* Info */}
       <div className="flex flex-col gap-1">
-        <p className="text-sm font-semibold leading-normal text-[#5d5d5d]">
-          {listing.name}
-        </p>
+        <p className="text-sm leading-normal font-semibold text-[#5d5d5d]">{listing.name}</p>
         <ListingStats
           inquiryCount={listing.inquiryCount}
           favoriteCount={listing.favoriteCount}

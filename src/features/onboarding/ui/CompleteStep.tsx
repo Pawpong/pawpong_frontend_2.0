@@ -24,7 +24,7 @@ const CompleteStep = () => {
       {/* 환영 + 심사 안내 메시지 */}
       {isBreeder ? (
         <div className="mt-[2rem] flex flex-col items-center gap-[0.95rem] tab:mt-[9.72rem]">
-          <p className="text-center text-[1.05rem] font-medium leading-[1.5] text-[rgba(79,59,46,0.8)] tab:text-[1.69rem]">
+          <p className="text-center text-[1.05rem] leading-[1.5] font-medium text-[rgba(79,59,46,0.8)] tab:text-[1.69rem]">
             포퐁에 오신 걸 환영해요!
             <br />
             브리더 심사는
@@ -47,7 +47,7 @@ const CompleteStep = () => {
           </div>
         </div>
       ) : (
-        <p className="hidden tab:mt-[9.72rem] tab:block tab:text-center tab:text-[1.69rem] tab:font-medium tab:leading-[1.5] tab:text-[rgba(79,59,46,0.8)]">
+        <p className="hidden tab:mt-[9.72rem] tab:block tab:text-center tab:text-[1.69rem] tab:leading-[1.5] tab:font-medium tab:text-[rgba(79,59,46,0.8)]">
           포퐁에 오신 걸 환영해요!
         </p>
       )}

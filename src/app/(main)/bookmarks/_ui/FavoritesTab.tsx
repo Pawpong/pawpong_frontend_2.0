@@ -19,7 +19,7 @@ const FavoritesTab = ({ listings }: FavoritesTabProps) => (
     </div>
 
     {/* 모바일: 2열 그리드 */}
-    <div className="grid grid-cols-2 gap-4 pb-15 pt-3 tab:hidden">
+    <div className="grid grid-cols-2 gap-4 pt-3 pb-15 tab:hidden">
       {listings.map((listing) => (
         <AdoptionCard key={listing.listingId} listing={listing} />
       ))}
