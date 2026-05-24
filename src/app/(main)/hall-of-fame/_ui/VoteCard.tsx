@@ -11,9 +11,9 @@ interface VoteCardProps {
 
 const VoteCard = ({ entry, onImageClick }: VoteCardProps) => {
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1 tab:gap-0 tab:overflow-hidden tab:rounded-[0.936rem] tab:bg-[#e7e7e7]">
       {/* 이미지 */}
-      <button type="button" onClick={onImageClick} className="relative aspect-square w-full overflow-hidden rounded-[0.375rem] tab:aspect-[4/3] tab:rounded-2xl tab:bg-[#e7e7e7]">
+      <button type="button" onClick={onImageClick} className="relative aspect-square w-full overflow-hidden rounded-[0.375rem] tab:aspect-[4/3] tab:rounded-none">
         <Image
           src={entry.imageUrl}
           alt={entry.description}
@@ -47,7 +47,7 @@ const VoteCard = ({ entry, onImageClick }: VoteCardProps) => {
       </div>
 
       {/* PC: 투표하기 버튼 */}
-      <div className="hidden justify-center tab:flex tab:px-5 tab:pb-5">
+      <div className="hidden justify-center tab:flex tab:mt-[1.875rem] tab:px-5 tab:pb-5">
         <VoteButton
           isVoted={entry.isVoted}
           voteCount={entry.voteCount}

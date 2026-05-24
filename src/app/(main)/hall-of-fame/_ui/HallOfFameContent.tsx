@@ -47,7 +47,7 @@ const HallOfFameContent = () => {
 
       {/* Contest Banner */}
       <Container className="mt-2 tab:mt-6 pc:px-[12.25rem]">
-        <ContestBanner contest={MOCK_CONTEST_INFO} />
+        <ContestBanner contest={MOCK_CONTEST_INFO} userType="adopter" />
       </Container>
 
       {/* Ranking Section */}
@@ -108,6 +108,7 @@ const HallOfFameContent = () => {
         entry={selectedEntry}
         open={selectedEntry !== null}
         onOpenChange={(open) => { if (!open) setSelectedEntry(null) }}
+        userType="adopter"
       />
     </div>
   )

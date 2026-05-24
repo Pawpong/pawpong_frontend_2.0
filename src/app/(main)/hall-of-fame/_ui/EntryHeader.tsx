@@ -1,14 +1,15 @@
 import { VoteIcon } from '@/shared/assets/icons'
-import type { ContestEntry } from '@/shared/types'
+import type { ContestEntry, HomeUserType } from '@/shared/types'
 
 interface EntryHeaderProps {
   entry: ContestEntry
   onClose: () => void
+  userType: HomeUserType
   className?: string
 }
 
-/** 상단 헤더 (닫기 + 투표 상태) */
-const EntryHeader = ({ entry, onClose, className }: EntryHeaderProps) => (
+/** 상단 헤더 (닫기 + 투표/참여 상태) */
+const EntryHeader = ({ entry, onClose, userType, className }: EntryHeaderProps) => (
   <div className={`flex shrink-0 items-center ${className ?? ''}`}>
     <button
       type="button"
@@ -17,7 +18,8 @@ const EntryHeader = ({ entry, onClose, className }: EntryHeaderProps) => (
     >
       <span className="text-sm font-medium text-white">닫기</span>
     </button>
-    {entry.isVoted && (
+
+    {userType === 'breeder' && entry.isVoted && (
       <div className="ml-auto flex items-center gap-1.5 tab:ml-0 tab:gap-2">
         <span className="text-sm font-medium text-white tab:text-base">투표했습니다</span>
         <VoteIcon className="size-6 text-white" />
@@ -25,6 +27,12 @@ const EntryHeader = ({ entry, onClose, className }: EntryHeaderProps) => (
           {entry.voteCount}
         </span>
       </div>
+    )}
+
+    {userType === 'adopter' && (
+      <span className="ml-3 text-sm font-medium text-white tab:ml-4 tab:text-base">
+        {entry.participant.name}님이 참여한 글입니다.
+      </span>
     )}
   </div>
 )

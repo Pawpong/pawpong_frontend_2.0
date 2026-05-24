@@ -3,13 +3,20 @@
 import Link from 'next/link'
 import { cafe24Proup } from '@/shared/lib/fonts'
 import { cn } from '@/shared/lib/Cn'
-import type { ContestInfo } from '@/shared/types'
+import type { ContestInfo, HomeUserType } from '@/shared/types'
+
+const CONTEST_ACTION: Record<HomeUserType, { label: string; href: string }> = {
+  breeder: { label: '콘테스트 참여하기', href: '/hall-of-fame/participate' },
+  adopter: { label: '나의 참여 보기', href: '/hall-of-fame/participate' },
+}
 
 interface ContestBannerProps {
   contest: ContestInfo
+  userType: HomeUserType
 }
 
-const ContestBanner = ({ contest }: ContestBannerProps) => {
+const ContestBanner = ({ contest, userType }: ContestBannerProps) => {
+  const action = CONTEST_ACTION[userType]
   return (
     <div className="relative rounded-2xl bg-[#ebebeb] px-5 pb-4 pt-3 tab:px-6 tab:pb-5 tab:pt-6">
       {/* 타이틀 */}
@@ -38,11 +45,11 @@ const ContestBanner = ({ contest }: ContestBannerProps) => {
       {/* 콘테스트 참여하기 버튼 */}
       <div className="mt-3 flex justify-center tab:justify-end">
         <Link
-          href="/hall-of-fame/participate"
+          href={action.href}
           className="flex h-10 w-[15.4375rem] items-center justify-center rounded-full bg-[#d4d4d4] p-[0.625rem] tab:h-12 tab:w-56"
         >
           <span className="whitespace-nowrap text-base font-semibold text-[#5d5d5d]">
-            콘테스트 참여하기
+            {action.label}
           </span>
         </Link>
       </div>

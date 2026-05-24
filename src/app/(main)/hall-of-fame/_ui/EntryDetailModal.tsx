@@ -6,7 +6,7 @@ import {
   DialogTitle,
 } from '@/shared/ui'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
-import type { ContestEntry } from '@/shared/types'
+import type { ContestEntry, HomeUserType } from '@/shared/types'
 import { EntryHeader } from './EntryHeader'
 import { EntryImage } from './EntryImage'
 import { EntryDescription } from './EntryDescription'
@@ -15,9 +15,10 @@ interface EntryDetailModalProps {
   entry: ContestEntry | null
   open: boolean
   onOpenChange: (open: boolean) => void
+  userType: HomeUserType
 }
 
-const EntryDetailModal = ({ entry, open, onOpenChange }: EntryDetailModalProps) => {
+const EntryDetailModal = ({ entry, open, onOpenChange, userType }: EntryDetailModalProps) => {
   if (!entry) return null
 
   const handleClose = () => onOpenChange(false)
@@ -30,6 +31,7 @@ const EntryDetailModal = ({ entry, open, onOpenChange }: EntryDetailModalProps) 
           <EntryHeader
             entry={entry}
             onClose={handleClose}
+            userType={userType}
             className="h-[3.3125rem] px-[1.125rem]"
           />
           <EntryImage entry={entry} className="flex-1" />
@@ -46,6 +48,7 @@ const EntryDetailModal = ({ entry, open, onOpenChange }: EntryDetailModalProps) 
             <EntryHeader
               entry={entry}
               onClose={handleClose}
+              userType={userType}
               className="h-[4.4375rem] gap-3 px-10"
             />
             <EntryImage entry={entry} />
