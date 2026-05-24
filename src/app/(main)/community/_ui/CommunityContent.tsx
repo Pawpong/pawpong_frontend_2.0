@@ -33,12 +33,14 @@ const CommunityContent = () => {
       <Separator className="bg-border-light" />
       <Container>
         <div className="flex items-center justify-between py-[0.6875rem] tab:py-4">
+          {/* 모바일: 게시글을 작성해보세요 / PC: 아이를 자랑해보세요 */}
           <p className="text-sm font-medium leading-[1.375rem] text-text-primary tab:text-base">
-            아이를 자랑해보세요
+            <span className="tab:hidden">게시글을 작성해보세요</span>
+            <span className="hidden tab:inline">아이를 자랑해보세요</span>
           </p>
           <Link
             href="/post/create"
-            className="flex h-10 items-center justify-center rounded-full bg-fill-muted px-5 text-sm font-semibold text-white tab:h-12 tab:px-7 tab:text-base"
+            className="flex h-8 w-[4.4375rem] items-center justify-center rounded-full bg-fill-muted text-sm font-semibold text-white tab:h-12 tab:w-auto tab:px-7 tab:text-base"
           >
             작성
           </Link>
@@ -46,25 +48,36 @@ const CommunityContent = () => {
       </Container>
       <Separator className="bg-border-light" />
 
-      {/* Breadcrumb + Sort */}
+      {/* 모바일: 필터 버튼 / PC: Breadcrumb + Sort */}
       <Container>
-        <div className="flex items-center justify-between pb-4 pt-5 tab:pt-8">
-          <nav className="text-sm font-medium leading-[1.375rem]">
+        <div className="flex items-center justify-end py-3 tab:justify-between tab:pb-4 tab:pt-8">
+          {/* PC only: Breadcrumb */}
+          <nav className="hidden text-sm font-medium leading-[1.375rem] tab:block">
             <span className="text-text-muted">{'홈 > '}</span>
             <span className="text-text-primary">커뮤니티</span>
           </nav>
-          <Select value={sort} onValueChange={(v) => setSort(v as CommunitySortType)}>
-            <SelectTrigger className="w-auto gap-2.5 rounded-full border-text-muted px-2.5 py-1 text-sm font-semibold text-text-muted">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {COMMUNITY_SORT_OPTIONS.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+
+          {/* 모바일: 필터 pill / PC: 정렬 드롭다운 */}
+          <button
+            type="button"
+            className="rounded-full border border-text-muted px-2.5 py-1 text-sm font-semibold leading-[1.375rem] text-text-muted tab:hidden"
+          >
+            필터
+          </button>
+          <div className="hidden tab:block">
+            <Select value={sort} onValueChange={(v) => setSort(v as CommunitySortType)}>
+              <SelectTrigger className="w-auto gap-2.5 rounded-full border-text-muted px-2.5 py-1 text-sm font-semibold text-text-muted">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {COMMUNITY_SORT_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </Container>
 

@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { Avatar, AvatarFallback, AvatarImage, DetailLink } from '@/shared/ui'
-import { FavoriteIcon, ChatBubbleIcon, BookmarkIcon } from '@/shared/assets/icons'
+import { FavoriteIcon, ChatBubbleIcon } from '@/shared/assets/icons'
 import type { CommunityPostCard as CommunityPostCardType } from '@/shared/types'
 
 interface CommunityPostCardProps {
@@ -52,14 +52,14 @@ const CommunityPostCard = ({ post }: CommunityPostCardProps) => {
         </div>
 
         {/* Description */}
-        <div className="flex items-center justify-between pl-[3.0625rem]">
+        <div className="mt-1 flex items-center justify-between tab:mt-0 tab:pl-[3.0625rem]">
           <p className="text-sm font-bold text-text-secondary">
             {post.bodyExcerpt}
           </p>
           <DetailLink
             href={`/community/${post.postId}`}
             size="md"
-            className="hidden text-text-secondary tab:inline-flex"
+            className="hidden shrink-0 text-text-secondary tab:inline-flex"
           />
         </div>
       </div>
@@ -83,11 +83,13 @@ const CommunityPostCard = ({ post }: CommunityPostCardProps) => {
         ))}
       </div>
 
-      {/* Actions: Like, Comment, Bookmark */}
+      {/* Actions: Like, Comment + Bookmark(PC only) */}
       <div className="mt-[0.763rem] flex items-center gap-[1.3125rem] tab:mt-[0.96rem]">
         <PostActionButton icon={FavoriteIcon} count={post.likeCount} />
         <PostActionButton icon={ChatBubbleIcon} count={post.commentCount} />
-        <PostActionButton icon={BookmarkIcon} />
+        <div className="hidden items-center tab:flex">
+          <Image src="/bookmark.svg" alt="북마크" width={24} height={24} />
+        </div>
       </div>
     </article>
   )
