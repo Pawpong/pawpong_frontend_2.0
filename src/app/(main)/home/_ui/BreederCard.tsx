@@ -13,28 +13,37 @@ const BreederCard = ({ breeder, showPopularBadge }: BreederCardProps) => {
   return (
     <div className="flex w-[10.25rem] shrink-0 flex-col gap-[0.438rem] tab:w-[21.75rem] tab:gap-0 tab:overflow-hidden tab:rounded-[0.935rem] tab:bg-[#e7e7e7]">
       {/* Image Area */}
-      <div className="relative h-[10.25rem] w-full overflow-hidden rounded-[0.375rem] bg-fill-placeholder tab:aspect-[348/290] tab:h-auto tab:rounded-none">
-        {/* 분양중 badge — overlay */}
-        {breeder.isBreeding && (
-          <Badge
-            variant="status"
-            className="absolute left-[0.625rem] top-[0.766rem] px-[0.625rem] py-[0.25rem] text-xs leading-[1.375rem]"
-          >
-            분양중
-          </Badge>
+      <div className="relative h-[10.25rem] w-full overflow-hidden rounded-[0.375rem] bg-fill-placeholder tab:aspect-[348/287] tab:h-auto tab:rounded-none">
+        {breeder.imageUrl && (
+          <Image
+            src={breeder.imageUrl}
+            alt={breeder.nickname}
+            fill
+            className="object-cover"
+          />
         )}
 
         {/* 인기 badge — overlay */}
         {showPopularBadge && (
           <Badge
             variant="outline"
-            className="absolute left-[1.211rem] top-[1.011rem] border-[#a8a8a8] bg-white px-[0.625rem] py-[0.25rem] text-sm font-semibold leading-[1.375rem] text-[#a8a8a8]"
+            className="absolute left-[1.228rem] top-[1.004rem] border-[#a8a8a8] bg-white px-[0.625rem] py-[0.25rem] text-sm font-semibold leading-[1.375rem] text-[#a8a8a8]"
           >
             인기🔥
           </Badge>
         )}
 
-        {/* Star icon — overlay */}
+        {/* 분양중 badge — mobile overlay */}
+        {breeder.isBreeding && (
+          <Badge
+            variant="status"
+            className="absolute left-[0.625rem] top-[0.766rem] px-[0.625rem] py-[0.25rem] text-xs leading-[1.375rem] tab:hidden"
+          >
+            분양중
+          </Badge>
+        )}
+
+        {/* Star icon — mobile overlay */}
         <button
           type="button"
           className="absolute right-[0.625rem] top-[0.766rem] tab:hidden"
@@ -45,7 +54,7 @@ const BreederCard = ({ breeder, showPopularBadge }: BreederCardProps) => {
       </div>
 
       {/* Info Area */}
-      <div className="flex flex-col tab:px-[1.228rem] tab:pb-[0.709rem]">
+      <div className="flex flex-col tab:px-[1.228rem] tab:pb-[0.68rem] tab:pt-[1.103rem]">
         {/* Name + Status Badge (desktop) */}
         <div className="flex items-center gap-1.5">
           <p className="text-sm font-semibold leading-[1.375rem] text-text-primary tab:text-[1.169rem] tab:leading-[1.286rem]">
