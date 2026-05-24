@@ -67,6 +67,9 @@ const BreederExploreContent = () => {
           </div>
         )}
       </section>
+
+      {/* 하단 여백 */}
+      <div className="h-[4rem]" />
     </>
   )
 }

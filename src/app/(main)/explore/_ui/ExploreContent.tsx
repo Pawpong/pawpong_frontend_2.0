@@ -95,33 +95,35 @@ const ExploreContent = () => {
         </button>
       </div>
 
+      {/* ══════ 모바일: 카테고리 (브리더 탐색에서는 카테고리만, 입양 탐색에서는 타이틀 포함) ══════ */}
+      <div className="flex flex-col gap-[0.75rem] py-5 tab:hidden">
+        {selectedType === 'adoption' && (
+          <p
+            className={cn(
+              cafe24Proup.className,
+              'font-cafe24 text-center text-[0.875rem] leading-[1.5] text-[#5d5d5d]',
+            )}
+          >
+            {CATEGORY_DESCRIPTION[selectedCategory]}
+          </p>
+        )}
+        <CategoryFilter
+          selected={selectedCategory}
+          onChange={handleCategoryChange}
+        />
+      </div>
+
+      {/* ══════ 데스크탑: 카테고리 ══════ */}
+      <CategoryFilter
+        selected={selectedCategory}
+        onChange={handleCategoryChange}
+        className="mt-[2.188rem] hidden tab:grid"
+      />
+
       {selectedType === 'breeder' ? (
         <BreederExploreContent />
       ) : (
         <>
-          {/* ══════ 모바일: 타이틀 + 카테고리 (gap12) ══════ */}
-          <div className="flex flex-col gap-[0.75rem] py-5 tab:hidden">
-            <p
-              className={cn(
-                cafe24Proup.className,
-                'font-cafe24 text-center text-[0.875rem] leading-[1.5] text-[#5d5d5d]',
-              )}
-            >
-              {CATEGORY_DESCRIPTION[selectedCategory]}
-            </p>
-            <CategoryFilter
-              selected={selectedCategory}
-              onChange={handleCategoryChange}
-            />
-          </div>
-
-          {/* ══════ 데스크탑: 카테고리 (top146 → mt ~98px from header) ══════ */}
-          <CategoryFilter
-            selected={selectedCategory}
-            onChange={handleCategoryChange}
-            className="mt-[2.188rem] hidden tab:grid"
-          />
-
           {/* 데스크탑 타이틀 — Pretendard Bold 20px, px100, h52, 중앙 정렬 (gap 35px from category) */}
           <p className="hidden px-[6.25rem] py-[0.625rem] text-center text-[1.25rem] font-bold leading-[1.375rem] text-[#5d5d5d] tab:mt-[2.188rem] tab:block">
             {CATEGORY_DESCRIPTION[selectedCategory]}

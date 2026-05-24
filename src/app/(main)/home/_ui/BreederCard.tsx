@@ -27,8 +27,8 @@ const BreederCard = ({ breeder, showPopularBadge }: BreederCardProps) => {
         {/* 인기 badge — overlay */}
         {showPopularBadge && (
           <Badge
-            variant="status"
-            className="absolute bottom-[0.625rem] right-[0.625rem] bg-[#ff6b00] px-[0.625rem] py-[0.25rem] text-xs leading-[1.375rem] text-white"
+            variant="outline"
+            className="absolute left-[1.211rem] top-[1.011rem] border-[#a8a8a8] bg-white px-[0.625rem] py-[0.25rem] text-sm font-semibold leading-[1.375rem] text-[#a8a8a8]"
           >
             인기🔥
           </Badge>
