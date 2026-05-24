@@ -38,6 +38,11 @@ export interface AdoptionListingCard {
   chatCount?: number
 }
 
+/** 내가 입양한 목록 아이템 */
+export interface AdoptedListingCard extends AdoptionListingCard {
+  adoptedAt: string
+}
+
 /** 입양 상태 한국어 매핑 */
 export const ADOPTION_STATUS_LABEL: Record<AdoptionStatus, string> = {
   available: '입양 가능',

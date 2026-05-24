@@ -1,0 +1,47 @@
+'use client'
+
+import { Container, SectionHeader, Separator } from '@/shared/ui'
+import { PostCard } from '@/app/(main)/home/_ui/PostCard'
+import type { MyHomePost } from '@/shared/mocks/myHome'
+
+interface SavedFeedsTabProps {
+  feeds: MyHomePost[]
+}
+
+const SavedFeedsTab = ({ feeds }: SavedFeedsTabProps) => (
+  <Container>
+    <div className="pt-5 tab:pt-8">
+      <SectionHeader
+        title={`저장한 피드 ${feeds.length}`}
+        linkText="커뮤니티 가기"
+        linkHref="/community"
+      />
+    </div>
+
+    {/* 모바일: 구분선 분리 */}
+    <div className="pb-15 tab:hidden">
+      {feeds.map((post, index) => (
+        <div key={post.id}>
+          <PostCard post={post} />
+          {index < feeds.length - 1 && (
+            <Separator className="-mx-5 w-[calc(100%+2.5rem)] bg-border-light" />
+          )}
+        </div>
+      ))}
+    </div>
+
+    {/* PC: 개별 카드 */}
+    <div className="hidden tab:mt-6 tab:flex tab:flex-col tab:gap-3 tab:pb-10">
+      {feeds.map((post) => (
+        <div
+          key={post.id}
+          className="overflow-hidden rounded-2xl border border-border-light px-[3.125rem]"
+        >
+          <PostCard post={post} />
+        </div>
+      ))}
+    </div>
+  </Container>
+)
+
+export { SavedFeedsTab }
