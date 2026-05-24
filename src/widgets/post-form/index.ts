@@ -1,3 +1,4 @@
+export { usePostForm } from './lib/usePostForm'
 export { PostFormHeader } from './ui/PostFormHeader'
 export { PostFormTextArea } from './ui/PostFormTextArea'
 export { PostFormToolbar } from './ui/PostFormToolbar'

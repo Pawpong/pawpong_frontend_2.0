@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import Link from 'next/link'
 import { ArrowBackIcon } from '@/shared/assets/icons'
 import { Container, SectionHeader } from '@/shared/ui'
@@ -9,26 +8,24 @@ import {
   MOCK_RANKING_ENTRIES,
   MOCK_VOTE_ENTRIES,
 } from '@/shared/mocks/hallOfFame'
-import type { ContestEntry } from '@/shared/types'
+import { useHallOfFame } from '../_lib/useHallOfFame'
 import { ContestBanner } from './ContestBanner'
 import { EntryDetailModal } from './EntryDetailModal'
 import { RankingCard } from './RankingCard'
 import { VoteCard } from './VoteCard'
 
-type RankingPeriod = 'current' | 'previous'
-
-const RANKING_PERIOD_CONFIG: Record<RankingPeriod, { title: string; buttonLabel: string; next: RankingPeriod }> = {
-  current: { title: '실시간 랭킹 1위~3위', buttonLabel: '< 저번주 랭킹', next: 'previous' },
-  previous: { title: '저번주 랭킹 1위~3위', buttonLabel: '이번주 랭킹>', next: 'current' },
-}
-
 const HallOfFameContent = () => {
-  const [isRankingOpen, setIsRankingOpen] = useState(true)
-  const [isVoteOpen, setIsVoteOpen] = useState(true)
-  const [rankingPeriod, setRankingPeriod] = useState<RankingPeriod>('current')
-  const [selectedEntry, setSelectedEntry] = useState<ContestEntry | null>(null)
-
-  const periodConfig = RANKING_PERIOD_CONFIG[rankingPeriod]
+  const {
+    isRankingOpen,
+    isVoteOpen,
+    periodConfig,
+    selectedEntry,
+    toggleRanking,
+    toggleVote,
+    switchPeriod,
+    selectEntry,
+    closeModal,
+  } = useHallOfFame()
 
   return (
     <div className="flex w-full flex-col pb-12">
@@ -58,12 +55,12 @@ const HallOfFameContent = () => {
             subtitle={MOCK_CONTEST_INFO.dateRange}
             collapsible
             collapsed={!isRankingOpen}
-            onToggle={() => setIsRankingOpen((prev) => !prev)}
+            onToggle={toggleRanking}
             rightSlot={
               <button
                 type="button"
                 className="flex h-9 items-center justify-center rounded-full bg-[#a4a4a4] px-5"
-                onClick={() => setRankingPeriod(periodConfig.next)}
+                onClick={switchPeriod}
               >
                 <span className="whitespace-nowrap text-sm font-semibold text-white tab:text-base">
                   {periodConfig.buttonLabel}
@@ -72,11 +69,10 @@ const HallOfFameContent = () => {
             }
           />
 
-          {/* 랭킹 카드 - 모바일: 세로 리스트 / PC: 3열 그리드 */}
           {isRankingOpen && (
             <div className="flex flex-col gap-3 tab:grid tab:grid-cols-3 tab:gap-5">
               {MOCK_RANKING_ENTRIES.map((entry) => (
-                <RankingCard key={entry.entryId} entry={entry} onImageClick={() => setSelectedEntry(entry)} />
+                <RankingCard key={entry.entryId} entry={entry} onImageClick={() => selectEntry(entry)} />
               ))}
             </div>
           )}
@@ -90,14 +86,13 @@ const HallOfFameContent = () => {
             title="투표하기"
             collapsible
             collapsed={!isVoteOpen}
-            onToggle={() => setIsVoteOpen((prev) => !prev)}
+            onToggle={toggleVote}
           />
 
-          {/* 투표 카드 - 2열 그리드 / PC: 3열 */}
           {isVoteOpen && (
             <div className="grid grid-cols-2 gap-4 tab:grid-cols-3 tab:gap-5">
               {MOCK_VOTE_ENTRIES.map((entry) => (
-                <VoteCard key={entry.entryId} entry={entry} onImageClick={() => setSelectedEntry(entry)} />
+                <VoteCard key={entry.entryId} entry={entry} onImageClick={() => selectEntry(entry)} />
               ))}
             </div>
           )}
@@ -107,7 +102,7 @@ const HallOfFameContent = () => {
       <EntryDetailModal
         entry={selectedEntry}
         open={selectedEntry !== null}
-        onOpenChange={(open) => { if (!open) setSelectedEntry(null) }}
+        onOpenChange={(open) => { if (!open) closeModal() }}
         userType="adopter"
       />
     </div>

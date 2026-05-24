@@ -4,11 +4,7 @@ import Link from 'next/link'
 import { cafe24Proup } from '@/shared/lib/fonts'
 import { cn } from '@/shared/lib/Cn'
 import type { ContestInfo, HomeUserType } from '@/shared/types'
-
-const CONTEST_ACTION: Record<HomeUserType, { label: string; href: string }> = {
-  breeder: { label: '콘테스트 참여하기', href: '/hall-of-fame/participate' },
-  adopter: { label: '나의 참여 보기', href: '/hall-of-fame/participate' },
-}
+import { CONTEST_ACTION } from '../_lib/constants'
 
 interface ContestBannerProps {
   contest: ContestInfo
