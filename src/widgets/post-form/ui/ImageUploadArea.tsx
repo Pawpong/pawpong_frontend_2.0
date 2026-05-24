@@ -76,8 +76,7 @@ const ImageUploadArea = ({
     }
   }
 
-  const isRepresentative = (index: number) =>
-    hasRepresentative && representativeIndex === index
+  const isRepresentative = (index: number) => hasRepresentative && representativeIndex === index
 
   return (
     <div className="flex flex-col gap-[0.375rem] tab:gap-3">
@@ -96,7 +95,7 @@ const ImageUploadArea = ({
         <button
           type="button"
           onClick={handleClick}
-          className="flex size-[3.793rem] shrink-0 flex-col items-center rounded-[0.438rem] border border-[#cdcdcd] pb-[0.569rem] pl-[1.131rem] pr-[1.162rem] pt-[0.802rem] tab:h-[12.623rem] tab:w-[12.363rem] tab:items-center tab:justify-center tab:gap-[0.188rem] tab:rounded-[0.596rem] tab:border-fill-placeholder tab:p-0"
+          className="flex size-[3.793rem] shrink-0 flex-col items-center rounded-[0.438rem] border border-[#cdcdcd] pt-[0.802rem] pr-[1.162rem] pb-[0.569rem] pl-[1.131rem] tab:h-[12.623rem] tab:w-[12.363rem] tab:items-center tab:justify-center tab:gap-[0.188rem] tab:rounded-[0.596rem] tab:border-fill-placeholder tab:p-0"
         >
           <ImageIcon className="size-[1.459rem] text-text-primary tab:size-[3.285rem]" />
           <span className="text-[0.729rem] font-medium text-text-primary tab:text-[1.642rem]">
@@ -125,12 +124,7 @@ const ImageUploadArea = ({
               onClick={() => handleImageClick(index)}
               aria-label={`이미지 ${index + 1} ${isRepresentative(index) ? '대표사진' : '미리보기'}`}
             >
-              <Image
-                src={src}
-                alt={`업로드 이미지 ${index + 1}`}
-                fill
-                className="object-cover"
-              />
+              <Image src={src} alt={`업로드 이미지 ${index + 1}`} fill className="object-cover" />
             </button>
 
             {/* 대표사진 뱃지 */}
@@ -149,7 +143,7 @@ const ImageUploadArea = ({
                 e.stopPropagation()
                 onRemove(index)
               }}
-              className="absolute right-1 top-1 flex size-4 items-center justify-center rounded-full bg-text-primary/60 tab:right-[0.323rem] tab:top-[0.323rem] tab:size-6"
+              className="absolute top-1 right-1 flex size-4 items-center justify-center rounded-full bg-text-primary/60 tab:top-[0.323rem] tab:right-[0.323rem] tab:size-6"
               aria-label={`이미지 ${index + 1} 삭제`}
             >
               <CloseIcon className="size-2.5 text-white tab:size-3.5" />
@@ -157,8 +151,8 @@ const ImageUploadArea = ({
 
             {/* 순번 — desktop only */}
             {!hasRepresentative && (
-              <div className="pointer-events-none absolute left-0 top-0 hidden size-[2.822rem] items-center justify-center tab:flex">
-                <span className="text-[1.562rem] font-bold leading-[1.552rem] text-white">
+              <div className="pointer-events-none absolute top-0 left-0 hidden size-[2.822rem] items-center justify-center tab:flex">
+                <span className="text-[1.562rem] leading-[1.552rem] font-bold text-white">
                   {index + 1}
                 </span>
               </div>
@@ -183,7 +177,7 @@ const ImageUploadArea = ({
         <Dialog open={actionDialogOpen} onOpenChange={setActionDialogOpen}>
           <DialogPortal>
             <DialogOverlay />
-            <DialogContent className="fixed left-1/2 top-1/2 z-50 w-[16rem] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl bg-white">
+            <DialogContent className="fixed top-1/2 left-1/2 z-50 w-[16rem] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl bg-white">
               <DialogTitle className="sr-only">이미지 옵션</DialogTitle>
               <div className="flex flex-col">
                 {!isRepresentative(actionIndex) && (

@@ -36,7 +36,7 @@ const FavoriteBreedersContent = () => {
               type="button"
               className="flex h-6 items-center gap-1 rounded-full bg-text-primary px-[0.625rem] py-[0.25rem] tab:h-auto tab:gap-2.5 tab:rounded-md tab:px-5 tab:py-3"
             >
-              <span className="text-xs font-semibold leading-[1.375rem] text-white tab:text-base tab:font-bold">
+              <span className="text-xs leading-[1.375rem] font-semibold text-white tab:text-base tab:font-bold">
                 {activeLabel}
               </span>
               <LockIcon className="size-4 text-white tab:size-5" />

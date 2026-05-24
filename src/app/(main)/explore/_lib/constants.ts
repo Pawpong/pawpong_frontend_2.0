@@ -5,10 +5,7 @@ export const EXPLORE_TABS: Array<{ type: ExploreType; label: string }> = [
   { type: 'breeder', label: '브리더 탐색' },
 ]
 
-export const SEARCH_PLACEHOLDERS: Record<
-  ExploreType,
-  { mobile: string; desktop: string }
-> = {
+export const SEARCH_PLACEHOLDERS: Record<ExploreType, { mobile: string; desktop: string }> = {
   adoption: {
     mobile: '검색해서 원하는 동물 찾기',
     desktop: '검색해서 원하는 아이 찾기',

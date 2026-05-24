@@ -23,7 +23,7 @@ const EntryHeader = ({ entry, onClose, userType, className }: EntryHeaderProps) 
       <div className="ml-auto flex items-center gap-1.5 tab:ml-0 tab:gap-2">
         <span className="text-sm font-medium text-white tab:text-base">투표했습니다</span>
         <VoteIcon className="size-6 text-white" />
-        <span className="text-sm font-semibold leading-[1.375rem] text-white">
+        <span className="text-sm leading-[1.375rem] font-semibold text-white">
           {entry.voteCount}
         </span>
       </div>

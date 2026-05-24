@@ -32,14 +32,10 @@ const CommunityWriteContent = () => {
     <div className="flex min-h-screen flex-col bg-white">
       <PostFormHeader title="글 작성" mobileTitle="게시글 작성" />
 
-      <Container className="flex-1 pb-[7.5rem] pt-[0.719rem] tab:px-[6.25rem] tab:pt-[5.5rem]">
+      <Container className="flex-1 pt-[0.719rem] pb-[7.5rem] tab:px-[6.25rem] tab:pt-[5.5rem]">
         <div className="flex flex-col gap-[1.125rem] tab:flex-row tab:gap-0">
           <div className="tab:w-[26.256rem] tab:shrink-0">
-            <ImageUploadArea
-              images={images}
-              onAdd={handleAddImages}
-              onRemove={handleRemoveImage}
-            />
+            <ImageUploadArea images={images} onAdd={handleAddImages} onRemove={handleRemoveImage} />
           </div>
 
           <div className="flex flex-1 flex-col tab:ml-[2.5rem]">
@@ -65,9 +61,7 @@ const CommunityWriteContent = () => {
         onSubmit={() => {}}
         submitLabel="업로드"
         isValid={isValid}
-        leftSlot={
-          <VisibilitySelect value={visibility} onChange={setVisibility} />
-        }
+        leftSlot={<VisibilitySelect value={visibility} onChange={setVisibility} />}
       />
     </div>
   )

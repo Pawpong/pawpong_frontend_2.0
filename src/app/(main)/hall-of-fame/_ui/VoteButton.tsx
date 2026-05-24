@@ -23,12 +23,9 @@ interface VoteButtonProps {
 
 const VoteButton = ({ isVoted, voteCount, label, className }: VoteButtonProps) => {
   return (
-    <button
-      type="button"
-      className={voteButtonVariants({ voted: isVoted, className })}
-    >
+    <button type="button" className={voteButtonVariants({ voted: isVoted, className })}>
       <VoteIcon className="size-6 text-white" />
-      <span className="text-sm font-semibold leading-[1.375rem] text-white">
+      <span className="text-sm leading-[1.375rem] font-semibold text-white">
         {isVoted ? voteCount : label}
       </span>
     </button>

@@ -3,10 +3,7 @@
 import Image from 'next/image'
 import { AuthorInfo, Breadcrumb, Container, PageHeader, Separator } from '@/shared/ui'
 import { FavoriteIcon, ChatBubbleIcon, MoreVertIcon } from '@/shared/assets/icons'
-import {
-  MOCK_COMMUNITY_POST_DETAIL,
-  MOCK_COMMUNITY_CATEGORIES,
-} from '@/shared/mocks/community'
+import { MOCK_COMMUNITY_POST_DETAIL, MOCK_COMMUNITY_CATEGORIES } from '@/shared/mocks/community'
 import { CategorySidebar } from '../../_ui/CategorySidebar'
 import { PostActionButton } from '../../_ui/PostActionButton'
 import { CommentItem } from './CommentItem'
@@ -23,7 +20,7 @@ const PostDetailContent = () => {
       <Container>
         <Breadcrumb
           items={['홈', '커뮤니티']}
-          className="hidden pb-4 pt-8 text-sm font-medium leading-[1.375rem] tab:block"
+          className="hidden pt-8 pb-4 text-sm leading-[1.375rem] font-medium tab:block"
         />
       </Container>
 
@@ -31,11 +28,7 @@ const PostDetailContent = () => {
       <Container>
         <div className="flex gap-6 pb-10 tab:pb-16">
           {/* PC Category Sidebar */}
-          <CategorySidebar
-            categories={MOCK_COMMUNITY_CATEGORIES}
-            selected=""
-            onSelect={() => {}}
-          />
+          <CategorySidebar categories={MOCK_COMMUNITY_CATEGORIES} selected="" onSelect={() => {}} />
 
           {/* Post Detail Card */}
           <div className="min-w-0 flex-1">

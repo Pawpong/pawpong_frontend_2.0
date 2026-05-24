@@ -29,10 +29,7 @@ const OnboardingLayout = ({
   )
 
   return (
-    <OnboardingProvider
-      userType={type as UserType}
-      initialStepIndex={initialStepIndex}
-    >
+    <OnboardingProvider userType={type as UserType} initialStepIndex={initialStepIndex}>
       {children}
     </OnboardingProvider>
   )

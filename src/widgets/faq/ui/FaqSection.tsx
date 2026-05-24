@@ -41,30 +41,19 @@ const FaqSection = ({ userType = 'adopter' }: FaqSectionProps) => {
             >
               신뢰할 수 있는 입양자
             </p>
-            <p className="text-[1rem] font-bold text-[#999] tab:text-[1.25rem]">
-              포퐁에서 만나요!
-            </p>
+            <p className="text-[1rem] font-bold text-[#999] tab:text-[1.25rem]">포퐁에서 만나요!</p>
           </div>
           <div className="flex h-[2.5rem] items-center justify-center rounded-full bg-[#d4d4d4] tab:h-[3rem]">
-            <span className="text-[1rem] font-semibold text-[#5d5d5d]">
-              분양 페이지
-            </span>
+            <span className="text-[1rem] font-semibold text-[#5d5d5d]">분양 페이지</span>
           </div>
         </div>
 
         {/* 자주묻는 질문 */}
         <div className="flex-1">
-          <SectionHeader
-            title="자주 묻는 질문"
-            linkText="자세히 보기"
-            linkHref="/faq"
-          />
+          <SectionHeader title="자주 묻는 질문" linkText="자세히 보기" linkHref="/faq" />
           <div className="mt-[0.721rem] grid grid-cols-1 tab:mt-[1.6525rem] tab:grid-cols-2 tab:gap-x-[2.5rem]">
             {faqItems.map((item, i) => (
-              <div
-                key={i}
-                className="border-t border-[#a8a8a8] py-[0.625rem] tab:py-[1.44rem]"
-              >
+              <div key={i} className="border-t border-[#a8a8a8] py-[0.625rem] tab:py-[1.44rem]">
                 <p className="text-[0.875rem] font-semibold text-[#818181] tab:text-[1rem]">
                   {item}
                 </p>

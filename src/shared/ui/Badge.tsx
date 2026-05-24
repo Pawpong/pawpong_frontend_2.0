@@ -6,9 +6,12 @@ const badgeVariants = tv({
   base: 'inline-flex items-center justify-center rounded-[999px] whitespace-nowrap font-semibold',
   variants: {
     variant: {
-      outline: 'border border-[#a8a8a8] text-[#a8a8a8] px-[0.625rem] py-[0.25rem] text-[0.875rem] leading-[1.375rem]',
-      filled: 'bg-[#e1e1e1] text-[#5d5d5d] px-[0.625rem] py-[0.25rem] text-[0.875rem] leading-[1.375rem]',
-      status: 'bg-[#5d5d5d] text-white',
+      outline:
+        'border border-[#a8a8a8] text-[#a8a8a8] px-[0.625rem] py-[0.25rem] text-[0.875rem] leading-[1.375rem]',
+      filled:
+        'bg-[#e1e1e1] text-[#5d5d5d] px-[0.625rem] py-[0.25rem] text-[0.875rem] leading-[1.375rem]',
+      status:
+        'bg-[#5d5d5d] text-white px-[0.625rem] py-[0.25rem] text-[0.875rem] leading-[1.375rem]',
     },
   },
   defaultVariants: {

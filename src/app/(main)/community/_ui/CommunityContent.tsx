@@ -35,7 +35,7 @@ const CommunityContent = () => {
       <Container>
         <div className="flex items-center justify-between py-[0.6875rem] tab:py-4">
           {/* 모바일: 게시글을 작성해보세요 / PC: 아이를 자랑해보세요 */}
-          <p className="text-sm font-medium leading-[1.375rem] text-text-primary tab:text-base">
+          <p className="text-sm leading-[1.375rem] font-medium text-text-primary tab:text-base">
             <span className="tab:hidden">게시글을 작성해보세요</span>
             <span className="hidden tab:inline">아이를 자랑해보세요</span>
           </p>
@@ -51,14 +51,14 @@ const CommunityContent = () => {
 
       {/* 모바일: 필터 버튼 / PC: Breadcrumb + Sort */}
       <Container>
-        <div className="flex items-center justify-end py-3 tab:justify-between tab:pb-4 tab:pt-8">
+        <div className="flex items-center justify-end py-3 tab:justify-between tab:pt-8 tab:pb-4">
           {/* PC only: Breadcrumb */}
           <Breadcrumb items={['홈', '커뮤니티']} />
 
           {/* 모바일: 필터 pill / PC: 정렬 드롭다운 */}
           <button
             type="button"
-            className="rounded-full border border-text-muted px-2.5 py-1 text-sm font-semibold leading-[1.375rem] text-text-muted tab:hidden"
+            className="rounded-full border border-text-muted px-2.5 py-1 text-sm leading-[1.375rem] font-semibold text-text-muted tab:hidden"
           >
             필터
           </button>
@@ -96,9 +96,7 @@ const CommunityContent = () => {
               {posts.map((post, index) => (
                 <div key={post.postId}>
                   <CommunityPostCard post={post} />
-                  {index < posts.length - 1 && (
-                    <Separator fullWidth className="bg-border-light" />
-                  )}
+                  {index < posts.length - 1 && <Separator fullWidth className="bg-border-light" />}
                 </div>
               ))}
             </div>

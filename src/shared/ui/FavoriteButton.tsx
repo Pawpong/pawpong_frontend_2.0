@@ -20,17 +20,12 @@ const favoriteIconSize = {
   lg: 'size-[1.5rem]',
 } as const
 
-interface FavoriteButtonProps
-  extends VariantProps<typeof favoriteButtonVariants> {
+interface FavoriteButtonProps extends VariantProps<typeof favoriteButtonVariants> {
   className?: string
   onClick?: () => void
 }
 
-const FavoriteButton = ({
-  size = 'lg',
-  className,
-  onClick,
-}: FavoriteButtonProps) => (
+const FavoriteButton = ({ size = 'lg', className, onClick }: FavoriteButtonProps) => (
   <button
     type="button"
     className={cn(favoriteButtonVariants({ size }), className)}

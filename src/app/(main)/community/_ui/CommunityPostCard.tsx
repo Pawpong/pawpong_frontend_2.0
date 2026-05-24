@@ -12,7 +12,7 @@ interface CommunityPostCardProps {
 
 const CommunityPostCard = ({ post }: CommunityPostCardProps) => {
   return (
-    <article className="flex flex-col pb-[0.671rem] pt-[1.176rem] tab:py-8">
+    <article className="flex flex-col pt-[1.176rem] pb-[0.671rem] tab:py-8">
       {/* Author + Description */}
       <div className="flex flex-col">
         {/* Author Row */}
@@ -25,9 +25,7 @@ const CommunityPostCard = ({ post }: CommunityPostCardProps) => {
 
         {/* Description */}
         <div className="mt-1 flex items-center justify-between tab:mt-0 tab:pl-[3.0625rem]">
-          <p className="text-sm font-bold text-text-secondary">
-            {post.bodyExcerpt}
-          </p>
+          <p className="text-sm font-bold text-text-secondary">{post.bodyExcerpt}</p>
           <DetailLink
             href={`/community/${post.postId}`}
             size="md"
@@ -44,12 +42,7 @@ const CommunityPostCard = ({ post }: CommunityPostCardProps) => {
             className="relative h-[8.995rem] w-[14.6147rem] shrink-0 overflow-hidden rounded-[0.67rem] bg-fill-placeholder tab:aspect-[349/215] tab:h-auto tab:w-[21.8125rem] tab:rounded-2xl"
           >
             {url && (
-              <Image
-                src={url}
-                alt={`게시글 이미지 ${index + 1}`}
-                fill
-                className="object-cover"
-              />
+              <Image src={url} alt={`게시글 이미지 ${index + 1}`} fill className="object-cover" />
             )}
           </div>
         ))}

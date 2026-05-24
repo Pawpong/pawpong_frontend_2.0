@@ -46,7 +46,7 @@ const AdoptionCreateContent = () => {
           <button type="button" onClick={handleCloseClick}>
             <CloseIcon className="size-5 text-text-primary tab:size-6" />
           </button>
-          <p className="text-sm font-semibold leading-[1.5] text-text-primary tab:flex-1 tab:text-center tab:text-xl">
+          <p className="text-sm leading-[1.5] font-semibold text-text-primary tab:flex-1 tab:text-center tab:text-xl">
             분양글 작성
           </p>
           {/* 우측 빈 공간 (데스크탑 중앙 정렬용) */}

@@ -46,14 +46,12 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
         <button type="button" onClick={() => router.back()}>
           <ArrowBackIcon className="size-[1.25rem] text-[#5d5d5d]" />
         </button>
-        <p className="text-[0.875rem] font-semibold leading-[1.5] text-[#5d5d5d]">
-          {detail.name}
-        </p>
+        <p className="text-[0.875rem] leading-[1.5] font-semibold text-[#5d5d5d]">{detail.name}</p>
       </div>
 
       {/* ── 데스크탑 브레드크럼 ── */}
       <div className="hidden tab:block tab:px-[3rem] tab:py-[0.75rem] pc:px-[6.25rem]">
-        <p className="text-[0.875rem] font-medium leading-[1.375rem] text-[#a8a8a8]">
+        <p className="text-[0.875rem] leading-[1.375rem] font-medium text-[#a8a8a8]">
           <span>홈 &gt; 입양 </span>
           <span className="text-[#5d5d5d]">&gt; 도마뱀</span>
         </p>
@@ -84,10 +82,7 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
               </div>
             </button>
             {/* 공유 버튼 (모바일) */}
-            <button
-              type="button"
-              className="absolute right-[0.75rem] top-[0.75rem] tab:hidden"
-            >
+            <button type="button" className="absolute top-[0.75rem] right-[0.75rem] tab:hidden">
               <ShareIcon className="size-[2rem] text-white" />
             </button>
           </div>
@@ -106,10 +101,10 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
                   />
                 </div>
                 <div className="flex flex-1 flex-col">
-                  <p className="text-[0.875rem] font-bold leading-[1.5] text-[#5d5d5d]">
+                  <p className="text-[0.875rem] leading-[1.5] font-bold text-[#5d5d5d]">
                     {detail.breeder.nickname}
                   </p>
-                  <p className="text-[0.75rem] font-semibold leading-[1.5] text-[#5d5d5d]">
+                  <p className="text-[0.75rem] leading-[1.5] font-semibold text-[#5d5d5d]">
                     {detail.breeder.location}
                   </p>
                 </div>
@@ -125,7 +120,7 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
 
             {/* 이름 + 상태 배지(드롭다운) + 인기 배지 */}
             <div className="flex flex-wrap items-center gap-[0.4375rem] tab:gap-[0.5rem]">
-              <p className="text-[0.875rem] font-bold leading-[1.375rem] text-[#5d5d5d] tab:text-[1.25rem]">
+              <p className="text-[0.875rem] leading-[1.375rem] font-bold text-[#5d5d5d] tab:text-[1.25rem]">
                 {detail.name}
               </p>
               <StatusDropdown currentStatus={detail.status} />
@@ -141,29 +136,23 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
 
             {/* 분양가 */}
             <div className="flex items-center gap-[0.5rem] text-[#5d5d5d]">
-              <span className="text-[0.75rem] font-bold leading-[1.375rem] tab:text-[1rem]">
+              <span className="text-[0.75rem] leading-[1.375rem] font-bold tab:text-[1rem]">
                 분양가 :
               </span>
-              <span className="text-[0.875rem] font-bold leading-[1.375rem] tab:text-[1.25rem]">
+              <span className="text-[0.875rem] leading-[1.375rem] font-bold tab:text-[1.25rem]">
                 {detail.price}
               </span>
             </div>
 
             {/* 상세 정보 (태어난 날, 성별, 소개) */}
             <div className="mt-[0.875rem] flex flex-col gap-[0.875rem] tab:mt-[1.5rem] tab:gap-[1.5rem]">
-              <InfoItem
-                label="태어난 날"
-                value={detail.birthDate}
-              />
-              <InfoItem
-                label="성별"
-                value={GENDER_LABEL[detail.gender]}
-              />
+              <InfoItem label="태어난 날" value={detail.birthDate} />
+              <InfoItem label="성별" value={GENDER_LABEL[detail.gender]} />
               <div className="flex flex-col text-[#5d5d5d]">
-                <p className="text-[0.75rem] font-medium leading-[1.375rem] tab:text-[1rem]">
+                <p className="text-[0.75rem] leading-[1.375rem] font-medium tab:text-[1rem]">
                   우리 아이를 소개합니다 !
                 </p>
-                <p className="whitespace-pre-wrap text-[0.875rem] font-semibold leading-[1.5] tab:text-[1.25rem] tab:leading-[1.375rem]">
+                <p className="text-[0.875rem] leading-[1.5] font-semibold whitespace-pre-wrap tab:text-[1.25rem] tab:leading-[1.375rem]">
                   {detail.description}
                 </p>
               </div>
@@ -194,10 +183,10 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
               />
             </div>
             <div className="flex flex-col">
-              <p className="text-[1rem] font-semibold leading-[1.375rem] text-[#5d5d5d]">
+              <p className="text-[1rem] leading-[1.375rem] font-semibold text-[#5d5d5d]">
                 {detail.breeder.nickname}
               </p>
-              <p className="text-[1rem] font-medium leading-[1.375rem] text-[#5d5d5d]">
+              <p className="text-[1rem] leading-[1.375rem] font-medium text-[#5d5d5d]">
                 {detail.breeder.location}
               </p>
             </div>
@@ -228,7 +217,6 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
             </div>
           </div>
         </div>
-
       </div>
 
       {/* ═══ 건강 정보 + 부모 정보 섹션 ═══ */}
@@ -247,7 +235,7 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
       {/* ═══ 브리더의 다른 분양 동물 ═══ */}
       <div className="mt-[1.5rem] px-[1.25rem] tab:mt-[2rem] tab:px-[3rem] pc:px-[6.25rem]">
         <Separator className="mb-[1rem] bg-[#d4d4d4]" />
-        <p className="text-[0.75rem] font-medium leading-[1.375rem] text-[#5d5d5d] tab:text-[1.25rem] tab:font-semibold">
+        <p className="text-[0.75rem] leading-[1.375rem] font-medium text-[#5d5d5d] tab:text-[1.25rem] tab:font-semibold">
           브리더의 다른 분양 동물 {detail.otherListings.length}
         </p>
         <div className="mt-[0.75rem] flex flex-col gap-[0.75rem] tab:mt-[1.3125rem] tab:gap-[1.3125rem]">
@@ -258,7 +246,7 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
       </div>
 
       {/* ═══ CTA 하단 고정 바 ═══ */}
-      <div className="fixed bottom-0 left-0 right-0 z-10 bg-white p-[1.25rem] tab:flex tab:items-center tab:justify-center tab:py-[1.4375rem]">
+      <div className="fixed right-0 bottom-0 left-0 z-10 bg-white p-[1.25rem] tab:flex tab:items-center tab:justify-center tab:py-[1.4375rem]">
         <div className="flex items-center gap-[0.625rem] tab:w-auto">
           <Link
             href={`/adoption/${detail.listingId}/apply`}
@@ -283,10 +271,8 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
 /* ── 정보 항목 (태어난 날, 성별) ── */
 const InfoItem = ({ label, value }: { label: string; value: string }) => (
   <div className="flex flex-col text-[#5d5d5d]">
-    <p className="text-[0.75rem] font-medium leading-[1.375rem] tab:text-[1rem]">
-      {label}
-    </p>
-    <p className="text-[0.875rem] font-semibold leading-[1.5] tab:text-[1.25rem] tab:leading-[1.375rem]">
+    <p className="text-[0.75rem] leading-[1.375rem] font-medium tab:text-[1rem]">{label}</p>
+    <p className="text-[0.875rem] leading-[1.5] font-semibold tab:text-[1.25rem] tab:leading-[1.375rem]">
       {value}
     </p>
   </div>
@@ -300,7 +286,7 @@ const StatusDropdown = ({ currentStatus }: { currentStatus: AdoptionStatus }) =>
     <DropdownMenuTrigger asChild>
       <button
         type="button"
-        className="inline-flex items-center gap-[0.625rem] rounded-full bg-[#5d5d5d] px-[0.625rem] py-[0.25rem] text-[0.75rem] font-semibold leading-[1.375rem] text-white tab:text-[0.875rem]"
+        className="inline-flex items-center gap-[0.625rem] rounded-full bg-[#5d5d5d] px-[0.625rem] py-[0.25rem] text-[0.75rem] leading-[1.375rem] font-semibold text-white tab:text-[0.875rem]"
       >
         {ADOPTION_STATUS_LABEL[currentStatus]}
         <CheckIcon className="size-[1.25rem]" />
@@ -313,12 +299,10 @@ const StatusDropdown = ({ currentStatus }: { currentStatus: AdoptionStatus }) =>
       {STATUS_OPTIONS.map((status) => (
         <DropdownMenuItem
           key={status}
-          className="flex items-center justify-between rounded-none px-0 py-0 text-[0.875rem] font-medium leading-[1.375rem] text-white hover:bg-transparent focus:bg-transparent"
+          className="flex items-center justify-between rounded-none px-0 py-0 text-[0.875rem] leading-[1.375rem] font-medium text-white hover:bg-transparent focus:bg-transparent"
         >
           <span>{ADOPTION_STATUS_LABEL[status]}</span>
-          {status === currentStatus && (
-            <CheckIcon className="size-[1.25rem]" />
-          )}
+          {status === currentStatus && <CheckIcon className="size-[1.25rem]" />}
         </DropdownMenuItem>
       ))}
     </DropdownMenuContent>

@@ -49,7 +49,7 @@ const HallOfFameContent = () => {
                 className="flex h-9 items-center justify-center rounded-full bg-[#a4a4a4] px-5"
                 onClick={switchPeriod}
               >
-                <span className="whitespace-nowrap text-sm font-semibold text-white tab:text-base">
+                <span className="text-sm font-semibold whitespace-nowrap text-white tab:text-base">
                   {periodConfig.buttonLabel}
                 </span>
               </button>
@@ -59,7 +59,11 @@ const HallOfFameContent = () => {
           {isRankingOpen && (
             <div className="flex flex-col gap-3 tab:grid tab:grid-cols-3 tab:gap-5">
               {MOCK_RANKING_ENTRIES.map((entry) => (
-                <RankingCard key={entry.entryId} entry={entry} onImageClick={() => selectEntry(entry)} />
+                <RankingCard
+                  key={entry.entryId}
+                  entry={entry}
+                  onImageClick={() => selectEntry(entry)}
+                />
               ))}
             </div>
           )}
@@ -79,7 +83,11 @@ const HallOfFameContent = () => {
           {isVoteOpen && (
             <div className="grid grid-cols-2 gap-4 tab:grid-cols-3 tab:gap-5">
               {MOCK_VOTE_ENTRIES.map((entry) => (
-                <VoteCard key={entry.entryId} entry={entry} onImageClick={() => selectEntry(entry)} />
+                <VoteCard
+                  key={entry.entryId}
+                  entry={entry}
+                  onImageClick={() => selectEntry(entry)}
+                />
               ))}
             </div>
           )}
@@ -89,7 +97,9 @@ const HallOfFameContent = () => {
       <EntryDetailModal
         entry={selectedEntry}
         open={selectedEntry !== null}
-        onOpenChange={(open) => { if (!open) closeModal() }}
+        onOpenChange={(open) => {
+          if (!open) closeModal()
+        }}
         userType="adopter"
       />
     </div>

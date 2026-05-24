@@ -36,10 +36,8 @@ const ChipSelect = ({ label, items, selected, onToggle }: ChipSelectProps) => (
             type="button"
             onClick={() => onToggle(item)}
             className={cn(
-              'rounded-full px-[0.625rem] py-[0.25rem] text-[0.875rem] font-semibold leading-[1.375rem]',
-              isSelected
-                ? 'bg-[#a8a8a8] text-white'
-                : 'border border-[#a8a8a8] text-[#a8a8a8]',
+              'rounded-full px-[0.625rem] py-[0.25rem] text-[0.875rem] leading-[1.375rem] font-semibold',
+              isSelected ? 'bg-[#a8a8a8] text-white' : 'border border-[#a8a8a8] text-[#a8a8a8]',
             )}
           >
             {item}

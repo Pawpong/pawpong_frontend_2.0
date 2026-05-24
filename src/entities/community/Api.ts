@@ -19,17 +19,15 @@ export const getCommunityPosts = async (
   if (params.page) query.set('page', String(params.page))
   if (params.pageSize) query.set('pageSize', String(params.pageSize))
 
-  const response = await apiClient.get<
-    ApiResponseFull<PaginationResponse<CommunityPostCard>>
-  >(`/api/v2/community/posts?${query.toString()}`)
+  const response = await apiClient.get<ApiResponseFull<PaginationResponse<CommunityPostCard>>>(
+    `/api/v2/community/posts?${query.toString()}`,
+  )
 
   return unwrap(response, '커뮤니티 게시글 목록 조회에 실패했습니다.')
 }
 
 /** 커뮤니티 게시글 상세 조회 */
-export const getCommunityPostDetail = async (
-  postId: string,
-): Promise<CommunityPostDetail> => {
+export const getCommunityPostDetail = async (postId: string): Promise<CommunityPostDetail> => {
   const response = await apiClient.get<ApiResponseFull<CommunityPostDetail>>(
     `/api/v2/community/posts/${postId}`,
   )

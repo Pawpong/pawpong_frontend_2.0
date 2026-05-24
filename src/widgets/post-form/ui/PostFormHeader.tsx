@@ -15,14 +15,10 @@ const PostFormHeader = ({ title, mobileTitle }: PostFormHeaderProps) => {
   return (
     <Container className="tab:px-[6.25rem]">
       <header className="flex h-[3rem] items-center gap-[0.625rem] tab:h-[5.5rem] tab:justify-between tab:gap-0">
-        <button
-          type="button"
-          onClick={() => router.back()}
-          aria-label="닫기"
-        >
+        <button type="button" onClick={() => router.back()} aria-label="닫기">
           <CloseIcon className="size-5 text-text-primary" />
         </button>
-        <h1 className="text-sm font-semibold leading-[1.5] text-text-primary tab:flex-1 tab:text-center tab:text-xl tab:leading-[1.375rem]">
+        <h1 className="text-sm leading-[1.5] font-semibold text-text-primary tab:flex-1 tab:text-center tab:text-xl tab:leading-[1.375rem]">
           {mobileTitle ? (
             <>
               <span className="tab:hidden">{mobileTitle}</span>

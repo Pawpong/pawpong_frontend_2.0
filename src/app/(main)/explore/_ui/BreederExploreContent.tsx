@@ -6,10 +6,7 @@ import { SearchBar, PopularKeywords } from '@/features/search'
 import { SEARCH_PLACEHOLDERS } from '../_lib/constants'
 import { BreederCard } from '@/app/(main)/home/_ui/BreederCard'
 import { BreederCardHorizontal } from './BreederCardHorizontal'
-import {
-  MOCK_FEATURED_BREEDERS,
-  MOCK_EXPLORE_BREEDERS,
-} from '@/shared/mocks/breederExplore'
+import { MOCK_FEATURED_BREEDERS, MOCK_EXPLORE_BREEDERS } from '@/shared/mocks/breederExplore'
 
 const BreederExploreContent = () => {
   const [featuredCollapsed, setFeaturedCollapsed] = useState(false)
@@ -18,7 +15,7 @@ const BreederExploreContent = () => {
   return (
     <>
       {/* 데스크탑 타이틀 */}
-      <p className="hidden px-[6.25rem] py-[0.625rem] text-center text-[1.25rem] font-bold leading-[1.375rem] text-[#5d5d5d] tab:mt-[2.188rem] tab:block">
+      <p className="hidden px-[6.25rem] py-[0.625rem] text-center text-[1.25rem] leading-[1.375rem] font-bold text-[#5d5d5d] tab:mt-[2.188rem] tab:block">
         신뢰있는 브리더들을 만나보세요
       </p>
 
@@ -47,11 +44,7 @@ const BreederExploreContent = () => {
             {/* 데스크탑: 3열 세로형 카드 */}
             <div className="hidden tab:grid tab:grid-cols-3 tab:gap-[1.156rem]">
               {MOCK_FEATURED_BREEDERS.map((breeder) => (
-                <BreederCard
-                  key={breeder.id}
-                  breeder={breeder}
-                  showPopularBadge
-                />
+                <BreederCard key={breeder.id} breeder={breeder} showPopularBadge />
               ))}
             </div>
           </>

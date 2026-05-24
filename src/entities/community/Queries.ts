@@ -13,8 +13,7 @@ export const communityQueries = {
   ) =>
     createInfiniteQuery({
       queryKey: [...communityQueries.all(), 'posts', sort, petType, category, pageSize],
-      queryFn: (page) =>
-        getCommunityPosts({ sort, petType, category, page, pageSize }),
+      queryFn: (page) => getCommunityPosts({ sort, petType, category, page, pageSize }),
       staleTime: STALE_TIME.DEFAULT,
     }),
 

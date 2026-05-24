@@ -12,7 +12,7 @@ interface PostCardProps {
 
 const PostCard = ({ post }: PostCardProps) => {
   return (
-    <div className="flex flex-col pb-[0.671rem] pt-[1.176rem] tab:py-8">
+    <div className="flex flex-col pt-[1.176rem] pb-[0.671rem] tab:py-8">
       {/* Author + Description */}
       <div className="flex flex-col">
         {/* Author Row */}
@@ -25,20 +25,14 @@ const PostCard = ({ post }: PostCardProps) => {
                 <AvatarFallback className="bg-fill-muted" />
               )}
             </Avatar>
-            <span className="text-sm font-bold text-text-primary">
-              {post.author.nickname}
-            </span>
+            <span className="text-sm font-bold text-text-primary">{post.author.nickname}</span>
           </Link>
-          <span className="text-xs font-bold text-text-secondary">
-            {post.createdAt}
-          </span>
+          <span className="text-xs font-bold text-text-secondary">{post.createdAt}</span>
         </div>
 
         {/* Description */}
         <div className="flex items-center justify-between pl-[3.0625rem]">
-          <p className="text-sm font-bold text-text-secondary">
-            {post.description}
-          </p>
+          <p className="text-sm font-bold text-text-secondary">{post.description}</p>
           <DetailLink href="#" size="md" className="hidden text-text-secondary tab:inline-flex" />
         </div>
       </div>
@@ -51,12 +45,7 @@ const PostCard = ({ post }: PostCardProps) => {
             className="relative h-[8.995rem] w-[14.6147rem] shrink-0 overflow-hidden rounded-[0.67rem] bg-fill-placeholder tab:aspect-[349/215] tab:h-auto tab:w-[21.8125rem] tab:rounded-2xl"
           >
             {image && (
-              <Image
-                src={image}
-                alt={`게시글 이미지 ${index + 1}`}
-                fill
-                className="object-cover"
-              />
+              <Image src={image} alt={`게시글 이미지 ${index + 1}`} fill className="object-cover" />
             )}
           </div>
         ))}
@@ -70,7 +59,7 @@ const PostCard = ({ post }: PostCardProps) => {
         ].map(({ Icon, count }) => (
           <div key={Icon.name} className="flex items-center gap-1.5">
             <Icon className="size-6 text-text-primary" />
-            <span className="text-sm font-semibold leading-[1.375rem] text-text-primary">
+            <span className="text-sm leading-[1.375rem] font-semibold text-text-primary">
               {count}
             </span>
           </div>

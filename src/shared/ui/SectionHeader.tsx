@@ -28,18 +28,12 @@ const SectionHeader = ({
   return (
     <div className="flex flex-col gap-0.5 tab:gap-1">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-bold leading-[1.5] text-text-primary tab:text-xl">
-          {title}
-        </p>
+        <p className="text-sm leading-[1.5] font-bold text-text-primary tab:text-xl">{title}</p>
         {linkText && linkHref && (
           <DetailLink href={linkHref} label={linkText} size="sm" className="tab:text-[0.875rem]" />
         )}
         {collapsible && (
-          <button
-            type="button"
-            onClick={onToggle}
-            className="tab:hidden"
-          >
+          <button type="button" onClick={onToggle} className="tab:hidden">
             <ArrowRightIcon
               className={cn(
                 'size-[1.25rem] text-[#5d5d5d] transition-transform',

@@ -35,8 +35,7 @@ const useAdoptionCreateForm = () => {
 
   const { isDirty } = form.formState
 
-  const { images, handleAddImages, handleRemoveImage: baseRemoveImage } =
-    useImageUpload()
+  const { images, handleAddImages, handleRemoveImage: baseRemoveImage } = useImageUpload()
 
   const handleRemoveImage = useCallback(
     (index: number) => {

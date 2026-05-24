@@ -16,7 +16,7 @@ const BottomTabBar = () => {
   const pathname = usePathname()
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 flex items-center justify-between bg-[#ebebeb] px-[1.25rem] py-[0.75rem] tab:hidden">
+    <nav className="fixed right-0 bottom-0 left-0 flex items-center justify-between bg-[#ebebeb] px-[1.25rem] py-[0.75rem] tab:hidden">
       {TAB_ITEMS.map((item) => {
         const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href)
 

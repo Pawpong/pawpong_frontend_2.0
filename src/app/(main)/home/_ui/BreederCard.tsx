@@ -13,23 +13,21 @@ interface BreederCardProps {
 const BreederCard = ({ breeder, showPopularBadge }: BreederCardProps) => {
   // TODO: API 연동 후 실제 브리더 홈 경로로 변경
   return (
-    <Link href={`/home/${breeder.id}`} className="flex w-[10.25rem] shrink-0 flex-col gap-[0.438rem] tab:w-[21.75rem] tab:gap-0 tab:overflow-hidden tab:rounded-[0.935rem] tab:bg-[#e7e7e7]">
+    <Link
+      href={`/home/${breeder.id}`}
+      className="flex w-[10.25rem] shrink-0 flex-col gap-[0.438rem] tab:w-[21.75rem] tab:gap-0 tab:overflow-hidden tab:rounded-[0.935rem] tab:bg-[#e7e7e7]"
+    >
       {/* Image Area */}
       <div className="relative h-[10.25rem] w-full overflow-hidden rounded-[0.375rem] bg-fill-placeholder tab:aspect-[348/287] tab:h-auto tab:rounded-none">
         {breeder.imageUrl && (
-          <Image
-            src={breeder.imageUrl}
-            alt={breeder.nickname}
-            fill
-            className="object-cover"
-          />
+          <Image src={breeder.imageUrl} alt={breeder.nickname} fill className="object-cover" />
         )}
 
         {/* 인기 badge — overlay */}
         {showPopularBadge && (
           <Badge
             variant="outline"
-            className="absolute left-[1.228rem] top-[1.004rem] border-[#a8a8a8] bg-white px-[0.625rem] py-[0.25rem] text-sm font-semibold leading-[1.375rem] text-[#a8a8a8]"
+            className="absolute top-[1.004rem] left-[1.228rem] border-[#a8a8a8] bg-white px-[0.625rem] py-[0.25rem] text-sm leading-[1.375rem] font-semibold text-[#a8a8a8]"
           >
             인기🔥
           </Badge>
@@ -39,7 +37,7 @@ const BreederCard = ({ breeder, showPopularBadge }: BreederCardProps) => {
         {breeder.isBreeding && (
           <Badge
             variant="status"
-            className="absolute left-[0.625rem] top-[0.766rem] px-[0.625rem] py-[0.25rem] text-xs leading-[1.375rem] tab:hidden"
+            className="absolute top-[0.766rem] left-[0.625rem] px-[0.625rem] py-[0.25rem] text-xs leading-[1.375rem] tab:hidden"
           >
             분양중
           </Badge>
@@ -48,7 +46,7 @@ const BreederCard = ({ breeder, showPopularBadge }: BreederCardProps) => {
         {/* Star icon — mobile overlay */}
         <button
           type="button"
-          className="absolute right-[0.625rem] top-[0.766rem] tab:hidden"
+          className="absolute top-[0.766rem] right-[0.625rem] tab:hidden"
           aria-label="즐겨찾기"
         >
           <Image src="/star.svg" alt="즐겨찾기" width={20} height={20} />
@@ -56,10 +54,10 @@ const BreederCard = ({ breeder, showPopularBadge }: BreederCardProps) => {
       </div>
 
       {/* Info Area */}
-      <div className="flex flex-col tab:px-[1.228rem] tab:pb-[0.68rem] tab:pt-[1.103rem]">
+      <div className="flex flex-col tab:px-[1.228rem] tab:pt-[1.103rem] tab:pb-[0.68rem]">
         {/* Name + Status Badge (desktop) */}
         <div className="flex items-center gap-1.5">
-          <p className="text-sm font-semibold leading-[1.375rem] text-text-primary tab:text-[1.169rem] tab:leading-[1.286rem]">
+          <p className="text-sm leading-[1.375rem] font-semibold text-text-primary tab:text-[1.169rem] tab:leading-[1.286rem]">
             {breeder.nickname}
           </p>
           {breeder.isBreeding && (
@@ -87,11 +85,11 @@ const BreederCard = ({ breeder, showPopularBadge }: BreederCardProps) => {
 
         {/* Location + Date (mobile only) */}
         <div className="flex items-center gap-[0.438rem] tab:hidden">
-          <span className="text-xs font-normal leading-[1.375rem] text-[#a3a3a3]">
+          <span className="text-xs leading-[1.375rem] font-normal text-[#a3a3a3]">
             {breeder.location}
           </span>
           <span className="size-[0.188rem] rounded-full bg-[#a3a3a3]" />
-          <span className="text-xs font-normal leading-[1.375rem] text-[#a3a3a3]">
+          <span className="text-xs leading-[1.375rem] font-normal text-[#a3a3a3]">
             {breeder.date}
           </span>
         </div>
@@ -103,7 +101,7 @@ const BreederCard = ({ breeder, showPopularBadge }: BreederCardProps) => {
             className="flex items-center gap-[0.585rem] rounded-full p-[0.585rem]"
           >
             <Image src="/star.svg" alt="즐겨찾기" width={24} height={24} />
-            <span className="text-[0.819rem] font-medium leading-none text-text-primary">
+            <span className="text-[0.819rem] leading-none font-medium text-text-primary">
               즐겨찾기
             </span>
           </button>

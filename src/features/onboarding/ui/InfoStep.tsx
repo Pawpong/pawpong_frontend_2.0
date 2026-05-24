@@ -13,10 +13,27 @@ import { StepNavButtons } from './StepNavButtons'
 import { ChipSelect } from './ChipSelect'
 
 const SAMPLE_KEYWORDS = [
-  '비숑', '도베르만', '골든리트리버', '푸들', '시바이누', '말티즈',
-  '포메라니안', '코기', '허스키', '사모예드', '래브라도', '치와와',
-  '닥스훈트', '보더콜리', '슈나우저', '비글', '요크셔테리어', '웰시코기',
-  '진돗개', '삽살개', '풍산개',
+  '비숑',
+  '도베르만',
+  '골든리트리버',
+  '푸들',
+  '시바이누',
+  '말티즈',
+  '포메라니안',
+  '코기',
+  '허스키',
+  '사모예드',
+  '래브라도',
+  '치와와',
+  '닥스훈트',
+  '보더콜리',
+  '슈나우저',
+  '비글',
+  '요크셔테리어',
+  '웰시코기',
+  '진돗개',
+  '삽살개',
+  '풍산개',
 ]
 
 const InfoStep = () => {
@@ -88,7 +105,11 @@ const InfoStep = () => {
         </div>
       </div>
 
-      <StepNavButtons onNext={() => handleSubmit(onSubmit)()} onBack={goBack} className="tab:mt-[9.9375rem]" />
+      <StepNavButtons
+        onNext={() => handleSubmit(onSubmit)()}
+        onBack={goBack}
+        className="tab:mt-[9.9375rem]"
+      />
     </StepLayout>
   )
 }

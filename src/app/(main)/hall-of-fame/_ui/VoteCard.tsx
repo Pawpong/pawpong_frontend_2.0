@@ -13,17 +13,16 @@ const VoteCard = ({ entry, onImageClick }: VoteCardProps) => {
   return (
     <div className="flex flex-col gap-1 tab:gap-0 tab:overflow-hidden tab:rounded-[0.936rem] tab:bg-[#e7e7e7]">
       {/* 이미지 */}
-      <button type="button" onClick={onImageClick} className="relative aspect-square w-full overflow-hidden rounded-[0.375rem] tab:aspect-[4/3] tab:rounded-none">
-        <Image
-          src={entry.imageUrl}
-          alt={entry.description}
-          fill
-          className="object-cover"
-        />
+      <button
+        type="button"
+        onClick={onImageClick}
+        className="relative aspect-square w-full overflow-hidden rounded-[0.375rem] tab:aspect-[4/3] tab:rounded-none"
+      >
+        <Image src={entry.imageUrl} alt={entry.description} fill className="object-cover" />
       </button>
 
       {/* 설명 */}
-      <p className="line-clamp-2 text-sm font-semibold leading-[1.5] text-[#959595] tab:px-5 tab:pt-4 tab:font-bold">
+      <p className="line-clamp-2 text-sm leading-[1.5] font-semibold text-[#959595] tab:px-5 tab:pt-4 tab:font-bold">
         {entry.description}
       </p>
 
@@ -34,7 +33,7 @@ const VoteCard = ({ entry, onImageClick }: VoteCardProps) => {
           onClick={onImageClick}
           className="flex h-10 w-full items-center justify-center rounded-full border border-[#5d5d5d] px-[0.875rem] py-1"
         >
-          <span className="text-sm font-semibold leading-[1.375rem] text-[#5d5d5d]">
+          <span className="text-sm leading-[1.375rem] font-semibold text-[#5d5d5d]">
             자세히 보기
           </span>
         </button>
@@ -47,7 +46,7 @@ const VoteCard = ({ entry, onImageClick }: VoteCardProps) => {
       </div>
 
       {/* PC: 투표하기 버튼 */}
-      <div className="hidden justify-center tab:flex tab:mt-[1.875rem] tab:px-5 tab:pb-5">
+      <div className="hidden justify-center tab:mt-[1.875rem] tab:flex tab:px-5 tab:pb-5">
         <VoteButton
           isVoted={entry.isVoted}
           voteCount={entry.voteCount}

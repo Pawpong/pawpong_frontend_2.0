@@ -2,14 +2,7 @@
 
 import { type Control, Controller, useWatch } from 'react-hook-form'
 import { InfoIcon } from '@/shared/assets/icons'
-import {
-  Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/shared/ui'
+import { Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui'
 import type { AdoptionCreateFormValues } from '../_lib/schema'
 import { FormSection } from './FormSection'
 import { AddRowButton } from './AddRowButton'
@@ -37,7 +30,7 @@ const HealthInfoSection = ({ control }: HealthInfoSectionProps) => {
     >
       {/* 예방 접종 현황 */}
       <div className="flex flex-col gap-3 tab:gap-3">
-        <p className="text-sm font-semibold leading-[1.375rem] text-text-primary tab:px-0 tab:text-base">
+        <p className="text-sm leading-[1.375rem] font-semibold text-text-primary tab:px-0 tab:text-base">
           예방 접종 현황
         </p>
         <div className="flex flex-col gap-1.5">
@@ -123,7 +116,7 @@ const HealthInfoSection = ({ control }: HealthInfoSectionProps) => {
 
       {/* 유전병 검사 */}
       <div className="flex flex-col gap-3 tab:gap-3">
-        <p className="text-sm font-semibold leading-[1.375rem] text-text-primary tab:px-0 tab:text-base">
+        <p className="text-sm leading-[1.375rem] font-semibold text-text-primary tab:px-0 tab:text-base">
           유전병 검사
         </p>
         <div className="flex flex-col gap-1.5">
@@ -161,22 +154,14 @@ const HealthInfoSection = ({ control }: HealthInfoSectionProps) => {
                 name="geneticTests.0.date"
                 control={control}
                 render={({ field }) => (
-                  <Input
-                    placeholder="검진날짜"
-                    value={field.value}
-                    onChange={field.onChange}
-                  />
+                  <Input placeholder="검진날짜" value={field.value} onChange={field.onChange} />
                 )}
               />
               <Controller
                 name="geneticTests.0.institution"
                 control={control}
                 render={({ field }) => (
-                  <Input
-                    placeholder="검사 기관"
-                    value={field.value}
-                    onChange={field.onChange}
-                  />
+                  <Input placeholder="검사 기관" value={field.value} onChange={field.onChange} />
                 )}
               />
               <div className="flex gap-1.5">

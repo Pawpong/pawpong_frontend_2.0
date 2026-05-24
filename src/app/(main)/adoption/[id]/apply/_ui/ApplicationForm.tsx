@@ -32,10 +32,14 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
     <div className="pb-[5.5rem] tab:pb-0">
       {/* ═══ 서브헤더 ═══ */}
       <div className="flex items-center gap-[0.625rem] px-[1.25rem] py-[0.75rem] tab:h-[5.5rem] tab:justify-center tab:px-[6.25rem] tab:py-[0.625rem]">
-        <button type="button" onClick={handleCloseClick} className="tab:absolute tab:left-[6.25rem]">
+        <button
+          type="button"
+          onClick={handleCloseClick}
+          className="tab:absolute tab:left-[6.25rem]"
+        >
           <CloseIcon className="size-[1.25rem] text-[#5d5d5d] tab:size-[1.5rem]" />
         </button>
-        <p className="text-[0.875rem] font-semibold leading-[1.5] text-[#5d5d5d] tab:text-[1.25rem]">
+        <p className="text-[0.875rem] leading-[1.5] font-semibold text-[#5d5d5d] tab:text-[1.25rem]">
           <span className="tab:hidden">입양 신청 | {detail.name}</span>
           <span className="hidden tab:inline">입양 신청</span>
         </p>
@@ -50,8 +54,8 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
       {/* ═══ 폼 영역 ═══ */}
       <form onSubmit={handleSubmit(onSubmit)}>
         {/* 모바일 안내 문구 */}
-        <div className="px-[1.25rem] pb-[0.25rem] pt-[0.75rem] tab:hidden">
-          <p className="text-[0.75rem] font-semibold leading-[1.5] text-[#5d5d5d]">
+        <div className="px-[1.25rem] pt-[0.75rem] pb-[0.25rem] tab:hidden">
+          <p className="text-[0.75rem] leading-[1.5] font-semibold text-[#5d5d5d]">
             입양 신청서 작성 이후,
             <br />
             담당 브리더와 채팅을 통해 더 상세한 입양 계획을 세워보세요
@@ -59,10 +63,10 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
         </div>
 
         {/* 회색 배경 컨테이너 */}
-        <div className="mx-[1.25rem] mt-[1.996rem] rounded-[1rem] bg-[#f5f5f5] p-[0.75rem] tab:mx-[6.25rem] tab:mb-[3rem] tab:mt-[2.5rem] tab:px-[2.625rem] tab:pb-[2.5rem] tab:pt-[2.5rem]">
+        <div className="mx-[1.25rem] mt-[1.996rem] rounded-[1rem] bg-[#f5f5f5] p-[0.75rem] tab:mx-[6.25rem] tab:mt-[2.5rem] tab:mb-[3rem] tab:px-[2.625rem] tab:pt-[2.5rem] tab:pb-[2.5rem]">
           {/* 데스크탑 안내 문구 */}
           <div className="hidden tab:mb-[4.379rem] tab:block">
-            <p className="text-[1rem] font-semibold leading-[1.5] text-[#5d5d5d]">
+            <p className="text-[1rem] leading-[1.5] font-semibold text-[#5d5d5d]">
               입양 신청서 작성 이후,
               <br />
               담당 브리더와 채팅을 통해 더 상세한 입양 계획을 세워보세요
@@ -80,7 +84,7 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
                 <textarea
                   {...register('adoptionPlan')}
                   placeholder="생활패턴, 주거환경, 입양 시기 등을 입력해주세요"
-                  className="h-[5.125rem] w-full resize-none rounded-[0.375rem] border border-[#a8a8a8] bg-white p-[0.625rem] text-[0.875rem] font-medium leading-[1.375rem] text-[#5d5d5d] placeholder:text-[#a8a8a8] focus:border-[#5d5d5d] focus:outline-none tab:h-[6.8125rem] tab:rounded-[1rem] tab:px-[1.25rem] tab:py-[0.9375rem] tab:text-[1rem]"
+                  className="h-[5.125rem] w-full resize-none rounded-[0.375rem] border border-[#a8a8a8] bg-white p-[0.625rem] text-[0.875rem] leading-[1.375rem] font-medium text-[#5d5d5d] placeholder:text-[#a8a8a8] focus:border-[#5d5d5d] focus:outline-none tab:h-[6.8125rem] tab:rounded-[1rem] tab:px-[1.25rem] tab:py-[0.9375rem] tab:text-[1rem]"
                 />
               </FormSection>
 
@@ -108,7 +112,7 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
                 <textarea
                   {...register('familyMembers')}
                   placeholder="예: 배우자 1명,  자녀 1명, 부모님 1명"
-                  className="h-[5.125rem] w-full resize-none rounded-[0.375rem] border border-[#a8a8a8] bg-white p-[0.625rem] text-[0.875rem] font-medium leading-[1.375rem] text-[#5d5d5d] placeholder:text-[#a8a8a8] focus:border-[#5d5d5d] focus:outline-none tab:h-[6.8125rem] tab:rounded-[1rem] tab:px-[1.25rem] tab:py-[0.9375rem] tab:text-[1rem]"
+                  className="h-[5.125rem] w-full resize-none rounded-[0.375rem] border border-[#a8a8a8] bg-white p-[0.625rem] text-[0.875rem] leading-[1.375rem] font-medium text-[#5d5d5d] placeholder:text-[#a8a8a8] focus:border-[#5d5d5d] focus:outline-none tab:h-[6.8125rem] tab:rounded-[1rem] tab:px-[1.25rem] tab:py-[0.9375rem] tab:text-[1rem]"
                 />
                 <CheckboxField
                   control={control}
@@ -126,9 +130,7 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
               disabled={!isValid || isPending}
               className={cn(
                 'flex h-10 w-[10rem] items-center justify-center rounded-full text-[0.875rem] font-medium transition-colors',
-                isValid && !isPending
-                  ? 'bg-[#5d5d5d] text-white'
-                  : 'bg-[#d4d4d4] text-[#5d5d5d]',
+                isValid && !isPending ? 'bg-[#5d5d5d] text-white' : 'bg-[#d4d4d4] text-[#5d5d5d]',
               )}
             >
               {isPending ? '제출 중...' : '상담 신청하기'}
@@ -137,15 +139,13 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
         </div>
 
         {/* 모바일 CTA (하단 고정) */}
-        <div className="fixed bottom-0 left-0 right-0 z-10 bg-white p-[1.25rem] tab:hidden">
+        <div className="fixed right-0 bottom-0 left-0 z-10 bg-white p-[1.25rem] tab:hidden">
           <button
             type="submit"
             disabled={!isValid || isPending}
             className={cn(
               'flex h-12 w-full items-center justify-center rounded-full text-[1rem] font-semibold transition-colors',
-              isValid && !isPending
-                ? 'bg-[#5d5d5d] text-white'
-                : 'bg-[#d4d4d4] text-[#5d5d5d]',
+              isValid && !isPending ? 'bg-[#5d5d5d] text-white' : 'bg-[#d4d4d4] text-[#5d5d5d]',
             )}
           >
             {isPending ? '제출 중...' : '상담 신청하기'}
@@ -154,11 +154,7 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
       </form>
 
       {/* ═══ 나가기 확인 모달 ═══ */}
-      <ExitConfirmDialog
-        open={showGuard}
-        onConfirm={confirmExit}
-        onCancel={cancelExit}
-      />
+      <ExitConfirmDialog open={showGuard} onConfirm={confirmExit} onCancel={cancelExit} />
     </div>
   )
 }

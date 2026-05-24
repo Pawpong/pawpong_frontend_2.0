@@ -19,15 +19,13 @@ const PostFormCTA = ({
   leftSlot,
 }: PostFormCTAProps) => {
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-10 bg-white/50 backdrop-blur-sm">
+    <div className="fixed right-0 bottom-0 left-0 z-10 bg-white/50 backdrop-blur-sm">
       <Container className="tab:px-[6.25rem]">
-        <div className={`flex items-center gap-[0.625rem] p-5 tab:h-[5.875rem] tab:p-0 ${leftSlot ? 'tab:justify-between' : 'tab:justify-end'}`}>
+        <div
+          className={`flex items-center gap-[0.625rem] p-5 tab:h-[5.875rem] tab:p-0 ${leftSlot ? 'tab:justify-between' : 'tab:justify-end'}`}
+        >
           {/* Left Slot — desktop only */}
-          {leftSlot && (
-            <div className="hidden tab:block">
-              {leftSlot}
-            </div>
-          )}
+          {leftSlot && <div className="hidden tab:block">{leftSlot}</div>}
 
           {/* Action Buttons */}
           <div className="flex w-full items-center gap-[0.625rem] tab:w-auto tab:gap-3">

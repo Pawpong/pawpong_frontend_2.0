@@ -19,12 +19,7 @@ const EntryDetailView = ({
   imageClassName,
 }: EntryDetailViewProps) => (
   <>
-    <EntryHeader
-      entry={entry}
-      onClose={onClose}
-      userType={userType}
-      className={headerClassName}
-    />
+    <EntryHeader entry={entry} onClose={onClose} userType={userType} className={headerClassName} />
     <EntryImage entry={entry} className={imageClassName} />
     <EntryDescription entry={entry} />
   </>

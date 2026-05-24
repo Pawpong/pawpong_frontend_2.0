@@ -15,17 +15,12 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
       <div className="flex rounded-[0.375rem] bg-[#f0f0f0] p-[0.5rem] tab:hidden">
         {/* 이미지 100x100 */}
         <div className="relative size-[6.25rem] shrink-0 overflow-hidden">
-          <Image
-            src={listing.thumbnailUrl}
-            alt={listing.name}
-            fill
-            className="object-cover"
-          />
+          <Image src={listing.thumbnailUrl} alt={listing.name} fill className="object-cover" />
           <div className="absolute inset-0 bg-white/70" />
           {listing.isPopular && (
             <Badge
               variant="outline"
-              className="absolute left-[0.5rem] top-[0.43rem] bg-white px-[0.5rem] py-[0.125rem] text-[0.75rem] leading-normal"
+              className="absolute top-[0.43rem] left-[0.5rem] bg-white px-[0.5rem] py-[0.125rem] text-[0.75rem] leading-normal"
             >
               인기
             </Badge>
@@ -35,7 +30,7 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
         {/* 정보 */}
         <div className="flex min-w-0 flex-1 flex-col justify-between py-[0.0625rem] pl-[0.5625rem]">
           <div className="flex flex-col">
-            <p className="line-clamp-1 text-sm font-bold leading-[1.5] text-[#5d5d5d]">
+            <p className="line-clamp-1 text-sm leading-[1.5] font-bold text-[#5d5d5d]">
               {listing.name}
             </p>
             <div className="mt-[0.125rem] flex items-center">
@@ -65,18 +60,10 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
       <div className="relative hidden h-[19.0625rem] overflow-hidden rounded-2xl bg-[#e7e7e7] tab:flex tab:items-center tab:pl-[1.719rem]">
         {/* 이미지: 세로 중앙, left 27.5px */}
         <div className="relative h-[14.124rem] w-[13.647rem] shrink-0 overflow-hidden rounded-[0.437rem]">
-          <Image
-            src={listing.thumbnailUrl}
-            alt={listing.name}
-            fill
-            className="object-cover"
-          />
+          <Image src={listing.thumbnailUrl} alt={listing.name} fill className="object-cover" />
           <div className="absolute inset-0 bg-white/70" />
           {listing.isPopular && (
-            <Badge
-              variant="outline"
-              className="absolute left-[0.625rem] top-[1.125rem] bg-white"
-            >
+            <Badge variant="outline" className="absolute top-[1.125rem] left-[0.625rem] bg-white">
               인기
             </Badge>
           )}
@@ -85,30 +72,28 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
         {/* 분양완료 뱃지: 우상단 */}
         <Badge
           variant="status"
-          className="absolute right-[1.719rem] top-[2.469rem] bg-[#5d5d5d] px-[0.585rem] py-[0.234rem] text-sm leading-[1.375rem]"
+          className="absolute top-[2.469rem] right-[1.719rem] bg-[#5d5d5d] px-[0.585rem] py-[0.234rem] text-sm leading-[1.375rem]"
         >
           분양완료
         </Badge>
 
         {/* 정보 영역 */}
-        <div className="absolute bottom-0 left-[16.898rem] right-0 top-0 flex flex-col">
+        <div className="absolute top-0 right-0 bottom-0 left-[16.898rem] flex flex-col">
           {/* 이름 + 성별/나이 */}
           <div className="mt-[2.631rem] flex items-center gap-[1.125rem]">
-            <p className="text-xl font-semibold leading-[1.375rem] text-[#5d5d5d]">
+            <p className="text-xl leading-[1.375rem] font-semibold text-[#5d5d5d]">
               {listing.name}
             </p>
             <span className="size-[0.253rem] rounded-full bg-[#5d5d5d]" />
-            <span className="text-xl font-semibold leading-[1.375rem] text-[#5d5d5d]">
-              성별
-            </span>
+            <span className="text-xl leading-[1.375rem] font-semibold text-[#5d5d5d]">성별</span>
             <span className="size-[0.253rem] rounded-full bg-[#5d5d5d]" />
-            <span className="text-xl font-semibold leading-[1.375rem] text-[#5d5d5d]">
+            <span className="text-xl leading-[1.375rem] font-semibold text-[#5d5d5d]">
               {listing.ageText}
             </span>
           </div>
 
           {/* 설명 */}
-          <p className="mt-[1.375rem] line-clamp-3 text-base font-semibold leading-[1.375rem] text-[#5d5d5d]">
+          <p className="mt-[1.375rem] line-clamp-3 text-base leading-[1.375rem] font-semibold text-[#5d5d5d]">
             {listing.description}
           </p>
 
@@ -121,7 +106,7 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
           />
 
           {/* 하단: 게시날짜 + 대화중인 채팅 버튼 */}
-          <div className="mt-auto mb-[1.719rem] mr-[1.719rem] flex items-center justify-between">
+          <div className="mt-auto mr-[1.719rem] mb-[1.719rem] flex items-center justify-between">
             <PostedDate date={listing.postedAt} size="lg" />
             <button
               type="button"

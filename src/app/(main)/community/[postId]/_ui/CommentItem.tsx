@@ -18,13 +18,8 @@ const CommentItem = ({ comment }: CommentItemProps) => {
         createdAt={comment.createdAt}
         contentSlot={
           <>
-            <p className="mt-1 text-sm font-bold text-text-secondary">
-              {comment.body}
-            </p>
-            <button
-              type="button"
-              className="mt-1 text-sm font-semibold text-text-secondary"
-            >
+            <p className="mt-1 text-sm font-bold text-text-secondary">{comment.body}</p>
+            <button type="button" className="mt-1 text-sm font-semibold text-text-secondary">
               답글달기
             </button>
           </>

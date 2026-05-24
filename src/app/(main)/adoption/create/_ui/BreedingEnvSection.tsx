@@ -22,11 +22,7 @@ const BreedingEnvSection = ({ register }: BreedingEnvSectionProps) => {
           className="h-[5.125rem] tab:h-[6.813rem]"
           {...register('breedingEnvDescription')}
         />
-        <ImageUploadArea
-          images={images}
-          onAdd={handleAddImages}
-          onRemove={handleRemoveImage}
-        />
+        <ImageUploadArea images={images} onAdd={handleAddImages} onRemove={handleRemoveImage} />
       </div>
     </FormSection>
   )
