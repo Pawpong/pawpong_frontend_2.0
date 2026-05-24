@@ -14,9 +14,10 @@ import {
 } from '@/shared/ui'
 import { Separator } from '@/shared/ui'
 import { AdoptionCard } from '@/entities/adoption'
-import { createMockListings } from '@/shared/mocks/adoption'
+import { createMockListings, MOCK_ADOPTED_LISTINGS } from '@/shared/mocks/adoption'
 import { MOCK_MY_HOME_POSTS } from '@/shared/mocks/myHome'
 import { PostCard } from '@/app/(main)/home/_ui/PostCard'
+import { AdoptedListingCard } from './AdoptedListingCard'
 import { cn } from '@/shared/lib/Cn'
 
 const BOOKMARK_TABS = [
@@ -31,6 +32,17 @@ const BookmarksContent = () => {
   // TODO: 실제 API 연동
   const listings = createMockListings().filter((l) => l.status === 'available')
   const savedFeeds = MOCK_MY_HOME_POSTS
+  const adoptedListings = MOCK_ADOPTED_LISTINGS
+
+  // 입양목록을 날짜별로 그룹핑
+  const groupedAdopted = adoptedListings.reduce<
+    Record<string, typeof adoptedListings>
+  >((acc, item) => {
+    const date = item.adoptedAt
+    if (!acc[date]) acc[date] = []
+    acc[date].push(item)
+    return acc
+  }, {})
 
   return (
     <div className="flex w-full flex-col">
@@ -139,7 +151,7 @@ const BookmarksContent = () => {
             </div>
 
             {/* 모바일: 구분선 분리 */}
-            <div className="tab:hidden">
+            <div className="pb-15 tab:hidden">
               {savedFeeds.map((post, index) => (
                 <div key={post.id}>
                   <PostCard post={post} />
@@ -167,8 +179,26 @@ const BookmarksContent = () => {
         {/* 입양목록 탭 */}
         <TabsContent value="adoption-list" className="mt-0">
           <Container>
-            <div className="flex items-center justify-center py-20 text-sm text-[#a7a7a7]">
-              입양 목록이 없습니다.
+            <div className="pt-5 tab:pt-8">
+              <h2 className="text-sm font-bold leading-[1.5] text-text-primary tab:text-xl">
+                내가 입양한 목록 {adoptedListings.length}
+              </h2>
+            </div>
+
+            <div className="flex flex-col gap-3 pb-15 pt-4 tab:gap-[0.625rem] tab:pb-10 tab:pt-6">
+              {Object.entries(groupedAdopted).map(([date, items]) => (
+                <div key={date} className="flex flex-col gap-[0.375rem] tab:gap-[0.625rem]">
+                  <p className="text-xs font-medium leading-[1.5] text-text-primary tab:text-sm tab:leading-[1.375rem]">
+                    {date}
+                  </p>
+                  {items.map((listing) => (
+                    <AdoptedListingCard
+                      key={listing.listingId}
+                      listing={listing}
+                    />
+                  ))}
+                </div>
+              ))}
             </div>
           </Container>
         </TabsContent>
