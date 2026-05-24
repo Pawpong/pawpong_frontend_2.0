@@ -1,4 +1,4 @@
-import { apiClient, unwrap, unwrapVoid } from '@/shared/api'
+import { apiClient, API_VERSION, unwrap, unwrapVoid } from '@/shared/api'
 import type {
   ChatRoomResponseDto,
   ChatMessageResponseDto,
@@ -9,7 +9,9 @@ import type {
 /** 내 채팅방 목록 조회 */
 export const getChatRooms = () =>
   apiClient
-    .get<{ success: boolean; data: ChatRoomResponseDto[]; message?: string }>('/api/chat/rooms')
+    .get<{ success: boolean; data: ChatRoomResponseDto[]; message?: string }>(
+      `${API_VERSION}/chat/rooms`,
+    )
     .then(unwrap)
 
 /** 채팅방 생성 또는 기존 방 조회 */
@@ -19,13 +21,15 @@ export const createOrGetChatRoom = (data: CreateRoomRequestDto) =>
       success: boolean
       data: ChatRoomResponseDto
       message?: string
-    }>('/api/chat/rooms', data)
+    }>(`${API_VERSION}/chat/rooms`, data)
     .then(unwrap)
 
 /** 채팅방 종료 */
 export const closeChatRoom = (roomId: string) =>
   apiClient
-    .delete<{ success: boolean; data: object; message?: string }>(`/api/chat/rooms/${roomId}`)
+    .delete<{ success: boolean; data: object; message?: string }>(
+      `${API_VERSION}/chat/rooms/${roomId}`,
+    )
     .then(unwrapVoid)
 
 /** 채팅 메시지 내역 조회 (커서 기반 페이지네이션) */
@@ -35,7 +39,7 @@ export const getChatMessages = (roomId: string, limit?: number, before?: string)
       success: boolean
       data: ChatMessageResponseDto[]
       message?: string
-    }>(`/api/chat/rooms/${roomId}/messages`, { params: { limit, before } })
+    }>(`${API_VERSION}/chat/rooms/${roomId}/messages`, { params: { limit, before } })
     .then(unwrap)
 
 /** 채팅 메시지 전송 */
@@ -45,5 +49,5 @@ export const sendChatMessage = (roomId: string, data: SendChatMessageRequest) =>
       success: boolean
       data: ChatMessageResponseDto
       message?: string
-    }>(`/api/chat/rooms/${roomId}/messages`, data)
+    }>(`${API_VERSION}/chat/rooms/${roomId}/messages`, data)
     .then(unwrap)

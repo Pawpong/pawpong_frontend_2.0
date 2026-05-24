@@ -1,4 +1,4 @@
-import { apiClient, unwrap } from '@/shared/api'
+import { apiClient, API_VERSION, unwrap } from '@/shared/api'
 import type { ReportReviewPayload, ReportBreederPayload } from '@/shared/types'
 
 export const reportReview = (payload: ReportReviewPayload) =>
@@ -7,7 +7,7 @@ export const reportReview = (payload: ReportReviewPayload) =>
       success: boolean
       data: { reportId: string; message: string }
       message?: string
-    }>('/api/adopter/report/review', payload)
+    }>(`${API_VERSION}/adopter/report/review`, payload)
     .then(unwrap)
 
 export const reportBreeder = (payload: ReportBreederPayload) =>
@@ -16,5 +16,5 @@ export const reportBreeder = (payload: ReportBreederPayload) =>
       success: boolean
       data: { reportId: string; message: string }
       message?: string
-    }>('/api/adopter/report', { type: 'breeder', ...payload })
+    }>(`${API_VERSION}/adopter/report`, { type: 'breeder', ...payload })
     .then(unwrap)

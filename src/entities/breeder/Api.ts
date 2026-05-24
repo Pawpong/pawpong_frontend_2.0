@@ -1,4 +1,4 @@
-import { apiClient, unwrap, unwrapNullable } from '@/shared/api'
+import { apiClient, API_VERSION, unwrap, unwrapNullable } from '@/shared/api'
 import type { ApiRequestConfig } from '@/shared/api'
 import type {
   BreederProfileResponseDto,
@@ -27,7 +27,7 @@ export const getBreederProfile = (breederId: string) =>
       success: boolean
       data: BreederProfileResponseDto
       message?: string
-    }>(`/api/breeder/${breederId}`, { skipAuth: true } as ApiRequestConfig)
+    }>(`${API_VERSION}/breeder/${breederId}`, { skipAuth: true } as ApiRequestConfig)
     .then(unwrap)
 
 /** 내 브리더 프로필 조회 */
@@ -37,7 +37,7 @@ export const getMyBreederProfile = () =>
       success: boolean
       data: BreederProfileResponseDto
       message?: string
-    }>('/api/breeder-management/profile')
+    }>(`${API_VERSION}/breeder-management/profile`)
     .then(unwrap)
 
 /** 브리더 프로필 수정 */
@@ -47,7 +47,7 @@ export const updateBreederProfile = (data: ProfileUpdateRequestDto) =>
       success: boolean
       data: BreederProfileUpdateResponseDto
       message?: string
-    }>('/api/breeder-management/profile', data)
+    }>(`${API_VERSION}/breeder-management/profile`, data)
     .then(unwrap)
 
 /** 브리더 대시보드 조회 */
@@ -57,7 +57,7 @@ export const getBreederDashboard = () =>
       success: boolean
       data: DashboardResponseDto
       message?: string
-    }>('/api/breeder-management/dashboard')
+    }>(`${API_VERSION}/breeder-management/dashboard`)
     .then(unwrap)
 
 /** 브리더 탐색/검색 */
@@ -67,15 +67,16 @@ export const exploreBreeders = (params: SearchBreederParams = {}) =>
       success: boolean
       data: PaginationResponse<Breeder>
       message?: string
-    }>('/api/breeder/explore', params)
+    }>(`${API_VERSION}/breeder/explore`, params)
     .then(unwrap)
 
 /** 인기 브리더 목록 */
 export const getPopularBreeders = () =>
   apiClient
-    .get<{ success: boolean; data: Breeder[]; message?: string }>('/api/breeder/popular', {
-      skipAuth: true,
-    } as ApiRequestConfig)
+    .get<{ success: boolean; data: Breeder[]; message?: string }>(
+      `${API_VERSION}/breeder/popular`,
+      { skipAuth: true } as ApiRequestConfig,
+    )
     .then(unwrap)
 
 /** 분양 개체 목록 */
@@ -85,7 +86,7 @@ export const getBreederPets = (breederId: string, page = 1, limit = 20) =>
       success: boolean
       data: PaginationResponse<AvailablePetSummaryDto>
       message?: string
-    }>(`/api/breeder/${breederId}/pets`, {
+    }>(`${API_VERSION}/breeder/${breederId}/pets`, {
       params: { page, limit },
       skipAuth: true,
     } as ApiRequestConfig)
@@ -98,7 +99,7 @@ export const getParentPets = (breederId: string, page = 1, limit = 4) =>
       success: boolean
       data: PaginationResponse<ParentPetSummaryDto>
       message?: string
-    }>(`/api/breeder/${breederId}/parent-pets`, {
+    }>(`${API_VERSION}/breeder/${breederId}/parent-pets`, {
       params: { page, limit },
       skipAuth: true,
     } as ApiRequestConfig)
@@ -111,7 +112,7 @@ export const getBreederReviews = (breederId: string, page = 1, limit = 10) =>
       success: boolean
       data: PaginationResponse<PublicReviewDto>
       message?: string
-    }>(`/api/breeder/${breederId}/reviews`, {
+    }>(`${API_VERSION}/breeder/${breederId}/reviews`, {
       params: { page, limit },
       skipAuth: true,
     } as ApiRequestConfig)
@@ -124,7 +125,9 @@ export const getBreederApplicationForm = (breederId: string) =>
       success: boolean
       data: BreederApplicationFormDto
       message?: string
-    }>(`/api/breeder/${breederId}/application-form`, { skipAuth: true } as ApiRequestConfig)
+    }>(`${API_VERSION}/breeder/${breederId}/application-form`, {
+      skipAuth: true,
+    } as ApiRequestConfig)
     .then(unwrap)
 
 /** 받은 신청 목록 (브리더용) */
@@ -134,7 +137,7 @@ export const getReceivedApplications = (page = 1, limit = 10) =>
       success: boolean
       data: PaginationResponse<ReceivedApplicationItemDto>
       message?: string
-    }>('/api/breeder-management/applications', { params: { page, limit } })
+    }>(`${API_VERSION}/breeder-management/applications`, { params: { page, limit } })
     .then(unwrap)
 
 /** 받은 신청 상세 (브리더용) */
@@ -144,7 +147,7 @@ export const getReceivedApplicationDetail = (applicationId: string) =>
       success: boolean
       data: ReceivedApplicationDetailDto
       message?: string
-    }>(`/api/breeder-management/applications/${applicationId}`)
+    }>(`${API_VERSION}/breeder-management/applications/${applicationId}`)
     .then(unwrap)
 
 /** 신청 상태 변경 (브리더용) */
@@ -157,7 +160,7 @@ export const updateBreederApplicationStatus = (
       success: boolean
       data: ApplicationStatusUpdateResponseDto
       message?: string
-    }>(`/api/breeder-management/applications/${applicationId}`, data)
+    }>(`${API_VERSION}/breeder-management/applications/${applicationId}`, data)
     .then(unwrap)
 
 /** 채팅 메시지 조회 */
@@ -168,7 +171,7 @@ export const getApplicationChatMessages = async (
     success: boolean
     data: ChatMessageDto[] | { messages?: ChatMessageDto[]; items?: ChatMessageDto[] }
     message?: string
-  }>(`/api/breeder-management/applications/${applicationId}/chat/messages`)
+  }>(`${API_VERSION}/breeder-management/applications/${applicationId}/chat/messages`)
 
   const data = unwrap(res)
   if (Array.isArray(data)) return data
@@ -184,5 +187,5 @@ export const sendApplicationChatMessage = (applicationId: string, data: SendChat
       success: boolean
       data: ChatMessageDto | null
       message?: string
-    }>(`/api/breeder-management/applications/${applicationId}/chat/messages`, data)
+    }>(`${API_VERSION}/breeder-management/applications/${applicationId}/chat/messages`, data)
     .then((res) => unwrapNullable(res, '채팅 메시지 전송에 실패했습니다.'))

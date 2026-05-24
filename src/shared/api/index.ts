@@ -1,4 +1,4 @@
-export { apiClient } from './Client'
+export { apiClient, API_VERSION } from './Client'
 export type { ApiRequestConfig } from './Client'
 export {
   ApiError,

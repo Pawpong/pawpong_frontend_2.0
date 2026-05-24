@@ -1,4 +1,4 @@
-import { apiClient, unwrap, unwrapVoid } from '@/shared/api'
+import { apiClient, API_VERSION, unwrap, unwrapVoid } from '@/shared/api'
 import type { UploadResponse } from '@/shared/types'
 
 const UPLOAD_TIMEOUT = 60000
@@ -11,8 +11,7 @@ export const uploadRepresentativePhotos = (files: File[]) => {
       success: boolean
       data: UploadResponse[]
       message?: string
-    }>('/api/upload/representative-photos', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    }>(`${API_VERSION}/upload/representative-photos`, formData, {
       timeout: UPLOAD_TIMEOUT,
     })
     .then(unwrap)
@@ -32,8 +31,7 @@ export const uploadParentPetPhoto = async (
       success: boolean
       data: UploadResponse | UploadResponse[]
       message?: string
-    }>(`/api/upload/parent-pet-photos/${petId}`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    }>(`${API_VERSION}/upload/parent-pet-photos/${petId}`, formData, {
       timeout: UPLOAD_TIMEOUT,
     })
     .then(unwrap)
@@ -55,8 +53,7 @@ export const uploadAvailablePetPhoto = async (
       success: boolean
       data: UploadResponse | UploadResponse[]
       message?: string
-    }>(`/api/upload/available-pet-photos/${petId}`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    }>(`${API_VERSION}/upload/available-pet-photos/${petId}`, formData, {
       timeout: UPLOAD_TIMEOUT,
     })
     .then(unwrap)
@@ -70,12 +67,9 @@ export const uploadSingleFile = (file: File, folder?: string) => {
   if (folder) formData.append('folder', folder)
   return apiClient
     .post<{ success: boolean; data: UploadResponse; message?: string }>(
-      '/api/upload/single',
+      `${API_VERSION}/upload/single`,
       formData,
-      {
-        headers: { 'Content-Type': 'multipart/form-data' },
-        timeout: UPLOAD_TIMEOUT,
-      },
+      { timeout: UPLOAD_TIMEOUT },
     )
     .then(unwrap)
 }
@@ -86,19 +80,17 @@ export const uploadMultipleFiles = (files: File[], folder?: string) => {
   if (folder) formData.append('folder', folder)
   return apiClient
     .post<{ success: boolean; data: UploadResponse[]; message?: string }>(
-      '/api/upload/multiple',
+      `${API_VERSION}/upload/multiple`,
       formData,
-      {
-        headers: { 'Content-Type': 'multipart/form-data' },
-        timeout: UPLOAD_TIMEOUT,
-      },
+      { timeout: UPLOAD_TIMEOUT },
     )
     .then(unwrap)
 }
 
 export const deleteFile = async (fileName: string): Promise<void> => {
-  const response = await apiClient.delete<{ success: boolean; message?: string }>('/api/upload', {
-    data: { fileName },
-  })
+  const response = await apiClient.delete<{ success: boolean; message?: string }>(
+    `${API_VERSION}/upload`,
+    { data: { fileName } },
+  )
   unwrapVoid(response, '파일 삭제에 실패했습니다.')
 }

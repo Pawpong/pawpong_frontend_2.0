@@ -1,71 +1,70 @@
 'use client'
 
+import Image from 'next/image'
+import Link from 'next/link'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Autoplay, Pagination } from 'swiper/modules'
-import { cn } from '@/shared/lib/Cn'
-import { cafe24Proup } from '@/shared/lib/fonts'
+import { useBanners } from '@/entities/home'
+import type { BannerDto } from '@/shared/types'
 import 'swiper/css'
 import 'swiper/css/pagination'
 
-const BANNER_SLIDES = [
-  {
-    title: ['건강하고 사랑스러운', '내 취향의 동물들을 찾고 계신가요?'],
-    titleMobile: ['건강하고 사랑스러운', '내 취향의 동물들을', '찾고 계신가요?'],
-    subtitle: '평생을 함께할 반려동물 포퐁에서 찾으세요!',
-    subtitleMobile: ['평생을 함께할 반려동물', '포퐁에서 찾으세요!'],
-  },
-  {
-    title: ['검증된 브리더만', '포퐁에서 만나보세요'],
-    titleMobile: ['검증된 브리더만', '포퐁에서', '만나보세요'],
-    subtitle: '브리더 인증 시스템으로 안심하고 분양받으세요',
-    subtitleMobile: ['브리더 인증 시스템으로', '안심하고 분양받으세요'],
-  },
-  {
-    title: ['반려동물과 함께하는', '행복한 일상을 시작하세요'],
-    titleMobile: ['반려동물과 함께하는', '행복한 일상을', '시작하세요'],
-    subtitle: '포퐁이 좋은 만남을 도와드릴게요',
-    subtitleMobile: ['포퐁이 좋은 만남을', '도와드릴게요'],
-  },
-]
+const BannerSlide = ({ banner }: { banner: BannerDto }) => {
+  const content = (
+    <section className="relative w-full overflow-hidden bg-[#d9d9d9]">
+      {/* Desktop */}
+      <div className="hidden aspect-[16/5] tab:block">
+        <Image
+          src={banner.desktopImageUrl}
+          alt={banner.title ?? ''}
+          fill
+          className="object-cover"
+          priority
+        />
+      </div>
+      {/* Mobile */}
+      <div className="block aspect-[16/9] tab:hidden">
+        <Image
+          src={banner.mobileImageUrl}
+          alt={banner.title ?? ''}
+          fill
+          className="object-cover"
+          priority
+        />
+      </div>
+    </section>
+  )
+
+  if (banner.linkUrl) {
+    if (banner.linkType === 'external') {
+      return (
+        <a href={banner.linkUrl} target="_blank" rel="noopener noreferrer">
+          {content}
+        </a>
+      )
+    }
+    return <Link href={banner.linkUrl}>{content}</Link>
+  }
+
+  return content
+}
 
 const Banner = () => {
+  const { data: banners } = useBanners()
+
+  if (!banners || banners.length === 0) return null
+
   return (
     <Swiper
       modules={[Autoplay, Pagination]}
       autoplay={{ delay: 4000, disableOnInteraction: false }}
       pagination={{ clickable: true }}
-      loop
+      loop={banners.length > 1}
       className="w-full"
     >
-      {BANNER_SLIDES.map((slide, i) => (
-        <SwiperSlide key={i}>
-          <section className="flex w-full flex-col items-center gap-[1.25rem] bg-[#d9d9d9] px-[1.25rem] py-[2.5rem] text-center text-black tab:px-[3rem] tab:py-[6.25rem] pc:px-[6.25rem]">
-            <h2
-              className={cn(
-                cafe24Proup.className,
-                'font-cafe24 text-[1.5rem] leading-[1.5] tab:text-[2.5rem]',
-              )}
-            >
-              {slide.title.map((line, j) => (
-                <span key={j} className="hidden tab:block">
-                  {line}
-                </span>
-              ))}
-              {slide.titleMobile.map((line, j) => (
-                <span key={j} className="block tab:hidden">
-                  {line}
-                </span>
-              ))}
-            </h2>
-            <p className="text-[1.25rem] leading-[1.5] font-bold tab:text-[1.5rem]">
-              <span className="hidden tab:inline">{slide.subtitle}</span>
-              {slide.subtitleMobile.map((line, j) => (
-                <span key={j} className="block tab:hidden">
-                  {line}
-                </span>
-              ))}
-            </p>
-          </section>
+      {banners.map((banner) => (
+        <SwiperSlide key={banner.bannerId}>
+          <BannerSlide banner={banner} />
         </SwiperSlide>
       ))}
     </Swiper>

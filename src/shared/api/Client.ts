@@ -158,3 +158,6 @@ function createApiClient(): AxiosInstance {
 }
 
 export const apiClient = createApiClient()
+
+/** 외부 API 버전 prefix */
+export const API_VERSION = '/api/v2' as const
