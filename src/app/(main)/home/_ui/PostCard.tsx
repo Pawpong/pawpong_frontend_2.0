@@ -48,7 +48,7 @@ const PostCard = ({ post }: PostCardProps) => {
         {post.images.map((image, index) => (
           <div
             key={index}
-            className="relative h-[8.995rem] w-[14.6147rem] shrink-0 overflow-hidden rounded-[0.67rem] bg-fill-placeholder tab:aspect-4/3 tab:h-auto tab:w-[22.55rem] tab:rounded-2xl"
+            className="relative h-[8.995rem] w-[14.6147rem] shrink-0 overflow-hidden rounded-[0.67rem] bg-fill-placeholder tab:aspect-[349/215] tab:h-auto tab:w-[21.8125rem] tab:rounded-2xl"
           >
             {image && (
               <Image
