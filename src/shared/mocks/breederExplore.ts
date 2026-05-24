@@ -2,16 +2,22 @@ import type { FavoriteBreeder } from './myHome'
 
 export interface ExploreBreeder extends FavoriteBreeder {
   isPopular: boolean
+  inquiryCount: number
+  favoriteCount: number
+  viewCount: number
 }
 
 const BREEDER_BASE: Omit<ExploreBreeder, 'id'> = {
   nickname: '도심속 도마뱀 사장님',
   imageUrl: null,
-  badges: ['브리더 뱃지', '80 BPM', '주목할 브리더'],
+  badges: ['초보집사', '50 BPM'],
   isBreeding: true,
   location: '마곡동',
   date: '2026.4.30',
   isPopular: false,
+  inquiryCount: 1,
+  favoriteCount: 10,
+  viewCount: 20,
 }
 
 export const MOCK_FEATURED_BREEDERS: ExploreBreeder[] = Array.from(
