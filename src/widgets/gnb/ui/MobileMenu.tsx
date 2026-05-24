@@ -3,12 +3,7 @@
 import Link from 'next/link'
 import { CloseIcon } from '@/shared/assets/icons'
 import { LogoButton } from './LogoButton'
-
-const MENU_ITEMS = [
-  { label: '알림', href: '/notifications' },
-  { label: '저장목록', href: '/bookmarks' },
-  { label: '설정', href: '/settings' },
-]
+import { MOBILE_MENU_ITEMS } from './NavItems'
 
 interface MobileMenuProps {
   onClose: () => void
@@ -32,14 +27,14 @@ const MobileMenu = ({ onClose }: MobileMenuProps) => {
 
       {/* 메뉴 항목 */}
       <nav className="flex flex-col px-[2.701rem] pt-[2.438rem]">
-        {MENU_ITEMS.map((item) => (
+        {MOBILE_MENU_ITEMS.map((item) => (
           <Link
             key={item.href}
             href={item.href}
             onClick={onClose}
             className="py-3 text-xl font-semibold text-black"
           >
-            {item.label}
+            {item.name}
           </Link>
         ))}
       </nav>
