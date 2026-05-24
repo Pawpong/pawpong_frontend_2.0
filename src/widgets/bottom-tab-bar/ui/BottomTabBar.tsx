@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/shared/lib/Cn'
+import { cafe24Proup } from '@/shared/lib/fonts'
 
 const TAB_ITEMS = [
   { name: '홈', href: '/' },
@@ -25,7 +26,8 @@ const BottomTabBar = () => {
             key={item.name}
             href={item.href}
             className={cn(
-              'text-[0.875rem] leading-[1.5] text-[rgba(18,18,18,0.5)]',
+              cafe24Proup.className,
+              'font-cafe24 text-[0.875rem] leading-[1.5] text-[rgba(18,18,18,0.5)]',
               isActive && 'text-[#121212]',
             )}
           >
