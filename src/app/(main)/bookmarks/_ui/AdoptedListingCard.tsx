@@ -1,7 +1,6 @@
 'use client'
 
 import Image from 'next/image'
-import { cn } from '@/shared/lib/Cn'
 import { Badge, ListingStats, PostedDate } from '@/shared/ui'
 import type { AdoptedListingCard as AdoptedListingCardType } from '@/shared/types'
 
@@ -63,9 +62,9 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
       </div>
 
       {/* PC 카드 */}
-      <div className="hidden overflow-hidden rounded-2xl bg-[#e7e7e7] tab:flex tab:h-[19.0625rem]">
-        {/* 이미지 */}
-        <div className="relative w-[13.647rem] shrink-0 overflow-hidden rounded-[0.437rem]">
+      <div className="relative hidden h-[19.0625rem] overflow-hidden rounded-2xl bg-[#e7e7e7] tab:block">
+        {/* 이미지: 세로 중앙, left 27.5px */}
+        <div className="absolute left-[1.719rem] top-1/2 h-[14.124rem] w-[13.647rem] -translate-y-1/2 overflow-hidden rounded-[0.437rem]">
           <Image
             src={listing.thumbnailUrl}
             alt={listing.name}
@@ -76,60 +75,57 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
           {listing.isPopular && (
             <Badge
               variant="outline"
-              className="absolute left-[1rem] top-[1rem] bg-white"
+              className="absolute left-[0.625rem] top-[1.125rem] bg-white"
             >
               인기
             </Badge>
           )}
         </div>
 
-        {/* 정보 */}
-        <div className="flex flex-1 flex-col justify-between px-[2rem] py-[2.5rem]">
-          <div className="flex flex-col">
-            {/* 이름 + 성별/나이 + 분양완료 배지 */}
-            <div className="flex items-center gap-[1.125rem]">
-              <p className="text-xl font-semibold leading-[1.375rem] text-[#5d5d5d]">
-                {listing.name}
-              </p>
-              <span className="size-[0.253rem] rounded-full bg-[#5d5d5d]" />
-              <span className="text-xl font-semibold leading-[1.375rem] text-[#5d5d5d]">
-                성별
-              </span>
-              <span className="size-[0.253rem] rounded-full bg-[#5d5d5d]" />
-              <span className="text-xl font-semibold leading-[1.375rem] text-[#5d5d5d]">
-                {listing.ageText}
-              </span>
-              <Badge
-                variant="status"
-                className="bg-[#5d5d5d] px-[0.585rem] py-[0.234rem] text-sm leading-[1.375rem]"
-              >
-                분양완료
-              </Badge>
-            </div>
+        {/* 분양완료 뱃지: 우상단 */}
+        <Badge
+          variant="status"
+          className="absolute right-[1.719rem] top-[2.469rem] bg-[#5d5d5d] px-[0.585rem] py-[0.234rem] text-sm leading-[1.375rem]"
+        >
+          분양완료
+        </Badge>
 
-            {/* 설명 */}
-            <p className="mt-[1.375rem] line-clamp-3 text-base font-semibold leading-[1.375rem] text-[#5d5d5d]">
-              {listing.description}
+        {/* 정보 영역 */}
+        <div className="absolute bottom-0 left-[16.898rem] right-0 top-0 flex flex-col">
+          {/* 이름 + 성별/나이 */}
+          <div className="mt-[2.631rem] flex items-center gap-[1.125rem]">
+            <p className="text-xl font-semibold leading-[1.375rem] text-[#5d5d5d]">
+              {listing.name}
             </p>
-
-            {/* 문의/관심/조회 */}
-            <ListingStats
-              inquiryCount={listing.inquiryCount}
-              favoriteCount={listing.favoriteCount}
-              viewCount={listing.viewCount}
-              className="mt-[0.75rem] gap-[1.25rem] text-sm leading-[1.375rem]"
-            />
+            <span className="size-[0.253rem] rounded-full bg-[#5d5d5d]" />
+            <span className="text-xl font-semibold leading-[1.375rem] text-[#5d5d5d]">
+              성별
+            </span>
+            <span className="size-[0.253rem] rounded-full bg-[#5d5d5d]" />
+            <span className="text-xl font-semibold leading-[1.375rem] text-[#5d5d5d]">
+              {listing.ageText}
+            </span>
           </div>
 
+          {/* 설명 */}
+          <p className="mt-[1.375rem] line-clamp-3 text-base font-semibold leading-[1.375rem] text-[#5d5d5d]">
+            {listing.description}
+          </p>
+
+          {/* 문의/관심/조회 */}
+          <ListingStats
+            inquiryCount={listing.inquiryCount}
+            favoriteCount={listing.favoriteCount}
+            viewCount={listing.viewCount}
+            className="mt-[0.75rem] gap-[1.25rem] text-sm leading-[1.375rem]"
+          />
+
           {/* 하단: 게시날짜 + 대화중인 채팅 버튼 */}
-          <div className="flex items-center justify-between">
+          <div className="mt-auto mb-[1.719rem] mr-[1.719rem] flex items-center justify-between">
             <PostedDate date={listing.postedAt} size="lg" />
             <button
               type="button"
-              className={cn(
-                'rounded-full bg-[#5d5d5d] px-[2.5rem] py-[0.625rem]',
-                'text-base font-semibold text-white',
-              )}
+              className="flex h-12 w-[11.938rem] items-center justify-center rounded-full bg-[#5d5d5d] text-base font-semibold text-white"
             >
               대화중인 채팅
             </button>
