@@ -1,10 +1,22 @@
-const SearchBar = () => {
+interface SearchBarProps {
+  placeholder?: {
+    mobile: string
+    desktop: string
+  }
+}
+
+const DEFAULT_PLACEHOLDER = {
+  mobile: '검색해서 원하는 동물 찾기',
+  desktop: '검색해서 원하는 아이 찾기',
+}
+
+const SearchBar = ({ placeholder = DEFAULT_PLACEHOLDER }: SearchBarProps) => {
   return (
     <div className="flex items-center gap-[0.25rem]">
       <div className="flex flex-1 items-center gap-[0.5rem] rounded-[0.5rem] border border-[#e5e5e5] bg-white p-[0.75rem] tab:rounded-full tab:border-[#a8a8a8] tab:px-[1.75rem] tab:py-[0.75rem]">
         <span className="flex-1 text-[0.875rem] text-[#171717] tab:font-semibold tab:text-[#a8a8a8]">
-          <span className="tab:hidden">검색해서 원하는 동물 찾기</span>
-          <span className="hidden tab:inline">검색해서 원하는 아이 찾기</span>
+          <span className="tab:hidden">{placeholder.mobile}</span>
+          <span className="hidden tab:inline">{placeholder.desktop}</span>
         </span>
       </div>
       <div className="flex size-[3rem] shrink-0 items-center justify-center rounded-[0.5rem] bg-[#3b3b3b] p-[0.5rem] tab:hidden">

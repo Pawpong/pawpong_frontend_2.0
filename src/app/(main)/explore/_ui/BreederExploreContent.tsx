@@ -1,0 +1,84 @@
+'use client'
+
+import { useState } from 'react'
+import { SectionHeader } from '@/shared/ui'
+import { SearchBar, PopularKeywords } from '@/features/search'
+import { SEARCH_PLACEHOLDERS } from '../_lib/constants'
+import { BreederCard } from '@/app/(main)/home/_ui/BreederCard'
+import { BreederCardHorizontal } from './BreederCardHorizontal'
+import {
+  MOCK_FEATURED_BREEDERS,
+  MOCK_EXPLORE_BREEDERS,
+} from '@/shared/mocks/breederExplore'
+
+const BreederExploreContent = () => {
+  const [featuredCollapsed, setFeaturedCollapsed] = useState(false)
+  const [exploreCollapsed, setExploreCollapsed] = useState(false)
+
+  return (
+    <>
+      {/* 데스크탑 타이틀 */}
+      <p className="hidden px-[6.25rem] py-[0.625rem] text-center text-[1.25rem] font-bold leading-[1.375rem] text-[#5d5d5d] tab:mt-[2.188rem] tab:block">
+        신뢰있는 브리더들을 만나보세요
+      </p>
+
+      {/* 검색바 + 인기 검색어 */}
+      <div className="w-full tab:mx-auto tab:mt-[1.25rem] tab:max-w-[42.5rem]">
+        <SearchBar placeholder={SEARCH_PLACEHOLDERS.breeder} />
+        <PopularKeywords />
+      </div>
+
+      {/* 주목할 브리더 */}
+      <section className="mt-[2.063rem] flex flex-col gap-[0.75rem] tab:mt-[4rem] tab:gap-[1.25rem]">
+        <SectionHeader
+          title={`주목할 브리더 ${MOCK_FEATURED_BREEDERS.length}`}
+          collapsible
+          collapsed={featuredCollapsed}
+          onToggle={() => setFeaturedCollapsed((prev) => !prev)}
+        />
+        {!featuredCollapsed && (
+          <>
+            {/* 모바일: 가로형 카드 리스트 */}
+            <div className="flex flex-col gap-[0.75rem] tab:hidden">
+              {MOCK_FEATURED_BREEDERS.map((breeder) => (
+                <BreederCardHorizontal key={breeder.id} breeder={breeder} />
+              ))}
+            </div>
+            {/* 데스크탑: 3열 세로형 카드 */}
+            <div className="hidden tab:grid tab:grid-cols-3 tab:gap-[1.156rem]">
+              {MOCK_FEATURED_BREEDERS.map((breeder) => (
+                <BreederCard
+                  key={breeder.id}
+                  breeder={breeder}
+                  showPopularBadge
+                />
+              ))}
+            </div>
+          </>
+        )}
+      </section>
+
+      {/* 전체 입양 소식 */}
+      <section className="mt-[1.25rem] flex flex-col gap-[0.75rem] tab:mt-[4rem] tab:gap-[1.25rem]">
+        <SectionHeader
+          title={`전체 입양 소식 ${MOCK_EXPLORE_BREEDERS.length}`}
+          collapsible
+          collapsed={exploreCollapsed}
+          onToggle={() => setExploreCollapsed((prev) => !prev)}
+        />
+        {!exploreCollapsed && (
+          <div className="grid grid-cols-2 gap-[0.97rem] tab:grid-cols-3 tab:gap-[1.156rem]">
+            {MOCK_EXPLORE_BREEDERS.map((breeder) => (
+              <BreederCard key={breeder.id} breeder={breeder} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* 하단 여백 */}
+      <div className="h-[4rem]" />
+    </>
+  )
+}
+
+export { BreederExploreContent }
