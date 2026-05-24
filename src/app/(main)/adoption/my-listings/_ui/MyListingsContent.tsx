@@ -1,8 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowBackIcon } from '@/shared/assets/icons'
-import { Container, Separator } from '@/shared/ui'
+import { Container, PageHeader, Separator } from '@/shared/ui'
 import { AdoptionCard } from '@/entities/adoption'
 import { createMockListings } from '@/shared/mocks/adoption'
 import { useListingsFilter } from '../_lib/useListingsFilter'
@@ -22,18 +21,7 @@ const MyListingsContent = () => {
 
   return (
     <div className="flex w-full flex-col pb-12">
-      {/* Navigation Header */}
-      <Container>
-        <div className="flex items-center py-3 tab:pb-[2rem] tab:pt-[1.5rem]">
-          <Link href="/home" className="flex flex-1 items-center">
-            <ArrowBackIcon className="size-6 text-text-primary" />
-          </Link>
-          <h1 className="text-sm font-semibold leading-[1.5] text-text-primary tab:text-xl tab:font-bold tab:leading-[1.375rem]">
-            분양 페이지
-          </h1>
-          <div className="flex-1" />
-        </div>
-      </Container>
+      <PageHeader title="분양 페이지" backHref="/home" />
 
       <Separator className="bg-border-light" />
 

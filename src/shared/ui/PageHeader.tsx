@@ -8,34 +8,17 @@ interface PageHeaderProps {
 }
 
 const PageHeader = ({ title, backHref }: PageHeaderProps) => (
-  <>
-    {/* 모바일 */}
-    <div className="flex items-center gap-2.5 px-5 py-3 tab:hidden">
-      <Link href={backHref} aria-label="뒤로 가기">
-        <ArrowBackIcon className="size-5 text-text-primary" />
+  <Container>
+    <div className="flex items-center gap-[0.625rem] py-3 tab:justify-center tab:pb-[2rem] tab:pt-[1.5rem]">
+      <Link href={backHref} className="flex items-center tab:flex-1" aria-label="뒤로 가기">
+        <ArrowBackIcon className="size-5 text-text-primary tab:size-6" />
       </Link>
-      <h1 className="text-sm font-semibold leading-[1.5] text-text-primary">
+      <h1 className="text-sm font-semibold leading-[1.5] text-text-primary tab:text-xl tab:font-bold tab:leading-[1.375rem]">
         {title}
       </h1>
+      <div className="hidden flex-1 tab:block" />
     </div>
-
-    {/* PC */}
-    <div className="hidden tab:block">
-      <Container>
-        <div className="flex items-center justify-center py-10">
-          <div className="flex flex-1 items-center">
-            <Link href={backHref} aria-label="뒤로 가기">
-              <ArrowBackIcon className="size-6 text-text-primary" />
-            </Link>
-          </div>
-          <h1 className="text-xl font-semibold text-text-primary">
-            {title}
-          </h1>
-          <div className="flex-1" />
-        </div>
-      </Container>
-    </div>
-  </>
+  </Container>
 )
 
 export { PageHeader }

@@ -1,8 +1,6 @@
 'use client'
 
-import Link from 'next/link'
-import { ArrowBackIcon } from '@/shared/assets/icons'
-import { Container, SectionHeader } from '@/shared/ui'
+import { Container, PageHeader, SectionHeader } from '@/shared/ui'
 import {
   MOCK_CONTEST_INFO,
   MOCK_RANKING_ENTRIES,
@@ -29,18 +27,7 @@ const HallOfFameContent = () => {
 
   return (
     <div className="flex w-full flex-col pb-12">
-      {/* Navigation Header */}
-      <Container>
-        <div className="flex items-center gap-[0.625rem] py-3 tab:justify-center tab:pb-[2rem] tab:pt-[1.5rem]">
-          <Link href="/home" className="flex items-center tab:flex-1">
-            <ArrowBackIcon className="size-5 text-text-primary tab:size-6" />
-          </Link>
-          <h1 className="text-sm font-semibold leading-[1.5] text-text-primary tab:text-xl tab:font-bold tab:leading-[1.375rem]">
-            명예의 전당
-          </h1>
-          <div className="hidden flex-1 tab:block" />
-        </div>
-      </Container>
+      <PageHeader title="명예의 전당" backHref="/home" />
 
       {/* Contest Banner */}
       <Container className="mt-2 tab:mt-6 pc:px-[12.25rem]">
