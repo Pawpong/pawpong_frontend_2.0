@@ -62,9 +62,9 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
       </div>
 
       {/* PC 카드 */}
-      <div className="relative hidden h-[19.0625rem] overflow-hidden rounded-2xl bg-[#e7e7e7] tab:block">
+      <div className="relative hidden h-[19.0625rem] overflow-hidden rounded-2xl bg-[#e7e7e7] tab:flex tab:items-center tab:pl-[1.719rem]">
         {/* 이미지: 세로 중앙, left 27.5px */}
-        <div className="absolute left-[1.719rem] top-1/2 h-[14.124rem] w-[13.647rem] -translate-y-1/2 overflow-hidden rounded-[0.437rem]">
+        <div className="relative h-[14.124rem] w-[13.647rem] shrink-0 overflow-hidden rounded-[0.437rem]">
           <Image
             src={listing.thumbnailUrl}
             alt={listing.name}
