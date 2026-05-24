@@ -24,7 +24,7 @@ const SavedFeedsTab = ({ feeds }: SavedFeedsTabProps) => (
         <div key={post.id}>
           <PostCard post={post} />
           {index < feeds.length - 1 && (
-            <Separator className="-mx-5 w-[calc(100%+2.5rem)] bg-border-light" />
+            <Separator fullWidth className="bg-border-light" />
           )}
         </div>
       ))}

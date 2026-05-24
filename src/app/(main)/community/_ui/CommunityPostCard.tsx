@@ -1,31 +1,14 @@
 'use client'
 
 import Image from 'next/image'
-import Link from 'next/link'
-import { Avatar, AvatarFallback, AvatarImage, DetailLink } from '@/shared/ui'
+import { AuthorInfo, DetailLink } from '@/shared/ui'
 import { FavoriteIcon, ChatBubbleIcon } from '@/shared/assets/icons'
 import type { CommunityPostCard as CommunityPostCardType } from '@/shared/types'
+import { PostActionButton } from './PostActionButton'
 
 interface CommunityPostCardProps {
   post: CommunityPostCardType
 }
-
-const PostActionButton = ({
-  icon: Icon,
-  count,
-}: {
-  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
-  count?: number
-}) => (
-  <div className="flex items-center gap-1.5">
-    <Icon className="size-6 text-text-primary" />
-    {count !== undefined && (
-      <span className="text-sm font-semibold leading-[1.375rem] text-text-primary">
-        {count}
-      </span>
-    )}
-  </div>
-)
 
 const CommunityPostCard = ({ post }: CommunityPostCardProps) => {
   return (
@@ -33,23 +16,12 @@ const CommunityPostCard = ({ post }: CommunityPostCardProps) => {
       {/* Author + Description */}
       <div className="flex flex-col">
         {/* Author Row */}
-        <div className="flex items-center gap-2.5">
-          <Link href={`/home/${post.authorId}`} className="flex items-center gap-3">
-            <Avatar size="sm">
-              {post.authorProfileImageUrl ? (
-                <AvatarImage src={post.authorProfileImageUrl} alt={post.authorNickname} />
-              ) : (
-                <AvatarFallback className="bg-fill-muted" />
-              )}
-            </Avatar>
-            <span className="text-sm font-bold text-text-primary">
-              {post.authorNickname}
-            </span>
-          </Link>
-          <span className="text-xs font-bold text-text-secondary">
-            {post.createdAt}
-          </span>
-        </div>
+        <AuthorInfo
+          authorId={post.authorId}
+          nickname={post.authorNickname}
+          profileImageUrl={post.authorProfileImageUrl}
+          createdAt={post.createdAt}
+        />
 
         {/* Description */}
         <div className="mt-1 flex items-center justify-between tab:mt-0 tab:pl-[3.0625rem]">

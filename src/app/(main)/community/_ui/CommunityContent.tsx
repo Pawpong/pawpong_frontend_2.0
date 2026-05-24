@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import {
+  Breadcrumb,
   Container,
   PageHeader,
   Separator,
@@ -52,10 +53,7 @@ const CommunityContent = () => {
       <Container>
         <div className="flex items-center justify-end py-3 tab:justify-between tab:pb-4 tab:pt-8">
           {/* PC only: Breadcrumb */}
-          <nav className="hidden text-sm font-medium leading-[1.375rem] tab:block">
-            <span className="text-text-muted">{'홈 > '}</span>
-            <span className="text-text-primary">커뮤니티</span>
-          </nav>
+          <Breadcrumb items={['홈', '커뮤니티']} />
 
           {/* 모바일: 필터 pill / PC: 정렬 드롭다운 */}
           <button
@@ -99,7 +97,7 @@ const CommunityContent = () => {
                 <div key={post.postId}>
                   <CommunityPostCard post={post} />
                   {index < posts.length - 1 && (
-                    <Separator className="-mx-5 w-[calc(100%+2.5rem)] bg-border-light" />
+                    <Separator fullWidth className="bg-border-light" />
                   )}
                 </div>
               ))}
