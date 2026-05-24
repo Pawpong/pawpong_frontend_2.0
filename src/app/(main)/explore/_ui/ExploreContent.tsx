@@ -96,7 +96,7 @@ const ExploreContent = () => {
       </div>
 
       {/* ══════ 모바일: 타이틀 + 카테고리 ══════ */}
-      <div className="flex flex-col gap-[0.75rem] p-5 tab:hidden">
+      <div className="flex flex-col gap-[0.75rem] py-5 tab:hidden">
         <p
           className={cn(
             cafe24Proup.className,
