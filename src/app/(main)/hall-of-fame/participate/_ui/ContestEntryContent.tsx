@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { Container } from '@/shared/ui'
 import {
   usePostForm,
@@ -10,9 +9,8 @@ import {
   PostFormCTA,
   ImageUploadArea,
 } from '@/widgets/post-form'
-import { VisibilitySelect, type VisibilityType } from './VisibilitySelect'
 
-const PostCreateContent = () => {
+const ContestEntryContent = () => {
   const {
     images,
     text,
@@ -21,15 +19,13 @@ const PostCreateContent = () => {
     handleAddImages,
     handleRemoveImage,
     handleEmojiSelect,
-  } = usePostForm()
+  } = usePostForm({ maxImages: 1 })
 
-  const [visibility, setVisibility] = useState<VisibilityType>('public')
-
-  const isValid = text.trim().length > 0 || images.length > 0
+  const isValid = text.trim().length > 0 && images.length > 0
 
   return (
     <div className="flex min-h-screen flex-col bg-white">
-      <PostFormHeader title="글 작성" mobileTitle="게시글 작성" />
+      <PostFormHeader title="명예의 전당 콘테스트 참여하기" />
 
       <Container className="flex-1 pb-[7.5rem] pt-[0.719rem] tab:px-[6.25rem] tab:pt-[5.5rem]">
         <div className="flex flex-col gap-[1.125rem] tab:flex-row tab:gap-0">
@@ -38,6 +34,7 @@ const PostCreateContent = () => {
               images={images}
               onAdd={handleAddImages}
               onRemove={handleRemoveImage}
+              maxImages={1}
             />
           </div>
 
@@ -47,13 +44,9 @@ const PostCreateContent = () => {
                 ref={textareaRef}
                 value={text}
                 onChange={setText}
-                placeholder="귀여운 동물을 자랑해보세요"
+                placeholder="귀여운 파이리"
               />
               <PostFormToolbar onEmojiSelect={handleEmojiSelect} />
-            </div>
-
-            <div className="mt-[1.125rem] tab:hidden">
-              <VisibilitySelect value={visibility} onChange={setVisibility} />
             </div>
           </div>
         </div>
@@ -62,14 +55,11 @@ const PostCreateContent = () => {
       <PostFormCTA
         onSaveDraft={() => { }}
         onSubmit={() => { }}
-        submitLabel="업로드"
+        submitLabel="참여하기"
         isValid={isValid}
-        leftSlot={
-          <VisibilitySelect value={visibility} onChange={setVisibility} />
-        }
       />
     </div>
   )
 }
 
-export { PostCreateContent }
+export { ContestEntryContent }

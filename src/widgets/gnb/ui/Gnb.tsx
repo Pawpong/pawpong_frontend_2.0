@@ -6,7 +6,7 @@ import { NavBar } from './NavBar'
 
 const Gnb = () => {
   return (
-    <header className="flex w-full items-center justify-center bg-white py-0 tab:py-[0.5rem]">
+    <header className="sticky top-0 z-50 flex w-full items-center justify-center bg-white py-0 tab:static tab:z-auto tab:py-[0.5rem]">
       <div className="flex w-full items-center justify-between px-[1.25rem] tab:px-[3rem] pc:px-[6.25rem]">
         <LogoButton />
         {/* PC: 네비게이션 */}
