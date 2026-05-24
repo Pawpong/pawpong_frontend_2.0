@@ -6,9 +6,10 @@ import type { FavoriteBreeder } from '@/shared/mocks/myHome'
 
 interface BreederCardProps {
   breeder: FavoriteBreeder
+  showPopularBadge?: boolean
 }
 
-const BreederCard = ({ breeder }: BreederCardProps) => {
+const BreederCard = ({ breeder, showPopularBadge }: BreederCardProps) => {
   return (
     <div className="flex w-[10.25rem] shrink-0 flex-col gap-[0.438rem] tab:w-[21.75rem] tab:gap-0 tab:overflow-hidden tab:rounded-[0.935rem] tab:bg-[#e7e7e7]">
       {/* Image Area */}
@@ -20,6 +21,16 @@ const BreederCard = ({ breeder }: BreederCardProps) => {
             className="absolute left-[0.625rem] top-[0.766rem] px-[0.625rem] py-[0.25rem] text-xs leading-[1.375rem]"
           >
             분양중
+          </Badge>
+        )}
+
+        {/* 인기 badge — overlay */}
+        {showPopularBadge && (
+          <Badge
+            variant="status"
+            className="absolute bottom-[0.625rem] right-[0.625rem] bg-[#ff6b00] px-[0.625rem] py-[0.25rem] text-xs leading-[1.375rem] text-white"
+          >
+            인기🔥
           </Badge>
         )}
 
