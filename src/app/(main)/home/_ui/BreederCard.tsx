@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { Badge } from '@/shared/ui'
 import type { FavoriteBreeder } from '@/shared/mocks/myHome'
 
@@ -10,8 +11,9 @@ interface BreederCardProps {
 }
 
 const BreederCard = ({ breeder, showPopularBadge }: BreederCardProps) => {
+  // TODO: API 연동 후 실제 브리더 홈 경로로 변경
   return (
-    <div className="flex w-[10.25rem] shrink-0 flex-col gap-[0.438rem] tab:w-[21.75rem] tab:gap-0 tab:overflow-hidden tab:rounded-[0.935rem] tab:bg-[#e7e7e7]">
+    <Link href={`/home/${breeder.id}`} className="flex w-[10.25rem] shrink-0 flex-col gap-[0.438rem] tab:w-[21.75rem] tab:gap-0 tab:overflow-hidden tab:rounded-[0.935rem] tab:bg-[#e7e7e7]">
       {/* Image Area */}
       <div className="relative h-[10.25rem] w-full overflow-hidden rounded-[0.375rem] bg-fill-placeholder tab:aspect-[348/287] tab:h-auto tab:rounded-none">
         {breeder.imageUrl && (
@@ -107,7 +109,7 @@ const BreederCard = ({ breeder, showPopularBadge }: BreederCardProps) => {
           </button>
         </div>
       </div>
-    </div>
+    </Link>
   )
 }
 

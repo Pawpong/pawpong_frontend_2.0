@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { Badge, FavoriteButton, ListingStats } from '@/shared/ui'
 import type { ExploreBreeder } from '@/shared/mocks/breederExplore'
 
@@ -9,8 +10,9 @@ interface BreederCardHorizontalProps {
 }
 
 const BreederCardHorizontal = ({ breeder }: BreederCardHorizontalProps) => {
+  // TODO: API 연동 후 실제 브리더 홈 경로로 변경
   return (
-    <div className="flex items-center gap-[0.563rem] rounded-[0.375rem] bg-[#f0f0f0] px-[0.5rem] py-[0.438rem]">
+    <Link href={`/home/${breeder.id}`} className="flex items-center gap-[0.563rem] rounded-[0.375rem] bg-[#f0f0f0] px-[0.5rem] py-[0.438rem]">
       {/* 이미지 100x100 */}
       <div className="relative size-[6.25rem] shrink-0 overflow-hidden">
         {breeder.imageUrl && (
@@ -65,7 +67,7 @@ const BreederCardHorizontal = ({ breeder }: BreederCardHorizontalProps) => {
           <FavoriteButton size="sm" />
         </div>
       </div>
-    </div>
+    </Link>
   )
 }
 
