@@ -39,7 +39,7 @@ const CommunityContent = () => {
             <span className="hidden tab:inline">아이를 자랑해보세요</span>
           </p>
           <Link
-            href="/post/create"
+            href="/community/write"
             className="flex h-8 w-[4.4375rem] items-center justify-center rounded-full bg-fill-muted text-sm font-semibold text-white tab:h-12 tab:w-auto tab:px-7 tab:text-base"
           >
             작성

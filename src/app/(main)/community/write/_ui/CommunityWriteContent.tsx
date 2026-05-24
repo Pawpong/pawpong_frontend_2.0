@@ -13,7 +13,7 @@ import {
   type VisibilityType,
 } from '@/widgets/post-form'
 
-const PostCreateContent = () => {
+const CommunityWriteContent = () => {
   const {
     images,
     text,
@@ -61,8 +61,8 @@ const PostCreateContent = () => {
       </Container>
 
       <PostFormCTA
-        onSaveDraft={() => { }}
-        onSubmit={() => { }}
+        onSaveDraft={() => {}}
+        onSubmit={() => {}}
         submitLabel="업로드"
         isValid={isValid}
         leftSlot={
@@ -73,4 +73,4 @@ const PostCreateContent = () => {
   )
 }
 
-export { PostCreateContent }
+export { CommunityWriteContent }
