@@ -2,8 +2,9 @@
 
 import * as React from 'react'
 import { Badge } from '@/shared/ui'
-import { MOCK_CHAT_MESSAGES, MOCK_ROOM_NAMES } from '@/shared/mocks/chat'
+import { MOCK_CHAT_MESSAGES } from '@/shared/mocks/chat'
 import type { ChatRoomResponseDto } from '@/shared/types'
+import { getDisplayName } from '../_lib/utils'
 import { PetInfoCard } from './PetInfoCard'
 import { ChatMessageBubble } from './ChatMessageBubble'
 import { ChatMessageInput } from './ChatMessageInput'
@@ -17,7 +18,7 @@ interface ChatRoomPanelProps {
 const ChatRoomPanel = ({ room, currentUserId, onBack }: ChatRoomPanelProps) => {
   const messages = MOCK_CHAT_MESSAGES.filter((msg) => msg.roomId === room.roomId)
   const messagesEndRef = React.useRef<HTMLDivElement>(null)
-  const displayName = MOCK_ROOM_NAMES[room.breederId] ?? room.breederId
+  const displayName = getDisplayName(room.breederId)
 
   React.useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })

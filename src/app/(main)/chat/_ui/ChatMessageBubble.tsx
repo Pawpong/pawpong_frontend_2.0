@@ -1,6 +1,6 @@
 import { cn } from '@/shared/lib/Cn'
 import type { ChatMessageResponseDto } from '@/shared/types'
-import { formatRelativeTime } from './ChatRoomItem'
+import { formatRelativeTime } from '../_lib/utils'
 
 interface ChatMessageBubbleProps {
   message: ChatMessageResponseDto

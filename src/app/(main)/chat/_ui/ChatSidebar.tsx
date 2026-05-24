@@ -1,20 +1,11 @@
 'use client'
 
 import * as React from 'react'
-import { Badge } from '@/shared/ui'
-import { cn } from '@/shared/lib/Cn'
 import { MOCK_CHAT_ROOMS } from '@/shared/mocks/chat'
 import type { ChatRoomResponseDto } from '@/shared/types'
+import { type FilterTab, filterRooms } from '../_lib/constants'
+import { ChatFilterTabs } from './ChatFilterTabs'
 import { ChatRoomItem } from './ChatRoomItem'
-
-type FilterTab = 'all' | 'unread' | 'adoption' | 'counsel'
-
-const FILTER_TABS: { value: FilterTab; label: string }[] = [
-  { value: 'all', label: '전체' },
-  { value: 'unread', label: '안읽음' },
-  { value: 'adoption', label: '입양' },
-  { value: 'counsel', label: '상담' },
-]
 
 interface ChatSidebarProps {
   activeRoomId: string
@@ -23,12 +14,7 @@ interface ChatSidebarProps {
 
 const ChatSidebar = ({ activeRoomId, onSelectRoom }: ChatSidebarProps) => {
   const [filter, setFilter] = React.useState<FilterTab>('all')
-
-  const filteredRooms = MOCK_CHAT_ROOMS.filter((room) => {
-    if (filter === 'all') return true
-    if (filter === 'adoption') return !!room.applicationId
-    return true
-  })
+  const filteredRooms = filterRooms(MOCK_CHAT_ROOMS, filter)
 
   return (
     <div className="flex h-full w-[26.1875rem] shrink-0 flex-col border border-border-light">
@@ -38,21 +24,7 @@ const ChatSidebar = ({ activeRoomId, onSelectRoom }: ChatSidebarProps) => {
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex items-center justify-end gap-4 px-5 pb-4">
-        {FILTER_TABS.map((tab) => (
-          <button key={tab.value} type="button" onClick={() => setFilter(tab.value)}>
-            <Badge
-              variant={filter === tab.value ? 'status' : 'filled'}
-              className={cn(
-                'cursor-pointer',
-                filter === tab.value && 'bg-text-primary text-white',
-              )}
-            >
-              {tab.label}
-            </Badge>
-          </button>
-        ))}
-      </div>
+      <ChatFilterTabs value={filter} onChange={setFilter} className="justify-end px-5 pb-4" />
 
       {/* Divider */}
       <div className="border-t border-border-light" />
