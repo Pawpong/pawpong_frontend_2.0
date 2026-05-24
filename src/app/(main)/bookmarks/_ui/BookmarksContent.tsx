@@ -12,8 +12,11 @@ import {
   TabsTrigger,
   TabsContent,
 } from '@/shared/ui'
+import { Separator } from '@/shared/ui'
 import { AdoptionCard } from '@/entities/adoption'
 import { createMockListings } from '@/shared/mocks/adoption'
+import { MOCK_MY_HOME_POSTS } from '@/shared/mocks/myHome'
+import { PostCard } from '@/app/(main)/home/_ui/PostCard'
 import { cn } from '@/shared/lib/Cn'
 
 const BOOKMARK_TABS = [
@@ -27,6 +30,7 @@ const BookmarksContent = () => {
 
   // TODO: 실제 API 연동
   const listings = createMockListings().filter((l) => l.status === 'available')
+  const savedFeeds = MOCK_MY_HOME_POSTS
 
   return (
     <div className="flex w-full flex-col">
@@ -126,8 +130,36 @@ const BookmarksContent = () => {
         {/* 저장 피드 탭 */}
         <TabsContent value="saved-feeds" className="mt-0">
           <Container>
-            <div className="flex items-center justify-center py-20 text-sm text-[#a7a7a7]">
-              저장된 피드가 없습니다.
+            <div className="pt-5 tab:pt-8">
+              <SectionHeader
+                title={`저장한 피드 ${savedFeeds.length}`}
+                linkText="커뮤니티 가기"
+                linkHref="/community"
+              />
+            </div>
+
+            {/* 모바일: 구분선 분리 */}
+            <div className="tab:hidden">
+              {savedFeeds.map((post, index) => (
+                <div key={post.id}>
+                  <PostCard post={post} />
+                  {index < savedFeeds.length - 1 && (
+                    <Separator className="-mx-5 w-[calc(100%+2.5rem)] bg-border-light" />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* PC: 개별 카드 */}
+            <div className="hidden tab:mt-6 tab:flex tab:flex-col tab:gap-3 tab:pb-10">
+              {savedFeeds.map((post) => (
+                <div
+                  key={post.id}
+                  className="overflow-hidden rounded-2xl border border-border-light px-[3.125rem]"
+                >
+                  <PostCard post={post} />
+                </div>
+              ))}
             </div>
           </Container>
         </TabsContent>
