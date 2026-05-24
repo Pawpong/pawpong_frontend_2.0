@@ -1,4 +1,4 @@
-import { apiClient, unwrap } from '@/shared/api'
+import { apiClient, API_VERSION, unwrap } from '@/shared/api'
 import type { FeedVideo, FeedComment, PaginationResponse } from '@/shared/types'
 
 /** 백엔드 원본 비디오 타입 */
@@ -35,9 +35,9 @@ interface BackendComment {
   isOwner: boolean
 }
 
-function transformVideo(v: BackendFeedVideo): FeedVideo {
+const transformVideo = (v: BackendFeedVideo): FeedVideo => {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8080'
-  const hlsUrl = `${baseUrl}/api/feed/videos/stream/${v.videoId}/master.m3u8`
+  const hlsUrl = `${baseUrl}${API_VERSION}/feed/videos/stream/${v.videoId}/master.m3u8`
   return {
     _id: v.videoId,
     uploaderId: v.uploadedBy._id,
@@ -59,21 +59,19 @@ function transformVideo(v: BackendFeedVideo): FeedVideo {
   }
 }
 
-function transformComment(c: BackendComment, videoId: string): FeedComment {
-  return {
-    _id: c.commentId,
-    commentId: c.commentId,
-    videoId,
-    userId: c.author._id,
-    userName: c.author.name || c.author.businessName || 'Unknown',
-    userProfileImage: c.author.profileImageFileName,
-    content: c.content,
-    likeCount: c.likeCount,
-    replyCount: c.replyCount,
-    isOwner: c.isOwner,
-    createdAt: c.createdAt,
-  }
-}
+const transformComment = (c: BackendComment, videoId: string): FeedComment => ({
+  _id: c.commentId,
+  commentId: c.commentId,
+  videoId,
+  userId: c.author._id,
+  userName: c.author.name || c.author.businessName || 'Unknown',
+  userProfileImage: c.author.profileImageFileName,
+  content: c.content,
+  likeCount: c.likeCount,
+  replyCount: c.replyCount,
+  isOwner: c.isOwner,
+  createdAt: c.createdAt,
+})
 
 /** 피드 비디오 목록 조회 */
 export const getFeedVideos = async (
@@ -88,7 +86,7 @@ export const getFeedVideos = async (
   const response = await apiClient.get<{
     items: BackendFeedVideo[]
     pagination: PaginationResponse<FeedVideo>['pagination']
-  }>(`/api/feed/videos?${params.toString()}`)
+  }>(`${API_VERSION}/feed/videos?${params.toString()}`)
 
   return {
     items: response.data.items.map(transformVideo),
@@ -102,7 +100,7 @@ export const toggleVideoLike = (videoId: string) =>
     .post<{
       success: boolean
       data: { videoId: string; isLiked: boolean; likeCount: number }
-    }>(`/api/feed/like/${videoId}`)
+    }>(`${API_VERSION}/feed/like/${videoId}`)
     .then((res) => unwrap(res, '좋아요 처리에 실패했습니다.'))
 
 /** 비디오 댓글 목록 조회 */
@@ -114,7 +112,7 @@ export const getVideoComments = async (
   const response = await apiClient.get<{
     success: boolean
     data: { comments: BackendComment[]; totalCount: number; hasNextPage: boolean }
-  }>(`/api/feed/comment/${videoId}?page=${page}&limit=${limit}`)
+  }>(`${API_VERSION}/feed/comment/${videoId}?page=${page}&limit=${limit}`)
 
   const data = unwrap(response, '댓글 목록 조회에 실패했습니다.')
   return {
@@ -126,7 +124,7 @@ export const getVideoComments = async (
 
 /** 댓글 작성 */
 export const createVideoComment = (videoId: string, content: string) =>
-  apiClient.post(`/api/feed/comment/${videoId}`, { content }).then((res) => res.data)
+  apiClient.post(`${API_VERSION}/feed/comment/${videoId}`, { content }).then((res) => res.data)
 
 /** 태그 검색 */
 export const searchTags = (query: string) =>
@@ -134,11 +132,11 @@ export const searchTags = (query: string) =>
     .get<{
       success: boolean
       data: { tags: string[] }
-    }>(`/api/feed/tag/search?q=${encodeURIComponent(query)}`)
+    }>(`${API_VERSION}/feed/tag/search?q=${encodeURIComponent(query)}`)
     .then((res) => unwrap(res, '태그 검색에 실패했습니다.').tags)
 
 /** HLS 스트리밍 URL 생성 */
 export const getHlsStreamUrl = (videoId: string, filename: string): string => {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8080'
-  return `${baseUrl}/api/feed/videos/stream/${videoId}/${filename}`
+  return `${baseUrl}${API_VERSION}/feed/videos/stream/${videoId}/${filename}`
 }

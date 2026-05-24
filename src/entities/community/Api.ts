@@ -1,4 +1,4 @@
-import { apiClient, unwrap, unwrapVoid } from '@/shared/api'
+import { apiClient, API_VERSION, unwrap, unwrapVoid } from '@/shared/api'
 import type {
   ApiResponseFull,
   PaginationResponse,
@@ -20,7 +20,7 @@ export const getCommunityPosts = async (
   if (params.pageSize) query.set('pageSize', String(params.pageSize))
 
   const response = await apiClient.get<ApiResponseFull<PaginationResponse<CommunityPostCard>>>(
-    `/api/v2/community/posts?${query.toString()}`,
+    `${API_VERSION}/community/posts?${query.toString()}`,
   )
 
   return unwrap(response, '커뮤니티 게시글 목록 조회에 실패했습니다.')
@@ -29,31 +29,31 @@ export const getCommunityPosts = async (
 /** 커뮤니티 게시글 상세 조회 */
 export const getCommunityPostDetail = async (postId: string): Promise<CommunityPostDetail> => {
   const response = await apiClient.get<ApiResponseFull<CommunityPostDetail>>(
-    `/api/v2/community/posts/${postId}`,
+    `${API_VERSION}/community/posts/${postId}`,
   )
   return unwrap(response, '커뮤니티 게시글 조회에 실패했습니다.')
 }
 
 /** 게시글 좋아요 */
 export const likeCommunityPost = async (postId: string): Promise<void> => {
-  const response = await apiClient.post(`/api/v2/community/posts/${postId}/like`)
+  const response = await apiClient.post(`${API_VERSION}/community/posts/${postId}/like`)
   unwrapVoid(response, '좋아요 처리에 실패했습니다.')
 }
 
 /** 게시글 좋아요 취소 */
 export const unlikeCommunityPost = async (postId: string): Promise<void> => {
-  const response = await apiClient.delete(`/api/v2/community/posts/${postId}/like`)
+  const response = await apiClient.delete(`${API_VERSION}/community/posts/${postId}/like`)
   unwrapVoid(response, '좋아요 취소에 실패했습니다.')
 }
 
 /** 게시글 북마크 */
 export const bookmarkCommunityPost = async (postId: string): Promise<void> => {
-  const response = await apiClient.post(`/api/v2/community/posts/${postId}/bookmark`)
+  const response = await apiClient.post(`${API_VERSION}/community/posts/${postId}/bookmark`)
   unwrapVoid(response, '북마크 처리에 실패했습니다.')
 }
 
 /** 게시글 북마크 취소 */
 export const unbookmarkCommunityPost = async (postId: string): Promise<void> => {
-  const response = await apiClient.delete(`/api/v2/community/posts/${postId}/bookmark`)
+  const response = await apiClient.delete(`${API_VERSION}/community/posts/${postId}/bookmark`)
   unwrapVoid(response, '북마크 취소에 실패했습니다.')
 }

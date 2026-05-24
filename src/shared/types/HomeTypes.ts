@@ -19,6 +19,7 @@ export interface BannerDto {
   title?: string
   description?: string
   order: number
+  isActive: boolean
   targetAudience?: ('guest' | 'adopter' | 'breeder')[]
 }
 

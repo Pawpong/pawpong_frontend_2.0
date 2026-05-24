@@ -1,4 +1,4 @@
-import { apiClient, unwrap, unwrapVoid } from '@/shared/api'
+import { apiClient, API_VERSION, unwrap, unwrapVoid } from '@/shared/api'
 import type {
   ApiResponse,
   AuthResponseDto,
@@ -8,33 +8,36 @@ import type {
 
 export const checkEmailDuplicate = (email: string) =>
   apiClient
-    .post<ApiResponse<{ isDuplicate: boolean }>>('/api/auth/check-email', { email })
+    .post<ApiResponse<{ isDuplicate: boolean }>>(`${API_VERSION}/auth/check-email`, { email })
     .then((res) => unwrap(res, '이메일 중복 확인에 실패했습니다.').isDuplicate)
 
 export const checkNicknameDuplicate = (nickname: string) =>
   apiClient
-    .post<ApiResponse<{ isDuplicate: boolean }>>('/api/auth/check-nickname', { nickname })
+    .post<ApiResponse<{ isDuplicate: boolean }>>(`${API_VERSION}/auth/check-nickname`, { nickname })
     .then((res) => unwrap(res, '닉네임 중복 확인에 실패했습니다.').isDuplicate)
 
 export const checkBreederNameDuplicate = (breederName: string) =>
   apiClient
-    .post<ApiResponse<{ isDuplicate: boolean }>>('/api/auth/check-breeder-name', { breederName })
+    .post<ApiResponse<{ isDuplicate: boolean }>>(`${API_VERSION}/auth/check-breeder-name`, {
+      breederName,
+    })
     .then((res) => unwrap(res, '브리더 상호명 중복 확인에 실패했습니다.').isDuplicate)
 
 export const sendVerificationCode = async (phone: string): Promise<void> => {
   const cleanPhone = phone.replace(/-/g, '')
-  const response = await apiClient.post<ApiResponse<null>>('/api/auth/phone/send-code', {
-    phone: cleanPhone,
-  })
+  const response = await apiClient.post<ApiResponse<null>>(
+    `${API_VERSION}/auth/phone/send-code`,
+    { phone: cleanPhone },
+  )
   unwrapVoid(response, '인증 코드 발송에 실패했습니다.')
 }
 
 export const verifyCode = async (phone: string, code: string): Promise<void> => {
   const cleanPhone = phone.replace(/-/g, '')
-  const response = await apiClient.post<ApiResponse<null>>('/api/auth/phone/verify-code', {
-    phone: cleanPhone,
-    code,
-  })
+  const response = await apiClient.post<ApiResponse<null>>(
+    `${API_VERSION}/auth/phone/verify-code`,
+    { phone: cleanPhone, code },
+  )
   unwrapVoid(response, '인증 코드 확인에 실패했습니다.')
 }
 
@@ -42,7 +45,7 @@ export const completeAdopterRegistration = async (
   data: AdopterRegistrationDto,
 ): Promise<AuthResponseDto> =>
   apiClient
-    .post<ApiResponse<AuthResponseDto>>('/api/auth/social/complete', {
+    .post<ApiResponse<AuthResponseDto>>(`${API_VERSION}/auth/social/complete`, {
       tempId: data.tempId,
       email: data.email,
       name: data.name,
@@ -57,7 +60,7 @@ export const completeBreederRegistration = async (
   data: BreederRegistrationDto,
 ): Promise<AuthResponseDto> =>
   apiClient
-    .post<ApiResponse<AuthResponseDto>>('/api/auth/social/complete', {
+    .post<ApiResponse<AuthResponseDto>>(`${API_VERSION}/auth/social/complete`, {
       ...data,
       role: 'breeder',
     })
@@ -74,10 +77,11 @@ export const uploadBreederDocuments = async (
   formData.append('level', level)
 
   return apiClient
-    .post<ApiResponse<{ documentUrls: string[] }>>('/api/auth/upload-breeder-documents', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-      params: { tempId },
-    })
+    .post<ApiResponse<{ documentUrls: string[] }>>(
+      `${API_VERSION}/auth/upload-breeder-documents`,
+      formData,
+      { params: { tempId } },
+    )
     .then((res) => unwrap(res, '서류 업로드에 실패했습니다.'))
 }
 
@@ -88,13 +92,11 @@ export const uploadProfileImage = async (
   const formData = new FormData()
   formData.append('file', file)
   const url = tempId
-    ? `/api/auth/upload-breeder-profile?tempId=${encodeURIComponent(tempId)}`
-    : '/api/auth/upload-breeder-profile'
+    ? `${API_VERSION}/auth/upload-breeder-profile?tempId=${encodeURIComponent(tempId)}`
+    : `${API_VERSION}/auth/upload-breeder-profile`
 
   return apiClient
-    .post<ApiResponse<{ url: string; filename: string; size: number }>>(url, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    })
+    .post<ApiResponse<{ url: string; filename: string; size: number }>>(url, formData)
     .then((res) => unwrap(res, '프로필 이미지 업로드에 실패했습니다.'))
 }
 
@@ -102,7 +104,7 @@ export const logout = async (): Promise<{ message: string; loggedOutAt: string }
   try {
     const response =
       await apiClient.post<ApiResponse<{ message: string; loggedOutAt: string }>>(
-        '/api/auth/logout',
+        `${API_VERSION}/auth/logout`,
       )
     await fetch('/api/auth/clear-cookie', { method: 'POST' })
     return unwrap(response, '로그아웃에 실패했습니다.')
