@@ -26,7 +26,7 @@ const ChatMessageInput = ({ onSend, disabled }: ChatMessageInputProps) => {
   }
 
   return (
-    <div className="flex items-center gap-3 bg-white px-5 py-5 tab:px-8">
+    <div className="flex items-center gap-3 bg-white px-5 pb-10 pt-5 tab:px-8 pc:pb-5">
       {/* Add button */}
       <button
         type="button"
