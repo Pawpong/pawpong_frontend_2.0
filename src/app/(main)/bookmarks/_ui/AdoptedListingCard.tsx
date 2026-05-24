@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { cn } from '@/shared/lib/Cn'
-import { Badge, ListingStats } from '@/shared/ui'
+import { Badge, ListingStats, PostedDate } from '@/shared/ui'
 import type { AdoptedListingCard as AdoptedListingCardType } from '@/shared/types'
 
 interface AdoptedListingCardProps {
@@ -57,11 +57,7 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
               size="sm"
               className="gap-[0.5rem]"
             />
-            <div className="flex items-center gap-[0.438rem] text-[0.75rem] leading-normal text-[#a3a3a3]">
-              <span>게시날짜</span>
-              <span className="size-[0.188rem] rounded-full bg-[#a3a3a3]" />
-              <span>{listing.postedAt}</span>
-            </div>
+            <PostedDate date={listing.postedAt} className="text-[0.75rem] leading-normal" />
           </div>
         </div>
       </div>
@@ -127,11 +123,7 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
 
           {/* 하단: 게시날짜 + 대화중인 채팅 버튼 */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-[0.438rem] text-sm text-[#a3a3a3]">
-              <span>게시날짜</span>
-              <span className="size-[0.188rem] rounded-full bg-[#a3a3a3]" />
-              <span>{listing.postedAt}</span>
-            </div>
+            <PostedDate date={listing.postedAt} size="lg" />
             <button
               type="button"
               className={cn(

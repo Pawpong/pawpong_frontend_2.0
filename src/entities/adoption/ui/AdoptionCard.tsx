@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { cn } from '@/shared/lib/Cn'
 
 import { FavoriteIcon } from '@/shared/assets/icons'
-import { Badge, FavoriteButton, ListingStats } from '@/shared/ui'
+import { Badge, FavoriteButton, ListingStats, PostedDate } from '@/shared/ui'
 import type { AdoptionListingCard } from '@/shared/types'
 import { ADOPTION_STATUS_LABEL, GENDER_LABEL } from '@/shared/types'
 
@@ -74,12 +74,7 @@ const AdoptionCard = ({ listing, className }: AdoptionCardProps) => {
             size="md"
             className="gap-[0.375rem]"
           />
-          {/* 게시날짜 (gap 7px, text 12px) */}
-          <div className="flex items-center gap-[0.438rem] text-[0.75rem] leading-normal text-[#a3a3a3]">
-            <span>게시날짜</span>
-            <span className="size-[0.188rem] rounded-full bg-[#a3a3a3]" />
-            <span>{listing.postedAt}</span>
-          </div>
+          <PostedDate date={listing.postedAt} className="text-[0.75rem] leading-normal" />
         </div>
       </div>
 
@@ -137,11 +132,7 @@ const AdoptionCard = ({ listing, className }: AdoptionCardProps) => {
           />
           {/* 게시날짜(top 393.72) + 관심있어요(left 229.7, top 381.09) */}
           <div className="mt-[0.321rem] flex items-center justify-between">
-            <div className="flex items-center gap-[0.438rem] text-[0.75rem] text-[#a3a3a3]">
-              <span>게시날짜</span>
-              <span className="size-[0.188rem] rounded-full bg-[#a3a3a3]" />
-              <span>{listing.postedAt}</span>
-            </div>
+            <PostedDate date={listing.postedAt} className="text-[0.75rem]" />
             <FavoriteButton size="md" />
           </div>
         </div>

@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { Badge, ListingStats } from '@/shared/ui'
+import { Badge, ListingStats, PostedDate } from '@/shared/ui'
 import { cn } from '@/shared/lib/Cn'
 import type { AdoptionListingCard } from '@/shared/types'
 import { ADOPTION_STATUS_LABEL, GENDER_LABEL } from '@/shared/types'
@@ -85,12 +85,7 @@ const ReservedListingCard = ({ listing, className }: ReservedListingCardProps) =
           className="mt-auto gap-2 text-[0.625rem] tab:gap-5 tab:text-sm"
         />
 
-        {/* 게시날짜 */}
-        <div className="flex items-center gap-[0.438rem] text-xs text-[#a3a3a3] tab:text-sm">
-          <span>게시날짜</span>
-          <span className="size-[0.188rem] rounded-full bg-[#a3a3a3]" />
-          <span>{listing.postedAt}</span>
-        </div>
+        <PostedDate date={listing.postedAt} size="md" />
       </div>
 
       {/* 대화중인 채팅 버튼: 데스크탑만 */}
