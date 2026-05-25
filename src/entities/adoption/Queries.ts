@@ -1,6 +1,12 @@
 import { createQuery, createInfiniteQuery, STALE_TIME } from '@/shared/api'
 import type { CommunityPetType, PetStatus, AdoptionSortType } from '@/shared/types'
-import { getAdoptionList, getPopularAdoptions, getAdoptionDetail } from './Api'
+import {
+  getAdoptionList,
+  getPopularAdoptions,
+  getAdoptionDetail,
+  getMyFavoriteAdoptions,
+  getMyAdoptedPets,
+} from './Api'
 
 export const adoptionQueries = {
   all: () => ['adoption'] as const,
@@ -39,6 +45,20 @@ export const adoptionQueries = {
       queryKey: [...adoptionQueries.all(), 'detail', petId],
       queryFn: () => getAdoptionDetail(petId),
       enabled: !!petId,
+      staleTime: STALE_TIME.DEFAULT,
+    }),
+
+  myFavorites: (status?: PetStatus, pageSize = 15) =>
+    createInfiniteQuery({
+      queryKey: [...adoptionQueries.all(), 'myFavorites', status, pageSize],
+      queryFn: (page) => getMyFavoriteAdoptions({ status, page, pageSize }),
+      staleTime: STALE_TIME.DEFAULT,
+    }),
+
+  myAdopted: (pageSize = 15) =>
+    createInfiniteQuery({
+      queryKey: [...adoptionQueries.all(), 'myAdopted', pageSize],
+      queryFn: (page) => getMyAdoptedPets({ page, pageSize }),
       staleTime: STALE_TIME.DEFAULT,
     }),
 }

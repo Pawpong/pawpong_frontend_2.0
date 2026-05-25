@@ -1,4 +1,5 @@
 export * from './adopter'
+export * from './adoption'
 export * from './application'
 export * from './auth'
 export * from './breeder'
