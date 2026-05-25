@@ -1,7 +1,9 @@
 import { apiClient, API_VERSION, unwrap, unwrapNullable } from '@/shared/api'
 import type { ApiRequestConfig } from '@/shared/api'
 import type {
+  ApiResponseFull,
   BreederProfileResponseDto,
+  BreederPublicProfile,
   ProfileUpdateRequestDto,
   BreederProfileUpdateResponseDto,
   DashboardResponseDto,
@@ -20,7 +22,16 @@ import type {
   SendChatMessageRequest,
 } from '@/shared/types'
 
-/** 브리더 공개 프로필 조회 */
+/** 브리더 공개 프로필 조회 (브리더홈) */
+export const getBreederPublicProfile = (breederId: string) =>
+  apiClient
+    .get<ApiResponseFull<BreederPublicProfile>>(
+      `${API_VERSION}/profile/breeders/${breederId}`,
+      { skipAuth: true } as ApiRequestConfig,
+    )
+    .then((res) => unwrap(res, '브리더 프로필 조회에 실패했습니다.'))
+
+/** 브리더 상세 프로필 조회 (기존) */
 export const getBreederProfile = (breederId: string) =>
   apiClient
     .get<{

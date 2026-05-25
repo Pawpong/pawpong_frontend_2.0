@@ -3,12 +3,11 @@
 import { useState } from 'react'
 import { BookmarkIcon } from '@/shared/assets/icons'
 import { Container, Separator, SectionHeader } from '@/shared/ui'
-import {
-  MOCK_MY_HOME_PROFILE,
-  MOCK_BREEDER_PROFILE,
-  MOCK_MY_HOME_POSTS,
-} from '@/shared/mocks/myHome'
+import { MOCK_MY_HOME_POSTS } from '@/shared/mocks/myHome'
 import { createMockListings } from '@/shared/mocks/adoption'
+import { useAdopterProfile } from '@/entities/adopter'
+import { useMyBreederProfile } from '@/entities/breeder'
+import type { AdopterPublicProfile, BreederPublicProfile } from '@/shared/types'
 import { AdoptionCard } from '@/entities/adoption'
 import { ProfileCard } from './ProfileCard'
 import { HomeTabs, TabsContent } from './HomeTabs'
@@ -20,17 +19,49 @@ import { FavoriteBreedersContent } from './FavoriteBreedersContent'
 import { BreederListingCard } from './BreederListingCard'
 import { MY_HOME_TABS, BREEDER_MY_HOME_TABS } from './constants'
 
-// TODO: 실제 유저 정보에서 브리더 여부 판단
-const IS_BREEDER = true
-
 const MyHomeContent = () => {
-  const isBreeder = IS_BREEDER
+  const { data: adopterProfile } = useAdopterProfile()
+  const { data: breederProfile } = useMyBreederProfile()
+
+  const isBreeder = !!breederProfile
   const tabs = isBreeder ? BREEDER_MY_HOME_TABS : MY_HOME_TABS
   const defaultTab = isBreeder ? 'listings' : 'posts'
 
   const [activeTab, setActiveTab] = useState(defaultTab)
   const posts = MOCK_MY_HOME_POSTS
   const listings = isBreeder ? createMockListings() : []
+
+  const adopterPublicProfile: AdopterPublicProfile | null = adopterProfile
+    ? {
+        userId: adopterProfile.adopterId,
+        nickname: adopterProfile.nickname,
+        profileImageUrl: adopterProfile.profileImageFileName,
+        bio: '',
+        bpm: 0,
+        followerCount: 0,
+        isFollowing: false,
+      }
+    : null
+
+  const breederPublicProfile: BreederPublicProfile | null = breederProfile
+    ? {
+        breederId: breederProfile.breederId,
+        nickname: breederProfile.breederName,
+        profileImageUrl: breederProfile.profileImageFileName,
+        bio: breederProfile.profileInfo.profileDescription,
+        bpm: 0,
+        followerCount: 0,
+        level: breederProfile.verificationInfo.level ?? 'new',
+        plan: 'basic',
+        businessLocation: {
+          city: breederProfile.profileInfo.locationInfo.cityName,
+          district: breederProfile.profileInfo.locationInfo.districtName,
+        },
+        isFavorited: false,
+      }
+    : null
+
+  if (!adopterPublicProfile && !breederPublicProfile) return null
 
   return (
     <div className="flex w-full flex-col">
@@ -44,11 +75,11 @@ const MyHomeContent = () => {
       />
 
       <Container className="pc:px-[10rem]">
-        {isBreeder ? (
-          <ProfileCard profile={MOCK_BREEDER_PROFILE} mode="mine-breeder" />
-        ) : (
-          <ProfileCard profile={MOCK_MY_HOME_PROFILE} />
-        )}
+        {isBreeder && breederPublicProfile ? (
+          <ProfileCard profile={breederPublicProfile} mode="mine-breeder" />
+        ) : adopterPublicProfile ? (
+          <ProfileCard profile={adopterPublicProfile} />
+        ) : null}
       </Container>
 
       <HomeTabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab}>

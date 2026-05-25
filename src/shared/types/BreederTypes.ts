@@ -151,6 +151,25 @@ export interface BreederProfileResponseDto {
   verificationInfo: BreederVerificationDto
 }
 
+/** 브리더 공개 프로필 (브리더홈) */
+export interface BreederPublicProfile {
+  breederId: string
+  nickname: string
+  profileImageUrl?: string
+  bio: string
+  longDescription?: string
+  bpm: number
+  followerCount: number
+  level: BreederLevel
+  plan: 'basic' | 'pro'
+  businessLocation: {
+    city: string
+    district: string
+    address?: string
+  }
+  isFavorited: boolean
+}
+
 /** 브리더 프로필 수정 요청 — Partial<BreederProfileInfoDto> 기반 */
 export type ProfileUpdateRequestDto = Partial<
   Omit<BreederProfileInfoDto, 'specializationAreas'> & {

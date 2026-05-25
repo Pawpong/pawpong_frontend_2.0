@@ -1,6 +1,6 @@
-import { createQuery, createInfiniteQuery } from '@/shared/api'
+import { createQuery, createInfiniteQuery, STALE_TIME } from '@/shared/api'
 import type { FavoriteItemDto, MyReviewItemDto } from '@/shared/types'
-import { getAdopterProfile, getFavorites, getMyReviews } from './Api'
+import { getAdopterProfile, getAdopterPublicProfile, getFavorites, getMyReviews } from './Api'
 
 export const adopterQueries = {
   all: () => ['adopter'] as const,
@@ -9,6 +9,14 @@ export const adopterQueries = {
     createQuery({
       queryKey: [...adopterQueries.all(), 'profile'],
       queryFn: getAdopterProfile,
+    }),
+
+  publicProfile: (userId: string) =>
+    createQuery({
+      queryKey: [...adopterQueries.all(), 'public-profile', userId],
+      queryFn: () => getAdopterPublicProfile(userId),
+      enabled: !!userId,
+      staleTime: STALE_TIME.VERY_LONG,
     }),
 
   favorites: (limit = 20) =>

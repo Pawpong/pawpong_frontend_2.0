@@ -1,7 +1,8 @@
 'use client'
 
 import { Container, Separator } from '@/shared/ui'
-import { MOCK_MY_HOME_PROFILE, MOCK_MY_HOME_POSTS } from '@/shared/mocks/myHome'
+import { useAdopterPublicProfile } from '@/entities/adopter'
+import { MOCK_MY_HOME_POSTS } from '@/shared/mocks/myHome'
 import { ProfileCard } from '../../_ui/ProfileCard'
 import { HomeTitle } from '../../_ui/HomeTitle'
 import { PostList } from '../../_ui/PostList'
@@ -11,10 +12,12 @@ interface UserHomeContentProps {
   userId: string
 }
 
-const UserHomeContent = ({ userId: _userId }: UserHomeContentProps) => {
-  // TODO: API 연동 후 userId로 데이터 fetch
-  const profile = MOCK_MY_HOME_PROFILE
+const UserHomeContent = ({ userId }: UserHomeContentProps) => {
+  const { data: profile } = useAdopterPublicProfile(userId)
+  // TODO: 게시글 API 연결
   const posts = MOCK_MY_HOME_POSTS
+
+  if (!profile) return null
 
   return (
     <div className="flex w-full flex-col">

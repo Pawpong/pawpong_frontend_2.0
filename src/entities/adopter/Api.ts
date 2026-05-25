@@ -1,6 +1,8 @@
 import { apiClient, API_VERSION, unwrap } from '@/shared/api'
+import type { ApiRequestConfig } from '@/shared/api'
 import type {
   AdopterProfileDto,
+  AdopterPublicProfile,
   FavoriteItemDto,
   FavoriteAddResponseDto,
   FavoriteRemoveResponseDto,
@@ -8,7 +10,17 @@ import type {
   ReviewCreateRequest,
   WithdrawReason,
   PaginationResponse,
+  ApiResponseFull,
 } from '@/shared/types'
+
+/** 입양자 공개 프로필 조회 (유저홈) */
+export const getAdopterPublicProfile = (userId: string) =>
+  apiClient
+    .get<ApiResponseFull<AdopterPublicProfile>>(
+      `${API_VERSION}/profile/users/${userId}`,
+      { skipAuth: true } as ApiRequestConfig,
+    )
+    .then((res) => unwrap(res, '입양자 프로필 조회에 실패했습니다.'))
 
 /** 내 프로필 조회 */
 export const getAdopterProfile = () =>
