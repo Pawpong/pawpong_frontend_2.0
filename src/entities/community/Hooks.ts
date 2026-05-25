@@ -15,3 +15,6 @@ export const useCommunityPostDetail = (postId: string) => useQuery(communityQuer
 
 export const useCommunityComments = (postId: string, pageSize?: number) =>
   useInfiniteQuery(communityQueries.comments(postId, pageSize))
+
+export const useMyBookmarkedPosts = (pageSize?: number) =>
+  useInfiniteQuery(communityQueries.myBookmarks(pageSize))
