@@ -2,6 +2,16 @@
  * 입양 탐색 페이지 관련 타입 정의
  */
 
+import type { PetGender, PetStatus } from './BreederTypes'
+import type { CommunityPetType } from './CommunityTypes'
+import type {
+  VaccinationStatusType,
+  GeneticTestStatusType,
+  PetVaccinationRecord,
+  PetGeneticTestRecord,
+  ParentRelation,
+} from './PetPostingTypes'
+
 /** 동물 카테고리 필터 */
 export type AnimalCategory = 'all' | 'dog' | 'cat' | 'lizard'
 
@@ -138,4 +148,89 @@ export interface AdoptionDetailDto {
   parents: ParentInfo[]
   breedingEnvironment: BreedingEnvironment
   otherListings: AdoptionListingCard[]
+}
+
+// ==================== v2 입양 API 타입 ====================
+
+/** v2 정렬 기준 */
+export type AdoptionSortType = 'latest' | 'popular'
+
+/** v2 입양 동물 카드 */
+export interface AdoptionPetCard {
+  petId: string
+  breederId: string
+  breederName: string
+  name: string
+  breed: string
+  petType: CommunityPetType
+  gender: PetGender
+  ageDescription: string
+  price: number
+  status: PetStatus
+  primaryPhotoUrl: string
+  photoUrls: string[]
+  inquiryCount: number
+  favoriteCount: number
+  viewCount: number
+  isFavorited: boolean
+  isPopular: boolean
+  createdAt: string
+}
+
+/** v2 입양 동물 목록 파라미터 */
+export interface AdoptionListParams {
+  petType?: CommunityPetType
+  breederId?: string
+  excludePetId?: string
+  status?: PetStatus
+  keyword?: string
+  sort?: AdoptionSortType
+  page?: number
+  pageSize?: number
+}
+
+/** v2 인기 입양 동물 파라미터 */
+export interface AdoptionPopularParams {
+  petType?: CommunityPetType
+  limit?: number
+}
+
+/** v2 입양 상세 - 부모 정보 */
+export interface AdoptionParent {
+  relation: ParentRelation
+  breed: string
+  name: string
+  birthDate: string
+  photoUrl: string
+}
+
+/** v2 입양 상세 - 사육 환경 */
+export interface AdoptionBreedingEnv {
+  description: string
+  photoUrl: string
+}
+
+/** v2 입양 상세 - 브리더 요약 */
+export interface AdoptionBreederSummary {
+  breederId: string
+  displayName: string
+  profileImageUrl: string
+  locationText: string
+  bpm: number
+}
+
+/** v2 입양 동물 상세 */
+export interface AdoptionPetDetail extends AdoptionPetCard {
+  description: string
+  tags: string[]
+  birthDate: string
+  vaccinationStatus: VaccinationStatusType
+  vaccinationRecords: PetVaccinationRecord[]
+  vaccinationIncompleteReason?: string
+  geneticTestStatus: GeneticTestStatusType
+  geneticTestRecords: PetGeneticTestRecord[]
+  geneticTestIncompleteReason?: string
+  parents: AdoptionParent[]
+  breedingEnvironment?: AdoptionBreedingEnv
+  breeder: AdoptionBreederSummary
 }
