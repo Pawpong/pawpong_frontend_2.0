@@ -1,16 +1,36 @@
 'use client'
 
 import Image from 'next/image'
-import { AuthorInfo, Breadcrumb, Container, PageHeader, Separator } from '@/shared/ui'
+import {
+  AuthorInfo,
+  Breadcrumb,
+  Container,
+  InfiniteScrollTrigger,
+  PageHeader,
+  Separator,
+} from '@/shared/ui'
 import { FavoriteIcon, ChatBubbleIcon, MoreVertIcon } from '@/shared/assets/icons'
-import { MOCK_COMMUNITY_POST_DETAIL, MOCK_COMMUNITY_CATEGORIES } from '@/shared/mocks/community'
+import { MOCK_COMMUNITY_CATEGORIES } from '@/shared/mocks/community'
+import { useCommunityPostDetail, useCommunityComments } from '@/entities/community'
 import { CategorySidebar } from '../../_ui/CategorySidebar'
 import { PostActionButton } from '../../_ui/PostActionButton'
 import { CommentItem } from './CommentItem'
 
-const PostDetailContent = () => {
-  // TODO: API 연동 후 useCommunityPostDetail(postId) 로 교체
-  const post = MOCK_COMMUNITY_POST_DETAIL
+interface PostDetailContentProps {
+  postId: string
+}
+
+const PostDetailContent = ({ postId }: PostDetailContentProps) => {
+  const { data: post } = useCommunityPostDetail(postId)
+  const {
+    data: commentsData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useCommunityComments(postId)
+  const comments = commentsData?.pages.flatMap((page) => page.items) ?? []
+
+  if (!post) return null
 
   return (
     <div className="flex w-full flex-col">
@@ -81,9 +101,14 @@ const PostDetailContent = () => {
               {/* Comments */}
               <Separator fullWidth className="mt-4 bg-border-light tab:mx-0 tab:w-full" />
               <div className="px-0 pb-4 tab:px-[3.125rem] tab:pb-8">
-                {post.commentPreview.map((comment) => (
+                {comments.map((comment) => (
                   <CommentItem key={comment.commentId} comment={comment} />
                 ))}
+                <InfiniteScrollTrigger
+                  onIntersect={fetchNextPage}
+                  hasNextPage={hasNextPage ?? false}
+                  isFetchingNextPage={isFetchingNextPage}
+                />
               </div>
             </div>
           </div>

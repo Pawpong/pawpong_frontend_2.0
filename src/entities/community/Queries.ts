@@ -1,6 +1,6 @@
 import { createInfiniteQuery, createQuery, STALE_TIME } from '@/shared/api'
-import type { CommunityPostListParams, CommunitySortType, CommunityPetType } from '@/shared/types'
-import { getCommunityPosts, getCommunityPostDetail } from './Api'
+import type { CommunitySortType, CommunityPetType } from '@/shared/types'
+import { getCommunityPosts, getCommunityPostDetail, getCommunityComments } from './Api'
 
 export const communityQueries = {
   all: () => ['community'] as const,
@@ -21,6 +21,14 @@ export const communityQueries = {
     createQuery({
       queryKey: [...communityQueries.all(), 'detail', postId],
       queryFn: () => getCommunityPostDetail(postId),
+      enabled: !!postId,
+      staleTime: STALE_TIME.DEFAULT,
+    }),
+
+  comments: (postId: string, pageSize = 20) =>
+    createInfiniteQuery({
+      queryKey: [...communityQueries.all(), 'comments', postId, pageSize],
+      queryFn: (page) => getCommunityComments(postId, { page, pageSize }),
       enabled: !!postId,
       staleTime: STALE_TIME.DEFAULT,
     }),
