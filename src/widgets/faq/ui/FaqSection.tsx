@@ -1,31 +1,17 @@
+'use client'
+
 import { cn } from '@/shared/lib/Cn'
 import { cafe24Proup } from '@/shared/lib/fonts'
 import { Container, SectionHeader } from '@/shared/ui'
+import { useAdopterFaqs, useBreederFaqs } from '@/entities/home'
 import type { HomeUserType } from '@/shared/types'
 
 interface FaqSectionProps {
   userType?: HomeUserType
 }
 
-const FAQ_ITEMS: Record<HomeUserType, string[]> = {
-  adopter: [
-    '혹시 사기나 허위 브리더가 있을까 걱정돼요',
-    '혹시 사기나 허위 브리더가 있을까 걱정돼요',
-    '혹시 사기나 허위 브리더가 있을까 걱정돼요',
-    '혹시 사기나 허위 브리더가 있을까 걱정돼요',
-    '혹시 사기나 허위 브리더가 있을까 걱정돼요',
-  ],
-  breeder: [
-    '혹시 사기나 허위 브리더가 있을까 걱정돼요',
-    '혹시 사기나 허위 브리더가 있을까 걱정돼요',
-    '혹시 사기나 허위 브리더가 있을까 걱정돼요',
-    '혹시 사기나 허위 브리더가 있을까 걱정돼요',
-    '혹시 사기나 허위 브리더가 있을까 걱정돼요',
-  ],
-}
-
 const FaqSection = ({ userType = 'adopter' }: FaqSectionProps) => {
-  const faqItems = FAQ_ITEMS[userType]
+  const { data: faqs } = userType === 'adopter' ? useAdopterFaqs() : useBreederFaqs()
 
   return (
     <Container className="mt-[3rem] pb-[3rem]">
@@ -52,10 +38,10 @@ const FaqSection = ({ userType = 'adopter' }: FaqSectionProps) => {
         <div className="flex-1">
           <SectionHeader title="자주 묻는 질문" linkText="자세히 보기" linkHref="/faq" />
           <div className="mt-[0.721rem] grid grid-cols-1 tab:mt-[1.6525rem] tab:grid-cols-2 tab:gap-x-[2.5rem]">
-            {faqItems.map((item, i) => (
-              <div key={i} className="border-t border-[#a8a8a8] py-[0.625rem] tab:py-[1.44rem]">
+            {faqs?.map((faq) => (
+              <div key={faq.faqId} className="border-b border-[#a8a8a8] py-[0.625rem] first:border-t tab:py-[1.44rem] tab:[&:nth-child(2)]:border-t">
                 <p className="text-[0.875rem] font-semibold text-[#818181] tab:text-[1rem]">
-                  {item}
+                  {faq.question}
                 </p>
               </div>
             ))}

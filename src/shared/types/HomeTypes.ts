@@ -23,13 +23,19 @@ export interface BannerDto {
   targetAudience?: ('guest' | 'adopter' | 'breeder')[]
 }
 
+/** FAQ 카테고리 */
+export type FaqCategory = 'service' | 'adoption' | 'breeder' | 'payment' | 'etc'
+
+/** FAQ 사용자 타입 */
+export type FaqUserType = 'adopter' | 'breeder' | 'both'
+
 /** FAQ DTO */
 export interface FaqDto {
   faqId: string
   question: string
   answer: string
-  category: string
-  userType: HomeUserType
+  category: FaqCategory
+  userType: FaqUserType
   order: number
 }
 
