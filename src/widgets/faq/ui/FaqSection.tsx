@@ -39,7 +39,7 @@ const FaqSection = ({ userType = 'adopter' }: FaqSectionProps) => {
           <SectionHeader title="자주 묻는 질문" linkText="자세히 보기" linkHref="/faq" />
           <div className="mt-[0.721rem] grid grid-cols-1 tab:mt-[1.6525rem] tab:grid-cols-2 tab:gap-x-[2.5rem]">
             {faqs?.map((faq) => (
-              <div key={faq.faqId} className="border-b border-[#a8a8a8] py-[0.625rem] first:border-t tab:py-[1.44rem]">
+              <div key={faq.faqId} className="border-b border-[#a8a8a8] py-[0.625rem] first:border-t tab:py-[1.44rem] tab:[&:nth-child(2)]:border-t">
                 <p className="text-[0.875rem] font-semibold text-[#818181] tab:text-[1rem]">
                   {faq.question}
                 </p>
