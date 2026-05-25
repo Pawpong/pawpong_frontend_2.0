@@ -69,3 +69,44 @@ export interface CommunityPostListParams {
   page?: number
   pageSize?: number
 }
+
+/** 게시글 작성 요청 */
+export interface CreateCommunityPostRequest {
+  body: string
+  title?: string
+  photos?: string[]
+  petType?: CommunityPetType
+  category?: string
+}
+
+/** 게시글 수정 요청 */
+export interface UpdateCommunityPostRequest {
+  title?: string
+  body?: string
+  photos?: string[]
+  petType?: CommunityPetType
+  category?: string
+}
+
+/** 게시글 삭제 응답 */
+export interface CommunityPostDeleteResponse {
+  deleted: boolean
+}
+
+/** 게시글 북마크 응답 */
+export interface CommunityBookmarkResponse {
+  postId: string
+  saved: boolean
+}
+
+/** 게시글 북마크 취소 응답 */
+export interface CommunityUnsaveResponse {
+  postId: string
+  unsaved: boolean
+}
+
+/** 내 북마크 목록 조회 파라미터 */
+export interface CommunityBookmarkListParams {
+  page?: number
+  pageSize?: number
+}
