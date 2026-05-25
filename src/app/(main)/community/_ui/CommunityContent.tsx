@@ -5,6 +5,7 @@ import Link from 'next/link'
 import {
   Breadcrumb,
   Container,
+  InfiniteScrollTrigger,
   PageHeader,
   Separator,
   Select,
@@ -13,7 +14,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui'
-import { MOCK_COMMUNITY_POSTS, MOCK_COMMUNITY_CATEGORIES } from '@/shared/mocks/community'
+import { MOCK_COMMUNITY_CATEGORIES } from '@/shared/mocks/community'
+import { useCommunityPosts } from '@/entities/community'
 import type { CommunitySortType } from '@/shared/types'
 import { COMMUNITY_SORT_OPTIONS } from './constants'
 import { CategorySidebar } from './CategorySidebar'
@@ -23,8 +25,12 @@ const CommunityContent = () => {
   const [sort, setSort] = useState<CommunitySortType>('latest')
   const [selectedCategory, setSelectedCategory] = useState('')
 
-  // TODO: API 연동 후 useCommunityPosts(sort, undefined, selectedCategory || undefined) 로 교체
-  const posts = MOCK_COMMUNITY_POSTS
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useCommunityPosts(
+    sort,
+    undefined,
+    selectedCategory || undefined,
+  )
+  const posts = data?.pages.flatMap((page) => page.items) ?? []
 
   return (
     <div className="flex w-full flex-col">
@@ -112,6 +118,12 @@ const CommunityContent = () => {
                 </div>
               ))}
             </div>
+
+            <InfiniteScrollTrigger
+              onIntersect={fetchNextPage}
+              hasNextPage={hasNextPage ?? false}
+              isFetchingNextPage={isFetchingNextPage}
+            />
           </div>
         </div>
       </Container>

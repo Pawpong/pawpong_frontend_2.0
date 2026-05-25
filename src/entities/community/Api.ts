@@ -5,6 +5,7 @@ import type {
   CommunityPostCard,
   CommunityPostDetail,
   CommunityPostListParams,
+  CommunityComment,
 } from '@/shared/types'
 
 /** 커뮤니티 게시글 목록 조회 */
@@ -56,4 +57,20 @@ export const bookmarkCommunityPost = async (postId: string): Promise<void> => {
 export const unbookmarkCommunityPost = async (postId: string): Promise<void> => {
   const response = await apiClient.delete(`${API_VERSION}/community/posts/${postId}/bookmark`)
   unwrapVoid(response, '북마크 취소에 실패했습니다.')
+}
+
+/** 커뮤니티 게시글 댓글 목록 조회 (페이지네이션) */
+export const getCommunityComments = async (
+  postId: string,
+  params: { page?: number; pageSize?: number } = {},
+): Promise<PaginationResponse<CommunityComment>> => {
+  const query = new URLSearchParams()
+  if (params.page) query.set('page', String(params.page))
+  if (params.pageSize) query.set('pageSize', String(params.pageSize))
+
+  const response = await apiClient.get<ApiResponseFull<PaginationResponse<CommunityComment>>>(
+    `${API_VERSION}/community/posts/${postId}/comments?${query.toString()}`,
+  )
+
+  return unwrap(response, '댓글 목록 조회에 실패했습니다.')
 }

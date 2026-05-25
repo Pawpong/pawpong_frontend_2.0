@@ -12,3 +12,6 @@ export const useCommunityPosts = (
 ) => useInfiniteQuery(communityQueries.posts(sort, petType, category, pageSize))
 
 export const useCommunityPostDetail = (postId: string) => useQuery(communityQueries.detail(postId))
+
+export const useCommunityComments = (postId: string, pageSize?: number) =>
+  useInfiniteQuery(communityQueries.comments(postId, pageSize))
