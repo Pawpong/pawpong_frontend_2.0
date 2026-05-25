@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { Container } from '@/shared/ui'
-import { MOCK_BREEDER_PROFILE, MOCK_MY_HOME_POSTS } from '@/shared/mocks/myHome'
+import { MOCK_MY_HOME_POSTS } from '@/shared/mocks/myHome'
 import { createMockListings } from '@/shared/mocks/adoption'
+import { useBreederPublicProfile } from '@/entities/breeder'
 import { ProfileCard } from '../../_ui/ProfileCard'
 import { BreederListingCard } from '../../_ui/BreederListingCard'
 import { AdoptionCard } from '@/entities/adoption'
@@ -18,11 +19,14 @@ interface BreederHomeContentProps {
   userId: string
 }
 
-const BreederHomeContent = ({ userId: _userId }: BreederHomeContentProps) => {
+const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
   const [activeTab, setActiveTab] = useState('listings')
-  const profile = MOCK_BREEDER_PROFILE
+  const { data: profile } = useBreederPublicProfile(userId)
+  // TODO: 분양 개체 / 게시글 API 연결
   const listings = createMockListings()
   const posts = MOCK_MY_HOME_POSTS
+
+  if (!profile) return null
 
   return (
     <div className="flex w-full flex-col">

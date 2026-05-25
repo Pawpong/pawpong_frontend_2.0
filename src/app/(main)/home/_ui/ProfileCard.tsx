@@ -6,17 +6,17 @@ import type { AvatarItem } from '@/shared/ui'
 import Image from 'next/image'
 import { cn } from '@/shared/lib/Cn'
 import { LocationIcon } from '@/shared/assets/icons'
-import type { MyHomeProfile, BreederProfile } from '@/shared/mocks/myHome'
+import type { AdopterPublicProfile, BreederPublicProfile } from '@/shared/types'
 
 type ProfileMode = 'mine' | 'mine-breeder' | 'other' | 'breeder'
 
 interface ProfileCardBaseProps {
-  profile: MyHomeProfile
+  profile: AdopterPublicProfile
   mode?: 'mine' | 'other'
 }
 
 interface ProfileCardBreederProps {
-  profile: BreederProfile
+  profile: BreederPublicProfile
   mode: 'breeder' | 'mine-breeder'
 }
 
@@ -149,7 +149,10 @@ const ACTION_MAP = {
 const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
   const Actions = ACTION_MAP[mode]
   const isBreederProfile = mode === 'breeder' || mode === 'mine-breeder'
-  const breederLocation = isBreederProfile ? (profile as BreederProfile).location : null
+  const breederProfile = isBreederProfile ? (profile as BreederPublicProfile) : null
+  const locationText = breederProfile
+    ? `${breederProfile.businessLocation.city} ${breederProfile.businessLocation.district}`
+    : null
 
   return (
     <div className="tab:overflow-hidden tab:rounded-2xl tab:bg-surface-primary">
@@ -163,22 +166,16 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
                 브리더
               </Badge>
             )}
-            {profile.badges.map((badge) => (
-              <Badge
-                key={badge}
-                variant="outline"
-                className="h-6 text-xs leading-[1.375rem] tab:text-sm"
-              >
-                {badge}
-              </Badge>
-            ))}
+            <Badge variant="outline" className="h-6 text-xs leading-[1.375rem] tab:text-sm">
+              {profile.bpm} BPM
+            </Badge>
           </div>
           <p className="text-base font-bold text-text-primary tab:mt-[0.804rem] tab:text-2xl tab:leading-[1.375rem] tab:font-semibold">
             {profile.nickname}
           </p>
           {/* Location — breeder, mobile only */}
-          {isBreederProfile && (
-            <LocationInfo location={breederLocation!} className="mt-1 tab:hidden" />
+          {locationText && (
+            <LocationInfo location={locationText} className="mt-1 tab:hidden" />
           )}
           <Bio text={profile.bio} className="mt-3 hidden max-w-[26.1rem] tab:block" />
         </div>
@@ -191,8 +188,8 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
         {/* Section 3: Avatar */}
         <div className="shrink-0">
           <Avatar size="lg" className="size-[4.0625rem] tab:h-[7.3125rem] tab:w-[7.4375rem]">
-            {profile.avatarUrl ? (
-              <AvatarImage src={profile.avatarUrl} alt={profile.nickname} />
+            {profile.profileImageUrl ? (
+              <AvatarImage src={profile.profileImageUrl} alt={profile.nickname} />
             ) : (
               <AvatarFallback className="bg-fill-muted" />
             )}
@@ -211,8 +208,8 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
       />
 
       {/* Location — breeder, desktop only */}
-      {isBreederProfile && (
-        <LocationInfo location={breederLocation!} className="hidden py-2 tab:flex tab:px-10" />
+      {locationText && (
+        <LocationInfo location={locationText} className="hidden py-2 tab:flex tab:px-10" />
       )}
 
       {/* Separator — desktop only */}

@@ -4,6 +4,9 @@ import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
 import { breederQueries } from './Queries'
 import type { SearchBreederParams } from '@/shared/types'
 
+export const useBreederPublicProfile = (breederId: string) =>
+  useQuery(breederQueries.publicProfile(breederId))
+
 export const useBreederProfile = (breederId: string) => useQuery(breederQueries.profile(breederId))
 
 export const useMyBreederProfile = () => useQuery(breederQueries.myProfile())

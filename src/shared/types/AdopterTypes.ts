@@ -21,6 +21,17 @@ export interface AdopterProfileDto {
   updatedAt: string
 }
 
+/** 입양자 공개 프로필 (유저홈) */
+export interface AdopterPublicProfile {
+  userId: string
+  nickname: string
+  profileImageUrl?: string
+  bio: string
+  bpm: number
+  followerCount: number
+  isFollowing: boolean
+}
+
 export interface AdopterProfileUpdateRequest {
   name?: string
   phone?: string

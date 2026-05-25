@@ -8,6 +8,7 @@ import type {
   ReceivedApplicationItemDto,
 } from '@/shared/types'
 import {
+  getBreederPublicProfile,
   getBreederProfile,
   getMyBreederProfile,
   getBreederDashboard,
@@ -24,6 +25,14 @@ import {
 
 export const breederQueries = {
   all: () => ['breeder'] as const,
+
+  publicProfile: (breederId: string) =>
+    createQuery({
+      queryKey: [...breederQueries.all(), 'public-profile', breederId],
+      queryFn: () => getBreederPublicProfile(breederId),
+      enabled: !!breederId,
+      staleTime: STALE_TIME.VERY_LONG,
+    }),
 
   profile: (breederId: string) =>
     createQuery({
