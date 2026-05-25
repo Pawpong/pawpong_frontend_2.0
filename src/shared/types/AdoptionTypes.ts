@@ -177,6 +177,25 @@ export interface AdoptionAdoptedParams {
   pageSize?: number
 }
 
+// ==================== v2 입양 신청 ====================
+
+/** v2 입양 신청서 제출 요청 */
+export interface CreateAdoptionApplicationRequest {
+  petId: string
+  adoptionPlan: string
+  familyMembers: string
+  privacyConsent: boolean
+  basicCareConsent: boolean
+  emergencyCareConsent: boolean
+  allFamilyConsent: boolean
+}
+
+/** v2 입양 신청서 제출 응답 */
+export interface CreateAdoptionApplicationResponse {
+  applicationId: string
+  status: string
+}
+
 // ==================== v2 입양 API 타입 ====================
 
 /** v2 정렬 기준 */
