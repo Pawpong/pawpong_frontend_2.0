@@ -150,6 +150,33 @@ export interface AdoptionDetailDto {
   otherListings: AdoptionListingCard[]
 }
 
+// ==================== v2 입양 API 타입 (인증) ====================
+
+/** v2 관심 등록/해제 응답 */
+export interface AdoptionFavoriteResponse {
+  petId: string
+  favoriteCount: number
+  success: boolean
+}
+
+/** v2 내가 입양한 동물 카드 (adoptedAt 추가) */
+export interface AdoptedPetCard extends AdoptionPetCard {
+  adoptedAt: string
+}
+
+/** v2 관심 목록 파라미터 */
+export interface AdoptionFavoritesParams {
+  status?: PetStatus
+  page?: number
+  pageSize?: number
+}
+
+/** v2 입양 완료 목록 파라미터 */
+export interface AdoptionAdoptedParams {
+  page?: number
+  pageSize?: number
+}
+
 // ==================== v2 입양 API 타입 ====================
 
 /** v2 정렬 기준 */

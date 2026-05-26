@@ -23,3 +23,9 @@ export const usePopularAdoptions = (petType?: CommunityPetType, limit?: number) 
 
 export const useAdoptionDetail = (petId: string) =>
   useQuery(adoptionQueries.detail(petId))
+
+export const useMyFavoriteAdoptions = (status?: PetStatus, pageSize?: number) =>
+  useInfiniteQuery(adoptionQueries.myFavorites(status, pageSize))
+
+export const useMyAdoptedPets = (pageSize?: number) =>
+  useInfiniteQuery(adoptionQueries.myAdopted(pageSize))

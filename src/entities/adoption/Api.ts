@@ -6,6 +6,10 @@ import type {
   AdoptionPetDetail,
   AdoptionListParams,
   AdoptionPopularParams,
+  AdoptionFavoriteResponse,
+  AdoptionFavoritesParams,
+  AdoptionAdoptedParams,
+  AdoptedPetCard,
 } from '@/shared/types'
 
 /** 입양 동물 목록 조회 */
@@ -48,4 +52,49 @@ export const getAdoptionDetail = async (petId: string): Promise<AdoptionPetDetai
     `${API_VERSION}/adoption/${petId}`,
   )
   return unwrap(response, '입양 동물 상세 조회에 실패했습니다.')
+}
+
+/** 동물 관심 등록 */
+export const addAdoptionFavorite = async (petId: string): Promise<AdoptionFavoriteResponse> => {
+  const response = await apiClient.post<ApiResponseFull<AdoptionFavoriteResponse>>(
+    `${API_VERSION}/adoption/${petId}/favorite`,
+  )
+  return unwrap(response, '관심 동물 등록에 실패했습니다.')
+}
+
+/** 동물 관심 해제 */
+export const removeAdoptionFavorite = async (petId: string): Promise<AdoptionFavoriteResponse> => {
+  const response = await apiClient.delete<ApiResponseFull<AdoptionFavoriteResponse>>(
+    `${API_VERSION}/adoption/${petId}/favorite`,
+  )
+  return unwrap(response, '관심 동물 해제에 실패했습니다.')
+}
+
+/** 입양 관심 목록 조회 */
+export const getMyFavoriteAdoptions = async (
+  params: AdoptionFavoritesParams = {},
+): Promise<PaginationResponse<AdoptionPetCard>> => {
+  const query = new URLSearchParams()
+  if (params.status) query.set('status', params.status)
+  if (params.page) query.set('page', String(params.page))
+  if (params.pageSize) query.set('pageSize', String(params.pageSize))
+
+  const response = await apiClient.get<ApiResponseFull<PaginationResponse<AdoptionPetCard>>>(
+    `${API_VERSION}/adoption/me/favorites?${query.toString()}`,
+  )
+  return unwrap(response, '관심 목록 조회에 실패했습니다.')
+}
+
+/** 내가 입양한 목록 조회 */
+export const getMyAdoptedPets = async (
+  params: AdoptionAdoptedParams = {},
+): Promise<PaginationResponse<AdoptedPetCard>> => {
+  const query = new URLSearchParams()
+  if (params.page) query.set('page', String(params.page))
+  if (params.pageSize) query.set('pageSize', String(params.pageSize))
+
+  const response = await apiClient.get<ApiResponseFull<PaginationResponse<AdoptedPetCard>>>(
+    `${API_VERSION}/adoption/me/adopted?${query.toString()}`,
+  )
+  return unwrap(response, '입양 완료 목록 조회에 실패했습니다.')
 }
