@@ -21,7 +21,7 @@ const RankingCard = ({ entry, onImageClick }: RankingCardProps) => {
           onClick={onImageClick}
           className="relative size-[6.25rem] shrink-0 overflow-hidden rounded-[0.375rem]"
         >
-          <Image src={entry.imageUrl} alt={entry.description} fill className="object-cover" />
+          <Image src={entry.photoUrl} alt={entry.description} fill className="object-cover" />
           {/* 랭킹 뱃지 */}
           {entry.rank && (
             <RankBadgeIcon
@@ -38,9 +38,9 @@ const RankingCard = ({ entry, onImageClick }: RankingCardProps) => {
           </p>
           <div className="flex items-center gap-1.5">
             <Avatar size="xs">
-              <AvatarFallback>{entry.participant.name.charAt(0)}</AvatarFallback>
+              <AvatarFallback>{entry.userDisplayName.charAt(0)}</AvatarFallback>
             </Avatar>
-            <span className="text-xs font-bold text-text-primary">{entry.participant.name}</span>
+            <span className="text-xs font-bold text-text-primary">{entry.userDisplayName}</span>
           </div>
         </div>
       </div>
@@ -48,7 +48,7 @@ const RankingCard = ({ entry, onImageClick }: RankingCardProps) => {
       {/* PC: 세로형 카드 */}
       <div className="relative hidden overflow-hidden rounded-2xl bg-[#e7e7e7] tab:block">
         <button type="button" onClick={onImageClick} className="relative aspect-[4/3] w-full">
-          <Image src={entry.imageUrl} alt={entry.description} fill className="object-cover" />
+          <Image src={entry.photoUrl} alt={entry.description} fill className="object-cover" />
         </button>
 
         {/* 랭킹 뱃지 */}
@@ -66,9 +66,9 @@ const RankingCard = ({ entry, onImageClick }: RankingCardProps) => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Avatar size="sm">
-                <AvatarFallback>{entry.participant.name.charAt(0)}</AvatarFallback>
+                <AvatarFallback>{entry.userDisplayName.charAt(0)}</AvatarFallback>
               </Avatar>
-              <span className="text-sm font-bold text-text-primary">{entry.participant.name}</span>
+              <span className="text-sm font-bold text-text-primary">{entry.userDisplayName}</span>
             </div>
             <span className="text-sm font-bold text-[#959595]">{`홈가기 >`}</span>
           </div>

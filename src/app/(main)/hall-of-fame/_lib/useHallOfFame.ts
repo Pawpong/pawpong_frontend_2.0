@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { ContestEntry } from '@/shared/types'
 import { RANKING_PERIOD_CONFIG, type RankingPeriod } from './constants'
 
-const useHallOfFame = () => {
+const useHallOfFameUI = () => {
   const [isRankingOpen, setIsRankingOpen] = useState(true)
   const [isVoteOpen, setIsVoteOpen] = useState(true)
   const [rankingPeriod, setRankingPeriod] = useState<RankingPeriod>('current')
@@ -19,6 +19,7 @@ const useHallOfFame = () => {
   return {
     isRankingOpen,
     isVoteOpen,
+    rankingPeriod,
     periodConfig,
     selectedEntry,
     toggleRanking,
@@ -29,4 +30,4 @@ const useHallOfFame = () => {
   }
 }
 
-export { useHallOfFame }
+export { useHallOfFameUI }
