@@ -1,18 +1,34 @@
 'use client'
 
+import Image from 'next/image'
+import { cafe24Proup } from '@/shared/lib/fonts'
+import { cn } from '@/shared/lib/Cn'
+
 interface UserTypeCardProps {
   label: string
+  imageSrc: string
+  textColor: string
+  selected?: boolean
   onClick: () => void
 }
 
-const UserTypeCard = ({ label, onClick }: UserTypeCardProps) => {
+const UserTypeCard = ({ label, imageSrc, textColor, selected, onClick }: UserTypeCardProps) => {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="flex h-[13.8125rem] w-[14.9375rem] items-center justify-center rounded-[0.5625rem] bg-[#d9d9d9] transition-colors hover:bg-[#cecece] tab:h-[17.38rem] tab:w-[18.765rem] tab:rounded-[0.715rem]"
+      className={`relative flex h-[10rem] w-[12rem] items-center justify-center transition-transform hover:scale-105 tab:h-[13.375rem] tab:w-[15.656rem] ${selected ? 'scale-105' : ''}`}
     >
-      <span className="text-[1.4375rem] font-bold text-black tab:text-[1.787rem]">{label}</span>
+      <Image src={imageSrc} alt="" fill className="object-contain" priority />
+      <span
+        className={cn(
+          cafe24Proup.className,
+          `relative z-10 font-cafe24 text-[1.5rem] font-bold leading-[1.5] tab:text-[2.5rem]`,
+          textColor,
+        )}
+      >
+        {label}
+      </span>
     </button>
   )
 }
