@@ -2,6 +2,20 @@ import { forwardRef } from 'react'
 import { cn } from '@/shared/lib/Cn'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui'
 
+interface StepFieldLabelProps {
+  label: string
+  required?: boolean
+}
+
+const StepFieldLabel = ({ label, required }: StepFieldLabelProps) => (
+  <div className="mb-[0.125rem] flex items-center gap-1">
+    <span className="text-[0.875rem] font-semibold leading-[1.5] text-[#3e3e3e]">{label}</span>
+    {required && (
+      <span className="text-[0.875rem] font-medium leading-[1.5] text-[#6b6b6b]">필수</span>
+    )}
+  </div>
+)
+
 type StepInputProps = React.InputHTMLAttributes<HTMLInputElement>
 
 const StepInput = forwardRef<HTMLInputElement, StepInputProps>(({ className, ...props }, ref) => (
@@ -9,7 +23,7 @@ const StepInput = forwardRef<HTMLInputElement, StepInputProps>(({ className, ...
     ref={ref}
     {...props}
     className={cn(
-      'h-[2.5rem] w-full rounded-[0.375rem] border border-[#a8a8a8] bg-white p-[0.625rem] text-[0.875rem] leading-[1.375rem] font-medium text-[#333] outline-none placeholder:text-[#5d5d5d] tab:h-[3.25rem] tab:rounded-[1rem] tab:px-[1.25rem] tab:py-[0.9375rem] tab:text-[1rem]',
+      'h-[2.5rem] w-full rounded-lg border border-[#e4e4e4] bg-white px-3 text-[0.875rem] font-medium leading-[1.5] text-[#3e3e3e] outline-none placeholder:text-[#a6a6a6] tab:h-[2.8125rem]',
       className,
     )}
   />
@@ -24,7 +38,7 @@ const StepTextarea = forwardRef<HTMLTextAreaElement, StepTextareaProps>(
       ref={ref}
       {...props}
       className={cn(
-        'h-[4.5rem] w-full resize-none rounded-[0.375rem] border border-[#a8a8a8] bg-white p-[0.625rem] text-[0.875rem] leading-[1.375rem] font-medium text-[#333] outline-none placeholder:text-[#5d5d5d] tab:h-[7.8125rem] tab:rounded-[1rem] tab:px-[1.25rem] tab:py-[0.9375rem] tab:text-[1rem]',
+        'h-[4.5rem] w-full resize-none rounded-lg border border-[#e4e4e4] bg-white px-3 py-3 text-[0.875rem] font-medium leading-[1.5] text-[#3e3e3e] outline-none placeholder:text-[#a6a6a6] tab:h-[7.8125rem]',
         className,
       )}
     />
@@ -41,7 +55,7 @@ const StepActionButton = ({
     type="button"
     {...props}
     className={cn(
-      'h-[2.5rem] shrink-0 rounded-[0.375rem] bg-[#a8a8a8] p-[0.625rem] text-[0.875rem] font-medium text-white tab:h-[3rem] tab:w-[12.5625rem] tab:rounded-full tab:bg-[#d4d4d4] tab:px-[0.625rem] tab:text-[1rem] tab:font-semibold tab:text-[#5d5d5d]',
+      'h-10 shrink-0 rounded-lg bg-[#3e3e3e] px-2 text-base font-semibold text-[#f6f6f6] tab:w-[6.25rem]',
       className,
     )}
   >
@@ -61,7 +75,7 @@ const StepSelect = ({ value, onValueChange, options, placeholder, className }: S
   <Select value={value} onValueChange={onValueChange}>
     <SelectTrigger
       className={cn(
-        'h-[2.5rem] w-full rounded-[0.375rem] border border-[#a8a8a8] bg-white px-[0.625rem] text-[0.875rem] leading-[1.375rem] font-medium text-[#5d5d5d] shadow-none ring-0 ring-offset-0 focus:ring-0 focus:ring-offset-0 tab:h-[3.25rem] tab:rounded-[1rem] tab:px-[1.25rem] tab:py-[0.9375rem] tab:text-[1rem]',
+        'h-[2.5rem] w-full rounded-lg border border-[#e4e4e4] bg-white px-3 text-[0.875rem] font-medium leading-[1.5] text-[#3e3e3e] shadow-none ring-0 ring-offset-0 focus:ring-0 focus:ring-offset-0 tab:h-[2.8125rem]',
         className,
       )}
     >
@@ -77,4 +91,4 @@ const StepSelect = ({ value, onValueChange, options, placeholder, className }: S
   </Select>
 )
 
-export { StepInput, StepTextarea, StepActionButton, StepSelect }
+export { StepFieldLabel, StepInput, StepTextarea, StepActionButton, StepSelect }
