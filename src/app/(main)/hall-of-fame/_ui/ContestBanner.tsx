@@ -30,12 +30,12 @@ const ContestBanner = ({ contest, userType }: ContestBannerProps) => {
         <p className="text-sm font-bold text-[#999] tab:text-xl tab:leading-[1.4] tab:font-semibold">
           이번주 참여자 : {contest.participantCount}명
         </p>
-        <p className="text-xs font-medium text-[#999] tab:hidden">참여 혜택</p>
+        <p className="text-xs font-medium text-[#999] tab:hidden">{contest.benefitText}</p>
       </div>
 
       {/* 참여 혜택 - PC 우측 상단 */}
       <p className="absolute top-6 right-6 hidden text-sm font-semibold text-[#999] tab:block">
-        참여 혜택
+        {contest.benefitText}
       </p>
 
       {/* 콘테스트 참여하기 버튼 */}

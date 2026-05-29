@@ -12,7 +12,7 @@ const EntryImage = ({ entry, className }: EntryImageProps) => (
   <div className={`relative flex flex-col items-center justify-center ${className ?? ''}`}>
     <div className="w-[20.9375rem] overflow-hidden rounded-[1.1rem] bg-[#c6c6c6] tab:w-full tab:max-w-[27.875rem]">
       <Image
-        src={entry.imageUrl}
+        src={entry.photoUrl}
         alt={entry.description}
         width={446}
         height={450}
@@ -21,7 +21,7 @@ const EntryImage = ({ entry, className }: EntryImageProps) => (
     </div>
     <div className="absolute right-5 bottom-4 flex flex-col items-end tab:right-6">
       <span className="text-base font-semibold text-white tab:text-xl">
-        {entry.participant.name}
+        {entry.userDisplayName}
       </span>
       <button
         type="button"

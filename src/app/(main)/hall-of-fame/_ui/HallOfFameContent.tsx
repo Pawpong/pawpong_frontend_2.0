@@ -1,12 +1,9 @@
 'use client'
 
+import { useMemo } from 'react'
 import { Container, PageHeader, SectionHeader } from '@/shared/ui'
-import {
-  MOCK_CONTEST_INFO,
-  MOCK_RANKING_ENTRIES,
-  MOCK_VOTE_ENTRIES,
-} from '@/shared/mocks/hallOfFame'
-import { useHallOfFame } from '../_lib/useHallOfFame'
+import { useCurrentContest, useContestEntries, usePreviousRanking } from '@/entities/contest'
+import { useHallOfFameUI } from '../_lib/useHallOfFame'
 import { ContestBanner } from './ContestBanner'
 import { EntryDetailModal } from './EntryDetailModal'
 import { RankingCard } from './RankingCard'
@@ -16,6 +13,7 @@ const HallOfFameContent = () => {
   const {
     isRankingOpen,
     isVoteOpen,
+    rankingPeriod,
     periodConfig,
     selectedEntry,
     toggleRanking,
@@ -23,7 +21,32 @@ const HallOfFameContent = () => {
     switchPeriod,
     selectEntry,
     closeModal,
-  } = useHallOfFame()
+  } = useHallOfFameUI()
+
+  const { data: currentContest } = useCurrentContest()
+  const { data: entriesData, fetchNextPage, hasNextPage } = useContestEntries()
+  const { data: previousRanking } = usePreviousRanking()
+
+  const ranking =
+    rankingPeriod === 'current'
+      ? (currentContest?.ranking ?? [])
+      : (previousRanking?.ranking ?? [])
+
+  const rankingDateRange = useMemo(() => {
+    const contest =
+      rankingPeriod === 'current' ? currentContest?.contest : previousRanking?.contest
+    if (!contest) return ''
+    const start = new Date(contest.startDate)
+    const end = new Date(contest.endDate)
+    return `${start.getMonth() + 1}.${start.getDate()} ~ ${end.getMonth() + 1}.${end.getDate()}`
+  }, [rankingPeriod, currentContest, previousRanking])
+
+  const entries = useMemo(
+    () => entriesData?.pages.flatMap((page) => page.items) ?? [],
+    [entriesData],
+  )
+
+  if (!currentContest) return null
 
   return (
     <div className="flex w-full flex-col pb-12">
@@ -31,7 +54,7 @@ const HallOfFameContent = () => {
 
       {/* Contest Banner */}
       <Container className="mt-2 tab:mt-6 pc:px-[12.25rem]">
-        <ContestBanner contest={MOCK_CONTEST_INFO} userType="adopter" />
+        <ContestBanner contest={currentContest.contest} userType="adopter" />
       </Container>
 
       {/* Ranking Section */}
@@ -39,7 +62,7 @@ const HallOfFameContent = () => {
         <div className="flex flex-col gap-3 tab:gap-5">
           <SectionHeader
             title={periodConfig.title}
-            subtitle={MOCK_CONTEST_INFO.dateRange}
+            subtitle={rankingDateRange}
             collapsible
             collapsed={!isRankingOpen}
             onToggle={toggleRanking}
@@ -58,9 +81,9 @@ const HallOfFameContent = () => {
 
           {isRankingOpen && (
             <div className="flex flex-col gap-3 tab:grid tab:grid-cols-3 tab:gap-5">
-              {MOCK_RANKING_ENTRIES.map((entry) => (
+              {ranking.map((entry) => (
                 <RankingCard
-                  key={entry.entryId}
+                  key={entry.id}
                   entry={entry}
                   onImageClick={() => selectEntry(entry)}
                 />
@@ -81,15 +104,26 @@ const HallOfFameContent = () => {
           />
 
           {isVoteOpen && (
-            <div className="grid grid-cols-2 gap-4 tab:grid-cols-3 tab:gap-5">
-              {MOCK_VOTE_ENTRIES.map((entry) => (
-                <VoteCard
-                  key={entry.entryId}
-                  entry={entry}
-                  onImageClick={() => selectEntry(entry)}
-                />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-2 gap-4 tab:grid-cols-3 tab:gap-5">
+                {entries.map((entry) => (
+                  <VoteCard
+                    key={entry.id}
+                    entry={entry}
+                    onImageClick={() => selectEntry(entry)}
+                  />
+                ))}
+              </div>
+              {hasNextPage && (
+                <button
+                  type="button"
+                  onClick={() => fetchNextPage()}
+                  className="mx-auto mt-4 flex h-10 items-center justify-center rounded-full bg-[#e7e7e7] px-8"
+                >
+                  <span className="text-sm font-semibold text-[#5d5d5d]">더보기</span>
+                </button>
+              )}
+            </>
           )}
         </div>
       </Container>

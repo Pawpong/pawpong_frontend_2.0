@@ -18,7 +18,7 @@ const VoteCard = ({ entry, onImageClick }: VoteCardProps) => {
         onClick={onImageClick}
         className="relative aspect-square w-full overflow-hidden rounded-[0.375rem] tab:aspect-[4/3] tab:rounded-none"
       >
-        <Image src={entry.imageUrl} alt={entry.description} fill className="object-cover" />
+        <Image src={entry.photoUrl} alt={entry.description} fill className="object-cover" />
       </button>
 
       {/* 설명 */}
@@ -38,7 +38,7 @@ const VoteCard = ({ entry, onImageClick }: VoteCardProps) => {
           </span>
         </button>
         <VoteButton
-          isVoted={entry.isVoted}
+          isVoted={entry.hasVoted}
           voteCount={entry.voteCount}
           label="투표"
           className="h-10 w-full px-[0.875rem]"
@@ -48,7 +48,7 @@ const VoteCard = ({ entry, onImageClick }: VoteCardProps) => {
       {/* PC: 투표하기 버튼 */}
       <div className="hidden justify-center tab:mt-[1.875rem] tab:flex tab:px-5 tab:pb-5">
         <VoteButton
-          isVoted={entry.isVoted}
+          isVoted={entry.hasVoted}
           voteCount={entry.voteCount}
           label="투표하기"
           className="w-[13.625rem]"
