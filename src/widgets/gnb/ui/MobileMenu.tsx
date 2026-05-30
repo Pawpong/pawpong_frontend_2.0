@@ -25,8 +25,26 @@ const MobileMenu = ({ onClose }: MobileMenuProps) => {
         </button>
       </div>
 
+      {/* 로그인/회원가입 */}
+      <div className="flex gap-3 px-[2.701rem] pt-[2.438rem]">
+        <Link
+          href="/login"
+          onClick={onClose}
+          className="flex-1 rounded-full border border-[#a8a8a8] py-3 text-center text-base font-medium text-[#666]"
+        >
+          로그인
+        </Link>
+        <Link
+          href="/signup"
+          onClick={onClose}
+          className="flex-1 rounded-full bg-[#fffa94] py-3 text-center text-base font-semibold text-[#3e3e3e]"
+        >
+          회원가입
+        </Link>
+      </div>
+
       {/* 메뉴 항목 */}
-      <nav className="flex flex-col px-[2.701rem] pt-[2.438rem]">
+      <nav className="flex flex-col px-[2.701rem] pt-[1.5rem]">
         {MOBILE_MENU_ITEMS.map((item) => (
           <Link
             key={item.href}
