@@ -1,14 +1,10 @@
 'use client'
 
-import { useForm, Controller } from 'react-hook-form'
-// import { zodResolver } from '@hookform/resolvers/zod'
+import { Controller } from 'react-hook-form'
 import { cn } from '@/shared/lib/Cn'
-import { useOnboarding } from '../model/OnboardingContext'
+import { useStepForm } from '../model/useStepForm'
 import { type AnimalSelectFormData, ANIMAL_TYPES } from '../model/schema'
-import { StepLayout } from './StepLayout'
-import { StepTitle } from './StepTitle'
-import { StepIndicator } from './StepIndicator'
-import { StepNavButtons } from './StepNavButtons'
+import { StepContainer } from './StepContainer'
 
 const ANIMAL_OPTIONS = [
   { id: 'cat', label: '고양이' },
@@ -17,30 +13,21 @@ const ANIMAL_OPTIONS = [
 ] as const
 
 const AnimalSelectStep = () => {
-  const { goNext, formData, setFormData } = useOnboarding()
-
-  const { control, handleSubmit, watch } = useForm<AnimalSelectFormData>({
-    // resolver: zodResolver(animalSelectSchema),
-    defaultValues: (formData['animal-select'] as AnimalSelectFormData) ?? {
+  const { control, handleSubmit, watch, onSubmit } =
+    useStepForm<AnimalSelectFormData>('animal-select', {
       selected: undefined as unknown as (typeof ANIMAL_TYPES)[number],
-    },
-  })
+    })
 
   const selected = watch('selected')
 
-  const onSubmit = (data: AnimalSelectFormData) => {
-    setFormData('animal-select', data as unknown as Record<string, unknown>)
-    goNext()
-  }
-
   return (
-    <StepLayout className="min-h-[calc(100dvh-3rem)] pb-0 tab:min-h-0">
-      <StepTitle>어떤 동물을 브리딩 하시나요?</StepTitle>
-
-      <div className="mt-[1.125rem] tab:mt-[2.09rem]">
-        <StepIndicator />
-      </div>
-
+    <StepContainer
+      title="어떤 동물을 브리딩 하시나요?"
+      onNext={() => handleSubmit(onSubmit)()}
+      nextDisabled={!selected}
+      layoutClassName="min-h-[calc(100dvh-3rem)] pb-0 tab:min-h-0"
+      navClassName="static right-auto bottom-auto left-auto z-auto tab:mt-[4rem]"
+    >
       {/* 동물 선택 카드 */}
       <Controller
         name="selected"
@@ -68,13 +55,7 @@ const AnimalSelectStep = () => {
 
       {/* 스페이서 (mo) */}
       <div className="flex-1 tab:hidden" />
-
-      <StepNavButtons
-        onNext={() => handleSubmit(onSubmit)()}
-        nextDisabled={!selected}
-        className="static right-auto bottom-auto left-auto z-auto tab:mt-[4rem]"
-      />
-    </StepLayout>
+    </StepContainer>
   )
 }
 

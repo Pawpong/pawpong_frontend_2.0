@@ -1,16 +1,13 @@
 'use client'
 
-import { useForm, Controller } from 'react-hook-form'
-// import { zodResolver } from '@hookform/resolvers/zod'
-import { ImageIcon } from '@/shared/assets/icons'
+import { Controller } from 'react-hook-form'
 import { useOnboarding } from '../model/OnboardingContext'
+import { useStepForm } from '../model/useStepForm'
 import { type InfoFormData } from '../model/schema'
-import { StepLayout } from './StepLayout'
-import { StepTitle } from './StepTitle'
-import { StepIndicator } from './StepIndicator'
+import { StepContainer } from './StepContainer'
 import { StepInput, StepActionButton } from './StepInput'
-import { StepNavButtons } from './StepNavButtons'
 import { ChipSelect } from './ChipSelect'
+import { ProfileImageUpload } from './ProfileImageUpload'
 
 const SAMPLE_KEYWORDS = [
   '비숑',
@@ -37,38 +34,22 @@ const SAMPLE_KEYWORDS = [
 ]
 
 const InfoStep = () => {
-  const { goNext, goBack, formData, setFormData } = useOnboarding()
+  const { goBack } = useOnboarding()
 
-  const { register, control, handleSubmit } = useForm<InfoFormData>({
-    // resolver: zodResolver(infoSchema),
-    defaultValues: (formData.info as InfoFormData) ?? {
+  const { register, control, handleSubmit, onSubmit } =
+    useStepForm<InfoFormData>('info', {
       nickname: '',
       selectedKeywords: [],
-    },
-  })
-
-  const onSubmit = (data: InfoFormData) => {
-    setFormData('info', data as unknown as Record<string, unknown>)
-    goNext()
-  }
+    })
 
   return (
-    <StepLayout>
-      <StepTitle>회원 정보를 입력해주세요</StepTitle>
-
-      <div className="mt-[1.125rem] tab:mt-[2.09rem]">
-        <StepIndicator />
-      </div>
-
-      {/* 프로필 이미지 */}
-      <div className="mt-[2.09rem] tab:mt-[6.343rem]">
-        <button
-          type="button"
-          className="flex h-[8.9375rem] w-[9.1875rem] items-center justify-center rounded-full bg-[#d4d4d4]"
-        >
-          <ImageIcon className="size-[3.5rem] text-white" />
-        </button>
-      </div>
+    <StepContainer
+      title="회원 정보를 입력해주세요"
+      onNext={() => handleSubmit(onSubmit)()}
+      onBack={goBack}
+      navClassName="tab:mt-[9.9375rem]"
+    >
+      <ProfileImageUpload />
 
       {/* 폼 영역 */}
       <div className="mt-[2.04rem] flex w-full flex-col px-[1.25rem] tab:mt-[3.0625rem] tab:w-[59.4375rem] tab:px-0">
@@ -104,13 +85,7 @@ const InfoStep = () => {
           />
         </div>
       </div>
-
-      <StepNavButtons
-        onNext={() => handleSubmit(onSubmit)()}
-        onBack={goBack}
-        className="tab:mt-[9.9375rem]"
-      />
-    </StepLayout>
+    </StepContainer>
   )
 }
 
