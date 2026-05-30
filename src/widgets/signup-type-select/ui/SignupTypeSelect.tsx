@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { cafe24Proup } from '@/shared/lib/fonts'
 import { cn } from '@/shared/lib/Cn'
 import { StepLayout } from '@/features/onboarding/ui/StepLayout'
+import { StepNavButtons } from '@/features/onboarding/ui/StepNavButtons'
 import { UserTypeCard } from './UserTypeCard'
 
 const USER_TYPE_OPTIONS = [
@@ -60,23 +61,11 @@ const SignupTypeSelect = () => {
         ))}
       </div>
 
-      <div className="flex w-full flex-col items-center gap-5 py-8">
-        <button
-          type="button"
-          onClick={handleNext}
-          disabled={!selected}
-          className="h-12 w-[16.125rem] rounded-full bg-[#fffa94] text-base font-semibold text-[#3e3e3e] transition-colors disabled:opacity-40"
-        >
-          다음
-        </button>
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="text-base font-medium text-[#3e3e3e]"
-        >
-          뒤로
-        </button>
-      </div>
+      <StepNavButtons
+        onNext={handleNext}
+        onBack={() => router.back()}
+        nextDisabled={!selected}
+      />
     </StepLayout>
   )
 }

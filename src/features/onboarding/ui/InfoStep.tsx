@@ -48,7 +48,7 @@ const InfoStep = () => {
       onNext={() => handleSubmit(onSubmit)()}
       onBack={goBack}
     >
-      <div className="mt-[2rem] flex w-full flex-col items-center gap-[2rem] px-5 tab:mt-[3.625rem] tab:max-w-[40.625rem] tab:gap-[3.625rem] tab:px-0">
+      <>
         <ProfileImageUpload />
 
         {/* 닉네임 + 중복검사 */}
@@ -82,7 +82,7 @@ const InfoStep = () => {
             )}
           />
         </div>
-      </div>
+      </>
     </StepContainer>
   )
 }

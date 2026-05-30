@@ -12,8 +12,8 @@ const StepProgressBar = () => {
   const progressPercent = Math.round(((currentStepIndex + 1) / (visibleSteps.length + 1)) * 100)
 
   return (
-    <div className="flex w-full items-center justify-center bg-white px-4 py-1 tab:px-20 tab:py-2">
-      <div className="flex items-center gap-[0.125rem]">
+    <div className="flex w-full items-center justify-center bg-white px-4 py-1 tab:px-12 pc:px-20 tab:py-2">
+      <div className="flex w-full items-center justify-center gap-[0.125rem]">
         <div
           className={cn(
             cafe24Proup.className,
@@ -29,7 +29,7 @@ const StepProgressBar = () => {
             alt={`진행률 ${progressPercent}%`}
             width={558}
             height={26}
-            className="h-[1rem] w-[12rem] tab:h-[1.644rem] tab:w-[34.846rem]"
+            className="h-[0.829rem] w-full max-w-[17.562rem] tab:h-[1.644rem] tab:max-w-[34.846rem]"
             priority
           />
         </div>

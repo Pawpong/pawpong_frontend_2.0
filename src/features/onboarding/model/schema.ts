@@ -63,7 +63,6 @@ export const surveySchema = z.object({
     .min(1, { error: '휴대폰번호를 입력해주세요' })
     .regex(PHONE_REGEX, { error: '올바른 휴대폰번호를 입력해주세요' }),
   email: z.string().min(1, { error: '이메일을 입력해주세요' }),
-  emailDomain: z.enum(EMAIL_DOMAINS),
   selfIntro: z.string().min(1, { error: '자기소개를 입력해주세요' }),
   awayTime: z.string().min(1, { error: '집을 비우는 시간을 입력해주세요' }),
   livingSpace: z.string().min(1, { error: '생활 공간을 소개해주세요' }),

@@ -21,7 +21,7 @@ const StepNavButtons = ({
 }: StepNavButtonsProps) => (
   <div
     className={cn(
-      'fixed right-0 bottom-0 left-0 z-10 flex flex-col items-center gap-3 bg-white px-4 py-4 tab:static tab:right-auto tab:bottom-auto tab:left-auto tab:z-auto tab:px-20 tab:py-4',
+      'fixed right-0 bottom-0 left-0 z-10 flex flex-col items-center gap-3 bg-white px-4 py-4 tab:static tab:right-auto tab:bottom-auto tab:left-auto tab:z-auto tab:gap-5 tab:px-12 pc:px-20 tab:py-8',
       className,
     )}
   >
