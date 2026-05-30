@@ -121,7 +121,7 @@ const ProfileStep = () => {
                   3:00
                 </span>
               </div>
-              <StepActionButton>확인</StepActionButton>
+              <StepActionButton disabled>확인</StepActionButton>
             </div>
           </div>
         </div>

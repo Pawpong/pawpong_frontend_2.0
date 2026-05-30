@@ -23,7 +23,7 @@ const StepInput = forwardRef<HTMLInputElement, StepInputProps>(({ className, ...
     ref={ref}
     {...props}
     className={cn(
-      'h-[2.5rem] w-full rounded-lg border border-[#e4e4e4] bg-white px-3 text-[0.875rem] font-medium leading-[1.5] text-[#3e3e3e] outline-none placeholder:text-[#a6a6a6] tab:h-[2.8125rem]',
+      'h-[2.8125rem] w-full rounded-lg border border-[#e4e4e4] bg-white px-3 text-[0.875rem] font-medium leading-[1.5] text-[#3e3e3e] outline-none placeholder:text-[#a6a6a6]',
       className,
     )}
   />
@@ -49,13 +49,18 @@ StepTextarea.displayName = 'StepTextarea'
 const StepActionButton = ({
   className,
   children,
+  disabled,
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
   <button
     type="button"
+    disabled={disabled}
     {...props}
     className={cn(
-      'h-10 shrink-0 rounded-lg bg-[#3e3e3e] px-2 text-base font-semibold text-[#f6f6f6] tab:w-[6.25rem]',
+      'h-10 w-[6.25rem] shrink-0 rounded-lg px-2 text-base font-semibold',
+      disabled
+        ? 'bg-[#e4e4e4] text-[#b8b8b8]'
+        : 'bg-[#3e3e3e] text-[#f6f6f6]',
       className,
     )}
   >
@@ -75,7 +80,7 @@ const StepSelect = ({ value, onValueChange, options, placeholder, className }: S
   <Select value={value} onValueChange={onValueChange}>
     <SelectTrigger
       className={cn(
-        'h-[2.5rem] w-full rounded-lg border border-[#e4e4e4] bg-white px-3 text-[0.875rem] font-medium leading-[1.5] text-[#3e3e3e] shadow-none ring-0 ring-offset-0 focus:ring-0 focus:ring-offset-0 tab:h-[2.8125rem]',
+        'h-[2.8125rem] w-full rounded-lg border border-[#e4e4e4] bg-white px-3 text-[0.875rem] font-medium leading-[1.5] text-[#3e3e3e] shadow-none ring-0 ring-offset-0 focus:ring-0 focus:ring-offset-0',
         className,
       )}
     >
