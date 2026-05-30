@@ -40,25 +40,24 @@ const KennelInfoStep = () => {
       title="브리더 정보를 입력해주세요"
       onNext={() => handleSubmit(onSubmit)()}
       onBack={goBack}
-      navClassName="tab:mt-[9.9375rem]"
     >
-      <ProfileImageUpload />
+      <div className="mt-[2rem] flex w-full flex-col items-center gap-[2rem] px-5 tab:mt-[3.625rem] tab:max-w-[40.625rem] tab:gap-[3.625rem] tab:px-0">
+        <ProfileImageUpload />
 
-      {/* 폼 영역 */}
-      <div className="mt-[2.04rem] flex w-full flex-col gap-[0.625rem] px-[1.25rem] tab:mt-[3.0625rem] tab:w-[59.4375rem] tab:gap-0 tab:px-0">
-        {/* 브리더명 + 중복검사 */}
-        <div className="flex gap-[0.25rem] tab:gap-[1.1875rem]">
-          <StepInput
-            type="text"
-            placeholder="브리더명(상호명)"
-            {...register('breederName')}
-            className="flex-1 tab:flex-[731]"
-          />
-          <StepActionButton>중복검사</StepActionButton>
-        </div>
+        {/* 폼 영역 */}
+        <div className="flex w-full flex-col gap-[0.625rem] tab:gap-[2.09rem]">
+          {/* 브리더명 + 중복검사 */}
+          <div className="flex gap-2">
+            <StepInput
+              type="text"
+              placeholder="브리더명(상호명)"
+              {...register('breederName')}
+              className="flex-1"
+            />
+            <StepActionButton>중복검사</StepActionButton>
+          </div>
 
-        {/* 지역 */}
-        <div className="tab:mt-[2.09rem]">
+          {/* 지역 */}
           <Controller
             name="region"
             control={control}
@@ -71,32 +70,32 @@ const KennelInfoStep = () => {
               />
             )}
           />
-        </div>
 
-        {/* 품종 키워드 */}
-        <div className="tab:mt-[2.09rem]">
-          <Controller
-            name="selectedBreeds"
-            control={control}
-            render={({ field }) => (
-              <ChipSelect
-                label={
-                  <>
-                    <span className="hidden tab:inline">품종</span>
-                    <span className="tab:hidden">관심있는 키워드</span>
-                  </>
-                }
-                items={BREED_KEYWORDS}
-                selected={field.value}
-                onToggle={(breed) => {
-                  const next = field.value.includes(breed)
-                    ? field.value.filter((b) => b !== breed)
-                    : [...field.value, breed]
-                  field.onChange(next)
-                }}
-              />
-            )}
-          />
+          {/* 품종 키워드 */}
+          <div className="flex flex-col">
+            <Controller
+              name="selectedBreeds"
+              control={control}
+              render={({ field }) => (
+                <ChipSelect
+                  label={
+                    <>
+                      <span className="hidden tab:inline">품종</span>
+                      <span className="tab:hidden">관심있는 키워드</span>
+                    </>
+                  }
+                  items={BREED_KEYWORDS}
+                  selected={field.value}
+                  onToggle={(breed) => {
+                    const next = field.value.includes(breed)
+                      ? field.value.filter((b) => b !== breed)
+                      : [...field.value, breed]
+                    field.onChange(next)
+                  }}
+                />
+              )}
+            />
+          </div>
         </div>
       </div>
     </StepContainer>
