@@ -1,50 +1,5 @@
-import { forwardRef } from 'react'
 import { cn } from '@/shared/lib/Cn'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui'
-
-interface StepFieldLabelProps {
-  label: string
-  required?: boolean
-}
-
-const StepFieldLabel = ({ label, required }: StepFieldLabelProps) => (
-  <div className="mb-[0.125rem] flex items-center gap-1">
-    <span className="text-[0.875rem] font-semibold leading-[1.5] text-[#3e3e3e]">{label}</span>
-    {required && (
-      <span className="text-[0.875rem] font-medium leading-[1.5] text-[#6b6b6b]">필수</span>
-    )}
-  </div>
-)
-
-type StepInputProps = React.InputHTMLAttributes<HTMLInputElement>
-
-const StepInput = forwardRef<HTMLInputElement, StepInputProps>(({ className, ...props }, ref) => (
-  <input
-    ref={ref}
-    {...props}
-    className={cn(
-      'h-[2.8125rem] w-full rounded-lg border border-[#e4e4e4] bg-white px-3 text-[0.875rem] font-medium leading-[1.5] text-[#3e3e3e] outline-none placeholder:text-[#a6a6a6]',
-      className,
-    )}
-  />
-))
-StepInput.displayName = 'StepInput'
-
-type StepTextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>
-
-const StepTextarea = forwardRef<HTMLTextAreaElement, StepTextareaProps>(
-  ({ className, ...props }, ref) => (
-    <textarea
-      ref={ref}
-      {...props}
-      className={cn(
-        'h-[4.5rem] w-full resize-none rounded-lg border border-[#cacaca] bg-white p-3 text-[0.875rem] font-medium leading-[1.5] text-[#3e3e3e] outline-none placeholder:text-[#a6a6a6] tab:h-[6.5625rem]',
-        className,
-      )}
-    />
-  ),
-)
-StepTextarea.displayName = 'StepTextarea'
 
 const StepActionButton = ({
   className,
@@ -96,4 +51,4 @@ const StepSelect = ({ value, onValueChange, options, placeholder, className }: S
   </Select>
 )
 
-export { StepFieldLabel, StepInput, StepTextarea, StepActionButton, StepSelect }
+export { StepActionButton, StepSelect }

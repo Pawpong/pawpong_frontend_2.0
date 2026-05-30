@@ -5,7 +5,7 @@ import { useOnboarding } from '../model/OnboardingContext'
 import { useStepForm } from '../model/useStepForm'
 import { type SurveyFormData } from '../model/schema'
 import { StepContainer } from './StepContainer'
-import { StepInput, StepTextarea } from './StepInput'
+import { TextareaField } from '@/shared/ui'
 import { CheckboxField } from './CheckboxField'
 
 const SurveyStep = () => {
@@ -83,14 +83,12 @@ const SurveyStep = () => {
             </span>
           </div>
 
-          <StepTextarea
+          <TextareaField
             placeholder="성별, 연령대, 거주지, 결혼 계획, 생활패턴 등"
             maxLength={100}
+            currentLength={watch('selfIntro')?.length ?? 0}
             {...register('selfIntro')}
           />
-          <p className="text-end text-[0.625rem] leading-[1.5] font-medium text-[#6b6b6b]">
-            {watch('selfIntro')?.length ?? 0}/100
-          </p>
         </div>
 
         {/* 섹션 4: 공간/생활패턴 */}
@@ -114,14 +112,12 @@ const SurveyStep = () => {
                   선택
                 </span>
               </div>
-              <StepTextarea
+              <TextareaField
                 placeholder="출퇴근 / 외출 시간을 포함해 하루 중 집을 비우는 시간"
                 maxLength={100}
+                currentLength={watch('awayTime')?.length ?? 0}
                 {...register('awayTime')}
               />
-              <p className="text-end text-[0.625rem] leading-[1.5] font-medium text-[#6b6b6b]">
-                {watch('awayTime')?.length ?? 0}/100
-              </p>
             </div>
 
             <div className="flex flex-col gap-[0.125rem]">
@@ -133,14 +129,12 @@ const SurveyStep = () => {
                   선택
                 </span>
               </div>
-              <StepTextarea
+              <TextareaField
                 placeholder="반려동물이 주로 생활할 공간(예: 거실 등)과 환경(크기, 구조 등)"
                 maxLength={100}
+                currentLength={watch('livingSpace')?.length ?? 0}
                 {...register('livingSpace')}
               />
-              <p className="text-end text-[0.625rem] leading-[1.5] font-medium text-[#6b6b6b]">
-                {watch('livingSpace')?.length ?? 0}/100
-              </p>
             </div>
           </div>
         </div>

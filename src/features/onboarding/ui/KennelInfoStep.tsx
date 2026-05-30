@@ -5,7 +5,8 @@ import { useOnboarding } from '../model/OnboardingContext'
 import { useStepForm } from '../model/useStepForm'
 import { type KennelInfoFormData, REGIONS } from '../model/schema'
 import { StepContainer } from './StepContainer'
-import { StepInput, StepActionButton, StepSelect } from './StepInput'
+import { Input } from '@/shared/ui'
+import { StepActionButton, StepSelect } from './StepInput'
 import { ChipSelect } from './ChipSelect'
 import { ProfileImageUpload } from './ProfileImageUpload'
 
@@ -48,7 +49,7 @@ const KennelInfoStep = () => {
         <div className="flex w-full flex-col gap-[0.625rem] tab:gap-[2.09rem]">
           {/* 브리더명 + 중복검사 */}
           <div className="flex gap-2">
-            <StepInput
+            <Input
               type="text"
               placeholder="브리더명(상호명)"
               {...register('breederName')}
