@@ -2,7 +2,7 @@
 
 import { notFound, usePathname } from 'next/navigation'
 import { use } from 'react'
-import { OnboardingProvider, ONBOARDING_STEPS } from '@/features/onboarding'
+import { OnboardingProvider, StepProgressBar, ONBOARDING_STEPS } from '@/features/onboarding'
 import type { UserType } from '@/features/onboarding'
 
 const VALID_TYPES: UserType[] = ['general', 'breeder']
@@ -30,6 +30,7 @@ const OnboardingLayout = ({
 
   return (
     <OnboardingProvider userType={type as UserType} initialStepIndex={initialStepIndex}>
+      <StepProgressBar />
       {children}
     </OnboardingProvider>
   )

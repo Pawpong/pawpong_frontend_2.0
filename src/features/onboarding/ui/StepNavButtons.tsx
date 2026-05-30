@@ -21,28 +21,28 @@ const StepNavButtons = ({
 }: StepNavButtonsProps) => (
   <div
     className={cn(
-      'fixed right-0 bottom-0 left-0 z-10 flex flex-col gap-[0.625rem] p-[1.25rem] tab:static tab:right-auto tab:bottom-auto tab:left-auto tab:z-auto tab:w-[31.4375rem] tab:gap-[0.875rem] tab:p-0 tab:pb-[2rem]',
+      'fixed right-0 bottom-0 left-0 z-10 flex flex-col items-center gap-3 bg-white px-4 py-4 tab:static tab:right-auto tab:bottom-auto tab:left-auto tab:z-auto tab:px-20 tab:py-4',
       className,
     )}
   >
-    {onBack && (
-      <button
-        type="button"
-        onClick={onBack}
-        className="order-first h-[3rem] w-full rounded-full text-[1rem] font-semibold text-[#5d5d5d] tab:order-last"
-      >
-        {backLabel}
-      </button>
-    )}
-    {extraButtons}
     {onNext && (
       <button
         type="button"
         onClick={onNext}
         disabled={nextDisabled}
-        className="h-[3rem] w-full rounded-full bg-[#d4d4d4] text-[1rem] font-semibold text-[#5d5d5d] transition-colors disabled:opacity-50"
+        className="h-12 w-full max-w-[18.5625rem] rounded-full bg-[#fffa94] text-base font-semibold text-[#3e3e3e] transition-colors disabled:opacity-40 tab:w-[16.125rem]"
       >
         {nextLabel}
+      </button>
+    )}
+    {extraButtons}
+    {onBack && (
+      <button
+        type="button"
+        onClick={onBack}
+        className="text-base font-medium text-[#3e3e3e]"
+      >
+        {backLabel}
       </button>
     )}
   </div>

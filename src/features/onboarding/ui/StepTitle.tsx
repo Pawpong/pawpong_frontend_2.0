@@ -1,12 +1,28 @@
+'use client'
+
+import { cafe24Proup } from '@/shared/lib/fonts'
+import { cn } from '@/shared/lib/Cn'
+
 interface StepTitleProps {
   children: React.ReactNode
+  subtitle?: string
 }
 
-const StepTitle = ({ children }: StepTitleProps) => (
-  <div className="mt-[4.375rem] flex w-full items-center justify-center px-[1.25rem] py-[0.625rem] tab:mt-0 tab:h-[7.8125rem] tab:px-[6.25rem]">
-    <h1 className="text-center text-[1.25rem] leading-[1.5] font-bold text-[#5d5d5d] tab:text-[2rem]">
+const StepTitle = ({ children, subtitle }: StepTitleProps) => (
+  <div className="flex w-full flex-col items-center justify-center px-4 py-8 tab:px-20 tab:py-12">
+    <h1
+      className={cn(
+        cafe24Proup.className,
+        'text-center font-cafe24 text-[1.25rem] leading-[1.5] font-bold text-[#3e3e3e] tab:text-[1.5rem]',
+      )}
+    >
       {children}
     </h1>
+    {subtitle && (
+      <p className="mt-1 text-center text-[0.875rem] font-semibold leading-[1.5] text-[#6b6b6b] tab:text-[1.25rem]">
+        {subtitle}
+      </p>
+    )}
   </div>
 )
 

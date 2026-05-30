@@ -1,22 +1,18 @@
 'use client'
 
-import { useForm, Controller } from 'react-hook-form'
-// import { zodResolver } from '@hookform/resolvers/zod'
-import { Checkbox } from '@/shared/ui'
+import { Controller } from 'react-hook-form'
 import { useOnboarding } from '../model/OnboardingContext'
+import { useStepForm } from '../model/useStepForm'
 import { type SurveyFormData, EMAIL_DOMAINS } from '../model/schema'
-import { StepLayout } from './StepLayout'
-import { StepTitle } from './StepTitle'
-import { StepIndicator } from './StepIndicator'
+import { StepContainer } from './StepContainer'
 import { StepInput, StepTextarea, StepSelect } from './StepInput'
-import { StepNavButtons } from './StepNavButtons'
+import { CheckboxField } from './CheckboxField'
 
 const SurveyStep = () => {
-  const { goNext, goBack, formData, setFormData } = useOnboarding()
+  const { goBack } = useOnboarding()
 
-  const { register, control, handleSubmit } = useForm<SurveyFormData>({
-    // resolver: zodResolver(surveySchema),
-    defaultValues: (formData.survey as SurveyFormData) ?? {
+  const { register, control, handleSubmit, onSubmit } =
+    useStepForm<SurveyFormData>('survey', {
       privacyAgreed: false as unknown as true,
       name: '',
       phone: '',
@@ -25,22 +21,24 @@ const SurveyStep = () => {
       selfIntro: '',
       awayTime: '',
       livingSpace: '',
-    },
-  })
-
-  const onSubmit = (data: SurveyFormData) => {
-    setFormData('survey', data as unknown as Record<string, unknown>)
-    goNext()
-  }
+    })
 
   return (
-    <StepLayout className="pb-[14rem]">
-      <StepTitle>간단한 조사 양식</StepTitle>
-
-      <div className="mt-[1.125rem] tab:mt-[2.09rem]">
-        <StepIndicator />
-      </div>
-
+    <StepContainer
+      title="간단한 조사 양식"
+      onNext={() => handleSubmit(onSubmit)()}
+      onBack={goBack}
+      layoutClassName="pb-[14rem]"
+      navClassName="bg-white tab:mt-[9.03rem] tab:bg-transparent"
+      navExtraButtons={
+        <button
+          type="button"
+          className="h-12 w-full rounded-full border border-[#d4d4d4] text-[1rem] font-semibold text-[#5d5d5d] tab:hidden"
+        >
+          다음에 하기
+        </button>
+      }
+    >
       {/* 콘텐츠 영역 */}
       <div className="mt-[2.4375rem] flex w-full flex-col px-[1.25rem] tab:mt-[3.125rem] tab:w-[59.4375rem] tab:px-0">
         {/* 섹션 1: 개인정보 수집 동의 */}
@@ -64,16 +62,12 @@ const SurveyStep = () => {
             name="privacyAgreed"
             control={control}
             render={({ field }) => (
-              <label className="flex cursor-pointer items-center gap-[0.75rem] rounded-[1rem] bg-[#f3f3f3] px-[1.25rem] py-[0.9375rem]">
-                <Checkbox
-                  checked={!!field.value}
-                  onCheckedChange={(checked) => field.onChange(checked)}
-                  className="size-[1.5rem] rounded-[0.1875rem] border-2 border-[#a8a8a8] bg-white shadow-none data-[state=checked]:border-[#5d5d5d] data-[state=checked]:bg-white data-[state=checked]:text-[#5d5d5d]"
-                />
-                <span className="text-[0.875rem] leading-[1.375rem] font-medium text-[#5d5d5d] tab:text-[1rem]">
-                  동의합니다
-                </span>
-              </label>
+              <CheckboxField
+                label="동의합니다"
+                checked={!!field.value}
+                onCheckedChange={(checked) => field.onChange(checked)}
+                className="rounded-[1rem] bg-[#f3f3f3] px-[1.25rem] py-[0.9375rem]"
+              />
             )}
           />
         </div>
@@ -165,20 +159,7 @@ const SurveyStep = () => {
         </div>
       </div>
 
-      <StepNavButtons
-        onNext={() => handleSubmit(onSubmit)()}
-        onBack={goBack}
-        className="bg-white tab:mt-[9.03rem] tab:bg-transparent"
-        extraButtons={
-          <button
-            type="button"
-            className="h-[3rem] w-full rounded-full border border-[#d4d4d4] text-[1rem] font-semibold text-[#5d5d5d] tab:hidden"
-          >
-            다음에 하기
-          </button>
-        }
-      />
-    </StepLayout>
+    </StepContainer>
   )
 }
 
