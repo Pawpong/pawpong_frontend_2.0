@@ -1,5 +1,5 @@
 export { OnboardingProvider, useOnboarding } from './model/OnboardingContext'
 export { StepRenderer } from './ui/StepRenderer'
 export { StepProgressBar } from './ui/StepProgressBar'
-export { ONBOARDING_STEPS } from './model/types'
+export { ONBOARDING_STEPS, VALID_USER_TYPES, isValidUserType } from './model/types'
 export type { UserType, StepConfig } from './model/types'
