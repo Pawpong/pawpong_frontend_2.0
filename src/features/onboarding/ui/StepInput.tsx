@@ -5,13 +5,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 interface StepFieldLabelProps {
   label: string
   required?: boolean
+  optional?: boolean
+  className?: string
 }
 
-const StepFieldLabel = ({ label, required }: StepFieldLabelProps) => (
-  <div className="mb-[0.125rem] flex items-center gap-1">
-    <span className="text-[0.875rem] font-semibold leading-[1.5] text-[#3e3e3e]">{label}</span>
+const StepFieldLabel = ({ label, required, optional, className }: StepFieldLabelProps) => (
+  <div className={cn('flex items-center gap-1', className)}>
+    <p className="p-[0.125rem] text-[0.875rem] font-semibold leading-[1.5] text-[#3e3e3e] tab:text-base">
+      {label}
+    </p>
     {required && (
-      <span className="text-[0.875rem] font-medium leading-[1.5] text-[#6b6b6b]">필수</span>
+      <span className="shrink-0 p-[0.125rem] text-[0.875rem] font-medium leading-[1.5] text-[#6b6b6b]">
+        필수
+      </span>
+    )}
+    {optional && (
+      <span className="shrink-0 p-[0.125rem] text-[0.875rem] font-medium leading-[1.5] text-[#6b6b6b]">
+        선택
+      </span>
     )}
   </div>
 )
@@ -96,4 +107,21 @@ const StepSelect = ({ value, onValueChange, options, placeholder, className }: S
   </Select>
 )
 
-export { StepFieldLabel, StepInput, StepTextarea, StepActionButton, StepSelect }
+interface StepTextareaWithCounterProps extends StepTextareaProps {
+  currentLength: number
+  maxLength: number
+}
+
+const StepTextareaWithCounter = forwardRef<HTMLTextAreaElement, StepTextareaWithCounterProps>(
+  ({ currentLength, maxLength, ...props }, ref) => (
+    <div className="flex flex-col gap-[0.125rem]">
+      <StepTextarea ref={ref} maxLength={maxLength} {...props} />
+      <p className="text-end text-[0.625rem] font-medium leading-[1.5] text-[#6b6b6b]">
+        {currentLength}/{maxLength}
+      </p>
+    </div>
+  ),
+)
+StepTextareaWithCounter.displayName = 'StepTextareaWithCounter'
+
+export { StepFieldLabel, StepInput, StepTextarea, StepTextareaWithCounter, StepActionButton, StepSelect }
