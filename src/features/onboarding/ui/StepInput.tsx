@@ -38,7 +38,7 @@ const StepTextarea = forwardRef<HTMLTextAreaElement, StepTextareaProps>(
       ref={ref}
       {...props}
       className={cn(
-        'h-[4.5rem] w-full resize-none rounded-lg border border-[#e4e4e4] bg-white px-3 py-3 text-[0.875rem] font-medium leading-[1.5] text-[#3e3e3e] outline-none placeholder:text-[#a6a6a6] tab:h-[7.8125rem]',
+        'h-[4.5rem] w-full resize-none rounded-lg border border-[#cacaca] bg-white p-3 text-[0.875rem] font-medium leading-[1.5] text-[#3e3e3e] outline-none placeholder:text-[#a6a6a6] tab:h-[6.5625rem]',
         className,
       )}
     />

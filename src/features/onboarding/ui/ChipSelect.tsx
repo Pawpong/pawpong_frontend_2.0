@@ -11,23 +11,13 @@ interface ChipSelectProps {
 
 const ChipSelect = ({ label, items, selected, onToggle }: ChipSelectProps) => (
   <>
-    {/* 선택된 칩 표시 영역 */}
-    <div className="flex min-h-[2.5rem] flex-wrap items-center gap-[0.75rem] rounded-[0.375rem] border border-[#a8a8a8] bg-white p-[0.625rem] tab:min-h-[3.25rem] tab:rounded-[1rem] tab:px-[1.25rem] tab:py-[0.9375rem]">
-      <span className="text-[0.875rem] leading-[1.375rem] font-medium text-[#5d5d5d] tab:text-[1rem]">
-        {label}
-      </span>
-      {selected.map((item) => (
-        <span
-          key={item}
-          className="rounded-full border border-[#a8a8a8] px-[0.625rem] py-[0.25rem] text-[0.875rem] font-semibold text-[#a8a8a8]"
-        >
-          #{item}
-        </span>
-      ))}
-    </div>
+    {/* 라벨 */}
+    <p className="text-[0.875rem] font-semibold leading-[1.5] text-[#3e3e3e] tab:text-base tab:font-bold">
+      {label}
+    </p>
 
     {/* 칩 목록 */}
-    <div className="mt-[0.75rem] flex flex-wrap gap-[1rem] px-[0.0175rem] tab:mt-[1.05rem] tab:px-[1.9375rem]">
+    <div className="mt-1 flex flex-wrap content-center justify-center gap-[0.75rem] tab:mt-[0.25rem] tab:gap-[1.25rem]">
       {items.map((item) => {
         const isSelected = selected.includes(item)
         return (
@@ -36,8 +26,10 @@ const ChipSelect = ({ label, items, selected, onToggle }: ChipSelectProps) => (
             type="button"
             onClick={() => onToggle(item)}
             className={cn(
-              'rounded-full px-[0.625rem] py-[0.25rem] text-[0.875rem] leading-[1.375rem] font-semibold',
-              isSelected ? 'bg-[#a8a8a8] text-white' : 'border border-[#a8a8a8] text-[#a8a8a8]',
+              'rounded-full px-2 py-1 text-[0.875rem] font-medium leading-[1.5] tab:text-base',
+              isSelected
+                ? 'border border-[#3e3e3e] bg-[#3e3e3e] text-white'
+                : 'border border-[#cacaca] text-[#6b6b6b]',
             )}
           >
             {item}

@@ -47,25 +47,23 @@ const InfoStep = () => {
       title="회원 정보를 입력해주세요"
       onNext={() => handleSubmit(onSubmit)()}
       onBack={goBack}
-      navClassName="tab:mt-[9.9375rem]"
     >
-      <ProfileImageUpload />
+      <>
+        <ProfileImageUpload />
 
-      {/* 폼 영역 */}
-      <div className="mt-[2.04rem] flex w-full flex-col px-[1.25rem] tab:mt-[3.0625rem] tab:w-[59.4375rem] tab:px-0">
         {/* 닉네임 + 중복검사 */}
-        <div className="flex gap-[0.25rem] tab:gap-[1.1875rem]">
+        <div className="flex w-full gap-2">
           <StepInput
             type="text"
             placeholder="닉네임"
             {...register('nickname')}
-            className="flex-1 tab:flex-[731]"
+            className="flex-1"
           />
           <StepActionButton>중복 검사</StepActionButton>
         </div>
 
         {/* 관심있는 키워드 */}
-        <div className="mt-[0.625rem] tab:mt-[2.09rem]">
+        <div className="flex w-full flex-col">
           <Controller
             name="selectedKeywords"
             control={control}
@@ -84,7 +82,7 @@ const InfoStep = () => {
             )}
           />
         </div>
-      </div>
+      </>
     </StepContainer>
   )
 }

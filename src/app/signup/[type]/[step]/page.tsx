@@ -2,20 +2,17 @@
 
 import { use } from 'react'
 import { notFound } from 'next/navigation'
-import { StepRenderer, ONBOARDING_STEPS } from '@/features/onboarding'
-import type { UserType } from '@/features/onboarding'
-
-const VALID_TYPES: UserType[] = ['general', 'breeder']
+import { StepRenderer, ONBOARDING_STEPS, isValidUserType } from '@/features/onboarding' // [refactored]
 
 const OnboardingStepPage = ({ params }: { params: Promise<{ type: string; step: string }> }) => {
   const { type, step } = use(params)
 
-  if (!VALID_TYPES.includes(type as UserType)) {
+  if (!isValidUserType(type)) {
     notFound()
   }
 
-  const steps = ONBOARDING_STEPS[type as UserType]
-  const isValidStep = steps.some((s) => s.id === step)
+  // [refactored] 타입 가드 덕분에 as 캐스팅 제거
+  const isValidStep = ONBOARDING_STEPS[type].some((s) => s.id === step)
 
   if (!isValidStep) {
     notFound()

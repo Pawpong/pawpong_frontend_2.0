@@ -6,12 +6,12 @@ interface ProfileImageUploadProps {
 }
 
 const ProfileImageUpload = ({ className }: ProfileImageUploadProps) => (
-  <div className={cn('mt-[2.09rem] tab:mt-[6.343rem]', className)}>
+  <div className={cn(className)}>
     <button
       type="button"
-      className="flex h-[8.9375rem] w-[9.1875rem] items-center justify-center rounded-full bg-[#d4d4d4]"
+      className="flex size-[5rem] items-center justify-center rounded-full bg-[#6b6b6b] tab:size-[6.25rem]"
     >
-      <ImageIcon className="size-[3.5rem] text-white" />
+      <ImageIcon className="size-[2.5rem] text-white tab:size-[3.5rem]" />
     </button>
   </div>
 )
