@@ -10,21 +10,19 @@ interface StepFieldLabelProps {
 }
 
 const StepFieldLabel = ({ label, required, optional, className }: StepFieldLabelProps) => (
-  <div className={cn('flex items-center gap-1', className)}>
-    <p className="p-[0.125rem] text-[0.875rem] font-semibold leading-[1.5] text-[#3e3e3e] tab:text-base">
-      {label}
-    </p>
+  <p className={cn('p-[0.125rem] text-[0.875rem] font-semibold leading-[1.5] text-[#3e3e3e] tab:text-base', className)}>
+    {label}
     {required && (
-      <span className="shrink-0 p-[0.125rem] text-[0.875rem] font-medium leading-[1.5] text-[#6b6b6b]">
+      <span className="ml-1 text-[0.875rem] font-medium leading-[1.5] text-[#6b6b6b]">
         필수
       </span>
     )}
     {optional && (
-      <span className="shrink-0 p-[0.125rem] text-[0.875rem] font-medium leading-[1.5] text-[#6b6b6b]">
+      <span className="ml-1 text-[0.875rem] font-medium leading-[1.5] text-[#6b6b6b]">
         선택
       </span>
     )}
-  </div>
+  </p>
 )
 
 type StepInputProps = React.InputHTMLAttributes<HTMLInputElement>
