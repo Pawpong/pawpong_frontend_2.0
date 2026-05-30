@@ -12,7 +12,7 @@ const StepProgressBar = () => {
   const progressPercent = Math.round(((currentStepIndex + 1) / (visibleSteps.length + 1)) * 100)
 
   return (
-    <div className="flex w-full items-center justify-center bg-white px-5 py-2 tab:px-20">
+    <div className="flex w-full items-center justify-center bg-white px-4 py-1 tab:px-20 tab:py-2">
       <div className="flex items-center gap-[0.125rem]">
         <div
           className={cn(

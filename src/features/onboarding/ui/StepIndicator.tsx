@@ -15,7 +15,7 @@ interface StepItemProps {
 const StepItem = ({ label, index, isActive, showArrowBefore }: StepItemProps) => (
   <>
     {showArrowBefore && (
-      <div className="relative size-6 shrink-0 tab:size-8">
+      <div className="relative size-[0.875rem] shrink-0 tab:size-8">
         <Image
           src="/images/onboarding/arrow-onboarding.svg"
           alt=""
@@ -24,7 +24,7 @@ const StepItem = ({ label, index, isActive, showArrowBefore }: StepItemProps) =>
         />
       </div>
     )}
-    <div className="relative flex h-[2.5rem] w-[8rem] items-center justify-center p-2 tab:h-[3.837rem] tab:w-[11.991rem]">
+    <div className="relative flex h-[2.125rem] w-[6.641rem] items-center justify-center p-2 tab:h-[3.837rem] tab:w-[11.991rem]">
       <Image
         src={
           isActive
@@ -54,7 +54,7 @@ const StepIndicator = () => {
   const visibleSteps = steps.filter((step) => step.id !== 'complete')
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center">
       {visibleSteps.map((step, index) => (
         <StepItem
           key={step.id}

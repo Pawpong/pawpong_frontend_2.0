@@ -9,7 +9,7 @@ interface StepTitleProps {
 }
 
 const StepTitle = ({ children, subtitle }: StepTitleProps) => (
-  <div className="mt-[4.375rem] flex w-full flex-col items-center justify-center px-5 py-[3rem] tab:mt-0 tab:px-20">
+  <div className="flex w-full flex-col items-center justify-center px-4 py-8 tab:px-20 tab:py-12">
     <h1
       className={cn(
         cafe24Proup.className,
