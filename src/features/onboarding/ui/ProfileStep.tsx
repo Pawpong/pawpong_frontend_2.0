@@ -1,14 +1,13 @@
 'use client'
 
 import { useForm, Controller } from 'react-hook-form'
-// import { zodResolver } from '@hookform/resolvers/zod'
 import { Checkbox, DetailLink } from '@/shared/ui'
 import { useOnboarding } from '../model/OnboardingContext'
 import { type ProfileFormData, EMAIL_DOMAINS } from '../model/schema'
 import { StepLayout } from './StepLayout'
 import { StepTitle } from './StepTitle'
 import { StepIndicator } from './StepIndicator'
-import { StepInput, StepActionButton, StepSelect } from './StepInput'
+import { StepFieldLabel, StepInput, StepActionButton, StepSelect } from './StepInput'
 import { StepNavButtons } from './StepNavButtons'
 
 const AGREEMENTS = [
@@ -39,7 +38,6 @@ const ProfileStep = () => {
   const { goNext, goBack, formData, setFormData } = useOnboarding()
 
   const { register, control, handleSubmit, watch, setValue } = useForm<ProfileFormData>({
-    // resolver: zodResolver(profileSchema),
     defaultValues: (formData.profile as ProfileFormData) ?? {
       email: '',
       emailDomain: EMAIL_DOMAINS[0],
@@ -73,122 +71,135 @@ const ProfileStep = () => {
   }
 
   return (
-    <StepLayout>
-      <StepTitle>계정 정보를 입력해주세요</StepTitle>
+    <StepLayout className="tab:px-20 tab:py-12">
+      <StepTitle subtitle="문자 미수신 시 [인증번호 재전송] 버튼을 눌러주세요">
+        계정 정보를 입력해주세요
+      </StepTitle>
 
-      <div className="mt-[1.125rem] tab:mt-[2.09rem]">
+      <div className="flex w-full max-w-[40.625rem] flex-col items-center gap-[3.625rem] px-5 tab:px-0">
         <StepIndicator />
-      </div>
 
-      {/* 폼 영역 */}
-      <div className="mt-[2.625rem] flex w-full flex-col px-[1.25rem] tab:mt-[7.1875rem] tab:w-[59.4375rem] tab:px-0">
-        {/* 이메일 */}
-        <div className="flex gap-[0.25rem] tab:gap-[1.25rem]">
-          <StepInput
-            type="text"
-            placeholder="이메일"
-            {...register('email')}
-            className="flex-1 tab:flex-[731]"
-          />
-          <Controller
-            name="emailDomain"
-            control={control}
-            render={({ field }) => (
-              <StepSelect
-                value={field.value}
-                onValueChange={field.onChange}
-                options={EMAIL_DOMAINS.map((d) => ({ value: d, label: d }))}
-                className="shrink-0 tab:w-[12.5rem]"
+        {/* 폼 영역 */}
+        <div className="flex w-full flex-col gap-4">
+          {/* 이메일 */}
+          <div>
+            <StepFieldLabel label="이메일" required />
+            <div className="flex items-end gap-1">
+              <StepInput
+                type="text"
+                placeholder="이메일을 입력해주세요"
+                {...register('email')}
+                className="flex-1"
               />
-            )}
-          />
-        </div>
-
-        {/* 휴대폰 번호 */}
-        <div className="mt-[0.625rem] flex gap-[0.25rem] tab:mt-[1.6875rem] tab:gap-[1.1875rem]">
-          <StepInput
-            type="tel"
-            placeholder="휴대폰번호"
-            {...register('phone')}
-            className="flex-1 tab:flex-[731]"
-          />
-          <StepActionButton>인증번호 받기</StepActionButton>
-        </div>
-
-        {/* 인증번호 */}
-        <div className="mt-[0.625rem] flex gap-[0.25rem] tab:mt-[1.6875rem] tab:gap-[1.1875rem]">
-          <div className="relative flex-1 tab:flex-[731]">
-            <StepInput
-              type="text"
-              placeholder="인증번호"
-              {...register('verificationCode')}
-              className="pr-[3rem]"
-            />
-            <span className="absolute top-1/2 right-[0.625rem] -translate-y-1/2 text-[0.75rem] leading-[1.375rem] text-[#5d5d5d] tab:right-[1.25rem] tab:text-[1rem]">
-              03:00
-            </span>
+              <Controller
+                name="emailDomain"
+                control={control}
+                render={({ field }) => (
+                  <StepSelect
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    options={EMAIL_DOMAINS.map((d) => ({ value: d, label: d }))}
+                    className="w-[7.6875rem]"
+                  />
+                )}
+              />
+            </div>
           </div>
-          <StepActionButton>확인</StepActionButton>
+
+          {/* 휴대폰 번호 */}
+          <div>
+            <StepFieldLabel label="휴대폰 번호" required />
+            <div className="flex items-end gap-2">
+              <StepInput
+                type="tel"
+                placeholder="휴대폰 번호를 입력해주세요"
+                {...register('phone')}
+                className="flex-1"
+              />
+              <StepActionButton>인증번호</StepActionButton>
+            </div>
+          </div>
+
+          {/* 인증번호 */}
+          <div>
+            <StepFieldLabel label="인증번호" required />
+            <div className="flex items-end gap-2">
+              <div className="relative flex-1">
+                <StepInput
+                  type="text"
+                  placeholder="인증번호를 입력해주세요"
+                  {...register('verificationCode')}
+                  className="pr-[3.5rem]"
+                />
+                <span className="absolute top-1/2 right-3 -translate-y-1/2 text-[0.875rem] font-medium text-[#3e3e3e]">
+                  3:00
+                </span>
+              </div>
+              <StepActionButton>확인</StepActionButton>
+            </div>
+          </div>
         </div>
 
         {/* 약관 동의 */}
-        <div className="mt-[2.5625rem] flex flex-col tab:mt-[1.688rem]">
-          <label className="flex cursor-pointer items-start gap-[0.75rem] rounded-[1rem] bg-white px-[1.25rem] py-[0.9375rem]">
-            <Checkbox
-              checked={!!allAgreementsChecked}
-              onCheckedChange={handleToggleAll}
-              className={CHECKBOX_CLASS}
-            />
-            <span className="text-[1rem] leading-[1.375rem] font-medium text-[#5d5d5d]">
-              전체 약관동의
-            </span>
-          </label>
-
-          {AGREEMENTS.map((agreement) => (
-            <Controller
-              key={agreement.id}
-              name={agreement.id}
-              control={control}
-              render={({ field }) => (
-                <label className="flex cursor-pointer items-start gap-[0.75rem] rounded-[1rem] bg-white px-[1.25rem] py-[0.9375rem]">
-                  <Checkbox
-                    checked={!!field.value}
-                    onCheckedChange={(checked) => field.onChange(checked)}
-                    className={CHECKBOX_CLASS}
-                  />
-                  <span className="flex-1 text-[1rem] leading-[1.375rem] font-medium text-[#5d5d5d]">
-                    {agreement.label}
-                  </span>
-                  {agreement.hasDetail && <DetailLink variant="button" size="lg" />}
-                </label>
-              )}
-            />
-          ))}
-        </div>
-
-        {/* 만 14세 확인 */}
-        <Controller
-          name="isOver14"
-          control={control}
-          render={({ field }) => (
-            <label className="mt-[2.4375rem] flex cursor-pointer items-start gap-[0.75rem] rounded-[1rem] bg-white px-[1.25rem] py-[0.9375rem]">
+        <div className="flex w-full flex-col gap-10">
+          <div className="flex flex-col gap-4">
+            <label className="flex cursor-pointer items-center gap-3">
               <Checkbox
-                checked={!!field.value}
-                onCheckedChange={(checked) => field.onChange(checked)}
+                checked={!!allAgreementsChecked}
+                onCheckedChange={handleToggleAll}
                 className={CHECKBOX_CLASS}
               />
-              <span className="text-[1rem] leading-[1.375rem] font-medium text-[#5d5d5d]">
-                본인은 만 14세 이상입니다.
+              <span className="text-base font-medium leading-[1.5] text-[#3e3e3e]">
+                전체 약관동의
               </span>
             </label>
-          )}
-        />
+
+            {AGREEMENTS.map((agreement) => (
+              <Controller
+                key={agreement.id}
+                name={agreement.id}
+                control={control}
+                render={({ field }) => (
+                  <label className="flex cursor-pointer items-center gap-3">
+                    <Checkbox
+                      checked={!!field.value}
+                      onCheckedChange={(checked) => field.onChange(checked)}
+                      className={CHECKBOX_CLASS}
+                    />
+                    <span className="flex-1 text-base font-medium leading-[1.5] text-[#3e3e3e]">
+                      {agreement.label}
+                    </span>
+                    {agreement.hasDetail && <DetailLink variant="button" size="lg" />}
+                  </label>
+                )}
+              />
+            ))}
+          </div>
+
+          {/* 만 14세 확인 */}
+          <Controller
+            name="isOver14"
+            control={control}
+            render={({ field }) => (
+              <label className="flex cursor-pointer items-center gap-3">
+                <Checkbox
+                  checked={!!field.value}
+                  onCheckedChange={(checked) => field.onChange(checked)}
+                  className={CHECKBOX_CLASS}
+                />
+                <span className="text-base font-medium leading-[1.5] text-[#3e3e3e]">
+                  본인은 만 14세 이상입니다.
+                </span>
+              </label>
+            )}
+          />
+        </div>
       </div>
 
       <StepNavButtons
         onNext={() => handleSubmit(onSubmit)()}
         onBack={goBack}
-        className="tab:mt-[3.375rem]"
+        className="mt-12"
       />
     </StepLayout>
   )
