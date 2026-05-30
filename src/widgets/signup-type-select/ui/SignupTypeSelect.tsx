@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { cafe24Proup } from '@/shared/lib/fonts'
 import { cn } from '@/shared/lib/Cn'
+import { StepLayout } from '@/features/onboarding/ui/StepLayout'
 import { UserTypeCard } from './UserTypeCard'
 
 const USER_TYPE_OPTIONS = [
@@ -34,7 +35,7 @@ const SignupTypeSelect = () => {
   }
 
   return (
-    <div className="flex flex-1 flex-col items-center">
+    <StepLayout className="flex-1">
       <div className="flex w-full items-center justify-center py-12">
         <h1
           className={cn(
@@ -76,7 +77,7 @@ const SignupTypeSelect = () => {
           뒤로
         </button>
       </div>
-    </div>
+    </StepLayout>
   )
 }
 
