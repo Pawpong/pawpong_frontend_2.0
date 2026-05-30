@@ -8,7 +8,7 @@ const SignupLayout = ({ children }: { children: React.ReactNode }) => {
         <div className="flex w-full max-w-[80rem] items-center justify-between">
           <Link href="/" aria-label="홈으로 이동">
             <Image
-              src="/1440/logo.svg"
+              src="/images/logo/logo.svg"
               alt="Pawpong"
               width={96}
               height={32}
