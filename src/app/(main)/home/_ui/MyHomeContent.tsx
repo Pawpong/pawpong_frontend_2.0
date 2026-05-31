@@ -1,12 +1,13 @@
 'use client'
 
 import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { BookmarkIcon } from '@/shared/assets/icons'
 import { Container, Separator, SectionHeader } from '@/shared/ui'
 import { MOCK_MY_HOME_POSTS } from '@/shared/mocks/myHome'
 import { createMockListings } from '@/shared/mocks/adoption'
-import { useAdopterProfile } from '@/entities/adopter'
-import { useMyBreederProfile } from '@/entities/breeder'
+import { adopterQueries } from '@/entities/adopter'
+import { breederQueries } from '@/entities/breeder'
 import type { AdopterPublicProfile, BreederPublicProfile } from '@/shared/types'
 import { AdoptionCard } from '@/entities/adoption'
 import { ProfileCard } from './ProfileCard'
@@ -20,8 +21,8 @@ import { BreederListingCard } from './BreederListingCard'
 import { MY_HOME_TABS, BREEDER_MY_HOME_TABS } from './constants'
 
 const MyHomeContent = () => {
-  const { data: adopterProfile } = useAdopterProfile()
-  const { data: breederProfile } = useMyBreederProfile()
+  const { data: adopterProfile } = useQuery(adopterQueries.profile())
+  const { data: breederProfile } = useQuery(breederQueries.myProfile())
 
   const isBreeder = !!breederProfile
   const tabs = isBreeder ? BREEDER_MY_HOME_TABS : MY_HOME_TABS

@@ -4,7 +4,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Autoplay, Pagination } from 'swiper/modules'
-import { useBanners } from '@/entities/home'
+import { useQuery } from '@tanstack/react-query'
+import { homeQueries } from '@/entities/home'
 import type { BannerDto } from '@/shared/types'
 import 'swiper/css'
 import 'swiper/css/pagination'
@@ -50,7 +51,7 @@ const BannerSlide = ({ banner }: { banner: BannerDto }) => {
 }
 
 const Banner = () => {
-  const { data: banners } = useBanners()
+  const { data: banners } = useQuery(homeQueries.banners())
 
   if (!banners || banners.length === 0) return null
 

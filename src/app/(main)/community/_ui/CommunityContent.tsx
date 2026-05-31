@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useInfiniteQuery } from '@tanstack/react-query'
 import {
   Breadcrumb,
   Container,
@@ -15,7 +16,7 @@ import {
   SelectValue,
 } from '@/shared/ui'
 import { MOCK_COMMUNITY_CATEGORIES } from '@/shared/mocks/community'
-import { useCommunityPosts } from '@/entities/community'
+import { communityQueries } from '@/entities/community'
 import type { CommunitySortType } from '@/shared/types'
 import { COMMUNITY_SORT_OPTIONS } from './constants'
 import { CategorySidebar } from './CategorySidebar'
@@ -25,10 +26,8 @@ const CommunityContent = () => {
   const [sort, setSort] = useState<CommunitySortType>('latest')
   const [selectedCategory, setSelectedCategory] = useState('')
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useCommunityPosts(
-    sort,
-    undefined,
-    selectedCategory || undefined,
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery(
+    communityQueries.posts(sort, undefined, selectedCategory || undefined),
   )
   const posts = data?.pages.flatMap((page) => page.items) ?? []
 

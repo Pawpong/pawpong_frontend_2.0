@@ -1,8 +1,9 @@
 'use client'
 
 import { useMemo } from 'react'
+import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
 import { Container, PageHeader, SectionHeader } from '@/shared/ui'
-import { useCurrentContest, useContestEntries, usePreviousRanking } from '@/entities/contest'
+import { contestQueries } from '@/entities/contest'
 import { useHallOfFameUI } from '../_lib/useHallOfFame'
 import { ContestBanner } from './ContestBanner'
 import { EntryDetailModal } from './EntryDetailModal'
@@ -23,18 +24,19 @@ const HallOfFameContent = () => {
     closeModal,
   } = useHallOfFameUI()
 
-  const { data: currentContest } = useCurrentContest()
-  const { data: entriesData, fetchNextPage, hasNextPage } = useContestEntries()
-  const { data: previousRanking } = usePreviousRanking()
+  const { data: currentContest } = useQuery(contestQueries.current())
+  const {
+    data: entriesData,
+    fetchNextPage,
+    hasNextPage,
+  } = useInfiniteQuery(contestQueries.entries())
+  const { data: previousRanking } = useQuery(contestQueries.previousRanking())
 
   const ranking =
-    rankingPeriod === 'current'
-      ? (currentContest?.ranking ?? [])
-      : (previousRanking?.ranking ?? [])
+    rankingPeriod === 'current' ? (currentContest?.ranking ?? []) : (previousRanking?.ranking ?? [])
 
   const rankingDateRange = useMemo(() => {
-    const contest =
-      rankingPeriod === 'current' ? currentContest?.contest : previousRanking?.contest
+    const contest = rankingPeriod === 'current' ? currentContest?.contest : previousRanking?.contest
     if (!contest) return ''
     const start = new Date(contest.startDate)
     const end = new Date(contest.endDate)
@@ -82,11 +84,7 @@ const HallOfFameContent = () => {
           {isRankingOpen && (
             <div className="flex flex-col gap-3 tab:grid tab:grid-cols-3 tab:gap-5">
               {ranking.map((entry) => (
-                <RankingCard
-                  key={entry.id}
-                  entry={entry}
-                  onImageClick={() => selectEntry(entry)}
-                />
+                <RankingCard key={entry.id} entry={entry} onImageClick={() => selectEntry(entry)} />
               ))}
             </div>
           )}
@@ -107,11 +105,7 @@ const HallOfFameContent = () => {
             <>
               <div className="grid grid-cols-2 gap-4 tab:grid-cols-3 tab:gap-5">
                 {entries.map((entry) => (
-                  <VoteCard
-                    key={entry.id}
-                    entry={entry}
-                    onImageClick={() => selectEntry(entry)}
-                  />
+                  <VoteCard key={entry.id} entry={entry} onImageClick={() => selectEntry(entry)} />
                 ))}
               </div>
               {hasNextPage && (
