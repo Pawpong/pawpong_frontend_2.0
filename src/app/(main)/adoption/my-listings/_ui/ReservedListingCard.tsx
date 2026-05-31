@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { Badge, ListingStats, PostedDate } from '@/shared/ui'
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 import type { AdoptionListingCard } from '@/shared/types'
 import { ADOPTION_STATUS_LABEL, GENDER_LABEL } from '@/shared/types'
 

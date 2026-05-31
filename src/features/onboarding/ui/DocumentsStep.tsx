@@ -11,12 +11,11 @@ import { CheckboxField } from './CheckboxField'
 const DocumentsStep = () => {
   const { goBack } = useOnboarding()
 
-  const { control, handleSubmit, onSubmit } =
-    useStepForm<DocumentsFormData>('documents', {
-      idDocument: undefined,
-      registrationCert: undefined,
-      breederAgreed: false as unknown as true,
-    })
+  const { control, handleSubmit, onSubmit } = useStepForm<DocumentsFormData>('documents', {
+    idDocument: undefined,
+    registrationCert: undefined,
+    breederAgreed: false as unknown as true,
+  })
 
   return (
     <StepContainer

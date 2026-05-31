@@ -1,5 +1,5 @@
 import { Badge } from '@/shared/ui'
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 import { FILTER_TABS, type FilterTab } from '../_lib/constants'
 
 interface ChatFilterTabsProps {
@@ -15,10 +15,7 @@ const ChatFilterTabs = ({ value, onChange, className }: ChatFilterTabsProps) => 
         <button key={tab.value} type="button" onClick={() => onChange(tab.value)}>
           <Badge
             variant={value === tab.value ? 'status' : 'filled'}
-            className={cn(
-              'cursor-pointer',
-              value === tab.value && 'bg-text-primary text-white',
-            )}
+            className={cn('cursor-pointer', value === tab.value && 'bg-text-primary text-white')}
           >
             {tab.label}
           </Badge>

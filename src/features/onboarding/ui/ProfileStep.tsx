@@ -66,7 +66,7 @@ const ProfileStep = () => {
         계정 정보를 입력해주세요
       </StepTitle>
 
-      <div className="flex w-full max-w-[40.625rem] flex-col items-center gap-8 px-4 py-12 tab:gap-[3.625rem]  tab:py-12">
+      <div className="flex w-full max-w-[40.625rem] flex-col items-center gap-8 px-4 py-12 tab:gap-[3.625rem] tab:py-12">
         <StepIndicator />
 
         {/* 폼 영역 */}
@@ -164,10 +164,7 @@ const ProfileStep = () => {
         </div>
       </div>
 
-      <StepNavButtons
-        onNext={() => handleSubmit(onSubmit)()}
-        onBack={goBack}
-      />
+      <StepNavButtons onNext={() => handleSubmit(onSubmit)()} onBack={goBack} />
     </StepLayout>
   )
 }

@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { cafe24Proup } from '@/shared/lib/fonts'
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 
 interface UserTypeCardProps {
   label: string
@@ -23,7 +23,7 @@ const UserTypeCard = ({ label, imageSrc, textColor, selected, onClick }: UserTyp
       <span
         className={cn(
           cafe24Proup.className,
-          `relative z-10 font-cafe24 text-[1.5rem] font-bold leading-[1.5] tab:text-[2.5rem]`,
+          `relative z-10 font-cafe24 text-[1.5rem] leading-[1.5] font-bold tab:text-[2.5rem]`,
           textColor,
         )}
       >

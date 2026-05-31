@@ -37,11 +37,10 @@ const SAMPLE_KEYWORDS = [
 const InfoStep = () => {
   const { goBack } = useOnboarding()
 
-  const { register, control, handleSubmit, onSubmit } =
-    useStepForm<InfoFormData>('info', {
-      nickname: '',
-      selectedKeywords: [],
-    })
+  const { register, control, handleSubmit, onSubmit } = useStepForm<InfoFormData>('info', {
+    nickname: '',
+    selectedKeywords: [],
+  })
 
   return (
     <StepContainer
@@ -54,12 +53,7 @@ const InfoStep = () => {
 
         {/* 닉네임 + 중복검사 */}
         <div className="flex w-full gap-2">
-          <Input
-            type="text"
-            placeholder="닉네임"
-            {...register('nickname')}
-            className="flex-1"
-          />
+          <Input type="text" placeholder="닉네임" {...register('nickname')} className="flex-1" />
           <StepActionButton>중복 검사</StepActionButton>
         </div>
 

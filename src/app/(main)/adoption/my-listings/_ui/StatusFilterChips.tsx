@@ -1,6 +1,6 @@
 'use client'
 
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 import type { AdoptionStatus } from '@/shared/types'
 import { ADOPTION_STATUS_LABEL } from '@/shared/types'
 

@@ -4,7 +4,7 @@ import axios, {
   AxiosRequestConfig,
   InternalAxiosRequestConfig,
 } from 'axios'
-import { ApiError, normalizeApiError } from './Unwrap'
+import { ApiError, normalizeApiError } from './unwrap'
 
 export interface ApiRequestConfig extends AxiosRequestConfig {
   skipAuth?: boolean

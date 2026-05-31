@@ -1,6 +1,6 @@
 import { ArrowRightIcon } from '@/shared/assets/icons'
 import { DetailLink } from './DetailLink'
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 
 interface SectionHeaderProps {
   title: string

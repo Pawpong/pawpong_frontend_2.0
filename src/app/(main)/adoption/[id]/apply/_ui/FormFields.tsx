@@ -1,6 +1,6 @@
 import { Controller, type Control, type FieldPath } from 'react-hook-form'
 import { CheckboxIcon } from '@/shared/assets/icons'
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 import type { ApplicationFormValues } from '../_lib/schema'
 
 const FormSection = ({ title, children }: { title: string; children: React.ReactNode }) => (

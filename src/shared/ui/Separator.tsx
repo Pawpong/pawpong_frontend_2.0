@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as SeparatorPrimitive from '@radix-ui/react-separator'
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 
 interface SeparatorProps extends React.ComponentPropsWithoutRef<typeof SeparatorPrimitive.Root> {
   /** Container 패딩을 무시하고 화면 끝까지 확장 */
