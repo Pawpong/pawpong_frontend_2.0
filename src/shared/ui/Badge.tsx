@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { tv, type VariantProps } from 'tailwind-variants'
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 
 const badgeVariants = tv({
   base: 'inline-flex items-center justify-center rounded-[999px] whitespace-nowrap font-semibold',

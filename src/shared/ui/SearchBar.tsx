@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { tv, type VariantProps } from 'tailwind-variants'
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 
 const searchBarVariants = tv({
   base: 'flex items-center justify-between border border-[#a8a8a8] rounded-full px-[1.75rem] py-[0.75rem] w-full',

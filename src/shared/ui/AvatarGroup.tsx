@@ -1,6 +1,6 @@
 'use client'
 
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 import { Avatar, AvatarFallback, AvatarImage } from './Avatar'
 import type { VariantProps } from 'tailwind-variants'
 

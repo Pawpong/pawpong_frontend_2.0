@@ -2,7 +2,7 @@
 
 import type { SVGProps } from 'react'
 import { Container, Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui'
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 
 interface HomeTabConfig {
   id: string

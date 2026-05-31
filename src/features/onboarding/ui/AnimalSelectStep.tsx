@@ -1,7 +1,7 @@
 'use client'
 
 import { Controller } from 'react-hook-form'
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 import { useStepForm } from '../model/useStepForm'
 import { type AnimalSelectFormData, ANIMAL_TYPES } from '../model/schema'
 import { StepContainer } from './StepContainer'
@@ -13,10 +13,12 @@ const ANIMAL_OPTIONS = [
 ] as const
 
 const AnimalSelectStep = () => {
-  const { control, handleSubmit, watch, onSubmit } =
-    useStepForm<AnimalSelectFormData>('animal-select', {
+  const { control, handleSubmit, watch, onSubmit } = useStepForm<AnimalSelectFormData>(
+    'animal-select',
+    {
       selected: undefined as unknown as (typeof ANIMAL_TYPES)[number],
-    })
+    },
+  )
 
   const selected = watch('selected')
 

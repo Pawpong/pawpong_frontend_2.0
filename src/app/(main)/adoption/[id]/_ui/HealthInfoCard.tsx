@@ -1,4 +1,4 @@
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 import { Badge } from '@/shared/ui'
 import { CheckIcon } from '@/shared/assets/icons'
 import type { AdoptionDetailDto } from '@/shared/types'

@@ -1,5 +1,5 @@
-export { apiClient, API_VERSION } from './Client'
-export type { ApiRequestConfig } from './Client'
+export { apiClient, API_VERSION } from './client'
+export type { ApiRequestConfig } from './client'
 export {
   ApiError,
   createApiError,
@@ -8,10 +8,10 @@ export {
   unwrap,
   unwrapNullable,
   unwrapVoid,
-} from './Unwrap'
+} from './unwrap'
 export {
   createQuery,
   createInfiniteQuery,
   createInfiniteQueryWithHasMore,
   STALE_TIME,
-} from './QueryFactory'
+} from './queryFactory'

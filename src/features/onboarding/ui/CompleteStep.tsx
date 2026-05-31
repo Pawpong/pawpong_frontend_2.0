@@ -11,8 +11,7 @@ const CompleteStep = () => {
   const router = useRouter()
   const { userType } = useOnboarding()
 
-  const subtitle =
-    userType === 'breeder' ? '포퐁에 오신걸 환영해요!' : '포퐁에 오신걸 환영해요!'
+  const subtitle = userType === 'breeder' ? '포퐁에 오신걸 환영해요!' : '포퐁에 오신걸 환영해요!'
 
   return (
     <StepLayout className="flex-1">

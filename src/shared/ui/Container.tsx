@@ -1,4 +1,4 @@
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 
 interface ContainerProps {
   children: React.ReactNode

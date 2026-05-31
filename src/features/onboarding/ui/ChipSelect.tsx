@@ -1,6 +1,6 @@
 'use client'
 
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 
 interface ChipSelectProps {
   label: React.ReactNode
@@ -12,7 +12,7 @@ interface ChipSelectProps {
 const ChipSelect = ({ label, items, selected, onToggle }: ChipSelectProps) => (
   <>
     {/* 라벨 */}
-    <p className="text-[0.875rem] font-semibold leading-[1.5] text-[#3e3e3e] tab:text-base tab:font-bold">
+    <p className="text-[0.875rem] leading-[1.5] font-semibold text-[#3e3e3e] tab:text-base tab:font-bold">
       {label}
     </p>
 
@@ -26,7 +26,7 @@ const ChipSelect = ({ label, items, selected, onToggle }: ChipSelectProps) => (
             type="button"
             onClick={() => onToggle(item)}
             className={cn(
-              'rounded-full px-2 py-1 text-[0.875rem] font-medium leading-[1.5] tab:text-base',
+              'rounded-full px-2 py-1 text-[0.875rem] leading-[1.5] font-medium tab:text-base',
               isSelected
                 ? 'border border-[#3e3e3e] bg-[#3e3e3e] text-white'
                 : 'border border-[#cacaca] text-[#6b6b6b]',

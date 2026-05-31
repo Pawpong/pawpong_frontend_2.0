@@ -1,7 +1,7 @@
 'use client'
 
 import { tv } from 'tailwind-variants'
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 import { CATEGORY_LABEL, ANIMAL_CATEGORIES } from '@/shared/types'
 import type { AnimalCategory } from '@/shared/types'
 
