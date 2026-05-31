@@ -1,17 +1,32 @@
 import * as React from 'react'
+import { tv, type VariantProps } from 'tailwind-variants'
 import { cn } from '@/shared/lib/Cn'
 
-export const Textarea = React.forwardRef<
-  HTMLTextAreaElement,
-  React.TextareaHTMLAttributes<HTMLTextAreaElement>
->(({ className, ...props }, ref) => (
-  <textarea
-    ref={ref}
-    className={cn(
-      'flex w-full resize-none rounded-[0.375rem] border border-[#a8a8a8] bg-white p-[0.625rem] text-sm leading-[1.375rem] font-medium text-text-primary placeholder:text-[#a8a8a8] focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 tab:rounded-[1rem] tab:px-[1.25rem] tab:py-[0.9375rem] tab:text-base',
-      className,
-    )}
-    {...props}
-  />
-))
+const textareaVariants = tv({
+  base: 'flex h-[6.5625rem] w-full resize-none rounded-lg border bg-white p-3 text-[0.875rem] font-medium leading-[1.5] text-[#3e3e3e] outline-none placeholder:text-[#a6a6a6] focus:border-[#256ef4] disabled:cursor-not-allowed disabled:border-[#dbdbdb] disabled:bg-[#e4e4e4] disabled:text-[#b8b8b8]',
+  variants: {
+    state: {
+      default: 'border-[#cacaca]',
+      error: 'border-[#d63d4a]',
+    },
+  },
+  defaultVariants: {
+    state: 'default',
+  },
+})
+
+type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement> &
+  VariantProps<typeof textareaVariants>
+
+const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
+  ({ className, state, ...props }, ref) => (
+    <textarea
+      ref={ref}
+      className={cn(textareaVariants({ state }), className)}
+      {...props}
+    />
+  ),
+)
 Textarea.displayName = 'Textarea'
+
+export { Textarea, textareaVariants, type TextareaProps }

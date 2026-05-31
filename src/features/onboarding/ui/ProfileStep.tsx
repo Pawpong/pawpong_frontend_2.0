@@ -7,7 +7,8 @@ import { type ProfileFormData, EMAIL_DOMAINS } from '../model/schema'
 import { StepLayout } from './StepLayout'
 import { StepTitle } from './StepTitle'
 import { StepIndicator } from './StepIndicator'
-import { StepFieldLabel, StepInput, StepActionButton, StepSelect } from './StepInput'
+import { Input, InputField } from '@/shared/ui'
+import { StepActionButton, StepSelect } from './StepInput'
 import { StepNavButtons } from './StepNavButtons'
 import { CheckboxField } from './CheckboxField'
 
@@ -70,10 +71,9 @@ const ProfileStep = () => {
 
         {/* 폼 영역 */}
         <div className="flex w-full flex-col gap-4">
-          <div>
-            <StepFieldLabel label="이메일" required />
+          <InputField label="이메일" required>
             <div className="flex items-end gap-1">
-              <StepInput
+              <Input
                 type="text"
                 placeholder="이메일을 입력해주세요"
                 {...register('email')}
@@ -92,12 +92,11 @@ const ProfileStep = () => {
                 )}
               />
             </div>
-          </div>
+          </InputField>
 
-          <div>
-            <StepFieldLabel label="휴대폰 번호" required />
+          <InputField label="휴대폰 번호" required>
             <div className="flex items-end gap-2">
-              <StepInput
+              <Input
                 type="tel"
                 placeholder="휴대폰 번호를 입력해주세요"
                 {...register('phone')}
@@ -105,13 +104,12 @@ const ProfileStep = () => {
               />
               <StepActionButton>인증번호</StepActionButton>
             </div>
-          </div>
+          </InputField>
 
-          <div>
-            <StepFieldLabel label="인증번호" required />
+          <InputField label="인증번호" required>
             <div className="flex items-end gap-2">
               <div className="relative flex-1">
-                <StepInput
+                <Input
                   type="text"
                   placeholder="인증번호를 입력해주세요"
                   {...register('verificationCode')}
@@ -123,7 +121,7 @@ const ProfileStep = () => {
               </div>
               <StepActionButton disabled>확인</StepActionButton>
             </div>
-          </div>
+          </InputField>
         </div>
 
         {/* 약관 동의 */}

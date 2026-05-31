@@ -34,7 +34,7 @@ const StepContainer = ({
   <StepLayout className={layoutClassName}>
     <StepTitle subtitle={subtitle}>{title}</StepTitle>
 
-    <div className="flex w-full max-w-[40.625rem] flex-col items-center gap-8 px-4 py-12 tab:gap-[3.625rem] tab:py-12">
+    <div className="flex w-full max-w-[40.625rem] flex-col items-center gap-8 px-4 py-12 tab:gap-[3.625rem] tab:px-0 tab:py-12">
       <StepIndicator />
       {children}
     </div>

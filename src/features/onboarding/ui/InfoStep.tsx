@@ -5,7 +5,8 @@ import { useOnboarding } from '../model/OnboardingContext'
 import { useStepForm } from '../model/useStepForm'
 import { type InfoFormData } from '../model/schema'
 import { StepContainer } from './StepContainer'
-import { StepInput, StepActionButton } from './StepInput'
+import { Input } from '@/shared/ui'
+import { StepActionButton } from './StepInput'
 import { ChipSelect } from './ChipSelect'
 import { ProfileImageUpload } from './ProfileImageUpload'
 
@@ -53,7 +54,7 @@ const InfoStep = () => {
 
         {/* 닉네임 + 중복검사 */}
         <div className="flex w-full gap-2">
-          <StepInput
+          <Input
             type="text"
             placeholder="닉네임"
             {...register('nickname')}
