@@ -1,1 +1,1 @@
-export * from './model/hooks'
+export * from './api/adoption.mutations'

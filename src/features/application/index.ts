@@ -1,1 +1,1 @@
-export * from './model/hooks'
+export * from './api/application.mutations'

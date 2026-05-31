@@ -1,7 +1,8 @@
 'use client'
 
+import { useQuery } from '@tanstack/react-query'
 import { Container, Separator } from '@/shared/ui'
-import { useAdopterPublicProfile } from '@/entities/adopter'
+import { adopterQueries } from '@/entities/adopter'
 import { MOCK_MY_HOME_POSTS } from '@/shared/mocks/myHome'
 import { ProfileCard } from '../../_ui/ProfileCard'
 import { HomeTitle } from '../../_ui/HomeTitle'
@@ -13,7 +14,7 @@ interface UserHomeContentProps {
 }
 
 const UserHomeContent = ({ userId }: UserHomeContentProps) => {
-  const { data: profile } = useAdopterPublicProfile(userId)
+  const { data: profile } = useQuery(adopterQueries.publicProfile(userId))
   // TODO: 게시글 API 연결
   const posts = MOCK_MY_HOME_POSTS
 

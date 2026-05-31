@@ -1,11 +1,12 @@
 'use client'
 
 import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import Image from 'next/image'
 import { Container } from '@/shared/ui'
 import { MOCK_MY_HOME_POSTS } from '@/shared/mocks/myHome'
 import { createMockListings } from '@/shared/mocks/adoption'
-import { useBreederPublicProfile } from '@/entities/breeder'
+import { breederQueries } from '@/entities/breeder'
 import { ProfileCard } from '../../_ui/ProfileCard'
 import { BreederListingCard } from '../../_ui/BreederListingCard'
 import { AdoptionCard } from '@/entities/adoption'
@@ -21,7 +22,7 @@ interface BreederHomeContentProps {
 
 const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
   const [activeTab, setActiveTab] = useState('listings')
-  const { data: profile } = useBreederPublicProfile(userId)
+  const { data: profile } = useQuery(breederQueries.publicProfile(userId))
   // TODO: 분양 개체 / 게시글 API 연결
   const listings = createMockListings()
   const posts = MOCK_MY_HOME_POSTS

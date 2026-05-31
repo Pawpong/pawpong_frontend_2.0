@@ -1,6 +1,7 @@
 'use client'
 
-import { useAdopterPublicProfile } from '@/entities/adopter'
+import { useQuery } from '@tanstack/react-query'
+import { adopterQueries } from '@/entities/adopter'
 import { UserHomeContent } from './UserHomeContent'
 import { BreederHomeContent } from './BreederHomeContent'
 
@@ -9,7 +10,9 @@ interface UserHomeRouterProps {
 }
 
 const UserHomeRouter = ({ userId }: UserHomeRouterProps) => {
-  const { data: adopterProfile, isError: isAdopterError } = useAdopterPublicProfile(userId)
+  const { data: adopterProfile, isError: isAdopterError } = useQuery(
+    adopterQueries.publicProfile(userId),
+  )
 
   if (isAdopterError) {
     return <BreederHomeContent userId={userId} />

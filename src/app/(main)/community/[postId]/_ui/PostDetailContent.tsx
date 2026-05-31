@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
 import {
   AuthorInfo,
   Breadcrumb,
@@ -11,7 +12,7 @@ import {
 } from '@/shared/ui'
 import { FavoriteIcon, ChatBubbleIcon, MoreVertIcon } from '@/shared/assets/icons'
 import { MOCK_COMMUNITY_CATEGORIES } from '@/shared/mocks/community'
-import { useCommunityPostDetail, useCommunityComments } from '@/entities/community'
+import { communityQueries } from '@/entities/community'
 import { CategorySidebar } from '../../_ui/CategorySidebar'
 import { PostActionButton } from '../../_ui/PostActionButton'
 import { CommentItem } from './CommentItem'
@@ -21,13 +22,13 @@ interface PostDetailContentProps {
 }
 
 const PostDetailContent = ({ postId }: PostDetailContentProps) => {
-  const { data: post } = useCommunityPostDetail(postId)
+  const { data: post } = useQuery(communityQueries.detail(postId))
   const {
     data: commentsData,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useCommunityComments(postId)
+  } = useInfiniteQuery(communityQueries.comments(postId))
   const comments = commentsData?.pages.flatMap((page) => page.items) ?? []
 
   if (!post) return null

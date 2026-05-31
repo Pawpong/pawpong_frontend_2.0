@@ -1,9 +1,10 @@
 'use client'
 
+import { useQuery } from '@tanstack/react-query'
 import { cn } from '@/shared/lib/Cn'
 import { cafe24Proup } from '@/shared/lib/fonts'
 import { Container, SectionHeader } from '@/shared/ui'
-import { useAdopterFaqs, useBreederFaqs } from '@/entities/home'
+import { homeQueries } from '@/entities/home'
 import type { HomeUserType } from '@/shared/types'
 
 interface FaqSectionProps {
@@ -11,7 +12,9 @@ interface FaqSectionProps {
 }
 
 const FaqSection = ({ userType = 'adopter' }: FaqSectionProps) => {
-  const { data: faqs } = userType === 'adopter' ? useAdopterFaqs() : useBreederFaqs()
+  const { data: faqs } = useQuery(
+    userType === 'adopter' ? homeQueries.adopterFaqs() : homeQueries.breederFaqs(),
+  )
 
   return (
     <Container className="mt-[3rem] pb-[3rem]">
@@ -39,7 +42,10 @@ const FaqSection = ({ userType = 'adopter' }: FaqSectionProps) => {
           <SectionHeader title="자주 묻는 질문" linkText="자세히 보기" linkHref="/faq" />
           <div className="mt-[0.721rem] grid grid-cols-1 tab:mt-[1.6525rem] tab:grid-cols-2 tab:gap-x-[2.5rem]">
             {faqs?.map((faq) => (
-              <div key={faq.faqId} className="border-b border-[#a8a8a8] py-[0.625rem] first:border-t tab:py-[1.44rem] tab:[&:nth-child(2)]:border-t">
+              <div
+                key={faq.faqId}
+                className="border-b border-[#a8a8a8] py-[0.625rem] first:border-t tab:py-[1.44rem] tab:[&:nth-child(2)]:border-t"
+              >
                 <p className="text-[0.875rem] font-semibold text-[#818181] tab:text-[1rem]">
                   {faq.question}
                 </p>
