@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { type MouseEvent } from 'react'
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 import { useNavigationGuardContext } from '@/shared/lib/NavigationGuardContext'
 import { HomeIcon } from '@/shared/assets/icons'
 import { NAV_ITEMS } from './NavItems'

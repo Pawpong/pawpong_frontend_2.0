@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 
 import { FavoriteIcon } from '@/shared/assets/icons'
 import { Badge, FavoriteButton, ListingStats, PostedDate } from '@/shared/ui'

@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { cafe24Proup } from '@/shared/lib/fonts'
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 import { useOnboarding } from '../model/OnboardingContext'
 
 interface StepItemProps {
@@ -38,7 +38,7 @@ const StepItem = ({ label, index, isActive, showArrowBefore }: StepItemProps) =>
       <span
         className={cn(
           cafe24Proup.className,
-          'relative z-10 whitespace-nowrap font-cafe24 text-[0.625rem] font-bold leading-[1.5] tab:text-base',
+          'relative z-10 font-cafe24 text-[0.625rem] leading-[1.5] font-bold whitespace-nowrap tab:text-base',
           isActive ? 'text-[#a9835a]' : 'text-[#dbdbdb]',
         )}
       >

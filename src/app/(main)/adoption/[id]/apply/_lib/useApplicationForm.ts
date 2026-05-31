@@ -3,7 +3,7 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
-import { useCreateApplication } from '@/features/application/model/hooks'
+import { useCreateApplication } from '@/features/application'
 import { useExitGuard } from '@/shared/lib/useExitGuard'
 import { GENDER_LABEL } from '@/shared/types'
 import type { AdoptionDetailDto } from '@/shared/types'

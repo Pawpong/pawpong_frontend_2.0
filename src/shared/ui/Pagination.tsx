@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 
 export const Pagination = ({ className, ...props }: React.ComponentProps<'nav'>) => (
   <nav

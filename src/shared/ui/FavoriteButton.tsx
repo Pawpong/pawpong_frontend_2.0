@@ -1,5 +1,5 @@
 import { tv, type VariantProps } from 'tailwind-variants'
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 import { FavoriteIcon } from '@/shared/assets/icons'
 
 const favoriteButtonVariants = tv({

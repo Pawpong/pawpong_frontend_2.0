@@ -32,7 +32,12 @@ const ChatRoomPanel = ({ room, currentUserId, onBack }: ChatRoomPanelProps) => {
     <div className="flex h-[calc(100dvh-4rem)] flex-col">
       {/* Room Header */}
       <div className="flex items-center gap-[0.625rem] bg-white px-5 py-3 pc:gap-3 pc:py-5">
-        <button type="button" onClick={onBack} className="shrink-0 pc:hidden" aria-label="뒤로 가기">
+        <button
+          type="button"
+          onClick={onBack}
+          className="shrink-0 pc:hidden"
+          aria-label="뒤로 가기"
+        >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
             <path
               d="M15 18L9 12L15 6"
@@ -44,10 +49,14 @@ const ChatRoomPanel = ({ room, currentUserId, onBack }: ChatRoomPanelProps) => {
           </svg>
         </button>
         <div className="hidden size-11 shrink-0 rounded-full bg-fill-muted pc:block" />
-        <span className="flex-1 text-sm font-semibold leading-[1.5] text-text-primary pc:flex-none pc:text-xl pc:leading-[1.375rem]">
+        <span className="flex-1 text-sm leading-[1.5] font-semibold text-text-primary pc:flex-none pc:text-xl pc:leading-[1.375rem]">
           {displayName}
         </span>
-        {room.applicationId && <Badge variant="outline" className="text-xs pc:text-sm">80 BPM</Badge>}
+        {room.applicationId && (
+          <Badge variant="outline" className="text-xs pc:text-sm">
+            80 BPM
+          </Badge>
+        )}
       </div>
 
       {/* Pet Info Card */}

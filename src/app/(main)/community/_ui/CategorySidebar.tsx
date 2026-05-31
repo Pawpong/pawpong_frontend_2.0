@@ -1,6 +1,6 @@
 'use client'
 
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 import { Separator } from '@/shared/ui'
 import type { CommunityCategory } from '@/shared/mocks/community'
 

@@ -1,5 +1,5 @@
 import { tv, type VariantProps } from 'tailwind-variants'
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 
 const listingStatsVariants = tv({
   base: 'flex items-center font-medium text-[#8e8e8e]',
