@@ -38,7 +38,7 @@ const SignupTypeSelect = () => {
     <StepLayout className="flex-1">
       <StepTitle>회원유형을 선택해 주세요</StepTitle>
 
-      <div className="flex w-full max-w-[40.625rem] tab:flex-row flex-1 flex-col items-center justify-center gap-8 px-4 py-12 tab:gap-[3.625rem] tab:py-12">
+      <div className="flex w-full max-w-[40.625rem] flex-1 flex-col items-center justify-center gap-8 px-4 py-12 tab:flex-row tab:gap-[3.625rem] tab:py-12">
         {USER_TYPE_OPTIONS.map((option) => (
           <UserTypeCard
             key={option.value}
@@ -51,11 +51,7 @@ const SignupTypeSelect = () => {
         ))}
       </div>
 
-      <StepNavButtons
-        onNext={handleNext}
-        onBack={() => router.back()}
-        nextDisabled={!selected}
-      />
+      <StepNavButtons onNext={handleNext} onBack={() => router.back()} nextDisabled={!selected} />
     </StepLayout>
   )
 }

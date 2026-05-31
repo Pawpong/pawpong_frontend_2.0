@@ -1,5 +1,5 @@
 import { Checkbox, DetailLink } from '@/shared/ui'
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 import { CHECKBOX_CLASS } from './constants'
 
 interface CheckboxFieldProps {
@@ -23,7 +23,7 @@ const CheckboxField = ({
       onCheckedChange={(v) => onCheckedChange(v as boolean)}
       className={CHECKBOX_CLASS}
     />
-    <span className="flex-1 text-base font-medium leading-[1.5] text-[#3e3e3e]">{label}</span>
+    <span className="flex-1 text-base leading-[1.5] font-medium text-[#3e3e3e]">{label}</span>
     {hasDetailLink && <DetailLink variant="button" size="lg" />}
   </label>
 )

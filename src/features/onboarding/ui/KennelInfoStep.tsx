@@ -29,12 +29,14 @@ const BREED_KEYWORDS = [
 const KennelInfoStep = () => {
   const { goBack } = useOnboarding()
 
-  const { register, control, handleSubmit, onSubmit } =
-    useStepForm<KennelInfoFormData>('kennel-info', {
+  const { register, control, handleSubmit, onSubmit } = useStepForm<KennelInfoFormData>(
+    'kennel-info',
+    {
       breederName: '',
       region: undefined,
       selectedBreeds: [],
-    })
+    },
+  )
 
   return (
     <StepContainer

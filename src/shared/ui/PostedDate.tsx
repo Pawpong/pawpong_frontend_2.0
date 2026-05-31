@@ -1,5 +1,5 @@
 import { tv, type VariantProps } from 'tailwind-variants'
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 
 const postedDateVariants = tv({
   base: 'flex items-center gap-[0.438rem] text-[#a3a3a3]',

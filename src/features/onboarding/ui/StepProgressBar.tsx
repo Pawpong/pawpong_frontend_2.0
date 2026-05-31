@@ -1,7 +1,7 @@
 'use client'
 
 import { cafe24Proup } from '@/shared/lib/fonts'
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 import { useOnboarding } from '../model/OnboardingContext'
 
 const FILL_START = 10.4868
@@ -46,8 +46,20 @@ const ProgressBarSvg = ({ percent }: ProgressBarSvgProps) => {
       {/* 녹색 채움 (진행률) */}
       {clampedPercent > 0 && (
         <>
-          <rect x={FILL_START} y={9.25618} width={fillEndX - FILL_START} height={10.48222} fill="#39D264" />
-          <rect x={FILL_START} y={9.25618} width={fillEndX - FILL_START} height={4.02742} fill="#74F08E" />
+          <rect
+            x={FILL_START}
+            y={9.25618}
+            width={fillEndX - FILL_START}
+            height={10.48222}
+            fill="#39D264"
+          />
+          <rect
+            x={FILL_START}
+            y={9.25618}
+            width={fillEndX - FILL_START}
+            height={4.02742}
+            fill="#74F08E"
+          />
         </>
       )}
     </svg>
@@ -61,12 +73,12 @@ const StepProgressBar = () => {
   const progressPercent = Math.round(((currentStepIndex + 1) / (visibleSteps.length + 1)) * 100)
 
   return (
-    <div className="flex w-full items-center justify-center bg-white px-4 py-1 tab:px-12 pc:px-20 tab:py-2">
+    <div className="flex w-full items-center justify-center bg-white px-4 py-1 tab:px-12 tab:py-2 pc:px-20">
       <div className="flex w-full items-center justify-center gap-[0.125rem]">
         <div
           className={cn(
             cafe24Proup.className,
-            'flex flex-col items-center font-cafe24 text-[0.625rem] font-bold leading-[1.5] tab:text-[0.875rem]',
+            'flex flex-col items-center font-cafe24 text-[0.625rem] leading-[1.5] font-bold tab:text-[0.875rem]',
           )}
         >
           <span className="-mb-[0.3125rem] text-[#a9835a]">EXP</span>

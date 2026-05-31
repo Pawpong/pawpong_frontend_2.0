@@ -1,5 +1,5 @@
 import { ImageIcon } from '@/shared/assets/icons'
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 
 interface ProfileImageUploadProps {
   className?: string

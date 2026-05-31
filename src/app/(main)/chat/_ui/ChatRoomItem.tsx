@@ -1,6 +1,6 @@
 'use client'
 
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 import type { ChatRoomResponseDto } from '@/shared/types'
 import { formatRelativeTime, getDisplayName } from '../_lib/utils'
 
@@ -20,7 +20,8 @@ const ChatRoomItem = ({ room, isActive, unreadCount = 0, onClick }: ChatRoomItem
       onClick={onClick}
       className={cn(
         'relative flex w-full items-start gap-[1.1875rem] text-left',
-        isActive && 'before:absolute before:inset-x-[-1rem] before:inset-y-[-0.5rem] before:rounded-[0.375rem] before:bg-surface-placeholder',
+        isActive &&
+          'before:absolute before:inset-x-[-1rem] before:inset-y-[-0.5rem] before:rounded-[0.375rem] before:bg-surface-placeholder',
       )}
     >
       {/* Avatar */}
@@ -29,13 +30,15 @@ const ChatRoomItem = ({ room, isActive, unreadCount = 0, onClick }: ChatRoomItem
       {/* Content */}
       <div className="relative z-10 min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <span className="text-base font-semibold leading-[1.375rem] text-text-primary">{displayName}</span>
-          <span className="shrink-0 text-sm font-medium leading-[1.375rem] text-text-primary">
+          <span className="text-base leading-[1.375rem] font-semibold text-text-primary">
+            {displayName}
+          </span>
+          <span className="shrink-0 text-sm leading-[1.375rem] font-medium text-text-primary">
             {formatRelativeTime(room.lastMessageAt)}
           </span>
         </div>
         <div className="mt-[0.53rem] flex items-center gap-2">
-          <p className="min-w-0 flex-1 truncate text-base font-semibold leading-[1.375rem] text-text-primary">
+          <p className="min-w-0 flex-1 truncate text-base leading-[1.375rem] font-semibold text-text-primary">
             {room.lastMessage ?? ''}
           </p>
           {unreadCount > 0 && (

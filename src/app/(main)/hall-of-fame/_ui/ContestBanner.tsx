@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { cafe24Proup } from '@/shared/lib/fonts'
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 import type { ContestInfo, HomeUserType } from '@/shared/types'
 import { CONTEST_ACTION } from '../_lib/constants'
 

@@ -4,7 +4,7 @@ import type { ComponentType } from 'react'
 import { Avatar, AvatarFallback, AvatarImage, AvatarGroup, Badge } from '@/shared/ui'
 import type { AvatarItem } from '@/shared/ui'
 import Image from 'next/image'
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 import { LocationIcon } from '@/shared/assets/icons'
 import type { AdopterPublicProfile, BreederPublicProfile } from '@/shared/types'
 
@@ -174,9 +174,7 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
             {profile.nickname}
           </p>
           {/* Location — breeder, mobile only */}
-          {locationText && (
-            <LocationInfo location={locationText} className="mt-1 tab:hidden" />
-          )}
+          {locationText && <LocationInfo location={locationText} className="mt-1 tab:hidden" />}
           <Bio text={profile.bio} className="mt-3 hidden max-w-[26.1rem] tab:block" />
         </div>
 

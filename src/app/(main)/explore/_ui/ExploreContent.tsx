@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 import { cafe24Proup } from '@/shared/lib/fonts'
 import { SectionHeader } from '@/shared/ui'
 import { SearchBar, PopularKeywords } from '@/features/search'

@@ -3,7 +3,7 @@
 import { CloseIcon } from '@/shared/assets/icons'
 import { ExitConfirmDialog } from '@/shared/ui'
 import type { AdoptionDetailDto } from '@/shared/types'
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 import { useApplicationForm } from '../_lib/useApplicationForm'
 import { BreederProfile } from './BreederProfile'
 import { PetInfoCard } from './PetInfoCard'

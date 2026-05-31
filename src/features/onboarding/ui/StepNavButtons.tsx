@@ -1,4 +1,4 @@
-import { cn } from '@/shared/lib/Cn'
+import { cn } from '@/shared/lib/cn'
 
 interface StepNavButtonsProps {
   onNext?: () => void
@@ -21,7 +21,7 @@ const StepNavButtons = ({
 }: StepNavButtonsProps) => (
   <div
     className={cn(
-      'fixed right-0 bottom-0 left-0 z-10 flex flex-col items-center gap-3 bg-white px-4 py-4 tab:static tab:right-auto tab:bottom-auto tab:left-auto tab:z-auto tab:gap-5 tab:px-12 pc:px-20 tab:py-8',
+      'fixed right-0 bottom-0 left-0 z-10 flex flex-col items-center gap-3 bg-white px-4 py-4 tab:static tab:right-auto tab:bottom-auto tab:left-auto tab:z-auto tab:gap-5 tab:px-12 tab:py-8 pc:px-20',
       className,
     )}
   >
@@ -37,11 +37,7 @@ const StepNavButtons = ({
     )}
     {extraButtons}
     {onBack && (
-      <button
-        type="button"
-        onClick={onBack}
-        className="text-base font-medium text-[#3e3e3e]"
-      >
+      <button type="button" onClick={onBack} className="text-base font-medium text-[#3e3e3e]">
         {backLabel}
       </button>
     )}
