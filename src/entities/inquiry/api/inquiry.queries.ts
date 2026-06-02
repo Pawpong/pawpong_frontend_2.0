@@ -1,6 +1,6 @@
 import { createQuery, createInfiniteQueryWithHasMore } from '@/shared/api'
 import type { AnimalType, InquirySortType } from '@/shared/types'
-import { getInquiries, getInquiryDetail, getBreederInquiries } from './inquiry.api'
+import { getInquiries, getMyInquiries, getInquiryDetail, getBreederInquiries } from './inquiry.api'
 
 export const inquiryQueries = {
   all: () => ['inquiry'] as const,
@@ -9,6 +9,12 @@ export const inquiryQueries = {
     createInfiniteQueryWithHasMore({
       queryKey: [...inquiryQueries.all(), 'list', animalType, sort],
       queryFn: (page) => getInquiries(page, animalType, sort),
+    }),
+
+  myList: (animalType: AnimalType) =>
+    createInfiniteQueryWithHasMore({
+      queryKey: [...inquiryQueries.all(), 'my', animalType],
+      queryFn: (page) => getMyInquiries(page, animalType),
     }),
 
   detail: (inquiryId: string) =>
