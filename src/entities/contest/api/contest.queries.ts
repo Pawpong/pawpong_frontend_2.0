@@ -4,6 +4,9 @@ import {
   getContestEntries,
   getMyContestEntry,
   getPreviousRanking,
+  getRandomContestEntry,
+  getContestWeeklyTop,
+  getContestYesterdayTop,
   getHallOfFame,
 } from './contest.api'
 
@@ -42,6 +45,27 @@ export const contestQueries = {
     createInfiniteQuery({
       queryKey: [...contestQueries.all(), 'hallOfFame', limit],
       queryFn: (page) => getHallOfFame({ page, limit }),
+      staleTime: STALE_TIME.LONG,
+    }),
+
+  randomEntry: () =>
+    createQuery({
+      queryKey: [...contestQueries.all(), 'randomEntry'],
+      queryFn: () => getRandomContestEntry(),
+      staleTime: STALE_TIME.REALTIME,
+    }),
+
+  weeklyTop: () =>
+    createQuery({
+      queryKey: [...contestQueries.all(), 'weeklyTop'],
+      queryFn: () => getContestWeeklyTop(),
+      staleTime: STALE_TIME.LONG,
+    }),
+
+  yesterdayTop: () =>
+    createQuery({
+      queryKey: [...contestQueries.all(), 'yesterdayTop'],
+      queryFn: () => getContestYesterdayTop(),
       staleTime: STALE_TIME.LONG,
     }),
 }
