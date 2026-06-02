@@ -27,3 +27,19 @@
 :root {
   font-family: var(--font-pretendard), sans-serif;
 }
+
+/* 배너 캐러셀 페이지네이션 (Figma: active 노란 알약, inactive 갈색 점) */
+.banner-swiper {
+  --swiper-pagination-color: #fffa94;
+  --swiper-pagination-bullet-inactive-color: #a9835a;
+  --swiper-pagination-bullet-inactive-opacity: 1;
+  --swiper-pagination-bullet-width: 0.5rem;
+  --swiper-pagination-bullet-height: 0.5rem;
+  --swiper-pagination-bullet-horizontal-gap: 0.125rem;
+  --swiper-pagination-bottom: 1rem;
+}
+
+.banner-swiper .swiper-pagination-bullet-active {
+  width: 1.25rem;
+  border-radius: 0.5rem;
+}
