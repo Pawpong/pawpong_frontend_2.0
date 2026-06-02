@@ -20,6 +20,18 @@ export const getInquiries = async (
     .then((res) => unwrap(res, '문의 목록 조회에 실패했습니다.'))
 }
 
+/** 내 문의 목록 조회 */
+export const getMyInquiries = async (
+  page: number,
+  animalType: AnimalType,
+): Promise<InquiryListResponse> => {
+  return apiClient
+    .get<ApiResponse<InquiryListResponse>>(`${API_VERSION}/inquiry/my`, {
+      params: { page, limit: 15, animalType },
+    })
+    .then((res) => unwrap(res, '내 문의 목록 조회에 실패했습니다.'))
+}
+
 /** 문의 상세 조회 */
 export const getInquiryDetail = async (inquiryId: string): Promise<Inquiry | null> => {
   try {

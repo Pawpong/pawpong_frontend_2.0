@@ -53,3 +53,9 @@ export interface CreateInquiryRequest {
   targetBreederId?: string
   imageUrls?: string[]
 }
+
+export interface UpdateInquiryRequest {
+  title?: string
+  content?: string
+  imageUrls?: string[]
+}
