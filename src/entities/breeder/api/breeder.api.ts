@@ -7,6 +7,8 @@ import type {
   DashboardResponseDto,
   Breeder,
   SearchBreederParams,
+  BreederSearchItem,
+  BreederSearchParams,
   PaginationResponse,
   AvailablePetSummaryDto,
   ParentPetSummaryDto,
@@ -63,6 +65,19 @@ export const exploreBreeders = (params: SearchBreederParams = {}) =>
       data: PaginationResponse<Breeder>
       message?: string
     }>(`${API_VERSION}/breeder/explore`, params)
+    .then(unwrap)
+
+/** 브리더 검색 (레거시) */
+export const searchBreeders = (params: BreederSearchParams = {}) =>
+  apiClient
+    .get<{
+      success: boolean
+      data: PaginationResponse<BreederSearchItem>
+      message?: string
+    }>(`${API_VERSION}/breeder/search`, {
+      params,
+      skipAuth: true,
+    } as ApiRequestConfig)
     .then(unwrap)
 
 /** 인기 브리더 목록 */

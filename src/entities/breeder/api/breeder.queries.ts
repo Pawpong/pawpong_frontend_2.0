@@ -2,6 +2,8 @@ import { createQuery, createInfiniteQuery, STALE_TIME } from '@/shared/api'
 import type {
   SearchBreederParams,
   Breeder,
+  BreederSearchItem,
+  BreederSearchParams,
   AvailablePetSummaryDto,
   ParentPetSummaryDto,
   PublicReviewDto,
@@ -13,6 +15,7 @@ import {
   getMyBreederProfile,
   getBreederDashboard,
   exploreBreeders,
+  searchBreeders,
   getPopularBreeders,
   getBreederPets,
   getParentPets,
@@ -57,6 +60,12 @@ export const breederQueries = {
     createInfiniteQuery<Breeder>({
       queryKey: [...breederQueries.all(), 'explore', params],
       queryFn: (page) => exploreBreeders({ ...params, page }),
+    }),
+
+  search: (params: BreederSearchParams) =>
+    createInfiniteQuery<BreederSearchItem>({
+      queryKey: [...breederQueries.all(), 'search', params],
+      queryFn: (page) => searchBreeders({ ...params, page }),
     }),
 
   popular: () =>

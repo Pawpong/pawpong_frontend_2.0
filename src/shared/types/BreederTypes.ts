@@ -226,6 +226,34 @@ export interface SearchBreederParams {
   limit?: number
 }
 
+// ==================== 브리더 검색 (레거시 /breeder/search) ====================
+
+export interface BreederSearchItem {
+  breederId: string
+  breederName: string
+  location: string
+  specialization: string[]
+  averageRating: number
+  totalReviews: number
+  profileImage?: string
+  profilePhotos: string[]
+  verificationStatus: string
+  availablePets: number
+}
+
+export interface BreederSearchParams {
+  petType?: 'dog' | 'cat'
+  breedName?: string
+  cityName?: string
+  districtName?: string
+  isImmediatelyAvailable?: boolean
+  minPrice?: number
+  maxPrice?: number
+  page?: number
+  limit?: number
+  sortCriteria?: 'rating' | 'reviews' | 'latest' | 'price_low' | 'price_high'
+}
+
 // ==================== 브리더 대시보드 ====================
 
 export interface DashboardResponseDto {
