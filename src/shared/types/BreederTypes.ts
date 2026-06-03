@@ -81,18 +81,23 @@ interface PetBase {
   description?: string
 }
 
-/** 등록 요청: 부모 동물 */
+/** 등록 요청: 부모 동물 (POST /breeder-management/parent-pets) */
 export interface ParentPetAddRequest extends PetBase {
-  photoFileName: string
+  photoFileName?: string
+  photos?: string[]
 }
 
-/** 등록 요청: 분양 동물 */
+/** 수정 요청: 부모 동물 (PATCH) — 전 필드 선택 */
+export type ParentPetUpdateRequest = Partial<ParentPetAddRequest>
+
+/** 등록/수정 요청: 분양 동물 (POST/PATCH /breeder-management/available-pets) */
 export interface AvailablePetAddRequest extends PetBase {
   price: number
   parentInfo?: {
     mother?: string
     father?: string
   }
+  photos?: string[]
 }
 
 /** 공개 프로필용 부모 동물 요약 */
@@ -256,23 +261,75 @@ export interface DashboardResponseDto {
   }>
 }
 
+// ==================== 내 개체 목록 (breeder-management) ====================
+
+/** 내 개체 목록 아이템 (GET /breeder-management/my-pets) */
+export interface BreederMyPetItem {
+  petId: string
+  name: string
+  breed: string
+  gender: PetGender
+  birthDate: string
+  ageInMonths: number
+  price: number
+  status: PetStatus
+  isActive: boolean
+  mainPhoto: string
+  photoCount: number
+  viewCount: number
+  applicationCount: number
+  createdAt: string
+  updatedAt: string
+}
+
+/** 내 개체 목록 조회 파라미터 */
+export interface MyPetsParams {
+  status?: PetStatus
+  includeInactive?: boolean
+  page?: number
+  limit?: number
+}
+
+// ==================== 개체 등록/수정/상태 응답 ====================
+
+export interface PetAddResponse {
+  petId: string
+  message: string
+}
+
+export interface PetMessageResponse {
+  message: string
+}
+
+/** 개체 상태 변경 요청 (PATCH available-pets/{petId}/status) */
+export interface PetStatusUpdateRequest {
+  petStatus: PetStatus
+}
+
 // ==================== 브리더 후기 (브리더 수신) ====================
 
-export interface BreederReceivedReviewItemDto {
+/** 내게 달린 후기 목록 아이템 (GET /breeder-management/my-reviews) */
+export interface BreederMyReviewItem {
   reviewId: string
-  adopterId: string
-  adopterName: string
-  petId?: string
-  petName?: string
-  rating: number
-  comment: string
-  photos?: string[]
-  visibility: 'public' | 'private'
-  isReported: boolean
-  createdAt: string
-  replyContent?: string
-  replyWrittenAt?: string
-  replyUpdatedAt?: string
+  breederNickname: string
+  breederProfileImage: string
+  breederLevel: string
+  breedingPetType: string
+  content: string
+  reviewType: string
+  writtenAt: string
+}
+
+/** 내 후기 목록 조회 파라미터 */
+export interface MyReviewsParams {
+  visibility?: string
+  page?: number
+  limit?: number
+}
+
+/** 후기 답글 요청 (POST/PATCH reviews/{reviewId}/reply) */
+export interface ReviewReplyRequest {
+  content: string
 }
 
 export interface ReviewReplyResponseDto {
@@ -287,12 +344,40 @@ export interface ReviewReplyDeleteResponseDto {
   message: string
 }
 
-// ==================== 인증 서류 ====================
+// ==================== 인증 ====================
 
-export interface VerificationStatusDto extends Omit<BreederVerificationDto, 'plan'> {
-  breederId: string
+/** 브리더 인증 상태 조회 응답 (GET /breeder-management/verification) */
+export interface VerificationStatusResponse {
+  status: 'pending' | 'reviewing' | 'approved' | 'rejected'
+  plan?: 'basic' | 'premium' | 'enterprise'
+  level?: 'new' | 'intermediate' | 'advanced' | 'expert'
+  submittedAt?: string
+  reviewedAt?: string
+  documents?: BreederDocumentDto[]
+  rejectionReason?: string
   submittedByEmail?: boolean
 }
+
+/** 브리더 인증 신청 요청 (POST /breeder-management/verification) */
+export interface VerificationSubmitRequest {
+  businessNumber: string
+  businessName: string
+  plan: 'basic' | 'premium' | 'enterprise'
+  documents: string[]
+  businessAddress: string
+  experienceYears: string
+  specialBreeds: string
+  facilityDescription: string
+  veterinaryPartnership?: string
+  submittedByEmail?: boolean
+  additionalMessage?: string
+}
+
+export interface VerificationSubmitResponse {
+  message: string
+}
+
+// ==================== 인증 서류 ====================
 
 export interface UploadedDocumentDto extends BreederDocumentDto {
   fileName: string
@@ -305,16 +390,49 @@ export interface UploadDocumentsResponseDto {
   documents: UploadedDocumentDto[]
 }
 
+/** 인증 서류 제출 (간소화) 요청 (POST /breeder-management/verification/submit) */
 export interface SubmitDocumentsRequest {
   level: BreederLevel
-  documents: Array<Pick<BreederDocumentDto, 'type'> & { fileName: string }>
+  documents: Array<{ type: string; fileName: string; originalFileName?: string }>
   submittedByEmail?: boolean
+}
+
+// ==================== 입양 신청 폼 (간소화) ====================
+
+/** 간소화 신청 폼 수정 요청 (PATCH /breeder-management/application-form/simple) */
+export interface SimpleApplicationFormUpdateRequest {
+  questions: Array<{ question: string }>
+}
+
+export interface CustomQuestionDto {
+  id: string
+  type: string
+  label: string
+  required: boolean
+  options?: string[]
+  placeholder?: string
+  order: number
+  isStandard: boolean
+}
+
+export interface SimpleApplicationFormUpdateResponse {
+  message: string
+  customQuestions: CustomQuestionDto[]
+  totalQuestions: number
 }
 
 // ==================== 회원 탈퇴 ====================
 
+export type BreederAccountDeleteReason =
+  | 'no_inquiry'
+  | 'time_consuming'
+  | 'verification_difficult'
+  | 'policy_mismatch'
+  | 'uncomfortable_ui'
+  | 'other'
+
 export interface BreederAccountDeleteRequest {
-  reason?: string
+  reason: BreederAccountDeleteReason
   otherReason?: string
 }
 
