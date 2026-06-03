@@ -15,6 +15,11 @@ import type {
   ReceivedApplicationDetailDto,
   BreederApplicationFormDto,
   ChatMessageDto,
+  BreederMyPetItem,
+  MyPetsParams,
+  BreederMyReviewItem,
+  MyReviewsParams,
+  VerificationStatusResponse,
 } from '@/shared/types'
 
 /** 브리더 공개 프로필 조회 (브리더홈) */
@@ -144,6 +149,36 @@ export const getReceivedApplicationDetail = (applicationId: string) =>
       data: ReceivedApplicationDetailDto
       message?: string
     }>(`${API_VERSION}/breeder-management/applications/${applicationId}`)
+    .then(unwrap)
+
+/** 내 개체 목록 조회 (브리더 관리) */
+export const getMyPets = (params: MyPetsParams = {}) =>
+  apiClient
+    .get<{
+      success: boolean
+      data: PaginationResponse<BreederMyPetItem>
+      message?: string
+    }>(`${API_VERSION}/breeder-management/my-pets`, { params })
+    .then(unwrap)
+
+/** 내게 달린 후기 목록 조회 (브리더 관리) */
+export const getMyReceivedReviews = (params: MyReviewsParams = {}) =>
+  apiClient
+    .get<{
+      success: boolean
+      data: PaginationResponse<BreederMyReviewItem>
+      message?: string
+    }>(`${API_VERSION}/breeder-management/my-reviews`, { params })
+    .then(unwrap)
+
+/** 브리더 인증 상태 조회 */
+export const getBreederVerification = () =>
+  apiClient
+    .get<{
+      success: boolean
+      data: VerificationStatusResponse
+      message?: string
+    }>(`${API_VERSION}/breeder-management/verification`)
     .then(unwrap)
 
 /** 채팅 메시지 조회 */
