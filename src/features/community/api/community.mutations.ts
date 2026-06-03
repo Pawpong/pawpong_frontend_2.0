@@ -2,11 +2,17 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { communityQueries } from '@/entities/community'
-import type { CreateCommunityPostRequest, UpdateCommunityPostRequest } from '@/shared/types'
+import type {
+  CreateCommunityPostRequest,
+  UpdateCommunityPostRequest,
+  UpdateCommunityCommentRequest,
+} from '@/shared/types'
 import {
   createCommunityPost,
   updateCommunityPost,
   deleteCommunityPost,
+  updateCommunityComment,
+  deleteCommunityComment,
   bookmarkCommunityPost,
   unbookmarkCommunityPost,
 } from './community.api'
@@ -35,6 +41,26 @@ export const useDeleteCommunityPost = () => {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (postId: string) => deleteCommunityPost(postId),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: communityQueries.all() })
+    },
+  })
+}
+
+export const useUpdateCommunityComment = (commentId: string) => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (data: UpdateCommunityCommentRequest) => updateCommunityComment(commentId, data),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: communityQueries.all() })
+    },
+  })
+}
+
+export const useDeleteCommunityComment = () => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (commentId: string) => deleteCommunityComment(commentId),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: communityQueries.all() })
     },
