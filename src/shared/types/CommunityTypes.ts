@@ -110,3 +110,8 @@ export interface CommunityBookmarkListParams {
   page?: number
   pageSize?: number
 }
+
+/** 댓글 수정 요청 */
+export interface UpdateCommunityCommentRequest {
+  body: string
+}
