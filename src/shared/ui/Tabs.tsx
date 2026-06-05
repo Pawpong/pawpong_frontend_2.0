@@ -2,32 +2,68 @@
 
 import * as React from 'react'
 import * as TabsPrimitive from '@radix-ui/react-tabs'
+import { tv, type VariantProps } from 'tailwind-variants'
 import { cn } from '@/shared/lib/cn'
+import { cafe24Proup } from '@/shared/lib/fonts'
 
 export const Tabs = TabsPrimitive.Root
 
+const tabsListVariants = tv({
+  base: 'inline-flex items-center',
+  variants: {
+    variant: {
+      default: 'justify-center',
+      // Figma: 하단 보더 + 전폭 (탭 균등 분할)
+      underline: 'w-full border-b border-[#cacaca]',
+    },
+  },
+  defaultVariants: { variant: 'default' },
+})
+
 export const TabsList = React.forwardRef<
   React.ComponentRef<typeof TabsPrimitive.List>,
-  React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>
->(({ className, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.List> & VariantProps<typeof tabsListVariants>
+>(({ className, variant, ...props }, ref) => (
   <TabsPrimitive.List
     ref={ref}
-    className={cn('inline-flex items-center justify-center', className)}
+    className={cn(tabsListVariants({ variant }), className)}
     {...props}
   />
 ))
 TabsList.displayName = TabsPrimitive.List.displayName
 
+const tabsTriggerVariants = tv({
+  base: 'inline-flex items-center justify-center whitespace-nowrap transition-all disabled:pointer-events-none disabled:opacity-50',
+  variants: {
+    variant: {
+      default: '',
+      // Figma: 라벨 상단 + 하단 갈색 바, 고정 높이(텍스트-바 간격). 활성 갈색/비활성 회색.
+      // cafe24 폰트 — 변수 단독으론 미적용이라 className 병행
+      underline: cn(
+        cafe24Proup.className,
+        'relative flex-1 items-start font-cafe24 text-[#a6a6a6] data-[state=active]:text-[#a9835a]',
+        'after:absolute after:bottom-0 after:left-0 after:w-full after:bg-[#a9835a]',
+        'after:opacity-0 data-[state=active]:after:opacity-100',
+      ),
+    },
+    size: { lg: '', md: '' },
+  },
+  compoundVariants: [
+    // 탭 높이: large 61px / medium 37px (컨테이너 pt 포함 시 77/49)
+    { variant: 'underline', size: 'lg', class: 'h-[3.8125rem] pt-2 text-base after:h-[0.5625rem]' },
+    { variant: 'underline', size: 'md', class: 'h-[2.3125rem] pt-1 text-xs after:h-[0.3125rem]' },
+  ],
+  defaultVariants: { variant: 'default', size: 'lg' },
+})
+
 export const TabsTrigger = React.forwardRef<
   React.ComponentRef<typeof TabsPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
->(({ className, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger> &
+    VariantProps<typeof tabsTriggerVariants>
+>(({ className, variant, size, ...props }, ref) => (
   <TabsPrimitive.Trigger
     ref={ref}
-    className={cn(
-      'inline-flex items-center justify-center whitespace-nowrap transition-all disabled:pointer-events-none disabled:opacity-50',
-      className,
-    )}
+    className={cn(tabsTriggerVariants({ variant, size }), className)}
     {...props}
   />
 ))
