@@ -1,6 +1,5 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { SectionHeader } from '@/shared/ui'
 import { cafe24Proup } from '@/shared/lib/fonts'
 import { cn } from '@/shared/lib/cn'
 
@@ -50,8 +49,8 @@ const CategoryCard = ({ label, href, icon }: CategoryCardProps) => {
 
 const CategoryBrowse = () => {
   return (
-    <div className="flex flex-col gap-[0.75rem]">
-      <SectionHeader title="둘러보기" />
+    /* 카테고리 영역 (Figma home-layout: mo py24/px16/gap8, tab py32/px48/gap12, pc py48/px80/gap12) */
+    <div className="flex flex-col items-center justify-center gap-2 px-4 py-6 tab:gap-3 tab:px-12 tab:py-8 pc:px-20 pc:py-12">
       <div className="mx-auto grid w-fit grid-cols-2 gap-x-[1.25rem] gap-y-[0.5rem] tab:grid-cols-4 tab:gap-y-0 pc:gap-x-[2rem]">
         {/* [refactored] 카드 렌더링을 CategoryCard로 위임 */}
         {CATEGORIES.map((category) => (
