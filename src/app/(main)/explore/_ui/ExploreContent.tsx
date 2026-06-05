@@ -4,7 +4,7 @@ import { useState, useCallback } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { cn } from '@/shared/lib/cn'
 import { cafe24Proup } from '@/shared/lib/fonts'
-import { SectionHeader } from '@/shared/ui'
+import { SectionHeader, Tabs, TabsList, TabsTrigger } from '@/shared/ui'
 import { SearchBar, PopularKeywords } from '@/features/search'
 import { CategoryFilter } from '@/features/category-filter'
 import { AdoptionCard, AdoptionCardHorizontal } from '@/entities/adoption'
@@ -63,25 +63,26 @@ const ExploreContent = () => {
 
   return (
     <div className="mx-auto flex w-full max-w-[67.5rem] flex-col">
-      {/* 모바일 탭 — 입양 탐색 / 브리더 탐색 */}
-      <div className="flex items-center tab:hidden">
-        {EXPLORE_TABS.map((tab) => (
-          <button
-            key={tab.type}
-            type="button"
-            onClick={() => handleTypeChange(tab.type)}
-            className={cn(
-              cafe24Proup.className,
-              'flex flex-1 items-center justify-center border-b-2 p-[0.625rem] font-cafe24 leading-[1.375rem]',
-              selectedType === tab.type
-                ? 'border-[#5d5d5d] text-[0.875rem] text-[#5d5d5d]'
-                : 'border-transparent text-[0.75rem] text-[#a7a7a7]',
-            )}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      {/* 탐색 탭 — 입양 탐색 / 브리더 탐색 (Figma 언더라인 탭: 모바일 md / 태블릿+ lg) */}
+      <Tabs
+        value={selectedType}
+        onValueChange={(value) => handleTypeChange(value as ExploreType)}
+        className="pt-3 tab:pt-4"
+      >
+        <TabsList variant="underline">
+          {EXPLORE_TABS.map((tab) => (
+            <TabsTrigger
+              key={tab.type}
+              value={tab.type}
+              variant="underline"
+              size="md"
+              className="tab:h-[3.8125rem] tab:pt-2 tab:text-base tab:after:h-[0.5625rem]"
+            >
+              {tab.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
 
       {/* ══════ 모바일: 타이틀 + 카테고리 ══════ */}
       <div className="flex flex-col gap-[0.75rem] py-5 tab:hidden">
