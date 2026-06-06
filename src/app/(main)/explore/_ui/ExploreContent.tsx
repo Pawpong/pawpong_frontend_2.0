@@ -2,8 +2,8 @@
 
 import { useState, useCallback } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
-import { SectionHeader, Tabs, TabsList, TabsTrigger } from '@/shared/ui'
-import { SearchBar, PopularKeywords } from '@/features/search'
+import { SectionHeader, Tabs, TabsList, TabsTrigger, SearchBar } from '@/shared/ui'
+import { PopularKeywords } from '@/features/search'
 import { CategoryFilter } from '@/features/category-filter'
 import { AdoptionCard, AdoptionCardHorizontal } from '@/entities/adoption'
 import { createMockListings } from '@/shared/mocks/adoption'

@@ -1,9 +1,9 @@
-import { Container } from '@/shared/ui'
+import { Container, SearchBar } from '@/shared/ui'
 import { Banner } from '@/widgets/banner'
 import { HallOfFame } from '@/widgets/hall-of-fame'
 import { CommunityShowcase } from '@/widgets/community-showcase'
 import { FaqSection } from '@/widgets/faq'
-import { SearchBar, PopularKeywords } from '@/features/search'
+import { PopularKeywords } from '@/features/search'
 import { CategoryBrowse } from '@/features/category-browse'
 import type { HomeUserType } from '@/shared/types'
 
