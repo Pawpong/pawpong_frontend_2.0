@@ -14,13 +14,8 @@ const BreederExploreContent = () => {
 
   return (
     <>
-      {/* 데스크탑 타이틀 */}
-      <p className="hidden px-[6.25rem] py-[0.625rem] text-center text-[1.25rem] leading-[1.375rem] font-bold text-[#5d5d5d] tab:mt-[2.188rem] tab:block">
-        신뢰있는 브리더들을 만나보세요
-      </p>
-
       {/* 검색바 + 인기 검색어 */}
-      <div className="w-full tab:mx-auto tab:mt-[1.25rem] tab:max-w-[42.5rem]">
+      <div className="w-full tab:mx-auto tab:mt-[2.188rem] tab:max-w-[42.5rem]">
         <SearchBar placeholder={SEARCH_PLACEHOLDERS.breeder} />
         <PopularKeywords />
       </div>

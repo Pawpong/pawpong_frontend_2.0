@@ -2,14 +2,12 @@
 
 import { useState, useCallback } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
-import { cn } from '@/shared/lib/cn'
-import { cafe24Proup } from '@/shared/lib/fonts'
 import { SectionHeader, Tabs, TabsList, TabsTrigger } from '@/shared/ui'
 import { SearchBar, PopularKeywords } from '@/features/search'
 import { CategoryFilter } from '@/features/category-filter'
 import { AdoptionCard, AdoptionCardHorizontal } from '@/entities/adoption'
 import { createMockListings } from '@/shared/mocks/adoption'
-import { CATEGORY_DESCRIPTION, ANIMAL_CATEGORIES } from '@/shared/types'
+import { ANIMAL_CATEGORIES } from '@/shared/types'
 import type { AnimalCategory } from '@/shared/types'
 import { BreederExploreContent } from './BreederExploreContent'
 import { EXPLORE_TABS, SEARCH_PLACEHOLDERS } from '../_lib/constants'
@@ -84,39 +82,17 @@ const ExploreContent = () => {
         </TabsList>
       </Tabs>
 
-      {/* ══════ 모바일: 타이틀 + 카테고리 ══════ */}
-      <div className="flex flex-col gap-[0.75rem] py-5 tab:hidden">
-        <p
-          className={cn(
-            cafe24Proup.className,
-            'text-center font-cafe24 text-[0.875rem] leading-[1.5] text-[#5d5d5d]',
-          )}
-        >
-          {selectedType === 'breeder'
-            ? '신뢰있는 브리더들을 만나보세요'
-            : CATEGORY_DESCRIPTION[selectedCategory]}
-        </p>
+      {/* ══════ 카테고리 영역 (Figma: mo py24/px16/gap8, tab py32/px48/gap12, pc py48/px80/gap12) ══════ */}
+      <div className="flex flex-col items-center justify-center gap-2 px-4 py-6 tab:gap-3 tab:px-12 tab:py-8 pc:px-20 pc:py-12">
         <CategoryFilter selected={selectedCategory} onChange={handleCategoryChange} />
       </div>
-
-      {/* ══════ 데스크탑: 카테고리 ══════ */}
-      <CategoryFilter
-        selected={selectedCategory}
-        onChange={handleCategoryChange}
-        className="mt-[2.188rem] hidden tab:grid"
-      />
 
       {selectedType === 'breeder' ? (
         <BreederExploreContent />
       ) : (
         <>
-          {/* 데스크탑 타이틀 — Pretendard Bold 20px, px100, h52, 중앙 정렬 (gap 35px from category) */}
-          <p className="hidden px-[6.25rem] py-[0.625rem] text-center text-[1.25rem] leading-[1.375rem] font-bold text-[#5d5d5d] tab:mt-[2.188rem] tab:block">
-            {CATEGORY_DESCRIPTION[selectedCategory]}
-          </p>
-
           {/* 검색바 + 인기 검색어 */}
-          <div className="w-full tab:mx-auto tab:mt-[1.25rem] tab:max-w-[42.5rem]">
+          <div className="w-full tab:mx-auto tab:mt-[2.188rem] tab:max-w-[42.5rem]">
             <SearchBar placeholder={SEARCH_PLACEHOLDERS.adoption} />
             <PopularKeywords />
           </div>
