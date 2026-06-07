@@ -2,8 +2,8 @@
 
 import { useState, useCallback } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
-import { SectionHeader, Tabs, TabsList, TabsTrigger, SearchBar } from '@/shared/ui'
-import { PopularKeywords } from '@/features/search'
+import { SectionHeader, Tabs, TabsList, TabsTrigger } from '@/shared/ui'
+import { SearchSection } from '@/features/search'
 import { CategoryFilter } from '@/features/category-filter'
 import { AdoptionCard, AdoptionCardHorizontal } from '@/entities/adoption'
 import { createMockListings } from '@/shared/mocks/adoption'
@@ -83,7 +83,7 @@ const ExploreContent = () => {
       </Tabs>
 
       {/* ══════ 카테고리 영역 (Figma: mo py24/px16/gap8, tab py32/px48/gap12, pc py48/px80/gap12) ══════ */}
-      <div className="flex flex-col items-center justify-center gap-2 px-4 py-6 tab:gap-3 tab:px-12 tab:py-8 pc:px-20 pc:py-12">
+      <div className="flex flex-col items-center justify-center gap-2 py-6 tab:gap-3 tab:py-8 pc:py-12">
         <CategoryFilter selected={selectedCategory} onChange={handleCategoryChange} />
       </div>
 
@@ -92,10 +92,11 @@ const ExploreContent = () => {
       ) : (
         <>
           {/* 검색바 + 인기 검색어 */}
-          <div className="w-full tab:mx-auto tab:mt-[2.188rem] tab:max-w-[42.5rem]">
-            <SearchBar placeholder={SEARCH_PLACEHOLDERS.adoption} />
-            <PopularKeywords />
-          </div>
+          <SearchSection
+            placeholder={SEARCH_PLACEHOLDERS.adoption}
+            withPadding={false}
+            className="tab:mt-[2.188rem]"
+          />
 
           {/* ─── 인기 있는 동물들 (mo: top475→검색바 후 ~gap33, pc: top584→gap ~64px) ─── */}
           <section className="mt-[2.063rem] flex flex-col gap-[0.75rem] tab:mt-[4rem] tab:gap-[1.25rem]">
