@@ -13,8 +13,10 @@ const tabsListVariants = tv({
   variants: {
     variant: {
       default: 'justify-center',
-      // Figma: 하단 보더 + 전폭 (탭 균등 분할)
-      underline: 'w-full border-b border-[#cacaca]',
+      // flex(block-level)로 두어 inline-flex line-box strut 여백을 없앤다
+      // (바깥 래퍼 border-b 회색선과 갈색 바가 틈 없이 붙도록).
+      // 탭은 flex-1 균등 분할이라 고정 gap은 두지 않는다(좁은 화면 라벨 잘림 방지).
+      underline: 'flex w-full justify-center',
     },
   },
   defaultVariants: { variant: 'default' },
