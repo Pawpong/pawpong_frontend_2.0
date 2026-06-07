@@ -13,7 +13,7 @@ const PopularKeywords = () => {
 
   // 라벨은 항상 노출, 키워드는 데이터 있을 때만 렌더
   return (
-    <div className="mt-[1.125rem] flex items-center gap-[1.0625rem]">
+    <div className="flex items-center gap-5">
       <span className="shrink-0 text-center text-base leading-[1.5] font-medium text-[#3e3e3e]">
         인기 검색어
       </span>

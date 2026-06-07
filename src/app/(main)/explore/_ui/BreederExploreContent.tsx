@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { SectionHeader, SearchBar } from '@/shared/ui'
-import { PopularKeywords } from '@/features/search'
+import { SectionHeader } from '@/shared/ui'
+import { SearchSection } from '@/features/search'
 import { SEARCH_PLACEHOLDERS } from '../_lib/constants'
 import { BreederCard } from '@/app/(main)/home/_ui/BreederCard'
 import { BreederCardHorizontal } from './BreederCardHorizontal'
@@ -15,10 +15,11 @@ const BreederExploreContent = () => {
   return (
     <>
       {/* 검색바 + 인기 검색어 */}
-      <div className="w-full tab:mx-auto tab:mt-[2.188rem] tab:max-w-[42.5rem]">
-        <SearchBar placeholder={SEARCH_PLACEHOLDERS.breeder} />
-        <PopularKeywords />
-      </div>
+      <SearchSection
+        placeholder={SEARCH_PLACEHOLDERS.breeder}
+        withPadding={false}
+        className="tab:mt-[2.188rem]"
+      />
 
       {/* 주목할 브리더 */}
       <section className="mt-[2.063rem] flex flex-col gap-[0.75rem] tab:mt-[4rem] tab:gap-[1.25rem]">
