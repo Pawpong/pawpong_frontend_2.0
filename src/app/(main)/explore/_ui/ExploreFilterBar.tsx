@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { SearchIcon } from '@/shared/ui'
+import { SearchIcon, badgeVariants } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { ANIMAL_CATEGORIES, CATEGORY_LABEL } from '@/shared/types'
 import type { AnimalCategory } from '@/shared/types'
@@ -59,32 +59,26 @@ const ExploreFilterBar = ({ selected, onChange, className }: ExploreFilterBarPro
           </button>
 
           {/* 전체폭 검색바 */}
-          <div className={cn(PILL_BASE, 'min-w-0 flex-1 justify-between gap-2 border-[#a6a6a6] px-2')}>
+          <div
+            className={cn(PILL_BASE, 'min-w-0 flex-1 justify-between gap-2 border-[#a6a6a6] px-2')}
+          >
             {searchContent}
           </div>
         </>
       ) : (
         <>
-          {/* 카테고리 칩 (badge) */}
+          {/* 카테고리 칩 — 공통 Badge(default/active) */}
           <div className="flex flex-wrap items-center gap-2">
-            {ANIMAL_CATEGORIES.map((category) => {
-              const active = selected === category
-              return (
-                <button
-                  key={category}
-                  type="button"
-                  onClick={() => onChange(category)}
-                  className={cn(
-                    'flex items-center rounded-full px-2 py-1 text-base leading-[1.5] font-medium whitespace-nowrap',
-                    active
-                      ? 'bg-[#3e3e3e] text-[#f6f6f6]'
-                      : 'border border-[#cacaca] bg-white text-[#6b6b6b]',
-                  )}
-                >
-                  {CATEGORY_LABEL[category]}
-                </button>
-              )
-            })}
+            {ANIMAL_CATEGORIES.map((category) => (
+              <button
+                key={category}
+                type="button"
+                onClick={() => onChange(category)}
+                className={badgeVariants({ variant: selected === category ? 'active' : 'default' })}
+              >
+                {CATEGORY_LABEL[category]}
+              </button>
+            ))}
           </div>
 
           {/* 작은 "검색" 버튼 — 클릭 시 검색바 펼침 */}
