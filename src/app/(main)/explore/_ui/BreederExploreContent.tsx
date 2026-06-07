@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { SectionHeader } from '@/shared/ui'
-import { SearchBar, PopularKeywords } from '@/features/search'
+import { SectionHeader, SearchBar } from '@/shared/ui'
+import { PopularKeywords } from '@/features/search'
 import { SEARCH_PLACEHOLDERS } from '../_lib/constants'
 import { BreederCard } from '@/app/(main)/home/_ui/BreederCard'
 import { BreederCardHorizontal } from './BreederCardHorizontal'
