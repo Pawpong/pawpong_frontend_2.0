@@ -1,15 +1,15 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useCallback } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
-import { Container, SectionHeader, Tabs, TabsList, TabsTrigger } from '@/shared/ui'
+import { Container, Tabs, TabsList, TabsTrigger } from '@/shared/ui'
 import { SearchSection } from '@/features/search'
 import { CategoryFilter } from '@/features/category-filter'
-import { AdoptionCard, AdoptionCardHorizontal } from '@/entities/adoption'
 import { createMockListings } from '@/shared/mocks/adoption'
 import { ANIMAL_CATEGORIES } from '@/shared/types'
 import type { AnimalCategory } from '@/shared/types'
 import { BreederExploreContent } from './BreederExploreContent'
+import { AdoptionListingSection } from './AdoptionListingSection'
 import { EXPLORE_TABS, SEARCH_PLACEHOLDERS } from '../_lib/constants'
 import type { ExploreType } from '../_lib/constants'
 
@@ -56,9 +56,6 @@ const ExploreContent = () => {
     [searchParams, router, pathname],
   )
 
-  const [popularCollapsed, setPopularCollapsed] = useState(false)
-  const [allCollapsed, setAllCollapsed] = useState(false)
-
   return (
     <>
       {/* ══════ 탐색 탭 바 (Figma 'tab bar-layout') ══════
@@ -90,75 +87,34 @@ const ExploreContent = () => {
 
       {/* ══════ 콘텐츠 영역 — 1080 중앙 정렬 ══════ */}
       <Container>
-        <div className="mx-auto flex w-full max-w-[67.5rem] flex-col">
-          {/* 카테고리 영역 (Figma: mo py24/px16/gap8, tab py32/px48/gap12, pc py48/px80/gap12) */}
-          <div className="flex flex-col items-center justify-center gap-2 py-6 tab:gap-3 tab:py-8 pc:py-12">
-            <CategoryFilter selected={selectedCategory} onChange={handleCategoryChange} />
-          </div>
-
-          {selectedType === 'breeder' ? (
-            <BreederExploreContent />
-          ) : (
-            <>
-              {/* 검색바 + 인기 검색어 */}
-              <SearchSection
-                placeholder={SEARCH_PLACEHOLDERS.adoption}
-                withPadding={false}
-                className="tab:mt-[2.188rem]"
-              />
-
-              {/* ─── 인기 있는 동물들 (mo: top475→검색바 후 ~gap33, pc: top584→gap ~64px) ─── */}
-              <section className="mt-[2.063rem] flex flex-col gap-[0.75rem] tab:mt-[4rem] tab:gap-[1.25rem]">
-                <SectionHeader
-                  title={`인기있는 동물들 ${popularListings.length}`}
-                  collapsible
-                  collapsed={popularCollapsed}
-                  onToggle={() => setPopularCollapsed((prev) => !prev)}
-                />
-                {/* 모바일: 가로형 카드 리스트 (gap 12px) */}
-                {!popularCollapsed && (
-                  <div className="flex flex-col gap-[0.75rem] tab:hidden">
-                    {popularListings.map((listing) => (
-                      <AdoptionCardHorizontal key={listing.listingId} listing={listing} />
-                    ))}
-                  </div>
-                )}
-                {/* 데스크탑: 3열 세로형 카드 (gap 18.493px) */}
-                <div className="hidden tab:grid tab:grid-cols-3 tab:gap-[1.156rem]">
-                  {popularListings.map((listing) => (
-                    <AdoptionCard key={listing.listingId} listing={listing} />
-                  ))}
-                </div>
-              </section>
-
-              {/* ─── 전체 입양 소식 (mo: gap20, pc: gap64→4rem) ─── */}
-              <section className="mt-[1.25rem] flex flex-col gap-[0.75rem] tab:mt-[4rem] tab:gap-[1.25rem]">
-                <SectionHeader
-                  title={`전체 입양 소식 ${mockListings.length}`}
-                  collapsible
-                  collapsed={allCollapsed}
-                  onToggle={() => setAllCollapsed((prev) => !prev)}
-                />
-                {/* 모바일 2열 / 데스크탑 3열, gap 피그마: mo 15.5px, pc 18.493px */}
-                {!allCollapsed && (
-                  <div className="grid grid-cols-2 gap-[0.97rem] tab:hidden">
-                    {mockListings.map((listing) => (
-                      <AdoptionCard key={listing.listingId} listing={listing} />
-                    ))}
-                  </div>
-                )}
-                <div className="hidden tab:grid tab:grid-cols-3 tab:gap-[1.156rem]">
-                  {mockListings.map((listing) => (
-                    <AdoptionCard key={listing.listingId} listing={listing} />
-                  ))}
-                </div>
-              </section>
-
-              {/* 하단 여백 */}
-              <div className="h-[4rem]" />
-            </>
-          )}
+        {/* 카테고리 영역 (Figma: mo py24/px16/gap8, tab py32/px48/gap12, pc py48/px80/gap12) */}
+        <div className="flex flex-col items-center justify-center gap-2 py-6 tab:gap-3 tab:py-8 pc:py-12">
+          <CategoryFilter selected={selectedCategory} onChange={handleCategoryChange} />
         </div>
+
+        {selectedType === 'breeder' ? (
+          <BreederExploreContent />
+        ) : (
+          <>
+            {/* 검색바 + 인기 검색어 */}
+            <SearchSection placeholder={SEARCH_PLACEHOLDERS.adoption} withPadding={false} />
+
+            {/* [refactored] 인기 동물 / 전체 입양 소식 — 공통 컴포넌트로 통합 (상단 여백만 차이) */}
+            <AdoptionListingSection
+              title="인기 동물"
+              listings={popularListings}
+              className="mt-[2.063rem]"
+            />
+            <AdoptionListingSection
+              title="전체 입양 소식"
+              listings={mockListings}
+              className="mt-[1.25rem]"
+            />
+
+            {/* 하단 여백 */}
+            <div className="h-[4rem]" />
+          </>
+        )}
       </Container>
     </>
   )

@@ -22,16 +22,22 @@ const favoriteIconSize = {
 
 interface FavoriteButtonProps extends VariantProps<typeof favoriteButtonVariants> {
   className?: string
+  iconClassName?: string
   onClick?: () => void
 }
 
-const FavoriteButton = ({ size = 'lg', className, onClick }: FavoriteButtonProps) => (
+const FavoriteButton = ({
+  size = 'lg',
+  className,
+  iconClassName,
+  onClick,
+}: FavoriteButtonProps) => (
   <button
     type="button"
     className={cn(favoriteButtonVariants({ size }), className)}
     onClick={onClick}
   >
-    <FavoriteIcon className={favoriteIconSize[size ?? 'lg']} />
+    <FavoriteIcon className={cn(favoriteIconSize[size ?? 'lg'], iconClassName)} />
     <span>관심있어요</span>
   </button>
 )
