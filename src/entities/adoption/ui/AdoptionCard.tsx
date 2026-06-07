@@ -15,11 +15,11 @@ const STATUS_BG: Record<AdoptionListingCard['status'], string> = {
   completed: 'bg-[#a4a4a4]',
 }
 
-// Figma 세로형 카드(796-81669 large / 796-81670 medium) 상태 배지: 활성 다크(#3e3e3e), 완료는 그레이
-const STATUS_BG_DARK: Record<AdoptionListingCard['status'], string> = {
-  available: 'bg-[#3e3e3e]',
-  reserved: 'bg-[#3e3e3e]',
-  completed: 'bg-[#a4a4a4]',
+// Figma 세로형 카드 상태 배지 → 공통 Badge 변형: 분양중/예약중 active(다크), 분양완료 disabled(그레이)
+const STATUS_BADGE_VARIANT: Record<AdoptionListingCard['status'], 'active' | 'disabled'> = {
+  available: 'active',
+  reserved: 'active',
+  completed: 'disabled',
 }
 
 interface AdoptionCardProps {
@@ -62,11 +62,9 @@ const AdoptionCard = ({ listing, className }: AdoptionCardProps) => {
             />
           </div>
           <Badge
-            variant="status"
-            className={cn(
-              STATUS_BG_DARK[listing.status],
-              'shrink-0 self-start px-[0.5rem] py-[0.125rem] text-[0.875rem] leading-[1.5] font-medium text-[#f6f6f6]',
-            )}
+            variant={STATUS_BADGE_VARIANT[listing.status]}
+            size="md"
+            className="shrink-0 self-start"
           >
             {ADOPTION_STATUS_LABEL[listing.status]}
           </Badge>
@@ -98,13 +96,7 @@ const AdoptionCard = ({ listing, className }: AdoptionCardProps) => {
           </div>
           {/* 우측: 상태배지(상단, 다크) + 관심있어요(하단, 하트+텍스트) */}
           <div className="flex shrink-0 flex-col items-end justify-between">
-            <Badge
-              variant="status"
-              className={cn(
-                STATUS_BG_DARK[listing.status],
-                'px-[0.5rem] py-[0.25rem] text-[1rem] leading-[1.5] font-medium text-[#f6f6f6]',
-              )}
-            >
+            <Badge variant={STATUS_BADGE_VARIANT[listing.status]} className="shrink-0">
               {ADOPTION_STATUS_LABEL[listing.status]}
             </Badge>
             <FavoriteButton
