@@ -1,10 +1,11 @@
 'use client'
 
-import { useCallback } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { Container, Tabs, TabsList, TabsTrigger } from '@/shared/ui'
 import { SearchSection } from '@/features/search'
 import { CategoryFilter } from '@/features/category-filter'
+import { cn } from '@/shared/lib/cn'
 import { createMockListings } from '@/shared/mocks/adoption'
 import { ANIMAL_CATEGORIES } from '@/shared/types'
 import type { AnimalCategory } from '@/shared/types'
@@ -57,60 +58,94 @@ const ExploreContent = () => {
     [searchParams, router, pathname],
   )
 
+  // PC 스크롤 인터랙션: 픽셀 카테고리+큰 검색바가 스크롤로 벗어나면 컴팩트 필터바를
+  // 탭바 아래에 fixed로 노출(레이아웃 점프 방지). 탭바는 tab+에서 상단 고정(sticky).
+  const headerRef = useRef<HTMLDivElement>(null)
+  const sentinelRef = useRef<HTMLDivElement>(null)
+  const [gnbH, setGnbH] = useState(0)
+  const [headerH, setHeaderH] = useState(0)
+  const [isStuck, setIsStuck] = useState(false)
+
+  useEffect(() => {
+    const measure = () => {
+      const gnb = document.querySelector('header')
+      setGnbH(gnb instanceof HTMLElement ? gnb.offsetHeight : 0)
+      if (headerRef.current) setHeaderH(headerRef.current.offsetHeight)
+    }
+    measure()
+    window.addEventListener('resize', measure)
+    return () => window.removeEventListener('resize', measure)
+  }, [])
+
+  useEffect(() => {
+    const el = sentinelRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(([entry]) => setIsStuck(!entry.isIntersecting), {
+      rootMargin: `-${gnbH + headerH}px 0px 0px 0px`,
+    })
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [gnbH, headerH])
+
   return (
     <>
-      {/* ══════ 탐색 탭 바 (Figma 'tab bar-layout') ══════
-          - GNB 헤더와 동일하게 max-width 캡 없는 full-width + margin/pc(20/48/80) inset.
-            (1440 초과 화면에서 헤더는 끝까지 가는데 탭만 멈춰 여백이 생기는 것 방지)
-          - 하단 회색선(border-b)은 이 래퍼에 두어 px(margin)을 무시하고 전폭(edge-to-edge)으로 항상 노출.
-          - spacing/16 상단 패딩(pt-4). */}
-      <div className="w-full border-b border-[#cacaca] px-[1.25rem] pt-3 tab:px-[3rem] tab:pt-4 pc:px-[5rem]">
-        <Tabs
-          value={selectedType}
-          onValueChange={(value) => handleTypeChange(value as ExploreType)}
-          className="w-full"
-        >
-          <TabsList variant="underline">
-            {EXPLORE_TABS.map((tab) => (
-              <TabsTrigger
-                key={tab.type}
-                value={tab.type}
-                variant="underline"
-                size="md"
-                className="tab:h-[3.8125rem] tab:pt-2 tab:text-base tab:after:h-[0.5625rem]"
-              >
-                {tab.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
+      {/* ══════ 탭 바(+모바일·탭 필터바) — tab+ 상단 고정(sticky), GNB 아래에 스택 ══════
+          (모바일은 탭 바 비고정, GNB만 sticky) */}
+      <div ref={headerRef} className="bg-white tab:sticky tab:z-40" style={{ top: gnbH }}>
+        {/* 탐색 탭 바 (Figma 'tab bar-layout') — full-width + margin/pc inset, 하단 회색선 */}
+        <div className="w-full border-b border-[#cacaca] px-[1.25rem] pt-3 tab:px-[3rem] tab:pt-4 pc:px-[5rem]">
+          <Tabs
+            value={selectedType}
+            onValueChange={(value) => handleTypeChange(value as ExploreType)}
+            className="w-full"
+          >
+            <TabsList variant="underline">
+              {EXPLORE_TABS.map((tab) => (
+                <TabsTrigger
+                  key={tab.type}
+                  value={tab.type}
+                  variant="underline"
+                  size="md"
+                  className="tab:h-[3.8125rem] tab:pt-2 tab:text-base tab:after:h-[0.5625rem]"
+                >
+                  {tab.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        </div>
+        {/* 모바일·탭 필터바 (PC는 아래 fixed 바 사용하므로 숨김) */}
+        <Container className="pc:hidden">
+          <ExploreFilterBar selected={selectedCategory} onChange={handleCategoryChange} />
+        </Container>
+      </div>
+
+      {/* PC: 스크롤 시 GNB+탭바 아래 고정 컴팩트 필터바 (fixed → 레이아웃 점프 없음, 구분선 없음) */}
+      <div
+        className={cn('fixed right-0 left-0 z-30 hidden bg-white', isStuck && 'pc:block')}
+        style={{ top: gnbH + headerH }}
+      >
+        <Container>
+          <ExploreFilterBar selected={selectedCategory} onChange={handleCategoryChange} />
+        </Container>
       </div>
 
       {/* ══════ 콘텐츠 영역 — 1080 중앙 정렬 ══════ */}
       <Container>
-        {/* 카테고리/검색 영역
-            - PC: 픽셀 카테고리(가운데) + 검색바(SearchSection)
-            - 탭/모바일: 카테고리+검색 한 줄 필터바 (Figma 1652-75035) */}
-        <div className="hidden flex-col items-center justify-center pc:flex pc:py-12">
-          <CategoryFilter selected={selectedCategory} onChange={handleCategoryChange} />
+        {/* PC 전용 상단: 픽셀 카테고리(가운데) + 큰 검색바 (스크롤되면 위로 사라짐) */}
+        <div className="hidden pc:block">
+          <div className="flex flex-col items-center justify-center py-12">
+            <CategoryFilter selected={selectedCategory} onChange={handleCategoryChange} />
+          </div>
+          <SearchSection placeholder={SEARCH_PLACEHOLDERS[selectedType]} withPadding={false} />
         </div>
-        <ExploreFilterBar
-          selected={selectedCategory}
-          onChange={handleCategoryChange}
-          className="pc:hidden"
-        />
+        {/* 스크롤 트리거 sentinel (PC 상단 영역 끝) */}
+        <div ref={sentinelRef} aria-hidden />
 
         {selectedType === 'breeder' ? (
           <BreederExploreContent />
         ) : (
           <>
-            {/* 검색바 + 인기 검색어 — PC 전용 (탭/모바일은 상단 필터바의 검색 pill 사용) */}
-            <SearchSection
-              placeholder={SEARCH_PLACEHOLDERS.adoption}
-              withPadding={false}
-              className="hidden pc:flex"
-            />
-
             {/* [refactored] 인기 동물 / 전체 입양 소식 — 공통 컴포넌트로 통합 (상단 여백만 차이) */}
             <AdoptionListingSection
               title="인기 동물"

@@ -1,6 +1,5 @@
 import { SearchBar } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
-import { PopularKeywords } from './PopularKeywords'
 
 interface SearchSectionProps {
   placeholder?: {
@@ -21,9 +20,8 @@ const SearchSection = ({ placeholder, className, withPadding = true }: SearchSec
         className,
       )}
     >
-      <div className="flex w-full flex-col gap-[0.4375rem] tab:max-w-[30.125rem] pc:max-w-[52.875rem]">
+      <div className="flex w-full flex-col tab:max-w-[30.125rem] pc:max-w-[52.875rem]">
         <SearchBar placeholder={placeholder} />
-        <PopularKeywords />
       </div>
     </section>
   )
