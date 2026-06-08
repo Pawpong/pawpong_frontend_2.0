@@ -58,11 +58,20 @@ const ExploreFilterBar = ({ selected, onChange, className }: ExploreFilterBarPro
             필터
           </button>
 
-          {/* 전체폭 검색바 */}
+          {/* 전체폭 검색바 (input) — 포커스 시 border #256EF4(1px) */}
           <div
-            className={cn(PILL_BASE, 'min-w-0 flex-1 justify-between gap-2 border-[#a6a6a6] px-2')}
+            className={cn(
+              PILL_BASE,
+              'min-w-0 flex-1 justify-between gap-2 border-[#a6a6a6] px-2 focus-within:border-[#256ef4]',
+            )}
           >
-            {searchContent}
+            <input
+              autoFocus
+              type="text"
+              placeholder="검색"
+              className="min-w-0 flex-1 bg-transparent text-[0.875rem] font-semibold text-[#3e3e3e] outline-none placeholder:text-[#6b6b6b]"
+            />
+            <SearchIcon className="size-5 shrink-0 text-[#6b6b6b]" />
           </div>
         </>
       ) : (
