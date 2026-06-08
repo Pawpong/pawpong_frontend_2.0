@@ -1,7 +1,7 @@
 'use client'
 
 import { Container, SectionHeader } from '@/shared/ui'
-import { AdoptionCard } from '@/entities/adoption'
+import { FavoriteAdoptionCard } from '@/features/adoption'
 import type { AdoptionListingCard } from '@/shared/types'
 
 interface FavoritesTabProps {
@@ -21,14 +21,14 @@ const FavoritesTab = ({ listings }: FavoritesTabProps) => (
     {/* 모바일: 2열 그리드 */}
     <div className="grid grid-cols-2 gap-4 pt-3 pb-15 tab:hidden">
       {listings.map((listing) => (
-        <AdoptionCard key={listing.listingId} listing={listing} />
+        <FavoriteAdoptionCard key={listing.listingId} listing={listing} />
       ))}
     </div>
 
     {/* PC: 3열 그리드 */}
     <div className="hidden tab:mt-6 tab:grid tab:grid-cols-3 tab:gap-[1.156rem] tab:pb-10">
       {listings.map((listing) => (
-        <AdoptionCard key={listing.listingId} listing={listing} />
+        <FavoriteAdoptionCard key={listing.listingId} listing={listing} />
       ))}
     </div>
   </Container>

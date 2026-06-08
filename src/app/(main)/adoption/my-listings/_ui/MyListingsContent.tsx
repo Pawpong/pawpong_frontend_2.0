@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { Container, PageHeader, Separator } from '@/shared/ui'
-import { AdoptionCard } from '@/entities/adoption'
+import { FavoriteAdoptionCard } from '@/features/adoption'
 import { createMockListings } from '@/shared/mocks/adoption'
 import { useListingsFilter } from '../_lib/useListingsFilter'
 import { StatusFilterChips } from './StatusFilterChips'
@@ -65,7 +65,7 @@ const MyListingsContent = () => {
             {/* Desktop: 3열 그리드 */}
             <div className="hidden tab:mt-6 tab:grid tab:grid-cols-3 tab:gap-6 tab:pb-8">
               {filteredListings.map((listing) => (
-                <AdoptionCard key={listing.listingId} listing={listing} />
+                <FavoriteAdoptionCard key={listing.listingId} listing={listing} />
               ))}
             </div>
           </>

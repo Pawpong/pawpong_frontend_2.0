@@ -9,7 +9,7 @@ import { createMockListings } from '@/shared/mocks/adoption'
 import { adopterQueries } from '@/entities/adopter'
 import { breederQueries } from '@/entities/breeder'
 import type { AdopterPublicProfile, BreederPublicProfile } from '@/shared/types'
-import { AdoptionCard } from '@/entities/adoption'
+import { FavoriteAdoptionCard } from '@/features/adoption'
 import { ProfileCard } from './ProfileCard'
 import { HomeTabs, TabsContent } from './HomeTabs'
 import { HomeTitle } from './HomeTitle'
@@ -111,7 +111,7 @@ const MyHomeContent = () => {
               {/* Desktop */}
               <div className="hidden tab:mt-6 tab:grid tab:grid-cols-3 tab:gap-6">
                 {listings.map((listing) => (
-                  <AdoptionCard key={listing.listingId} listing={listing} />
+                  <FavoriteAdoptionCard key={listing.listingId} listing={listing} />
                 ))}
               </div>
             </Container>

@@ -1,3 +1,6 @@
+'use client'
+
+import { type MouseEvent } from 'react'
 import { tv, type VariantProps } from 'tailwind-variants'
 import { cn } from '@/shared/lib/cn'
 import { FavoriteIcon } from '@/shared/assets/icons'
@@ -23,23 +26,38 @@ const favoriteIconSize = {
 interface FavoriteButtonProps extends VariantProps<typeof favoriteButtonVariants> {
   className?: string
   iconClassName?: string
-  onClick?: () => void
+  // 제어형: 관심 여부와 토글 콜백은 상위(카드)에서 mutation과 연결한다
+  isFavorite?: boolean
+  onToggle?: () => void
 }
 
 const FavoriteButton = ({
   size = 'lg',
   className,
   iconClassName,
-  onClick,
-}: FavoriteButtonProps) => (
-  <button
-    type="button"
-    className={cn(favoriteButtonVariants({ size }), className)}
-    onClick={onClick}
-  >
-    <FavoriteIcon className={cn(favoriteIconSize[size ?? 'lg'], iconClassName)} />
-    <span>관심있어요</span>
-  </button>
-)
+  isFavorite = false,
+  onToggle,
+}: FavoriteButtonProps) => {
+  // 카드 Link 내부에 있을 수 있으므로 클릭 시 네비게이션 방지 + 관심 토글
+  const handleClick = (e: MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    onToggle?.()
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handleClick}
+      // 관심 시 하트+텍스트 모두 #FF8181
+      className={cn(favoriteButtonVariants({ size }), className, isFavorite && 'text-[#ff8181]')}
+    >
+      <FavoriteIcon
+        className={cn(favoriteIconSize[size ?? 'lg'], iconClassName, isFavorite && 'text-[#ff8181]')}
+      />
+      <span>관심있어요</span>
+    </button>
+  )
+}
 
 export { FavoriteButton, favoriteButtonVariants }

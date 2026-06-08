@@ -9,7 +9,7 @@ import { createMockListings } from '@/shared/mocks/adoption'
 import { breederQueries } from '@/entities/breeder'
 import { ProfileCard } from '../../_ui/ProfileCard'
 import { BreederListingCard } from '../../_ui/BreederListingCard'
-import { AdoptionCard } from '@/entities/adoption'
+import { FavoriteAdoptionCard } from '@/features/adoption'
 import { HomeTabs, TabsContent } from '../../_ui/HomeTabs'
 import { HomeTitle } from '../../_ui/HomeTitle'
 import { PostList } from '../../_ui/PostList'
@@ -56,7 +56,7 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
             {/* Desktop */}
             <div className="hidden tab:mt-[2.959rem] tab:grid tab:grid-cols-3 tab:gap-6">
               {listings.map((listing) => (
-                <AdoptionCard key={listing.listingId} listing={listing} />
+                <FavoriteAdoptionCard key={listing.listingId} listing={listing} />
               ))}
             </div>
           </Container>

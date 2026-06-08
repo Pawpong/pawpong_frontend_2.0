@@ -1,4 +1,4 @@
-import { AdoptionCard } from '@/entities/adoption'
+import { FavoriteAdoptionCard } from '@/features/adoption'
 import { cn } from '@/shared/lib/cn'
 import type { AdoptionListingCard } from '@/shared/types'
 import { CollapsibleSection } from './CollapsibleSection'
@@ -27,7 +27,7 @@ const AdoptionListingSection = ({ title, listings, className }: AdoptionListingS
     >
       <div className={CARD_GRID}>
         {listings.map((listing) => (
-          <AdoptionCard key={listing.listingId} listing={listing} />
+          <FavoriteAdoptionCard key={listing.listingId} listing={listing} />
         ))}
       </div>
     </CollapsibleSection>

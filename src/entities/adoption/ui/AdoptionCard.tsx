@@ -1,5 +1,6 @@
 'use client'
 
+import { type MouseEvent } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { cn } from '@/shared/lib/cn'
@@ -25,6 +26,9 @@ const STATUS_BADGE_VARIANT: Record<AdoptionListingCard['status'], 'active' | 'di
 interface AdoptionCardProps {
   listing: AdoptionListingCard
   className?: string
+  // 제어형 관심 상태 — mutation 연결은 features 레이어 래퍼(FavoriteAdoptionCard)에서 주입
+  isFavorite?: boolean
+  onToggle?: () => void
 }
 
 // [refactored] 세로형 카드 이미지(이미지 + 분양완료 오버레이) — 모바일/태블릿 공통, rounded만 className으로 차이
@@ -67,8 +71,15 @@ const CardStats = ({
    - 모바일: medium (1023-40492) — rounded-4, 상/하 2행(제목·배지 / stats·하트), 제목=품종명, stats 12px
    - 태블릿+: large (796-81669) — rounded-8, 좌/우 2단(제목·stats / 배지·관심있어요), 제목=품종ǀ성별 나이
    ═══════════════════════════════════════════════ */
-const AdoptionCard = ({ listing, className }: AdoptionCardProps) => {
+const AdoptionCard = ({ listing, className, isFavorite, onToggle }: AdoptionCardProps) => {
   const isCompleted = listing.status === 'completed'
+
+  // 카드 Link 내부의 하트 클릭 시 네비게이션 방지 + 관심 토글
+  const handleFavoriteClick = (e: MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    onToggle?.()
+  }
 
   return (
     <Link href={`/adoption/${listing.listingId}`} className={cn('block', className)}>
@@ -94,8 +105,10 @@ const AdoptionCard = ({ listing, className }: AdoptionCardProps) => {
               listing={listing}
               className="gap-[0.25rem] text-[0.75rem] leading-[1.5] whitespace-nowrap text-[#6b6b6b]"
             />
-            <button type="button" className="shrink-0">
-              <FavoriteIcon className="size-6 text-[#a6a6a6]" />
+            <button type="button" onClick={handleFavoriteClick} className="shrink-0">
+              <FavoriteIcon
+                className={cn('size-6', isFavorite ? 'text-[#ff8181]' : 'text-[#a6a6a6]')}
+              />
             </button>
           </div>
         </div>
@@ -126,6 +139,8 @@ const AdoptionCard = ({ listing, className }: AdoptionCardProps) => {
             </Badge>
             <FavoriteButton
               size="md"
+              isFavorite={isFavorite}
+              onToggle={onToggle}
               className="gap-[0.25rem] p-0 text-[0.75rem] font-semibold text-[#3e3e3e]"
               iconClassName="size-6 text-[#a6a6a6]"
             />
@@ -140,7 +155,12 @@ const AdoptionCard = ({ listing, className }: AdoptionCardProps) => {
    가로형 카드 — 모바일 인기 동물 섹션 전용
    피그마: bg #f0f0f0, rounded 6, px8 py7, img 100x100
    ═══════════════════════════════════════════════ */
-const AdoptionCardHorizontal = ({ listing, className }: AdoptionCardProps) => {
+const AdoptionCardHorizontal = ({
+  listing,
+  className,
+  isFavorite,
+  onToggle,
+}: AdoptionCardProps) => {
   return (
     <Link
       href={`/adoption/${listing.listingId}`}
@@ -177,7 +197,7 @@ const AdoptionCardHorizontal = ({ listing, className }: AdoptionCardProps) => {
         {/* 문의/관심/조회 + 관심있어요 */}
         <div className="flex flex-col items-end">
           <CardStats listing={listing} size="sm" className="w-full justify-end" />
-          <FavoriteButton size="sm" />
+          <FavoriteButton size="sm" isFavorite={isFavorite} onToggle={onToggle} />
         </div>
       </div>
 
