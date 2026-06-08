@@ -6,7 +6,9 @@ import { CollapsibleSection } from './CollapsibleSection'
 // [refactored] 섹션 래퍼/제목/collapse는 CollapsibleSection이 담당, 여기선 카드 그리드만 정의
 const SECTION_CLASS = 'tab:mt-[2.5rem] tab:px-[2rem] pc:px-0' // tab 좌우 80px = Container 48 + 32, pc 리셋
 const SECTION_TITLE = 'font-semibold text-[#3e3e3e] tab:text-base' // Figma body/large/bold #3e3e3e
-const CARD_GRID = 'grid grid-cols-2 gap-[0.97rem] tab:gap-[1.25rem] pc:grid-cols-4' // mo·tab 2열 / pc 4열
+// mo·tab 2열 / pc 4열, 그리드 좌우 margin: tab 12px / pc(4열) 46px
+const CARD_GRID =
+  'grid grid-cols-2 gap-[0.97rem] tab:mx-[0.75rem] tab:gap-[1.25rem] pc:mx-[2.875rem] pc:grid-cols-4'
 
 interface AdoptionListingSectionProps {
   /** 섹션 라벨 (개수는 listings.length로 자동 부착) */

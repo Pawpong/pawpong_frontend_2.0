@@ -1,6 +1,4 @@
-import { SearchSection } from '@/features/search'
 import { cn } from '@/shared/lib/cn'
-import { SEARCH_PLACEHOLDERS } from '../_lib/constants'
 import { BreederCard } from '@/app/(main)/home/_ui/BreederCard'
 import { BreederCardHorizontal } from './BreederCardHorizontal'
 import { CollapsibleSection } from './CollapsibleSection'
@@ -10,16 +8,10 @@ import { MOCK_FEATURED_BREEDERS, MOCK_EXPLORE_BREEDERS } from '@/shared/mocks/br
 const SECTION_CLASS = 'tab:mt-[4rem] tab:gap-[1.25rem]'
 const BREEDER_GRID = 'tab:grid tab:grid-cols-3 tab:gap-[1.156rem]'
 
+// 상단 카테고리/검색(PC 픽셀 카테고리 + 큰 검색바)은 ExploreContent에서 공통 렌더
 const BreederExploreContent = () => {
   return (
     <>
-      {/* 검색바 + 인기 검색어 — PC 전용 (탭/모바일은 상단 필터바의 검색 pill 사용) */}
-      <SearchSection
-        placeholder={SEARCH_PLACEHOLDERS.breeder}
-        withPadding={false}
-        className="hidden pc:mt-[2.188rem] pc:flex"
-      />
-
       {/* 주목할 브리더 — 모바일 가로형 / 데스크탑 3열 */}
       {/* [refactored] CollapsibleSection으로 헤더+collapse 위임 */}
       <CollapsibleSection
