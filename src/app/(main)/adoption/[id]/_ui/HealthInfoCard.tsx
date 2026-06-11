@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { cn } from '@/shared/lib/cn'
 import { Badge } from '@/shared/ui'
 import { CheckIcon } from '@/shared/assets/icons'
@@ -17,74 +18,82 @@ const CompletionBadge = ({ completed }: { completed: boolean }) => (
   </Badge>
 )
 
+// [refactored] 섹션 헤더(제목 + 검사완료 배지) — 2회 반복 제거
+const SectionHeader = ({ title, completed }: { title: string; completed: boolean }) => (
+  <div className="flex items-center justify-between">
+    <p className="text-[0.875rem] leading-[1.375rem] font-semibold text-[#5d5d5d]">{title}</p>
+    <CompletionBadge completed={completed} />
+  </div>
+)
+
+// [refactored] 피그마 TableLayout 컨테이너 — 반복 className 제거
+const Table = ({ children }: { children: ReactNode }) => (
+  <div className="flex flex-col text-[0.875rem] leading-[1.375rem] font-semibold tab:text-[1rem] tab:leading-[1.5]">
+    {children}
+  </div>
+)
+
+// [refactored] 테이블 행(border #cacaca, gap-8, 기본 py-8) — 7회 반복 제거 (헤더는 className으로 py-4)
+const TableRow = ({ className, children }: { className?: string; children: ReactNode }) => (
+  <div
+    className={cn('flex items-center gap-[0.5rem] border-b border-[#cacaca] py-[0.5rem]', className)}
+  >
+    {children}
+  </div>
+)
+
 const HealthInfoCard = ({ detail }: { detail: AdoptionDetailDto }) => (
-  <BaseInfoCard title="건강 정보" className="tab:flex-1">
-    <div className="flex flex-col gap-[2.1875rem] tab:gap-[2rem]">
+  <BaseInfoCard title="건강 정보" className="tab:flex-1 pc:w-[55.75rem] pc:flex-none">
+    <div className="flex flex-col gap-[2.1875rem] tab:gap-[1.25rem]">
       {/* 예방 접종 현황 */}
       <div className="flex flex-col gap-[0.6875rem]">
-        <div className="flex items-center justify-between">
-          <p className="text-[0.875rem] leading-[1.375rem] font-semibold text-[#5d5d5d]">
-            예방 접종 현황
-          </p>
-          <CompletionBadge completed={detail.health.vaccinationCompleted} />
-        </div>
+        {/* [refactored] SectionHeader 사용 */}
+        <SectionHeader title="예방 접종 현황" completed={detail.health.vaccinationCompleted} />
 
-        <div className="flex flex-col gap-[0.75rem] text-[0.875rem] leading-[1.375rem] text-[#5d5d5d]">
-          <div className="flex items-center border-b border-[#d4d4d4] pb-px font-medium">
-            <span className="min-w-0 flex-1">접종명</span>
-            <div className="flex w-[10.5rem] items-center justify-end tab:w-[13.75rem]">
-              <span className="min-w-0 flex-1">접종일</span>
-              <span className="w-[2.85rem] text-right">차수</span>
-            </div>
-          </div>
+        {/* [refactored] Table/TableRow 사용 (3컬럼: 접종명/접종일/차수) */}
+        <Table>
+          <TableRow className="py-[0.25rem] font-medium text-[#6b6b6b]">
+            <span className="min-w-px flex-1">접종명</span>
+            <span className="min-w-px flex-1">접종일</span>
+            <span className="shrink-0 whitespace-nowrap">차수</span>
+          </TableRow>
           {detail.health.vaccinations.map((v, i) => (
-            <div
-              key={`${v.name}-${v.dose}-${i}`}
-              className="flex items-center border-b border-[#d4d4d4] pb-px font-semibold"
-            >
-              <span className="min-w-0 flex-1">{v.name}</span>
-              <div className="flex w-[10.5rem] items-center justify-end tab:w-[13.75rem]">
-                <span className="min-w-0 flex-1">{v.date}</span>
-                <span className="w-[2.85rem] text-right">{v.dose}</span>
-              </div>
-            </div>
+            <TableRow key={`${v.name}-${v.dose}-${i}`} className="text-[#3e3e3e]">
+              <span className="min-w-px flex-1">{v.name}</span>
+              <span className="min-w-px flex-1">{v.date}</span>
+              <span className="shrink-0 whitespace-nowrap">{v.dose}</span>
+            </TableRow>
           ))}
-        </div>
+        </Table>
       </div>
 
       {/* 유전병 검사 */}
       <div className="flex flex-col gap-[0.75rem]">
-        <div className="flex items-center justify-between">
-          <p className="text-[0.875rem] leading-[1.375rem] font-semibold text-[#5d5d5d]">
-            유전병 검사
-          </p>
-          <CompletionBadge completed={detail.health.geneticTestCompleted} />
-        </div>
+        {/* [refactored] SectionHeader 사용 */}
+        <SectionHeader title="유전병 검사" completed={detail.health.geneticTestCompleted} />
 
-        <div className="flex flex-col gap-[0.75rem] text-[0.875rem] leading-[1.375rem] font-medium text-[#5d5d5d]">
-          <div className="flex items-center border-b border-[#d4d4d4] pb-px">
-            <span className="min-w-0 flex-1">검진일</span>
-            <span className="min-w-0 flex-1 text-right">{detail.health.geneticTest.date}</span>
-          </div>
-          <div className="flex items-center border-b border-[#d4d4d4] pb-px">
-            <span className="min-w-0 flex-1">검사기관</span>
-            <span className="min-w-0 flex-1 text-right">
+        {/* [refactored] Table/TableRow 사용 (접종일 컬럼 없음) */}
+        <Table>
+          <TableRow>
+            <span className="min-w-px flex-1 text-[#6b6b6b]">검진일</span>
+            <span className="shrink-0 whitespace-nowrap text-[#3e3e3e]">
+              {detail.health.geneticTest.date}
+            </span>
+          </TableRow>
+          <TableRow>
+            <span className="min-w-px flex-1 text-[#6b6b6b]">검사기관</span>
+            <span className="shrink-0 whitespace-nowrap text-[#3e3e3e]">
               {detail.health.geneticTest.institution}
             </span>
-          </div>
+          </TableRow>
           {detail.health.geneticTest.results.map((r, i) => (
-            <div
-              key={`${r.disease}-${i}`}
-              className="flex items-center border-b border-[#d4d4d4] pb-px"
-            >
-              <span className="min-w-0 flex-1">{i === 0 ? '결과' : ''}</span>
-              <div className="flex min-w-0 flex-1 items-center text-right">
-                <span className="min-w-0 flex-1">{r.disease}</span>
-                <span className="min-w-0 flex-1">{r.result}</span>
-              </div>
-            </div>
+            <TableRow key={`${r.disease}-${i}`}>
+              <span className="min-w-px flex-1 text-[#6b6b6b]">{i === 0 ? '결과' : ''}</span>
+              <span className="min-w-px flex-1 text-[#3e3e3e]">{r.disease}</span>
+              <span className="shrink-0 whitespace-nowrap text-[#3e3e3e]">{r.result}</span>
+            </TableRow>
           ))}
-        </div>
+        </Table>
       </div>
     </div>
   </BaseInfoCard>

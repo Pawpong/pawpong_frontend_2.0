@@ -6,6 +6,7 @@ import { Fragment, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Badge,
+  Container,
   FavoriteButton,
   ListingStats,
   Separator,
@@ -58,9 +59,9 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
       </div>
 
       {/* ═══ 히어로 섹션 (브레드크럼 + 이미지 + 프로필 | 정보) ═══ */}
-      {/* 피그마: padding 20/80, 가로 2섹션 gap-20, 최대 1280 중앙 정렬 */}
-      <div className="tab:flex tab:justify-center tab:px-[3rem] tab:py-[1.25rem] pc:px-[5rem]">
-        <div className="tab:flex tab:w-full tab:max-w-[80rem] tab:items-start tab:gap-[1.25rem]">
+      {/* [refactored] 공용 Container 사용 (모바일은 풀블리드 이미지 위해 px-0) */}
+      <Container className="px-0 tab:px-[3rem] tab:py-[1.25rem]">
+        <div className="tab:flex tab:items-start tab:gap-[1.25rem]">
           {/* ── 좌측 섹션: 브레드크럼 + 이미지 + 브리더 프로필 ── 피그마: w-500, gap-12 */}
           <div className="relative tab:flex tab:w-[31.25rem] tab:shrink-0 tab:flex-col tab:gap-[0.75rem]">
             {/* 브레드크럼 (데스크탑 전용) — 피그마: 라벨(body/md/bold 14px #6b6b6b) + chevron */}
@@ -218,33 +219,34 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
             </div>
           </div>
         </div>
-      </div>
+      </Container>
 
-      {/* ═══ 건강 정보 + 부모 정보 섹션 ═══ */}
-      <div className="mt-[1.25rem] px-[1.25rem] tab:mt-[2rem] tab:flex tab:gap-[1.25rem] tab:px-[3rem] pc:px-[5rem]">
-        {/* 건강 정보 카드 */}
-        <HealthInfoCard detail={detail} />
-        {/* 부모 정보 카드 */}
-        <ParentInfoCard detail={detail} onImageClick={openImageModal} />
-      </div>
-
-      {/* ═══ 사육 환경 섹션 ═══ */}
-      <div className="mt-[1.25rem] px-[1.25rem] tab:mt-[2rem] tab:px-[3rem] pc:px-[5rem]">
-        <BreedingEnvironmentCard detail={detail} onImageClick={openImageModal} />
-      </div>
-
-      {/* ═══ 브리더의 다른 분양 동물 ═══ */}
-      <div className="mt-[1.5rem] px-[1.25rem] tab:mt-[2rem] tab:px-[3rem] pc:px-[5rem]">
-        <Separator className="mb-[1rem] bg-[#d4d4d4]" />
-        <p className="text-[0.75rem] leading-[1.375rem] font-medium text-[#5d5d5d] tab:text-[1.25rem] tab:font-semibold">
-          브리더의 다른 분양 동물 {detail.otherListings.length}
-        </p>
-        <div className="mt-[0.75rem] flex flex-col gap-[0.75rem] tab:mt-[1.3125rem] tab:gap-[1.3125rem]">
-          {detail.otherListings.map((listing) => (
-            <OtherListingCard key={listing.listingId} listing={listing} />
-          ))}
+      {/* ═══ 하단 콘텐츠 — [refactored] 히어로와 동일 공용 Container 사용 ═══ */}
+      <Container className="tab:py-[1.25rem]">
+        {/* 건강 정보 + 부모 정보 섹션 */}
+        <div className="mt-[1.25rem] tab:mt-0 tab:flex tab:gap-[1.25rem]">
+          <HealthInfoCard detail={detail} />
+          <ParentInfoCard detail={detail} onImageClick={openImageModal} />
         </div>
-      </div>
+
+        {/* 사육 환경 섹션 */}
+        <div className="mt-[1.25rem] tab:mt-[2rem]">
+          <BreedingEnvironmentCard detail={detail} onImageClick={openImageModal} />
+        </div>
+
+        {/* 브리더의 다른 분양 동물 */}
+        <div className="mt-[1.5rem] tab:mt-[2rem]">
+          <Separator className="mb-[1rem] bg-[#d4d4d4]" />
+          <p className="text-[0.75rem] leading-[1.375rem] font-medium text-[#5d5d5d] tab:text-[1.25rem] tab:font-semibold">
+            브리더의 다른 분양 동물 {detail.otherListings.length}
+          </p>
+          <div className="mt-[0.75rem] flex flex-col gap-[0.75rem] tab:mt-[1.3125rem] tab:gap-[1.3125rem]">
+            {detail.otherListings.map((listing) => (
+              <OtherListingCard key={listing.listingId} listing={listing} />
+            ))}
+          </div>
+        </div>
+      </Container>
 
       {/* ═══ CTA 하단 고정 바 ═══ */}
       <div className="fixed right-0 bottom-0 left-0 z-10 bg-white p-[1.25rem] tab:flex tab:items-center tab:justify-center tab:py-[1.4375rem]">
