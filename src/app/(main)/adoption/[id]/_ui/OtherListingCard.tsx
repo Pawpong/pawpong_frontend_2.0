@@ -1,9 +1,9 @@
 'use client'
 
 import Image from 'next/image'
-import { Badge, FavoriteButton, ListingStats } from '@/shared/ui'
-import { ShareIcon } from '@/shared/assets/icons'
+import { Badge, ListingStats } from '@/shared/ui'
 import { ADOPTION_STATUS_LABEL, GENDER_LABEL } from '@/shared/types'
+import { FavoriteShareActions } from './FavoriteShareActions'
 import { AdoptionCardHorizontal } from '@/entities/adoption'
 import { useToggleAdoptionFavorite } from '@/features/adoption'
 import type { AdoptionListingCard } from '@/shared/types'
@@ -37,6 +37,7 @@ const OtherListingCard = ({ listing }: { listing: AdoptionListingCard }) => {
   )
 }
 
+// 피그마 card-2 (node 1226-54636): bg #f6f6f6, 이미지 280×210 + 정보(제목/소개/통계/관심·공유)
 const DesktopOtherListingCard = ({
   listing,
   isFavorite,
@@ -46,48 +47,51 @@ const DesktopOtherListingCard = ({
   isFavorite: boolean
   onToggle: () => void
 }) => (
-  <div className="flex overflow-hidden rounded-[1rem] bg-[#e7e7e7]">
-    <div className="relative h-[21.75rem] w-[20.1875rem] shrink-0 overflow-hidden rounded-[0.5rem] bg-[#c6c6c6]">
-      <Image src={listing.thumbnailUrl} alt={listing.name} fill className="object-cover" />
-    </div>
-    <div className="flex flex-1 flex-col px-[1.5rem] py-[1.5rem]">
-      {listing.isPopular && (
-        <Badge
-          variant="status"
-          className="mb-[0.5rem] w-fit px-[0.585rem] py-[0.234rem] text-[0.819rem] leading-[1.286rem]"
-        >
-          {ADOPTION_STATUS_LABEL[listing.status]}
-        </Badge>
-      )}
-      <div className="flex items-center gap-[1.125rem]">
-        <p className="text-[1.25rem] leading-[1.375rem] font-semibold text-[#5d5d5d]">
-          {listing.name}
-        </p>
-        <span className="size-[0.25rem] rounded-full bg-[#5d5d5d]" />
-        <span className="text-[1.25rem] leading-[1.375rem] font-semibold text-[#5d5d5d]">
-          {GENDER_LABEL[listing.gender]}
-        </span>
-        <span className="size-[0.25rem] rounded-full bg-[#5d5d5d]" />
-        <span className="text-[1.25rem] leading-[1.375rem] font-semibold text-[#5d5d5d]">
-          {listing.ageText}
-        </span>
+  <div className="flex items-center rounded-[0.5rem] bg-[#f6f6f6] px-[1.25rem] py-[0.75rem]">
+    <div className="flex w-full items-center gap-[1.75rem]">
+      {/* 이미지 + 인기 배지 */}
+      <div className="relative aspect-[4/3] h-[13.125rem] w-[17.5rem] shrink-0 overflow-hidden rounded-[0.5rem] bg-[#c6c6c6]">
+        <Image src={listing.thumbnailUrl} alt={listing.name} fill className="object-cover" />
+        {listing.isPopular && (
+          // [refactored] raw span → 공통 Badge(default 변형)
+          <Badge variant="default" className="absolute top-[0.875rem] left-[1rem]">
+            인기
+          </Badge>
+        )}
       </div>
-      <ListingStats
-        inquiryCount={listing.inquiryCount}
-        favoriteCount={listing.favoriteCount}
-        viewCount={listing.viewCount}
-        size="lg"
-        className="mt-auto justify-end"
-      />
-      <div className="mt-[0.5rem] flex items-center justify-end gap-[0.625rem]">
-        <FavoriteButton size="lg" isFavorite={isFavorite} onToggle={onToggle} />
-        <button
-          type="button"
-          className="flex items-center gap-[0.625rem] rounded-full p-[0.625rem] text-[0.875rem] font-medium text-[#5d5d5d]"
-        >
-          <ShareIcon className="size-[1.5rem]" />
-          <span>공유</span>
-        </button>
+
+      {/* 우측 정보 */}
+      <div className="flex min-w-px flex-1 flex-col justify-between self-stretch">
+        <div className="flex flex-col gap-[0.75rem]">
+          {/* 제목 + 상태 배지 */}
+          <div className="flex items-center gap-[0.5rem]">
+            <p className="min-w-px truncate text-[1.25rem] leading-[1.5] font-semibold text-[#3e3e3e]">
+              {listing.name} | {GENDER_LABEL[listing.gender]} {listing.ageText}
+            </p>
+            {/* [refactored] raw span → 공통 Badge(active 변형) */}
+            <Badge variant="active" className="shrink-0">
+              {ADOPTION_STATUS_LABEL[listing.status]}
+            </Badge>
+          </div>
+          {listing.description && (
+            <p className="line-clamp-3 text-[1rem] leading-[1.5] font-semibold text-[#3e3e3e]">
+              {listing.description}
+            </p>
+          )}
+        </div>
+
+        {/* 하단: 문의/관심/조회 + 관심있어요/공유 */}
+        <div className="flex w-full items-center gap-[0.5rem]">
+          <ListingStats
+            inquiryCount={listing.inquiryCount}
+            favoriteCount={listing.favoriteCount}
+            viewCount={listing.viewCount}
+            size="lg"
+            className="flex-1 gap-[0.5rem] text-[#6b6b6b]"
+          />
+          {/* [refactored] 공통 FavoriteShareActions 사용 */}
+          <FavoriteShareActions isFavorite={isFavorite} onToggle={onToggle} />
+        </div>
       </div>
     </div>
   </div>
