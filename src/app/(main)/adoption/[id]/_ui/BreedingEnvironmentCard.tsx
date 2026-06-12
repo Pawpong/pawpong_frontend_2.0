@@ -34,9 +34,9 @@ const BreedingEnvironmentCard = ({ detail, onImageClick }: BreedingEnvironmentCa
   const { description, imageUrls } = detail.breedingEnvironment
 
   return (
-    <div className="overflow-hidden rounded-[1rem] bg-[#f5f5f5] p-[0.875rem] tab:p-[1.25rem]">
+    <div className="overflow-hidden rounded-[1rem] bg-[#f5f5f5] p-[0.875rem] pc:p-[1.25rem]">
       {/* 모바일: 세로 레이아웃 */}
-      <div className="tab:hidden">
+      <div className="pc:hidden">
         <p className="text-[0.75rem] leading-[1.375rem] font-medium text-[#5d5d5d]">사육 환경</p>
         <p className="mt-[0.5rem] text-[0.875rem] leading-[1.5] font-semibold text-[#5d5d5d]">
           {description}
@@ -56,7 +56,7 @@ const BreedingEnvironmentCard = ({ detail, onImageClick }: BreedingEnvironmentCa
       </div>
 
       {/* 데스크탑: 세로 — 제목 → 이미지 스트립(320×240) → 설명 (피그마 1226-46244 environment) */}
-      <div className="hidden tab:flex tab:flex-col tab:gap-[1.25rem]">
+      <div className="hidden pc:flex pc:flex-col pc:gap-[1.25rem]">
         <p className="text-[1.25rem] leading-[1.5] font-semibold text-[#3e3e3e]">사육 환경</p>
         <div className="flex gap-[0.75rem] overflow-x-auto">
           {/* [refactored] EnvImageButton 사용 */}

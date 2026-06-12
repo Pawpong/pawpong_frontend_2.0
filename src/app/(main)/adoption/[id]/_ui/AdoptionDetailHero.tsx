@@ -13,6 +13,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from '@/shared/ui'
+import { cn } from '@/shared/lib/cn'
 import { ArrowRightIcon, CheckIcon, GenderIcon } from '@/shared/assets/icons'
 import { ADOPTION_STATUS_LABEL, GENDER_LABEL } from '@/shared/types'
 import type { AdoptionDetailDto, AdoptionStatus } from '@/shared/types'
@@ -26,13 +27,13 @@ interface AdoptionDetailHeroProps {
 
 /* ── 입양 상세 히어로 (브레드크럼 + 이미지 + 브리더 프로필 | 정보) ── */
 const AdoptionDetailHero = ({ detail, onImageClick }: AdoptionDetailHeroProps) => (
-  // 공용 Container 사용 (모바일은 풀블리드 이미지 위해 px-0)
-  <Container className="px-0 tab:px-[3rem] tab:py-[1.25rem]">
-    <div className="tab:flex tab:items-start tab:gap-[1.25rem]">
+  // 좌우 패딩(모바일20/탭48)은 Container가 담당, 이미지만 음수마진으로 풀블리드
+  <Container className="pc:px-[3rem] pc:py-[0.75rem]">
+    <div className="pc:flex pc:items-start pc:gap-[1.25rem]">
       {/* ── 좌측 섹션: 브레드크럼 + 이미지 + 브리더 프로필 ── 피그마: w-500, gap-12 */}
-      <div className="relative tab:flex tab:w-[31.25rem] tab:shrink-0 tab:flex-col tab:gap-[0.75rem]">
+      <div className="relative -mx-[1.25rem] tab:-mx-[3rem] pc:mx-0 pc:flex pc:w-[31.25rem] pc:shrink-0 pc:flex-col pc:gap-[0.75rem]">
         {/* 브레드크럼 (데스크탑 전용) — 피그마: 라벨(body/md/bold 14px #6b6b6b) + chevron */}
-        <div className="hidden items-end py-[0.625rem] tab:flex">
+        <div className="hidden items-end py-[0.625rem] pc:flex">
           {['홈', '입양', '도마뱀'].map((label, index) => (
             <Fragment key={label}>
               {index > 0 && <ArrowRightIcon className="size-[1.5rem] text-[#6b6b6b]" />}
@@ -51,17 +52,15 @@ const AdoptionDetailHero = ({ detail, onImageClick }: AdoptionDetailHeroProps) =
         />
 
         {/* ── 브리더 프로필 (데스크탑 전용) ── 아바타 + 닉네임 + 애정도 배지 ··· 브리더홈 > */}
-        <div className="hidden items-center gap-[1.75rem] tab:flex">
+        <div className="hidden items-center gap-[1.75rem] pc:flex">
           <div className="flex flex-1 items-center gap-[1.25rem]">
             <div className="flex items-center gap-[0.5rem]">
-              <div className="relative size-[2.5rem] shrink-0 overflow-hidden rounded-full bg-[#d4d4d4]">
-                <Image
-                  src={detail.breeder.profileImageUrl}
-                  alt={detail.breeder.nickname}
-                  fill
-                  className="object-cover"
-                />
-              </div>
+              {/* [refactored] BreederAvatar 사용 */}
+              <BreederAvatar
+                src={detail.breeder.profileImageUrl}
+                alt={detail.breeder.nickname}
+                className="size-[2.5rem]"
+              />
               <p className="text-[1rem] leading-[1.5] font-semibold text-[#3e3e3e]">
                 {detail.breeder.nickname}
               </p>
@@ -78,19 +77,17 @@ const AdoptionDetailHero = ({ detail, onImageClick }: AdoptionDetailHeroProps) =
         </div>
       </div>
 
-      {/* ── 우측 섹션: 이름 ~ 관심/공유 ── 피그마: flex-1, py-48, items-end, justify-between */}
-      <div className="flex flex-col px-[1.25rem] pt-[0.75rem] tab:flex-1 tab:items-end tab:justify-between tab:self-stretch tab:px-0 tab:py-[3rem]">
+      {/* ── 우측 섹션: 이름 ~ 관심/공유 ── 좌우 px는 바깥 Container가, 여기는 py만 (px 없음) */}
+      <div className="flex h-full w-full flex-col py-[0.75rem] pc:flex-1 pc:items-end pc:justify-between pc:self-stretch pc:py-[3rem]">
         {/* 브리더 프로필 (모바일만 여기서 표시) */}
-        <div className="w-full tab:hidden">
+        <div className="w-full pc:hidden">
           <div className="flex items-center gap-[0.375rem]">
-            <div className="relative size-[2.75rem] shrink-0 overflow-hidden rounded-full bg-[#d4d4d4]">
-              <Image
-                src={detail.breeder.profileImageUrl}
-                alt={detail.breeder.nickname}
-                fill
-                className="object-cover"
-              />
-            </div>
+            {/* [refactored] BreederAvatar 사용 */}
+            <BreederAvatar
+              src={detail.breeder.profileImageUrl}
+              alt={detail.breeder.nickname}
+              className="size-[2.75rem]"
+            />
             <div className="flex flex-1 flex-col">
               <p className="text-[0.875rem] leading-[1.5] font-bold text-[#5d5d5d]">
                 {detail.breeder.nickname}
@@ -112,8 +109,8 @@ const AdoptionDetailHero = ({ detail, onImageClick }: AdoptionDetailHeroProps) =
         {/* ── 상단 그룹: 이름 ~ 소개 (한 줄씩 gap-20px) ── */}
         <div className="flex w-full flex-col gap-[1.25rem]">
           {/* 이름 + 상태 배지(드롭다운) + 인기 배지 (피그마: body/2xl/bolder 24px) */}
-          <div className="flex flex-wrap items-center gap-[0.4375rem] tab:gap-[0.5rem]">
-            <p className="text-[0.875rem] leading-[1.5] font-bold text-[#5d5d5d] tab:text-[1.5rem] tab:text-[#3e3e3e]">
+          <div className="flex flex-wrap items-center gap-[0.4375rem] pc:gap-[0.5rem]">
+            <p className="text-[0.875rem] leading-[1.5] font-bold text-[#5d5d5d] pc:text-[1.5rem] pc:text-[#3e3e3e]">
               {detail.name}
             </p>
             <StatusDropdown currentStatus={detail.status} />
@@ -133,15 +130,17 @@ const AdoptionDetailHero = ({ detail, onImageClick }: AdoptionDetailHeroProps) =
           <InfoItem
             label="성별"
             value={GENDER_LABEL[detail.gender]}
-            trailing={<GenderIcon gender={detail.gender} className="size-[1.5rem] text-[#6b6b6b]" />}
+            trailing={
+              <GenderIcon gender={detail.gender} className="size-[1.5rem] text-[#6b6b6b]" />
+            }
           />
 
           {/* 소개 (라벨 ↔ 내용 gap-4px, 내용 body/lg/bold 16px) */}
           <div className="flex flex-col gap-[0.25rem] text-[#5d5d5d]">
-            <p className="text-[0.75rem] leading-[1.5] font-medium tab:text-[1.25rem] tab:text-[#6b6b6b]">
+            <p className="text-[0.75rem] leading-[1.5] font-medium pc:text-[1.25rem] pc:text-[#6b6b6b]">
               소개
             </p>
-            <p className="text-[0.875rem] leading-[1.5] font-semibold whitespace-pre-wrap tab:text-[1rem] tab:text-[#3e3e3e]">
+            <p className="text-[0.875rem] leading-[1.5] font-semibold whitespace-pre-wrap pc:text-[1rem] pc:text-[#3e3e3e]">
               {detail.description}
             </p>
           </div>
@@ -153,11 +152,11 @@ const AdoptionDetailHero = ({ detail, onImageClick }: AdoptionDetailHeroProps) =
           favoriteCount={detail.favoriteCount}
           viewCount={detail.viewCount}
           size="sm"
-          className="mt-[0.5rem] justify-end tab:hidden"
+          className="mt-[0.5rem] justify-end pc:hidden"
         />
 
         {/* ── 하단 그룹: 문의/관심/조회 + 관심/공유 (데스크탑 전용) ── */}
-        <div className="hidden flex-col items-end gap-[0.5rem] tab:flex">
+        <div className="hidden flex-col items-end gap-[0.5rem] pc:flex">
           <ListingStats
             inquiryCount={detail.inquiryCount}
             favoriteCount={detail.favoriteCount}
@@ -169,6 +168,13 @@ const AdoptionDetailHero = ({ detail, onImageClick }: AdoptionDetailHeroProps) =
       </div>
     </div>
   </Container>
+)
+
+// [refactored] 브리더 아바타 (원형 이미지 + fallback 배경) — 데스크탑/모바일 중복 제거 (크기만 className)
+const BreederAvatar = ({ src, alt, className }: { src: string; alt: string; className: string }) => (
+  <div className={cn('relative shrink-0 overflow-hidden rounded-full bg-[#d4d4d4]', className)}>
+    <Image src={src} alt={alt} fill className="object-cover" />
+  </div>
 )
 
 /* ── 정보 항목 (라벨 ↔ 내용: 가로 배치 gap-12px) ── */
@@ -183,11 +189,11 @@ const InfoItem = ({
   trailing?: ReactNode
 }) => (
   <div className="flex items-center gap-[0.75rem] text-[#5d5d5d]">
-    <p className="shrink-0 text-[0.75rem] leading-[1.5] font-medium tab:text-[1.25rem] tab:text-[#6b6b6b]">
+    <p className="shrink-0 text-[0.75rem] leading-[1.5] font-medium pc:text-[1.25rem] pc:text-[#6b6b6b]">
       {label}
     </p>
     <div className="flex items-center gap-[0.25rem]">
-      <p className="text-[0.875rem] leading-[1.5] font-semibold tab:text-[1.25rem] tab:text-[#3e3e3e]">
+      <p className="text-[0.875rem] leading-[1.5] font-semibold pc:text-[1.25rem] pc:text-[#3e3e3e]">
         {value}
       </p>
       {trailing}
@@ -203,7 +209,7 @@ const StatusDropdown = ({ currentStatus }: { currentStatus: AdoptionStatus }) =>
     <DropdownMenuTrigger asChild>
       <button
         type="button"
-        className="inline-flex items-center gap-[0.625rem] rounded-full bg-[#5d5d5d] px-[0.625rem] py-[0.25rem] text-[0.75rem] leading-[1.375rem] font-semibold text-white tab:text-[0.875rem]"
+        className="inline-flex items-center gap-[0.625rem] rounded-full bg-[#5d5d5d] px-[0.625rem] py-[0.25rem] text-[0.75rem] leading-[1.375rem] font-semibold text-white pc:text-[0.875rem]"
       >
         {ADOPTION_STATUS_LABEL[currentStatus]}
         <CheckIcon className="size-[1.25rem]" />

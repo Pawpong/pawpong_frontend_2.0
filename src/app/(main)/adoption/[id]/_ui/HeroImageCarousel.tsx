@@ -18,7 +18,7 @@ const HeroImageCarousel = ({
   const hasMultiple = images.length > 1
 
   return (
-    <div className="relative aspect-[375/279] w-full overflow-hidden tab:flex tab:aspect-square tab:h-[31.25rem] tab:w-[31.25rem] tab:items-center tab:justify-center tab:self-stretch tab:rounded-[0.5rem]">
+    <div className="relative aspect-[375/279] w-full overflow-hidden pc:flex pc:aspect-square pc:h-[31.25rem] pc:w-[31.25rem] pc:items-center pc:justify-center pc:self-stretch pc:rounded-[0.5rem]">
       <button
         type="button"
         onClick={() => onImageClick(currentIndex)}
@@ -28,7 +28,7 @@ const HeroImageCarousel = ({
       </button>
 
       {/* 공유 버튼 (모바일) */}
-      <button type="button" className="absolute top-[0.75rem] right-[0.75rem] tab:hidden">
+      <button type="button" className="absolute top-[0.75rem] right-[0.75rem] pc:hidden">
         <ShareIcon className="size-[2rem] text-white" />
       </button>
 
@@ -45,7 +45,7 @@ const HeroImageCarousel = ({
       )}
 
       {/* 인디케이터 — 활성 pill(20x8 #fffa94), 비활성 dot(8 #a9835a) */}
-      <div className="absolute bottom-[1rem] left-1/2 flex -translate-x-1/2 items-center gap-[0.25rem] tab:bottom-[1.5rem]">
+      <div className="absolute bottom-[1rem] left-1/2 flex -translate-x-1/2 items-center gap-[0.25rem] pc:bottom-[1.5rem]">
         {images.map((url, index) => (
           <span
             key={url}
