@@ -78,7 +78,8 @@ const AdoptionDetailHero = ({ detail, onImageClick }: AdoptionDetailHeroProps) =
       </div>
 
       {/* ── 우측 섹션: 이름 ~ 관심/공유 ── 좌우 px는 바깥 Container가, 여기는 py만 (px 없음) */}
-      <div className="flex h-full w-full flex-col py-[0.75rem] pc:flex-1 pc:items-end pc:justify-between pc:self-stretch pc:py-0">
+      {/* pc: self-stretch가 동작하려면 height가 auto여야 함(h-full 제거) → justify-between + py-48로 하단 그룹을 이미지 바닥에 정렬 */}
+      <div className="flex w-full flex-col py-[0.75rem] pc:flex-1 pc:items-end pc:justify-between pc:self-stretch pc:py-[3rem]">
         {/* 브리더 프로필 (모바일만 여기서 표시) */}
         <div className="w-full pc:hidden">
           <div className="flex items-center gap-[0.375rem]">
@@ -146,14 +147,16 @@ const AdoptionDetailHero = ({ detail, onImageClick }: AdoptionDetailHeroProps) =
           </div>
         </div>
 
-        {/* 문의/관심/조회 (모바일) */}
-        <ListingStats
-          inquiryCount={detail.inquiryCount}
-          favoriteCount={detail.favoriteCount}
-          viewCount={detail.viewCount}
-          size="sm"
-          className="mt-[0.5rem] justify-end pc:hidden"
-        />
+        {/* 문의/관심/조회 + 공유 (모바일·탭) — 피그마 1943:128143: 좌측 통계(flex-1) + 우측 공유 */}
+        <div className="mt-[0.5rem] flex w-full items-center justify-between pc:hidden">
+          <ListingStats
+            inquiryCount={detail.inquiryCount}
+            favoriteCount={detail.favoriteCount}
+            viewCount={detail.viewCount}
+            size="sm"
+          />
+          <FavoriteShareActions showFavorite={false} />
+        </div>
 
         {/* ── 하단 그룹: 문의/관심/조회 + 관심/공유 (데스크탑 전용) ── */}
         <div className="hidden flex-col items-end gap-[0.5rem] pc:flex">
