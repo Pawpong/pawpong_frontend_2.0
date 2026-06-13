@@ -30,19 +30,16 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
 
   return (
     <div className="pb-[5.5rem] tab:pb-0">
-      {/* ═══ 서브헤더 ═══ */}
-      <div className="flex items-center gap-[0.625rem] px-[1.25rem] py-[0.75rem] tab:h-[5.5rem] tab:justify-center tab:px-[6.25rem] tab:py-[0.625rem]">
-        <button
-          type="button"
-          onClick={handleCloseClick}
-          className="tab:absolute tab:left-[6.25rem]"
-        >
-          <CloseIcon className="size-[1.25rem] text-[#5d5d5d] tab:size-[1.5rem]" />
-        </button>
-        <p className="text-[0.875rem] leading-[1.5] font-semibold text-[#5d5d5d] tab:text-[1.25rem]">
-          <span className="tab:hidden">입양 신청 | {detail.name}</span>
-          <span className="hidden tab:inline">입양 신청</span>
-        </p>
+      {/* ═══ 서브헤더 (Figma 1654-161687) — 패딩 mo: 4·16 / tab: 4·48 / pc: 8·80 ═══ */}
+      <div className="flex flex-col items-center bg-white px-4 py-1 tab:px-12 pc:px-20 pc:py-2">
+        <div className="flex w-full items-center">
+          <button type="button" onClick={handleCloseClick} aria-label="닫기">
+            <CloseIcon className="size-6 text-[#3e3e3e]" />
+          </button>
+          <div className="flex flex-1 items-center justify-center p-0.5">
+            <p className="text-base leading-normal font-semibold text-[#3e3e3e]">입양 신청</p>
+          </div>
+        </div>
       </div>
 
       {/* ═══ 브리더 프로필 (데스크탑) ═══ */}
