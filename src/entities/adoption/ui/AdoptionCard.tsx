@@ -165,7 +165,7 @@ const AdoptionCardHorizontal = ({
     <Link
       href={`/adoption/${listing.listingId}`}
       className={cn(
-        'relative flex items-center gap-[0.5625rem] rounded-[0.375rem] bg-[#f0f0f0] px-[0.5rem] py-[0.4375rem]',
+        'relative flex items-center gap-[0.5625rem] rounded-[0.375rem] bg-[#f0f0f0] px-[0.5rem] py-[0.4375rem] tab:gap-[1rem]',
         className,
       )}
     >
