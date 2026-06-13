@@ -27,11 +27,11 @@ interface AdoptionDetailHeroProps {
 
 /* ── 입양 상세 히어로 (브레드크럼 + 이미지 + 브리더 프로필 | 정보) ── */
 const AdoptionDetailHero = ({ detail, onImageClick }: AdoptionDetailHeroProps) => (
-  // 좌우 패딩(모바일20/탭48)은 Container가 담당, 이미지만 음수마진으로 풀블리드
-  <Container className="pc:px-[3rem] pc:py-[0.75rem]">
+  // 좌우 패딩(모바일16/탭48/pc80)은 Container가 담당, 이미지만 음수마진으로 풀블리드. pc 섹션 py-20
+  <Container className="px-[1rem] pc:py-[1.25rem]">
     <div className="pc:flex pc:items-start pc:gap-[1.25rem]">
       {/* ── 좌측 섹션: 브레드크럼 + 이미지 + 브리더 프로필 ── 피그마: w-500, gap-12 */}
-      <div className="relative -mx-[1.25rem] tab:-mx-[3rem] pc:mx-0 pc:flex pc:w-[31.25rem] pc:shrink-0 pc:flex-col pc:gap-[0.75rem]">
+      <div className="relative -mx-[1rem] tab:-mx-[3rem] pc:mx-0 pc:flex pc:w-[31.25rem] pc:shrink-0 pc:flex-col pc:gap-[0.75rem]">
         {/* 브레드크럼 (데스크탑 전용) — 피그마: 라벨(body/md/bold 14px #6b6b6b) + chevron */}
         <div className="hidden items-end py-[0.625rem] pc:flex">
           {['홈', '입양', '도마뱀'].map((label, index) => (
@@ -78,7 +78,7 @@ const AdoptionDetailHero = ({ detail, onImageClick }: AdoptionDetailHeroProps) =
       </div>
 
       {/* ── 우측 섹션: 이름 ~ 관심/공유 ── 좌우 px는 바깥 Container가, 여기는 py만 (px 없음) */}
-      <div className="flex h-full w-full flex-col py-[0.75rem] pc:flex-1 pc:items-end pc:justify-between pc:self-stretch pc:py-[3rem]">
+      <div className="flex h-full w-full flex-col py-[0.75rem] pc:flex-1 pc:items-end pc:justify-between pc:self-stretch pc:py-0">
         {/* 브리더 프로필 (모바일만 여기서 표시) */}
         <div className="w-full pc:hidden">
           <div className="flex items-center gap-[0.375rem]">
@@ -171,7 +171,15 @@ const AdoptionDetailHero = ({ detail, onImageClick }: AdoptionDetailHeroProps) =
 )
 
 // [refactored] 브리더 아바타 (원형 이미지 + fallback 배경) — 데스크탑/모바일 중복 제거 (크기만 className)
-const BreederAvatar = ({ src, alt, className }: { src: string; alt: string; className: string }) => (
+const BreederAvatar = ({
+  src,
+  alt,
+  className,
+}: {
+  src: string
+  alt: string
+  className: string
+}) => (
   <div className={cn('relative shrink-0 overflow-hidden rounded-full bg-[#d4d4d4]', className)}>
     <Image src={src} alt={alt} fill className="object-cover" />
   </div>

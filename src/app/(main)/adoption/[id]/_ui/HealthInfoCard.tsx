@@ -43,7 +43,7 @@ const TableRow = ({ className, children }: { className?: string; children: React
 )
 
 const HealthInfoCard = ({ detail }: { detail: AdoptionDetailDto }) => (
-  <BaseInfoCard title="건강 정보" className="pc:w-[55.75rem] pc:flex-none">
+  <BaseInfoCard title="건강 정보" className="pc:col-start-1 pc:row-start-1">
     <div className="flex flex-col gap-[2.1875rem] pc:gap-[1.25rem]">
       {/* 예방 접종 현황 */}
       <div className="flex flex-col gap-[0.6875rem]">

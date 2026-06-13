@@ -17,12 +17,13 @@ const OtherListingCard = ({ listing }: { listing: AdoptionListingCard }) => {
 
   return (
     <>
-      {/* 모바일: 가로형 카드 */}
+      {/* 모바일·탭: 가로형 카드 — 다른 분양건 카드 패딩 8px (Figma card-2) */}
       <div className="pc:hidden">
         <AdoptionCardHorizontal
           listing={listing}
           isFavorite={isFavorite}
           onToggle={toggleFavorite}
+          className="p-[0.5rem]"
         />
       </div>
       {/* 데스크탑: 가로형 큰 카드 */}
