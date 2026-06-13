@@ -25,7 +25,7 @@ const AdoptionCtaBar = ({ listingId }: AdoptionCtaBarProps) => (
 
       <Link
         href={`/adoption/${listingId}/apply`}
-        className="flex  max-w-[18.5625rem] flex-1 items-center justify-center rounded-full bg-[#fffa94] p-[0.5rem] text-[1rem] font-semibold text-[#3e3e3e] tab:h-[2rem] tab:max-w-[16.125rem] tab:text-[0.875rem]"
+        className="flex h-[3rem] max-w-[18.5625rem] flex-1 items-center justify-center rounded-full bg-[#fffa94] px-[0.5rem] text-[1rem] font-semibold text-[#3e3e3e] tab:h-[2rem] tab:max-w-[16.125rem] tab:text-[0.875rem]"
       >
         입양 신청하기
       </Link>
