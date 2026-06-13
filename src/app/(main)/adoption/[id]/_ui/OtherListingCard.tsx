@@ -18,7 +18,7 @@ const OtherListingCard = ({ listing }: { listing: AdoptionListingCard }) => {
   return (
     <>
       {/* 모바일: 가로형 카드 */}
-      <div className="tab:hidden">
+      <div className="pc:hidden">
         <AdoptionCardHorizontal
           listing={listing}
           isFavorite={isFavorite}
@@ -26,7 +26,7 @@ const OtherListingCard = ({ listing }: { listing: AdoptionListingCard }) => {
         />
       </div>
       {/* 데스크탑: 가로형 큰 카드 */}
-      <div className="hidden tab:block">
+      <div className="hidden pc:block">
         <DesktopOtherListingCard
           listing={listing}
           isFavorite={isFavorite}

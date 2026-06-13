@@ -9,11 +9,11 @@ const CompletionBadge = ({ completed }: { completed: boolean }) => (
   <Badge
     variant="status"
     className={cn(
-      'flex items-center justify-center px-[0.625rem] py-[0.25rem] text-[0.75rem] leading-[1.375rem] tab:text-[0.875rem]',
+      'flex items-center justify-center px-[0.625rem] py-[0.25rem] text-[0.75rem] leading-[1.375rem] pc:text-[0.875rem]',
       completed ? 'bg-[#5d5d5d]' : 'bg-[#a4a4a4]',
     )}
   >
-    <CheckIcon className="size-[1.25rem] tab:size-[1.5rem]" />
+    <CheckIcon className="size-[1.25rem] pc:size-[1.5rem]" />
     <span>{completed ? '검사 완료' : '미완료'}</span>
   </Badge>
 )
@@ -28,7 +28,7 @@ const SectionHeader = ({ title, completed }: { title: string; completed: boolean
 
 // [refactored] 피그마 TableLayout 컨테이너 — 반복 className 제거
 const Table = ({ children }: { children: ReactNode }) => (
-  <div className="flex flex-col text-[0.875rem] leading-[1.375rem] font-semibold tab:text-[1rem] tab:leading-[1.5]">
+  <div className="flex flex-col text-[0.875rem] leading-[1.375rem] font-semibold pc:text-[1rem] pc:leading-[1.5]">
     {children}
   </div>
 )
@@ -43,8 +43,8 @@ const TableRow = ({ className, children }: { className?: string; children: React
 )
 
 const HealthInfoCard = ({ detail }: { detail: AdoptionDetailDto }) => (
-  <BaseInfoCard title="건강 정보" className="tab:flex-1 pc:w-[55.75rem] pc:flex-none">
-    <div className="flex flex-col gap-[2.1875rem] tab:gap-[1.25rem]">
+  <BaseInfoCard title="건강 정보" className="pc:w-[55.75rem] pc:flex-none">
+    <div className="flex flex-col gap-[2.1875rem] pc:gap-[1.25rem]">
       {/* 예방 접종 현황 */}
       <div className="flex flex-col gap-[0.6875rem]">
         {/* [refactored] SectionHeader 사용 */}
