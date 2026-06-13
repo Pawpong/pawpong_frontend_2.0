@@ -4,6 +4,7 @@ import { Controller } from 'react-hook-form'
 import { CloseIcon } from '@/shared/assets/icons'
 import {
   Container,
+  CtaModal,
   Input,
   Select,
   SelectContent,
@@ -18,7 +19,6 @@ import { FormFieldLabel } from './FormFieldLabel'
 import { HealthInfoSection } from './HealthInfoSection'
 import { ParentInfoSection } from './ParentInfoSection'
 import { BreedingEnvSection } from './BreedingEnvSection'
-import { AdoptionCreateExitDialog } from './AdoptionCreateExitDialog'
 
 const AdoptionCreateContent = () => {
   const {
@@ -143,11 +143,16 @@ const AdoptionCreateContent = () => {
         </Container>
       </div>
 
-      <AdoptionCreateExitDialog
+      <CtaModal
         open={showGuard}
-        onExit={handleExitConfirm}
-        onSaveDraft={handleSaveDraft}
-        onCancel={cancelExit}
+        onOpenChange={(isOpen) => !isOpen && cancelExit()}
+        title="분양글 작성을 그만하시겠어요?"
+        description="임시저장하면 나중에 이어서 작성할 수 있어요."
+        actions={[
+          { label: '임시저장', variant: 'fill', onClick: handleSaveDraft },
+          { label: '분양글 작성 그만하기', variant: 'outline', onClick: handleExitConfirm },
+          { label: '닫기', variant: 'ghost', onClick: cancelExit },
+        ]}
       />
     </div>
   )

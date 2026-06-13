@@ -1,7 +1,7 @@
 'use client'
 
 import { CloseIcon } from '@/shared/assets/icons'
-import { ExitConfirmDialog } from '@/shared/ui'
+import { CtaModal } from '@/shared/ui'
 import type { AdoptionDetailDto } from '@/shared/types'
 import { cn } from '@/shared/lib/cn'
 import { useApplicationForm } from '../_lib/useApplicationForm'
@@ -154,7 +154,17 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
       </form>
 
       {/* ═══ 나가기 확인 모달 ═══ */}
-      <ExitConfirmDialog open={showGuard} onConfirm={confirmExit} onCancel={cancelExit} />
+      <CtaModal
+        open={showGuard}
+        onOpenChange={(isOpen) => !isOpen && cancelExit()}
+        icon={null}
+        title="입양 신청을 그만두시나요?"
+        direction="responsive"
+        actions={[
+          { label: '닫기', variant: 'outline', onClick: cancelExit },
+          { label: '그만두기', variant: 'fill', onClick: confirmExit },
+        ]}
+      />
     </div>
   )
 }
