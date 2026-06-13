@@ -76,7 +76,7 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
       </Section>
 
       {/* ═══ CTA 하단 고정 바 ═══ */}
-      <AdoptionCtaBar listingId={detail.listingId} chatCount={detail.chatCount} />
+      <AdoptionCtaBar listingId={detail.listingId} />
 
       {/* ═══ 이미지 모달 ═══ */}
       <ImageModal
