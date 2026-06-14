@@ -50,20 +50,24 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
 
   return (
     <div className="pb-[5.5rem] tab:pb-20">
-      {/* ═══ 서브헤더 (Figma 1654-161687) — 패딩 mo: 4·16 / tab: 4·48 / pc: 8·80 ═══ */}
-      <div className="flex flex-col items-center bg-white px-4 py-1 tab:px-12 pc:px-20 pc:py-2">
-        <div className="flex w-full items-center">
-          <button type="button" onClick={handleCloseClick} aria-label="닫기">
-            <CloseIcon className="size-6 text-[#6b6b6b]" />
-          </button>
-          <div className="flex flex-1 items-center justify-center p-0.5">
-            <p className="text-base leading-normal font-semibold text-[#3e3e3e]">입양 신청</p>
+      {/* ═══ 상단 고정 영역 — GNB(sticky top-0) 아래에 서브헤더 + 동물 정보 카드를 함께 sticky ═══ */}
+      {/* top 값 = GNB 높이(모바일 48px / 탭+ ≈56px) 기준 오프셋 */}
+      <div className="sticky top-12 z-40 tab:top-14">
+        {/* 서브헤더 (Figma 1654-161687) — 패딩 mo: 4·16 / tab: 4·48 / pc: 8·80 */}
+        <div className="flex flex-col items-center bg-white px-4 py-1 tab:px-12 pc:px-20 pc:py-2">
+          <div className="flex w-full items-center">
+            <button type="button" onClick={handleCloseClick} aria-label="닫기">
+              <CloseIcon className="size-6 text-[#6b6b6b]" />
+            </button>
+            <div className="flex flex-1 items-center justify-center p-0.5">
+              <p className="text-base leading-normal font-semibold text-[#3e3e3e]">입양 신청</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* ═══ 동물 정보 카드 ═══ */}
-      <PetInfoCard detail={detail} />
+        {/* 동물 정보 카드 */}
+        <PetInfoCard detail={detail} />
+      </div>
 
       {/* ═══ 안내 배너 (정보 카드 하단) — px mo16/tab48/pc16, py32 / 정보 카드와 동일하게 max-w-[57.5rem] 중앙 컬럼, 텍스트 좌측 정렬 ═══ */}
       <div className="flex flex-col items-center px-4 py-8 tab:px-12 pc:px-4">
