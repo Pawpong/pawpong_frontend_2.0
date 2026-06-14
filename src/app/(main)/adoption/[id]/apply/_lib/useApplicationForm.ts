@@ -32,7 +32,12 @@ const useApplicationForm = (detail: AdoptionDetailDto) => {
     },
   })
 
-  const { showGuard, requestExit, confirmExit, cancelExit } = useExitGuard({
+  const {
+    showGuard,
+    requestExit,
+    confirmExit: rawConfirmExit,
+    cancelExit,
+  } = useExitGuard({
     hasChanges: isDirty,
   })
 
@@ -41,6 +46,9 @@ const useApplicationForm = (detail: AdoptionDetailDto) => {
       router.back()
     }
   }
+
+  // X 버튼(programmatic)으로 띄운 가드에서 "그만두기" 시에도 실제로 나가도록 router.back() 주입
+  const confirmExit = () => rawConfirmExit(() => router.back())
 
   const onSubmit = (data: ApplicationFormValues) => {
     createApplication(

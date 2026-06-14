@@ -75,12 +75,16 @@ const useExitGuard = ({ hasChanges, enabled = true }: UseExitGuardOptions) => {
     return false
   }, [])
 
-  /** 사용자가 나가기 확인 */
-  const confirmExit = useCallback(() => {
+  /** 사용자가 나가기 확인
+   *  - browser: 가드용으로 쌓은 history 1칸 + 원래 1칸 = go(-2)로 복귀
+   *  - programmatic(X 버튼 등): 라우터를 모르는 훅 대신 호출부가 넘긴 콜백으로 나감 */
+  const confirmExit = useCallback((onProgrammaticExit?: () => void) => {
     setShowGuard(false)
     if (sourceRef.current === 'browser') {
       allowNavigationRef.current = true
       window.history.go(-2)
+    } else if (sourceRef.current === 'programmatic') {
+      onProgrammaticExit?.()
     }
     sourceRef.current = null
   }, [])
