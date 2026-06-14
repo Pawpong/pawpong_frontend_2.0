@@ -12,7 +12,7 @@ import {
   ReadonlyInput,
   TextareaField,
   CheckboxField,
-  SubmitButton,
+  FooterCtaBar,
 } from './FormFields'
 
 interface ApplicationFormProps {
@@ -49,7 +49,7 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
   } = useApplicationForm(detail)
 
   return (
-    <div className="pb-[5.5rem] tab:pb-0">
+    <div className="pb-[5.5rem] tab:pb-20">
       {/* ═══ 서브헤더 (Figma 1654-161687) — 패딩 mo: 4·16 / tab: 4·48 / pc: 8·80 ═══ */}
       <div className="flex flex-col items-center bg-white px-4 py-1 tab:px-12 pc:px-20 pc:py-2">
         <div className="flex w-full items-center">
@@ -125,26 +125,11 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
                 label="모든 가족 구성원이 입양에 동의했습니다."
               />
             </div>
-
-            {/* 데스크탑 CTA — [refactored] SubmitButton 사용 (크기만 주입) */}
-            <div className="mt-6 hidden justify-end tab:flex">
-              <SubmitButton
-                isValid={isValid}
-                isPending={isPending}
-                className="h-10 w-[10rem] text-[0.875rem] font-medium"
-              />
-            </div>
           </div>
         </Container>
 
-        {/* 모바일 CTA (하단 고정) — [refactored] SubmitButton 사용 */}
-        <div className="fixed right-0 bottom-0 left-0 z-10 bg-white p-[1.25rem] tab:hidden">
-          <SubmitButton
-            isValid={isValid}
-            isPending={isPending}
-            className="h-12 w-full text-[1rem] font-semibold"
-          />
-        </div>
+        {/* ═══ 하단 CTA 바 (Figma 1654-161691/97/03) — [refactored] FooterCtaBar로 분리 ═══ */}
+        <FooterCtaBar onCancel={handleCloseClick} isValid={isValid} isPending={isPending} />
       </form>
 
       {/* ═══ 나가기 확인 모달 ═══ */}
