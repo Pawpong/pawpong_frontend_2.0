@@ -5,7 +5,7 @@ import {
   type FieldPath,
   type UseFormRegisterReturn,
 } from 'react-hook-form'
-import { CheckboxIcon } from '@/shared/assets/icons'
+import { Checkbox } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import type { ApplicationFormValues } from '../_lib/schema'
 
@@ -76,7 +76,7 @@ const TextareaField = ({
   </div>
 )
 
-// 체크박스 — 24px 아이콘(미체크 #cacaca), 라벨 lg/medium 14→16
+// 체크박스 — 공통 Checkbox(기본 large 24px) + 라벨 lg/medium 14→16
 const CheckboxField = ({
   control,
   name,
@@ -90,19 +90,13 @@ const CheckboxField = ({
     control={control}
     name={name}
     render={({ field }) => (
-      <button
-        type="button"
-        onClick={() => field.onChange(!field.value)}
-        className="flex w-full items-center gap-1.5 text-left"
-      >
-        <CheckboxIcon
-          checked={!!field.value}
-          className={cn('size-6 shrink-0', field.value ? 'text-[#5d5d5d]' : 'text-[#cacaca]')}
-        />
+      // [refactored] 브랜드 스타일이 공통 Checkbox 기본값으로 이동 — 커스텀 className 제거
+      <label className="flex w-full cursor-pointer items-center gap-1.5">
+        <Checkbox checked={!!field.value} onCheckedChange={(v) => field.onChange(v === true)} />
         <span className="flex-1 text-sm leading-[1.5] font-medium text-[#3e3e3e] pc:text-base">
           {label}
         </span>
-      </button>
+      </label>
     )}
   />
 )

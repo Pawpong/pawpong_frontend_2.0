@@ -1,6 +1,5 @@
 import { Checkbox, DetailLink } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
-import { CHECKBOX_CLASS } from './constants'
 
 interface CheckboxFieldProps {
   label: React.ReactNode
@@ -18,11 +17,8 @@ const CheckboxField = ({
   className,
 }: CheckboxFieldProps) => (
   <label className={cn('flex cursor-pointer items-center gap-3', className)}>
-    <Checkbox
-      checked={!!checked}
-      onCheckedChange={(v) => onCheckedChange(v as boolean)}
-      className={CHECKBOX_CLASS}
-    />
+    {/* [refactored] 불필요한 !! 코어션 + as boolean 단언 제거 (checked는 이미 boolean, v는 === true로 판정) */}
+    <Checkbox checked={checked} onCheckedChange={(v) => onCheckedChange(v === true)} />
     <span className="flex-1 text-base leading-[1.5] font-medium text-[#3e3e3e]">{label}</span>
     {hasDetailLink && <DetailLink variant="button" size="lg" />}
   </label>
