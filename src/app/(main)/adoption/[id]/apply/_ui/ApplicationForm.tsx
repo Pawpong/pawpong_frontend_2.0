@@ -41,32 +41,23 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
         </div>
       </div>
 
-      {/* ═══ 동물 정보 카드 (데스크탑) ═══ */}
+      {/* ═══ 동물 정보 카드 ═══ */}
       <PetInfoCard detail={detail} />
+
+      {/* ═══ 안내 배너 (정보 카드 하단) — px mo16/tab48/pc16, py32 / 정보 카드와 동일하게 max-w-[57.5rem] 중앙 컬럼, 텍스트 좌측 정렬 ═══ */}
+      <div className="flex flex-col items-center px-4 py-8 tab:px-12 pc:px-4">
+        <p className="w-full max-w-[57.5rem] font-cafe24 text-sm leading-[1.5] text-[#3e3e3e]">
+          입양 신청서 작성 이후,
+          <br />
+          담당 브리더와 채팅을 통해 더 자세한 입양 계획을 세워보세요
+        </p>
+      </div>
 
       {/* ═══ 폼 영역 ═══ */}
       <form onSubmit={handleSubmit(onSubmit)}>
-        {/* 모바일 안내 문구 — 공통 Container 패딩 시스템(16/48/80) */}
-        <Container className="px-[1rem] pt-[0.75rem] pb-[0.25rem] tab:hidden">
-          <p className="text-[0.75rem] leading-[1.5] font-semibold text-[#5d5d5d]">
-            입양 신청서 작성 이후,
-            <br />
-            담당 브리더와 채팅을 통해 더 상세한 입양 계획을 세워보세요
-          </p>
-        </Container>
-
         {/* 회색 배경 컨테이너 — 상세 페이지 Section과 동일: 상위 Container에 12px 48px 패딩 + pc 중앙 컬럼 */}
         <Container className="px-[1rem] py-[0.75rem] pc:py-[1.25rem]">
           <div className="mt-[1.996rem] rounded-[1rem] bg-[#f5f5f5] p-[0.75rem] tab:mt-[2.5rem] tab:mb-[3rem] tab:px-[2.625rem] tab:pt-[2.5rem] tab:pb-[2.5rem] pc:mx-auto pc:max-w-[57.5rem]">
-            {/* 데스크탑 안내 문구 */}
-            <div className="hidden tab:mb-[4.379rem] tab:block">
-              <p className="text-[1rem] leading-[1.5] font-semibold text-[#5d5d5d]">
-                입양 신청서 작성 이후,
-                <br />
-                담당 브리더와 채팅을 통해 더 상세한 입양 계획을 세워보세요
-              </p>
-            </div>
-
             {/* 흰색 폼 카드 */}
             <div className="rounded-[1rem] bg-white px-[0.75rem] py-[1rem] tab:px-[4.25rem] tab:py-[2.125rem]">
               <div className="flex flex-col gap-[0.75rem] tab:gap-[2rem]">
