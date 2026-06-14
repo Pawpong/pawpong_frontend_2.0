@@ -17,6 +17,7 @@ const useApplicationForm = (detail: AdoptionDetailDto) => {
     register,
     control,
     handleSubmit,
+    watch,
     formState: { isValid, isDirty },
   } = useForm<ApplicationFormValues>({
     resolver: zodResolver(applicationSchema),
@@ -71,6 +72,7 @@ const useApplicationForm = (detail: AdoptionDetailDto) => {
     register,
     control,
     handleSubmit,
+    watch,
     isValid,
     isPending,
     showGuard,

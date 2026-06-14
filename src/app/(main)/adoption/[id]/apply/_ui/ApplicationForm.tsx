@@ -1,22 +1,43 @@
 'use client'
 
+import type { FieldPath } from 'react-hook-form'
 import { CloseIcon } from '@/shared/assets/icons'
 import { Container, CtaModal } from '@/shared/ui'
 import type { AdoptionDetailDto } from '@/shared/types'
-import { cn } from '@/shared/lib/cn'
 import { useApplicationForm } from '../_lib/useApplicationForm'
+import type { ApplicationFormValues } from '../_lib/schema'
 import { PetInfoCard } from './PetInfoCard'
-import { FormSection, ReadonlyInput, CheckboxField } from './FormFields'
+import {
+  LabeledField,
+  ReadonlyInput,
+  TextareaField,
+  CheckboxField,
+  SubmitButton,
+} from './FormFields'
 
 interface ApplicationFormProps {
   detail: AdoptionDetailDto
 }
+
+// [refactored] 반복되던 체크박스 3개를 배열+map으로 전환
+const CONSENT_CHECKS: { name: FieldPath<ApplicationFormValues>; label: string }[] = [
+  { name: 'privacyConsent', label: '개인정보 수집 및 이용에 동의합니다.' },
+  {
+    name: 'canProvideBasicCare',
+    label: '정기 예방 접종/ 건강검진/ 훈련 등 기본 케어가 가능합니다.',
+  },
+  {
+    name: 'canAffordMedicalExpenses',
+    label: '예상치 못한 질병/ 사고 치료비를 감당할 수 있습니다.',
+  },
+]
 
 const ApplicationForm = ({ detail }: ApplicationFormProps) => {
   const {
     register,
     control,
     handleSubmit,
+    watch,
     isValid,
     isPending,
     showGuard,
@@ -53,89 +74,76 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
         </p>
       </div>
 
-      {/* ═══ 폼 영역 ═══ */}
+      {/* ═══ 폼 영역 (Figma 1237-41470) — 모바일: 박스 없음 / 탭+: 회색 카드(#f6f6f6 p40 rounded12 max-w880) ═══ */}
       <form onSubmit={handleSubmit(onSubmit)}>
-        {/* 회색 배경 컨테이너 — 상세 페이지 Section과 동일: 상위 Container에 12px 48px 패딩 + pc 중앙 컬럼 */}
-        <Container className="px-[1rem] py-[0.75rem] pc:py-[1.25rem]">
-          <div className="mt-[1.996rem] rounded-[1rem] bg-[#f5f5f5] p-[0.75rem] tab:mt-[2.5rem] tab:mb-[3rem] tab:px-[2.625rem] tab:pt-[2.5rem] tab:pb-[2.5rem] pc:mx-auto pc:max-w-[57.5rem]">
-            {/* 흰색 폼 카드 */}
-            <div className="rounded-[1rem] bg-white px-[0.75rem] py-[1rem] tab:px-[4.25rem] tab:py-[2.125rem]">
-              <div className="flex flex-col gap-[0.75rem] tab:gap-[2rem]">
-                <FormSection title="마음에 두신 아이가 있나요?">
-                  <ReadonlyInput value={petSummary} />
-                </FormSection>
+        <Container className="px-[1rem] pb-12">
+          <div className="pc:mx-auto pc:max-w-[55rem]">
+            {/* 폼 박스 — 섹션 간 gap 40 */}
+            <div className="flex flex-col gap-10 tab:rounded-xl tab:bg-[#f6f6f6] tab:p-10">
+              {/* [refactored] 라벨+필드 래퍼를 LabeledField로 통일 */}
+              {/* 입양하는 동물 (읽기 전용) */}
+              <LabeledField title="입양하는 동물">
+                <ReadonlyInput value={petSummary} />
+              </LabeledField>
 
-                <FormSection title="입양 계획을 간단히 작성해 주세요">
-                  <textarea
-                    {...register('adoptionPlan')}
-                    placeholder="생활패턴, 주거환경, 입양 시기 등을 입력해주세요"
-                    className="h-[5.125rem] w-full resize-none rounded-[0.375rem] border border-[#a8a8a8] bg-white p-[0.625rem] text-[0.875rem] leading-[1.375rem] font-medium text-[#5d5d5d] placeholder:text-[#a8a8a8] focus:border-[#5d5d5d] focus:outline-none tab:h-[6.8125rem] tab:rounded-[1rem] tab:px-[1.25rem] tab:py-[0.9375rem] tab:text-[1rem]"
-                  />
-                </FormSection>
+              {/* 입양 계획 */}
+              <LabeledField title="입양 계획을 간단히 작성해 주세요">
+                <TextareaField
+                  register={register('adoptionPlan')}
+                  value={watch('adoptionPlan')}
+                  placeholder="생활패턴, 주거환경, 입양 시기 등을 입력해주세요"
+                />
+              </LabeledField>
 
-                <FormSection title="입양준비 확인을 위한 필수 항목을 체크해볼게요">
-                  <div className="flex flex-col gap-[0.375rem] tab:gap-[1.125rem]">
-                    <CheckboxField
-                      control={control}
-                      name="privacyConsent"
-                      label="개인정보 수집 및 이용에 동의합니다"
-                    />
-                    <CheckboxField
-                      control={control}
-                      name="canProvideBasicCare"
-                      label="정기 예방접종/ 검강검진/ 훈련 등 기본 케어가 가능합니다."
-                    />
-                    <CheckboxField
-                      control={control}
-                      name="canAffordMedicalExpenses"
-                      label="예상치 못한 질병/ 사고 치료비를 감당할 수 있습니다."
-                    />
-                  </div>
-                </FormSection>
+              {/* 입양준비 확인 체크 */}
+              <LabeledField
+                title="입양준비 확인을 위한 필수 항목을 체크해주세요"
+                size="lg"
+                gap="gap-5"
+              >
+                {/* [refactored] CONSENT_CHECKS 배열을 map으로 렌더 */}
+                <div className="flex flex-col gap-3">
+                  {CONSENT_CHECKS.map(({ name, label }) => (
+                    <CheckboxField key={name} control={control} name={name} label={label} />
+                  ))}
+                </div>
+              </LabeledField>
 
-                <FormSection title="함께 거주하는 가족 구성원을 입력해주세요">
-                  <textarea
-                    {...register('familyMembers')}
-                    placeholder="예: 배우자 1명,  자녀 1명, 부모님 1명"
-                    className="h-[5.125rem] w-full resize-none rounded-[0.375rem] border border-[#a8a8a8] bg-white p-[0.625rem] text-[0.875rem] leading-[1.375rem] font-medium text-[#5d5d5d] placeholder:text-[#a8a8a8] focus:border-[#5d5d5d] focus:outline-none tab:h-[6.8125rem] tab:rounded-[1rem] tab:px-[1.25rem] tab:py-[0.9375rem] tab:text-[1rem]"
-                  />
-                  <CheckboxField
-                    control={control}
-                    name="allFamilyConsent"
-                    label="모든 가족 구성원이 입양에 동의했습니다."
-                  />
-                </FormSection>
-              </div>
+              {/* 가족 구성원 */}
+              <LabeledField title="함께 거주하는 가족 구성원을 입력해주세요">
+                <TextareaField
+                  register={register('familyMembers')}
+                  value={watch('familyMembers')}
+                  placeholder="예) 배우자 1명, 자녀 1명, 부모님 1명"
+                />
+              </LabeledField>
+
+              {/* 모든 가족 동의 */}
+              <CheckboxField
+                control={control}
+                name="allFamilyConsent"
+                label="모든 가족 구성원이 입양에 동의했습니다."
+              />
             </div>
 
-            {/* 데스크탑 CTA */}
-            <div className="hidden tab:mt-[1.5rem] tab:flex tab:justify-end">
-              <button
-                type="submit"
-                disabled={!isValid || isPending}
-                className={cn(
-                  'flex h-10 w-[10rem] items-center justify-center rounded-full text-[0.875rem] font-medium transition-colors',
-                  isValid && !isPending ? 'bg-[#5d5d5d] text-white' : 'bg-[#d4d4d4] text-[#5d5d5d]',
-                )}
-              >
-                {isPending ? '제출 중...' : '상담 신청하기'}
-              </button>
+            {/* 데스크탑 CTA — [refactored] SubmitButton 사용 (크기만 주입) */}
+            <div className="mt-6 hidden justify-end tab:flex">
+              <SubmitButton
+                isValid={isValid}
+                isPending={isPending}
+                className="h-10 w-[10rem] text-[0.875rem] font-medium"
+              />
             </div>
           </div>
         </Container>
 
-        {/* 모바일 CTA (하단 고정) */}
+        {/* 모바일 CTA (하단 고정) — [refactored] SubmitButton 사용 */}
         <div className="fixed right-0 bottom-0 left-0 z-10 bg-white p-[1.25rem] tab:hidden">
-          <button
-            type="submit"
-            disabled={!isValid || isPending}
-            className={cn(
-              'flex h-12 w-full items-center justify-center rounded-full text-[1rem] font-semibold transition-colors',
-              isValid && !isPending ? 'bg-[#5d5d5d] text-white' : 'bg-[#d4d4d4] text-[#5d5d5d]',
-            )}
-          >
-            {isPending ? '제출 중...' : '상담 신청하기'}
-          </button>
+          <SubmitButton
+            isValid={isValid}
+            isPending={isPending}
+            className="h-12 w-full text-[1rem] font-semibold"
+          />
         </div>
       </form>
 
