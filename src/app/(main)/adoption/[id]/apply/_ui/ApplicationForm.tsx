@@ -2,18 +2,12 @@
 
 import type { FieldPath } from 'react-hook-form'
 import { CloseIcon } from '@/shared/assets/icons'
-import { Container, CtaModal } from '@/shared/ui'
+import { Container, CtaModal, TextareaField } from '@/shared/ui'
 import type { AdoptionDetailDto } from '@/shared/types'
 import { useApplicationForm } from '../_lib/useApplicationForm'
 import type { ApplicationFormValues } from '../_lib/schema'
 import { PetInfoCard } from './PetInfoCard'
-import {
-  LabeledField,
-  ReadonlyInput,
-  TextareaField,
-  CheckboxField,
-  FooterCtaBar,
-} from './FormFields'
+import { LabeledField, ReadonlyInput, CheckboxField, FooterCtaBar } from './FormFields'
 
 interface ApplicationFormProps {
   detail: AdoptionDetailDto
@@ -31,6 +25,9 @@ const CONSENT_CHECKS: { name: FieldPath<ApplicationFormValues>; label: string }[
     label: '예상치 못한 질병/ 사고 치료비를 감당할 수 있습니다.',
   },
 ]
+
+// [refactored] textarea 글자 수 제한 매직넘버(100) 상수화
+const TEXTAREA_MAX_LENGTH = 100
 
 const ApplicationForm = ({ detail }: ApplicationFormProps) => {
   const {
@@ -93,9 +90,10 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
               {/* 입양 계획 */}
               <LabeledField title="입양 계획을 간단히 작성해 주세요">
                 <TextareaField
-                  register={register('adoptionPlan')}
-                  value={watch('adoptionPlan')}
                   placeholder="생활패턴, 주거환경, 입양 시기 등을 입력해주세요"
+                  maxLength={TEXTAREA_MAX_LENGTH}
+                  currentLength={watch('adoptionPlan')?.length ?? 0}
+                  {...register('adoptionPlan')}
                 />
               </LabeledField>
 
@@ -116,9 +114,10 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
               {/* 가족 구성원 */}
               <LabeledField title="함께 거주하는 가족 구성원을 입력해주세요">
                 <TextareaField
-                  register={register('familyMembers')}
-                  value={watch('familyMembers')}
                   placeholder="예) 배우자 1명, 자녀 1명, 부모님 1명"
+                  maxLength={TEXTAREA_MAX_LENGTH}
+                  currentLength={watch('familyMembers')?.length ?? 0}
+                  {...register('familyMembers')}
                 />
               </LabeledField>
 

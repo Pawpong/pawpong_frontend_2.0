@@ -1,10 +1,5 @@
 import type { ReactNode } from 'react'
-import {
-  Controller,
-  type Control,
-  type FieldPath,
-  type UseFormRegisterReturn,
-} from 'react-hook-form'
+import { Controller, type Control, type FieldPath } from 'react-hook-form'
 import { Checkbox } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import type { ApplicationFormValues } from '../_lib/schema'
@@ -46,33 +41,6 @@ const LabeledField = ({
 const ReadonlyInput = ({ value }: { value: string }) => (
   <div className="flex h-[2.8125rem] items-center rounded-lg border border-[#e4e4e4] bg-white p-3">
     <p className="text-sm leading-[1.5] font-medium text-[#3e3e3e]">{value}</p>
-  </div>
-)
-
-// 텍스트영역 + 글자수 카운터 — border #cacaca, h-105, rounded-8, p-12, placeholder #a6a6a6
-const TextareaField = ({
-  register,
-  value,
-  placeholder,
-  maxLength = 100,
-}: {
-  register: UseFormRegisterReturn
-  value: string
-  placeholder: string
-  maxLength?: number
-}) => (
-  <div className="flex flex-col gap-0.5">
-    <textarea
-      {...register}
-      placeholder={placeholder}
-      maxLength={maxLength}
-      className="h-[6.5625rem] w-full resize-none rounded-lg border border-[#cacaca] bg-white p-3 text-sm leading-[1.5] font-medium text-[#3e3e3e] placeholder:text-[#a6a6a6] focus:border-[#5d5d5d] focus:outline-none"
-    />
-    <div className="flex justify-end">
-      <span className="text-[0.625rem] leading-[1.5] font-medium text-[#6b6b6b]">
-        {value.length}/{maxLength}
-      </span>
-    </div>
   </div>
 )
 
@@ -179,4 +147,4 @@ const FooterCtaBar = ({
 )
 
 // [refactored] FieldLabel/CancelButton/SubmitButton은 내부 전용이 되어 export 제거 (FooterCtaBar로 통합)
-export { LabeledField, ReadonlyInput, TextareaField, CheckboxField, FooterCtaBar }
+export { LabeledField, ReadonlyInput, CheckboxField, FooterCtaBar }
