@@ -92,7 +92,8 @@ const CtaModal = ({
             </div>
           )}
           <div className="flex flex-col items-center text-center text-[#3e3e3e]">
-            <DialogPrimitive.Title className="text-xl leading-normal font-semibold">
+            {/* whitespace-pre-line: title에 \n 넣으면 원하는 위치에서 줄바꿈 (단일 줄은 영향 없음) */}
+            <DialogPrimitive.Title className="text-xl leading-normal font-semibold whitespace-pre-line">
               {title}
             </DialogPrimitive.Title>
             {description && (

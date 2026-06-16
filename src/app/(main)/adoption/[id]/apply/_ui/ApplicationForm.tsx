@@ -1,7 +1,7 @@
 'use client'
 
 import type { FieldPath } from 'react-hook-form'
-import { CloseIcon } from '@/shared/assets/icons'
+import { CloseIcon, PawIcon } from '@/shared/assets/icons'
 import { Container, CtaModal, TextareaField } from '@/shared/ui'
 import type { AdoptionDetailDto } from '@/shared/types'
 import { useApplicationForm } from '../_lib/useApplicationForm'
@@ -42,6 +42,10 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
     cancelExit,
     handleCloseClick,
     onSubmit,
+    showConsultConfirm,
+    confirmConsult,
+    cancelConsult,
+    giveUpFromConsult,
     petSummary,
   } = useApplicationForm(detail)
 
@@ -145,6 +149,19 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
         actions={[
           { label: '닫기', variant: 'outline', onClick: cancelExit },
           { label: '그만두기', variant: 'fill', onClick: confirmExit },
+        ]}
+      />
+
+      {/* ═══ 입양 상담 확인 모달 (Figma 1955-262642) — 제출 버튼 → 이 모달 → "상담하기"로 실제 신청 ═══ */}
+      <CtaModal
+        open={showConsultConfirm}
+        onOpenChange={(isOpen) => !isOpen && cancelConsult()}
+        icon={<PawIcon className="size-8 text-[#6b6b6b]" />}
+        title={'브리더와 더 자세한 입양 상담이\n이루어집니다.'}
+        direction="row"
+        actions={[
+          { label: '그만두기', variant: 'outline', onClick: giveUpFromConsult },
+          { label: '상담하기', variant: 'fill', onClick: confirmConsult },
         ]}
       />
     </div>
