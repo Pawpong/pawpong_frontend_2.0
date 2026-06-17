@@ -2,10 +2,13 @@
 
 import * as React from 'react'
 import { Badge } from '@/shared/ui'
+import { ArrowBackIcon, MoreVertIcon } from '@/shared/assets/icons'
 import { MOCK_CHAT_MESSAGES } from '@/shared/mocks/chat'
 import type { ChatRoomResponseDto } from '@/shared/types'
 import { getDisplayName } from '../_lib/utils'
+import { ProfileAvatar } from './ProfileAvatar'
 import { PetInfoCard } from './PetInfoCard'
+import { ChatNoticeBanner } from './ChatNoticeBanner'
 import { ChatMessageBubble } from './ChatMessageBubble'
 import { ChatMessageInput } from './ChatMessageInput'
 
@@ -19,6 +22,7 @@ const ChatRoomPanel = ({ room, currentUserId, onBack }: ChatRoomPanelProps) => {
   const messages = MOCK_CHAT_MESSAGES.filter((msg) => msg.roomId === room.roomId)
   const messagesEndRef = React.useRef<HTMLDivElement>(null)
   const displayName = getDisplayName(room.breederId)
+  const [showNotice, setShowNotice] = React.useState(true)
 
   React.useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -29,68 +33,56 @@ const ChatRoomPanel = ({ room, currentUserId, onBack }: ChatRoomPanelProps) => {
   }
 
   return (
-    <div className="flex h-[calc(100dvh-4rem)] flex-col">
+    <div className="flex h-[calc(100dvh-4rem)] flex-col bg-[#ededed]">
       {/* Room Header */}
-      <div className="flex items-center gap-[0.625rem] bg-white px-5 py-3 pc:gap-3 pc:py-5">
-        <button
-          type="button"
-          onClick={onBack}
-          className="shrink-0 pc:hidden"
-          aria-label="뒤로 가기"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M15 18L9 12L15 6"
-              stroke="#5d5d5d"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
-        <div className="hidden size-11 shrink-0 rounded-full bg-fill-muted pc:block" />
-        <span className="flex-1 text-sm leading-[1.5] font-semibold text-text-primary pc:flex-none pc:text-xl pc:leading-[1.375rem]">
-          {displayName}
-        </span>
-        {room.applicationId && (
-          <Badge variant="outline" className="text-xs pc:text-sm">
-            80 BPM
-          </Badge>
-        )}
+      <div className="flex items-center justify-center bg-white px-[0.625rem] py-2 shadow-[0px_7px_7px_rgba(55,55,55,0.1)]">
+        <div className="flex w-full max-w-[55rem] items-center justify-between">
+          <div className="flex items-center gap-5">
+            <div className="flex items-center gap-1">
+              <button type="button" onClick={onBack} className="shrink-0" aria-label="뒤로 가기">
+                <ArrowBackIcon className="size-8 text-[#3e3e3e]" />
+              </button>
+              <div className="flex items-center gap-2">
+                <ProfileAvatar size="md" />
+                <span className="text-base leading-[1.5] font-semibold text-[#3e3e3e]">
+                  {displayName}
+                </span>
+              </div>
+            </div>
+            {room.applicationId && <Badge variant="active">애정도</Badge>}
+          </div>
+          <button type="button" className="shrink-0" aria-label="더보기">
+            <MoreVertIcon className="size-6 text-[#3e3e3e]" />
+          </button>
+        </div>
       </div>
 
       {/* Pet Info Card */}
       {room.applicationId && <PetInfoCard />}
 
       {/* Messages */}
-      <div className="mx-5 mt-3 flex-1 overflow-y-auto rounded-2xl bg-surface-primary">
-        {/* Notice */}
-        <div className="px-4 pt-3 text-center pc:px-6 pc:pt-[1.125rem]">
-          <p className="text-[0.625rem] leading-[1.5] font-medium text-text-muted pc:text-sm">
-            담당 브리더와 채팅을 통해 더 상세한 입양 계획을 세워보세요
-          </p>
-          <p className="text-[0.625rem] leading-[1.5] font-medium text-text-muted pc:text-sm">
-            채팅 내용을 pawpong팀이 검수할 수 있습니다.
-          </p>
-        </div>
+      <div className="flex-1 overflow-y-auto px-5 py-5 tab:px-8 pc:px-20">
+        <div className="mx-auto flex w-full max-w-[55rem] flex-col gap-10">
+          {showNotice && <ChatNoticeBanner onClose={() => setShowNotice(false)} />}
 
-        {/* Message List */}
-        <div className="flex flex-col gap-5 p-6">
-          {messages.map((msg, idx) => {
-            const isMine = msg.senderId === currentUserId
-            const prevMsg = messages[idx - 1]
-            const showAvatar = !isMine && (!prevMsg || prevMsg.senderId !== msg.senderId)
+          <div className="flex flex-col gap-3">
+            {messages.map((msg, idx) => {
+              const isMine = msg.senderId === currentUserId
+              const prevMsg = messages[idx - 1]
+              const showProfile = !isMine && (!prevMsg || prevMsg.senderId !== msg.senderId)
 
-            return (
-              <ChatMessageBubble
-                key={msg.messageId}
-                message={msg}
-                isMine={isMine}
-                showAvatar={showAvatar}
-              />
-            )
-          })}
-          <div ref={messagesEndRef} />
+              return (
+                <ChatMessageBubble
+                  key={msg.messageId}
+                  message={msg}
+                  isMine={isMine}
+                  senderName={displayName}
+                  showProfile={showProfile}
+                />
+              )
+            })}
+            <div ref={messagesEndRef} />
+          </div>
         </div>
       </div>
 

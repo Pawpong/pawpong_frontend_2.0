@@ -10,13 +10,10 @@ interface ChatFilterTabsProps {
 
 const ChatFilterTabs = ({ value, onChange, className }: ChatFilterTabsProps) => {
   return (
-    <div className={cn('flex items-center gap-4', className)}>
+    <div className={cn('flex flex-wrap items-center gap-2', className)}>
       {FILTER_TABS.map((tab) => (
         <button key={tab.value} type="button" onClick={() => onChange(tab.value)}>
-          <Badge
-            variant={value === tab.value ? 'status' : 'filled'}
-            className={cn('cursor-pointer', value === tab.value && 'bg-text-primary text-white')}
-          >
+          <Badge variant={value === tab.value ? 'active' : 'default'} className="cursor-pointer">
             {tab.label}
           </Badge>
         </button>
