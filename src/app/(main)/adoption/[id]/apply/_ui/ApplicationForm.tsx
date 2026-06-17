@@ -1,23 +1,40 @@
 'use client'
 
-import { CloseIcon } from '@/shared/assets/icons'
-import { CtaModal } from '@/shared/ui'
+import type { FieldPath } from 'react-hook-form'
+import { CloseIcon, PawIcon } from '@/shared/assets/icons'
+import { Container, CtaModal, TextareaField } from '@/shared/ui'
 import type { AdoptionDetailDto } from '@/shared/types'
-import { cn } from '@/shared/lib/cn'
 import { useApplicationForm } from '../_lib/useApplicationForm'
-import { BreederProfile } from './BreederProfile'
+import type { ApplicationFormValues } from '../_lib/schema'
 import { PetInfoCard } from './PetInfoCard'
-import { FormSection, ReadonlyInput, CheckboxField } from './FormFields'
+import { LabeledField, ReadonlyInput, CheckboxField, FooterCtaBar } from './FormFields'
 
 interface ApplicationFormProps {
   detail: AdoptionDetailDto
 }
+
+// [refactored] 반복되던 체크박스 3개를 배열+map으로 전환
+const CONSENT_CHECKS: { name: FieldPath<ApplicationFormValues>; label: string }[] = [
+  { name: 'privacyConsent', label: '개인정보 수집 및 이용에 동의합니다.' },
+  {
+    name: 'canProvideBasicCare',
+    label: '정기 예방 접종/ 건강검진/ 훈련 등 기본 케어가 가능합니다.',
+  },
+  {
+    name: 'canAffordMedicalExpenses',
+    label: '예상치 못한 질병/ 사고 치료비를 감당할 수 있습니다.',
+  },
+]
+
+// [refactored] textarea 글자 수 제한 매직넘버(100) 상수화
+const TEXTAREA_MAX_LENGTH = 100
 
 const ApplicationForm = ({ detail }: ApplicationFormProps) => {
   const {
     register,
     control,
     handleSubmit,
+    watch,
     isValid,
     isPending,
     showGuard,
@@ -25,132 +42,101 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
     cancelExit,
     handleCloseClick,
     onSubmit,
+    showConsultConfirm,
+    confirmConsult,
+    cancelConsult,
+    giveUpFromConsult,
     petSummary,
   } = useApplicationForm(detail)
 
   return (
-    <div className="pb-[5.5rem] tab:pb-0">
-      {/* ═══ 서브헤더 ═══ */}
-      <div className="flex items-center gap-[0.625rem] px-[1.25rem] py-[0.75rem] tab:h-[5.5rem] tab:justify-center tab:px-[6.25rem] tab:py-[0.625rem]">
-        <button
-          type="button"
-          onClick={handleCloseClick}
-          className="tab:absolute tab:left-[6.25rem]"
-        >
-          <CloseIcon className="size-[1.25rem] text-[#5d5d5d] tab:size-[1.5rem]" />
-        </button>
-        <p className="text-[0.875rem] leading-[1.5] font-semibold text-[#5d5d5d] tab:text-[1.25rem]">
-          <span className="tab:hidden">입양 신청 | {detail.name}</span>
-          <span className="hidden tab:inline">입양 신청</span>
+    <div className="pb-[5.5rem] tab:pb-20">
+      {/* ═══ 상단 고정 영역 — GNB(sticky top-0) 아래에 서브헤더 + 동물 정보 카드를 함께 sticky ═══ */}
+      {/* top 값 = GNB 높이(모바일 48px / 탭+ ≈56px) 기준 오프셋 */}
+      <div className="sticky top-12 z-40 tab:top-14">
+        {/* 서브헤더 (Figma 1654-161687) — 패딩 mo: 4·16 / tab: 4·48 / pc: 8·80 */}
+        <div className="flex flex-col items-center bg-white px-4 py-1 tab:px-12 pc:px-20 pc:py-2">
+          <div className="flex w-full items-center">
+            <button type="button" onClick={handleCloseClick} aria-label="닫기">
+              <CloseIcon className="size-6 text-[#6b6b6b]" />
+            </button>
+            <div className="flex flex-1 items-center justify-center p-0.5">
+              <p className="text-base leading-normal font-semibold text-[#3e3e3e]">입양 신청</p>
+            </div>
+          </div>
+        </div>
+
+        {/* 동물 정보 카드 */}
+        <PetInfoCard detail={detail} />
+      </div>
+
+      {/* ═══ 안내 배너 (정보 카드 하단) — px mo16/tab48/pc16, py32 / 정보 카드와 동일하게 max-w-[57.5rem] 중앙 컬럼, 텍스트 좌측 정렬 ═══ */}
+      <div className="flex flex-col items-center px-4 py-8 tab:px-12 pc:px-4">
+        <p className="w-full max-w-[57.5rem] font-cafe24 text-sm leading-[1.5] text-[#3e3e3e]">
+          입양 신청서 작성 이후,
+          <br />
+          담당 브리더와 채팅을 통해 더 자세한 입양 계획을 세워보세요
         </p>
       </div>
 
-      {/* ═══ 브리더 프로필 (데스크탑) ═══ */}
-      <BreederProfile breeder={detail.breeder} />
-
-      {/* ═══ 동물 정보 카드 (데스크탑) ═══ */}
-      <PetInfoCard detail={detail} />
-
-      {/* ═══ 폼 영역 ═══ */}
+      {/* ═══ 폼 영역 (Figma 1237-41470) — 모바일: 박스 없음 / 탭+: 회색 카드(#f6f6f6 p40 rounded12 max-w880) ═══ */}
       <form onSubmit={handleSubmit(onSubmit)}>
-        {/* 모바일 안내 문구 */}
-        <div className="px-[1.25rem] pt-[0.75rem] pb-[0.25rem] tab:hidden">
-          <p className="text-[0.75rem] leading-[1.5] font-semibold text-[#5d5d5d]">
-            입양 신청서 작성 이후,
-            <br />
-            담당 브리더와 채팅을 통해 더 상세한 입양 계획을 세워보세요
-          </p>
-        </div>
-
-        {/* 회색 배경 컨테이너 */}
-        <div className="mx-[1.25rem] mt-[1.996rem] rounded-[1rem] bg-[#f5f5f5] p-[0.75rem] tab:mx-[6.25rem] tab:mt-[2.5rem] tab:mb-[3rem] tab:px-[2.625rem] tab:pt-[2.5rem] tab:pb-[2.5rem]">
-          {/* 데스크탑 안내 문구 */}
-          <div className="hidden tab:mb-[4.379rem] tab:block">
-            <p className="text-[1rem] leading-[1.5] font-semibold text-[#5d5d5d]">
-              입양 신청서 작성 이후,
-              <br />
-              담당 브리더와 채팅을 통해 더 상세한 입양 계획을 세워보세요
-            </p>
-          </div>
-
-          {/* 흰색 폼 카드 */}
-          <div className="rounded-[1rem] bg-white px-[0.75rem] py-[1rem] tab:px-[4.25rem] tab:py-[2.125rem]">
-            <div className="flex flex-col gap-[0.75rem] tab:gap-[2rem]">
-              <FormSection title="마음에 두신 아이가 있나요?">
+        <Container className="px-[1rem] pb-12">
+          <div className="pc:mx-auto pc:max-w-[55rem]">
+            {/* 폼 박스 — 섹션 간 gap 40 */}
+            <div className="flex flex-col gap-10 tab:rounded-xl tab:bg-[#f6f6f6] tab:p-10">
+              {/* [refactored] 라벨+필드 래퍼를 LabeledField로 통일 */}
+              {/* 입양하는 동물 (읽기 전용) */}
+              <LabeledField title="입양하는 동물">
                 <ReadonlyInput value={petSummary} />
-              </FormSection>
+              </LabeledField>
 
-              <FormSection title="입양 계획을 간단히 작성해 주세요">
-                <textarea
-                  {...register('adoptionPlan')}
+              {/* 입양 계획 */}
+              <LabeledField title="입양 계획을 간단히 작성해 주세요">
+                <TextareaField
                   placeholder="생활패턴, 주거환경, 입양 시기 등을 입력해주세요"
-                  className="h-[5.125rem] w-full resize-none rounded-[0.375rem] border border-[#a8a8a8] bg-white p-[0.625rem] text-[0.875rem] leading-[1.375rem] font-medium text-[#5d5d5d] placeholder:text-[#a8a8a8] focus:border-[#5d5d5d] focus:outline-none tab:h-[6.8125rem] tab:rounded-[1rem] tab:px-[1.25rem] tab:py-[0.9375rem] tab:text-[1rem]"
+                  maxLength={TEXTAREA_MAX_LENGTH}
+                  currentLength={watch('adoptionPlan')?.length ?? 0}
+                  {...register('adoptionPlan')}
                 />
-              </FormSection>
+              </LabeledField>
 
-              <FormSection title="입양준비 확인을 위한 필수 항목을 체크해볼게요">
-                <div className="flex flex-col gap-[0.375rem] tab:gap-[1.125rem]">
-                  <CheckboxField
-                    control={control}
-                    name="privacyConsent"
-                    label="개인정보 수집 및 이용에 동의합니다"
-                  />
-                  <CheckboxField
-                    control={control}
-                    name="canProvideBasicCare"
-                    label="정기 예방접종/ 검강검진/ 훈련 등 기본 케어가 가능합니다."
-                  />
-                  <CheckboxField
-                    control={control}
-                    name="canAffordMedicalExpenses"
-                    label="예상치 못한 질병/ 사고 치료비를 감당할 수 있습니다."
-                  />
+              {/* 입양준비 확인 체크 */}
+              <LabeledField
+                title="입양준비 확인을 위한 필수 항목을 체크해주세요"
+                size="lg"
+                gap="gap-5"
+              >
+                {/* [refactored] CONSENT_CHECKS 배열을 map으로 렌더 */}
+                <div className="flex flex-col gap-3">
+                  {CONSENT_CHECKS.map(({ name, label }) => (
+                    <CheckboxField key={name} control={control} name={name} label={label} />
+                  ))}
                 </div>
-              </FormSection>
+              </LabeledField>
 
-              <FormSection title="함께 거주하는 가족 구성원을 입력해주세요">
-                <textarea
+              {/* 가족 구성원 */}
+              <LabeledField title="함께 거주하는 가족 구성원을 입력해주세요">
+                <TextareaField
+                  placeholder="예) 배우자 1명, 자녀 1명, 부모님 1명"
+                  maxLength={TEXTAREA_MAX_LENGTH}
+                  currentLength={watch('familyMembers')?.length ?? 0}
                   {...register('familyMembers')}
-                  placeholder="예: 배우자 1명,  자녀 1명, 부모님 1명"
-                  className="h-[5.125rem] w-full resize-none rounded-[0.375rem] border border-[#a8a8a8] bg-white p-[0.625rem] text-[0.875rem] leading-[1.375rem] font-medium text-[#5d5d5d] placeholder:text-[#a8a8a8] focus:border-[#5d5d5d] focus:outline-none tab:h-[6.8125rem] tab:rounded-[1rem] tab:px-[1.25rem] tab:py-[0.9375rem] tab:text-[1rem]"
                 />
-                <CheckboxField
-                  control={control}
-                  name="allFamilyConsent"
-                  label="모든 가족 구성원이 입양에 동의했습니다."
-                />
-              </FormSection>
+              </LabeledField>
+
+              {/* 모든 가족 동의 */}
+              <CheckboxField
+                control={control}
+                name="allFamilyConsent"
+                label="모든 가족 구성원이 입양에 동의했습니다."
+              />
             </div>
           </div>
+        </Container>
 
-          {/* 데스크탑 CTA */}
-          <div className="hidden tab:mt-[1.5rem] tab:flex tab:justify-end">
-            <button
-              type="submit"
-              disabled={!isValid || isPending}
-              className={cn(
-                'flex h-10 w-[10rem] items-center justify-center rounded-full text-[0.875rem] font-medium transition-colors',
-                isValid && !isPending ? 'bg-[#5d5d5d] text-white' : 'bg-[#d4d4d4] text-[#5d5d5d]',
-              )}
-            >
-              {isPending ? '제출 중...' : '상담 신청하기'}
-            </button>
-          </div>
-        </div>
-
-        {/* 모바일 CTA (하단 고정) */}
-        <div className="fixed right-0 bottom-0 left-0 z-10 bg-white p-[1.25rem] tab:hidden">
-          <button
-            type="submit"
-            disabled={!isValid || isPending}
-            className={cn(
-              'flex h-12 w-full items-center justify-center rounded-full text-[1rem] font-semibold transition-colors',
-              isValid && !isPending ? 'bg-[#5d5d5d] text-white' : 'bg-[#d4d4d4] text-[#5d5d5d]',
-            )}
-          >
-            {isPending ? '제출 중...' : '상담 신청하기'}
-          </button>
-        </div>
+        {/* ═══ 하단 CTA 바 (Figma 1654-161691/97/03) — [refactored] FooterCtaBar로 분리 ═══ */}
+        <FooterCtaBar onCancel={handleCloseClick} isValid={isValid} isPending={isPending} />
       </form>
 
       {/* ═══ 나가기 확인 모달 ═══ */}
@@ -163,6 +149,19 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
         actions={[
           { label: '닫기', variant: 'outline', onClick: cancelExit },
           { label: '그만두기', variant: 'fill', onClick: confirmExit },
+        ]}
+      />
+
+      {/* ═══ 입양 상담 확인 모달 (Figma 1955-262642) — 제출 버튼 → 이 모달 → "상담하기"로 실제 신청 ═══ */}
+      <CtaModal
+        open={showConsultConfirm}
+        onOpenChange={(isOpen) => !isOpen && cancelConsult()}
+        icon={<PawIcon className="size-8 text-[#6b6b6b]" />}
+        title={'브리더와 더 자세한 입양 상담이\n이루어집니다.'}
+        direction="row"
+        actions={[
+          { label: '그만두기', variant: 'outline', onClick: giveUpFromConsult },
+          { label: '상담하기', variant: 'fill', onClick: confirmConsult },
         ]}
       />
     </div>

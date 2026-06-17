@@ -4,8 +4,6 @@
   --breakpoint-mo: 375px;
   --breakpoint-tab: 768px;
   --breakpoint-pc: 1440px;
-  --font-sans: var(--font-pretendard), sans-serif;
-  --font-cafe24: var(--font-cafe24proup), sans-serif;
 
   /* text */
   --color-text-primary: #5d5d5d;
@@ -22,6 +20,12 @@
 
   /* border */
   --color-border-light: color(display-p3 0.7777 0.7777 0.7777);
+}
+
+/* next/font 변수(body에 주입되는 --font-*)는 inline으로 둬야 font-* 유틸이 값을 직접 인라인해 정상 동작 */
+@theme inline {
+  --font-sans: var(--font-pretendard), sans-serif;
+  --font-cafe24: var(--font-cafe24proup), sans-serif;
 }
 
 :root {

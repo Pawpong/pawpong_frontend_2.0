@@ -70,7 +70,7 @@ const CtaModal = ({
         // 설명이 없으면 Radix의 aria-describedby 누락 경고를 명시적으로 끔
         {...(description ? {} : { 'aria-describedby': undefined })}
         className={cn(
-          'fixed top-1/2 left-1/2 z-50 flex w-[calc(100vw-2.5rem)] max-w-[22.5rem] -translate-x-1/2 -translate-y-1/2 flex-col rounded-xl bg-white data-[state=closed]:opacity-0 data-[state=open]:opacity-100',
+          'fixed top-1/2 left-1/2 z-50 flex w-[calc(100vw-2.5rem)] max-w-[19.5rem] -translate-x-1/2 -translate-y-1/2 flex-col rounded-xl bg-white data-[state=closed]:opacity-0 data-[state=open]:opacity-100 pc:max-w-[22.5rem]',
           className,
         )}
       >
@@ -92,7 +92,8 @@ const CtaModal = ({
             </div>
           )}
           <div className="flex flex-col items-center text-center text-[#3e3e3e]">
-            <DialogPrimitive.Title className="text-xl leading-normal font-semibold">
+            {/* whitespace-pre-line: title에 \n 넣으면 원하는 위치에서 줄바꿈 (단일 줄은 영향 없음) */}
+            <DialogPrimitive.Title className="text-xl leading-normal font-semibold whitespace-pre-line">
               {title}
             </DialogPrimitive.Title>
             {description && (
