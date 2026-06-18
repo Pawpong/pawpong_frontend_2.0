@@ -2,7 +2,9 @@
 
 import * as React from 'react'
 import { Input } from '@/shared/ui'
+import { cn } from '@/shared/lib/cn'
 import { PlusIcon } from '@/shared/assets/icons'
+import { CHAT_CONTENT_WIDTH, CHAT_GUTTER_X } from '../_lib/constants'
 
 interface ChatMessageInputProps {
   onSend: (content: string) => void
@@ -27,8 +29,8 @@ const ChatMessageInput = ({ onSend, disabled }: ChatMessageInputProps) => {
   }
 
   return (
-    <div className="bg-white px-5 py-3 tab:px-8 pc:px-20">
-      <div className="mx-auto flex w-full max-w-[55rem] items-center gap-3">
+    <div className={cn('bg-white py-3', CHAT_GUTTER_X)}>
+      <div className={cn(CHAT_CONTENT_WIDTH, 'flex items-center gap-3')}>
         {/* 첨부 버튼 */}
         <button
           type="button"

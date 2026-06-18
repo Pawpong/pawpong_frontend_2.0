@@ -20,7 +20,7 @@ const ChatRoomItem = ({ room, isActive, unreadCount = 0, onClick }: ChatRoomItem
   return (
     <div
       className={cn(
-        'flex items-start justify-between gap-3 rounded-lg p-3',
+        'flex items-start justify-between  p-3',
         isActive && 'bg-[#ededed]',
       )}
     >
@@ -42,7 +42,7 @@ const ChatRoomItem = ({ room, isActive, unreadCount = 0, onClick }: ChatRoomItem
           </p>
         </div>
         {unreadCount > 0 && (
-          <span className="flex h-5 shrink-0 items-center justify-center rounded-full bg-[#d63d4a] px-2 text-sm leading-[1.5] font-normal text-white">
+          <span className="ml-2 flex h-5 shrink-0 items-center justify-center rounded-full bg-[#d63d4a] px-2 text-sm leading-[1.5] font-normal text-white">
             {unreadCount}
           </span>
         )}

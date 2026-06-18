@@ -2,9 +2,11 @@
 
 import * as React from 'react'
 import { Badge } from '@/shared/ui'
+import { cn } from '@/shared/lib/cn'
 import { ArrowBackIcon, MoreVertIcon } from '@/shared/assets/icons'
 import { MOCK_CHAT_MESSAGES } from '@/shared/mocks/chat'
 import type { ChatRoomResponseDto } from '@/shared/types'
+import { CHAT_CONTENT_WIDTH, CHAT_GUTTER_X } from '../_lib/constants'
 import { getDisplayName } from '../_lib/utils'
 import { ProfileAvatar } from './ProfileAvatar'
 import { PetInfoCard } from './PetInfoCard'
@@ -35,12 +37,18 @@ const ChatRoomPanel = ({ room, currentUserId, onBack }: ChatRoomPanelProps) => {
   return (
     <div className="flex h-[calc(100dvh-4rem)] flex-col bg-[#ededed]">
       {/* Room Header */}
-      <div className="flex items-center justify-center bg-white px-[0.625rem] py-2 shadow-[0px_7px_7px_rgba(55,55,55,0.1)]">
-        <div className="flex w-full max-w-[55rem] items-center justify-between">
+      {/* [refactored] 가로 마진·콘텐츠 폭 상수 적용, justify-center → 내부 mx-auto로 통일 */}
+      <div
+        className={cn(
+          'bg-white py-1 pc:py-2 shadow-[0px_7px_7px_rgba(55,55,55,0.1)]',
+          CHAT_GUTTER_X,
+        )}
+      >
+        <div className={cn(CHAT_CONTENT_WIDTH, 'flex items-center justify-between')}>
           <div className="flex items-center gap-5">
             <div className="flex items-center gap-1">
               <button type="button" onClick={onBack} className="shrink-0" aria-label="뒤로 가기">
-                <ArrowBackIcon className="size-8 text-[#3e3e3e]" />
+                <ArrowBackIcon className="size-8 text-[#6b6b6b]" />
               </button>
               <div className="flex items-center gap-2">
                 <ProfileAvatar size="md" />
@@ -61,8 +69,8 @@ const ChatRoomPanel = ({ room, currentUserId, onBack }: ChatRoomPanelProps) => {
       {room.applicationId && <PetInfoCard />}
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-5 py-5 tab:px-8 pc:px-20">
-        <div className="mx-auto flex w-full max-w-[55rem] flex-col gap-10">
+      <div className={cn('flex-1 overflow-y-auto py-5', CHAT_GUTTER_X)}>
+        <div className={cn(CHAT_CONTENT_WIDTH, 'flex flex-col gap-10')}>
           {showNotice && <ChatNoticeBanner onClose={() => setShowNotice(false)} />}
 
           <div className="flex flex-col gap-3">
