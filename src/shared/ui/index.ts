@@ -1,3 +1,4 @@
+export * from './AlertMessage'
 export * from './AuthorInfo'
 export * from './Avatar'
 export * from './Breadcrumb'

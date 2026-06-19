@@ -15,8 +15,8 @@ const filterRooms = (rooms: ChatRoomResponseDto[], filter: FilterTab): ChatRoomR
   return rooms
 }
 
-// [refactored] 채팅방 콘텐츠 반응형 가로 마진 (모바일 20 / 태블릿 48 / PC 80) — 섹션 4곳 공유
-const CHAT_GUTTER_X = 'px-5 tab:px-12 pc:px-20'
+// [refactored] 채팅방 콘텐츠 반응형 가로 마진 (모바일 16 / 태블릿 48 / PC 80) — 섹션 4곳 공유
+const CHAT_GUTTER_X = 'px-4 tab:px-12 pc:px-20'
 
 // [refactored] 채팅방 콘텐츠 중앙 정렬 + 최대 폭(880px) — 헤더/메시지/입력/펫카드 공유
 const CHAT_CONTENT_WIDTH = 'mx-auto w-full max-w-[55rem]'
