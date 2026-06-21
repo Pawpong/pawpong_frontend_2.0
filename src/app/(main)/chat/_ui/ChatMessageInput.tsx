@@ -3,8 +3,8 @@
 import * as React from 'react'
 import { Input } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
-import { PlusIcon } from '@/shared/assets/icons'
 import { CHAT_CONTENT_WIDTH, CHAT_GUTTER_X } from '../_lib/constants'
+import { ChatAttachMenu } from './ChatAttachMenu'
 
 interface ChatMessageInputProps {
   onSend: (content: string) => void
@@ -31,14 +31,8 @@ const ChatMessageInput = ({ onSend, disabled }: ChatMessageInputProps) => {
   return (
     <div className={cn('bg-white py-3', CHAT_GUTTER_X)}>
       <div className={cn(CHAT_CONTENT_WIDTH, 'flex items-center gap-3')}>
-        {/* 첨부 버튼 */}
-        <button
-          type="button"
-          aria-label="파일 첨부"
-          className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[#3e3e3e]"
-        >
-          <PlusIcon className="size-[0.875rem] text-white" />
-        </button>
+        {/* 첨부 메뉴 (+ 버튼 클릭 시 이미지/위치/파일) */}
+        <ChatAttachMenu disabled={disabled} />
 
         {/* 입력 */}
         <Input
