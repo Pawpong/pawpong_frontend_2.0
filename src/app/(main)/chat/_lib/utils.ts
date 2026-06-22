@@ -1,4 +1,5 @@
 import { MOCK_ROOM_NAMES } from '@/shared/mocks/chat'
+import type { ChatRoomResponseDto } from '@/shared/types'
 
 const formatRelativeTime = (dateStr?: string) => {
   if (!dateStr) return ''
@@ -17,4 +18,7 @@ const getDisplayName = (breederId: string) => {
   return MOCK_ROOM_NAMES[breederId] ?? breederId
 }
 
-export { formatRelativeTime, getDisplayName }
+// [refactored] mock 안읽음 카운트 로직을 한 곳으로 모음 (sidebar/list 중복 제거)
+const getUnreadCount = (room: ChatRoomResponseDto) => (room.roomId === 'room-2' ? 2 : 0)
+
+export { formatRelativeTime, getDisplayName, getUnreadCount }

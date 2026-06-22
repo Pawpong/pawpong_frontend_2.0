@@ -1,7 +1,10 @@
 'use client'
 
 import * as React from 'react'
+import { Input } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
+import { CHAT_CONTENT_WIDTH, CHAT_GUTTER_X } from '../_lib/constants'
+import { ChatAttachMenu } from './ChatAttachMenu'
 
 interface ChatMessageInputProps {
   onSend: (content: string) => void
@@ -26,48 +29,31 @@ const ChatMessageInput = ({ onSend, disabled }: ChatMessageInputProps) => {
   }
 
   return (
-    <div className="flex items-center gap-3 bg-white px-5 pt-5 pb-10 tab:px-8 pc:pb-5">
-      {/* Add button */}
-      <button
-        type="button"
-        className="flex size-[3.125rem] shrink-0 items-center justify-center rounded-full bg-fill-muted"
-        aria-label="파일 첨부"
-      >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <path d="M12 5V19M5 12H19" stroke="#5d5d5d" strokeWidth="2" strokeLinecap="round" />
-        </svg>
-      </button>
+    <div className={cn('bg-white py-3', CHAT_GUTTER_X)}>
+      <div className={cn(CHAT_CONTENT_WIDTH, 'flex items-center gap-3')}>
+        {/* 첨부 메뉴 (+ 버튼 클릭 시 이미지/위치/파일) */}
+        <ChatAttachMenu disabled={disabled} />
 
-      {/* Input */}
-      <div className="flex-1">
-        <input
-          type="text"
+        {/* 입력 */}
+        <Input
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="메시지 입력"
+          placeholder="입력해보세요"
           disabled={disabled}
-          className={cn(
-            'w-full rounded-2xl bg-fill-muted px-5 py-[0.9375rem] text-base leading-[1.375rem] font-medium text-text-primary outline-none',
-            'placeholder:text-white',
-            'disabled:cursor-not-allowed disabled:opacity-50',
-          )}
+          className="flex-1"
         />
-      </div>
 
-      {/* Send button */}
-      <button
-        type="button"
-        onClick={handleSubmit}
-        disabled={disabled || !value.trim()}
-        className={cn(
-          'flex h-[3.125rem] shrink-0 items-center justify-center rounded-full bg-fill-muted px-5',
-          'text-sm font-semibold text-text-primary',
-          'disabled:cursor-not-allowed disabled:opacity-50',
-        )}
-      >
-        보내기
-      </button>
+        {/* 보내기 버튼 */}
+        <button
+          type="button"
+          onClick={handleSubmit}
+          disabled={disabled || !value.trim()}
+          className="flex h-10 shrink-0 items-center justify-center rounded-lg bg-[#3e3e3e] px-3 text-base leading-[1.5] font-semibold text-[#f6f6f6] disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          보내기
+        </button>
+      </div>
     </div>
   )
 }

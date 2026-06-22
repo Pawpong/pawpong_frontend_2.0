@@ -11,8 +11,8 @@ export const metadata: Metadata = {
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <html lang="ko">
-      <body className={`${pretendard.variable} ${cafe24Proup.variable}`}>
+    <html lang="ko" className={`${pretendard.variable} ${cafe24Proup.variable}`}>
+      <body>
         <QueryProvider>
           <NavigationGuardProvider>{children}</NavigationGuardProvider>
         </QueryProvider>
