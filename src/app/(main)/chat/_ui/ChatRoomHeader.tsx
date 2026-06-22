@@ -1,10 +1,9 @@
 'use client'
 
-import { Badge } from '@/shared/ui'
+import { Badge, ProfileAvatar } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { ArrowBackIcon, MoreVertIcon } from '@/shared/assets/icons'
 import { CHAT_CONTENT_WIDTH, CHAT_GUTTER_X } from '../_lib/constants'
-import { ProfileAvatar } from './ProfileAvatar'
 
 interface ChatRoomHeaderProps {
   displayName: string
@@ -25,7 +24,7 @@ const ChatRoomHeader = ({ displayName, hasApplication, onBack }: ChatRoomHeaderP
             </button>
             <div className="flex items-center gap-2">
               <ProfileAvatar size="responsive" />
-              <span className="text-sm leading-[1.5] font-semibold text-[#3e3e3e] pc:text-base">
+              <span className="text-sm leading-[1.5] font-semibold text-[#3e3e3e] tab:text-base">
                 {displayName}
               </span>
             </div>

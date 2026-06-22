@@ -19,6 +19,7 @@ const ChatSidebar = ({ activeRoomId, onSelectRoom }: ChatSidebarProps) => {
         activeRoomId={activeRoomId}
         onSelectRoom={onSelectRoom}
         listClassName="flex-1 overflow-y-auto"
+        gutterClassName="px-4"
       />
     </aside>
   )

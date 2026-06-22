@@ -1,5 +1,8 @@
 @import 'tailwindcss';
 
+/* 다크모드 미사용: dark: variant를 클래스 기반으로 고정해 OS 다크모드(prefers-color-scheme) 자동 적용 차단 */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --breakpoint-mo: 375px;
   --breakpoint-tab: 768px;

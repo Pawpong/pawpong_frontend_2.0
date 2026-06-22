@@ -2,6 +2,7 @@
 
 import { cn } from '@/shared/lib/cn'
 import type { ChatRoomResponseDto } from '@/shared/types'
+import { CHAT_GUTTER_X } from '../_lib/constants'
 import { useChatRoomFilter } from '../_lib/useChatRoomFilter'
 import { getUnreadCount } from '../_lib/utils'
 import { ChatFilterTabs } from './ChatFilterTabs'
@@ -12,6 +13,8 @@ interface ChatRoomFilterableListProps {
   onSelectRoom: (room: ChatRoomResponseDto) => void
   /** 방 목록 컨테이너 클래스 (사이드바는 독립 스크롤을 위해 flex-1/overflow 전달) */
   listClassName?: string
+  /** 가로 패딩 (전체 목록=반응형 페이지 마진, 사이드바=px-4) */
+  gutterClassName?: string
 }
 
 // [refactored] sidebar/list가 공유하던 "필터 탭 바 + 빈 상태 + 방 아이템 맵" 블록을 공통 컴포넌트로 추출
@@ -19,12 +22,15 @@ const ChatRoomFilterableList = ({
   activeRoomId,
   onSelectRoom,
   listClassName,
+  gutterClassName = CHAT_GUTTER_X,
 }: ChatRoomFilterableListProps) => {
   const { filter, setFilter, filteredRooms } = useChatRoomFilter()
 
   return (
     <>
-      <div className="flex flex-col items-end border-b border-[#cacaca] px-4 py-3">
+      <div
+        className={cn('flex flex-col items-end border-b border-[#cacaca] py-3 pc:py-4', gutterClassName)}
+      >
         <ChatFilterTabs value={filter} onChange={setFilter} className="justify-end" />
       </div>
 
@@ -33,7 +39,7 @@ const ChatRoomFilterableList = ({
           <p className="text-sm font-medium text-[#6b6b6b]">채팅방이 없습니다</p>
         </div>
       ) : (
-        <div className={cn('flex flex-col gap-5 px-4 py-10', listClassName)}>
+        <div className={cn('flex flex-col gap-5 py-6 pc:py-10', gutterClassName, listClassName)}>
           {filteredRooms.map((room) => (
             <ChatRoomItem
               key={room.roomId}

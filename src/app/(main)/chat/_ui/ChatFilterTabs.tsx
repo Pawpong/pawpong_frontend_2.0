@@ -13,7 +13,12 @@ const ChatFilterTabs = ({ value, onChange, className }: ChatFilterTabsProps) => 
     <div className={cn('flex flex-wrap items-center gap-2', className)}>
       {FILTER_TABS.map((tab) => (
         <button key={tab.value} type="button" onClick={() => onChange(tab.value)}>
-          <Badge variant={value === tab.value ? 'active' : 'default'} className="cursor-pointer">
+          {/* 모바일 md(14px) → PC lg(16px) */}
+          <Badge
+            variant={value === tab.value ? 'active' : 'default'}
+            size="md"
+            className="cursor-pointer pc:h-auto pc:py-1 pc:text-base"
+          >
             {tab.label}
           </Badge>
         </button>

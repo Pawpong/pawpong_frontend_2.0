@@ -49,7 +49,7 @@ const ChatRoomPanel = ({ room, currentUserId, onBack }: ChatRoomPanelProps) => {
         <div className="tab:px-12 tab:py-3 pc:px-20">
           <ChatNoticeBanner
             onClose={() => setShowNotice(false)}
-            className="rounded-none tab:mx-auto tab:w-full tab:max-w-[55rem] tab:rounded-lg"
+            className="rounded-none tab:rounded-lg pc:mx-auto pc:w-full pc:max-w-[55rem]"
           />
         </div>
       )}

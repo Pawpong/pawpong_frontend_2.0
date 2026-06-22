@@ -4,7 +4,7 @@ import { cn } from '@/shared/lib/cn'
 import { MoreVertIcon } from '@/shared/assets/icons'
 import type { ChatRoomResponseDto } from '@/shared/types'
 import { getDisplayName } from '../_lib/utils'
-import { ProfileAvatar } from './ProfileAvatar'
+import { ProfileAvatar } from '@/shared/ui'
 import { RelativeTime } from './RelativeTime'
 
 interface ChatRoomItemProps {
@@ -20,29 +20,28 @@ const ChatRoomItem = ({ room, isActive, unreadCount = 0, onClick }: ChatRoomItem
   return (
     <div
       className={cn(
-        'flex items-start justify-between  p-3',
+        'flex items-start justify-between p-2 hover:bg-[#ededed] tab:p-3',
         isActive && 'bg-[#ededed]',
       )}
     >
-      <button
-        type="button"
-        onClick={onClick}
-        className="flex min-w-0 flex-1 items-center gap-2 text-left"
-      >
-        <ProfileAvatar size="md" />
-        <div className="flex min-w-0 flex-1 flex-col justify-center">
-          <div className="flex items-center gap-2">
-            <span className="text-base leading-[1.5] font-semibold text-[#3e3e3e]">
-              {displayName}
-            </span>
-            <RelativeTime dateStr={room.lastMessageAt} />
+      <button type="button" onClick={onClick} className="flex min-w-0 items-center gap-4 text-left">
+        {/* community-profile: 아바타 상단 정렬 (모바일 32 / PC 40) */}
+        <div className="flex min-w-0 items-start gap-2">
+          <ProfileAvatar size="responsive" />
+          <div className="flex min-w-0 flex-col">
+            <div className="flex items-center gap-2">
+              <span className="text-sm leading-[1.5] font-semibold text-[#3e3e3e] tab:text-base">
+                {displayName}
+              </span>
+              <RelativeTime dateStr={room.lastMessageAt} />
+            </div>
+            <p className="max-w-[21.625rem] truncate text-sm leading-[1.5] font-semibold text-[#3e3e3e]">
+              {room.lastMessage ?? ''}
+            </p>
           </div>
-          <p className="truncate text-sm leading-[1.5] font-semibold text-[#3e3e3e]">
-            {room.lastMessage ?? ''}
-          </p>
         </div>
         {unreadCount > 0 && (
-          <span className="ml-2 flex h-5 shrink-0 items-center justify-center rounded-full bg-[#d63d4a] px-2 text-sm leading-[1.5] font-normal text-white">
+          <span className="flex h-5 shrink-0 items-center justify-center rounded-full bg-[#d63d4a] px-2 text-sm leading-[1.5] font-normal text-white">
             {unreadCount}
           </span>
         )}
