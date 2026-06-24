@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { BookmarkIcon } from '@/shared/assets/icons'
-import { Container, Separator, SectionHeader } from '@/shared/ui'
+import { Container, Separator, SectionHeader, NavigationBar } from '@/shared/ui'
 import { MOCK_MY_HOME_POSTS } from '@/shared/mocks/myHome'
 import { createMockListings } from '@/shared/mocks/adoption'
 import { adopterQueries } from '@/entities/adopter'
@@ -12,7 +12,6 @@ import type { AdopterPublicProfile, BreederPublicProfile } from '@/shared/types'
 import { FavoriteAdoptionCard } from '@/features/adoption'
 import { ProfileCard } from './ProfileCard'
 import { HomeTabs, TabsContent } from './HomeTabs'
-import { HomeTitle } from './HomeTitle'
 import { PostList } from './PostList'
 import { FooterPlaceholder } from './FooterPlaceholder'
 import { PostCreateBar } from './PostCreateBar'
@@ -20,11 +19,79 @@ import { FavoriteBreedersContent } from './FavoriteBreedersContent'
 import { BreederListingCard } from './BreederListingCard'
 import { MY_HOME_TABS, BREEDER_MY_HOME_TABS } from './constants'
 
-const MyHomeContent = () => {
-  const { data: adopterProfile } = useQuery(adopterQueries.profile())
-  const { data: breederProfile } = useQuery(breederQueries.myProfile())
+// TODO(ui-정비): UI 작업용 목데이터. 로그인 연결 시 아래 MOCK_* 제거하고 쿼리 enabled 복구
+const MOCK_IS_BREEDER = false // true로 바꾸면 브리더 마이홈 확인
 
-  const isBreeder = !!breederProfile
+const MOCK_ADOPTER_PUBLIC_PROFILE: AdopterPublicProfile = {
+  userId: 'mock-adopter',
+  nickname: '파이리귀여워',
+  profileImageUrl: undefined,
+  bio: '안녕하세요 감사해요 잘있어요 다시만나요 아침해가 뜨면 아침해가 뜨면',
+  bpm: 50,
+  followerCount: 100,
+  isFollowing: false,
+}
+
+const MOCK_BREEDER_PUBLIC_PROFILE: BreederPublicProfile = {
+  breederId: 'mock-breeder',
+  nickname: 'CityLizard',
+  profileImageUrl: undefined,
+  bio: '안녕하세요 감사해요 잘있어요 다시만나요 아침해가 뜨면 아침해가 뜨면',
+  bpm: 50,
+  followerCount: 100,
+  level: 'new',
+  plan: 'basic',
+  businessLocation: {
+    city: '서울',
+    district: '강서구',
+  },
+  isFavorited: false,
+}
+
+const MyHomeContent = () => {
+  // UI 정비용: 쿼리 비활성화 (401 → /login 리다이렉트 방지)
+  useQuery({ ...adopterQueries.profile(), enabled: false })
+  useQuery({ ...breederQueries.myProfile(), enabled: false })
+
+  const isBreeder = MOCK_IS_BREEDER
+
+  // ===== 실제 API 연결 로직 (로그인 붙일 때 아래 블록으로 복구) =====
+  // const { data: adopterProfile } = useQuery(adopterQueries.profile())
+  // const { data: breederProfile } = useQuery(breederQueries.myProfile())
+  //
+  // const isBreeder = !!breederProfile
+  //
+  // const adopterPublicProfile: AdopterPublicProfile | null = adopterProfile
+  //   ? {
+  //       userId: adopterProfile.adopterId,
+  //       nickname: adopterProfile.nickname,
+  //       profileImageUrl: adopterProfile.profileImageFileName,
+  //       bio: '',
+  //       bpm: 0,
+  //       followerCount: 0,
+  //       isFollowing: false,
+  //     }
+  //   : null
+  //
+  // const breederPublicProfile: BreederPublicProfile | null = breederProfile
+  //   ? {
+  //       breederId: breederProfile.breederId,
+  //       nickname: breederProfile.breederName,
+  //       profileImageUrl: breederProfile.profileImageFileName,
+  //       bio: breederProfile.profileInfo.profileDescription,
+  //       bpm: 0,
+  //       followerCount: 0,
+  //       level: breederProfile.verificationInfo.level ?? 'new',
+  //       plan: 'basic',
+  //       businessLocation: {
+  //         city: breederProfile.profileInfo.locationInfo.cityName,
+  //         district: breederProfile.profileInfo.locationInfo.districtName,
+  //       },
+  //       isFavorited: false,
+  //     }
+  //   : null
+  // ================================================================
+
   const tabs = isBreeder ? BREEDER_MY_HOME_TABS : MY_HOME_TABS
   const defaultTab = isBreeder ? 'listings' : 'posts'
 
@@ -32,50 +99,30 @@ const MyHomeContent = () => {
   const posts = MOCK_MY_HOME_POSTS
   const listings = isBreeder ? createMockListings() : []
 
-  const adopterPublicProfile: AdopterPublicProfile | null = adopterProfile
-    ? {
-        userId: adopterProfile.adopterId,
-        nickname: adopterProfile.nickname,
-        profileImageUrl: adopterProfile.profileImageFileName,
-        bio: '',
-        bpm: 0,
-        followerCount: 0,
-        isFollowing: false,
-      }
-    : null
-
-  const breederPublicProfile: BreederPublicProfile | null = breederProfile
-    ? {
-        breederId: breederProfile.breederId,
-        nickname: breederProfile.breederName,
-        profileImageUrl: breederProfile.profileImageFileName,
-        bio: breederProfile.profileInfo.profileDescription,
-        bpm: 0,
-        followerCount: 0,
-        level: breederProfile.verificationInfo.level ?? 'new',
-        plan: 'basic',
-        businessLocation: {
-          city: breederProfile.profileInfo.locationInfo.cityName,
-          district: breederProfile.profileInfo.locationInfo.districtName,
-        },
-        isFavorited: false,
-      }
+  const adopterPublicProfile: AdopterPublicProfile | null = isBreeder
+    ? null
+    : MOCK_ADOPTER_PUBLIC_PROFILE
+  const breederPublicProfile: BreederPublicProfile | null = isBreeder
+    ? MOCK_BREEDER_PUBLIC_PROFILE
     : null
 
   if (!adopterPublicProfile && !breederPublicProfile) return null
 
   return (
     <div className="flex w-full flex-col">
-      <HomeTitle
+      <NavigationBar
         title="마이홈"
-        rightAction={
-          <button type="button" aria-label="북마크" className="hidden tab:block">
-            <BookmarkIcon className="size-7 text-text-primary" />
+        // 디자인(node 2046-160996): 마이홈 모바일 navbar는 좌우 margin-tab(48px) — 공통 기본(16)을 덮어씀
+        className="px-12"
+        right={
+          <button type="button" aria-label="북마크">
+            <BookmarkIcon className="size-6 text-[#3e3e3e]" />
           </button>
         }
       />
 
-      <Container className="pc:px-[10rem]">
+      {/* 디자인: 모바일 px-16(margin-mo)·py-20 / 탭 px-48·PC px-80·py-40 */}
+      <Container className="px-4 py-5 tab:py-10">
         {isBreeder && breederPublicProfile ? (
           <ProfileCard profile={breederPublicProfile} mode="mine-breeder" />
         ) : adopterPublicProfile ? (

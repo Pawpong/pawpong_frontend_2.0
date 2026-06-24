@@ -1,9 +1,8 @@
 'use client'
 
-import type { ComponentType } from 'react'
-import { Avatar, AvatarFallback, AvatarImage, AvatarGroup, Badge } from '@/shared/ui'
-import type { AvatarItem } from '@/shared/ui'
+import type { ComponentType, ReactNode } from 'react'
 import Image from 'next/image'
+import { Badge, ProfileAvatar } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { LocationIcon } from '@/shared/assets/icons'
 import type { AdopterPublicProfile, BreederPublicProfile } from '@/shared/types'
@@ -22,12 +21,6 @@ interface ProfileCardBreederProps {
 
 type ProfileCardProps = ProfileCardBaseProps | ProfileCardBreederProps
 
-const FOLLOWER_AVATARS: AvatarItem[] = [
-  { id: 1, imageUrl: '' },
-  { id: 2, imageUrl: '' },
-  { id: 3, imageUrl: '' },
-]
-
 const FollowerSection = ({
   followerCount,
   className,
@@ -37,21 +30,19 @@ const FollowerSection = ({
   className?: string
   textClassName?: string
 }) => (
-  <div className={cn('flex items-center gap-2.5 py-2.5 tab:p-2.5', className)}>
-    <AvatarGroup
-      avatars={FOLLOWER_AVATARS}
-      ringClassName="ring-[3px] ring-white tab:ring-surface-primary"
-    />
-    <span className={cn('font-medium text-text-primary', textClassName)}>
-      팔로워 {followerCount}
-    </span>
+  <div className={cn('flex items-center gap-0.5', className)}>
+    {/* 팔로워 미리보기 — ProfileAvatar xsmall(24) + 회색 테두리, 살짝 겹침 */}
+    <div className="flex items-center">
+      {[0, 1, 2].map((i) => (
+        <ProfileAvatar
+          key={i}
+          size="xsmall"
+          className={cn('border-2 border-[#e4e4e4]', i < 2 && '-mr-[0.3125rem]')}
+        />
+      ))}
+    </div>
+    <span className={cn('font-medium text-[#3e3e3e]', textClassName)}>팔로워 {followerCount}</span>
   </div>
-)
-
-const Bio = ({ text, className }: { text: string; className?: string }) => (
-  <p className={cn('text-sm leading-[1.375rem] font-medium text-text-primary', className)}>
-    {text}
-  </p>
 )
 
 const LocationInfo = ({ location, className }: { location: string; className?: string }) => (
@@ -61,80 +52,83 @@ const LocationInfo = ({ location, className }: { location: string; className?: s
   </div>
 )
 
+// [refactored] 프로필 이름/소개 타이포 — 공통 스타일을 한 곳에, 크기만 className으로 분기
+const ProfileName = ({ children, className }: { children: ReactNode; className?: string }) => (
+  <p className={cn('leading-[1.5] font-semibold text-[#3e3e3e]', className)}>{children}</p>
+)
+
+const ProfileBio = ({ children, className }: { children: ReactNode; className?: string }) => (
+  <p className={cn('leading-[1.5] font-semibold break-words text-[#3e3e3e]', className)}>
+    {children}
+  </p>
+)
+
 /* ── 공통 버튼 ── */
 
+// [refactored] pill 버튼 공통 베이스 (h-40, 둥근, muted 배경) — 3개 버튼이 공유
+const PILL_BASE = 'flex h-10 items-center justify-center rounded-full bg-fill-muted p-2.5'
+
 const FollowButton = ({ className }: { className?: string }) => (
-  <button
-    type="button"
-    className={cn(
-      'flex h-10 items-center justify-center rounded-full bg-fill-muted p-2.5 text-sm font-medium text-white',
-      className,
-    )}
-  >
+  <button type="button" className={cn(PILL_BASE, 'text-sm font-medium text-white', className)}>
     팔로우
   </button>
 )
 
+// [refactored] 아이콘+라벨 pill 버튼 — 메시지/즐겨찾기 공통 구조 통합
+const IconPillButton = ({
+  icon,
+  label,
+  className,
+}: {
+  icon: string
+  label: string
+  className?: string
+}) => (
+  <button type="button" className={cn(PILL_BASE, 'gap-1.5', className)}>
+    <Image src={icon} alt={label} width={20} height={20} />
+    <span className="text-sm leading-[1.375rem] font-semibold text-text-primary">{label}</span>
+  </button>
+)
+
+// [refactored] IconPillButton 얇은 래퍼 — 기존 호출부(MineActions 등) 유지
 const MessageButton = ({
   label = '메시지 보내기',
   className,
 }: {
   label?: string
   className?: string
-}) => (
-  <button
-    type="button"
-    className={cn(
-      'flex h-10 items-center justify-center gap-1.5 rounded-full bg-fill-muted p-2.5',
-      className,
-    )}
-  >
-    <Image src="/chat.svg" alt="메시지" width={20} height={20} />
-    <span className="text-sm leading-[1.375rem] font-semibold text-text-primary">{label}</span>
-  </button>
-)
+}) => <IconPillButton icon="/chat.svg" label={label} className={className} />
 
 const FavoriteButton = ({ className }: { className?: string }) => (
+  <IconPillButton icon="/star.svg" label="즐겨찾기 등록" className={className} />
+)
+
+/* ── mode별 하단 액션 (디자인: pill border 버튼) ── */
+
+const EditButton = () => (
   <button
     type="button"
-    className={cn(
-      'h-10 items-center justify-center gap-1.5 rounded-full bg-fill-muted p-2.5',
-      className,
-    )}
+    className="flex h-10 flex-1 items-center justify-center rounded-full border border-[#cacaca] p-2 text-base leading-[1.5] font-semibold text-[#3e3e3e] tab:h-12"
   >
-    <Image src="/star.svg" alt="즐겨찾기" width={20} height={20} />
-    <span className="text-sm leading-[1.375rem] font-semibold text-text-primary">
-      즐겨찾기 등록
-    </span>
+    프로필 편집
   </button>
 )
 
-/* ── mode별 액션 그룹 ── */
-
-const MineActions = () => (
-  <div className="flex justify-center pt-[0.7rem] pb-[1.854rem] tab:justify-start tab:pr-[8.5rem] tab:pb-[1.275rem] tab:pl-[4.9375rem]">
-    <button
-      type="button"
-      className="flex h-10 w-[16.4375rem] items-center justify-center rounded-full bg-fill-muted p-2.5 text-sm font-medium text-white tab:w-full"
-    >
-      프로필 편집
-    </button>
-  </div>
-)
+const MineActions = () => <EditButton />
 
 const BreederActions = () => (
-  <div className="flex items-center justify-center gap-3 pb-[1.854rem] tab:justify-start tab:gap-3 tab:px-10 tab:pb-[1.275rem]">
-    <FavoriteButton className="hidden tab:order-1 tab:flex tab:w-[12.5rem]" />
-    <FollowButton className="flex-1 tab:order-3 tab:flex-1" />
-    <MessageButton label="상담하기" className="flex-1 tab:order-2 tab:w-[12.5rem] tab:flex-none" />
-  </div>
+  <>
+    <FavoriteButton className="hidden tab:flex tab:w-[12.5rem]" />
+    <MessageButton label="상담하기" className="tab:w-[12.5rem]" />
+    <FollowButton className="flex-1" />
+  </>
 )
 
 const OtherActions = () => (
-  <div className="flex items-center justify-center gap-3 pb-[1.854rem] tab:justify-start tab:px-10 tab:pb-[1.275rem]">
-    <FollowButton className="w-[9.375rem] tab:order-2 tab:w-auto tab:flex-1" />
-    <MessageButton className="w-[8.75rem] tab:order-1 tab:w-[12.5rem]" />
-  </div>
+  <>
+    <MessageButton className="tab:w-[12.5rem]" />
+    <FollowButton className="flex-1" />
+  </>
 )
 
 const ACTION_MAP = {
@@ -148,74 +142,85 @@ const ACTION_MAP = {
 
 const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
   const Actions = ACTION_MAP[mode]
-  const isBreederProfile = mode === 'breeder' || mode === 'mine-breeder'
-  const breederProfile = isBreederProfile ? (profile as BreederPublicProfile) : null
+  // [refactored] 타입 단언(as) 대신 in-내로잉으로 브리더 프로필 판별
+  const breederProfile = 'businessLocation' in profile ? profile : null
+  const isBreederProfile = breederProfile !== null
   const locationText = breederProfile
     ? `${breederProfile.businessLocation.city} ${breederProfile.businessLocation.district}`
     : null
 
+  // 상단 뱃지 (전 모드 공통, 채운 #3e3e3e) — 모바일 md(14px) / 데스크탑 lg(16px)
+  const renderBadges = (size?: 'md') => (
+    <>
+      {isBreederProfile && (
+        <Badge variant="active" size={size}>
+          브리더
+        </Badge>
+      )}
+      <Badge variant="active" size={size}>
+        {profile.bpm} BPM
+      </Badge>
+    </>
+  )
+
   return (
-    <div className="tab:overflow-hidden tab:rounded-2xl tab:bg-surface-primary">
-      {/* Content Area */}
-      <div className="flex items-end justify-between pt-[0.659rem] tab:items-stretch tab:px-10 tab:pt-8">
-        {/* Section 1: Badges + Nickname + Bio */}
-        <div className="flex flex-col gap-2 tab:flex-1 tab:gap-0">
-          <div className="flex items-center gap-1 tab:gap-3">
-            {isBreederProfile && (
-              <Badge variant="outline" className="h-6 text-xs leading-[1.375rem] tab:text-sm">
-                브리더
-              </Badge>
-            )}
-            <Badge variant="outline" className="h-6 text-xs leading-[1.375rem] tab:text-sm">
-              {profile.bpm} BPM
-            </Badge>
+    <>
+      {/* ===== Mobile (디자인 node 1023-22324) — 세로 gap-16 ===== */}
+      <div className="flex flex-col gap-4 tab:hidden">
+        {/* 프로필 정보 (세로 gap-12) */}
+        <div className="flex flex-col items-start gap-3">
+          {/* 상단: 좌(뱃지·이름) / 우(아바타 large 52) */}
+          <div className="flex w-full items-center justify-between gap-3">
+            <div className="flex min-w-0 flex-col items-start gap-2">
+              <div className="flex flex-wrap items-start gap-3">{renderBadges('md')}</div>
+              <ProfileName className="text-base">{profile.nickname}</ProfileName>
+            </div>
+            <ProfileAvatar
+              size="large"
+              src={profile.profileImageUrl}
+              alt={profile.nickname}
+              className="shrink-0"
+            />
           </div>
-          <p className="text-base font-bold text-text-primary tab:mt-[0.804rem] tab:text-2xl tab:leading-[1.375rem] tab:font-semibold">
-            {profile.nickname}
-          </p>
-          {/* Location — breeder, mobile only */}
-          {locationText && <LocationInfo location={locationText} className="mt-1 tab:hidden" />}
-          <Bio text={profile.bio} className="mt-3 hidden max-w-[26.1rem] tab:block" />
+          {/* 소개 */}
+          <ProfileBio className="w-full text-sm">{profile.bio}</ProfileBio>
+          {locationText && <LocationInfo location={locationText} />}
+          {/* 팔로워 */}
+          <FollowerSection followerCount={profile.followerCount} textClassName="text-xs" />
         </div>
-
-        {/* Section 2: Follower — desktop only */}
-        <div className="hidden shrink-0 items-end tab:flex">
-          <FollowerSection followerCount={profile.followerCount} textClassName="text-sm" />
-        </div>
-
-        {/* Section 3: Avatar */}
-        <div className="shrink-0">
-          <Avatar size="lg" className="size-[4.0625rem] tab:h-[7.3125rem] tab:w-[7.4375rem]">
-            {profile.profileImageUrl ? (
-              <AvatarImage src={profile.profileImageUrl} alt={profile.nickname} />
-            ) : (
-              <AvatarFallback className="bg-fill-muted" />
-            )}
-          </Avatar>
+        {/* 하단: 모드별 버튼 (풀폭, gap-10, h-40) */}
+        <div className="flex w-full items-start gap-2.5">
+          <Actions />
         </div>
       </div>
 
-      {/* Bio — mobile */}
-      <Bio text={profile.bio} className="mt-[1.097rem] tab:hidden" />
+      {/* ===== Desktop (디자인 node 1021-20324) ===== */}
+      <div className="mx-auto hidden max-w-[59.25rem] overflow-hidden rounded-lg bg-[#f6f6f6] tab:block">
+        {/* 상단: 좌(뱃지·이름·소개) / 우(팔로워·아바타) — h-204 고정, 콘텐츠 가운데 정렬 */}
+        <div className="flex h-[12.75rem] items-center justify-center overflow-hidden px-5 py-8">
+          <div className="flex w-full max-w-[48.75rem] items-end justify-between gap-3">
+            <div className="flex min-w-0 flex-1 flex-col items-start gap-3">
+              <div className="flex items-start gap-3">{renderBadges()}</div>
+              <ProfileName className="text-2xl">{profile.nickname}</ProfileName>
+              {locationText && <LocationInfo location={locationText} />}
+              <ProfileBio className="text-base">{profile.bio}</ProfileBio>
+            </div>
+            <div className="flex shrink-0 items-end gap-3">
+              <FollowerSection followerCount={profile.followerCount} textClassName="text-xs" />
+              <ProfileAvatar size="xlarge" src={profile.profileImageUrl} alt={profile.nickname} />
+            </div>
+          </div>
+        </div>
 
-      {/* Follower — mobile */}
-      <FollowerSection
-        followerCount={profile.followerCount}
-        className="mt-[0.513rem] tab:hidden"
-        textClassName="text-xs"
-      />
-
-      {/* Location — breeder, desktop only */}
-      {locationText && (
-        <LocationInfo location={locationText} className="hidden py-2 tab:flex tab:px-10" />
-      )}
-
-      {/* Separator — desktop only */}
-      <div className="my-5 hidden h-px w-full bg-border-light tab:block" />
-
-      {/* Action Buttons */}
-      <Actions />
-    </div>
+        {/* 하단: 구분선 + 모드별 버튼 */}
+        <div className="flex flex-col items-center gap-3 pb-8">
+          <div className="h-px w-full bg-[#e4e4e4]" />
+          <div className="flex w-full max-w-[36.625rem] items-center gap-6 px-5">
+            <Actions />
+          </div>
+        </div>
+      </div>
+    </>
   )
 }
 
