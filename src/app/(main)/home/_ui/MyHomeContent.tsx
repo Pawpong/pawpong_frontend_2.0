@@ -175,8 +175,8 @@ const MyHomeContent = () => {
           </TabPanel>
         )}
 
-        {/* 디자인(2046-160971): Container 기본 margin(pc 80px) + spacing-40(py-40) */}
-        <TabPanel value="posts" className="tab:py-10">
+        {/* 디자인: 모바일(1023-23241) px-16·py-24 / 탭·PC(2046-160971) px-48·80·py-40 */}
+        <TabPanel value="posts" className="px-4 py-6 tab:py-10">
           <PostList posts={posts} />
         </TabPanel>
 
