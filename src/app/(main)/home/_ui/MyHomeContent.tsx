@@ -48,9 +48,19 @@ const MOCK_BREEDER_PUBLIC_PROFILE: BreederPublicProfile = {
 }
 
 // [refactored] 탭 패널 공통 래퍼 — TabsContent(mt-0) + Container(pc 좌우 여백) 반복 제거
-const TabPanel = ({ value, children }: { value: string; children: ReactNode }) => (
+// 탭 콘텐츠는 Container 기본 margin(margin-mo 20 / margin-tab 48 / margin-pc 80) 사용.
+// py 등 추가 여백은 패널별 className으로 주입
+const TabPanel = ({
+  value,
+  children,
+  className,
+}: {
+  value: string
+  children: ReactNode
+  className?: string
+}) => (
   <TabsContent value={value} className="mt-0">
-    <Container className="pc:px-[10rem]">{children}</Container>
+    <Container className={className}>{children}</Container>
   </TabsContent>
 )
 
@@ -146,7 +156,7 @@ const MyHomeContent = () => {
 
         {/* 분양목록 탭 (브리더만) */}
         {isBreeder && (
-          <TabPanel value="listings">
+          <TabPanel value="listings" className="pc:px-[10rem]">
             <div className="pt-5 tab:pt-8">
               <SectionHeader title="분양목록" linkText="분양페이지 가기" linkHref="/adoption" />
             </div>
@@ -165,7 +175,8 @@ const MyHomeContent = () => {
           </TabPanel>
         )}
 
-        <TabPanel value="posts">
+        {/* 디자인(2046-160971): Container 기본 margin(pc 80px) + spacing-40(py-40) */}
+        <TabPanel value="posts" className="tab:py-10">
           <PostList posts={posts} />
         </TabPanel>
 

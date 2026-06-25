@@ -22,6 +22,22 @@ export interface MyHomePost {
   commentCount: number
 }
 
+// [refactored] MyHomePost → 공통 PostCard(@/entities/community) props 매핑
+// (PostList·SavedFeedsTab 공용. PostCard를 import하지 않고 구조적 호환만 사용 → 역방향 import 없음)
+export const toPostCardProps = (post: MyHomePost) => ({
+  author: {
+    id: post.author.userId,
+    nickname: post.author.nickname,
+    profileImageUrl: post.author.avatarUrl ?? undefined,
+  },
+  createdAt: post.createdAt,
+  text: post.description,
+  images: post.images,
+  likeCount: post.likeCount,
+  commentCount: post.commentCount,
+  detailHref: `/community/${post.id}`,
+})
+
 export const MOCK_MY_HOME_PROFILE: MyHomeProfile = {
   nickname: '파이리귀여워',
   bio: '안녕하세요 감사해요 잘있어요 다시만나요 아침해가 뜨면 아침해가 뜨면 안녕하세요 감사해요 잘있어요 다시만나요 아침해가 뜨면 아침해가 뜨면 ',
@@ -83,7 +99,7 @@ export const MOCK_MY_HOME_POSTS: MyHomePost[] = [
     },
     createdAt: '20시간',
     description: '너무 이쁜 아이가 태어났어요~ 이름은 파이리!! 포캣몬 파이리랑 똑같이 생겼죠!?',
-    images: ['/images/placeholder-1.jpg', '/images/placeholder-2.jpg', '/images/placeholder-3.jpg'],
+    images: ['/images/mock-pet.jpg', '/images/mock-pet.jpg', '/images/mock-pet.jpg'],
     likeCount: 10,
     commentCount: 10,
   },
@@ -96,7 +112,7 @@ export const MOCK_MY_HOME_POSTS: MyHomePost[] = [
     },
     createdAt: '20시간',
     description: '너무 이쁜 아이가 태어났어요~ 이름은 파이리!! 포캣몬 파이리랑 똑같이 생겼죠!?',
-    images: ['/images/placeholder-1.jpg', '/images/placeholder-2.jpg', '/images/placeholder-3.jpg'],
+    images: ['/images/mock-pet.jpg', '/images/mock-pet.jpg', '/images/mock-pet.jpg'],
     likeCount: 10,
     commentCount: 10,
   },
@@ -109,7 +125,7 @@ export const MOCK_MY_HOME_POSTS: MyHomePost[] = [
     },
     createdAt: '20시간',
     description: '너무 이쁜 아이가 태어났어요~ 이름은 파이리!! 포캣몬 파이리랑 똑같이 생겼죠!?',
-    images: ['/images/placeholder-1.jpg', '/images/placeholder-2.jpg', '/images/placeholder-3.jpg'],
+    images: ['/images/mock-pet.jpg', '/images/mock-pet.jpg', '/images/mock-pet.jpg'],
     likeCount: 10,
     commentCount: 10,
   },
