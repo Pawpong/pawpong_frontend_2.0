@@ -60,14 +60,14 @@ export interface FavoriteBreeder {
 
 const FAVORITE_BREEDER_BASE: Omit<FavoriteBreeder, 'id'> = {
   nickname: '도심속 도마뱀사장님',
-  imageUrl: null,
+  imageUrl: '/images/mock-pet.jpg',
   badges: ['초보집사', '50 BPM'],
   isBreeding: true,
   location: '마곡동',
   date: '2026.4.30',
 }
 
-export const MOCK_FAVORITE_BREEDERS: FavoriteBreeder[] = Array.from({ length: 2 }, (_, i) => ({
+export const MOCK_FAVORITE_BREEDERS: FavoriteBreeder[] = Array.from({ length: 8 }, (_, i) => ({
   ...FAVORITE_BREEDER_BASE,
   id: String(i + 1),
 }))

@@ -4,7 +4,7 @@ import type { ComponentType, ReactNode } from 'react'
 import Image from 'next/image'
 import { Badge, ProfileAvatar } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
-import { LocationIcon } from '@/shared/assets/icons'
+import { LocationOnIcon } from '@/shared/assets/icons'
 import type { AdopterPublicProfile, BreederPublicProfile } from '@/shared/types'
 
 type ProfileMode = 'mine' | 'mine-breeder' | 'other' | 'breeder'
@@ -47,7 +47,7 @@ const FollowerSection = ({
 
 const LocationInfo = ({ location, className }: { location: string; className?: string }) => (
   <div className={cn('flex items-center gap-1.5', className)}>
-    <LocationIcon className="size-5 text-text-secondary" />
+    <LocationOnIcon className="size-5 text-text-secondary" />
     <span className="text-sm font-medium text-text-secondary">{location}</span>
   </div>
 )

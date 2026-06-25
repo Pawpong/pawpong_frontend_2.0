@@ -1,8 +1,11 @@
 'use client'
 
+import { useState, type MouseEvent } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Badge } from '@/shared/ui'
+import { cn } from '@/shared/lib/cn'
+import { LocationOnIcon, PixelStarIcon } from '@/shared/assets/icons'
 import type { FavoriteBreeder } from '@/shared/mocks/myHome'
 
 interface BreederCardProps {
@@ -10,102 +13,91 @@ interface BreederCardProps {
   showPopularBadge?: boolean
 }
 
+/**
+ * 즐겨찾는 브리더 카드 (Figma node 1023-38692 · CardStar)
+ * - 모바일(medium): 이미지 위 별(우하단) + 인기/분양중 14px
+ * - PC(large): 이미지엔 별 없음, 정보 하단에 "별 + 즐겨찾기" 행 + 인기/분양중 16px
+ * - 별(IconStar 814-99421): default 회색 / press 노란색(#fffa94) 토글
+ */
 const BreederCard = ({ breeder, showPopularBadge }: BreederCardProps) => {
   // TODO: API 연동 후 실제 브리더 홈 경로로 변경
+  // 로컬 UI 토글 (실데이터 연결 시 API의 즐겨찾기 여부로 초기화)
+  const [favorited, setFavorited] = useState(false)
+
+  // 카드가 Link라 별 클릭 시 이동 방지 후 토글
+  const toggleFavorite = (e: MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setFavorited((prev) => !prev)
+  }
+
+  const starColor = favorited ? 'text-[#fffa94]' : 'text-[#a6a6a6]'
+
   return (
-    <Link
-      href={`/home/${breeder.id}`}
-      className="flex w-[10.25rem] shrink-0 flex-col gap-[0.438rem] tab:w-[21.75rem] tab:gap-0 tab:overflow-hidden tab:rounded-[0.935rem] tab:bg-[#e7e7e7]"
-    >
-      {/* Image Area */}
-      <div className="relative h-[10.25rem] w-full overflow-hidden rounded-[0.375rem] bg-fill-placeholder tab:aspect-[348/287] tab:h-auto tab:rounded-none">
+    <Link href={`/home/${breeder.id}`} className="flex flex-col">
+      {/* 이미지: 인기 뱃지(좌상단) / 모바일 별(우하단) */}
+      <div className="relative aspect-[282/230] w-full overflow-hidden rounded bg-[#6b6b6b] tab:rounded-lg">
         {breeder.imageUrl && (
           <Image src={breeder.imageUrl} alt={breeder.nickname} fill className="object-cover" />
         )}
-
-        {/* 인기 badge — overlay */}
         {showPopularBadge && (
           <Badge
-            variant="outline"
-            className="absolute top-[1.004rem] left-[1.228rem] border-[#a8a8a8] bg-white px-[0.625rem] py-[0.25rem] text-sm leading-[1.375rem] font-semibold text-[#a8a8a8]"
+            variant="default"
+            size="md"
+            className="absolute top-2.5 left-2.5 tab:top-3.5 tab:left-3.5 tab:h-auto tab:py-1 tab:text-base"
           >
-            인기🔥
+            인기
           </Badge>
         )}
-
-        {/* 분양중 badge — mobile overlay */}
-        {breeder.isBreeding && (
-          <Badge
-            variant="status"
-            className="absolute top-[0.766rem] left-[0.625rem] px-[0.625rem] py-[0.25rem] text-xs leading-[1.375rem] tab:hidden"
-          >
-            분양중
-          </Badge>
-        )}
-
-        {/* Star icon — mobile overlay */}
+        {/* 모바일 전용 별 오버레이 (PC는 정보 영역의 즐겨찾기 행) */}
         <button
           type="button"
-          className="absolute top-[0.766rem] right-[0.625rem] tab:hidden"
           aria-label="즐겨찾기"
+          aria-pressed={favorited}
+          onClick={toggleFavorite}
+          className="absolute right-0 bottom-0 tab:hidden"
         >
-          <Image src="/star.svg" alt="즐겨찾기" width={20} height={20} />
+          <PixelStarIcon className={cn('size-12', starColor)} />
         </button>
       </div>
 
-      {/* Info Area */}
-      <div className="flex flex-col tab:px-[1.228rem] tab:pt-[1.103rem] tab:pb-[0.68rem]">
-        {/* Name + Status Badge (desktop) */}
-        <div className="flex items-center gap-1.5">
-          <p className="text-sm leading-[1.375rem] font-semibold text-text-primary tab:text-[1.169rem] tab:leading-[1.286rem]">
-            {breeder.nickname}
-          </p>
+      {/* 정보 */}
+      <div className="flex flex-col gap-2 p-2 tab:min-h-[7.5625rem] tab:justify-between tab:p-3">
+        {/* 이름/위치 + 분양중 */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex min-w-0 flex-col">
+            {/* 디자인(926-25250): 라벨 16px semibold #3e3e3e (p-2px) */}
+            <span className="truncate p-0.5 text-base leading-[1.5] font-semibold text-[#3e3e3e]">
+              {breeder.nickname}
+            </span>
+            <div className="flex items-center">
+              <LocationOnIcon className="size-6 shrink-0 text-[#6b6b6b]" />
+              <span className="truncate text-xs leading-[1.5] font-medium text-[#6b6b6b]">
+                {breeder.location}
+              </span>
+            </div>
+          </div>
           {breeder.isBreeding && (
             <Badge
-              variant="status"
-              className="hidden px-[0.537rem] py-[0.215rem] text-[0.625rem] leading-[1.182rem] tab:inline-flex tab:text-xs tab:leading-[1.182rem]"
+              variant="active"
+              size="md"
+              className="shrink-0 tab:h-auto tab:py-1 tab:text-base"
             >
-              분양 진행중
+              분양중
             </Badge>
           )}
         </div>
 
-        {/* Badges */}
-        <div className="flex items-center gap-1 tab:mt-1.5 tab:gap-3">
-          {breeder.badges.map((badge) => (
-            <Badge
-              key={badge}
-              variant="outline"
-              className="h-6 text-xs leading-[1.375rem] tab:text-sm"
-            >
-              {badge}
-            </Badge>
-          ))}
-        </div>
-
-        {/* Location + Date (mobile only) */}
-        <div className="flex items-center gap-[0.438rem] tab:hidden">
-          <span className="text-xs leading-[1.375rem] font-normal text-[#a3a3a3]">
-            {breeder.location}
-          </span>
-          <span className="size-[0.188rem] rounded-full bg-[#a3a3a3]" />
-          <span className="text-xs leading-[1.375rem] font-normal text-[#a3a3a3]">
-            {breeder.date}
-          </span>
-        </div>
-
-        {/* Favorite Button (desktop only) */}
-        <div className="mt-2 hidden justify-end tab:mt-3 tab:flex">
-          <button
-            type="button"
-            className="flex items-center gap-[0.585rem] rounded-full p-[0.585rem]"
-          >
-            <Image src="/star.svg" alt="즐겨찾기" width={24} height={24} />
-            <span className="text-[0.819rem] leading-none font-medium text-text-primary">
-              즐겨찾기
-            </span>
-          </button>
-        </div>
+        {/* PC 전용: 즐겨찾기 (별 + 텍스트, 우측 정렬) */}
+        <button
+          type="button"
+          aria-pressed={favorited}
+          onClick={toggleFavorite}
+          className="hidden items-center self-end tab:flex"
+        >
+          <PixelStarIcon className={cn('size-8', starColor)} />
+          <span className="text-xs leading-[1.5] font-semibold text-[#3e3e3e]">즐겨찾기</span>
+        </button>
       </div>
     </Link>
   )
