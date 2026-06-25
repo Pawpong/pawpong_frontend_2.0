@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { BookmarkIcon } from '@/shared/assets/icons'
-import { Container, Separator, SectionHeader, NavigationBar } from '@/shared/ui'
+import { Container, SectionHeader, NavigationBar, InputUpload } from '@/shared/ui'
 import { MOCK_MY_HOME_POSTS } from '@/shared/mocks/myHome'
 import { createMockListings } from '@/shared/mocks/adoption'
 import { adopterQueries } from '@/entities/adopter'
@@ -14,7 +14,6 @@ import { ProfileCard } from './ProfileCard'
 import { HomeTabs, TabsContent } from './HomeTabs'
 import { PostList } from './PostList'
 import { FooterPlaceholder } from './FooterPlaceholder'
-import { PostCreateBar } from './PostCreateBar'
 import { FavoriteBreedersContent } from './FavoriteBreedersContent'
 import { BreederListingCard } from './BreederListingCard'
 import { MY_HOME_TABS, BREEDER_MY_HOME_TABS } from './constants'
@@ -47,6 +46,13 @@ const MOCK_BREEDER_PUBLIC_PROFILE: BreederPublicProfile = {
   },
   isFavorited: false,
 }
+
+// [refactored] 탭 패널 공통 래퍼 — TabsContent(mt-0) + Container(pc 좌우 여백) 반복 제거
+const TabPanel = ({ value, children }: { value: string; children: ReactNode }) => (
+  <TabsContent value={value} className="mt-0">
+    <Container className="pc:px-[10rem]">{children}</Container>
+  </TabsContent>
+)
 
 const MyHomeContent = () => {
   // UI 정비용: 쿼리 비활성화 (401 → /login 리다이렉트 방지)
@@ -94,6 +100,10 @@ const MyHomeContent = () => {
 
   const tabs = isBreeder ? BREEDER_MY_HOME_TABS : MY_HOME_TABS
   const defaultTab = isBreeder ? 'listings' : 'posts'
+  // [refactored] 작성 바 문구/링크를 역할별로 분리 — 단일 InputUpload 인스턴스로 렌더
+  const writeBar = isBreeder
+    ? { text: '분양글을 올려보세요', href: '/adoption/create' }
+    : { text: '게시글을 올려보세요', href: '/post/create' }
 
   const [activeTab, setActiveTab] = useState(defaultTab)
   const posts = MOCK_MY_HOME_POSTS
@@ -131,45 +141,33 @@ const MyHomeContent = () => {
       </Container>
 
       <HomeTabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab}>
-        {/* 브리더: 분양글 작성 바 / 일반: 게시글 작성 바 */}
-        <div className="px-[1.25rem] tab:px-[6.25rem]">
-          {isBreeder ? (
-            <PostCreateBar label="분양글 작성하기" href="/adoption/create" />
-          ) : (
-            <PostCreateBar />
-          )}
-        </div>
-
-        <Separator className="bg-border-light" />
+        {/* 브리더: 분양글 작성 바 / 일반: 게시글 작성 바 (공통 InputUpload, 상·하 보더 포함) */}
+        <InputUpload text={writeBar.text} href={writeBar.href} />
 
         {/* 분양목록 탭 (브리더만) */}
         {isBreeder && (
-          <TabsContent value="listings" className="mt-0">
-            <Container className="pc:px-[10rem]">
-              <div className="pt-5 tab:pt-8">
-                <SectionHeader title="분양목록" linkText="분양페이지 가기" linkHref="/adoption" />
-              </div>
-              {/* Mobile */}
-              <div className="grid grid-cols-2 gap-[0.625rem] py-[1.25rem] tab:hidden">
-                {listings.map((listing) => (
-                  <BreederListingCard key={listing.listingId} listing={listing} />
-                ))}
-              </div>
-              {/* Desktop */}
-              <div className="hidden tab:mt-6 tab:grid tab:grid-cols-3 tab:gap-6">
-                {listings.map((listing) => (
-                  <FavoriteAdoptionCard key={listing.listingId} listing={listing} />
-                ))}
-              </div>
-            </Container>
-          </TabsContent>
+          <TabPanel value="listings">
+            <div className="pt-5 tab:pt-8">
+              <SectionHeader title="분양목록" linkText="분양페이지 가기" linkHref="/adoption" />
+            </div>
+            {/* Mobile */}
+            <div className="grid grid-cols-2 gap-[0.625rem] py-[1.25rem] tab:hidden">
+              {listings.map((listing) => (
+                <BreederListingCard key={listing.listingId} listing={listing} />
+              ))}
+            </div>
+            {/* Desktop */}
+            <div className="hidden tab:mt-6 tab:grid tab:grid-cols-3 tab:gap-6">
+              {listings.map((listing) => (
+                <FavoriteAdoptionCard key={listing.listingId} listing={listing} />
+              ))}
+            </div>
+          </TabPanel>
         )}
 
-        <TabsContent value="posts" className="mt-0">
-          <Container className="pc:px-[10rem]">
-            <PostList posts={posts} />
-          </Container>
-        </TabsContent>
+        <TabPanel value="posts">
+          <PostList posts={posts} />
+        </TabPanel>
 
         <TabsContent value="breeders" className="mt-0">
           <FavoriteBreedersContent />

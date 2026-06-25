@@ -15,8 +15,9 @@ const tabsListVariants = tv({
       default: 'justify-center',
       // flex(block-level)로 두어 inline-flex line-box strut 여백을 없앤다
       // (바깥 래퍼 border-b 회색선과 갈색 바가 틈 없이 붙도록).
-      // 탭은 flex-1 균등 분할이라 고정 gap은 두지 않는다(좁은 화면 라벨 잘림 방지).
-      underline: 'flex w-full justify-center',
+      // 탭은 flex-1 균등 분할 + 디자인(976-32388) large 기준 탭 간 gap-41(2.5625rem).
+      // 모바일(medium)은 gap 없음이라 large 전환 지점(tab:)부터 gap 적용.
+      underline: 'flex w-full justify-center tab:gap-[2.5625rem]',
     },
   },
   defaultVariants: { variant: 'default' },
