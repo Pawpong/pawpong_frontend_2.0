@@ -1,7 +1,15 @@
 'use client'
 
-import { useState, useRef, useEffect, type ComponentProps } from 'react'
+import { useState, useRef, useEffect, type ChangeEvent, type ComponentProps } from 'react'
 import { useRouter } from 'next/navigation'
+import { useQuery } from '@tanstack/react-query'
+import { adopterQueries } from '@/entities/adopter'
+import { profileQueries } from '@/entities/profile'
+import { useUpdateAdopterProfile, useDeleteAdopterAccount } from '@/features/adopter'
+import { useUpdateMyProfile } from '@/features/profile'
+import { useUploadSingleFile } from '@/features/upload'
+import { useLogout } from '@/features/auth'
+import { WithdrawReason } from '@/shared/types'
 import {
   AlertMessage,
   BottomSheet,
@@ -15,9 +23,6 @@ import {
   TextareaField,
 } from '@/shared/ui'
 import { CheckIcon } from '@/shared/assets/icons'
-
-// TODO: 실데이터 연결 — 프로필 조회로 초기값, 저장 mutation 연결
-const MOCK_EMAIL = 'eunjinchoe94@gmail.com'
 
 // [refactored] 매직 넘버·문자열 상수화
 const TOAST_DURATION_MS = 3000
@@ -59,16 +64,42 @@ const useToast = (duration = TOAST_DURATION_MS) => {
   return { visible, show: () => setVisible(true), hide: () => setVisible(false) }
 }
 
-// [refactored] 사진 선택 로직 분리 (SRP) — pc는 바로 파일 선택, 모바일·탭은 바텀시트
-const usePhotoPicker = () => {
+/** 프로필 편집 (Figma node 2145-191107) — GNB는 MainLayout 제공 */
+const ProfileEditContent = () => {
+  const router = useRouter()
+  const [name, setName] = useState('')
+  const [bio, setBio] = useState('')
+  const [showApply, setShowApply] = useState(false)
+  const [showLeave, setShowLeave] = useState(false)
+
+  const toast = useToast() // [refactored]
+
+  // 사진 선택 — pc는 바로 파일 선택, 모바일·탭은 바텀시트
   const [sheetOpen, setSheetOpen] = useState(false)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const uploadFile = useUploadSingleFile()
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null) // 업로드 직후 미리보기(cdnUrl)
+  const [photoFileName, setPhotoFileName] = useState<string | null>(null) // 저장용 파일명
+
+  // 파일 선택 → 즉시 업로드 → 미리보기/저장값 보관
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = '' // 같은 파일 재선택 시에도 onChange 발생
+    if (!file) return
+    try {
+      const res = await uploadFile.mutateAsync({ file, folder: 'profile' })
+      setPhotoPreview(res.cdnUrl)
+      setPhotoFileName(res.fileName)
+    } catch {
+      // TODO: 업로드 실패 토스트
+    }
+  }
 
   const openFilePicker = (capture: boolean) => {
     setSheetOpen(false)
-    if (capture) inputRef.current?.setAttribute('capture', 'environment')
-    else inputRef.current?.removeAttribute('capture')
-    inputRef.current?.click()
+    if (capture) fileInputRef.current?.setAttribute('capture', 'environment')
+    else fileInputRef.current?.removeAttribute('capture')
+    fileInputRef.current?.click()
   }
 
   const requestChange = () => {
@@ -79,28 +110,65 @@ const usePhotoPicker = () => {
     openFilePicker(false)
   }
 
-  return { inputRef, sheetOpen, setSheetOpen, openFilePicker, requestChange }
-}
+  // 조회: 활동명·이메일·사진은 /adopter/profile, 소개(bio)는 /profile/me
+  const { data: adopterProfile } = useQuery(adopterQueries.profile())
+  const { data: myProfile } = useQuery(profileQueries.me())
 
-/** 프로필 편집 (Figma node 2145-191107) — GNB는 MainLayout 제공 */
-const ProfileEditContent = () => {
-  const router = useRouter()
-  const [name, setName] = useState('')
-  const [bio, setBio] = useState('')
-  const [showApply, setShowApply] = useState(false)
-  const [showLeave, setShowLeave] = useState(false)
+  // 조회값으로 폼 초기화 (최초 1회) — effect 대신 렌더 중 동기화(React 권장 패턴)
+  const [seeded, setSeeded] = useState(false)
+  if (!seeded && adopterProfile && myProfile) {
+    setName(adopterProfile.nickname ?? '')
+    setBio(myProfile.bio ?? '')
+    setSeeded(true)
+  }
 
-  const toast = useToast() // [refactored]
-  const photo = usePhotoPicker() // [refactored]
+  const email = adopterProfile?.emailAddress ?? ''
+
+  const updateAdopterProfile = useUpdateAdopterProfile()
+  const updateMyProfile = useUpdateMyProfile()
+  const deleteAccount = useDeleteAdopterAccount()
+  const logout = useLogout()
 
   // 사진 제외 모든 입력 필드가 채워져야 적용 가능 (소셜 로그인은 readOnly로 항상 채워짐)
   const isFormFilled = name.trim().length > 0 && bio.trim().length > 0
+  const isSaving =
+    updateAdopterProfile.isPending || updateMyProfile.isPending || uploadFile.isPending
 
-  // [refactored] 적용 확인 후 토스트 노출
-  const handleApply = () => {
-    // TODO: 저장 mutation 연결
+  // 적용: 활동명·사진→PATCH /adopter/profile(name, profileImage), 소개→PATCH /profile/me(bio)
+  const handleApply = async () => {
     setShowApply(false)
-    toast.show()
+    try {
+      await Promise.all([
+        updateAdopterProfile.mutateAsync({
+          name,
+          ...(photoFileName ? { profileImage: photoFileName } : {}),
+        }),
+        updateMyProfile.mutateAsync({ bio }),
+      ])
+      toast.show()
+    } catch {
+      // TODO: 실패 토스트/에러 처리
+    }
+  }
+
+  // 탈퇴: reason은 'other' 고정 (사유 선택 UI는 추후)
+  const handleLeave = async () => {
+    setShowLeave(false)
+    try {
+      await deleteAccount.mutateAsync({ reason: WithdrawReason.OTHER })
+      router.replace('/')
+    } catch {
+      // TODO: 실패 처리
+    }
+  }
+
+  const handleLogout = async () => {
+    try {
+      await logout.mutateAsync()
+      router.replace('/')
+    } catch {
+      // TODO: 실패 처리
+    }
   }
 
   return (
@@ -112,19 +180,20 @@ const ProfileEditContent = () => {
         <div className="flex w-full max-w-[37.5rem] flex-col items-center gap-11">
           {/* 아바타 + 사진 변경 */}
           <div className="flex w-28 flex-col items-center gap-8">
-            <ProfileAvatar size="xlarge" />
+            <ProfileAvatar
+              size="xlarge"
+              src={photoPreview ?? adopterProfile?.profileImageFileName}
+            />
             <div className="flex w-full flex-col items-center gap-3">
               {/* TODO: 선택한 파일 업로드 연결 (onChange) */}
               <input
-                ref={photo.inputRef} // [refactored]
+                ref={fileInputRef}
                 type="file"
                 accept="image/*"
                 className="hidden"
-                onChange={() => {
-                  // TODO: 이미지 업로드 mutation 연결
-                }}
+                onChange={handleFileChange}
               />
-              <Button variant="fill" className="w-full" onClick={photo.requestChange}>
+              <Button variant="fill" className="w-full" onClick={requestChange}>
                 사진 변경
               </Button>
               <span className="text-base leading-[1.5] font-semibold text-[#3e3e3e]">
@@ -160,7 +229,7 @@ const ProfileEditContent = () => {
             <InputField label="소셜 로그인">
               {/* 표시 전용 — readOnly(수정X) + tabIndex/-1·focus 보더 중립화(focus X) */}
               <Input
-                value={MOCK_EMAIL}
+                value={email}
                 readOnly
                 className="cursor-default focus:border-[#e4e4e4]"
               />
@@ -173,7 +242,9 @@ const ProfileEditContent = () => {
           <Button variant="text" onClick={() => setShowLeave(true)}>
             탈퇴
           </Button>
-          <Button variant="text">로그아웃</Button>
+          <Button variant="text" onClick={handleLogout}>
+            로그아웃
+          </Button>
         </div>
       </Container>
 
@@ -208,7 +279,7 @@ const ProfileEditContent = () => {
             <Button
               variant="primary"
               size="lg"
-              disabled={!isFormFilled}
+              disabled={!isFormFilled || isSaving}
               onClick={() => setShowApply(true)}
               className="max-w-[18.5625rem] flex-1 tab:h-8 tab:max-w-[16.125rem] tab:text-sm"
             >
@@ -220,12 +291,12 @@ const ProfileEditContent = () => {
 
       {/* 사진 변경 바텀시트 — 모바일·탭 전용 (디자인 2147-196483) */}
       <BottomSheet
-        open={photo.sheetOpen} // [refactored]
-        onOpenChange={photo.setSheetOpen} // [refactored]
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
         title="사진변경"
         actions={[
-          { label: '사진첩 보기', onClick: () => photo.openFilePicker(false) }, // [refactored]
-          { label: '촬영하기', onClick: () => photo.openFilePicker(true) }, // [refactored]
+          { label: '사진첩 보기', onClick: () => openFilePicker(false) },
+          { label: '촬영하기', onClick: () => openFilePicker(true) },
         ]}
       />
 
@@ -247,8 +318,7 @@ const ProfileEditContent = () => {
         title="포퐁을 떠나실 건가요?"
         description={LEAVE_DESCRIPTION} // [refactored]
         actions={[
-          // TODO: 탈퇴 mutation 연결
-          { label: '계정 탈퇴', variant: 'outline', onClick: () => setShowLeave(false) },
+          { label: '계정 탈퇴', variant: 'outline', onClick: handleLeave },
           { label: '다시 생각해볼게요', variant: 'fill', onClick: () => setShowLeave(false) },
         ]}
       />
