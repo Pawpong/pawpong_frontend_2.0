@@ -36,8 +36,8 @@ interface CtaModalProps {
   onOpenChange: (open: boolean) => void
   /** 제목 (Body xl bold) */
   title: string
-  /** 설명 (Body lg medium) — 없으면 숨김 */
-  description?: string
+  /** 설명 (Body lg medium) — 없으면 숨김. 반응형 줄바꿈 등은 ReactNode로 전달 */
+  description?: ReactNode
   /** 상단 원형 아이콘 (기본: InfoIcon). null이면 아이콘 영역 숨김 */
   icon?: ReactNode | null
   /** 하단 버튼들 — variant로 fill/outline/ghost 지정.
@@ -76,16 +76,17 @@ const CtaModal = ({
       >
         {/* 상단: 닫기 + 아이콘 + 제목/설명 */}
         <div className="flex flex-col items-center gap-2 rounded-t-xl p-3">
-          {showClose && (
-            <div className="flex w-full items-center justify-end">
+          {/* 닫기 슬롯 — X 없어도 높이(24px) 유지해 제목 상단 여백 확보 (디자인 동일) */}
+          <div className="flex h-6 w-full items-center justify-end">
+            {showClose && (
               <DialogPrimitive.Close
                 aria-label="닫기"
                 className="flex size-6 items-center justify-center text-[#6b6b6b]"
               >
                 <CloseIcon className="size-[1.125rem]" />
               </DialogPrimitive.Close>
-            </div>
-          )}
+            )}
+          </div>
           {icon && (
             <div className="flex items-center justify-center rounded-full bg-[#ededed] p-2.5">
               {icon}

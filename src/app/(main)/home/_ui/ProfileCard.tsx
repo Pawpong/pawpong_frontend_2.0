@@ -2,6 +2,7 @@
 
 import type { ComponentType, ReactNode } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { Badge, ProfileAvatar } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { LocationOnIcon } from '@/shared/assets/icons'
@@ -106,12 +107,12 @@ const FavoriteButton = ({ className }: { className?: string }) => (
 /* ── mode별 하단 액션 (디자인: pill border 버튼) ── */
 
 const EditButton = () => (
-  <button
-    type="button"
+  <Link
+    href="/home/edit"
     className="flex h-10 flex-1 items-center justify-center rounded-full border border-[#cacaca] p-2 text-base leading-[1.5] font-semibold text-[#3e3e3e] tab:h-12"
   >
     프로필 편집
-  </button>
+  </Link>
 )
 
 const MineActions = () => <EditButton />
