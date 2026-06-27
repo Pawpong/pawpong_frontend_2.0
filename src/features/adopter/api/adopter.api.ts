@@ -1,14 +1,14 @@
 import { apiClient, API_VERSION, unwrap } from '@/shared/api'
 import type {
-  AdopterProfileDto,
+  AdopterProfileUpdateRequest,
   FavoriteAddResponseDto,
   FavoriteRemoveResponseDto,
   ReviewCreateRequest,
   WithdrawReason,
 } from '@/shared/types'
 
-/** 프로필 수정 */
-export const updateAdopterProfile = (data: Partial<AdopterProfileDto>) =>
+/** 프로필 수정 (name/phone/profileImage/marketingConsent) */
+export const updateAdopterProfile = (data: AdopterProfileUpdateRequest) =>
   apiClient
     .patch<{
       success: boolean

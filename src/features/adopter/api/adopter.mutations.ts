@@ -9,12 +9,16 @@ import {
   removeFavorite,
   createReview,
 } from './adopter.api'
-import type { AdopterProfileDto, ReviewCreateRequest, WithdrawReason } from '@/shared/types'
+import type {
+  AdopterProfileUpdateRequest,
+  ReviewCreateRequest,
+  WithdrawReason,
+} from '@/shared/types'
 
 export const useUpdateAdopterProfile = () => {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (data: Partial<AdopterProfileDto>) => updateAdopterProfile(data),
+    mutationFn: (data: AdopterProfileUpdateRequest) => updateAdopterProfile(data),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: adopterQueries.profile().queryKey })
     },
