@@ -13,6 +13,37 @@ interface BreederCardProps {
   showPopularBadge?: boolean
 }
 
+// [refactored] md 뱃지 → 탭+에서 lg(16px)로 키우는 반응형 오버라이드 (인기·분양중 공용)
+const BADGE_TAB_LG = 'tab:h-auto tab:py-1 tab:text-base'
+
+// [refactored] 즐겨찾기 별 토글 — 모바일(이미지 위)·PC(즐겨찾기 행) 공용
+const FavoriteStar = ({
+  pressed,
+  onClick,
+  className,
+  iconClassName,
+  label,
+}: {
+  pressed: boolean
+  onClick: (e: MouseEvent) => void
+  className: string
+  iconClassName: string
+  label?: string
+}) => (
+  <button
+    type="button"
+    aria-label={label ? undefined : '즐겨찾기'}
+    aria-pressed={pressed}
+    onClick={onClick}
+    className={className}
+  >
+    <PixelStarIcon className={cn(iconClassName, pressed ? 'text-[#fffa94]' : 'text-[#a6a6a6]')} />
+    {label && (
+      <span className="text-xs leading-[1.5] font-semibold text-[#3e3e3e]">{label}</span>
+    )}
+  </button>
+)
+
 /**
  * 즐겨찾는 브리더 카드 (Figma node 1023-38692 · CardStar)
  * - 모바일(medium): 이미지 위 별(우하단) + 인기/분양중 14px
@@ -31,8 +62,6 @@ const BreederCard = ({ breeder, showPopularBadge }: BreederCardProps) => {
     setFavorited((prev) => !prev)
   }
 
-  const starColor = favorited ? 'text-[#fffa94]' : 'text-[#a6a6a6]'
-
   return (
     <Link href={`/home/${breeder.id}`} className="flex flex-col">
       {/* 이미지: 인기 뱃지(좌상단) / 모바일 별(우하단) */}
@@ -44,30 +73,27 @@ const BreederCard = ({ breeder, showPopularBadge }: BreederCardProps) => {
           <Badge
             variant="default"
             size="md"
-            className="absolute top-2.5 left-2.5 tab:top-3.5 tab:left-3.5 tab:h-auto tab:py-1 tab:text-base"
+            className={cn('absolute top-2.5 left-2.5 tab:top-3.5 tab:left-3.5', BADGE_TAB_LG)}
           >
             인기
           </Badge>
         )}
         {/* 모바일 전용 별 오버레이 (PC는 정보 영역의 즐겨찾기 행) */}
-        <button
-          type="button"
-          aria-label="즐겨찾기"
-          aria-pressed={favorited}
+        <FavoriteStar
+          pressed={favorited}
           onClick={toggleFavorite}
           className="absolute right-0 bottom-0 tab:hidden"
-        >
-          <PixelStarIcon className={cn('size-12', starColor)} />
-        </button>
+          iconClassName="size-12"
+        />
       </div>
 
       {/* 정보 */}
-      <div className="flex flex-col gap-2 p-2 tab:min-h-[7.5625rem] tab:justify-between tab:p-3">
-        {/* 이름/위치 + 분양중 */}
-        <div className="flex items-center justify-between gap-2">
+      <div className="flex min-h-20 flex-col gap-2 p-2 tab:min-h-[7.5625rem] tab:justify-between tab:p-3">
+        {/* 이름/위치 + 분양중 (모바일 items-start / PC items-center) */}
+        <div className="flex items-start justify-between gap-2 tab:items-center">
           <div className="flex min-w-0 flex-col">
-            {/* 디자인(926-25250): 라벨 16px semibold #3e3e3e (p-2px) */}
-            <span className="truncate p-0.5 text-base leading-[1.5] font-semibold text-[#3e3e3e]">
+            {/* 카드 이름 라벨 14px semibold #3e3e3e (p-2px) */}
+            <span className="truncate p-0.5 text-sm leading-[1.5] font-semibold text-[#3e3e3e]">
               {breeder.nickname}
             </span>
             <div className="flex items-center">
@@ -78,26 +104,20 @@ const BreederCard = ({ breeder, showPopularBadge }: BreederCardProps) => {
             </div>
           </div>
           {breeder.isBreeding && (
-            <Badge
-              variant="active"
-              size="md"
-              className="shrink-0 tab:h-auto tab:py-1 tab:text-base"
-            >
+            <Badge variant="active" size="md" className={cn('shrink-0', BADGE_TAB_LG)}>
               분양중
             </Badge>
           )}
         </div>
 
         {/* PC 전용: 즐겨찾기 (별 + 텍스트, 우측 정렬) */}
-        <button
-          type="button"
-          aria-pressed={favorited}
+        <FavoriteStar
+          pressed={favorited}
           onClick={toggleFavorite}
           className="hidden items-center self-end tab:flex"
-        >
-          <PixelStarIcon className={cn('size-8', starColor)} />
-          <span className="text-xs leading-[1.5] font-semibold text-[#3e3e3e]">즐겨찾기</span>
-        </button>
+          iconClassName="size-8"
+          label="즐겨찾기"
+        />
       </div>
     </Link>
   )

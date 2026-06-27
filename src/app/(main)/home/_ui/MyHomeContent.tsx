@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, type ReactNode } from 'react'
+import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { BookmarkIcon } from '@/shared/assets/icons'
 import { Container, SectionHeader, NavigationBar, InputUpload } from '@/shared/ui'
+import { useGnbHeight } from '@/shared/lib/useGnbHeight'
 import { MOCK_MY_HOME_POSTS } from '@/shared/mocks/myHome'
 import { createMockListings } from '@/shared/mocks/adoption'
 import { adopterQueries } from '@/entities/adopter'
@@ -13,7 +14,6 @@ import { FavoriteAdoptionCard } from '@/features/adoption'
 import { ProfileCard } from './ProfileCard'
 import { HomeTabs, TabsContent } from './HomeTabs'
 import { PostList } from './PostList'
-import { FooterPlaceholder } from './FooterPlaceholder'
 import { FavoriteBreedersContent } from './FavoriteBreedersContent'
 import { BreederListingCard } from './BreederListingCard'
 import { MY_HOME_TABS, BREEDER_MY_HOME_TABS } from './constants'
@@ -68,6 +68,24 @@ const MyHomeContent = () => {
   // UI 정비용: 쿼리 비활성화 (401 → /login 리다이렉트 방지)
   useQuery({ ...adopterQueries.profile(), enabled: false })
   useQuery({ ...breederQueries.myProfile(), enabled: false })
+
+  // sticky 헤더 스택: GNB → navbar(top=gnbH) → 탭바(top=gnbH+navH)
+  const gnbH = useGnbHeight()
+  const navRef = useRef<HTMLDivElement>(null)
+  const [navH, setNavH] = useState(0)
+
+  useLayoutEffect(() => {
+    const nav = navRef.current
+    if (!nav) return
+
+    const measure = () => setNavH(nav.offsetHeight)
+    measure()
+
+    const observer = new ResizeObserver(measure)
+    observer.observe(nav)
+
+    return () => observer.disconnect()
+  }, [])
 
   const isBreeder = MOCK_IS_BREEDER
 
@@ -130,16 +148,19 @@ const MyHomeContent = () => {
 
   return (
     <div className="flex w-full flex-col">
-      <NavigationBar
-        title="마이홈"
-        // 디자인(node 2046-160996): 마이홈 모바일 navbar는 좌우 margin-tab(48px) — 공통 기본(16)을 덮어씀
-        className="px-12"
-        right={
-          <button type="button" aria-label="북마크">
-            <BookmarkIcon className="size-6 text-[#3e3e3e]" />
-          </button>
-        }
-      />
+      {/* 스크롤 시 GNB 아래 고정(sticky) — tab+만 */}
+      <div ref={navRef} className="bg-white tab:sticky tab:z-40" style={{ top: gnbH }}>
+        <NavigationBar
+          title="마이홈"
+          // 디자인(node 2046-160996): 마이홈 모바일 navbar는 좌우 margin-tab(48px) — 공통 기본(16)을 덮어씀
+          className="px-12"
+          right={
+            <button type="button" aria-label="북마크">
+              <BookmarkIcon className="size-6 text-[#3e3e3e]" />
+            </button>
+          }
+        />
+      </div>
 
       {/* 디자인: 모바일 px-16(margin-mo)·py-20 / 탭 px-48·PC px-80·py-40 */}
       <Container className="px-4 py-5 tab:py-10">
@@ -150,7 +171,12 @@ const MyHomeContent = () => {
         ) : null}
       </Container>
 
-      <HomeTabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab}>
+      <HomeTabs
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        stickyTop={gnbH + navH}
+      >
         {/* 브리더: 분양글 작성 바 / 일반: 게시글 작성 바 (공통 InputUpload, 상·하 보더 포함) */}
         <InputUpload text={writeBar.text} href={writeBar.href} />
 
@@ -184,8 +210,6 @@ const MyHomeContent = () => {
           <FavoriteBreedersContent />
         </TabsContent>
       </HomeTabs>
-
-      <FooterPlaceholder />
     </div>
   )
 }

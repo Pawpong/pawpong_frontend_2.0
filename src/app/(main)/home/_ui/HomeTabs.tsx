@@ -2,6 +2,7 @@
 
 import type { SVGProps } from 'react'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui'
+import { useGnbHeight } from '@/shared/lib/useGnbHeight'
 
 interface HomeTabConfig {
   id: string
@@ -14,13 +15,22 @@ interface HomeTabsProps {
   activeTab: string
   onTabChange: (tab: string) => void
   children: React.ReactNode
+  /** sticky 시 상단 오프셋(px). 미지정 시 GNB 높이만 사용 */
+  stickyTop?: number
 }
 
-const HomeTabs = ({ tabs, activeTab, onTabChange, children }: HomeTabsProps) => {
+const HomeTabs = ({ tabs, activeTab, onTabChange, children, stickyTop }: HomeTabsProps) => {
+  const gnbH = useGnbHeight()
+  const top = Math.max((stickyTop ?? gnbH) - 1, 0)
+
   return (
     <Tabs value={activeTab} onValueChange={onTabChange}>
       {/* 공통 TabBar (디자인 976-32388 / 마이홈 2046-160969) — 모바일 medium / 탭·PC large */}
-      <div className="w-full border-b border-[#cacaca] px-4 pt-3 tab:px-12 tab:pt-4 pc:px-20">
+      {/* 스크롤 시 GNB(+navbar) 아래 고정(sticky) — tab+만, 모바일은 비고정 */}
+      <div
+        className="w-full border-b border-[#cacaca] bg-white px-4 pt-3 tab:sticky tab:z-30 tab:px-12 tab:pt-4 pc:px-20"
+        style={{ top }}
+      >
         <TabsList variant="underline">
           {tabs.map((tab) => (
             <TabsTrigger

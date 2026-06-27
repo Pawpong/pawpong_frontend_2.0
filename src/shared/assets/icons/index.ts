@@ -1,4 +1,5 @@
 export { ArrowBackIcon } from './ArrowBackIcon'
+export { ChevronIcon } from './ChevronIcon'
 export { ArrowRightIcon } from './ArrowRightIcon'
 export { ChatBubbleIcon } from './ChatBubbleIcon'
 export { AttachmentIcon } from './AttachmentIcon'
