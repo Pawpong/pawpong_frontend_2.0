@@ -49,6 +49,8 @@ export type ProfileFormData = z.infer<typeof profileSchema>
 export const infoSchema = z.object({
   nickname: z.string().min(2, { error: '닉네임을 2자 이상 입력해주세요' }),
   selectedKeywords: z.array(z.string()),
+  // 업로드 후 받은 프로필 이미지 파일명/URL (선택)
+  profileImage: z.string().optional(),
 })
 
 export type InfoFormData = z.infer<typeof infoSchema>

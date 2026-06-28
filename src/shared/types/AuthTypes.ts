@@ -13,6 +13,8 @@ export interface AdopterRegistrationDto {
   nickname: string
   phone?: string
   marketingAgreed?: boolean
+  /** 사전 업로드한 프로필 이미지 파일명 또는 URL */
+  profileImage?: string
 }
 
 export interface BreederRegistrationDto {

@@ -62,6 +62,8 @@ const SurveyStep = () => {
         nickname: info.nickname ?? '',
         phone: profile.phone,
         marketingAgreed: profile.marketingAgreed ?? false,
+        // InfoStep 에서 업로드한 프로필 이미지(URL/파일명) — 없으면 미전송
+        profileImage: info.profileImage || undefined,
       },
       {
         onSuccess: async (auth) => {

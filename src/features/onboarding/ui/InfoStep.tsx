@@ -42,6 +42,7 @@ const InfoStep = () => {
   const { register, control, handleSubmit, watch, onSubmit } = useStepForm<InfoFormData>('info', {
     nickname: '',
     selectedKeywords: [],
+    profileImage: '',
   })
 
   const nickname = watch('nickname')
@@ -72,7 +73,13 @@ const InfoStep = () => {
       onBack={goBack}
     >
       <>
-        <ProfileImageUpload />
+        <Controller
+          name="profileImage"
+          control={control}
+          render={({ field }) => (
+            <ProfileImageUpload value={field.value} onChange={field.onChange} />
+          )}
+        />
 
         {/* 닉네임 + 중복검사 */}
         <div className="flex w-full flex-col gap-1">
