@@ -1,8 +1,10 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { Controller } from 'react-hook-form'
 import { useOnboarding } from '../model/OnboardingContext'
 import { useStepForm } from '../model/useStepForm'
+import { useSendVerificationCode, useVerifyCode } from '@/features/auth'
 import { type ProfileFormData, EMAIL_DOMAINS } from '../model/schema'
 import { StepLayout } from './StepLayout'
 import { StepTitle } from './StepTitle'
@@ -49,6 +51,70 @@ const ProfileStep = () => {
   const privacyAgreed = watch('privacyAgreed')
   const marketingAgreed = watch('marketingAgreed')
   const isOver14 = watch('isOver14')
+
+  const phone = watch('phone')
+  const verificationCode = watch('verificationCode')
+
+  // 휴대폰 인증 (백엔드: POST /api/v2/auth/phone/send-code · verify-code)
+  const { mutate: sendCode, isPending: isSending } = useSendVerificationCode()
+  const { mutate: verifyCode, isPending: isVerifying } = useVerifyCode()
+  const [isCodeSent, setIsCodeSent] = useState(false)
+  const [isPhoneVerified, setIsPhoneVerified] = useState(false)
+  const [secondsLeft, setSecondsLeft] = useState(0)
+  const [phoneMessage, setPhoneMessage] = useState<string | null>(null)
+  const [codeMessage, setCodeMessage] = useState<string | null>(null)
+
+  // 인증코드 유효시간 카운트다운 (백엔드 만료 3분과 동일)
+  useEffect(() => {
+    if (!isCodeSent || isPhoneVerified) return
+    const timerId = setInterval(() => {
+      setSecondsLeft((prev) => (prev <= 1 ? 0 : prev - 1))
+    }, 1000)
+    return () => clearInterval(timerId)
+  }, [isCodeSent, isPhoneVerified])
+
+  const formatTimer = (sec: number) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`
+
+  const handleSendCode = () => {
+    if (!phone) {
+      setPhoneMessage('휴대폰 번호를 입력해주세요.')
+      return
+    }
+    setPhoneMessage(null)
+    sendCode(phone, {
+      onSuccess: () => {
+        setIsCodeSent(true)
+        setIsPhoneVerified(false)
+        setValue('verificationCode', '')
+        setSecondsLeft(180)
+        setCodeMessage(null)
+        setPhoneMessage('인증번호를 발송했습니다.')
+      },
+      onError: (error) => {
+        setPhoneMessage(error instanceof Error ? error.message : '인증번호 발송에 실패했습니다.')
+      },
+    })
+  }
+
+  const handleVerifyCode = () => {
+    if (!verificationCode) {
+      setCodeMessage('인증번호를 입력해주세요.')
+      return
+    }
+    verifyCode(
+      { phone, code: verificationCode },
+      {
+        onSuccess: () => {
+          setIsPhoneVerified(true)
+          setSecondsLeft(0)
+          setCodeMessage('인증이 완료되었습니다.')
+        },
+        onError: (error) => {
+          setCodeMessage(error instanceof Error ? error.message : '인증번호 확인에 실패했습니다.')
+        },
+      },
+    )
+  }
 
   const allAgreementsChecked = serviceAgreed && privacyAgreed && marketingAgreed && isOver14
 
@@ -101,9 +167,13 @@ const ProfileStep = () => {
                 placeholder="휴대폰 번호를 입력해주세요"
                 {...register('phone')}
                 className="flex-1"
+                disabled={isPhoneVerified}
               />
-              <StepActionButton>인증번호</StepActionButton>
+              <StepActionButton onClick={handleSendCode} disabled={isSending || isPhoneVerified}>
+                {isSending ? '발송 중' : isCodeSent ? '재전송' : '인증번호'}
+              </StepActionButton>
             </div>
+            {phoneMessage && <p className="mt-1 text-[0.8125rem] text-[#6b6b6b]">{phoneMessage}</p>}
           </InputField>
 
           <InputField label="인증번호" required>
@@ -114,13 +184,22 @@ const ProfileStep = () => {
                   placeholder="인증번호를 입력해주세요"
                   {...register('verificationCode')}
                   className="pr-[3.5rem]"
+                  disabled={!isCodeSent || isPhoneVerified}
                 />
-                <span className="absolute top-1/2 right-3 -translate-y-1/2 text-[0.875rem] font-medium text-[#3e3e3e]">
-                  3:00
-                </span>
+                {isCodeSent && !isPhoneVerified && (
+                  <span className="absolute top-1/2 right-3 -translate-y-1/2 text-[0.875rem] font-medium text-[#3e3e3e]">
+                    {formatTimer(secondsLeft)}
+                  </span>
+                )}
               </div>
-              <StepActionButton disabled>확인</StepActionButton>
+              <StepActionButton
+                onClick={handleVerifyCode}
+                disabled={!isCodeSent || isPhoneVerified || isVerifying}
+              >
+                {isPhoneVerified ? '완료' : isVerifying ? '확인 중' : '확인'}
+              </StepActionButton>
             </div>
+            {codeMessage && <p className="mt-1 text-[0.8125rem] text-[#6b6b6b]">{codeMessage}</p>}
           </InputField>
         </div>
 
