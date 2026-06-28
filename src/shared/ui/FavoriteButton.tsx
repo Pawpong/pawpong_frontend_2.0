@@ -9,9 +9,9 @@ const favoriteButtonVariants = tv({
   base: 'flex items-center rounded-full font-medium text-[#5d5d5d]',
   variants: {
     size: {
-      sm: 'gap-[0.25rem] text-[0.75rem]',
-      md: 'gap-[0.585rem] p-[0.585rem] text-[0.819rem]',
-      lg: 'gap-[0.625rem] p-[0.625rem] text-[0.875rem]',
+      sm: 'text-[0.75rem]',
+      md: 'p-[0.585rem] text-[0.819rem]',
+      lg: 'p-[0.625rem] text-[0.875rem]',
     },
   },
   defaultVariants: { size: 'lg' },

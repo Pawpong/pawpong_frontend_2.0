@@ -1,2 +1,3 @@
 export { AdoptionCard, AdoptionCardHorizontal } from './ui/AdoptionCard'
+export { ADOPTION_STATUS_BG } from './ui/statusBg'
 export * from './api/adoption.queries'
