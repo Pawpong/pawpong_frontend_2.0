@@ -29,33 +29,21 @@ const ACTION_SIZE = {
 
 type LabelTextButtonVariants = VariantProps<typeof labelTextButtonVariants>
 
-interface LabelTextButtonBase extends LabelTextButtonVariants {
+interface LabelTextButtonProps extends LabelTextButtonVariants {
   label: string
-  /** 우측 버튼 라벨 (없으면 버튼 미노출) */
-  actionLabel?: string
   className?: string
   /** 라벨 텍스트 스타일 오버라이드 (반응형 사이즈 등) */
   labelClassName?: string
+  /** 우측 텍스트버튼 라벨 — href와 함께 있을 때만 노출 (없으면 라벨 전용) */
+  actionLabel?: string
+  href?: string
 }
-
-interface LabelTextButtonAsLink extends LabelTextButtonBase {
-  href: string
-  onAction?: never
-}
-
-interface LabelTextButtonAsButton extends LabelTextButtonBase {
-  href?: never
-  onAction: (e: React.MouseEvent<HTMLButtonElement>) => void
-}
-
-type LabelTextButtonProps = LabelTextButtonAsLink | LabelTextButtonAsButton
 
 const LabelTextButton = ({
   size = 'large',
   label,
   actionLabel,
   href,
-  onAction,
   className,
   labelClassName,
 }: LabelTextButtonProps) => {
@@ -65,12 +53,9 @@ const LabelTextButton = ({
   return (
     <div className={cn(root(), className)}>
       <p className={cn(labelClass(), labelClassName)}>{label}</p>
-      {actionLabel &&
-        (href ? (
-          <DetailLink href={href} label={actionLabel} size={actionSize} />
-        ) : (
-          <DetailLink variant="button" onClick={onAction} label={actionLabel} size={actionSize} />
-        ))}
+      {actionLabel && href && (
+        <DetailLink href={href} label={actionLabel} size={actionSize} />
+      )}
     </div>
   )
 }

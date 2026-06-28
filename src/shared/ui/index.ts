@@ -1,5 +1,6 @@
 export * from './AlertMessage'
 export * from './AuthorInfo'
+export * from './ProfileHeader'
 export * from './Avatar'
 export * from './Breadcrumb'
 export * from './AvatarGroup'

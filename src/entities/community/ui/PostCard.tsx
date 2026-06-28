@@ -1,9 +1,9 @@
 'use client'
 
-import type { ComponentType, SVGProps } from 'react'
+import { useState, type ComponentType, type SVGProps } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ProfileAvatar } from '@/shared/ui'
+import { ProfileAvatar, ProfileHeader } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import {
   FavoriteIcon,
@@ -29,6 +29,8 @@ interface PostCardProps {
   commentCount: number
   /** 게시글 상세 링크 (있으면 본문 영역이 링크) */
   detailHref?: string
+  /** 지정 시 헤더를 공통 ProfileHeader(아바타 32/40·미리보기 1줄)로 렌더 + 이미지 tab 상단패딩 제거 (저장피드용) */
+  profileType?: 'sm' | 'md'
   className?: string
 }
 
@@ -60,9 +62,11 @@ const PostCard = ({
   likeCount,
   commentCount,
   detailHref,
+  profileType,
   className,
 }: PostCardProps) => {
   const hasImages = images.length > 0
+  const [isBookmarked, setIsBookmarked] = useState(false)
 
   const profileCluster = (
     <div className="flex min-w-0 flex-1 items-start gap-2">
@@ -95,23 +99,35 @@ const PostCard = ({
 
   return (
     <article className={cn('flex flex-col py-3 tab:p-3', className)}>
-      {/* 헤더: 프로필 + 더보기 */}
-      <div className="flex items-start justify-between gap-4 py-2 tab:py-3">
-        {detailHref ? (
-          <Link href={detailHref} className="flex min-w-0 flex-1">
-            {profileCluster}
-          </Link>
-        ) : (
-          profileCluster
-        )}
-        <button type="button" aria-label="더보기" className="shrink-0">
-          <MoreVertIcon className="size-6 text-[#3e3e3e]" />
-        </button>
-      </div>
+      {/* 헤더: profileType 지정 시 공통 ProfileHeader, 아니면 기본 인라인 헤더 */}
+      {profileType ? (
+        <ProfileHeader
+          type={profileType}
+          nickname={author.nickname}
+          createdAt={createdAt}
+          preview={text}
+          profileImageUrl={author.profileImageUrl}
+          detailHref={detailHref}
+          className="py-2 tab:py-3"
+        />
+      ) : (
+        <div className="flex items-start justify-between gap-4 py-2 tab:py-3">
+          {detailHref ? (
+            <Link href={detailHref} className="flex min-w-0 flex-1">
+              {profileCluster}
+            </Link>
+          ) : (
+            profileCluster
+          )}
+          <button type="button" aria-label="더보기" className="shrink-0">
+            <MoreVertIcon className="size-6 text-[#3e3e3e]" />
+          </button>
+        </div>
+      )}
 
-      {/* 이미지 (가로 스크롤) */}
+      {/* 이미지 (가로 스크롤) — 저장피드(profileType)는 상단패딩 제거 */}
       {hasImages && (
-        <div className="flex gap-3 overflow-x-auto pt-3">
+        <div className={cn('flex gap-3 overflow-x-auto pt-3', profileType && 'pt-0')}>
           {images.map((src, index) => (
             <div
               key={index}
@@ -129,8 +145,17 @@ const PostCard = ({
       <div className="flex items-center gap-2">
         <Stat icon={FavoriteIcon} count={likeCount} />
         <Stat icon={PixelMessageIcon} count={commentCount} />
-        <button type="button" aria-label="북마크" className="shrink-0">
-          <PixelBookmarkIcon className="size-8 text-[#a6a6a6]" />
+        <button
+          type="button"
+          aria-label="북마크"
+          aria-pressed={isBookmarked}
+          onClick={() => setIsBookmarked((prev) => !prev)}
+          className="shrink-0"
+        >
+          {/* 활성(저장) 시 브랜드 브라운 #a9835a */}
+          <PixelBookmarkIcon
+            className={cn('size-8', isBookmarked ? 'text-[#a9835a]' : 'text-[#a6a6a6]')}
+          />
         </button>
       </div>
     </article>
