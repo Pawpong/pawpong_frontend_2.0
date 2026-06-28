@@ -1,31 +1,102 @@
 'use client'
 
+import { useState } from 'react'
 import { Controller } from 'react-hook-form'
 import { useOnboarding } from '../model/OnboardingContext'
 import { useStepForm } from '../model/useStepForm'
-import { type SurveyFormData } from '../model/schema'
+import {
+  useCompleteAdopterRegistration,
+  loadSocialSignupSession,
+  clearSocialSignupSession,
+} from '@/features/auth'
+import {
+  type SurveyFormData,
+  type ProfileFormData,
+  type InfoFormData,
+} from '../model/schema'
 import { StepContainer } from './StepContainer'
 import { TextareaField } from '@/shared/ui'
 import { CheckboxField } from './CheckboxField'
 
 const SurveyStep = () => {
-  const { goBack } = useOnboarding()
+  // 입양자 플로우의 마지막 데이터 단계 — 여기서 실제 가입(social/complete)을 호출한다.
+  const { goBack, goNext, formData, setFormData } = useOnboarding()
 
-  const { register, control, watch, handleSubmit, onSubmit } = useStepForm<SurveyFormData>(
-    'survey',
-    {
-      privacyAgreed: false as unknown as true,
-      name: '',
-      phone: '',
-      email: '',
-      selfIntro: '',
-      awayTime: '',
-      livingSpace: '',
-    },
-  )
+  const { register, control, watch, handleSubmit } = useStepForm<SurveyFormData>('survey', {
+    privacyAgreed: false as unknown as true,
+    name: '',
+    phone: '',
+    email: '',
+    selfIntro: '',
+    awayTime: '',
+    livingSpace: '',
+  })
+
+  const { mutate: completeAdopter, isPending } = useCompleteAdopterRegistration()
+  const [submitError, setSubmitError] = useState<string | null>(null)
+
+  // "다음" → 입양자 가입 완료 처리 (성공 시에만 complete 단계로 이동)
+  const handleComplete = (surveyData: SurveyFormData) => {
+    if (isPending) return
+    setFormData('survey', surveyData)
+    setSubmitError(null)
+
+    const social = loadSocialSignupSession()
+    if (!social?.tempId) {
+      setSubmitError('소셜 가입 정보가 없습니다. 로그인 화면에서 소셜 로그인으로 다시 시작해주세요.')
+      return
+    }
+
+    const profile = (formData.profile ?? {}) as Partial<ProfileFormData>
+    const info = (formData.info ?? {}) as Partial<InfoFormData>
+    const email =
+      social.email ||
+      (profile.email && profile.emailDomain ? `${profile.email}@${profile.emailDomain}` : '')
+
+    completeAdopter(
+      {
+        tempId: social.tempId,
+        email,
+        // 백엔드 DTO 는 name 을 필수로 요구 — 소셜 이름이 없으면 닉네임으로 대체
+        name: social.name || info.nickname || '',
+        nickname: info.nickname ?? '',
+        phone: profile.phone,
+        marketingAgreed: profile.marketingAgreed ?? false,
+      },
+      {
+        onSuccess: async (auth) => {
+          // 발급 토큰을 쿠키로 저장해 로그인 상태로 전환
+          try {
+            await fetch('/api/auth/set-cookie', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                accessToken: auth.accessToken,
+                refreshToken: auth.refreshToken,
+              }),
+              credentials: 'include',
+            })
+          } catch {
+            // 쿠키 저장에 실패해도 가입 자체는 완료된 상태 — 완료 화면으로 진행
+          }
+          clearSocialSignupSession()
+          goNext()
+        },
+        onError: (error) => {
+          setSubmitError(error instanceof Error ? error.message : '회원가입 완료에 실패했습니다.')
+        },
+      },
+    )
+  }
 
   return (
-    <StepContainer title="간단한 조사 양식" onNext={() => handleSubmit(onSubmit)()} onBack={goBack}>
+    <StepContainer
+      title="간단한 조사 양식"
+      onNext={() => handleSubmit(handleComplete)()}
+      onBack={goBack}
+      nextLabel={isPending ? '가입 중...' : '다음'}
+      nextDisabled={isPending}
+    >
       {/* 콘텐츠 영역 */}
       <div className="flex w-full flex-col">
         {/* 섹션 1: 개인정보 수집 동의 */}
@@ -118,6 +189,10 @@ const SurveyStep = () => {
           </div>
         </div>
       </div>
+
+      {submitError && (
+        <p className="px-4 text-center text-[0.8125rem] text-red-500">{submitError}</p>
+      )}
     </StepContainer>
   )
 }

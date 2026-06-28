@@ -1,30 +1,32 @@
+import { Suspense } from 'react'
 import { SignupTypeSelect } from '@/widgets/signup-type-select'
+import { SocialSignupCapture } from '@/features/auth'
 
 /**
  * 회원가입 진입 (유형 선택: 입양자 / 브리더)
  *
- * ──────────────────────────────────────────────────────────────────────────
- * TODO(FE) — 소셜 "신규 회원" 연동 미완성 지점
- * ──────────────────────────────────────────────────────────────────────────
- * 백엔드 OAuth 콜백은 가입 이력이 없는 신규 소셜 사용자를 아래 쿼리와 함께 이 페이지로 보낸다:
- *   /signup?tempId=...&provider=kakao|naver|google&email=...&name=...&profileImage=...[&needsEmail=true]
+ * 소셜 신규가입 흐름:
+ *   백엔드 OAuth 콜백 → /signup?tempId=...&provider=...&email=...&name=...&profileImage=...
  *   (백엔드: auth-social-signup-redirect-factory.service.ts)
+ *   → SocialSignupCapture 가 위 파라미터를 sessionStorage 에 저장(여러 단계 거치며 유지)
+ *   → 마지막 단계에서 social/complete 호출로 실제 가입 + 토큰 쿠키 저장
  *
- * 현재 이 페이지/온보딩(OnboardingProvider)은 위 파라미터를 읽지 않는다. 연동하려면:
- *   1) useSearchParams() 로 tempId/provider/email/name/profileImage 를 읽어
- *      온보딩 컨텍스트(features/onboarding)의 초기값으로 주입한다.
- *   2) 유형 선택 후 마지막 단계에서 이미 존재하는 뮤테이션으로 가입을 완료한다:
- *        - 입양자: useCompleteAdopterRegistration({ tempId, email, name, nickname, phone, ... })
- *        - 브리더: useCompleteBreederRegistration({ tempId, ... })
- *      (둘 다 features/auth/api/auth.api.ts → POST /api/v2/auth/social/complete)
- *   3) 완료 응답(AuthResponseDto)에서 받은 accessToken/refreshToken 을
- *      /api/auth/set-cookie 로 저장 후 홈으로 이동한다. (로그인 성공과 동일 패턴)
- *
- * 참고: 기존 회원 로그인은 /login → /login/success 로 이미 연결돼 있다.
- * ──────────────────────────────────────────────────────────────────────────
+ * 구현 상태:
+ *   - 입양자(general): 연동 완료. SurveyStep 의 "다음"에서 completeAdopterRegistration 호출 →
+ *     /api/auth/set-cookie 로 로그인 처리 후 complete 단계로 이동.
+ *   - TODO(FE) 브리더(breeder): 아직 미연동. KennelInfoStep/DocumentsStep 데이터로
+ *     completeBreederRegistration + 서류 업로드(upload-breeder-documents)를 마지막 단계에서 호출해야 함.
  */
 const SignupPage = () => {
-  return <SignupTypeSelect />
+  return (
+    <>
+      {/* 소셜 신규가입 파라미터(tempId 등) 캡처 — useSearchParams 사용으로 Suspense 필요 */}
+      <Suspense fallback={null}>
+        <SocialSignupCapture />
+      </Suspense>
+      <SignupTypeSelect />
+    </>
+  )
 }
 
 export default SignupPage
