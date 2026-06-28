@@ -1,8 +1,10 @@
 'use client'
 
+import { useState } from 'react'
 import { Controller } from 'react-hook-form'
 import { useOnboarding } from '../model/OnboardingContext'
 import { useStepForm } from '../model/useStepForm'
+import { useCheckNicknameDuplicate } from '@/features/auth'
 import { type InfoFormData } from '../model/schema'
 import { StepContainer } from './StepContainer'
 import { Input } from '@/shared/ui'
@@ -37,10 +39,31 @@ const SAMPLE_KEYWORDS = [
 const InfoStep = () => {
   const { goBack } = useOnboarding()
 
-  const { register, control, handleSubmit, onSubmit } = useStepForm<InfoFormData>('info', {
+  const { register, control, handleSubmit, watch, onSubmit } = useStepForm<InfoFormData>('info', {
     nickname: '',
     selectedKeywords: [],
   })
+
+  const nickname = watch('nickname')
+
+  // 닉네임 중복 검사 (백엔드: POST /api/v2/auth/check-nickname)
+  const { mutate: checkNickname, isPending: isCheckingNickname } = useCheckNicknameDuplicate()
+  const [nicknameMessage, setNicknameMessage] = useState<string | null>(null)
+
+  const handleCheckNickname = () => {
+    if (!nickname?.trim()) {
+      setNicknameMessage('닉네임을 입력해주세요.')
+      return
+    }
+    checkNickname(nickname.trim(), {
+      onSuccess: (isDuplicate) => {
+        setNicknameMessage(isDuplicate ? '이미 사용 중인 닉네임입니다.' : '사용 가능한 닉네임입니다.')
+      },
+      onError: (error) => {
+        setNicknameMessage(error instanceof Error ? error.message : '중복 검사에 실패했습니다.')
+      },
+    })
+  }
 
   return (
     <StepContainer
@@ -52,9 +75,14 @@ const InfoStep = () => {
         <ProfileImageUpload />
 
         {/* 닉네임 + 중복검사 */}
-        <div className="flex w-full gap-2">
-          <Input type="text" placeholder="닉네임" {...register('nickname')} className="flex-1" />
-          <StepActionButton>중복 검사</StepActionButton>
+        <div className="flex w-full flex-col gap-1">
+          <div className="flex w-full gap-2">
+            <Input type="text" placeholder="닉네임" {...register('nickname')} className="flex-1" />
+            <StepActionButton onClick={handleCheckNickname} disabled={isCheckingNickname}>
+              {isCheckingNickname ? '검사 중' : '중복 검사'}
+            </StepActionButton>
+          </div>
+          {nicknameMessage && <p className="text-[0.8125rem] text-[#6b6b6b]">{nicknameMessage}</p>}
         </div>
 
         {/* 관심있는 키워드 */}
