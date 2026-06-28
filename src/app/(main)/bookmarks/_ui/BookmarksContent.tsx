@@ -1,11 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { cafe24Proup } from '@/shared/lib/fonts'
-import { Container, PageHeader, Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui'
+import { Container, NavigationBar, Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui'
 import { createMockListings, MOCK_ADOPTED_LISTINGS } from '@/shared/mocks/adoption'
 import { MOCK_MY_HOME_POSTS } from '@/shared/mocks/myHome'
-import { cn } from '@/shared/lib/cn'
 import { BOOKMARK_TABS } from './constants'
 import { FavoritesTab } from './FavoritesTab'
 import { SavedFeedsTab } from './SavedFeedsTab'
@@ -20,41 +18,24 @@ const BookmarksContent = () => {
   const adoptedListings = MOCK_ADOPTED_LISTINGS
 
   return (
-    <div className="flex w-full flex-col">
-      <PageHeader title="저장목록" backHref="/home" />
+    <div className="flex w-full flex-1 flex-col">
+      <NavigationBar title="저장목록" backHref="/home" />
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <div className="border-b border-border-light">
-          <Container>
-            <TabsList className="flex w-full items-center gap-8">
+        {/* 공통 TabBar (디자인 976-32388) — 모바일 medium / 탭·PC large
+            border는 풀폭, 탭 목록은 Container(mx-auto max-w)로 가운데 정렬 */}
+        <div className="w-full border-b border-[#cacaca] bg-white">
+          <Container className="pt-3 tab:pt-4">
+            <TabsList variant="underline">
               {BOOKMARK_TABS.map((tab) => (
                 <TabsTrigger
                   key={tab.id}
                   value={tab.id}
-                  className={cn(
-                    'group flex min-w-px flex-1 items-center justify-center p-2.5',
-                    'data-[state=active]:border-b-2 data-[state=active]:border-text-primary',
-                  )}
+                  variant="underline"
+                  size="md"
+                  className="tab:h-[3.8125rem] tab:pt-2 tab:text-base tab:after:h-[0.5625rem]"
                 >
-                  {/* 모바일: cafe24 폰트 */}
-                  <span
-                    className={cn(
-                      cafe24Proup.className,
-                      'font-cafe24 text-xs leading-[1.375rem] whitespace-nowrap text-[#a7a7a7] tab:hidden',
-                      'group-data-[state=active]:text-text-primary',
-                    )}
-                  >
-                    {tab.label}
-                  </span>
-                  {/* PC: Pretendard */}
-                  <span
-                    className={cn(
-                      'hidden text-base leading-[1.375rem] font-medium whitespace-nowrap text-[#a7a7a7] tab:inline',
-                      'group-data-[state=active]:font-semibold group-data-[state=active]:text-text-primary',
-                    )}
-                  >
-                    {tab.label}
-                  </span>
+                  {tab.label}
                 </TabsTrigger>
               ))}
             </TabsList>

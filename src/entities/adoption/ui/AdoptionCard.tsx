@@ -9,12 +9,7 @@ import { FavoriteIcon } from '@/shared/assets/icons'
 import { Badge, FavoriteButton, ListingStats } from '@/shared/ui'
 import type { AdoptionListingCard } from '@/shared/types'
 import { ADOPTION_STATUS_LABEL, GENDER_LABEL } from '@/shared/types'
-
-const STATUS_BG: Record<AdoptionListingCard['status'], string> = {
-  available: 'bg-[#5d5d5d]',
-  reserved: 'bg-[#5d5d5d]',
-  completed: 'bg-[#a4a4a4]',
-}
+import { ADOPTION_STATUS_BG } from './statusBg'
 
 // Figma 세로형 카드 상태 배지 → 공통 Badge 변형: 분양중/예약중 active(다크), 분양완료 disabled(그레이)
 const STATUS_BADGE_VARIANT: Record<AdoptionListingCard['status'], 'active' | 'disabled'> = {
@@ -22,6 +17,9 @@ const STATUS_BADGE_VARIANT: Record<AdoptionListingCard['status'], 'active' | 'di
   reserved: 'active',
   completed: 'disabled',
 }
+
+// [refactored] 세로형 카드 제목 공통 클래스 (모바일/태블릿 — 사이즈만 각 카드에서 cn으로 덧붙임)
+const CARD_TITLE_BASE = 'line-clamp-2 leading-[1.5] font-semibold text-[#3e3e3e]'
 
 interface AdoptionCardProps {
   listing: AdoptionListingCard
@@ -66,6 +64,19 @@ const CardStats = ({
   />
 )
 
+// [refactored] 세로형 카드 상태 배지 — variant·label 룩업 중복 제거 (모바일 size=md / 태블릿 기본)
+const StatusBadge = ({
+  status,
+  size,
+}: {
+  status: AdoptionListingCard['status']
+  size?: 'md' | 'lg'
+}) => (
+  <Badge variant={STATUS_BADGE_VARIANT[status]} size={size} className="shrink-0">
+    {ADOPTION_STATUS_LABEL[status]}
+  </Badge>
+)
+
 /* ═══════════════════════════════════════════════
    세로형 카드 (Figma)
    - 모바일: medium (1023-40492) — rounded-4, 상/하 2행(제목·배지 / stats·하트), 제목=품종명, stats 12px
@@ -83,34 +94,37 @@ const AdoptionCard = ({ listing, className, isFavorite, onToggle }: AdoptionCard
 
   return (
     <Link href={`/adoption/${listing.listingId}`} className={cn('block', className)}>
-      {/* ══════ 모바일 카드 (Figma 1023-40492, medium) ══════ */}
+      {/* ══════ 모바일 카드 (Figma 796-81670, medium) ══════ */}
       <div className="flex flex-col tab:hidden">
-        {/* [refactored] 이미지 공통 컴포넌트 — rounded-4 */}
-        <CardImage listing={listing} isCompleted={isCompleted} className="rounded-[0.25rem]" />
+        {/* 이미지 + 우하단 하트 48px 오버레이 (medium은 하트가 정보영역이 아닌 이미지 위) */}
+        <div className="relative">
+          <CardImage listing={listing} isCompleted={isCompleted} className="rounded-[0.25rem]" />
+          <button
+            type="button"
+            onClick={handleFavoriteClick}
+            className="absolute right-0 bottom-0"
+            aria-label="관심 등록"
+          >
+            <FavoriteIcon
+              className={cn('size-12', isFavorite ? 'text-[#ff8181]' : 'text-[#a6a6a6]')}
+            />
+          </button>
+        </div>
 
-        {/* 정보: p-8, 상단(제목/배지) · 하단(stats/하트) 2행 (Figma 796-81620) */}
+        {/* 정보: p-8 — 상단(제목 2줄/입양가능 배지) · 하단(stats) (Figma 796-81620) */}
         <div className="flex min-h-[5rem] flex-col justify-between gap-[0.5rem] p-[0.5rem]">
           {/* 상단: 제목 + 입양가능 배지 */}
           <div className="flex items-start justify-between gap-[0.5rem]">
-            <p className="line-clamp-2 min-w-0 flex-1 text-[0.875rem] leading-[1.5] font-semibold text-[#3e3e3e]">
-              {listing.name}
-            </p>
-            <Badge variant={STATUS_BADGE_VARIANT[listing.status]} size="md" className="shrink-0">
-              {ADOPTION_STATUS_LABEL[listing.status]}
-            </Badge>
+            {/* [refactored] 제목 공통 클래스 + 모바일 사이즈 */}
+            <p className={cn(CARD_TITLE_BASE, 'min-w-0 flex-1 text-[0.875rem]')}>{listing.name}</p>
+            {/* [refactored] StatusBadge 추출 */}
+            <StatusBadge status={listing.status} size="md" />
           </div>
-          {/* 하단: 문의/관심/조회 + 하트 */}
-          <div className="flex items-end justify-between gap-[0.5rem]">
-            <CardStats
-              listing={listing}
-              className="gap-[0.25rem] text-[0.75rem] leading-[1.5] whitespace-nowrap text-[#6b6b6b]"
-            />
-            <button type="button" onClick={handleFavoriteClick} className="shrink-0">
-              <FavoriteIcon
-                className={cn('size-6', isFavorite ? 'text-[#ff8181]' : 'text-[#a6a6a6]')}
-              />
-            </button>
-          </div>
+          {/* 하단: 문의/관심/조회 */}
+          <CardStats
+            listing={listing}
+            className="gap-[0.25rem] text-[0.75rem] leading-[1.5] whitespace-nowrap text-[#6b6b6b]"
+          />
         </div>
       </div>
 
@@ -124,7 +138,8 @@ const AdoptionCard = ({ listing, className, isFavorite, onToggle }: AdoptionCard
         <div className="flex min-h-[7.5rem] flex-1 justify-between gap-[0.5rem] p-[0.75rem]">
           {/* 좌측: 제목(품종 ǀ 성별 나이, 2줄 clamp) + 문의/관심/조회 */}
           <div className="flex min-w-0 flex-1 flex-col justify-between">
-            <p className="line-clamp-2 text-[1rem] leading-[1.5] font-semibold text-[#3e3e3e]">
+            {/* [refactored] 제목 공통 클래스 + 태블릿 사이즈 */}
+            <p className={cn(CARD_TITLE_BASE, 'text-[1rem]')}>
               {`${listing.name} | ${GENDER_LABEL[listing.gender]} ${listing.ageText}`}
             </p>
             <CardStats
@@ -134,15 +149,14 @@ const AdoptionCard = ({ listing, className, isFavorite, onToggle }: AdoptionCard
           </div>
           {/* 우측: 상태배지(상단, 다크) + 관심있어요(하단, 하트+텍스트) */}
           <div className="flex shrink-0 flex-col items-end justify-between">
-            <Badge variant={STATUS_BADGE_VARIANT[listing.status]} className="shrink-0">
-              {ADOPTION_STATUS_LABEL[listing.status]}
-            </Badge>
+            {/* [refactored] StatusBadge 추출 (태블릿은 기본 사이즈) */}
+            <StatusBadge status={listing.status} />
             <FavoriteButton
               size="md"
               isFavorite={isFavorite}
               onToggle={onToggle}
-              className="gap-[0.25rem] p-0 text-[0.75rem] font-semibold text-[#3e3e3e]"
-              iconClassName="size-6 text-[#a6a6a6]"
+              className="p-0 text-[0.75rem] font-semibold text-[#3e3e3e]"
+              iconClassName="size-8 text-[#a6a6a6]"
             />
           </div>
         </div>
@@ -185,7 +199,7 @@ const AdoptionCardHorizontal = ({
             <Badge
               variant="status"
               className={cn(
-                STATUS_BG[listing.status],
+                ADOPTION_STATUS_BG[listing.status],
                 'px-[0.5rem] py-[0.125rem] text-[0.75rem] leading-normal',
               )}
             >

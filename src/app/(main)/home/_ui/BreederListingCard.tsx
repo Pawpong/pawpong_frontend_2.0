@@ -6,16 +6,11 @@ import { Badge, ListingStats, PostedDate } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import type { AdoptionListingCard } from '@/shared/types'
 import { ADOPTION_STATUS_LABEL } from '@/shared/types'
+import { ADOPTION_STATUS_BG } from '@/entities/adoption'
 
 interface BreederListingCardProps {
   listing: AdoptionListingCard
   className?: string
-}
-
-const STATUS_BG: Record<AdoptionListingCard['status'], string> = {
-  available: 'bg-[#5d5d5d]',
-  reserved: 'bg-[#5d5d5d]',
-  completed: 'bg-[#a4a4a4]',
 }
 
 const BreederListingCard = ({ listing, className }: BreederListingCardProps) => {
@@ -30,7 +25,7 @@ const BreederListingCard = ({ listing, className }: BreederListingCardProps) => 
         <Badge
           variant="status"
           className={cn(
-            STATUS_BG[listing.status],
+            ADOPTION_STATUS_BG[listing.status],
             'absolute top-[0.766rem] left-[0.625rem] px-[0.625rem] py-[0.25rem] text-xs leading-[1.375rem]',
           )}
         >

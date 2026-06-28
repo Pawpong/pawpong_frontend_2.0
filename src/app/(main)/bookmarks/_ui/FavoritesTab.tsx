@@ -1,6 +1,6 @@
 'use client'
 
-import { Container, SectionHeader } from '@/shared/ui'
+import { Container, LabelTextButton } from '@/shared/ui'
 import { FavoriteAdoptionCard } from '@/features/adoption'
 import type { AdoptionListingCard } from '@/shared/types'
 
@@ -9,24 +9,20 @@ interface FavoritesTabProps {
 }
 
 const FavoritesTab = ({ listings }: FavoritesTabProps) => (
-  <Container>
-    <div className="pt-5 tab:pt-8">
-      <SectionHeader
-        title={`입양 관심목록 ${listings.length}`}
-        linkText="입양페이지 가기"
-        linkHref="/adoption"
-      />
-    </div>
+  // 섹션 패딩을 Container로 일원화 (세로 20/40/40 · 가로 16/48/80, 모바일만 기본값 20→16 오버라이드)
+  // 헤더-그리드 간격은 gap으로 (모바일 10px / tab 12px)
+  <Container className="flex flex-col gap-2.5 px-4 py-5 tab:gap-3 tab:py-10">
+    {/* 라벨 사이즈는 labelClassName으로 일원화 — 모바일 14px → tab 이상 16px (size는 기본 large = action md) */}
+    <LabelTextButton
+      labelClassName="text-sm tab:text-base"
+      label={`입양 관심 목록 ${listings.length}`}
+      actionLabel="입양 탐색"
+      href="/adoption"
+    />
 
-    {/* 모바일: 2열 그리드 */}
-    <div className="grid grid-cols-2 gap-4 pt-3 pb-15 tab:hidden">
-      {listings.map((listing) => (
-        <FavoriteAdoptionCard key={listing.listingId} listing={listing} />
-      ))}
-    </div>
-
-    {/* PC: 3열 그리드 */}
-    <div className="hidden tab:mt-6 tab:grid tab:grid-cols-3 tab:gap-[1.156rem] tab:pb-10">
+    {/* 카드 그리드 — mo·tab 2열 / pc 4열.
+        tab은 좌우 mx-44px(Container 위 추가 여백)로 카드 282px 고정, pc는 max-w+mx-auto로 가운데 정렬 */}
+    <div className="grid grid-cols-2 gap-4 tab:mx-[2.75rem] tab:gap-5 pc:mx-auto pc:max-w-[74.25rem] pc:grid-cols-4">
       {listings.map((listing) => (
         <FavoriteAdoptionCard key={listing.listingId} listing={listing} />
       ))}
