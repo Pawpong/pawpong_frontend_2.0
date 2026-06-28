@@ -17,18 +17,13 @@ const AdoptionListTab = ({ listings }: AdoptionListTabProps) => {
   }, {})
 
   return (
-    <Container>
-      <div className="pt-5 tab:pt-8">
-        <h2 className="text-sm leading-[1.5] font-bold text-text-primary tab:text-xl">
-          내가 입양한 목록 {listings.length}
-        </h2>
-      </div>
-
-      <div className="flex flex-col gap-3 pt-4 pb-15 tab:gap-[0.625rem] tab:pt-6 tab:pb-10">
+    // 패딩: 모바일 py20·px16(기본 20→px-4 오버라이드) / tab px48 / pc px80·py40 — 카드는 max-w로 중앙정렬
+    <Container className="px-4 py-5 pc:py-10">
+      <div className="flex flex-col gap-3 tab:gap-[0.625rem]">
         {Object.entries(groupedByDate).map(([date, items]) => (
           <div key={date} className="flex flex-col gap-[0.375rem] tab:gap-[0.625rem]">
             <p className="text-xs leading-[1.5] font-medium text-text-primary tab:text-sm tab:leading-[1.375rem]">
-              {date}
+              입양 날짜 : {date}
             </p>
             {items.map((listing) => (
               <AdoptedListingCard key={listing.listingId} listing={listing} />
