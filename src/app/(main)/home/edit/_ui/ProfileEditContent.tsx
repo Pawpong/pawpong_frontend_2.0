@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 import { adopterQueries } from '@/entities/adopter'
 import { profileQueries } from '@/entities/profile'
 import { useUpdateAdopterProfile, useDeleteAdopterAccount } from '@/features/adopter'
+import { useUpdateBreederProfile } from '@/features/breeder'
 import { useUpdateMyProfile } from '@/features/profile'
 import { useUploadSingleFile } from '@/features/upload'
 import { useLogout } from '@/features/auth'
@@ -110,21 +111,31 @@ const ProfileEditContent = () => {
     openFilePicker(false)
   }
 
-  // 조회: 활동명·이메일·사진은 /adopter/profile, 소개(bio)는 /profile/me
-  const { data: adopterProfile } = useQuery(adopterQueries.profile())
+  // 역할 판별: /profile/me 는 입양자·브리더 공용 (nickname·bio·profileImageUrl·role 제공)
   const { data: myProfile } = useQuery(profileQueries.me())
+  const isBreeder = myProfile?.role === 'breeder'
+
+  // 활동명·이메일은 입양자 전용(/adopter/profile) — 브리더는 호출하지 않는다(조회 실패 방지)
+  const { data: adopterProfile } = useQuery({
+    ...adopterQueries.profile(),
+    enabled: myProfile?.role === 'adopter',
+  })
 
   // 조회값으로 폼 초기화 (최초 1회) — effect 대신 렌더 중 동기화(React 권장 패턴)
+  // 브리더는 adopterProfile 을 기다리지 않고 myProfile(닉네임)로 시드한다
   const [seeded, setSeeded] = useState(false)
-  if (!seeded && adopterProfile && myProfile) {
-    setName(adopterProfile.nickname ?? '')
-    setBio(myProfile.bio ?? '')
+  const seedReady = isBreeder ? !!myProfile : !!(adopterProfile && myProfile)
+  if (!seeded && seedReady) {
+    setName((isBreeder ? myProfile?.nickname : adopterProfile?.nickname) ?? '')
+    setBio(myProfile?.bio ?? '')
     setSeeded(true)
   }
 
+  // 소셜 로그인 이메일은 입양자 프로필에만 있다 (브리더는 미표시)
   const email = adopterProfile?.emailAddress ?? ''
 
   const updateAdopterProfile = useUpdateAdopterProfile()
+  const updateBreederProfile = useUpdateBreederProfile()
   const updateMyProfile = useUpdateMyProfile()
   const deleteAccount = useDeleteAdopterAccount()
   const logout = useLogout()
@@ -132,19 +143,31 @@ const ProfileEditContent = () => {
   // 사진 제외 모든 입력 필드가 채워져야 적용 가능 (소셜 로그인은 readOnly로 항상 채워짐)
   const isFormFilled = name.trim().length > 0 && bio.trim().length > 0
   const isSaving =
-    updateAdopterProfile.isPending || updateMyProfile.isPending || uploadFile.isPending
+    updateAdopterProfile.isPending ||
+    updateBreederProfile.isPending ||
+    updateMyProfile.isPending ||
+    uploadFile.isPending
 
-  // 적용: 활동명·사진→PATCH /adopter/profile(name, profileImage), 소개→PATCH /profile/me(bio)
+  // 적용: 소개(bio)는 양쪽 공용 PATCH /profile/me.
+  //  - 입양자: 활동명·사진 → PATCH /adopter/profile
+  //  - 브리더: 사진 → PATCH /breeder-management/profile (활동명은 이 화면에서 미수정)
   const handleApply = async () => {
     setShowApply(false)
     try {
-      await Promise.all([
-        updateAdopterProfile.mutateAsync({
-          name,
-          ...(photoFileName ? { profileImage: photoFileName } : {}),
-        }),
-        updateMyProfile.mutateAsync({ bio }),
-      ])
+      const tasks: Promise<unknown>[] = [updateMyProfile.mutateAsync({ bio })]
+      if (isBreeder) {
+        if (photoFileName) {
+          tasks.push(updateBreederProfile.mutateAsync({ profileImage: photoFileName }))
+        }
+      } else {
+        tasks.push(
+          updateAdopterProfile.mutateAsync({
+            name,
+            ...(photoFileName ? { profileImage: photoFileName } : {}),
+          }),
+        )
+      }
+      await Promise.all(tasks)
       toast.show()
     } catch {
       // TODO: 실패 토스트/에러 처리
@@ -182,7 +205,7 @@ const ProfileEditContent = () => {
           <div className="flex w-28 flex-col items-center gap-8">
             <ProfileAvatar
               size="xlarge"
-              src={photoPreview ?? adopterProfile?.profileImageFileName}
+              src={photoPreview ?? myProfile?.profileImageUrl}
             />
             <div className="flex w-full flex-col items-center gap-3">
               {/* TODO: 선택한 파일 업로드 연결 (onChange) */}
@@ -205,15 +228,20 @@ const ProfileEditContent = () => {
           {/* 폼 */}
           <div className="flex w-full flex-col">
             <InputField label="포퐁 활동명">
+              {/* 브리더 활동명(브리더명)은 이 화면에서 수정 불가 — 읽기전용 표시 */}
               <Input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 maxLength={NAME_MAX_LENGTH} // [refactored]
                 placeholder="입력해보세요"
+                readOnly={isBreeder}
+                className={isBreeder ? 'cursor-default focus:border-[#e4e4e4]' : undefined}
               />
-              <p className="mt-1 self-end text-[0.625rem] leading-[1.5] font-medium text-[#6b6b6b]">
-                {name.length}/{NAME_MAX_LENGTH} {/* [refactored] */}
-              </p>
+              {!isBreeder && (
+                <p className="mt-1 self-end text-[0.625rem] leading-[1.5] font-medium text-[#6b6b6b]">
+                  {name.length}/{NAME_MAX_LENGTH} {/* [refactored] */}
+                </p>
+              )}
             </InputField>
 
             <TextareaField
@@ -226,22 +254,28 @@ const ProfileEditContent = () => {
               className="min-h-[6.5625rem]"
             />
 
-            <InputField label="소셜 로그인">
-              {/* 표시 전용 — readOnly(수정X) + tabIndex/-1·focus 보더 중립화(focus X) */}
-              <Input
-                value={email}
-                readOnly
-                className="cursor-default focus:border-[#e4e4e4]"
-              />
-            </InputField>
+            {/* 소셜 로그인 이메일은 입양자 프로필에만 있어 브리더에선 숨김 */}
+            {!isBreeder && (
+              <InputField label="소셜 로그인">
+                {/* 표시 전용 — readOnly(수정X) + tabIndex/-1·focus 보더 중립화(focus X) */}
+                <Input
+                  value={email}
+                  readOnly
+                  className="cursor-default focus:border-[#e4e4e4]"
+                />
+              </InputField>
+            )}
           </div>
         </div>
 
         {/* 탈퇴 / 로그아웃 — 로그아웃은 TODO 연결 */}
         <div className="flex items-center gap-10">
-          <Button variant="text" onClick={() => setShowLeave(true)}>
-            탈퇴
-          </Button>
+          {/* 탈퇴는 입양자 전용 API(useDeleteAdopterAccount) — 브리더에선 숨김 */}
+          {!isBreeder && (
+            <Button variant="text" onClick={() => setShowLeave(true)}>
+              탈퇴
+            </Button>
+          )}
           <Button variant="text" onClick={handleLogout}>
             로그아웃
           </Button>
