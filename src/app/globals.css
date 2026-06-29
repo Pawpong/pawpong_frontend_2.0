@@ -8,6 +8,16 @@
   --breakpoint-tab: 768px;
   --breakpoint-pc: 1440px;
 
+  /* typography — Body 스케일 (line-height 150% 포함). weight는 font-* 유틸로: font-normal/medium/semibold */
+  --text-body-sm: 0.75rem; /* 12 */
+  --text-body-sm--line-height: 1.5;
+  --text-body-md: 0.875rem; /* 14 */
+  --text-body-md--line-height: 1.5;
+  --text-body-lg: 1rem; /* 16 */
+  --text-body-lg--line-height: 1.5;
+  --text-body-xl: 1.25rem; /* 20 */
+  --text-body-xl--line-height: 1.5;
+
   /* text */
   --color-text-primary: #5d5d5d;
   --color-text-secondary: #959595;
