@@ -32,6 +32,13 @@ function createApiClient(): AxiosInstance {
   })
 
   instance.interceptors.request.use((config) => {
+    // FormData(멀티파트) 업로드는 axios 기본 JSON Content-Type을 제거해
+    // 브라우저가 `multipart/form-data; boundary=...`를 직접 설정하도록 한다.
+    // 제거하지 않으면 axios가 FormData를 JSON으로 직렬화해 File이 {}로 깨진다.
+    if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
+      config.headers.delete('Content-Type')
+    }
+
     if ((config as InternalAxiosRequestConfig & { skipAuth?: boolean }).skipAuth) return config
 
     if (typeof window !== 'undefined') {
