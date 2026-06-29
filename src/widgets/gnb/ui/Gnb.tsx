@@ -47,8 +47,9 @@ const Gnb = () => {
                   >
                     로그인
                   </Link>
+                  {/* 소셜 전용 서비스 — 회원가입도 /login(소셜 인증)에서 시작, 신규 유저는 백엔드가 /signup?tempId=...로 보냄 */}
                   <Link
-                    href="/signup"
+                    href="/login"
                     className="rounded-full bg-[#fffa94] px-4 py-2 text-sm font-semibold text-[#3e3e3e] transition-colors hover:bg-[#fff066]"
                   >
                     회원가입

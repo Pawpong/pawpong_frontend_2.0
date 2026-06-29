@@ -55,8 +55,9 @@ const MobileMenu = ({ onClose }: MobileMenuProps) => {
             >
               로그인
             </Link>
+            {/* 소셜 전용 서비스 — 회원가입도 /login(소셜 인증)에서 시작, 신규 유저는 백엔드가 /signup?tempId=...로 보냄 */}
             <Link
-              href="/signup"
+              href="/login"
               onClick={onClose}
               className="flex-1 rounded-full bg-[#fffa94] py-3 text-center text-base font-semibold text-[#3e3e3e]"
             >

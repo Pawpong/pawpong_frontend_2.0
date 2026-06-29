@@ -1,5 +1,4 @@
 import { Suspense } from 'react'
-import Link from 'next/link'
 import { SocialLoginList } from '@/features/auth'
 
 /**
@@ -11,7 +10,10 @@ import { SocialLoginList } from '@/features/auth'
  *   [이 페이지] 소셜 버튼 클릭
  *     → 백엔드 OAuth (/api/auth/{provider})
  *       → 기존 회원: /login/success (토큰 쿠키 저장 후 홈)
- *       → 신규 회원: /signup?tempId=... (회원가입 완료 플로우)
+ *       → 신규 회원: /signup?tempId=... (회원가입 완료 플로우 — 유형 선택부터)
+ *
+ * 소셜 전용 서비스라 로그인 = 회원가입 진입점이 동일하다(별도 이메일/비밀번호 가입 없음).
+ * GNB/모바일 메뉴의 "회원가입" 버튼도 이 페이지로 들어온다.
  *
  * TODO(FE): 디자인 확정 시 헤더/로고/약관 동의/배너(login-banners) 영역 추가.
  */
@@ -27,13 +29,6 @@ const LoginPage = () => {
       <Suspense fallback={<div className="h-40" />}>
         <SocialLoginList />
       </Suspense>
-
-      <p className="text-center text-sm text-[#6b6b6b]">
-        아직 회원이 아니신가요?{' '}
-        <Link href="/signup" className="font-semibold underline">
-          회원가입
-        </Link>
-      </p>
     </main>
   )
 }
