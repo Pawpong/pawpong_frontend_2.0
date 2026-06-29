@@ -86,6 +86,8 @@ export const kennelInfoSchema = z.object({
   breederName: z.string().min(1, { error: '브리더명을 입력해주세요' }),
   region: z.enum(REGIONS).optional(),
   selectedBreeds: z.array(z.string()),
+  // 업로드 후 받은 브리더 프로필 이미지 URL (선택) — social/complete 시 profileImage 로 전송
+  profileImage: z.string().optional(),
 })
 
 export type KennelInfoFormData = z.infer<typeof kennelInfoSchema>

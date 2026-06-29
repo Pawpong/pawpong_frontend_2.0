@@ -37,6 +37,7 @@ const KennelInfoStep = () => {
       breederName: '',
       region: undefined,
       selectedBreeds: [],
+      profileImage: undefined,
     },
   )
 
@@ -71,7 +72,14 @@ const KennelInfoStep = () => {
       onBack={goBack}
     >
       <div className="mt-[2rem] flex w-full flex-col items-center gap-[2rem] px-5 tab:mt-[3.625rem] tab:max-w-[40.625rem] tab:gap-[3.625rem] tab:px-0">
-        <ProfileImageUpload />
+        {/* 업로드 후 받은 URL을 폼(profileImage)에 보관 → DocumentsStep의 social/complete에서 전송 */}
+        <Controller
+          name="profileImage"
+          control={control}
+          render={({ field }) => (
+            <ProfileImageUpload value={field.value} onChange={field.onChange} />
+          )}
+        />
 
         {/* 폼 영역 */}
         <div className="flex w-full flex-col gap-[0.625rem] tab:gap-[2.09rem]">
