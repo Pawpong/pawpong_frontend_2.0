@@ -1,7 +1,9 @@
 'use client'
 
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { Badge, Button, ListingStats } from '@/shared/ui'
+import { Badge, Button, CtaModal, ListingStats } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import type { AdoptedListingCard as AdoptedListingCardType } from '@/shared/types'
 import { ADOPTION_STATUS_LABEL, GENDER_LABEL } from '@/shared/types'
@@ -53,13 +55,20 @@ const CardStats = ({
 )
 
 const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
+  const router = useRouter()
   const isCompleted = listing.status === 'completed'
+  const [modalOpen, setModalOpen] = useState(false)
 
   return (
     <>
-      {/* 모바일·탭 카드 (Figma 975-15983 · Card2 medium) — bg #f6f6f6, 이미지 110, 제목+상태배지/stats (목록은 하트 없음)
+      {/* 모바일·탭 카드 (Figma 975-15983 · Card2 medium) — 클릭 시 CTA 모달(상세/채팅 선택)
+          bg #f6f6f6, 이미지 110, 제목+상태배지/stats (목록은 하트 없음)
           카드 max-w 600 중앙정렬 (탭에서 좌우 ≈36px 여백, 모바일은 full) */}
-      <div className="mx-auto flex w-full max-w-[37.5rem] items-center gap-4 rounded-lg bg-[#f6f6f6] p-2 pc:hidden">
+      <button
+        type="button"
+        onClick={() => setModalOpen(true)}
+        className="mx-auto flex w-full max-w-[37.5rem] items-center gap-4 rounded-lg bg-[#f6f6f6] p-2 text-left pc:hidden"
+      >
         {/* [refactored] CardImage — 110×110 rounded-4 */}
         <CardImage
           listing={listing}
@@ -74,12 +83,14 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
             <p className="w-full truncate text-base leading-[1.5] font-bold text-[#3e3e3e]">
               {listing.name}
             </p>
-            <Badge variant="active">{ADOPTION_STATUS_LABEL[listing.status]}</Badge>
+            <Badge variant="active" size="md">
+              {ADOPTION_STATUS_LABEL[listing.status]}
+            </Badge>
           </div>
           {/* [refactored] CardStats */}
           <CardStats listing={listing} size="sm" className="w-full text-xs text-[#6b6b6b]" />
         </div>
-      </div>
+      </button>
 
       {/* PC 카드 (Figma 797-87156 · Card2 large) — pc 전용. bg #f6f6f6, 이미지 280×210, 제목+상태배지/설명 3줄, stats + 대화중인 채팅
           카드 고정폭 920px 중앙정렬 (콘텐츠 폭이 더 넓으면 좌우 여백) */}
@@ -113,12 +124,32 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
           <div className="flex items-center gap-2">
             {/* [refactored] CardStats */}
             <CardStats listing={listing} className="flex-1 text-sm leading-[1.5] text-[#6b6b6b]" />
-            <Button variant="primary" className="h-10 w-[11.4375rem] shrink-0 text-base">
+            <Button
+              variant="primary"
+              onClick={() => router.push('/chat')}
+              className="h-10 w-[11.4375rem] shrink-0 text-base"
+            >
               대화중인 채팅
             </Button>
           </div>
         </div>
       </div>
+
+      {/* 카드(tab~mobile) 클릭 시 — 입양 상세 / 대화중인 채팅 선택 (Figma 2151-193965) */}
+      <CtaModal
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        title="분양 완료 된 건입니다."
+        icon={null}
+        actions={[
+          {
+            label: '입양 상세 보기',
+            variant: 'fill',
+            onClick: () => router.push(`/adoption/${listing.listingId}`),
+          },
+          { label: '대화중인채팅', variant: 'outline', onClick: () => router.push('/chat') },
+        ]}
+      />
     </>
   )
 }
