@@ -5,9 +5,10 @@ import { useQuery } from '@tanstack/react-query'
 import { BookmarkIcon } from '@/shared/assets/icons'
 import { Container, SectionHeader, NavigationBar, InputUpload } from '@/shared/ui'
 import { useGnbHeight } from '@/shared/lib/useGnbHeight'
-import { MOCK_MY_HOME_POSTS } from '@/shared/mocks/myHome'
+import { type MyHomePost } from '@/shared/mocks/myHome'
 import { createMockListings } from '@/shared/mocks/adoption'
 import { profileQueries } from '@/entities/profile'
+import { communityQueries } from '@/entities/community'
 import type { AdopterPublicProfile, BreederPublicProfile } from '@/shared/types'
 import { FavoriteAdoptionCard } from '@/features/adoption'
 import { ProfileCard } from './ProfileCard'
@@ -38,6 +39,9 @@ const MyHomeContent = () => {
   // 마이홈 프로필 카드: /profile/me 로 내 프로필 조회 (role 에 따라 adopter/breeder 분기, 프로필 이미지 포함)
   const { data: myProfile } = useQuery(profileQueries.me())
 
+  // 마이홈 '게시글' 탭 — 내가 작성한 커뮤니티 글을 백엔드에서 조회 (profile 로드 후 활성화)
+  const { data: myPostsData } = useQuery(communityQueries.myPosts(!!myProfile))
+
   // sticky 헤더 스택: GNB → navbar(top=gnbH) → 탭바(top=gnbH+navH)
   const gnbH = useGnbHeight()
   const navRef = useRef<HTMLDivElement>(null)
@@ -66,7 +70,20 @@ const MyHomeContent = () => {
     : { text: '게시글을 올려보세요', href: '/post/create' }
 
   const [activeTab, setActiveTab] = useState(defaultTab)
-  const posts = MOCK_MY_HOME_POSTS
+  // 백엔드 CommunityPostCard → PostList 가 쓰는 MyHomePost 뷰 모델로 매핑
+  const posts: MyHomePost[] = (myPostsData?.items ?? []).map((post) => ({
+    id: post.postId,
+    author: {
+      userId: post.authorId,
+      nickname: post.authorNickname,
+      avatarUrl: post.authorProfileImageUrl ?? null,
+    },
+    createdAt: post.createdAt,
+    description: post.bodyExcerpt,
+    images: post.photoUrls,
+    likeCount: post.likeCount,
+    commentCount: post.commentCount,
+  }))
   const listings = isBreeder ? createMockListings() : []
 
   // /profile/me 응답을 ProfileCard 가 쓰는 공개 프로필 형태로 매핑 (프로필 이미지는 profileImageUrl)

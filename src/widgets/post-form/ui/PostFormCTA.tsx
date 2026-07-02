@@ -7,6 +7,8 @@ interface PostFormCTAProps {
   onSubmit: () => void
   submitLabel?: string
   isValid: boolean
+  /** 업로드/저장 진행 중 — 버튼 비활성화로 중복 제출 방지 */
+  isSubmitting?: boolean
   /** 왼쪽 슬롯 (예: visibility select) */
   leftSlot?: React.ReactNode
 }
@@ -16,6 +18,7 @@ const PostFormCTA = ({
   onSubmit,
   submitLabel = '업로드',
   isValid,
+  isSubmitting = false,
   leftSlot,
 }: PostFormCTAProps) => {
   return (
@@ -32,14 +35,15 @@ const PostFormCTA = ({
             <button
               type="button"
               onClick={onSaveDraft}
-              className="h-12 w-[6.813rem] shrink-0 rounded-full border border-[#d4d4d4] text-base font-semibold text-text-primary tab:w-[17rem]"
+              disabled={isSubmitting}
+              className="h-12 w-[6.813rem] shrink-0 rounded-full border border-[#d4d4d4] text-base font-semibold text-text-primary disabled:opacity-50 tab:w-[17rem]"
             >
               임시저장
             </button>
             <button
               type="button"
               onClick={onSubmit}
-              disabled={!isValid}
+              disabled={!isValid || isSubmitting}
               className="h-12 flex-1 rounded-full bg-fill-muted text-base font-semibold text-text-primary disabled:opacity-50 tab:w-[17rem] tab:flex-none"
             >
               {submitLabel}

@@ -6,13 +6,17 @@ interface UsePostFormOptions {
 
 const usePostForm = ({ maxImages = 10 }: UsePostFormOptions = {}) => {
   const [images, setImages] = useState<string[]>([])
+  // 미리보기 URL(images) 과 1:1 로 대응하는 실제 File 객체 — 업로드 시 서버 전송에 사용.
+  const [files, setFiles] = useState<File[]>([])
   const [text, setText] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const handleAddImages = useCallback(
-    (files: FileList) => {
-      const newImages = Array.from(files).map((file) => URL.createObjectURL(file))
+    (fileList: FileList) => {
+      const added = Array.from(fileList)
+      const newImages = added.map((file) => URL.createObjectURL(file))
       setImages((prev) => [...prev, ...newImages].slice(0, maxImages))
+      setFiles((prev) => [...prev, ...added].slice(0, maxImages))
     },
     [maxImages],
   )
@@ -23,6 +27,7 @@ const usePostForm = ({ maxImages = 10 }: UsePostFormOptions = {}) => {
       if (removed) URL.revokeObjectURL(removed)
       return prev.filter((_, i) => i !== index)
     })
+    setFiles((prev) => prev.filter((_, i) => i !== index))
   }, [])
 
   const handleEmojiSelect = useCallback(
@@ -48,6 +53,7 @@ const usePostForm = ({ maxImages = 10 }: UsePostFormOptions = {}) => {
 
   return {
     images,
+    files,
     text,
     setText,
     textareaRef,

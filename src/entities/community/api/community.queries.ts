@@ -30,6 +30,15 @@ export const communityQueries = {
       staleTime: STALE_TIME.DEFAULT,
     }),
 
+  // 마이홈 '게시글' 탭 — 내가 쓴 커뮤니티 글(authorId=me). 인증 필요.
+  myPosts: (enabled = true, pageSize = 30) =>
+    createQuery({
+      queryKey: [...communityQueries.all(), 'myPosts', pageSize],
+      queryFn: () => getCommunityPosts({ authorId: 'me', pageSize }),
+      enabled,
+      staleTime: STALE_TIME.DEFAULT,
+    }),
+
   comments: (postId: string, pageSize = 20) =>
     createInfiniteQuery({
       queryKey: [...communityQueries.all(), 'comments', postId, pageSize],

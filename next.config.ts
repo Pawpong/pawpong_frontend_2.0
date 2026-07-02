@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'kr.object.iwinv.kr',
       },
+      // 로컬/개발 시드 데이터의 placeholder 이미지 (community 시드 게시글 등)
+      {
+        protocol: 'https',
+        hostname: 'picsum.photos',
+      },
     ],
   },
 }
