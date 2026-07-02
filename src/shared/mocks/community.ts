@@ -73,4 +73,6 @@ export const MOCK_COMMUNITY_POST_DETAIL: CommunityPostDetail = {
   viewCount: 50,
   createdAt: '20시간',
   commentPreview: MOCK_COMMUNITY_COMMENTS,
+  isLiked: false,
+  isSaved: false,
 }

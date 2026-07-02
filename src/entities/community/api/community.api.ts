@@ -70,6 +70,8 @@ interface RawCommunityPostDetail {
   viewCount: number
   createdAt: string
   commentPreview: RawCommunityComment[]
+  isLiked: boolean
+  isSaved: boolean
 }
 
 const flattenAuthor = (author: RawAuthor) => ({
@@ -124,6 +126,8 @@ const mapDetail = (raw: RawCommunityPostDetail): CommunityPostDetail => ({
   viewCount: raw.viewCount,
   createdAt: raw.createdAt,
   commentPreview: raw.commentPreview.map(mapComment),
+  isLiked: raw.isLiked,
+  isSaved: raw.isSaved,
 })
 
 /** 커뮤니티 게시글 목록 조회 */

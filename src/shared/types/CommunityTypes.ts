@@ -68,6 +68,10 @@ export interface CommunityPostDetail {
   viewCount: number
   createdAt: string
   commentPreview: CommunityComment[]
+  /** 현재 요청 사용자의 좋아요 여부 (비인증 시 false) */
+  isLiked: boolean
+  /** 현재 요청 사용자의 저장 여부 (비인증 시 false) */
+  isSaved: boolean
 }
 
 /** 게시글 목록 조회 파라미터 */
@@ -131,4 +135,11 @@ export interface CommunityBookmarkListParams {
 /** 댓글 수정 요청 */
 export interface UpdateCommunityCommentRequest {
   body: string
+}
+
+/** 댓글 작성 요청 */
+export interface CreateCommunityCommentRequest {
+  body: string
+  /** 답글 대상 댓글 ID (없으면 최상위 댓글) */
+  parentCommentId?: string
 }
