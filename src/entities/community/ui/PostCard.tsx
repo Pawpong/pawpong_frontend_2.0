@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ProfileAvatar } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
+import { formatRelativeTime } from '@/shared/lib/formatRelativeTime'
 import {
   FavoriteIcon,
   PixelMessageIcon,
@@ -20,7 +21,7 @@ interface PostCardAuthor {
 
 interface PostCardProps {
   author: PostCardAuthor
-  /** 작성 시각 (이미 포맷된 문자열) */
+  /** 작성 시각 — ISO 문자열이면 상대 시간으로 변환, 이미 포맷된 문자열은 그대로 표시 */
   createdAt: string
   /** 본문 미리보기 (이미지 있으면 1줄, 없으면 최대 5줄) */
   text: string
@@ -77,8 +78,11 @@ const PostCard = ({
           <span className="truncate text-sm leading-[1.5] font-semibold text-[#3e3e3e] tab:text-base">
             {author.nickname}
           </span>
-          <span className="shrink-0 text-xs leading-[1.5] font-medium text-[#6b6b6b]">
-            {createdAt}
+          <span
+            className="shrink-0 text-xs leading-[1.5] font-medium text-[#6b6b6b]"
+            suppressHydrationWarning
+          >
+            {formatRelativeTime(createdAt)}
           </span>
         </div>
         <p
