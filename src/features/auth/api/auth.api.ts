@@ -52,6 +52,7 @@ export const completeAdopterRegistration = async (
       nickname: data.nickname,
       phone: data.phone,
       marketingAgreed: data.marketingAgreed ?? false,
+      profileImage: data.profileImage,
     })
     .then((res) => unwrap(res, '회원가입에 실패했습니다.'))
 

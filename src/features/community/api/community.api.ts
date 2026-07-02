@@ -4,6 +4,7 @@ import type {
   CommunityPostDetail,
   CreateCommunityPostRequest,
   UpdateCommunityPostRequest,
+  CreateCommunityCommentRequest,
   UpdateCommunityCommentRequest,
   CommunityPostDeleteResponse,
   CommunityBookmarkResponse,
@@ -51,6 +52,18 @@ export const deleteCommunityPost = async (postId: string): Promise<CommunityPost
     `${API_VERSION}/community/posts/${postId}`,
   )
   return unwrap(response, '게시글 삭제에 실패했습니다.')
+}
+
+/** 댓글 작성 (parentCommentId 있으면 답글) */
+export const createCommunityComment = async (
+  postId: string,
+  data: CreateCommunityCommentRequest,
+): Promise<{ commentId: string }> => {
+  const response = await apiClient.post<ApiResponseFull<{ commentId: string }>>(
+    `${API_VERSION}/community/posts/${postId}/comments`,
+    data,
+  )
+  return unwrap(response, '댓글 작성에 실패했습니다.')
 }
 
 /** 댓글 수정 */

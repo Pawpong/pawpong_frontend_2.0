@@ -7,6 +7,12 @@ export type CommunityAuthorModel = 'Adopter' | 'Breeder'
 /** 정렬 기준 */
 export type CommunitySortType = 'latest' | 'popular'
 
+/** 공개 범위 — 전체공개 / 팔로워공개 / 나만보기 */
+export type CommunityPostVisibility = 'public' | 'followers' | 'private'
+
+/** 발행 상태 — 발행 / 임시저장 */
+export type CommunityPostStatus = 'draft' | 'published'
+
 /** 커뮤니티 게시글 카드 (목록용) */
 export interface CommunityPostCard {
   postId: string
@@ -20,6 +26,8 @@ export interface CommunityPostCard {
   photoUrls: string[]
   petType?: CommunityPetType
   category?: string
+  visibility: CommunityPostVisibility
+  status: CommunityPostStatus
   likeCount: number
   commentCount: number
   saveCount: number
@@ -52,12 +60,18 @@ export interface CommunityPostDetail {
   photoUrls: string[]
   petType?: CommunityPetType
   category?: string
+  visibility: CommunityPostVisibility
+  status: CommunityPostStatus
   likeCount: number
   commentCount: number
   saveCount: number
   viewCount: number
   createdAt: string
   commentPreview: CommunityComment[]
+  /** 현재 요청 사용자의 좋아요 여부 (비인증 시 false) */
+  isLiked: boolean
+  /** 현재 요청 사용자의 저장 여부 (비인증 시 false) */
+  isSaved: boolean
 }
 
 /** 게시글 목록 조회 파라미터 */
@@ -72,11 +86,16 @@ export interface CommunityPostListParams {
 
 /** 게시글 작성 요청 */
 export interface CreateCommunityPostRequest {
-  body: string
+  /** 발행(published) 시 필수, 임시저장(draft) 시 비어 있어도 됨 */
+  body?: string
   title?: string
   photos?: string[]
   petType?: CommunityPetType
   category?: string
+  /** 공개 범위 (기본 public) */
+  visibility?: CommunityPostVisibility
+  /** 발행 상태 (기본 published). 임시저장은 'draft' */
+  status?: CommunityPostStatus
 }
 
 /** 게시글 수정 요청 */
@@ -86,6 +105,8 @@ export interface UpdateCommunityPostRequest {
   photos?: string[]
   petType?: CommunityPetType
   category?: string
+  visibility?: CommunityPostVisibility
+  status?: CommunityPostStatus
 }
 
 /** 게시글 삭제 응답 */
@@ -114,4 +135,11 @@ export interface CommunityBookmarkListParams {
 /** 댓글 수정 요청 */
 export interface UpdateCommunityCommentRequest {
   body: string
+}
+
+/** 댓글 작성 요청 */
+export interface CreateCommunityCommentRequest {
+  body: string
+  /** 답글 대상 댓글 ID (없으면 최상위 댓글) */
+  parentCommentId?: string
 }

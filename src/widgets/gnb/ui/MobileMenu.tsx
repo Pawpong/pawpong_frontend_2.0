@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { CloseIcon } from '@/shared/assets/icons'
+import { useAuthStatus, useLogout } from '@/features/auth'
 import { LogoButton } from './LogoButton'
 import { MOBILE_MENU_ITEMS } from './NavItems'
 
@@ -10,6 +11,15 @@ interface MobileMenuProps {
 }
 
 const MobileMenu = ({ onClose }: MobileMenuProps) => {
+  const { isLoggedIn } = useAuthStatus()
+  const { mutate: logout, isPending: isLoggingOut } = useLogout()
+
+  // 로그아웃: 쿠키 정리 후 홈으로 하드 내비게이션 → 비로그인 상태로 갱신
+  const handleLogout = () => {
+    onClose()
+    logout(undefined, { onSettled: () => window.location.assign('/') })
+  }
+
   return (
     <div className="fixed inset-0 z-[60] flex flex-col bg-white tab:hidden">
       {/* 헤더 */}
@@ -25,22 +35,36 @@ const MobileMenu = ({ onClose }: MobileMenuProps) => {
         </button>
       </div>
 
-      {/* 로그인/회원가입 */}
+      {/* 로그인 상태별 액션 (로그인 시 로그아웃 / 비로그인 시 로그인·회원가입) */}
       <div className="flex gap-3 px-[2.701rem] pt-[2.438rem]">
-        <Link
-          href="/login"
-          onClick={onClose}
-          className="flex-1 rounded-full border border-[#a8a8a8] py-3 text-center text-base font-medium text-[#666]"
-        >
-          로그인
-        </Link>
-        <Link
-          href="/signup"
-          onClick={onClose}
-          className="flex-1 rounded-full bg-[#fffa94] py-3 text-center text-base font-semibold text-[#3e3e3e]"
-        >
-          회원가입
-        </Link>
+        {isLoggedIn ? (
+          <button
+            type="button"
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            className="flex-1 rounded-full border border-[#a8a8a8] py-3 text-center text-base font-medium text-[#666] disabled:opacity-50"
+          >
+            로그아웃
+          </button>
+        ) : (
+          <>
+            <Link
+              href="/login"
+              onClick={onClose}
+              className="flex-1 rounded-full border border-[#a8a8a8] py-3 text-center text-base font-medium text-[#666]"
+            >
+              로그인
+            </Link>
+            {/* 소셜 전용 서비스 — 회원가입도 /login(소셜 인증)에서 시작, 신규 유저는 백엔드가 /signup?tempId=...로 보냄 */}
+            <Link
+              href="/login"
+              onClick={onClose}
+              className="flex-1 rounded-full bg-[#fffa94] py-3 text-center text-base font-semibold text-[#3e3e3e]"
+            >
+              회원가입
+            </Link>
+          </>
+        )}
       </div>
 
       {/* 메뉴 항목 */}

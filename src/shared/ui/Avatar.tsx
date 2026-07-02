@@ -37,7 +37,8 @@ export const AvatarImage = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AvatarPrimitive.Image
     ref={ref}
-    className={cn('aspect-square size-full', className)}
+    // object-cover: 정사각 박스에 비율 유지하며 채우고 넘치는 부분만 크롭 (없으면 이미지가 늘어나 찌그러짐)
+    className={cn('aspect-square size-full object-cover', className)}
     {...props}
   />
 ))

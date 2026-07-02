@@ -5,10 +5,10 @@ import { useQuery } from '@tanstack/react-query'
 import { BookmarkIcon } from '@/shared/assets/icons'
 import { Container, SectionHeader, NavigationBar, InputUpload } from '@/shared/ui'
 import { useGnbHeight } from '@/shared/lib/useGnbHeight'
-import { MOCK_MY_HOME_POSTS } from '@/shared/mocks/myHome'
+import { type MyHomePost } from '@/shared/mocks/myHome'
 import { createMockListings } from '@/shared/mocks/adoption'
-import { adopterQueries } from '@/entities/adopter'
-import { breederQueries } from '@/entities/breeder'
+import { profileQueries } from '@/entities/profile'
+import { communityQueries } from '@/entities/community'
 import type { AdopterPublicProfile, BreederPublicProfile } from '@/shared/types'
 import { FavoriteAdoptionCard } from '@/features/adoption'
 import { ProfileCard } from './ProfileCard'
@@ -17,35 +17,6 @@ import { PostList } from './PostList'
 import { FavoriteBreedersContent } from './FavoriteBreedersContent'
 import { BreederListingCard } from './BreederListingCard'
 import { MY_HOME_TABS, BREEDER_MY_HOME_TABS } from './constants'
-
-// TODO(ui-정비): UI 작업용 목데이터. 로그인 연결 시 아래 MOCK_* 제거하고 쿼리 enabled 복구
-const MOCK_IS_BREEDER = false // true로 바꾸면 브리더 마이홈 확인
-
-const MOCK_ADOPTER_PUBLIC_PROFILE: AdopterPublicProfile = {
-  userId: 'mock-adopter',
-  nickname: '파이리귀여워',
-  profileImageUrl: undefined,
-  bio: '안녕하세요 감사해요 잘있어요 다시만나요 아침해가 뜨면 아침해가 뜨면',
-  bpm: 50,
-  followerCount: 100,
-  isFollowing: false,
-}
-
-const MOCK_BREEDER_PUBLIC_PROFILE: BreederPublicProfile = {
-  breederId: 'mock-breeder',
-  nickname: 'CityLizard',
-  profileImageUrl: undefined,
-  bio: '안녕하세요 감사해요 잘있어요 다시만나요 아침해가 뜨면 아침해가 뜨면',
-  bpm: 50,
-  followerCount: 100,
-  level: 'new',
-  plan: 'basic',
-  businessLocation: {
-    city: '서울',
-    district: '강서구',
-  },
-  isFavorited: false,
-}
 
 // [refactored] 탭 패널 공통 래퍼 — TabsContent(mt-0) + Container(pc 좌우 여백) 반복 제거
 // 탭 콘텐츠는 Container 기본 margin(margin-mo 20 / margin-tab 48 / margin-pc 80) 사용.
@@ -65,9 +36,11 @@ const TabPanel = ({
 )
 
 const MyHomeContent = () => {
-  // UI 정비용: 쿼리 비활성화 (401 → /login 리다이렉트 방지)
-  useQuery({ ...adopterQueries.profile(), enabled: false })
-  useQuery({ ...breederQueries.myProfile(), enabled: false })
+  // 마이홈 프로필 카드: /profile/me 로 내 프로필 조회 (role 에 따라 adopter/breeder 분기, 프로필 이미지 포함)
+  const { data: myProfile } = useQuery(profileQueries.me())
+
+  // 마이홈 '게시글' 탭 — 내가 작성한 커뮤니티 글을 백엔드에서 조회 (profile 로드 후 활성화)
+  const { data: myPostsData } = useQuery(communityQueries.myPosts(!!myProfile))
 
   // sticky 헤더 스택: GNB → navbar(top=gnbH) → 탭바(top=gnbH+navH)
   const gnbH = useGnbHeight()
@@ -87,44 +60,7 @@ const MyHomeContent = () => {
     return () => observer.disconnect()
   }, [])
 
-  const isBreeder = MOCK_IS_BREEDER
-
-  // ===== 실제 API 연결 로직 (로그인 붙일 때 아래 블록으로 복구) =====
-  // const { data: adopterProfile } = useQuery(adopterQueries.profile())
-  // const { data: breederProfile } = useQuery(breederQueries.myProfile())
-  //
-  // const isBreeder = !!breederProfile
-  //
-  // const adopterPublicProfile: AdopterPublicProfile | null = adopterProfile
-  //   ? {
-  //       userId: adopterProfile.adopterId,
-  //       nickname: adopterProfile.nickname,
-  //       profileImageUrl: adopterProfile.profileImageFileName,
-  //       bio: '',
-  //       bpm: 0,
-  //       followerCount: 0,
-  //       isFollowing: false,
-  //     }
-  //   : null
-  //
-  // const breederPublicProfile: BreederPublicProfile | null = breederProfile
-  //   ? {
-  //       breederId: breederProfile.breederId,
-  //       nickname: breederProfile.breederName,
-  //       profileImageUrl: breederProfile.profileImageFileName,
-  //       bio: breederProfile.profileInfo.profileDescription,
-  //       bpm: 0,
-  //       followerCount: 0,
-  //       level: breederProfile.verificationInfo.level ?? 'new',
-  //       plan: 'basic',
-  //       businessLocation: {
-  //         city: breederProfile.profileInfo.locationInfo.cityName,
-  //         district: breederProfile.profileInfo.locationInfo.districtName,
-  //       },
-  //       isFavorited: false,
-  //     }
-  //   : null
-  // ================================================================
+  const isBreeder = myProfile?.role === 'breeder'
 
   const tabs = isBreeder ? BREEDER_MY_HOME_TABS : MY_HOME_TABS
   const defaultTab = isBreeder ? 'listings' : 'posts'
@@ -134,15 +70,55 @@ const MyHomeContent = () => {
     : { text: '게시글을 올려보세요', href: '/post/create' }
 
   const [activeTab, setActiveTab] = useState(defaultTab)
-  const posts = MOCK_MY_HOME_POSTS
+  // 백엔드 CommunityPostCard → PostList 가 쓰는 MyHomePost 뷰 모델로 매핑
+  const posts: MyHomePost[] = (myPostsData?.items ?? []).map((post) => ({
+    id: post.postId,
+    author: {
+      userId: post.authorId,
+      nickname: post.authorNickname,
+      avatarUrl: post.authorProfileImageUrl ?? null,
+    },
+    createdAt: post.createdAt,
+    description: post.bodyExcerpt,
+    images: post.photoUrls,
+    likeCount: post.likeCount,
+    commentCount: post.commentCount,
+  }))
   const listings = isBreeder ? createMockListings() : []
 
-  const adopterPublicProfile: AdopterPublicProfile | null = isBreeder
-    ? null
-    : MOCK_ADOPTER_PUBLIC_PROFILE
-  const breederPublicProfile: BreederPublicProfile | null = isBreeder
-    ? MOCK_BREEDER_PUBLIC_PROFILE
-    : null
+  // /profile/me 응답을 ProfileCard 가 쓰는 공개 프로필 형태로 매핑 (프로필 이미지는 profileImageUrl)
+  const adopterPublicProfile: AdopterPublicProfile | null =
+    myProfile && myProfile.role === 'adopter'
+      ? {
+          userId: myProfile.userId,
+          nickname: myProfile.nickname,
+          profileImageUrl: myProfile.profileImageUrl,
+          bio: myProfile.bio,
+          bpm: myProfile.bpm,
+          followerCount: myProfile.followerCount,
+          isFollowing: false,
+        }
+      : null
+  const breederPublicProfile: BreederPublicProfile | null =
+    myProfile && myProfile.role === 'breeder'
+      ? {
+          breederId: myProfile.userId,
+          nickname: myProfile.nickname,
+          profileImageUrl: myProfile.profileImageUrl,
+          bio: myProfile.bio,
+          longDescription: myProfile.longDescription,
+          bpm: myProfile.bpm,
+          followerCount: myProfile.followerCount,
+          level: myProfile.level ?? 'new',
+          plan: myProfile.plan ?? 'basic',
+          businessLocation: {
+            city: myProfile.businessLocation?.city ?? '',
+            district: myProfile.businessLocation?.district ?? '',
+            address: myProfile.businessLocation?.address,
+          },
+          isFavorited: false,
+        }
+      : null
 
   if (!adopterPublicProfile && !breederPublicProfile) return null
 

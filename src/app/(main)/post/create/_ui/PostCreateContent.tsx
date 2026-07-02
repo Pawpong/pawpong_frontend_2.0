@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Container } from '@/shared/ui'
+import { useSubmitCommunityPostForm } from '@/features/community'
 import {
   usePostForm,
   PostFormHeader,
@@ -14,8 +16,10 @@ import {
 } from '@/widgets/post-form'
 
 const PostCreateContent = () => {
+  const router = useRouter()
   const {
     images,
+    files,
     text,
     setText,
     textareaRef,
@@ -25,8 +29,24 @@ const PostCreateContent = () => {
   } = usePostForm()
 
   const [visibility, setVisibility] = useState<VisibilityType>('public')
+  const { submit, isSubmitting, error } = useSubmitCommunityPostForm()
 
-  const isValid = text.trim().length > 0 || images.length > 0
+  const hasContent = text.trim().length > 0 || images.length > 0
+  const isValid = hasContent && !isSubmitting
+
+  // 발행: 커뮤니티 피드에 노출되는 정식 게시글로 등록 후 상세로 이동
+  const handleSubmit = async () => {
+    if (!hasContent || isSubmitting) return
+    const postId = await submit({ text, files, visibility, status: 'published' })
+    if (postId) router.push(`/community/${postId}`)
+  }
+
+  // 임시저장: draft 로 저장 후 커뮤니티 피드로 이동 (작성 중이던 내용 보존)
+  const handleSaveDraft = async () => {
+    if (!hasContent || isSubmitting) return
+    const postId = await submit({ text, files, visibility, status: 'draft' })
+    if (postId) router.push('/community')
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-white">
@@ -52,15 +72,18 @@ const PostCreateContent = () => {
             <div className="mt-[1.125rem] tab:hidden">
               <VisibilitySelect value={visibility} onChange={setVisibility} />
             </div>
+
+            {error && <p className="mt-[0.75rem] text-sm text-red-500">{error}</p>}
           </div>
         </div>
       </Container>
 
       <PostFormCTA
-        onSaveDraft={() => {}}
-        onSubmit={() => {}}
+        onSaveDraft={handleSaveDraft}
+        onSubmit={handleSubmit}
         submitLabel="업로드"
         isValid={isValid}
+        isSubmitting={isSubmitting}
         leftSlot={<VisibilitySelect value={visibility} onChange={setVisibility} />}
       />
     </div>
