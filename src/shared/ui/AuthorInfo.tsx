@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { formatRelativeTime } from '@/shared/lib/formatRelativeTime'
 import { Avatar, AvatarFallback, AvatarImage } from './Avatar'
 
 interface AuthorInfoProps {
@@ -19,6 +20,8 @@ const AuthorInfo = ({
   className,
   contentSlot,
 }: AuthorInfoProps) => {
+  // ISO 시간은 상대 시간("N시간 전")으로 표시. 목업 문자열은 그대로 통과.
+  const displayTime = formatRelativeTime(createdAt)
   const avatar = (
     <Avatar size="sm">
       {profileImageUrl ? (
@@ -38,7 +41,9 @@ const AuthorInfo = ({
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2.5">
             <span className="text-sm font-bold text-text-primary">{nickname}</span>
-            <span className="text-xs font-bold text-text-secondary">{createdAt}</span>
+            <span className="text-xs font-bold text-text-secondary" suppressHydrationWarning>
+              {displayTime}
+            </span>
           </div>
           {contentSlot}
         </div>
@@ -52,7 +57,9 @@ const AuthorInfo = ({
         {avatar}
         <span className="text-sm font-bold text-text-primary">{nickname}</span>
       </Link>
-      <span className="text-xs font-bold text-text-secondary">{createdAt}</span>
+      <span className="text-xs font-bold text-text-secondary" suppressHydrationWarning>
+        {displayTime}
+      </span>
     </div>
   )
 }
