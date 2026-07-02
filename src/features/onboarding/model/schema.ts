@@ -88,6 +88,8 @@ export const kennelInfoSchema = z.object({
   selectedBreeds: z.array(z.string()),
   // 업로드 후 받은 브리더 프로필 이미지 URL (선택) — social/complete 시 profileImage 로 전송
   profileImage: z.string().optional(),
+  // 브리더 한 줄 소개 — 가입 완료 후 프로필 bio(PATCH /profile/me)로 저장
+  introduction: z.string().optional(),
 })
 
 export type KennelInfoFormData = z.infer<typeof kennelInfoSchema>

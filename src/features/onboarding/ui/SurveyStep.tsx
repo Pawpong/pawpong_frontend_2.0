@@ -9,6 +9,7 @@ import {
   loadSocialSignupSession,
   clearSocialSignupSession,
 } from '@/features/auth'
+import { useUpdateMyProfile } from '@/features/profile'
 import {
   type SurveyFormData,
   type ProfileFormData,
@@ -33,6 +34,7 @@ const SurveyStep = () => {
   })
 
   const { mutate: completeAdopter, isPending } = useCompleteAdopterRegistration()
+  const updateMyProfile = useUpdateMyProfile()
   const [submitError, setSubmitError] = useState<string | null>(null)
 
   // "다음" → 입양자 가입 완료 처리 (성공 시에만 complete 단계로 이동)
@@ -80,6 +82,15 @@ const SurveyStep = () => {
             })
           } catch {
             // 쿠키 저장에 실패해도 가입 자체는 완료된 상태 — 완료 화면으로 진행
+          }
+          // 가입 때 적은 자기소개를 프로필 소개(bio)로 저장 (베스트에포트 — 실패해도 가입은 완료)
+          const intro = surveyData.selfIntro?.trim()
+          if (intro) {
+            try {
+              await updateMyProfile.mutateAsync({ bio: intro })
+            } catch {
+              // bio 저장 실패는 무시 — 마이홈에서 다시 입력 가능
+            }
           }
           clearSocialSignupSession()
           goNext()

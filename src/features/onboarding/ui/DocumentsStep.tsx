@@ -10,6 +10,7 @@ import {
   loadSocialSignupSession,
   clearSocialSignupSession,
 } from '@/features/auth'
+import { useUpdateMyProfile } from '@/features/profile'
 import {
   type DocumentsFormData,
   type AnimalSelectFormData,
@@ -43,6 +44,7 @@ const DocumentsStep = () => {
 
   const { mutateAsync: completeBreeder, isPending: isCompleting } = useCompleteBreederRegistration()
   const { mutateAsync: uploadDocuments, isPending: isUploading } = useUploadBreederDocuments()
+  const { mutateAsync: updateMyBio } = useUpdateMyProfile()
   const isPending = isCompleting || isUploading
   const [submitError, setSubmitError] = useState<string | null>(null)
 
@@ -142,6 +144,15 @@ const DocumentsStep = () => {
         })
       } catch {
         // 쿠키 저장에 실패해도 가입 자체는 완료된 상태 — 완료 화면으로 진행
+      }
+      // 가입 때 적은 브리더 소개를 프로필 소개(bio)로 저장 (베스트에포트)
+      const intro = kennel.introduction?.trim()
+      if (intro) {
+        try {
+          await updateMyBio({ bio: intro })
+        } catch {
+          // bio 저장 실패는 무시 — 마이홈 편집에서 다시 입력 가능
+        }
       }
       clearSocialSignupSession()
       goNext()

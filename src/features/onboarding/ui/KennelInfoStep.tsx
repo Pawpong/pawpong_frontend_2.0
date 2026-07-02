@@ -7,7 +7,7 @@ import { useStepForm } from '../model/useStepForm'
 import { useCheckBreederNameDuplicate } from '@/features/auth'
 import { type KennelInfoFormData, REGIONS } from '../model/schema'
 import { StepContainer } from './StepContainer'
-import { Input } from '@/shared/ui'
+import { Input, TextareaField } from '@/shared/ui'
 import { StepActionButton, StepSelect } from './StepInput'
 import { ChipSelect } from './ChipSelect'
 import { ProfileImageUpload } from './ProfileImageUpload'
@@ -38,6 +38,7 @@ const KennelInfoStep = () => {
       region: undefined,
       selectedBreeds: [],
       profileImage: undefined,
+      introduction: '',
     },
   )
 
@@ -143,6 +144,15 @@ const KennelInfoStep = () => {
               )}
             />
           </div>
+
+          {/* 소개 — 가입 완료 후 프로필 bio(PATCH /profile/me)로 저장 */}
+          <TextareaField
+            label="소개"
+            placeholder="브리더 소개를 입력해주세요"
+            maxLength={100}
+            currentLength={watch('introduction')?.length ?? 0}
+            {...register('introduction')}
+          />
         </div>
       </div>
     </StepContainer>
