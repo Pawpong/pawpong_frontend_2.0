@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { cn } from '@/shared/lib/cn'
 import { ArrowBackIcon } from '@/shared/assets/icons'
+import { TextLabel } from './TextLabel'
 
 interface NavigationBarProps {
   title: string
@@ -24,9 +25,7 @@ const NavigationBar = ({ title, backHref, right, className }: NavigationBarProps
             <ArrowBackIcon className="size-6 text-[#3e3e3e]" />
           </Link>
         )}
-        <span className="min-w-0 flex-1 truncate p-0.5 text-center text-base leading-[1.5] font-semibold text-[#3e3e3e]">
-          {title}
-        </span>
+        <TextLabel className="min-w-0 flex-1 truncate text-center">{title}</TextLabel>
         {right && <div className="shrink-0">{right}</div>}
       </div>
     </div>
