@@ -1,49 +1,51 @@
-import { cn } from '@/shared/lib/cn'
+import { Container } from '@/shared/ui'
 import { BreederCard } from '@/app/(main)/home/_ui/BreederCard'
-import { BreederCardHorizontal } from './BreederCardHorizontal'
 import { CollapsibleSection } from './CollapsibleSection'
 import { MOCK_FEATURED_BREEDERS, MOCK_EXPLORE_BREEDERS } from '@/shared/mocks/breederExplore'
 
-// [refactored] 반복 섹션/그리드 className 상수화
-const SECTION_CLASS = 'tab:mt-[4rem] tab:gap-[1.25rem]'
-const BREEDER_GRID = 'tab:grid tab:grid-cols-3 tab:gap-[1.156rem]'
+
+// 섹션 제목: Body/large/bold(16px·600·150%) + 라벨 패딩 2px, color #3E3E3E
+const SECTION_TITLE_CLASS = 'p-0.5 text-base font-semibold leading-[1.5] text-[#3e3e3e] tab:text-base'
 
 // 상단 카테고리/검색(PC 픽셀 카테고리 + 큰 검색바)은 ExploreContent에서 공통 렌더
 const BreederExploreContent = () => {
   return (
     <>
-      {/* 주목할 브리더 — 모바일 가로형 / 데스크탑 3열 */}
-      {/* [refactored] CollapsibleSection으로 헤더+collapse 위임 */}
-      <CollapsibleSection
-        title={`주목할 브리더 ${MOCK_FEATURED_BREEDERS.length}`}
-        className={cn('mt-[2.063rem]', SECTION_CLASS)}
-      >
-        <div className="flex flex-col gap-[0.75rem] tab:hidden">
-          {MOCK_FEATURED_BREEDERS.map((breeder) => (
-            <BreederCardHorizontal key={breeder.id} breeder={breeder} />
-          ))}
-        </div>
-        <div className={cn('hidden', BREEDER_GRID)}>
-          {MOCK_FEATURED_BREEDERS.map((breeder) => (
-            <BreederCard key={breeder.id} breeder={breeder} showPopularBadge />
-          ))}
-        </div>
-      </CollapsibleSection>
+      {/* 인기 브리더 — 모바일 가로형 / 데스크탑 3열 */}
+      {/* 공통 Container(가로 margin-pc 80) + 세로 spacing-40(40px) padding */}
+      <Container className="py-[2.5rem]">
+        <CollapsibleSection
+          title={`인기 브리더 ${MOCK_FEATURED_BREEDERS.length}`}
+          titleClassName={SECTION_TITLE_CLASS}
+        >
+          {/* 3개만 노출 + 가운데 정렬 (모바일 2열 / 데스크탑 3열, 마지막 카드 중앙) — 즐겨찾기 그리드 gap(20px) 동일 */}
+          {/* 카드 레이아웃만 좌우 px (제목은 컨테이너 기준 유지) */}
+          <div className="flex flex-wrap justify-center gap-x-2.5 gap-y-4 tab:gap-5 pc:px-[12.328125rem]">
+            {MOCK_FEATURED_BREEDERS.slice(0, 3).map((breeder) => (
+              <div
+                key={breeder.id}
+                className="w-[calc(50%-0.3125rem)] tab:w-[calc((100%-2.5rem)/3)]"
+              >
+                <BreederCard breeder={breeder} showPopularBadge />
+              </div>
+            ))}
+          </div>
+        </CollapsibleSection>
+      </Container>
 
-      {/* 전체 입양 소식 — 모바일 2열 / 데스크탑 3열 */}
-      <CollapsibleSection
-        title={`전체 입양 소식 ${MOCK_EXPLORE_BREEDERS.length}`}
-        className={cn('mt-[1.25rem]', SECTION_CLASS)}
-      >
-        <div className={cn('grid grid-cols-2 gap-[0.97rem]', BREEDER_GRID)}>
-          {MOCK_EXPLORE_BREEDERS.map((breeder) => (
-            <BreederCard key={breeder.id} breeder={breeder} />
-          ))}
-        </div>
-      </CollapsibleSection>
-
-      {/* 하단 여백 */}
-      <div className="h-[4rem]" />
+      {/* 전체 브리더 소식 — 즐겨찾기 브리더 그리드와 동일 (모바일 2열 / 태블릿 3열 / PC 4열) */}
+      <Container className="py-[2.5rem]">
+        <CollapsibleSection
+          title={`전체 브리더 소식 ${MOCK_EXPLORE_BREEDERS.length}`}
+          titleClassName={SECTION_TITLE_CLASS}
+        >
+          <div className="grid grid-cols-2 gap-x-2.5 gap-y-4 pb-[6.75rem] tab:grid-cols-3 tab:gap-5 pc:grid-cols-4 pc:px-[2.89625rem]">
+            {MOCK_EXPLORE_BREEDERS.map((breeder) => (
+              <BreederCard key={breeder.id} breeder={breeder} />
+            ))}
+          </div>
+        </CollapsibleSection>
+      </Container>
     </>
   )
 }

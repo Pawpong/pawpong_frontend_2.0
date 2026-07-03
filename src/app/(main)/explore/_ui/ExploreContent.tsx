@@ -130,7 +130,8 @@ const ExploreContent = () => {
         </Container>
       </div>
 
-      {/* ══════ 콘텐츠 영역 — 1080 중앙 정렬 ══════ */}
+      {/* ══════ 콘텐츠 영역 — 1080 중앙 정렬 ══════
+          섹션별로 각자 Container를 갖도록 분리 중 (전역 px 제거) */}
       <Container>
         {/* PC 전용 상단: 픽셀 카테고리(가운데) + 큰 검색바 (스크롤되면 위로 사라짐) */}
         <div className="hidden pc:block">
@@ -141,28 +142,28 @@ const ExploreContent = () => {
         </div>
         {/* 스크롤 트리거 sentinel (PC 상단 영역 끝) */}
         <div ref={sentinelRef} aria-hidden />
-
-        {selectedType === 'breeder' ? (
-          <BreederExploreContent />
-        ) : (
-          <>
-            {/* [refactored] 인기 동물 / 전체 입양 소식 — 공통 컴포넌트로 통합 (상단 여백만 차이) */}
-            <AdoptionListingSection
-              title="인기 동물"
-              listings={popularListings}
-              className="mt-[2.063rem]"
-            />
-            <AdoptionListingSection
-              title="전체 입양 소식"
-              listings={mockListings}
-              className="mt-[1.25rem]"
-            />
-
-            {/* 하단 여백 */}
-            <div className="h-[4rem]" />
-          </>
-        )}
       </Container>
+
+      {selectedType === 'breeder' ? (
+        <BreederExploreContent />
+      ) : (
+        <Container>
+          {/* [refactored] 인기 동물 / 전체 입양 소식 — 공통 컴포넌트로 통합 (상단 여백만 차이) */}
+          <AdoptionListingSection
+            title="인기 동물"
+            listings={popularListings}
+            className="mt-[2.063rem]"
+          />
+          <AdoptionListingSection
+            title="전체 입양 소식"
+            listings={mockListings}
+            className="mt-[1.25rem]"
+          />
+
+          {/* 하단 여백 */}
+          <div className="h-[4rem]" />
+        </Container>
+      )}
     </>
   )
 }
