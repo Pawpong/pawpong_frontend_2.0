@@ -18,6 +18,11 @@
   --text-body-xl: 1.25rem; /* 20 */
   --text-body-xl--line-height: 1.5;
 
+  /* 반응형 타이포 토큰 — Figma Body/S: mo 14 / tab+ 16, line-height 150%.
+     non-inline @theme는 유틸이 var() 참조로 출력되므로 아래 @layer theme 미디어쿼리 재정의가 적용됨 */
+  --text-body-s: 0.875rem; /* mo 14 */
+  --text-body-s--line-height: 1.5;
+
   /* text */
   --color-text-primary: #5d5d5d;
   --color-text-secondary: #959595;
@@ -33,6 +38,15 @@
 
   /* border */
   --color-border-light: color(display-p3 0.7777 0.7777 0.7777);
+}
+
+/* 반응형 타이포 토큰 브레이크포인트 오버라이드 (tab = 768px) */
+@layer theme {
+  :root {
+    @media (width >= 48rem) {
+      --text-body-s: 1rem; /* tab+ 16 */
+    }
+  }
 }
 
 /* next/font 변수(body에 주입되는 --font-*)는 inline으로 둬야 font-* 유틸이 값을 직접 인라인해 정상 동작 */

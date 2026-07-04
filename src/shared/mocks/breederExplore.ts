@@ -20,7 +20,7 @@ const BREEDER_BASE: Omit<ExploreBreeder, 'id'> = {
   viewCount: 20,
 }
 
-export const MOCK_FEATURED_BREEDERS: ExploreBreeder[] = Array.from({ length: 3 }, (_, i) => ({
+export const MOCK_FEATURED_BREEDERS: ExploreBreeder[] = Array.from({ length: 4 }, (_, i) => ({
   ...BREEDER_BASE,
   id: `featured-${i + 1}`,
   isPopular: true,

@@ -74,7 +74,7 @@ const HallOfFameContent = () => {
                 className="flex h-9 items-center justify-center rounded-full bg-[#a4a4a4] px-5"
                 onClick={switchPeriod}
               >
-                <span className="text-sm font-semibold whitespace-nowrap text-white tab:text-base">
+                <span className="text-body-s font-semibold whitespace-nowrap text-white">
                   {periodConfig.buttonLabel}
                 </span>
               </button>

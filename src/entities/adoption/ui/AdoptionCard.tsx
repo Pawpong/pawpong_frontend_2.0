@@ -42,6 +42,15 @@ const CardImage = ({
   <div className={cn('relative aspect-[348/284] w-full overflow-hidden bg-[#6b6b6b]', className)}>
     <Image src={listing.thumbnailUrl} alt={listing.name} fill className="object-cover" />
     {isCompleted && <div className="absolute inset-0 bg-white/70" />}
+    {/* 인기(bestBadge) 좌상단 배지 — Figma 796-81671 (mo 14px/py-2 · tab 16px/py-4) */}
+    {listing.isPopular && (
+      <Badge
+        variant="outline"
+        className="absolute top-[0.6875rem] left-[0.6875rem] bg-white px-2 py-0.5 text-sm leading-[1.5] font-medium text-[#6b6b6b] tab:top-[0.875rem] tab:left-[0.9219rem] tab:py-1 tab:text-base"
+      >
+        인기
+      </Badge>
+    )}
   </div>
 )
 
@@ -130,7 +139,8 @@ const AdoptionCard = ({ listing, className, isFavorite, onToggle }: AdoptionCard
 
       {/* ══════ 태블릿+ 카드 (Figma 796-81669, large) ══════ */}
       {/* 카드 배경 없음 — 이미지만 rounded-8, 정보는 2단(제목/stats · 상태배지/관심있어요) */}
-      <div className="hidden h-full flex-col tab:flex">
+      {/* hover: bg white + rounded-20 + drop shadow (Figma 1867-254861) */}
+      <div className="hidden h-full flex-col transition-shadow tab:flex tab:hover:overflow-hidden tab:hover:rounded-[1.25rem] tab:hover:bg-white tab:hover:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]">
         {/* [refactored] 이미지 공통 컴포넌트 — rounded-8 */}
         <CardImage listing={listing} isCompleted={isCompleted} className="rounded-[0.5rem]" />
 
