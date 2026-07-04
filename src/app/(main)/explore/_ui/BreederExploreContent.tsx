@@ -1,39 +1,34 @@
 import { Container } from '@/shared/ui'
+import { cn } from '@/shared/lib/cn'
 import { BreederCard } from '@/app/(main)/home/_ui/BreederCard'
-import { TitledSection } from './TitledSection'
-import { FeaturedGrid } from './FeaturedGrid'
+import { ExploreListingSection } from './ExploreListingSection'
 import { MOCK_FEATURED_BREEDERS, MOCK_EXPLORE_BREEDERS } from '@/shared/mocks/breederExplore'
-import { EXPLORE_SECTION_TITLE_CLASS, EXPLORE_SECTION_CONTAINER } from '../_lib/constants'
+import { EXPLORE_SECTION_CONTAINER } from '../_lib/constants'
 
-// 상단 카테고리/검색(PC 픽셀 카테고리 + 큰 검색바)은 ExploreContent에서 공통 렌더
+// 상단 카테고리/검색(픽셀 카테고리 + 큰 검색바)은 ExploreContent에서 공통 렌더
+// [refactored] 입양 탐색 탭과 동일한 ExploreListingSection 사용
 const BreederExploreContent = () => {
   return (
     <>
-      {/* 인기 브리더 — 모바일 가로형 / 데스크탑 3열 */}
-      {/* [refactored] 섹션 패딩 공통 상수 */}
-      <Container className={EXPLORE_SECTION_CONTAINER}>
-        <TitledSection title="인기 브리더" titleClassName={EXPLORE_SECTION_TITLE_CLASS}>
-          {/* 3개만 노출 + 가운데 정렬 (제목은 컨테이너 기준 유지, 카드 레이아웃만 좌우 px) */}
-          <FeaturedGrid
-            items={MOCK_FEATURED_BREEDERS}
-            getKey={(breeder) => breeder.id}
-            renderCard={(breeder) => <BreederCard breeder={breeder} showPopularBadge />}
-          />
-        </TitledSection>
+      {/* 인기 브리더 — 입양 탐색 인기 동물과 동일 (tab 가로 80px) */}
+      <Container className={cn(EXPLORE_SECTION_CONTAINER, 'tab:px-20')}>
+        <ExploreListingSection
+          title="인기 브리더"
+          items={MOCK_FEATURED_BREEDERS}
+          getKey={(breeder) => breeder.id}
+          renderCard={(breeder) => <BreederCard breeder={breeder} showPopularBadge />}
+          variant="featured"
+        />
       </Container>
 
-      {/* 전체 브리더 소식 — 즐겨찾기 브리더 그리드와 동일 (모바일 2열 / 태블릿 3열 / PC 4열) */}
+      {/* 전체 브리더 소식 — 전체 입양 소식과 동일 그리드 */}
       <Container className={EXPLORE_SECTION_CONTAINER}>
-        <TitledSection
-          title={`전체 브리더 소식 ${MOCK_EXPLORE_BREEDERS.length}`}
-          titleClassName={EXPLORE_SECTION_TITLE_CLASS}
-        >
-          <div className="grid grid-cols-2 gap-x-2.5 gap-y-4 pb-[6.75rem] tab:grid-cols-3 tab:gap-5 pc:grid-cols-4 pc:px-[2.89625rem]">
-            {MOCK_EXPLORE_BREEDERS.map((breeder) => (
-              <BreederCard key={breeder.id} breeder={breeder} />
-            ))}
-          </div>
-        </TitledSection>
+        <ExploreListingSection
+          title="전체 브리더 소식"
+          items={MOCK_EXPLORE_BREEDERS}
+          getKey={(breeder) => breeder.id}
+          renderCard={(breeder) => <BreederCard breeder={breeder} />}
+        />
       </Container>
     </>
   )

@@ -8,6 +8,7 @@ export type ExploreType = 'adoption' | 'breeder'
 export const EXPLORE_SECTION_TITLE_CLASS = cn(textLabelVariants(), 'text-body-s tab:text-body-s')
 
 // [refactored] 섹션 Container 공통 패딩 — 세로 mo 20px(spacing/20)→tab+ 40px(spacing/40), 가로 mo 16px(margin/mo)/tab 48/pc 80
+// (그리드/featured 레이아웃 클래스는 단일 소비자인 ExploreListingSection 로컬 상수로 이동)
 export const EXPLORE_SECTION_CONTAINER = 'px-4 py-5 tab:py-10'
 
 export const EXPLORE_TABS: Array<{ type: ExploreType; label: string }> = [

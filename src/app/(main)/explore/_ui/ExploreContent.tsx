@@ -9,8 +9,9 @@ import { cn } from '@/shared/lib/cn'
 import { createMockListings } from '@/shared/mocks/adoption'
 import { ANIMAL_CATEGORIES } from '@/shared/types'
 import type { AnimalCategory } from '@/shared/types'
+import { FavoriteAdoptionCard } from '@/features/adoption'
 import { BreederExploreContent } from './BreederExploreContent'
-import { AdoptionListingSection } from './AdoptionListingSection'
+import { ExploreListingSection } from './ExploreListingSection'
 import { ExploreFilterBar } from './ExploreFilterBar'
 import { EXPLORE_TABS, SEARCH_PLACEHOLDERS, EXPLORE_SECTION_CONTAINER } from '../_lib/constants'
 import type { ExploreType } from '../_lib/constants'
@@ -145,12 +146,23 @@ const ExploreContent = () => {
       ) : (
         <>
           {/* 인기 브리더와 동일 — 섹션별 Container, padding 세로 mo 20px→tab+ 40px, 가로 mo 16px/tab 48/pc 80 */}
-          {/* [refactored] 섹션 패딩 공통 상수 — 인기 동물만 tab 가로 80px(margin/pc, Figma 1652-125625) */}
+          {/* [refactored] 공용 ExploreListingSection — 인기 동물만 tab 가로 80px(margin/pc, Figma 1652-125625) */}
           <Container className={cn(EXPLORE_SECTION_CONTAINER, 'tab:px-20')}>
-            <AdoptionListingSection title="인기 동물" listings={popularListings} variant="featured" />
+            <ExploreListingSection
+              title="인기 동물"
+              items={popularListings}
+              getKey={(listing) => listing.listingId}
+              renderCard={(listing) => <FavoriteAdoptionCard listing={listing} />}
+              variant="featured"
+            />
           </Container>
           <Container className={EXPLORE_SECTION_CONTAINER}>
-            <AdoptionListingSection title="전체 입양 소식" listings={mockListings} />
+            <ExploreListingSection
+              title="전체 입양 소식"
+              items={mockListings}
+              getKey={(listing) => listing.listingId}
+              renderCard={(listing) => <FavoriteAdoptionCard listing={listing} />}
+            />
           </Container>
         </>
       )}
