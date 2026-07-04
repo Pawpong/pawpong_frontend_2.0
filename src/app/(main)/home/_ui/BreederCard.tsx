@@ -3,7 +3,7 @@
 import { useState, type MouseEvent } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Badge } from '@/shared/ui'
+import { Badge, TextLabel } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { LocationOnIcon, PixelStarIcon } from '@/shared/assets/icons'
 import type { FavoriteBreeder } from '@/shared/mocks/myHome'
@@ -93,9 +93,9 @@ const BreederCard = ({ breeder, showPopularBadge }: BreederCardProps) => {
         <div className="flex items-start justify-between gap-2 tab:items-center">
           <div className="flex min-w-0 flex-col">
             {/* 카드 이름 라벨 14px semibold #3e3e3e (p-2px) */}
-            <span className="truncate p-0.5 text-sm leading-[1.5] font-semibold text-[#3e3e3e]">
+            <TextLabel size="14" className="truncate">
               {breeder.nickname}
-            </span>
+            </TextLabel>
             <div className="flex items-center">
               <LocationOnIcon className="size-6 shrink-0 text-[#6b6b6b]" />
               <span className="truncate text-xs leading-[1.5] font-medium text-[#6b6b6b]">

@@ -1,11 +1,12 @@
-import { Container } from '@/shared/ui'
+import { Container, textLabelVariants } from '@/shared/ui'
+import { cn } from '@/shared/lib/cn'
 import { BreederCard } from '@/app/(main)/home/_ui/BreederCard'
 import { CollapsibleSection } from './CollapsibleSection'
 import { MOCK_FEATURED_BREEDERS, MOCK_EXPLORE_BREEDERS } from '@/shared/mocks/breederExplore'
 
-
-// 섹션 제목: Body/large/bold(16px·600·150%) + 라벨 패딩 2px, color #3E3E3E
-const SECTION_TITLE_CLASS = 'p-0.5 text-base font-semibold leading-[1.5] text-[#3e3e3e] tab:text-base'
+// 섹션 제목: 공통 TextLabel 스타일(Body/large/bold 16px·600·150%, 패딩 2px, #3E3E3E)
+// tab:text-base는 SectionHeader 기본 tab:text-xl 오버라이드용
+const SECTION_TITLE_CLASS = cn(textLabelVariants(), 'tab:text-base')
 
 // 상단 카테고리/검색(PC 픽셀 카테고리 + 큰 검색바)은 ExploreContent에서 공통 렌더
 const BreederExploreContent = () => {
