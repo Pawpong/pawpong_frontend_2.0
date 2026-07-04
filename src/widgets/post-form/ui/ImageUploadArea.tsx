@@ -81,7 +81,7 @@ const ImageUploadArea = ({
   return (
     <div className="flex flex-col gap-[0.375rem] tab:gap-3">
       {!hideLabel && (
-        <p className="text-sm leading-[1.5] text-text-primary tab:text-base">
+        <p className="text-body-s text-text-primary">
           <span className="font-bold">이미지</span>{' '}
           <span className="hidden font-medium tab:inline">선택</span>
           <span className="text-xs font-medium tab:hidden">

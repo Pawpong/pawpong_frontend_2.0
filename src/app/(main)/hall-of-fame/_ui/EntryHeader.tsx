@@ -21,7 +21,7 @@ const EntryHeader = ({ entry, onClose, userType, className }: EntryHeaderProps) 
 
     {userType === 'breeder' && entry.hasVoted && (
       <div className="ml-auto flex items-center gap-1.5 tab:ml-0 tab:gap-2">
-        <span className="text-sm font-medium text-white tab:text-base">투표했습니다</span>
+        <span className="text-body-s font-medium text-white">투표했습니다</span>
         <VoteIcon className="size-6 text-white" />
         <span className="text-sm leading-[1.375rem] font-semibold text-white">
           {entry.voteCount}
@@ -30,7 +30,7 @@ const EntryHeader = ({ entry, onClose, userType, className }: EntryHeaderProps) 
     )}
 
     {userType === 'adopter' && (
-      <span className="ml-3 text-sm font-medium text-white tab:ml-4 tab:text-base">
+      <span className="ml-3 text-body-s font-medium text-white tab:ml-4">
         {entry.userDisplayName}님이 참여한 글입니다.
       </span>
     )}

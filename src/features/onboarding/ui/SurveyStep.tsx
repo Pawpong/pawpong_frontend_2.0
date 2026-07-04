@@ -114,7 +114,7 @@ const SurveyStep = () => {
       <div className="flex w-full flex-col">
         {/* 섹션 1: 개인정보 수집 동의 */}
         <div className="flex flex-col gap-[0.4375rem]">
-          <p className="p-[0.125rem] text-[0.875rem] leading-[1.5] font-semibold text-[#3e3e3e] tab:text-base">
+          <p className="p-[0.125rem] text-body-s font-semibold text-[#3e3e3e]">
             반려동물 입양 상담을 위한 개인정보 수집과 이용에 동의하시나요?
             <span className="ml-1 font-medium text-[#6b6b6b]">필수</span>
           </p>
@@ -153,7 +153,7 @@ const SurveyStep = () => {
               />
             </svg>
           </button>
-          <p className="p-[0.125rem] text-[0.875rem] leading-[1.5] font-semibold text-[#3e3e3e] tab:text-base">
+          <p className="p-[0.125rem] text-body-s font-semibold text-[#3e3e3e]">
             간단하게 자기소개 부탁드려요
             <span className="ml-1 font-medium text-[#6b6b6b]">필수</span>
           </p>
@@ -168,14 +168,14 @@ const SurveyStep = () => {
 
         {/* 섹션 4: 공간/생활패턴 */}
         <div className="mt-[2.0375rem] tab:mt-[3.662rem]">
-          <p className="p-[0.125rem] text-[0.875rem] leading-[1.5] font-semibold text-[#3e3e3e] tab:text-base">
+          <p className="p-[0.125rem] text-body-s font-semibold text-[#3e3e3e]">
             반려동물이 지낼 공간과 생활패턴에 대해 알려주세요
             <span className="ml-1 font-medium text-[#6b6b6b]">선택</span>
           </p>
 
           <div className="mt-[1.25rem] flex flex-col gap-[1.25rem] tab:mt-3 tab:gap-3">
             <div className="flex flex-col gap-[0.125rem]">
-              <p className="p-[0.125rem] text-[0.875rem] leading-[1.5] font-semibold text-[#3e3e3e] tab:text-base">
+              <p className="p-[0.125rem] text-body-s font-semibold text-[#3e3e3e]">
                 평균적으로 집을 비우는 시간은 얼마나 되나요?
                 <span className="ml-1 font-medium text-[#6b6b6b]">선택</span>
               </p>
@@ -188,7 +188,7 @@ const SurveyStep = () => {
             </div>
 
             <div className="flex flex-col gap-[0.125rem]">
-              <p className="p-[0.125rem] text-[0.875rem] leading-[1.5] font-semibold text-[#3e3e3e] tab:text-base">
+              <p className="p-[0.125rem] text-body-s font-semibold text-[#3e3e3e]">
                 반려동물과 함께 지내게 될 공간을 소개해 주세요
                 <span className="ml-1 font-medium text-[#6b6b6b]">선택</span>
               </p>

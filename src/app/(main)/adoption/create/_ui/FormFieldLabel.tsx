@@ -7,7 +7,7 @@ interface FormFieldLabelProps {
 const FormFieldLabel = ({ label, required = false, hint }: FormFieldLabelProps) => {
   return (
     <div className="flex gap-1.5 text-text-primary tab:gap-2">
-      <span className="text-sm leading-[1.5] font-bold tab:text-base">{label}</span>
+      <span className="text-body-s font-bold">{label}</span>
       {hint && (
         <span className="text-xs leading-[1.375rem] font-medium tab:text-base tab:leading-[1.5]">
           {hint}

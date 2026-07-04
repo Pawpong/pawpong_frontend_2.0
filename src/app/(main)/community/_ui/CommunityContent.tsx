@@ -46,7 +46,7 @@ const CommunityContent = () => {
           </p>
           <Link
             href="/community/write"
-            className="flex h-8 w-[4.4375rem] items-center justify-center rounded-full bg-fill-muted text-sm font-semibold text-white tab:h-12 tab:w-auto tab:px-7 tab:text-base"
+            className="flex h-8 w-[4.4375rem] items-center justify-center rounded-full bg-fill-muted text-body-s font-semibold text-white tab:h-12 tab:w-auto tab:px-7"
           >
             작성
           </Link>

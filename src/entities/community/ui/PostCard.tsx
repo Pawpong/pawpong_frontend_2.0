@@ -79,7 +79,7 @@ const PostCard = ({
       />
       <div className="flex min-w-0 flex-1 flex-col justify-center">
         <div className="flex items-center gap-2 p-0.5">
-          <span className="truncate text-sm leading-[1.5] font-semibold text-[#3e3e3e] tab:text-base">
+          <span className="truncate text-body-s font-semibold text-[#3e3e3e]">
             {author.nickname}
           </span>
           <span

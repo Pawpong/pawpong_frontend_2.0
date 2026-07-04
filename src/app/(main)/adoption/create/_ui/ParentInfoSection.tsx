@@ -41,7 +41,7 @@ const ParentInfoSection = ({ control, register }: ParentInfoSectionProps) => {
         {/* 폼 필드 */}
         <div className="flex flex-1 flex-col gap-1.5">
           <div className="flex flex-col gap-1.5 tab:px-0">
-            <p className="text-sm leading-[1.5] font-bold text-text-primary tab:text-base">관계</p>
+            <p className="text-body-s font-bold text-text-primary">관계</p>
             <Controller
               name="parents.0.relationship"
               control={control}
@@ -59,13 +59,13 @@ const ParentInfoSection = ({ control, register }: ParentInfoSectionProps) => {
             />
           </div>
           <div className="flex flex-col gap-1.5 tab:px-0">
-            <p className="text-sm leading-[1.5] font-bold text-text-primary tab:text-base">
+            <p className="text-body-s font-bold text-text-primary">
               품종 및 이름
             </p>
             <Input placeholder="입력" {...register('parents.0.breedAndName')} />
           </div>
           <div className="flex flex-col gap-1.5 tab:px-0">
-            <p className="text-sm leading-[1.5] font-bold text-text-primary tab:text-base">
+            <p className="text-body-s font-bold text-text-primary">
               태어난 날짜
             </p>
             <Input placeholder="입력" {...register('parents.0.birthDate')} />

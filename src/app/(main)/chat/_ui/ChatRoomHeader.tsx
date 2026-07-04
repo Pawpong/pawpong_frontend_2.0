@@ -24,7 +24,7 @@ const ChatRoomHeader = ({ displayName, hasApplication, onBack }: ChatRoomHeaderP
             </button>
             <div className="flex items-center gap-2">
               <ProfileAvatar size="responsive" />
-              <span className="text-sm leading-[1.5] font-semibold text-[#3e3e3e] tab:text-base">
+              <span className="text-body-s font-semibold text-[#3e3e3e]">
                 {displayName}
               </span>
             </div>
