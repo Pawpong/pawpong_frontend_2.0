@@ -6,6 +6,7 @@ import { Container, Tabs, TabsList, TabsTrigger } from '@/shared/ui'
 import { SearchSection } from '@/features/search'
 import { CategorySection } from '@/features/category-filter'
 import { cn } from '@/shared/lib/cn'
+import { useBreakpoint } from '@/shared/lib/useBreakpoint'
 import { createMockListings } from '@/shared/mocks/adoption'
 import { ANIMAL_CATEGORIES } from '@/shared/types'
 import type { AnimalCategory } from '@/shared/types'
@@ -66,6 +67,9 @@ const ExploreContent = () => {
   const [gnbH, setGnbH] = useState(0)
   const [headerH, setHeaderH] = useState(0)
   const [isStuck, setIsStuck] = useState(false)
+  // 헤더는 tab+에서만 sticky(탭바가 남음) → 고정 칩바 top에 headerH 반영. 모바일은 탭바가 스크롤로 사라져 gnbH만.
+  const isTabUp = useBreakpoint('tab')
+  const stickyBarTop = gnbH + (isTabUp ? headerH : 0)
 
   useEffect(() => {
     const measure = () => {
@@ -82,11 +86,11 @@ const ExploreContent = () => {
     const el = sentinelRef.current
     if (!el) return
     const observer = new IntersectionObserver(([entry]) => setIsStuck(!entry.isIntersecting), {
-      rootMargin: `-${gnbH + headerH}px 0px 0px 0px`,
+      rootMargin: `-${stickyBarTop}px 0px 0px 0px`,
     })
     observer.observe(el)
     return () => observer.disconnect()
-  }, [gnbH, headerH])
+  }, [stickyBarTop])
 
   return (
     <>
@@ -115,16 +119,12 @@ const ExploreContent = () => {
             </TabsList>
           </Tabs>
         </div>
-        {/* 모바일 전용 필터바 (탭+는 상단 픽셀 카테고리 → 스크롤 시 아래 fixed 칩바 사용) */}
-        <Container className="tab:hidden">
-          <ExploreFilterBar selected={selectedCategory} onChange={handleCategoryChange} />
-        </Container>
       </div>
 
-      {/* 탭+: 스크롤 시 GNB+탭바 아래 고정 컴팩트 칩바 (fixed → 레이아웃 점프 없음, 구분선 없음) */}
+      {/* 스크롤 시 GNB(+tab: 탭바) 아래 고정 컴팩트 칩바 (fixed → 레이아웃 점프 없음, 구분선 없음) */}
       <div
-        className={cn('fixed right-0 left-0 z-30 hidden bg-white', isStuck && 'tab:block')}
-        style={{ top: gnbH + headerH }}
+        className={cn('fixed right-0 left-0 z-30 hidden bg-white', isStuck && 'block')}
+        style={{ top: stickyBarTop }}
       >
         <Container>
           <ExploreFilterBar selected={selectedCategory} onChange={handleCategoryChange} />
@@ -132,13 +132,13 @@ const ExploreContent = () => {
       </div>
 
       {/* ══════ 콘텐츠 영역 — 섹션별로 각자 Container를 갖도록 분리 (전역 px 제거) ══════ */}
-      {/* 탭+ 상단: 픽셀 카테고리(가운데) + 큰 검색바 (스크롤되면 위로 사라짐) */}
-      <div className="hidden tab:block">
+      {/* 상단: 픽셀 카테고리(모바일 2x2 / tab+ 4열 가운데) + 큰 검색바 — 스크롤되면 위 fixed 칩바로 전환 */}
+      <div>
         <CategorySection selected={selectedCategory} onChange={handleCategoryChange} />
         {/* 검색바: 홈과 동일 — SearchSection 자체 패딩 20px(py-3 tab:py-5) / 80px(pc:px-20) */}
         <SearchSection placeholder={SEARCH_PLACEHOLDERS[selectedType]} />
       </div>
-      {/* 스크롤 트리거 sentinel (탭+ 상단 영역 끝) */}
+      {/* 스크롤 트리거 sentinel (상단 영역 끝) */}
       <div ref={sentinelRef} aria-hidden />
 
       {selectedType === 'breeder' ? (
