@@ -43,7 +43,7 @@ export const createMockListings = (): AdoptionListingCard[] => {
     listingId: String(i + 1),
     status: item.status,
     postedAt: item.postedAt,
-    isPopular: i < 3,
+    isPopular: i < 4,
   }))
 }
 
