@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { Container, Tabs, TabsList, TabsTrigger } from '@/shared/ui'
 import { SearchSection } from '@/features/search'
-import { CategoryFilter } from '@/features/category-filter'
+import { CategorySection } from '@/features/category-filter'
 import { cn } from '@/shared/lib/cn'
 import { createMockListings } from '@/shared/mocks/adoption'
 import { ANIMAL_CATEGORIES } from '@/shared/types'
@@ -12,7 +12,7 @@ import type { AnimalCategory } from '@/shared/types'
 import { BreederExploreContent } from './BreederExploreContent'
 import { AdoptionListingSection } from './AdoptionListingSection'
 import { ExploreFilterBar } from './ExploreFilterBar'
-import { EXPLORE_TABS, SEARCH_PLACEHOLDERS } from '../_lib/constants'
+import { EXPLORE_TABS, SEARCH_PLACEHOLDERS, EXPLORE_SECTION_CONTAINER } from '../_lib/constants'
 import type { ExploreType } from '../_lib/constants'
 
 const mockListings = createMockListings()
@@ -114,15 +114,15 @@ const ExploreContent = () => {
             </TabsList>
           </Tabs>
         </div>
-        {/* 모바일·탭 필터바 (PC는 아래 fixed 바 사용하므로 숨김) */}
-        <Container className="pc:hidden">
+        {/* 모바일 전용 필터바 (탭+는 상단 픽셀 카테고리 → 스크롤 시 아래 fixed 칩바 사용) */}
+        <Container className="tab:hidden">
           <ExploreFilterBar selected={selectedCategory} onChange={handleCategoryChange} />
         </Container>
       </div>
 
-      {/* PC: 스크롤 시 GNB+탭바 아래 고정 컴팩트 필터바 (fixed → 레이아웃 점프 없음, 구분선 없음) */}
+      {/* 탭+: 스크롤 시 GNB+탭바 아래 고정 컴팩트 칩바 (fixed → 레이아웃 점프 없음, 구분선 없음) */}
       <div
-        className={cn('fixed right-0 left-0 z-30 hidden bg-white', isStuck && 'pc:block')}
+        className={cn('fixed right-0 left-0 z-30 hidden bg-white', isStuck && 'tab:block')}
         style={{ top: gnbH + headerH }}
       >
         <Container>
@@ -130,39 +130,29 @@ const ExploreContent = () => {
         </Container>
       </div>
 
-      {/* ══════ 콘텐츠 영역 — 1080 중앙 정렬 ══════
-          섹션별로 각자 Container를 갖도록 분리 중 (전역 px 제거) */}
-      <Container>
-        {/* PC 전용 상단: 픽셀 카테고리(가운데) + 큰 검색바 (스크롤되면 위로 사라짐) */}
-        <div className="hidden pc:block">
-          <div className="flex flex-col items-center justify-center py-12">
-            <CategoryFilter selected={selectedCategory} onChange={handleCategoryChange} />
-          </div>
-          <SearchSection placeholder={SEARCH_PLACEHOLDERS[selectedType]} withPadding={false} />
-        </div>
-        {/* 스크롤 트리거 sentinel (PC 상단 영역 끝) */}
-        <div ref={sentinelRef} aria-hidden />
-      </Container>
+      {/* ══════ 콘텐츠 영역 — 섹션별로 각자 Container를 갖도록 분리 (전역 px 제거) ══════ */}
+      {/* 탭+ 상단: 픽셀 카테고리(가운데) + 큰 검색바 (스크롤되면 위로 사라짐) */}
+      <div className="hidden tab:block">
+        <CategorySection selected={selectedCategory} onChange={handleCategoryChange} />
+        {/* 검색바: 홈과 동일 — SearchSection 자체 패딩 20px(py-3 tab:py-5) / 80px(pc:px-20) */}
+        <SearchSection placeholder={SEARCH_PLACEHOLDERS[selectedType]} />
+      </div>
+      {/* 스크롤 트리거 sentinel (탭+ 상단 영역 끝) */}
+      <div ref={sentinelRef} aria-hidden />
 
       {selectedType === 'breeder' ? (
         <BreederExploreContent />
       ) : (
-        <Container>
-          {/* [refactored] 인기 동물 / 전체 입양 소식 — 공통 컴포넌트로 통합 (상단 여백만 차이) */}
-          <AdoptionListingSection
-            title="인기 동물"
-            listings={popularListings}
-            className="mt-[2.063rem]"
-          />
-          <AdoptionListingSection
-            title="전체 입양 소식"
-            listings={mockListings}
-            className="mt-[1.25rem]"
-          />
-
-          {/* 하단 여백 */}
-          <div className="h-[4rem]" />
-        </Container>
+        <>
+          {/* 인기 브리더와 동일 — 섹션별 Container, padding 세로 mo 20px→tab+ 40px, 가로 mo 16px/tab 48/pc 80 */}
+          {/* [refactored] 섹션 패딩 공통 상수 — 인기 동물만 tab 가로 80px(margin/pc, Figma 1652-125625) */}
+          <Container className={cn(EXPLORE_SECTION_CONTAINER, 'tab:px-20')}>
+            <AdoptionListingSection title="인기 동물" listings={popularListings} variant="featured" />
+          </Container>
+          <Container className={EXPLORE_SECTION_CONTAINER}>
+            <AdoptionListingSection title="전체 입양 소식" listings={mockListings} />
+          </Container>
+        </>
       )}
     </>
   )
