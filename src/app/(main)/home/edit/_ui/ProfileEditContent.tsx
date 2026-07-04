@@ -24,6 +24,7 @@ import {
   TextareaField,
 } from '@/shared/ui'
 import { CheckIcon } from '@/shared/assets/icons'
+import { WithdrawReasonModal } from './WithdrawReasonModal'
 
 // [refactored] 매직 넘버·문자열 상수화
 const TOAST_DURATION_MS = 3000
@@ -71,7 +72,12 @@ const ProfileEditContent = () => {
   const [name, setName] = useState('')
   const [bio, setBio] = useState('')
   const [showApply, setShowApply] = useState(false)
-  const [showLeave, setShowLeave] = useState(false)
+  const [showReason, setShowReason] = useState(false) // 탈퇴 사유 선택 단계
+  const [showLeave, setShowLeave] = useState(false) // 탈퇴 최종 확인 단계
+  // 선택한 탈퇴 사유(확인 모달에서 실제 요청 시 사용)
+  const [withdraw, setWithdraw] = useState<{ reason: WithdrawReason; otherReason?: string } | null>(
+    null,
+  )
 
   const toast = useToast() // [refactored]
 
@@ -174,11 +180,22 @@ const ProfileEditContent = () => {
     }
   }
 
-  // 탈퇴: reason은 'other' 고정 (사유 선택 UI는 추후)
+  // 사유 선택 완료 → 최종 확인 모달로 전환
+  const handleReasonNext = (reason: WithdrawReason, otherReason?: string) => {
+    setWithdraw({ reason, otherReason })
+    setShowReason(false)
+    setShowLeave(true)
+  }
+
+  // 탈퇴: 사용자가 선택한 사유(+기타 상세)로 요청 — reason='other'면 otherReason 동반
   const handleLeave = async () => {
+    if (!withdraw) return
     setShowLeave(false)
     try {
-      await deleteAccount.mutateAsync({ reason: WithdrawReason.OTHER })
+      await deleteAccount.mutateAsync({
+        reason: withdraw.reason,
+        ...(withdraw.otherReason ? { otherReason: withdraw.otherReason } : {}),
+      })
       router.replace('/')
     } catch {
       // TODO: 실패 처리
@@ -272,7 +289,7 @@ const ProfileEditContent = () => {
         <div className="flex items-center gap-10">
           {/* 탈퇴는 입양자 전용 API(useDeleteAdopterAccount) — 브리더에선 숨김 */}
           {!isBreeder && (
-            <Button variant="text" onClick={() => setShowLeave(true)}>
+            <Button variant="text" onClick={() => setShowReason(true)}>
               탈퇴
             </Button>
           )}
@@ -344,6 +361,9 @@ const ProfileEditContent = () => {
           { label: '적용하기', variant: 'fill', onClick: handleApply },
         ]}
       />
+
+      {/* 탈퇴 사유 선택 (확인 모달 앞 단계) — 선택 완료 시 최종 확인 모달로 전환 */}
+      <WithdrawReasonModal open={showReason} onOpenChange={setShowReason} onNext={handleReasonNext} />
 
       {/* 계정 탈퇴 확인 (디자인 2145-193207 / 모바일·탭 2145-193342) */}
       <ConfirmModal
