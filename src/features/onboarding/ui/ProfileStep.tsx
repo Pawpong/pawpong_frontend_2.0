@@ -9,8 +9,8 @@ import { type ProfileFormData, EMAIL_DOMAINS } from '../model/schema'
 import { StepLayout } from './StepLayout'
 import { StepTitle } from './StepTitle'
 import { StepIndicator } from './StepIndicator'
-import { Input, InputField } from '@/shared/ui'
-import { StepActionButton, StepSelect } from './StepInput'
+import { Dropdown, Input, InputField } from '@/shared/ui'
+import { StepActionButton } from './StepInput'
 import { StepNavButtons } from './StepNavButtons'
 import { CheckboxField } from './CheckboxField'
 
@@ -149,7 +149,7 @@ const ProfileStep = () => {
                 name="emailDomain"
                 control={control}
                 render={({ field }) => (
-                  <StepSelect
+                  <Dropdown
                     value={field.value}
                     onValueChange={field.onChange}
                     options={EMAIL_DOMAINS.map((d) => ({ value: d, label: d }))}
