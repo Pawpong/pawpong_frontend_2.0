@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, type ComponentType } from 'react'
+import { useEffect, useState } from 'react'
 import { Controller } from 'react-hook-form'
 import { CheckRoundedIcon } from '@/shared/assets/icons'
 import { useOnboarding } from '../model/OnboardingContext'
@@ -10,16 +10,10 @@ import { type ProfileFormData, EMAIL_DOMAINS } from '../model/schema'
 import { StepLayout } from './StepLayout'
 import { StepTitle } from './StepTitle'
 import { StepIndicator } from './StepIndicator'
-import { Dropdown, Input, InputField, HelpMessage, type HelpMessageStatus } from '@/shared/ui'
+import { Dropdown, Input, InputField, HelpMessage, type HelpMessageState } from '@/shared/ui'
 import { StepActionButton } from './StepInput'
 import { StepNavButtons } from './StepNavButtons'
 import { CheckboxField } from './CheckboxField'
-
-type StepMessage = {
-  text: string
-  status: HelpMessageStatus
-  icon?: ComponentType<{ className?: string }>
-}
 
 const AGREEMENTS = [
   {
@@ -68,8 +62,8 @@ const ProfileStep = () => {
   const [isCodeSent, setIsCodeSent] = useState(false)
   const [isPhoneVerified, setIsPhoneVerified] = useState(false)
   const [secondsLeft, setSecondsLeft] = useState(0)
-  const [phoneMessage, setPhoneMessage] = useState<StepMessage | null>(null)
-  const [codeMessage, setCodeMessage] = useState<StepMessage | null>(null)
+  const [phoneMessage, setPhoneMessage] = useState<HelpMessageState | null>(null)
+  const [codeMessage, setCodeMessage] = useState<HelpMessageState | null>(null)
 
   // 인증코드 유효시간 카운트다운 (백엔드 만료 3분과 동일)
   useEffect(() => {

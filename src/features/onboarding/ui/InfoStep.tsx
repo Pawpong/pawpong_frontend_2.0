@@ -1,13 +1,13 @@
 'use client'
 
-import { useState } from 'react'
 import { Controller } from 'react-hook-form'
 import { useOnboarding } from '../model/OnboardingContext'
 import { useStepForm } from '../model/useStepForm'
+import { useDuplicateCheck } from '../model/useDuplicateCheck'
 import { useCheckNicknameDuplicate } from '@/features/auth'
 import { type InfoFormData } from '../model/schema'
 import { StepContainer } from './StepContainer'
-import { Input, HelpMessage, type HelpMessageStatus } from '@/shared/ui'
+import { Input, HelpMessage } from '@/shared/ui'
 import { StepActionButton } from './StepInput'
 import { ChipSelect } from './ChipSelect'
 import { ProfileImageUpload } from './ProfileImageUpload'
@@ -48,33 +48,12 @@ const InfoStep = () => {
   const nickname = watch('nickname')
 
   // 닉네임 중복 검사 (백엔드: POST /api/v2/auth/check-nickname)
-  const { mutate: checkNickname, isPending: isCheckingNickname } = useCheckNicknameDuplicate()
-  const [nicknameMessage, setNicknameMessage] = useState<{
-    text: string
-    status: HelpMessageStatus
-  } | null>(null)
-
-  const handleCheckNickname = () => {
-    if (!nickname?.trim()) {
-      setNicknameMessage({ text: '닉네임을 입력해주세요.', status: 'error' })
-      return
-    }
-    checkNickname(nickname.trim(), {
-      onSuccess: (isDuplicate) => {
-        setNicknameMessage(
-          isDuplicate
-            ? { text: '사용 불가능한 별명입니다.', status: 'error' }
-            : { text: '사용 가능한 별명입니다.', status: 'success' },
-        )
-      },
-      onError: (error) => {
-        setNicknameMessage({
-          text: error instanceof Error ? error.message : '중복 검사에 실패했습니다.',
-          status: 'error',
-        })
-      },
-    })
-  }
+  const nicknameCheck = useDuplicateCheck(useCheckNicknameDuplicate(), {
+    empty: '닉네임을 입력해주세요.',
+    duplicate: '사용 불가능한 별명입니다.',
+    available: '사용 가능한 별명입니다.',
+    fallback: '중복 검사에 실패했습니다.',
+  })
 
   return (
     <StepContainer
@@ -95,12 +74,17 @@ const InfoStep = () => {
         <div className="flex w-full flex-col gap-1">
           <div className="flex w-full gap-2">
             <Input type="text" placeholder="닉네임" {...register('nickname')} className="flex-1" />
-            <StepActionButton onClick={handleCheckNickname} disabled={isCheckingNickname}>
-              {isCheckingNickname ? '검사 중' : '중복 검사'}
+            <StepActionButton
+              onClick={() => nicknameCheck.check(nickname)}
+              disabled={nicknameCheck.isPending}
+            >
+              {nicknameCheck.isPending ? '검사 중' : '중복 검사'}
             </StepActionButton>
           </div>
-          {nicknameMessage && (
-            <HelpMessage status={nicknameMessage.status}>{nicknameMessage.text}</HelpMessage>
+          {nicknameCheck.message && (
+            <HelpMessage status={nicknameCheck.message.status}>
+              {nicknameCheck.message.text}
+            </HelpMessage>
           )}
         </div>
 

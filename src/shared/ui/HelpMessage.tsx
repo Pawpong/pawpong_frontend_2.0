@@ -23,6 +23,13 @@ const helpMessage = tv({
 
 type HelpMessageStatus = NonNullable<VariantProps<typeof helpMessage>['status']>
 
+// [refactored] 안내문 상태(문구+상태+아이콘) 공통 타입 — 각 폼에서 인라인으로 반복하던 정의 통합
+interface HelpMessageState {
+  text: string
+  status: HelpMessageStatus
+  icon?: ComponentType<{ className?: string }>
+}
+
 // 피그마 기본 아이콘 (4개 상태 공통, 색만 상속). icon prop으로 언제든 교체 가능
 
 interface HelpMessageProps {
@@ -47,4 +54,4 @@ const HelpMessage = ({ status = 'default', children, icon, hideIcon, className }
   )
 }
 
-export { HelpMessage, type HelpMessageProps, type HelpMessageStatus }
+export { HelpMessage, type HelpMessageProps, type HelpMessageStatus, type HelpMessageState }

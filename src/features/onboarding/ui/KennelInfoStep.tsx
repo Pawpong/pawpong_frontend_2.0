@@ -1,13 +1,13 @@
 'use client'
 
-import { useState } from 'react'
 import { Controller } from 'react-hook-form'
 import { useOnboarding } from '../model/OnboardingContext'
 import { useStepForm } from '../model/useStepForm'
+import { useDuplicateCheck } from '../model/useDuplicateCheck'
 import { useCheckBreederNameDuplicate } from '@/features/auth'
 import { type KennelInfoFormData, REGIONS } from '../model/schema'
 import { StepContainer } from './StepContainer'
-import { Input, TextareaField, HelpMessage, type HelpMessageStatus } from '@/shared/ui'
+import { Input, TextareaField, HelpMessage } from '@/shared/ui'
 import { StepActionButton, StepSelect } from './StepInput'
 import { ChipSelect } from './ChipSelect'
 import { ProfileImageUpload } from './ProfileImageUpload'
@@ -45,34 +45,12 @@ const KennelInfoStep = () => {
   const breederName = watch('breederName')
 
   // 브리더명 중복 검사 (백엔드: POST /api/v2/auth/check-breeder-name)
-  const { mutate: checkBreederName, isPending: isCheckingBreederName } =
-    useCheckBreederNameDuplicate()
-  const [breederNameMessage, setBreederNameMessage] = useState<{
-    text: string
-    status: HelpMessageStatus
-  } | null>(null)
-
-  const handleCheckBreederName = () => {
-    if (!breederName?.trim()) {
-      setBreederNameMessage({ text: '브리더명을 입력해주세요.', status: 'error' })
-      return
-    }
-    checkBreederName(breederName.trim(), {
-      onSuccess: (isDuplicate) => {
-        setBreederNameMessage(
-          isDuplicate
-            ? { text: '이미 사용 중인 브리더명입니다.', status: 'error' }
-            : { text: '사용 가능한 브리더명입니다.', status: 'success' },
-        )
-      },
-      onError: (error) => {
-        setBreederNameMessage({
-          text: error instanceof Error ? error.message : '중복검사에 실패했습니다.',
-          status: 'error',
-        })
-      },
-    })
-  }
+  const breederNameCheck = useDuplicateCheck(useCheckBreederNameDuplicate(), {
+    empty: '브리더명을 입력해주세요.',
+    duplicate: '이미 사용 중인 브리더명입니다.',
+    available: '사용 가능한 브리더명입니다.',
+    fallback: '중복검사에 실패했습니다.',
+  })
 
   return (
     <StepContainer
@@ -102,15 +80,15 @@ const KennelInfoStep = () => {
                 className="flex-1"
               />
               <StepActionButton
-                onClick={handleCheckBreederName}
-                disabled={isCheckingBreederName}
+                onClick={() => breederNameCheck.check(breederName)}
+                disabled={breederNameCheck.isPending}
               >
-                {isCheckingBreederName ? '검사 중' : '중복검사'}
+                {breederNameCheck.isPending ? '검사 중' : '중복검사'}
               </StepActionButton>
             </div>
-            {breederNameMessage && (
-              <HelpMessage status={breederNameMessage.status}>
-                {breederNameMessage.text}
+            {breederNameCheck.message && (
+              <HelpMessage status={breederNameCheck.message.status}>
+                {breederNameCheck.message.text}
               </HelpMessage>
             )}
           </div>
