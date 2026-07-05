@@ -35,7 +35,14 @@ const UserTypeCard = ({ label, selected, onClick }: UserTypeCardProps) => (
           className="object-contain group-hover:hidden"
           priority
         />
-        <Image src={FRAME_HOVER} alt="" fill className="hidden object-contain group-hover:block" />
+        {/* priority: hidden 상태로 lazy 로드되면 첫 hover 시 프레임 깜빡임 */}
+        <Image
+          src={FRAME_HOVER}
+          alt=""
+          fill
+          className="hidden object-contain group-hover:block"
+          priority
+        />
       </>
     )}
     <span
