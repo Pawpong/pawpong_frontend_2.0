@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { cn } from '@/shared/lib/cn'
+import { TextLabel } from './TextLabel'
 
 interface InputFieldProps {
   label?: string
@@ -13,13 +14,12 @@ const InputField = ({ label, required, error, className, children }: InputFieldP
   <div className={cn('flex flex-col', className)}>
     {label && (
       <div className="flex items-center gap-1">
-        <span className="p-[0.125rem] text-[0.875rem] leading-[1.5] font-semibold text-[#3e3e3e]">
-          {label}
-        </span>
+        {/* 공통 TextLabel — Figma Label 14 bold/medium */}
+        <TextLabel size="14">{label}</TextLabel>
         {required && (
-          <span className="p-[0.125rem] text-[0.875rem] leading-[1.5] font-medium text-[#6b6b6b]">
+          <TextLabel size="14" weight="medium" color="secondary">
             필수
-          </span>
+          </TextLabel>
         )}
       </div>
     )}
