@@ -7,7 +7,7 @@ import { useStepForm } from '../model/useStepForm'
 import { useCheckNicknameDuplicate } from '@/features/auth'
 import { type InfoFormData } from '../model/schema'
 import { StepContainer } from './StepContainer'
-import { Input } from '@/shared/ui'
+import { Input, HelpMessage, type HelpMessageStatus } from '@/shared/ui'
 import { StepActionButton } from './StepInput'
 import { ChipSelect } from './ChipSelect'
 import { ProfileImageUpload } from './ProfileImageUpload'
@@ -49,19 +49,29 @@ const InfoStep = () => {
 
   // 닉네임 중복 검사 (백엔드: POST /api/v2/auth/check-nickname)
   const { mutate: checkNickname, isPending: isCheckingNickname } = useCheckNicknameDuplicate()
-  const [nicknameMessage, setNicknameMessage] = useState<string | null>(null)
+  const [nicknameMessage, setNicknameMessage] = useState<{
+    text: string
+    status: HelpMessageStatus
+  } | null>(null)
 
   const handleCheckNickname = () => {
     if (!nickname?.trim()) {
-      setNicknameMessage('닉네임을 입력해주세요.')
+      setNicknameMessage({ text: '닉네임을 입력해주세요.', status: 'error' })
       return
     }
     checkNickname(nickname.trim(), {
       onSuccess: (isDuplicate) => {
-        setNicknameMessage(isDuplicate ? '이미 사용 중인 닉네임입니다.' : '사용 가능한 닉네임입니다.')
+        setNicknameMessage(
+          isDuplicate
+            ? { text: '사용 불가능한 별명입니다.', status: 'error' }
+            : { text: '사용 가능한 별명입니다.', status: 'success' },
+        )
       },
       onError: (error) => {
-        setNicknameMessage(error instanceof Error ? error.message : '중복 검사에 실패했습니다.')
+        setNicknameMessage({
+          text: error instanceof Error ? error.message : '중복 검사에 실패했습니다.',
+          status: 'error',
+        })
       },
     })
   }
@@ -89,7 +99,9 @@ const InfoStep = () => {
               {isCheckingNickname ? '검사 중' : '중복 검사'}
             </StepActionButton>
           </div>
-          {nicknameMessage && <p className="text-[0.8125rem] text-[#6b6b6b]">{nicknameMessage}</p>}
+          {nicknameMessage && (
+            <HelpMessage status={nicknameMessage.status}>{nicknameMessage.text}</HelpMessage>
+          )}
         </div>
 
         {/* 관심있는 키워드 */}

@@ -11,6 +11,7 @@ import {
   clearSocialSignupSession,
 } from '@/features/auth'
 import { useUpdateMyProfile } from '@/features/profile'
+import { HelpMessage } from '@/shared/ui'
 import {
   type DocumentsFormData,
   type AnimalSelectFormData,
@@ -206,7 +207,9 @@ const DocumentsStep = () => {
         />
 
         {submitError && (
-          <p className="mt-3 px-1 text-center text-[0.8125rem] text-red-500">{submitError}</p>
+          <HelpMessage status="error" className="mt-3 justify-center px-1">
+            {submitError}
+          </HelpMessage>
         )}
       </div>
     </StepContainer>

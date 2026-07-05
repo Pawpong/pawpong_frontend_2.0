@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ComponentType } from 'react'
 import { Controller } from 'react-hook-form'
+import { CheckRoundedIcon } from '@/shared/assets/icons'
 import { useOnboarding } from '../model/OnboardingContext'
 import { useStepForm } from '../model/useStepForm'
 import { useSendVerificationCode, useVerifyCode } from '@/features/auth'
@@ -9,10 +10,16 @@ import { type ProfileFormData, EMAIL_DOMAINS } from '../model/schema'
 import { StepLayout } from './StepLayout'
 import { StepTitle } from './StepTitle'
 import { StepIndicator } from './StepIndicator'
-import { Dropdown, Input, InputField } from '@/shared/ui'
+import { Dropdown, Input, InputField, HelpMessage, type HelpMessageStatus } from '@/shared/ui'
 import { StepActionButton } from './StepInput'
 import { StepNavButtons } from './StepNavButtons'
 import { CheckboxField } from './CheckboxField'
+
+type StepMessage = {
+  text: string
+  status: HelpMessageStatus
+  icon?: ComponentType<{ className?: string }>
+}
 
 const AGREEMENTS = [
   {
@@ -61,8 +68,8 @@ const ProfileStep = () => {
   const [isCodeSent, setIsCodeSent] = useState(false)
   const [isPhoneVerified, setIsPhoneVerified] = useState(false)
   const [secondsLeft, setSecondsLeft] = useState(0)
-  const [phoneMessage, setPhoneMessage] = useState<string | null>(null)
-  const [codeMessage, setCodeMessage] = useState<string | null>(null)
+  const [phoneMessage, setPhoneMessage] = useState<StepMessage | null>(null)
+  const [codeMessage, setCodeMessage] = useState<StepMessage | null>(null)
 
   // 인증코드 유효시간 카운트다운 (백엔드 만료 3분과 동일)
   useEffect(() => {
@@ -77,7 +84,7 @@ const ProfileStep = () => {
 
   const handleSendCode = () => {
     if (!phone) {
-      setPhoneMessage('휴대폰 번호를 입력해주세요.')
+      setPhoneMessage({ text: '휴대폰 번호를 입력해주세요.', status: 'error' })
       return
     }
     setPhoneMessage(null)
@@ -88,17 +95,24 @@ const ProfileStep = () => {
         setValue('verificationCode', '')
         setSecondsLeft(180)
         setCodeMessage(null)
-        setPhoneMessage('인증번호를 발송했습니다.')
+        setPhoneMessage({
+          text: '인증번호를 발송했습니다.',
+          status: 'default',
+          icon: CheckRoundedIcon,
+        })
       },
       onError: (error) => {
-        setPhoneMessage(error instanceof Error ? error.message : '인증번호 발송에 실패했습니다.')
+        setPhoneMessage({
+          text: error instanceof Error ? error.message : '인증번호 발송에 실패했습니다.',
+          status: 'error',
+        })
       },
     })
   }
 
   const handleVerifyCode = () => {
     if (!verificationCode) {
-      setCodeMessage('인증번호를 입력해주세요.')
+      setCodeMessage({ text: '인증번호를 입력해주세요.', status: 'error' })
       return
     }
     verifyCode(
@@ -107,10 +121,13 @@ const ProfileStep = () => {
         onSuccess: () => {
           setIsPhoneVerified(true)
           setSecondsLeft(0)
-          setCodeMessage('인증이 완료되었습니다.')
+          setCodeMessage({ text: '인증되었습니다.', status: 'success' })
         },
         onError: (error) => {
-          setCodeMessage(error instanceof Error ? error.message : '인증번호 확인에 실패했습니다.')
+          setCodeMessage({
+            text: error instanceof Error ? error.message : '인증번호를 다시 입력해주세요',
+            status: 'error',
+          })
         },
       },
     )
@@ -173,7 +190,11 @@ const ProfileStep = () => {
                 {isSending ? '발송 중' : isCodeSent ? '재전송' : '인증번호'}
               </StepActionButton>
             </div>
-            {phoneMessage && <p className="mt-1 text-[0.8125rem] text-[#6b6b6b]">{phoneMessage}</p>}
+            {phoneMessage && (
+              <HelpMessage status={phoneMessage.status} icon={phoneMessage.icon} className="mt-1">
+                {phoneMessage.text}
+              </HelpMessage>
+            )}
           </InputField>
 
           <InputField label="인증번호" required>
@@ -199,7 +220,11 @@ const ProfileStep = () => {
                 {isPhoneVerified ? '완료' : isVerifying ? '확인 중' : '확인'}
               </StepActionButton>
             </div>
-            {codeMessage && <p className="mt-1 text-[0.8125rem] text-[#6b6b6b]">{codeMessage}</p>}
+            {codeMessage && (
+              <HelpMessage status={codeMessage.status} className="mt-1">
+                {codeMessage.text}
+              </HelpMessage>
+            )}
           </InputField>
         </div>
 

@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { ImageIcon } from '@/shared/assets/icons'
+import { HelpMessage } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { useUploadProfileImage, loadSocialSignupSession } from '@/features/auth'
 
@@ -71,7 +72,7 @@ const ProfileImageUpload = ({ value, onChange, className }: ProfileImageUploadPr
         onChange={handleFileChange}
       />
       {isPending && <p className="text-[0.75rem] text-[#6b6b6b]">업로드 중...</p>}
-      {error && <p className="text-[0.75rem] text-red-500">{error}</p>}
+      {error && <HelpMessage status="error">{error}</HelpMessage>}
     </div>
   )
 }

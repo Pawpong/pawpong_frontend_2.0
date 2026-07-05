@@ -16,7 +16,7 @@ import {
   type InfoFormData,
 } from '../model/schema'
 import { StepContainer } from './StepContainer'
-import { TextareaField } from '@/shared/ui'
+import { TextareaField, HelpMessage } from '@/shared/ui'
 import { CheckboxField } from './CheckboxField'
 
 const SurveyStep = () => {
@@ -204,7 +204,9 @@ const SurveyStep = () => {
       </div>
 
       {submitError && (
-        <p className="px-4 text-center text-[0.8125rem] text-red-500">{submitError}</p>
+        <HelpMessage status="error" className="justify-center px-4">
+          {submitError}
+        </HelpMessage>
       )}
     </StepContainer>
   )
