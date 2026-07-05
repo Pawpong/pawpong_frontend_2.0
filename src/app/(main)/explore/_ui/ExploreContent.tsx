@@ -7,6 +7,7 @@ import { SearchSection } from '@/features/search'
 import { CategorySection } from '@/features/category-filter'
 import { cn } from '@/shared/lib/cn'
 import { useBreakpoint } from '@/shared/lib/useBreakpoint'
+import { useGnbHeight } from '@/shared/lib/useGnbHeight'
 import { createMockListings } from '@/shared/mocks/adoption'
 import { ANIMAL_CATEGORIES } from '@/shared/types'
 import type { AnimalCategory } from '@/shared/types'
@@ -60,11 +61,12 @@ const ExploreContent = () => {
     [searchParams, router, pathname],
   )
 
-  // PC 스크롤 인터랙션: 픽셀 카테고리+큰 검색바가 스크롤로 벗어나면 컴팩트 필터바를
+  // 스크롤 인터랙션: 픽셀 카테고리+큰 검색바가 스크롤로 벗어나면 컴팩트 필터바를
   // 탭바 아래에 fixed로 노출(레이아웃 점프 방지). 탭바는 tab+에서 상단 고정(sticky).
   const headerRef = useRef<HTMLDivElement>(null)
   const sentinelRef = useRef<HTMLDivElement>(null)
-  const [gnbH, setGnbH] = useState(0)
+  // [refactored] GNB 높이는 공통 훅 재사용 (직접 querySelector 측정 제거)
+  const gnbH = useGnbHeight()
   const [headerH, setHeaderH] = useState(0)
   const [isStuck, setIsStuck] = useState(false)
   // 헤더는 tab+에서만 sticky(탭바가 남음) → 고정 칩바 top에 headerH 반영. 모바일은 탭바가 스크롤로 사라져 gnbH만.
@@ -73,8 +75,6 @@ const ExploreContent = () => {
 
   useEffect(() => {
     const measure = () => {
-      const gnb = document.querySelector('header')
-      setGnbH(gnb instanceof HTMLElement ? gnb.offsetHeight : 0)
       if (headerRef.current) setHeaderH(headerRef.current.offsetHeight)
     }
     measure()

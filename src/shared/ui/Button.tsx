@@ -5,14 +5,15 @@ import { cn } from '@/shared/lib/cn'
 // 디자인 시스템 BaseButton. 쓰는 variant부터 정의 — 더 필요하면 추가
 // primary/outline은 알약형(size 필요), text·fill은 자체 완결(size 미사용)
 const buttonVariants = tv({
-  base: 'flex items-center justify-center leading-[1.5] font-semibold text-[#3e3e3e] disabled:cursor-not-allowed disabled:opacity-50',
+  base: 'flex items-center justify-center leading-[1.5] font-semibold text-[#3e3e3e] transition-colors disabled:cursor-not-allowed disabled:opacity-50',
   variants: {
     variant: {
-      // disabled: 색(bg/text)만 반영 — opacity는 적용하지 않음(base의 opacity-50 무효화)
+      // primary: hover 텍스트 #6b6b6b / press 배경 #f5ec2c / disabled 배경·텍스트(opacity-100로 base opacity-50 무효화)
       primary:
-        'rounded-full bg-[#fffa94] p-2 disabled:bg-[#e4e4e4] disabled:text-[#b8b8b8] disabled:opacity-100',
+        'rounded-full bg-[#fffa94] p-2 hover:text-[#6b6b6b] active:bg-[#f5ec2c] disabled:bg-[#e4e4e4] disabled:text-[#b8b8b8] disabled:opacity-100',
       outline: 'rounded-full border border-[#cacaca] bg-white p-2',
-      text: 'px-1 text-sm',
+      // text(txt btn): hover 배경 #f6f6f6 / press 배경 #ededed / disabled 텍스트 #c2c2c2, rounded-8
+      text: 'rounded-lg px-1 text-sm hover:bg-[#f6f6f6] active:bg-[#ededed] disabled:text-[#c2c2c2] disabled:opacity-100',
       // FillButton (다크) — h-40, rounded-8, 16px #f6f6f6
       fill: 'h-10 rounded-lg bg-[#3e3e3e] p-2 text-base text-[#f6f6f6]',
     },

@@ -1,3 +1,4 @@
+import { Button } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 
 interface StepNavButtonsProps {
@@ -21,25 +22,27 @@ const StepNavButtons = ({
 }: StepNavButtonsProps) => (
   <div
     className={cn(
-      'fixed right-0 bottom-0 left-0 z-10 flex flex-col items-center gap-3 bg-white px-4 py-4 tab:static tab:right-auto tab:bottom-auto tab:left-auto tab:z-auto tab:gap-5 tab:px-12 tab:py-8 pc:px-20',
+      // tab+ 레이아웃: Figma BtnLayout(966-11668) — gap 8 / py 12 / px 48·80
+      'fixed right-0 bottom-0 left-0 z-10 flex flex-col items-center gap-3 bg-white px-4 py-4 tab:static tab:right-auto tab:bottom-auto tab:left-auto tab:z-auto tab:gap-2 tab:px-12 tab:py-3 pc:px-20',
       className,
     )}
   >
     {onNext && (
-      <button
-        type="button"
+      <Button
+        variant="primary"
+        size="lg"
         onClick={onNext}
         disabled={nextDisabled}
-        className="h-12 w-full max-w-[18.5625rem] rounded-full bg-[#fffa94] text-base font-semibold text-[#3e3e3e] transition-colors disabled:opacity-40 tab:w-[16.125rem]"
+        className="w-full max-w-[18.5625rem] tab:h-8 tab:w-[11.5rem] tab:text-sm"
       >
         {nextLabel}
-      </button>
+      </Button>
     )}
     {extraButtons}
     {onBack && (
-      <button type="button" onClick={onBack} className="text-base font-medium text-[#3e3e3e]">
+      <Button variant="text" onClick={onBack} className="font-medium text-base tab:text-sm">
         {backLabel}
-      </button>
+      </Button>
     )}
   </div>
 )
