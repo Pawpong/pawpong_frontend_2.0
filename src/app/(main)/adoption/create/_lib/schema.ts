@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-/** YYYY-MM-DD 날짜 형식 */
-const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
+/** 날짜 형식: YYYY-MM-DD 또는 하이픈 없는 8자리(YYYYMMDD) 허용 */
+const DATE_RE = /^(\d{4}-\d{2}-\d{2}|\d{8})$/
 
 /** 예방접종 기록 행 */
 const vaccinationRowSchema = z.object({
@@ -30,6 +30,7 @@ const parentRowSchema = z.object({
 export const adoptionCreateSchema = z
   .object({
     /* ── 기본 정보 ── */
+    petType: z.string(),
     name: z.string().trim().min(1, '이름을 입력해주세요.'),
     breed: z.string().trim().min(1, '품종을 입력해주세요.'),
     price: z
@@ -42,7 +43,7 @@ export const adoptionCreateSchema = z
     birthDate: z
       .string()
       .min(1, '태어난 날짜를 입력해주세요.')
-      .regex(DATE_RE, '태어난 날짜는 YYYY-MM-DD 형식으로 입력해주세요.'),
+      .regex(DATE_RE, '태어난 날짜는 YYYY-MM-DD 형식으로 입력해주세요. (예: 2024-03-15)'),
     gender: z.string(),
     introduction: z
       .string()
@@ -66,6 +67,15 @@ export const adoptionCreateSchema = z
     breedingEnvDescription: z.string().optional(),
   })
   .superRefine((data, ctx) => {
+    // 종류: dog/cat/reptile 중 선택 필수
+    if (data.petType !== 'dog' && data.petType !== 'cat' && data.petType !== 'reptile') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['petType'],
+        message: '동물 종류를 선택해주세요.',
+      })
+    }
+
     // 성별: male/female 중 선택 필수 (refine 타입 내로잉 회피 위해 여기서 검증)
     if (data.gender !== 'male' && data.gender !== 'female') {
       ctx.addIssue({

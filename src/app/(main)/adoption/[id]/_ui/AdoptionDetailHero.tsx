@@ -15,7 +15,7 @@ import {
 } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { ArrowRightIcon, CheckIcon, GenderIcon } from '@/shared/assets/icons'
-import { ADOPTION_STATUS_LABEL, GENDER_LABEL } from '@/shared/types'
+import { ADOPTION_STATUS_LABEL, CATEGORY_LABEL, GENDER_LABEL } from '@/shared/types'
 import type { AdoptionDetailDto, AdoptionStatus } from '@/shared/types'
 import { HeroImageCarousel } from './HeroImageCarousel'
 import { FavoriteShareActions } from './FavoriteShareActions'
@@ -23,10 +23,12 @@ import { FavoriteShareActions } from './FavoriteShareActions'
 interface AdoptionDetailHeroProps {
   detail: AdoptionDetailDto
   onImageClick: (images: string[], index?: number) => void
+  /** 로그인 사용자가 이 분양글의 브리더 본인인지 — 상태변경 노출 제어 */
+  isOwner: boolean
 }
 
 /* ── 입양 상세 히어로 (브레드크럼 + 이미지 + 브리더 프로필 | 정보) ── */
-const AdoptionDetailHero = ({ detail, onImageClick }: AdoptionDetailHeroProps) => (
+const AdoptionDetailHero = ({ detail, onImageClick, isOwner }: AdoptionDetailHeroProps) => (
   // 좌우 패딩(모바일16/탭48/pc80)은 Container가 담당, 이미지만 음수마진으로 풀블리드. pc 섹션 py-20
   <Container className="px-[1rem] pc:py-[1.25rem]">
     <div className="pc:flex pc:items-start pc:gap-[1.25rem]">
@@ -34,7 +36,7 @@ const AdoptionDetailHero = ({ detail, onImageClick }: AdoptionDetailHeroProps) =
       <div className="relative -mx-[1rem] tab:-mx-[3rem] pc:mx-0 pc:flex pc:w-[31.25rem] pc:shrink-0 pc:flex-col pc:gap-[0.75rem]">
         {/* 브레드크럼 (데스크탑 전용) — 피그마: 라벨(body/md/bold 14px #6b6b6b) + chevron */}
         <div className="hidden items-end py-[0.625rem] pc:flex">
-          {['홈', '입양', '도마뱀'].map((label, index) => (
+          {['홈', '입양', CATEGORY_LABEL[detail.category]].map((label, index) => (
             <Fragment key={label}>
               {index > 0 && <ArrowRightIcon className="size-[1.5rem] text-[#6b6b6b]" />}
               <span className="p-[0.125rem] text-[0.875rem] leading-[1.5] font-semibold text-[#6b6b6b]">
@@ -114,7 +116,11 @@ const AdoptionDetailHero = ({ detail, onImageClick }: AdoptionDetailHeroProps) =
             <p className="text-[0.875rem] leading-[1.5] font-bold text-[#5d5d5d] pc:text-[1.5rem] pc:text-[#3e3e3e]">
               {detail.name}
             </p>
-            <StatusDropdown currentStatus={detail.status} />
+            {isOwner ? (
+              <StatusDropdown currentStatus={detail.status} />
+            ) : (
+              <StatusBadge status={detail.status} />
+            )}
             {detail.isPopular && (
               <Badge
                 variant="outline"
@@ -212,7 +218,15 @@ const InfoItem = ({
   </div>
 )
 
-/* ── 상태 변경 드롭다운 (브리더용) ── */
+/* ── 상태 배지 (비소유자용: 변경 불가, 표시 전용) ── */
+const StatusBadge = ({ status }: { status: AdoptionStatus }) => (
+  <span className="inline-flex items-center gap-[0.625rem] rounded-full bg-[#5d5d5d] px-[0.625rem] py-[0.25rem] text-[0.75rem] leading-[1.375rem] font-semibold text-white pc:text-[0.875rem]">
+    {ADOPTION_STATUS_LABEL[status]}
+    <CheckIcon className="size-[1.25rem]" />
+  </span>
+)
+
+/* ── 상태 변경 드롭다운 (브리더 본인용) ── */
 const STATUS_OPTIONS: AdoptionStatus[] = ['reserved', 'available', 'completed']
 
 const StatusDropdown = ({ currentStatus }: { currentStatus: AdoptionStatus }) => (

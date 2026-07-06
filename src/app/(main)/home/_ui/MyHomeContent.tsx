@@ -94,12 +94,17 @@ const MyHomeContent = () => {
 
   const tabs = isBreeder ? BREEDER_MY_HOME_TABS : MY_HOME_TABS
   const defaultTab = isBreeder ? 'listings' : 'posts'
-  // [refactored] 작성 바 문구/링크를 역할별로 분리 — 단일 InputUpload 인스턴스로 렌더
-  const writeBar = isBreeder
-    ? { text: '분양글을 올려보세요', href: '/adoption/create' }
-    : { text: '게시글을 올려보세요', href: '/post/create' }
 
   const [activeTab, setActiveTab] = useState(defaultTab)
+
+  // 작성 바 문구/링크를 활성 탭 기준으로 분기 — 분양목록 탭이면 분양글, 내가 쓴 글 탭이면 커뮤니티 글.
+  // (브리더도 커뮤니티 글을 쓸 수 있도록 진입점 제공) 즐겨찾는 브리더 탭에서는 작성 바 숨김.
+  const writeBar =
+    activeTab === 'listings'
+      ? { text: '분양글을 올려보세요', href: '/adoption/create' }
+      : activeTab === 'posts'
+        ? { text: '게시글을 올려보세요', href: '/community/write' }
+        : null
   // 백엔드 CommunityPostCard → PostList 가 쓰는 MyHomePost 뷰 모델로 매핑
   const posts: MyHomePost[] = (myPostsData?.items ?? []).map((post) => ({
     id: post.postId,
@@ -185,8 +190,8 @@ const MyHomeContent = () => {
         onTabChange={setActiveTab}
         stickyTop={gnbH + navH}
       >
-        {/* 브리더: 분양글 작성 바 / 일반: 게시글 작성 바 (공통 InputUpload, 상·하 보더 포함) */}
-        <InputUpload text={writeBar.text} href={writeBar.href} />
+        {/* 활성 탭 기준 작성 바 (분양목록→분양글 / 내가 쓴 글→커뮤니티 글). 즐겨찾는 브리더 탭은 숨김 */}
+        {writeBar && <InputUpload text={writeBar.text} href={writeBar.href} />}
 
         {/* 분양목록 탭 (브리더만) */}
         {isBreeder && (

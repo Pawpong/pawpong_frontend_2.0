@@ -15,6 +15,8 @@ import { AdoptionCtaBar } from './AdoptionCtaBar'
 
 interface AdoptionDetailContentProps {
   detail: AdoptionDetailDto
+  /** 로그인 사용자가 이 분양글의 브리더 본인인지 */
+  isOwner: boolean
 }
 
 /* ═══════════════════════════════════════════════
@@ -22,7 +24,7 @@ interface AdoptionDetailContentProps {
    - 모바일 서브헤더 + 히어로 + 하단 섹션 + CTA + 이미지 모달
    - 이미지 모달 상태는 히어로/하단 카드가 공유하므로 여기서 보관
    ═══════════════════════════════════════════════ */
-const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
+const AdoptionDetailContent = ({ detail, isOwner }: AdoptionDetailContentProps) => {
   const router = useRouter()
   const { imageModalOpen, setImageModalOpen, modalImages, modalInitialIndex, openImageModal } =
     useImageModal(detail.imageUrls)
@@ -45,13 +47,13 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
       </div>
 
       {/* ═══ 히어로 섹션 ═══ */}
-      <AdoptionDetailHero detail={detail} onImageClick={openImageModal} />
+      <AdoptionDetailHero detail={detail} onImageClick={openImageModal} isOwner={isOwner} />
 
       {/* ═══ 하단 콘텐츠 ═══ 피그마 tab: 섹션별 컨테이너 px-48 py-12 */}
       {/* [refactored] 반복되던 <Container className="tab:py-[0.75rem] pc:py-[1.25rem]"> 를 Section으로 추출 */}
       {/* 건강 + 부모 + 사육 — pc: 좌(건강↑/사육↓) | 우(부모 전체 높이) grid / 모바일·탭: 세로 (Figma 1226-54550) */}
       <Section>
-        <div className="pc:grid pc:grid-cols-[55.75rem_minmax(0,1fr)] pc:gap-[1.75rem]">
+        <div className="pc:grid pc:grid-cols-[minmax(0,55.75rem)_minmax(0,1fr)] pc:gap-[1.75rem]">
           <HealthInfoCard detail={detail} />
           <ParentInfoCard detail={detail} onImageClick={openImageModal} />
           <BreedingEnvironmentCard
@@ -76,7 +78,7 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
       </Section>
 
       {/* ═══ CTA 하단 고정 바 ═══ */}
-      <AdoptionCtaBar listingId={detail.listingId} />
+      <AdoptionCtaBar listingId={detail.listingId} isOwner={isOwner} />
 
       {/* ═══ 이미지 모달 ═══ */}
       <ImageModal

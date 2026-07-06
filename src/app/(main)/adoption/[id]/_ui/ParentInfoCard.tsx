@@ -20,6 +20,11 @@ const ParentInfoCard = ({ detail, onImageClick }: ParentInfoCardProps) => {
     >
       {/* 세로 배치: 4:3 이미지 → 배지(role + 성별 아이콘) + 이름/생일 — Figma 1240-45069 */}
       <div className="flex flex-col gap-[0.75rem]">
+        {detail.parents.length === 0 && (
+          <p className="py-[0.5rem] text-[0.875rem] leading-[1.375rem] font-medium text-[#a4a4a4]">
+            등록된 부모 정보가 없어요.
+          </p>
+        )}
         {detail.parents.map((parent, i) => (
           <div key={parent.role} className="flex flex-col items-start gap-[0.75rem]">
             {/* 이미지: 4:3 풀폭 (rounded-8) */}

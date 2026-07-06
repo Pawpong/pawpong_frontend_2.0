@@ -82,7 +82,7 @@ const HealthInfoSection = ({ control }: HealthInfoSectionProps) => {
                   control={control}
                   render={({ field }) => (
                     <Input
-                      placeholder="접종일"
+                      placeholder="접종일 (예: 2024-03-15)"
                       className="flex-1"
                       value={field.value}
                       onChange={field.onChange}
@@ -154,7 +154,11 @@ const HealthInfoSection = ({ control }: HealthInfoSectionProps) => {
                 name="geneticTests.0.date"
                 control={control}
                 render={({ field }) => (
-                  <Input placeholder="검진날짜" value={field.value} onChange={field.onChange} />
+                  <Input
+                    placeholder="검진날짜 (예: 2024-03-15)"
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
                 )}
               />
               <Controller

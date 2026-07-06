@@ -7,6 +7,7 @@ import type {
   ParentInfo,
   BreedingEnvironment,
 } from '@/shared/types'
+import { formatDate } from '@/shared/lib/formatDate'
 
 /** 백엔드 종류(petType) → 탐색 카테고리 매핑 */
 const PET_TYPE_TO_CATEGORY: Record<string, AnimalCategory> = {
@@ -47,7 +48,7 @@ export const mapAdoptionDetail = (d: AdoptionPetDetail): AdoptionDetailDto => {
     role: p.relation === 'father' ? '아빠' : '엄마',
     name: p.name,
     imageUrl: p.photoUrl,
-    birthDate: p.birthDate,
+    birthDate: formatDate(p.birthDate),
   }))
 
   const breedingEnvironment: BreedingEnvironment = {
@@ -65,7 +66,7 @@ export const mapAdoptionDetail = (d: AdoptionPetDetail): AdoptionDetailDto => {
     name: d.name,
     status: toAdoptionStatus(d.status),
     price: `${d.price.toLocaleString('ko-KR')}원`,
-    birthDate: d.birthDate,
+    birthDate: formatDate(d.birthDate),
     gender: d.gender,
     description: d.description,
     tags: d.tags ?? [],

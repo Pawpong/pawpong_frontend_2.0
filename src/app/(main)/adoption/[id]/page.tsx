@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { Container } from '@/shared/ui'
 import { adoptionQueries } from '@/entities/adoption'
+import { profileQueries } from '@/entities/profile'
 import { AdoptionDetailContent } from './_ui/AdoptionDetailContent'
 import { mapAdoptionDetail } from './_lib/mapAdoptionDetail'
 
@@ -12,6 +13,8 @@ const AdoptionDetailPage = () => {
   const petId = params.id
 
   const { data, isLoading, isError } = useQuery(adoptionQueries.detail(petId))
+  // 로그인 사용자 조회 (비로그인 시 undefined) — 브리더 본인 여부 판별용
+  const { data: myProfile } = useQuery(profileQueries.me())
 
   if (isLoading) {
     return (
@@ -29,7 +32,10 @@ const AdoptionDetailPage = () => {
     )
   }
 
-  return <AdoptionDetailContent detail={mapAdoptionDetail(data)} />
+  const detail = mapAdoptionDetail(data)
+  const isOwner = !!myProfile && myProfile.userId === detail.breeder.id
+
+  return <AdoptionDetailContent detail={detail} isOwner={isOwner} />
 }
 
 export default AdoptionDetailPage

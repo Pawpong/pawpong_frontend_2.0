@@ -73,6 +73,26 @@ const AdoptionCreateContent = () => {
           {/* 우측: 폼 필드 */}
           <div className="flex flex-1 flex-col gap-3 tab:gap-[1.375rem]">
             <div className="flex flex-col gap-1.5 tab:gap-[1.125rem]">
+              <FormFieldLabel label="종류" required />
+              <Controller
+                name="petType"
+                control={control}
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="종류 선택" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="dog">강아지</SelectItem>
+                      <SelectItem value="cat">고양이</SelectItem>
+                      <SelectItem value="reptile">파충류</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5 tab:gap-[1.125rem]">
               <FormFieldLabel label="이름" required />
               <Input placeholder="레오파드게코 도마뱀(만다린).여.6개월" {...register('name')} />
             </div>
@@ -89,7 +109,7 @@ const AdoptionCreateContent = () => {
 
             <div className="flex flex-col gap-1.5 tab:gap-[1.125rem]">
               <FormFieldLabel label="태어난 날짜" required />
-              <Input placeholder="생년월일" {...register('birthDate')} />
+              <Input placeholder="생년월일 (예: 2024-03-15)" {...register('birthDate')} />
             </div>
 
             <div className="flex flex-col gap-1.5 tab:gap-[1.125rem]">
