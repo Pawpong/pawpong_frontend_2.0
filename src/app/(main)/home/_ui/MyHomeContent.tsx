@@ -1,15 +1,20 @@
 'use client'
 
 import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
 import { BookmarkIcon } from '@/shared/assets/icons'
 import { Container, SectionHeader, NavigationBar, InputUpload } from '@/shared/ui'
 import { useGnbHeight } from '@/shared/lib/useGnbHeight'
 import { type MyHomePost } from '@/shared/mocks/myHome'
-import { createMockListings } from '@/shared/mocks/adoption'
 import { profileQueries } from '@/entities/profile'
 import { communityQueries } from '@/entities/community'
-import type { AdopterPublicProfile, BreederPublicProfile } from '@/shared/types'
+import { petPostingQueries } from '@/entities/pet-posting'
+import type {
+  AdopterPublicProfile,
+  BreederPublicProfile,
+  AdoptionListingCard,
+  MyPetPostingCard,
+} from '@/shared/types'
 import { FavoriteAdoptionCard } from '@/features/adoption'
 import { ProfileCard } from './ProfileCard'
 import { HomeTabs, TabsContent } from './HomeTabs'
@@ -35,12 +40,37 @@ const TabPanel = ({
   </TabsContent>
 )
 
+// 백엔드 내 분양글 카드(MyPetPostingCard) → 마이홈 카드(AdoptionListingCard) 매핑
+// petType 은 이번 MVP 에서 전송하지 않으므로 category 는 'all' 기본값
+const toListingCard = (c: MyPetPostingCard): AdoptionListingCard => ({
+  listingId: c.petId,
+  name: c.name,
+  gender: c.gender,
+  ageText: c.ageDescription,
+  thumbnailUrl: c.primaryPhotoUrl,
+  status: c.status === 'adopted' ? 'completed' : c.status,
+  category: 'all',
+  inquiryCount: c.inquiryCount,
+  favoriteCount: c.favoriteCount,
+  viewCount: c.viewCount,
+  isFavorited: false,
+  isPopular: false,
+  postedAt: c.createdAt,
+  description: c.description,
+})
+
 const MyHomeContent = () => {
   // 마이홈 프로필 카드: /profile/me 로 내 프로필 조회 (role 에 따라 adopter/breeder 분기, 프로필 이미지 포함)
   const { data: myProfile } = useQuery(profileQueries.me())
 
   // 마이홈 '게시글' 탭 — 내가 작성한 커뮤니티 글을 백엔드에서 조회 (profile 로드 후 활성화)
   const { data: myPostsData } = useQuery(communityQueries.myPosts(!!myProfile))
+
+  // 마이홈 '분양목록' 탭 — 내가 등록한 분양글을 백엔드에서 조회 (브리더일 때만 활성화)
+  const { data: myListingsData } = useInfiniteQuery({
+    ...petPostingQueries.myList(),
+    enabled: myProfile?.role === 'breeder',
+  })
 
   // sticky 헤더 스택: GNB → navbar(top=gnbH) → 탭바(top=gnbH+navH)
   const gnbH = useGnbHeight()
@@ -84,7 +114,9 @@ const MyHomeContent = () => {
     likeCount: post.likeCount,
     commentCount: post.commentCount,
   }))
-  const listings = isBreeder ? createMockListings() : []
+  const listings: AdoptionListingCard[] = isBreeder
+    ? (myListingsData?.pages.flatMap((page) => page.items) ?? []).map(toListingCard)
+    : []
 
   // /profile/me 응답을 ProfileCard 가 쓰는 공개 프로필 형태로 매핑 (프로필 이미지는 profileImageUrl)
   const adopterPublicProfile: AdopterPublicProfile | null =

@@ -34,6 +34,8 @@ const AdoptionCreateContent = () => {
     handleExitConfirm,
     handleUpload,
     handleSaveDraft,
+    isSubmitting,
+    error,
   } = useAdoptionCreateForm()
 
   const { register, control } = form
@@ -132,13 +134,15 @@ const AdoptionCreateContent = () => {
 
       {/* 하단 CTA */}
       <div className="sticky bottom-0 bg-white pb-10 tab:pb-0">
-        <Container className="flex items-center justify-end py-5 tab:py-[1.438rem]">
+        <Container className="flex flex-col items-end gap-2 py-5 tab:py-[1.438rem]">
+          {error && <p className="w-full text-right text-sm text-red-500">{error}</p>}
           <button
             type="button"
             onClick={handleUpload}
-            className="h-12 w-full rounded-full bg-[#d4d4d4] text-base font-semibold text-text-primary tab:w-[17rem]"
+            disabled={isSubmitting}
+            className="h-12 w-full rounded-full bg-[#d4d4d4] text-base font-semibold text-text-primary disabled:opacity-60 tab:w-[17rem]"
           >
-            업로드
+            {isSubmitting ? '업로드 중...' : '업로드'}
           </button>
         </Container>
       </div>

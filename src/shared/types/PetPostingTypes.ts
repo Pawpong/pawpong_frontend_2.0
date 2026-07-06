@@ -32,14 +32,14 @@ export interface ParentPetSnapshot {
   relation: ParentRelation
   breed: string
   name: string
-  birthDate: string
-  photoFileName: string
+  birthDate?: string
+  photoFileName?: string
 }
 
 /** 사육 환경 */
 export interface PetBreedingEnvironment {
   description: string
-  photoFileName: string
+  photoFileName?: string
 }
 
 /** 분양글 작성 요청 */
