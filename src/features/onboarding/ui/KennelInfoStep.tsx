@@ -7,10 +7,11 @@ import { useDuplicateCheck } from '../model/useDuplicateCheck'
 import { useCheckBreederNameDuplicate } from '@/features/auth'
 import { type KennelInfoFormData, REGIONS } from '../model/schema'
 import { StepContainer } from './StepContainer'
-import { Input, TextareaField, HelpMessage } from '@/shared/ui'
-import { StepActionButton, StepSelect } from './StepInput'
+import { TextareaField } from '@/shared/ui'
+import { StepSelect } from './StepInput'
 import { ChipSelect } from './ChipSelect'
 import { ProfileImageUpload } from './ProfileImageUpload'
+import { DuplicateCheckField } from './DuplicateCheckField'
 
 const REGION_OPTIONS = REGIONS.map((r) => ({ value: r, label: r }))
 
@@ -70,28 +71,15 @@ const KennelInfoStep = () => {
 
         {/* 폼 영역 */}
         <div className="flex w-full flex-col gap-[0.625rem] tab:gap-[2.09rem]">
-          {/* 브리더명 + 중복검사 */}
-          <div className="flex flex-col gap-1">
-            <div className="flex gap-2">
-              <Input
-                type="text"
-                placeholder="브리더명(상호명)"
-                {...register('breederName')}
-                className="flex-1"
-              />
-              <StepActionButton
-                onClick={() => breederNameCheck.check(breederName)}
-                disabled={breederNameCheck.isPending}
-              >
-                {breederNameCheck.isPending ? '검사 중' : '중복검사'}
-              </StepActionButton>
-            </div>
-            {breederNameCheck.message && (
-              <HelpMessage status={breederNameCheck.message.status}>
-                {breederNameCheck.message.text}
-              </HelpMessage>
-            )}
-          </div>
+          {/* 브리더명 + 중복검사 — 공통 DuplicateCheckField */}
+          <DuplicateCheckField
+            placeholder="브리더명(상호명)"
+            checkLabel="중복검사"
+            pendingLabel="검사 중"
+            value={breederName}
+            registration={register('breederName')}
+            check={breederNameCheck}
+          />
 
           {/* 지역 */}
           <Controller
@@ -121,13 +109,8 @@ const KennelInfoStep = () => {
                     </>
                   }
                   items={BREED_KEYWORDS}
-                  selected={field.value}
-                  onToggle={(breed) => {
-                    const next = field.value.includes(breed)
-                      ? field.value.filter((b) => b !== breed)
-                      : [...field.value, breed]
-                    field.onChange(next)
-                  }}
+                  value={field.value}
+                  onChange={field.onChange}
                 />
               )}
             />

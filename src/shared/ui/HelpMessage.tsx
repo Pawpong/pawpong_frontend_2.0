@@ -1,7 +1,7 @@
 import type { ComponentType, ReactNode } from 'react'
 import { tv, type VariantProps } from 'tailwind-variants'
 import { cn } from '@/shared/lib/cn'
-import { AlertCircleIcon } from '@/shared/assets/icons'
+import { AlertCircleIcon, CheckRoundedIcon } from '@/shared/assets/icons'
 
 const helpMessage = tv({
   slots: {
@@ -42,9 +42,17 @@ interface HelpMessageProps {
   className?: string
 }
 
+// status별 기본 아이콘 — 성공은 체크, 나머지는 알림 (icon prop으로 언제든 교체)
+const STATUS_ICON: Record<HelpMessageStatus, ComponentType<{ className?: string }>> = {
+  default: AlertCircleIcon,
+  info: AlertCircleIcon,
+  error: AlertCircleIcon,
+  success: CheckRoundedIcon,
+}
+
 const HelpMessage = ({ status = 'default', children, icon, hideIcon, className }: HelpMessageProps) => {
   const styles = helpMessage({ status })
-  const Icon = icon ?? AlertCircleIcon
+  const Icon = icon ?? STATUS_ICON[status]
 
   return (
     <div className={cn(styles.base(), className)}>

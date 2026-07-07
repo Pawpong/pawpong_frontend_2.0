@@ -7,10 +7,9 @@ import { useDuplicateCheck } from '../model/useDuplicateCheck'
 import { useCheckNicknameDuplicate } from '@/features/auth'
 import { type InfoFormData } from '../model/schema'
 import { StepContainer } from './StepContainer'
-import { Input, HelpMessage } from '@/shared/ui'
-import { StepActionButton } from './StepInput'
 import { ChipSelect } from './ChipSelect'
 import { ProfileImageUpload } from './ProfileImageUpload'
+import { DuplicateCheckField } from './DuplicateCheckField'
 
 const SAMPLE_KEYWORDS = [
   '비숑',
@@ -70,44 +69,31 @@ const InfoStep = () => {
           )}
         />
 
-        {/* 닉네임 + 중복검사 */}
-        <div className="flex w-full flex-col gap-1">
-          <div className="flex w-full gap-2">
-            <Input type="text" placeholder="닉네임" {...register('nickname')} className="flex-1" />
-            <StepActionButton
-              onClick={() => nicknameCheck.check(nickname)}
-              disabled={nicknameCheck.isPending}
-            >
-              {nicknameCheck.isPending ? '검사 중' : '중복 검사'}
-            </StepActionButton>
-          </div>
-          {nicknameCheck.message && (
-            <HelpMessage status={nicknameCheck.message.status}>
-              {nicknameCheck.message.text}
-            </HelpMessage>
-          )}
-        </div>
+        {/* 별명 + 중복 확인 (Figma 966-20830) — 공통 DuplicateCheckField */}
+        <DuplicateCheckField
+          label="별명"
+          required
+          placeholder="별명을 입력해주세요"
+          checkLabel="중복 확인"
+          pendingLabel="확인 중"
+          value={nickname}
+          registration={register('nickname')}
+          check={nicknameCheck}
+        />
 
-        {/* 관심있는 키워드 */}
-        <div className="flex w-full flex-col">
-          <Controller
-            name="selectedKeywords"
-            control={control}
-            render={({ field }) => (
-              <ChipSelect
-                label="관심있는 키워드"
-                items={SAMPLE_KEYWORDS}
-                selected={field.value}
-                onToggle={(keyword) => {
-                  const next = field.value.includes(keyword)
-                    ? field.value.filter((k) => k !== keyword)
-                    : [...field.value, keyword]
-                  field.onChange(next)
-                }}
-              />
-            )}
-          />
-        </div>
+        {/* 관심있는 키워드 (ChipSelect 자체가 w-full flex-col) */}
+        <Controller
+          name="selectedKeywords"
+          control={control}
+          render={({ field }) => (
+            <ChipSelect
+              label="관심있는 키워드"
+              items={SAMPLE_KEYWORDS}
+              value={field.value}
+              onChange={field.onChange}
+            />
+          )}
+        />
       </>
     </StepContainer>
   )
