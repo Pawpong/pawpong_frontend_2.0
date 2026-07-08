@@ -8,12 +8,11 @@ import { useGnbHeight } from '@/shared/lib/useGnbHeight'
 import { type MyHomePost } from '@/shared/mocks/myHome'
 import { profileQueries } from '@/entities/profile'
 import { communityQueries } from '@/entities/community'
-import { petPostingQueries } from '@/entities/pet-posting'
+import { petPostingQueries, toListingCard } from '@/entities/pet-posting'
 import type {
   AdopterPublicProfile,
   BreederPublicProfile,
   AdoptionListingCard,
-  MyPetPostingCard,
 } from '@/shared/types'
 import { FavoriteAdoptionCard } from '@/features/adoption'
 import { ProfileCard } from './ProfileCard'
@@ -39,25 +38,6 @@ const TabPanel = ({
     <Container className={className}>{children}</Container>
   </TabsContent>
 )
-
-// 백엔드 내 분양글 카드(MyPetPostingCard) → 마이홈 카드(AdoptionListingCard) 매핑
-// petType 은 이번 MVP 에서 전송하지 않으므로 category 는 'all' 기본값
-const toListingCard = (c: MyPetPostingCard): AdoptionListingCard => ({
-  listingId: c.petId,
-  name: c.name,
-  gender: c.gender,
-  ageText: c.ageDescription,
-  thumbnailUrl: c.primaryPhotoUrl,
-  status: c.status === 'adopted' ? 'completed' : c.status,
-  category: 'all',
-  inquiryCount: c.inquiryCount,
-  favoriteCount: c.favoriteCount,
-  viewCount: c.viewCount,
-  isFavorited: false,
-  isPopular: false,
-  postedAt: c.createdAt,
-  description: c.description,
-})
 
 const MyHomeContent = () => {
   // 마이홈 프로필 카드: /profile/me 로 내 프로필 조회 (role 에 따라 adopter/breeder 분기, 프로필 이미지 포함)

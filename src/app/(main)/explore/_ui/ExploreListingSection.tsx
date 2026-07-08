@@ -23,6 +23,8 @@ interface ExploreListingSectionProps<T> {
   renderCard: (item: T) => ReactNode
   /** featured: 인기 섹션(모바일 4개 2x2, tab+ 3개 중앙) / grid(기본): 전체 소식 그리드 */
   variant?: 'featured' | 'grid'
+  /** grid variant 제목 옆 개수 — 무한스크롤 전체 건수(totalItems)용 (미지정 시 items.length) */
+  count?: number
   className?: string
 }
 
@@ -32,6 +34,7 @@ const ExploreListingSection = <T,>({
   getKey,
   renderCard,
   variant = 'grid',
+  count,
   className,
 }: ExploreListingSectionProps<T>) => {
   if (variant === 'featured') {
@@ -51,7 +54,7 @@ const ExploreListingSection = <T,>({
 
   return (
     <TitledSection
-      title={`${title} ${items.length}`}
+      title={`${title} ${count ?? items.length}`}
       titleClassName={EXPLORE_SECTION_TITLE_CLASS}
       className={cn(GRID_SECTION_CLASS, className)}
     >

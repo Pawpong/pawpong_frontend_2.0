@@ -2,24 +2,24 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
-import { Container, Tabs, TabsList, TabsTrigger } from '@/shared/ui'
+import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
+import { Container, Tabs, TabsList, TabsTrigger, InfiniteScrollTrigger } from '@/shared/ui'
 import { SearchSection } from '@/features/search'
 import { CategorySection } from '@/features/category-filter'
 import { cn } from '@/shared/lib/cn'
 import { useBreakpoint } from '@/shared/lib/useBreakpoint'
 import { useGnbHeight } from '@/shared/lib/useGnbHeight'
-import { createMockListings } from '@/shared/mocks/adoption'
+import { CATEGORY_TO_PET_TYPE } from '@/shared/lib/petCategory'
 import { ANIMAL_CATEGORIES } from '@/shared/types'
 import type { AnimalCategory } from '@/shared/types'
+import { adoptionQueries } from '@/entities/adoption'
 import { FavoriteAdoptionCard } from '@/features/adoption'
 import { BreederExploreContent } from './BreederExploreContent'
 import { ExploreListingSection } from './ExploreListingSection'
 import { ExploreFilterBar } from './ExploreFilterBar'
+import { mapAdoptionCard } from '../_lib/mapAdoptionCard'
 import { EXPLORE_TABS, SEARCH_PLACEHOLDERS, EXPLORE_SECTION_CONTAINER } from '../_lib/constants'
 import type { ExploreType } from '../_lib/constants'
-
-const mockListings = createMockListings()
-const popularListings = mockListings.filter((l) => l.isPopular)
 
 const ExploreContent = () => {
   const searchParams = useSearchParams()
@@ -34,6 +34,30 @@ const ExploreContent = () => {
     categoryParam && ANIMAL_CATEGORIES.includes(categoryParam as AnimalCategory)
       ? (categoryParam as AnimalCategory)
       : 'all'
+
+  // 입양 탐색 실데이터 — 카테고리 칩을 petType 필터로 매핑해 v2 API 조회 (입양 탭에서만 활성화)
+  const isAdoptionTab = selectedType === 'adoption'
+  const petType = CATEGORY_TO_PET_TYPE[selectedCategory]
+  // featured 그리드는 모바일 2x2 4개 노출이라 limit 4
+  const { data: popularData } = useQuery({
+    ...adoptionQueries.popular(petType, 4),
+    enabled: isAdoptionTab,
+  })
+  const {
+    data: listData,
+    isLoading: isListLoading,
+    isError: isListError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    ...adoptionQueries.list('latest', petType),
+    enabled: isAdoptionTab,
+  })
+
+  const popularListings = (popularData ?? []).map(mapAdoptionCard)
+  const listings = (listData?.pages.flatMap((page) => page.items) ?? []).map(mapAdoptionCard)
+  const totalCount = listData?.pages[0]?.pagination.totalItems
 
   const handleTypeChange = useCallback(
     (type: ExploreType) => {
@@ -142,26 +166,46 @@ const ExploreContent = () => {
       <div ref={sentinelRef} aria-hidden />
 
       {selectedType === 'breeder' ? (
-        <BreederExploreContent />
+        <BreederExploreContent selectedCategory={selectedCategory} />
+      ) : isListLoading ? (
+        <Container className="flex items-center justify-center py-10">
+          <p className="text-sm text-[#6b6b6b]">불러오는 중...</p>
+        </Container>
+      ) : isListError ? (
+        <Container className="flex items-center justify-center py-10">
+          <p className="text-sm text-[#6b6b6b]">분양글을 불러오지 못했습니다.</p>
+        </Container>
       ) : (
         <>
           {/* 인기 브리더와 동일 — 섹션별 Container, padding 세로 mo 20px→tab+ 40px, 가로 mo 16px/tab 48/pc 80 */}
           {/* [refactored] 공용 ExploreListingSection — 인기 동물만 tab 가로 80px(margin/pc, Figma 1652-125625) */}
-          <Container className={cn(EXPLORE_SECTION_CONTAINER, 'tab:px-20')}>
-            <ExploreListingSection
-              title="인기 동물"
-              items={popularListings}
-              getKey={(listing) => listing.listingId}
-              renderCard={(listing) => <FavoriteAdoptionCard listing={listing} />}
-              variant="featured"
-            />
-          </Container>
+          {popularListings.length > 0 && (
+            <Container className={cn(EXPLORE_SECTION_CONTAINER, 'tab:px-20')}>
+              <ExploreListingSection
+                title="인기 동물"
+                items={popularListings}
+                getKey={(listing) => listing.listingId}
+                renderCard={(listing) => <FavoriteAdoptionCard listing={listing} />}
+                variant="featured"
+              />
+            </Container>
+          )}
           <Container className={EXPLORE_SECTION_CONTAINER}>
-            <ExploreListingSection
-              title="전체 입양 소식"
-              items={mockListings}
-              getKey={(listing) => listing.listingId}
-              renderCard={(listing) => <FavoriteAdoptionCard listing={listing} />}
+            {listings.length === 0 ? (
+              <p className="py-10 text-center text-sm text-[#6b6b6b]">등록된 분양글이 없습니다.</p>
+            ) : (
+              <ExploreListingSection
+                title="전체 입양 소식"
+                items={listings}
+                count={totalCount}
+                getKey={(listing) => listing.listingId}
+                renderCard={(listing) => <FavoriteAdoptionCard listing={listing} />}
+              />
+            )}
+            <InfiniteScrollTrigger
+              onIntersect={fetchNextPage}
+              hasNextPage={hasNextPage ?? false}
+              isFetchingNextPage={isFetchingNextPage}
             />
           </Container>
         </>

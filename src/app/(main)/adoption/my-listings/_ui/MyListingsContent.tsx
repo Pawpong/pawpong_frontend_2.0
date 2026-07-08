@@ -1,16 +1,21 @@
 'use client'
 
 import Link from 'next/link'
-import { Container, PageHeader, Separator } from '@/shared/ui'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { Container, PageHeader, Separator, InfiniteScrollTrigger } from '@/shared/ui'
 import { FavoriteAdoptionCard } from '@/features/adoption'
-import { createMockListings } from '@/shared/mocks/adoption'
+import { petPostingQueries, toListingCard } from '@/entities/pet-posting'
 import { useListingsFilter } from '../_lib/useListingsFilter'
 import { StatusFilterChips } from './StatusFilterChips'
 import { ReservedListingCard } from './ReservedListingCard'
 import { BreederListingCard } from '@/app/(main)/home/_ui/BreederListingCard'
 
 const MyListingsContent = () => {
-  const allListings = createMockListings()
+  // 내 분양글 실데이터 — 마이홈 분양목록 탭과 동일 API(GET /api/v2/breeder-pet-posting/me).
+  // 상태 칩은 로드된 아이템에 대한 클라이언트 필터(useListingsFilter)로 유지
+  const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery(petPostingQueries.myList())
+  const allListings = (data?.pages.flatMap((page) => page.items) ?? []).map(toListingCard)
   const { activeStatus, setActiveStatus, filteredListings, isGroupedView, groupedByDate } =
     useListingsFilter(allListings)
 
@@ -39,7 +44,13 @@ const MyListingsContent = () => {
           <StatusFilterChips activeStatus={activeStatus} onStatusChange={setActiveStatus} />
         </div>
 
-        {isGroupedView && groupedByDate ? (
+        {isLoading ? (
+          <p className="py-10 text-center text-sm text-[#6b6b6b]">불러오는 중...</p>
+        ) : isError ? (
+          <p className="py-10 text-center text-sm text-[#6b6b6b]">분양글을 불러오지 못했습니다.</p>
+        ) : filteredListings.length === 0 ? (
+          <p className="py-10 text-center text-sm text-[#6b6b6b]">등록된 분양글이 없습니다.</p>
+        ) : isGroupedView && groupedByDate ? (
           /* 예약중: 날짜 그룹 + 가로형 리스트 */
           <div className="flex flex-col gap-3 py-5 tab:gap-[3.787rem] tab:py-8">
             {[...groupedByDate.entries()].map(([date, listings]) => (
@@ -70,6 +81,11 @@ const MyListingsContent = () => {
             </div>
           </>
         )}
+        <InfiniteScrollTrigger
+          onIntersect={fetchNextPage}
+          hasNextPage={hasNextPage ?? false}
+          isFetchingNextPage={isFetchingNextPage}
+        />
       </Container>
     </div>
   )

@@ -1,20 +1,13 @@
 import type {
   AdoptionPetDetail,
   AdoptionDetailDto,
-  AnimalCategory,
   AdoptionStatus,
   HealthInfo,
   ParentInfo,
   BreedingEnvironment,
 } from '@/shared/types'
 import { formatDate } from '@/shared/lib/formatDate'
-
-/** 백엔드 종류(petType) → 탐색 카테고리 매핑 */
-const PET_TYPE_TO_CATEGORY: Record<string, AnimalCategory> = {
-  dog: 'dog',
-  cat: 'cat',
-  reptile: 'lizard',
-}
+import { petTypeToCategory } from '@/shared/lib/petCategory'
 
 /** 백엔드 PetStatus('adopted') → 프론트 AdoptionStatus('completed') */
 const toAdoptionStatus = (status: AdoptionPetDetail['status']): AdoptionStatus =>
@@ -71,7 +64,7 @@ export const mapAdoptionDetail = (d: AdoptionPetDetail): AdoptionDetailDto => {
     description: d.description,
     tags: d.tags ?? [],
     imageUrls,
-    category: (d.petType && PET_TYPE_TO_CATEGORY[d.petType]) || 'all',
+    category: petTypeToCategory(d.petType),
     inquiryCount: d.inquiryCount,
     favoriteCount: d.favoriteCount,
     viewCount: d.viewCount,
