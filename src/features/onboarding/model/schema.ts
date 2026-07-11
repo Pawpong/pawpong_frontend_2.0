@@ -57,17 +57,13 @@ export type InfoFormData = z.infer<typeof infoSchema>
 
 // ─── SurveyStep (일반) ────────────────────────────────────────
 
+// UI 기준: 개인정보 동의만 필수, 자기소개/집비우는시간/생활공간은 "선택"(optional).
+// 이름·휴대폰·이메일은 이 스텝에서 입력받지 않고 이전 스텝/소셜 세션에서 가져오므로 스키마에서 제외.
 export const surveySchema = z.object({
   privacyAgreed: z.literal(true, { error: '개인정보 수집에 동의해주세요' }),
-  name: z.string().min(1, { error: '이름을 입력해주세요' }),
-  phone: z
-    .string()
-    .min(1, { error: '휴대폰번호를 입력해주세요' })
-    .regex(PHONE_REGEX, { error: '올바른 휴대폰번호를 입력해주세요' }),
-  email: z.string().min(1, { error: '이메일을 입력해주세요' }),
-  selfIntro: z.string().min(1, { error: '자기소개를 입력해주세요' }),
-  awayTime: z.string().min(1, { error: '집을 비우는 시간을 입력해주세요' }),
-  livingSpace: z.string().min(1, { error: '생활 공간을 소개해주세요' }),
+  selfIntro: z.string().optional(),
+  awayTime: z.string().optional(),
+  livingSpace: z.string().optional(),
 })
 
 export type SurveyFormData = z.infer<typeof surveySchema>

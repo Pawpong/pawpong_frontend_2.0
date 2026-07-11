@@ -11,12 +11,13 @@ import {
 } from '@/features/auth'
 import { useUpdateMyProfile } from '@/features/profile'
 import {
+  surveySchema,
   type SurveyFormData,
   type ProfileFormData,
   type InfoFormData,
 } from '../model/schema'
 import { StepContainer } from './StepContainer'
-import { TextareaField, HelpMessage, TextLabel } from '@/shared/ui'
+import { TextareaField, TextLabel } from '@/shared/ui'
 import { CheckboxField } from './CheckboxField'
 
 // [refactored] 라벨(선택) + TextareaField 블록 판박이(자기소개·집비우는·공간소개) 통합
@@ -48,15 +49,16 @@ const SurveyStep = () => {
   // 입양자 플로우의 마지막 데이터 단계 — 여기서 실제 가입(social/complete)을 호출한다.
   const { goBack, goNext, formData, setFormData } = useOnboarding()
 
-  const { register, control, watch, handleSubmit } = useStepForm<SurveyFormData>('survey', {
-    privacyAgreed: false as unknown as true,
-    name: '',
-    phone: '',
-    email: '',
-    selfIntro: '',
-    awayTime: '',
-    livingSpace: '',
-  })
+  const { register, control, watch, handleSubmit, firstErrorMessage } = useStepForm<SurveyFormData>(
+    'survey',
+    surveySchema,
+    {
+      privacyAgreed: false as unknown as true,
+      selfIntro: '',
+      awayTime: '',
+      livingSpace: '',
+    },
+  )
 
   const { mutate: completeAdopter, isPending } = useCompleteAdopterRegistration()
   const updateMyProfile = useUpdateMyProfile()
@@ -70,7 +72,9 @@ const SurveyStep = () => {
 
     const social = loadSocialSignupSession()
     if (!social?.tempId) {
-      setSubmitError('소셜 가입 정보가 없습니다. 로그인 화면에서 소셜 로그인으로 다시 시작해주세요.')
+      setSubmitError(
+        '소셜 가입 정보가 없습니다. 로그인 화면에서 소셜 로그인으로 다시 시작해주세요.',
+      )
       return
     }
 
@@ -134,6 +138,7 @@ const SurveyStep = () => {
       onBack={goBack}
       nextLabel={isPending ? '가입 중...' : '다음'}
       nextDisabled={isPending}
+      navError={firstErrorMessage ?? submitError ?? undefined}
     >
       {/* 콘텐츠 영역 — 섹션 간 gap: 모바일 32px / tab+ 58px (Figma root gap, mt 대신 gap) */}
       <div className="flex w-full flex-col gap-8 tab:gap-[3.625rem]">
@@ -210,12 +215,6 @@ const SurveyStep = () => {
           />
         </div>
       </div>
-
-      {submitError && (
-        <HelpMessage status="error" className="justify-center px-4">
-          {submitError}
-        </HelpMessage>
-      )}
     </StepContainer>
   )
 }

@@ -6,7 +6,7 @@ import { CheckRoundedIcon } from '@/shared/assets/icons'
 import { useOnboarding } from '../model/OnboardingContext'
 import { useStepForm } from '../model/useStepForm'
 import { useSendVerificationCode, useVerifyCode } from '@/features/auth'
-import { type ProfileFormData, EMAIL_DOMAINS } from '../model/schema'
+import { profileSchema, type ProfileFormData, EMAIL_DOMAINS } from '../model/schema'
 import { StepLayout } from './StepLayout'
 import { StepTitle } from './StepTitle'
 import { StepIndicator } from './StepIndicator'
@@ -23,7 +23,7 @@ const AGREEMENTS = [
   },
   {
     id: 'privacyAgreed' as const,
-    label: '개인정보 수집 및 이용 동의',
+    label: '(필수) 개인정보 수집 및 이용 동의',
     hasDetail: true,
   },
   {
@@ -36,8 +36,8 @@ const AGREEMENTS = [
 const ProfileStep = () => {
   const { goBack } = useOnboarding()
 
-  const { register, control, handleSubmit, watch, setValue, onSubmit } =
-    useStepForm<ProfileFormData>('profile', {
+  const { register, control, handleSubmit, watch, setValue, onSubmit, firstErrorMessage } =
+    useStepForm<ProfileFormData>('profile', profileSchema, {
       email: '',
       emailDomain: EMAIL_DOMAINS[0],
       phone: '',
@@ -74,7 +74,8 @@ const ProfileStep = () => {
     return () => clearInterval(timerId)
   }, [isCodeSent, isPhoneVerified])
 
-  const formatTimer = (sec: number) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`
+  const formatTimer = (sec: number) =>
+    `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`
 
   const handleSendCode = () => {
     if (!phone) {
@@ -262,7 +263,11 @@ const ProfileStep = () => {
         </div>
       </div>
 
-      <StepNavButtons onNext={() => handleSubmit(onSubmit)()} onBack={goBack} />
+      <StepNavButtons
+        onNext={() => handleSubmit(onSubmit)()}
+        onBack={goBack}
+        error={firstErrorMessage}
+      />
     </StepLayout>
   )
 }

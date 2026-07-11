@@ -40,7 +40,7 @@ const CompleteStep = () => {
         onNext={() => router.push('/')}
         nextLabel="다음"
         extraButtons={
-          <Button variant="text" className="font-medium text-base tab:text-sm">
+          <Button variant="text" className="text-base font-medium tab:text-sm">
             문의하기
           </Button>
         }

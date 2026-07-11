@@ -5,7 +5,7 @@ import { useOnboarding } from '../model/OnboardingContext'
 import { useStepForm } from '../model/useStepForm'
 import { useDuplicateCheck } from '../model/useDuplicateCheck'
 import { useCheckBreederNameDuplicate } from '@/features/auth'
-import { type KennelInfoFormData, REGIONS } from '../model/schema'
+import { kennelInfoSchema, type KennelInfoFormData, REGIONS } from '../model/schema'
 import { StepContainer } from './StepContainer'
 import { TextareaField } from '@/shared/ui'
 import { StepSelect } from './StepInput'
@@ -32,16 +32,14 @@ const BREED_KEYWORDS = [
 const KennelInfoStep = () => {
   const { goBack } = useOnboarding()
 
-  const { register, control, handleSubmit, watch, onSubmit } = useStepForm<KennelInfoFormData>(
-    'kennel-info',
-    {
+  const { register, control, handleSubmit, watch, onSubmit, firstErrorMessage } =
+    useStepForm<KennelInfoFormData>('kennel-info', kennelInfoSchema, {
       breederName: '',
       region: undefined,
       selectedBreeds: [],
       profileImage: undefined,
       introduction: '',
-    },
-  )
+    })
 
   const breederName = watch('breederName')
 
@@ -58,6 +56,7 @@ const KennelInfoStep = () => {
       title="브리더 정보를 입력해주세요"
       onNext={() => handleSubmit(onSubmit)()}
       onBack={goBack}
+      navError={firstErrorMessage}
     >
       <div className="mt-[2rem] flex w-full flex-col items-center gap-[2rem] px-5 tab:mt-[3.625rem] tab:max-w-[40.625rem] tab:gap-[3.625rem] tab:px-0">
         {/* 업로드 후 받은 URL을 폼(profileImage)에 보관 → DocumentsStep의 social/complete에서 전송 */}

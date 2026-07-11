@@ -14,6 +14,8 @@ interface StepContainerProps {
   onBack?: () => void
   nextLabel?: string
   nextDisabled?: boolean
+  /** 검증 실패 등 nav 버튼 위 에러 메시지 */
+  navError?: string
   layoutClassName?: string
   navClassName?: string
   navExtraButtons?: React.ReactNode
@@ -27,6 +29,7 @@ const StepContainer = ({
   onBack,
   nextLabel,
   nextDisabled,
+  navError,
   layoutClassName,
   navClassName,
   navExtraButtons,
@@ -46,6 +49,7 @@ const StepContainer = ({
       onBack={onBack}
       nextLabel={nextLabel}
       nextDisabled={nextDisabled}
+      error={navError}
       className={navClassName}
       extraButtons={navExtraButtons}
     />

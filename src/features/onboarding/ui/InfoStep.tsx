@@ -5,7 +5,7 @@ import { useOnboarding } from '../model/OnboardingContext'
 import { useStepForm } from '../model/useStepForm'
 import { useDuplicateCheck } from '../model/useDuplicateCheck'
 import { useCheckNicknameDuplicate } from '@/features/auth'
-import { type InfoFormData } from '../model/schema'
+import { infoSchema, type InfoFormData } from '../model/schema'
 import { StepContainer } from './StepContainer'
 import { ChipSelect } from './ChipSelect'
 import { ProfileImageUpload } from './ProfileImageUpload'
@@ -38,11 +38,12 @@ const SAMPLE_KEYWORDS = [
 const InfoStep = () => {
   const { goBack } = useOnboarding()
 
-  const { register, control, handleSubmit, watch, onSubmit } = useStepForm<InfoFormData>('info', {
-    nickname: '',
-    selectedKeywords: [],
-    profileImage: '',
-  })
+  const { register, control, handleSubmit, watch, onSubmit, firstErrorMessage } =
+    useStepForm<InfoFormData>('info', infoSchema, {
+      nickname: '',
+      selectedKeywords: [],
+      profileImage: '',
+    })
 
   const nickname = watch('nickname')
 
@@ -59,6 +60,7 @@ const InfoStep = () => {
       title="회원 정보를 입력해주세요"
       onNext={() => handleSubmit(onSubmit)()}
       onBack={goBack}
+      navError={firstErrorMessage}
     >
       <>
         <Controller
