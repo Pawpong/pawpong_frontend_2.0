@@ -31,7 +31,10 @@ export const profileSchema = z.object({
   phone: z
     .string()
     .min(1, { error: '휴대폰번호를 입력해주세요' })
-    .regex(PHONE_REGEX, { error: '올바른 휴대폰번호를 입력해주세요' }),
+    // API가 하이픈을 제거하므로 검증도 하이픈 제거 후 판정 (010-1234-5678 허용)
+    .refine((v) => PHONE_REGEX.test(v.replace(/-/g, '')), {
+      error: '올바른 휴대폰번호를 입력해주세요',
+    }),
   verificationCode: z
     .string()
     .min(1, { error: '인증번호를 입력해주세요' })
