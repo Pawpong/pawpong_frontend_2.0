@@ -12,16 +12,11 @@ interface InputFieldProps {
 
 const InputField = ({ label, required, error, className, children }: InputFieldProps) => (
   <div className={cn('flex flex-col', className)}>
+    {/* 공통 TextLabel + requirement — Figma label-필수 medium(14) */}
     {label && (
-      <div className="flex items-center gap-1">
-        {/* 공통 TextLabel — Figma Label 14 bold/medium */}
-        <TextLabel size="14">{label}</TextLabel>
-        {required && (
-          <TextLabel size="14" weight="medium" color="secondary">
-            필수
-          </TextLabel>
-        )}
-      </div>
+      <TextLabel size="14" requirement={required ? '필수' : undefined}>
+        {label}
+      </TextLabel>
     )}
     {children}
     {error && <p className="mt-1 text-xs text-[#d63d4a]">{error}</p>}
