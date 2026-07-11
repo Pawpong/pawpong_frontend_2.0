@@ -1,4 +1,4 @@
-import { Button } from '@/shared/ui'
+import { Button, HelpMessage } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 
 interface StepNavButtonsProps {
@@ -7,6 +7,8 @@ interface StepNavButtonsProps {
   nextLabel?: string
   backLabel?: string
   nextDisabled?: boolean
+  /** 검증 실패 등 버튼 위에 노출할 에러 메시지 */
+  error?: string
   className?: string
   extraButtons?: React.ReactNode
 }
@@ -17,6 +19,7 @@ const StepNavButtons = ({
   nextLabel = '다음',
   backLabel = '뒤로',
   nextDisabled = false,
+  error,
   className,
   extraButtons,
 }: StepNavButtonsProps) => (
@@ -27,6 +30,11 @@ const StepNavButtons = ({
       className,
     )}
   >
+    {error && (
+      <HelpMessage status="error" className="justify-center">
+        {error}
+      </HelpMessage>
+    )}
     {onNext && (
       <Button
         variant="primary"
@@ -40,7 +48,7 @@ const StepNavButtons = ({
     )}
     {extraButtons}
     {onBack && (
-      <Button variant="text" onClick={onBack} className="font-medium text-base tab:text-sm">
+      <Button variant="text" onClick={onBack} className="text-base font-medium tab:text-sm">
         {backLabel}
       </Button>
     )}

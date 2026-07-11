@@ -2,6 +2,7 @@
 
 import { cafe24Proup } from '@/shared/lib/fonts'
 import { cn } from '@/shared/lib/cn'
+import { useGnbHeight } from '@/shared/lib/useGnbHeight'
 import { useOnboarding } from '../model/OnboardingContext'
 
 const FILL_START = 10.4868
@@ -68,12 +69,16 @@ const ProgressBarSvg = ({ percent }: ProgressBarSvgProps) => {
 
 const StepProgressBar = () => {
   const { currentStepIndex, steps } = useOnboarding()
+  const gnbH = useGnbHeight() // 위쪽 sticky 헤더(로고) 아래에 고정
 
   const visibleSteps = steps.filter((step) => step.id !== 'complete')
   const progressPercent = Math.round(((currentStepIndex + 1) / (visibleSteps.length + 1)) * 100)
 
   return (
-    <div className="flex w-full items-center justify-center bg-white px-4 py-1 tab:px-12 tab:py-2 pc:px-20">
+    <div
+      style={{ top: gnbH }}
+      className="sticky z-20 flex w-full items-center justify-center bg-white px-4 py-1 tab:px-12 tab:py-2 pc:px-20"
+    >
       <div className="flex w-full items-center justify-center gap-[0.125rem]">
         <div
           className={cn(

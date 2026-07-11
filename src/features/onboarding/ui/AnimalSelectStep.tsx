@@ -3,7 +3,7 @@
 import { Controller } from 'react-hook-form'
 import { cn } from '@/shared/lib/cn'
 import { useStepForm } from '../model/useStepForm'
-import { type AnimalSelectFormData, ANIMAL_TYPES } from '../model/schema'
+import { animalSelectSchema, type AnimalSelectFormData, ANIMAL_TYPES } from '../model/schema'
 import { StepContainer } from './StepContainer'
 
 const ANIMAL_OPTIONS = [
@@ -13,12 +13,10 @@ const ANIMAL_OPTIONS = [
 ] as const
 
 const AnimalSelectStep = () => {
-  const { control, handleSubmit, watch, onSubmit } = useStepForm<AnimalSelectFormData>(
-    'animal-select',
-    {
+  const { control, handleSubmit, watch, onSubmit, firstErrorMessage } =
+    useStepForm<AnimalSelectFormData>('animal-select', animalSelectSchema, {
       selected: undefined as unknown as (typeof ANIMAL_TYPES)[number],
-    },
-  )
+    })
 
   const selected = watch('selected')
 
@@ -26,6 +24,7 @@ const AnimalSelectStep = () => {
     <StepContainer
       title="어떤 동물을 브리딩 하시나요?"
       onNext={() => handleSubmit(onSubmit)()}
+      navError={firstErrorMessage}
       nextDisabled={!selected}
       layoutClassName="min-h-[calc(100dvh-3rem)] pb-0 tab:min-h-0"
       navClassName="static right-auto bottom-auto left-auto z-auto tab:mt-[4rem]"

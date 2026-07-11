@@ -1,7 +1,8 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { ImageIcon } from '@/shared/assets/icons'
+import { PixelUserIcon } from '@/shared/assets/icons'
+import { HelpMessage } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { useUploadProfileImage, loadSocialSignupSession } from '@/features/auth'
 
@@ -53,14 +54,14 @@ const ProfileImageUpload = ({ value, onChange, className }: ProfileImageUploadPr
         type="button"
         onClick={() => inputRef.current?.click()}
         disabled={isPending}
-        className="flex size-[5rem] items-center justify-center overflow-hidden rounded-full bg-[#6b6b6b] disabled:opacity-60 tab:size-[6.25rem]"
+        className="flex size-[5rem] items-center justify-center overflow-hidden rounded-full bg-[#a6a6a6] disabled:opacity-60 tab:size-[6.25rem]"
       >
         {shownImage ? (
           // 사용자가 고른 파일(blob)·CDN URL 모두 표시 — next/image는 blob 미지원이라 img 사용
           // eslint-disable-next-line @next/next/no-img-element
           <img src={shownImage} alt="프로필 미리보기" className="size-full object-cover" />
         ) : (
-          <ImageIcon className="size-[2.5rem] text-white tab:size-[3.5rem]" />
+          <PixelUserIcon className="size-[2.5rem] text-white tab:size-[3.5rem]" />
         )}
       </button>
       <input
@@ -71,7 +72,7 @@ const ProfileImageUpload = ({ value, onChange, className }: ProfileImageUploadPr
         onChange={handleFileChange}
       />
       {isPending && <p className="text-[0.75rem] text-[#6b6b6b]">업로드 중...</p>}
-      {error && <p className="text-[0.75rem] text-red-500">{error}</p>}
+      {error && <HelpMessage status="error">{error}</HelpMessage>}
     </div>
   )
 }
