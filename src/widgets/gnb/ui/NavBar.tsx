@@ -7,6 +7,7 @@ import { cn } from '@/shared/lib/cn'
 import { useNavigationGuardContext } from '@/shared/lib/NavigationGuardContext'
 import { HomeIcon } from '@/shared/assets/icons'
 import { NAV_ITEMS } from './NavItems'
+import { NotificationBell } from './NotificationBell'
 
 const NavBar = ({ className }: { className?: string }) => {
   const pathname = usePathname()
@@ -42,6 +43,8 @@ const NavBar = ({ className }: { className?: string }) => {
           </Link>
         )
       })}
+      {/* 알림 — 링크 대신 유튜브식 드롭다운 */}
+      <NotificationBell />
     </nav>
   )
 }

@@ -10,12 +10,18 @@ import type { AdopterPublicProfile, BreederPublicProfile } from '@/shared/types'
 
 type ProfileMode = 'mine' | 'mine-breeder' | 'other' | 'breeder'
 
-interface ProfileCardBaseProps {
+// 하단 액션(메시지/상담 등)에 공통으로 전달되는 핸들러
+interface ProfileActionProps {
+  onMessage?: () => void
+  isMessagePending?: boolean
+}
+
+interface ProfileCardBaseProps extends ProfileActionProps {
   profile: AdopterPublicProfile
   mode?: 'mine' | 'other'
 }
 
-interface ProfileCardBreederProps {
+interface ProfileCardBreederProps extends ProfileActionProps {
   profile: BreederPublicProfile
   mode: 'breeder' | 'mine-breeder'
 }
@@ -80,12 +86,21 @@ const IconPillButton = ({
   icon,
   label,
   className,
+  onClick,
+  disabled,
 }: {
   icon: string
   label: string
   className?: string
+  onClick?: () => void
+  disabled?: boolean
 }) => (
-  <button type="button" className={cn(PILL_BASE, 'gap-1.5', className)}>
+  <button
+    type="button"
+    onClick={onClick}
+    disabled={disabled}
+    className={cn(PILL_BASE, 'gap-1.5 disabled:opacity-50', className)}
+  >
     <Image src={icon} alt={label} width={20} height={20} />
     <span className="text-sm leading-[1.375rem] font-semibold text-text-primary">{label}</span>
   </button>
@@ -95,10 +110,22 @@ const IconPillButton = ({
 const MessageButton = ({
   label = '메시지 보내기',
   className,
+  onClick,
+  disabled,
 }: {
   label?: string
   className?: string
-}) => <IconPillButton icon="/chat.svg" label={label} className={className} />
+  onClick?: () => void
+  disabled?: boolean
+}) => (
+  <IconPillButton
+    icon="/chat.svg"
+    label={label}
+    className={className}
+    onClick={onClick}
+    disabled={disabled}
+  />
+)
 
 const FavoriteButton = ({ className }: { className?: string }) => (
   <IconPillButton icon="/star.svg" label="즐겨찾기 등록" className={className} />
@@ -117,17 +144,22 @@ const EditButton = () => (
 
 const MineActions = () => <EditButton />
 
-const BreederActions = () => (
+const BreederActions = ({ onMessage, isMessagePending }: ProfileActionProps) => (
   <>
     <FavoriteButton className="hidden tab:flex tab:w-[12.5rem]" />
-    <MessageButton label="상담하기" className="tab:w-[12.5rem]" />
+    <MessageButton
+      label="상담하기"
+      className="tab:w-[12.5rem]"
+      onClick={onMessage}
+      disabled={isMessagePending}
+    />
     <FollowButton className="flex-1" />
   </>
 )
 
-const OtherActions = () => (
+const OtherActions = ({ onMessage, isMessagePending }: ProfileActionProps) => (
   <>
-    <MessageButton className="tab:w-[12.5rem]" />
+    <MessageButton className="tab:w-[12.5rem]" onClick={onMessage} disabled={isMessagePending} />
     <FollowButton className="flex-1" />
   </>
 )
@@ -137,11 +169,11 @@ const ACTION_MAP = {
   'mine-breeder': MineActions,
   breeder: BreederActions,
   other: OtherActions,
-} satisfies Record<ProfileMode, ComponentType>
+} satisfies Record<ProfileMode, ComponentType<ProfileActionProps>>
 
 /* ── ProfileCard ── */
 
-const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
+const ProfileCard = ({ profile, mode = 'mine', onMessage, isMessagePending }: ProfileCardProps) => {
   const Actions = ACTION_MAP[mode]
   // [refactored] 타입 단언(as) 대신 in-내로잉으로 브리더 프로필 판별
   const breederProfile = 'businessLocation' in profile ? profile : null
@@ -191,7 +223,7 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
         </div>
         {/* 하단: 모드별 버튼 (풀폭, gap-10, h-40) */}
         <div className="flex w-full items-start gap-2.5">
-          <Actions />
+          <Actions onMessage={onMessage} isMessagePending={isMessagePending} />
         </div>
       </div>
 
@@ -217,7 +249,7 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
         <div className="flex flex-col items-center gap-3 pb-8">
           <div className="h-px w-full bg-[#e4e4e4]" />
           <div className="flex w-full max-w-[36.625rem] items-center gap-6 px-5">
-            <Actions />
+            <Actions onMessage={onMessage} isMessagePending={isMessagePending} />
           </div>
         </div>
       </div>

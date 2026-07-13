@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
+import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { Container } from '@/shared/ui'
 import type { AdoptionListingCard } from '@/shared/types'
@@ -9,6 +10,7 @@ import type { MyHomePost } from '@/shared/mocks/myHome'
 import { breederQueries } from '@/entities/breeder'
 import { adoptionQueries } from '@/entities/adoption'
 import { communityQueries } from '@/entities/community'
+import { useCreateOrGetChatRoom } from '@/features/send-message'
 import { mapAdoptionCard } from '@/app/(main)/explore/_lib/mapAdoptionCard'
 import { toMyHomePost } from '../../_lib/toMyHomePost'
 import { ProfileCard } from '../../_ui/ProfileCard'
@@ -26,7 +28,21 @@ interface BreederHomeContentProps {
 
 const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
   const [activeTab, setActiveTab] = useState('listings')
+  const router = useRouter()
   const { data: profile } = useQuery(breederQueries.publicProfile(userId))
+
+  // 상담하기 — 브리더와의 채팅방 생성/조회 후 대화로 이동
+  const { mutate: startChat, isPending: isStartingChat } = useCreateOrGetChatRoom()
+  const handleMessage = () => {
+    startChat(
+      { breederId: userId },
+      {
+        onSuccess: (room) => router.push(`/chat?roomId=${room.roomId}`),
+        onError: (error) =>
+          window.alert(error instanceof Error ? error.message : '채팅을 시작하지 못했습니다.'),
+      },
+    )
+  }
 
   // 분양 개체 탭 — GET /adoption?breederId=userId
   const { data: listingsData } = useInfiniteQuery(adoptionQueries.breederPets(userId))
@@ -52,7 +68,12 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
       />
 
       <Container className="pc:px-[10rem]">
-        <ProfileCard profile={profile} mode="breeder" />
+        <ProfileCard
+          profile={profile}
+          mode="breeder"
+          onMessage={handleMessage}
+          isMessagePending={isStartingChat}
+        />
       </Container>
 
       <HomeTabs tabs={BREEDER_HOME_TABS} activeTab={activeTab} onTabChange={setActiveTab}>

@@ -4,7 +4,6 @@ import { cn } from '@/shared/lib/cn'
 import type { ChatRoomResponseDto } from '@/shared/types'
 import { CHAT_GUTTER_X } from '../_lib/constants'
 import { useChatRoomFilter } from '../_lib/useChatRoomFilter'
-import { getUnreadCount } from '../_lib/utils'
 import { ChatFilterTabs } from './ChatFilterTabs'
 import { ChatRoomItem } from './ChatRoomItem'
 
@@ -24,7 +23,13 @@ const ChatRoomFilterableList = ({
   listClassName,
   gutterClassName = CHAT_GUTTER_X,
 }: ChatRoomFilterableListProps) => {
-  const { filter, setFilter, filteredRooms } = useChatRoomFilter()
+  const { filter, setFilter, filteredRooms, isLoading, isError } = useChatRoomFilter()
+
+  const emptyMessage = isLoading
+    ? '불러오는 중...'
+    : isError
+      ? '채팅방을 불러오지 못했습니다'
+      : '채팅방이 없습니다'
 
   return (
     <>
@@ -36,7 +41,7 @@ const ChatRoomFilterableList = ({
 
       {filteredRooms.length === 0 ? (
         <div className="flex items-center justify-center py-20">
-          <p className="text-sm font-medium text-[#6b6b6b]">채팅방이 없습니다</p>
+          <p className="text-sm font-medium text-[#6b6b6b]">{emptyMessage}</p>
         </div>
       ) : (
         <div className={cn('flex flex-col gap-5 py-6 pc:py-10', gutterClassName, listClassName)}>
@@ -45,7 +50,7 @@ const ChatRoomFilterableList = ({
               key={room.roomId}
               room={room}
               isActive={room.roomId === activeRoomId}
-              unreadCount={getUnreadCount(room)}
+              unreadCount={room.unreadCount}
               onClick={() => onSelectRoom(room)}
             />
           ))}

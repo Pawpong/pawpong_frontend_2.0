@@ -1,10 +1,8 @@
 import { apiClient, API_VERSION, unwrap, unwrapVoid } from '@/shared/api'
-import type {
-  ChatRoomResponseDto,
-  ChatMessageResponseDto,
-  CreateRoomRequestDto,
-  SendChatMessageRequest,
-} from '@/shared/types'
+import type { ChatRoomResponseDto, CreateRoomRequestDto } from '@/shared/types'
+
+// 메시지 전송/수신은 REST 가 아니라 WebSocket(/chat 네임스페이스, send_message/new_message)으로
+// 처리한다. useChatRoomSocket 참고. (백엔드에 메시지 전송용 REST 엔드포인트는 존재하지 않음)
 
 /** 채팅방 생성 또는 기존 방 조회 */
 export const createOrGetChatRoom = (data: CreateRoomRequestDto) =>
@@ -25,13 +23,3 @@ export const closeChatRoom = (roomId: string) =>
       message?: string
     }>(`${API_VERSION}/chat/rooms/${roomId}`)
     .then(unwrapVoid)
-
-/** 채팅 메시지 전송 */
-export const sendChatMessage = (roomId: string, data: SendChatMessageRequest) =>
-  apiClient
-    .post<{
-      success: boolean
-      data: ChatMessageResponseDto
-      message?: string
-    }>(`${API_VERSION}/chat/rooms/${roomId}/messages`, data)
-    .then(unwrap)

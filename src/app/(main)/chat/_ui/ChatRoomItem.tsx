@@ -3,7 +3,6 @@
 import { cn } from '@/shared/lib/cn'
 import { MoreVertIcon } from '@/shared/assets/icons'
 import type { ChatRoomResponseDto } from '@/shared/types'
-import { getDisplayName } from '../_lib/utils'
 import { ProfileAvatar } from '@/shared/ui'
 import { RelativeTime } from './RelativeTime'
 
@@ -15,7 +14,7 @@ interface ChatRoomItemProps {
 }
 
 const ChatRoomItem = ({ room, isActive, unreadCount = 0, onClick }: ChatRoomItemProps) => {
-  const displayName = getDisplayName(room.breederId)
+  const displayName = room.counterpart.nickname
 
   return (
     <div

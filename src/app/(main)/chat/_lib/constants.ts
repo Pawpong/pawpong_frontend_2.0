@@ -11,7 +11,10 @@ const FILTER_TABS: { value: FilterTab; label: string }[] = [
 
 const filterRooms = (rooms: ChatRoomResponseDto[], filter: FilterTab): ChatRoomResponseDto[] => {
   if (filter === 'all') return rooms
+  if (filter === 'unread') return rooms.filter((room) => room.unreadCount > 0)
+  // 입양 신청(applicationId 有) 채팅 vs 일반 상담 채팅으로 구분
   if (filter === 'adoption') return rooms.filter((room) => !!room.applicationId)
+  if (filter === 'counsel') return rooms.filter((room) => !room.applicationId)
   return rooms
 }
 

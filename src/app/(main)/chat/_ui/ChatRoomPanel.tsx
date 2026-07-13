@@ -1,11 +1,12 @@
 'use client'
 
 import * as React from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { cn } from '@/shared/lib/cn'
-import { MOCK_CHAT_MESSAGES } from '@/shared/mocks/chat'
 import type { ChatRoomResponseDto } from '@/shared/types'
+import { chatQueries, useChatRoomSocket } from '@/entities/chat'
+import { profileQueries } from '@/entities/profile'
 import { CHAT_CONTENT_WIDTH, CHAT_GUTTER_X } from '../_lib/constants'
-import { getDisplayName } from '../_lib/utils'
 import { ChatRoomHeader } from './ChatRoomHeader'
 import { PetInfoCard } from './PetInfoCard'
 import { ChatNoticeBanner } from './ChatNoticeBanner'
@@ -14,23 +15,31 @@ import { ChatMessageInput } from './ChatMessageInput'
 
 interface ChatRoomPanelProps {
   room: ChatRoomResponseDto
-  currentUserId: string
   onBack: () => void
 }
 
-const ChatRoomPanel = ({ room, currentUserId, onBack }: ChatRoomPanelProps) => {
-  const messages = MOCK_CHAT_MESSAGES.filter((msg) => msg.roomId === room.roomId)
+const ChatRoomPanel = ({ room, onBack }: ChatRoomPanelProps) => {
+  const displayName = room.counterpart.nickname
   const messagesEndRef = React.useRef<HTMLDivElement>(null)
-  const displayName = getDisplayName(room.breederId)
   const [showNotice, setShowNotice] = React.useState(true)
+
+  // 현재 사용자 (소켓 수신 메시지의 isMine 계산에 사용)
+  const { data: myProfile } = useQuery(profileQueries.me())
+  const currentUserId = myProfile?.userId ?? ''
+
+  // 메시지 내역 조회 (GET /chat/rooms/:roomId/messages) — 시간 오름차순 정렬
+  const { data: history } = useQuery(chatQueries.messages(room.roomId))
+  const messages = React.useMemo(
+    () => [...(history ?? [])].sort((a, b) => a.createdAt.localeCompare(b.createdAt)),
+    [history],
+  )
+
+  // 실시간 연결 (join_room / new_message 수신 / send_message)
+  const { sendMessage } = useChatRoomSocket(room.roomId, currentUserId)
 
   React.useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages.length])
-
-  const handleSend = (_content: string) => {
-    // mock: no-op
-  }
 
   return (
     <div className="flex h-[calc(100dvh-4rem)] flex-col bg-[#ededed]">
@@ -58,15 +67,15 @@ const ChatRoomPanel = ({ room, currentUserId, onBack }: ChatRoomPanelProps) => {
       <div className={cn('flex-1 overflow-y-auto py-5', CHAT_GUTTER_X)}>
         <div className={cn(CHAT_CONTENT_WIDTH, 'flex flex-col gap-3')}>
           {messages.map((msg, idx) => {
-            const isMine = msg.senderId === currentUserId
             const prevMsg = messages[idx - 1]
-            const showProfile = !isMine && (!prevMsg || prevMsg.senderId !== msg.senderId)
+            // 상대가 연속으로 보낸 메시지 묶음의 첫 줄에만 프로필 표시
+            const showProfile = !msg.isMine && (!prevMsg || prevMsg.isMine)
 
             return (
               <ChatMessageBubble
                 key={msg.messageId}
                 message={msg}
-                isMine={isMine}
+                isMine={msg.isMine}
                 senderName={displayName}
                 showProfile={showProfile}
               />
@@ -77,7 +86,7 @@ const ChatRoomPanel = ({ room, currentUserId, onBack }: ChatRoomPanelProps) => {
       </div>
 
       {/* Input */}
-      <ChatMessageInput onSend={handleSend} disabled={room.status === 'closed'} />
+      <ChatMessageInput onSend={sendMessage} disabled={room.status === 'closed'} />
     </div>
   )
 }
