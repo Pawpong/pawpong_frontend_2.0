@@ -3,7 +3,7 @@ import { tv, type VariantProps } from 'tailwind-variants'
 import { cn } from '@/shared/lib/cn'
 
 const inputVariants = tv({
-  base: 'flex h-[2.8125rem] w-full rounded-lg border bg-white p-3 text-[0.875rem] font-medium leading-[1.5] text-[#3e3e3e] outline-none placeholder:text-[#a6a6a6] focus:border-[#256ef4] disabled:cursor-not-allowed disabled:border-[#dbdbdb] disabled:bg-[#e4e4e4] disabled:text-[#b8b8b8]',
+  base: 'flex h-[2.8125rem] w-full rounded-lg border bg-white p-3 text-[0.875rem] font-medium leading-[1.5] text-[#3e3e3e] outline-none placeholder:text-[#a6a6a6] focus:border-[#0072ff] disabled:cursor-not-allowed disabled:border-[#dbdbdb] disabled:bg-[#e4e4e4] disabled:text-[#b8b8b8]',
   variants: {
     state: {
       default: 'border-[#e4e4e4]',

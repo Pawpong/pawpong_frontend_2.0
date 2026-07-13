@@ -14,6 +14,8 @@ interface StepContainerProps {
   onBack?: () => void
   nextLabel?: string
   nextDisabled?: boolean
+  /** 검증 실패 등 nav 버튼 위 에러 메시지 */
+  navError?: string
   layoutClassName?: string
   navClassName?: string
   navExtraButtons?: React.ReactNode
@@ -27,14 +29,17 @@ const StepContainer = ({
   onBack,
   nextLabel,
   nextDisabled,
+  navError,
   layoutClassName,
   navClassName,
   navExtraButtons,
 }: StepContainerProps) => (
-  <StepLayout className={layoutClassName}>
+  <StepLayout className={cn('w-full flex-1', layoutClassName)}>
     <StepTitle subtitle={subtitle}>{title}</StepTitle>
 
-    <div className="flex w-full max-w-[40.625rem] flex-col items-center gap-8 px-4 py-12 tab:gap-[3.625rem] tab:px-0 tab:py-12">
+    {/* tab+: flex-1로 남는 공간 채워 nav를 바닥에 붙임. 모바일: nav가 fixed라 flex-1 불필요 →
+        자연 높이 + pb로 fixed nav 가림 방지(내용이 뷰포트보다 커도 잘리지 않고 페이지 스크롤) */}
+    <div className="flex w-full max-w-[40.625rem] flex-col items-center gap-8 px-4 pt-12 pb-[7rem] tab:min-h-0 tab:flex-1 tab:gap-[3.625rem] tab:px-0 tab:py-12">
       <StepIndicator />
       {children}
     </div>
@@ -44,6 +49,7 @@ const StepContainer = ({
       onBack={onBack}
       nextLabel={nextLabel}
       nextDisabled={nextDisabled}
+      error={navError}
       className={navClassName}
       extraButtons={navExtraButtons}
     />

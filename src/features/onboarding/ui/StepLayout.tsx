@@ -6,7 +6,7 @@ interface StepLayoutProps {
 }
 
 const StepLayout = ({ children, className }: StepLayoutProps) => (
-  <div className={cn('flex flex-col items-center pb-[7rem] tab:pb-0', className)}>{children}</div>
+  <div className={cn('flex flex-col items-center', className)}>{children}</div>
 )
 
 export { StepLayout }

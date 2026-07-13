@@ -12,6 +12,7 @@ import {
 } from '@/features/auth'
 import { useUpdateMyProfile } from '@/features/profile'
 import {
+  documentsSchema,
   type DocumentsFormData,
   type AnimalSelectFormData,
   type KennelInfoFormData,
@@ -33,11 +34,12 @@ const DocumentsStep = () => {
   // 브리더 플로우의 마지막 데이터 단계 — 여기서 서류 업로드 + 실제 가입(social/complete)을 호출한다.
   const { goBack, goNext, formData, setFormData } = useOnboarding()
 
-  const { control, handleSubmit, watch, setValue } = useStepForm<DocumentsFormData>('documents', {
-    idDocument: undefined,
-    registrationCert: undefined,
-    breederAgreed: false as unknown as true,
-  })
+  const { control, handleSubmit, watch, setValue, firstErrorMessage } =
+    useStepForm<DocumentsFormData>('documents', documentsSchema, {
+      idDocument: undefined,
+      registrationCert: undefined,
+      breederAgreed: false as unknown as true,
+    })
 
   const idDocument = watch('idDocument')
   const registrationCert = watch('registrationCert')
@@ -61,7 +63,9 @@ const DocumentsStep = () => {
 
     const social = loadSocialSignupSession()
     if (!social?.tempId) {
-      setSubmitError('소셜 가입 정보가 없습니다. 로그인 화면에서 소셜 로그인으로 다시 시작해주세요.')
+      setSubmitError(
+        '소셜 가입 정보가 없습니다. 로그인 화면에서 소셜 로그인으로 다시 시작해주세요.',
+      )
       return
     }
 
@@ -77,6 +81,7 @@ const DocumentsStep = () => {
     const breeds = kennel.selectedBreeds ?? []
 
     // 백엔드 필수값 사전 검증 (FE 스키마상 optional 이지만 social/complete 에서 필수)
+    // if 체인은 이후 DTO 빌드에서 쓰는 타입 좁히기 역할도 겸함 — 테이블화하지 않음
     if (!petType) {
       setSubmitError('브리딩 동물을 선택해주세요. (브리딩 동물 선택 단계)')
       return
@@ -168,6 +173,7 @@ const DocumentsStep = () => {
       onBack={goBack}
       nextLabel={isPending ? '가입 중...' : '다음'}
       nextDisabled={isPending}
+      navError={firstErrorMessage ?? submitError ?? undefined}
       navClassName="tab:mt-[9.9375rem]"
     >
       {/* 서류 영역 */}
@@ -204,10 +210,6 @@ const DocumentsStep = () => {
             />
           )}
         />
-
-        {submitError && (
-          <p className="mt-3 px-1 text-center text-[0.8125rem] text-red-500">{submitError}</p>
-        )}
       </div>
     </StepContainer>
   )
