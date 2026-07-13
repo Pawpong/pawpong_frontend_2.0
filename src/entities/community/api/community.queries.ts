@@ -39,6 +39,15 @@ export const communityQueries = {
       staleTime: STALE_TIME.DEFAULT,
     }),
 
+  // 남의 홈 '게시글' 탭 — 특정 유저가 쓴 커뮤니티 글(authorId=userId).
+  userPosts: (userId: string, pageSize = 30) =>
+    createQuery({
+      queryKey: [...communityQueries.all(), 'userPosts', userId, pageSize],
+      queryFn: () => getCommunityPosts({ authorId: userId, pageSize }),
+      enabled: !!userId,
+      staleTime: STALE_TIME.DEFAULT,
+    }),
+
   comments: (postId: string, pageSize = 20) =>
     createInfiniteQuery({
       queryKey: [...communityQueries.all(), 'comments', postId, pageSize],

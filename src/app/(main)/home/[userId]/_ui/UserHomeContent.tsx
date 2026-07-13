@@ -2,8 +2,10 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { Container, Separator } from '@/shared/ui'
+import type { MyHomePost } from '@/shared/mocks/myHome'
 import { adopterQueries } from '@/entities/adopter'
-import { MOCK_MY_HOME_POSTS } from '@/shared/mocks/myHome'
+import { communityQueries } from '@/entities/community'
+import { toMyHomePost } from '../../_lib/toMyHomePost'
 import { ProfileCard } from '../../_ui/ProfileCard'
 import { HomeTitle } from '../../_ui/HomeTitle'
 import { PostList } from '../../_ui/PostList'
@@ -15,8 +17,10 @@ interface UserHomeContentProps {
 
 const UserHomeContent = ({ userId }: UserHomeContentProps) => {
   const { data: profile } = useQuery(adopterQueries.publicProfile(userId))
-  // TODO: 게시글 API 연결
-  const posts = MOCK_MY_HOME_POSTS
+
+  // 게시글 탭 — GET /community/posts?authorId=userId
+  const { data: postsData } = useQuery(communityQueries.userPosts(userId))
+  const posts: MyHomePost[] = (postsData?.items ?? []).map(toMyHomePost)
 
   if (!profile) return null
 

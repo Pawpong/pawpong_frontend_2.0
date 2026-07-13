@@ -1,12 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
 import Image from 'next/image'
 import { Container } from '@/shared/ui'
-import { MOCK_MY_HOME_POSTS } from '@/shared/mocks/myHome'
-import { createMockListings } from '@/shared/mocks/adoption'
+import type { AdoptionListingCard } from '@/shared/types'
+import type { MyHomePost } from '@/shared/mocks/myHome'
 import { breederQueries } from '@/entities/breeder'
+import { adoptionQueries } from '@/entities/adoption'
+import { communityQueries } from '@/entities/community'
+import { mapAdoptionCard } from '@/app/(main)/explore/_lib/mapAdoptionCard'
+import { toMyHomePost } from '../../_lib/toMyHomePost'
 import { ProfileCard } from '../../_ui/ProfileCard'
 import { BreederListingCard } from '../../_ui/BreederListingCard'
 import { FavoriteAdoptionCard } from '@/features/adoption'
@@ -23,9 +27,16 @@ interface BreederHomeContentProps {
 const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
   const [activeTab, setActiveTab] = useState('listings')
   const { data: profile } = useQuery(breederQueries.publicProfile(userId))
-  // TODO: 분양 개체 / 게시글 API 연결
-  const listings = createMockListings()
-  const posts = MOCK_MY_HOME_POSTS
+
+  // 분양 개체 탭 — GET /adoption?breederId=userId
+  const { data: listingsData } = useInfiniteQuery(adoptionQueries.breederPets(userId))
+  const listings: AdoptionListingCard[] = (
+    listingsData?.pages.flatMap((page) => page.items) ?? []
+  ).map(mapAdoptionCard)
+
+  // 게시글 탭 — GET /community/posts?authorId=userId
+  const { data: postsData } = useQuery(communityQueries.userPosts(userId))
+  const posts: MyHomePost[] = (postsData?.items ?? []).map(toMyHomePost)
 
   if (!profile) return null
 

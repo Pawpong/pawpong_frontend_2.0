@@ -13,9 +13,18 @@ export type ApplicationFormValues = z.infer<typeof applicationSchema>
 
 export const getAgeText = (birthDate: string): string => {
   const match = birthDate.match(/(\d{4})년\s*(\d{1,2})월/)
-  if (!match) return birthDate
-  const birthYear = parseInt(match[1], 10)
-  const birthMonth = parseInt(match[2], 10)
+  let birthYear: number
+  let birthMonth: number
+  if (match) {
+    birthYear = parseInt(match[1], 10)
+    birthMonth = parseInt(match[2], 10)
+  } else {
+    // ISO('2025-06-20')·표시용('2025.06.20') 등 파싱 가능한 날짜 폴백 (실 API birthDate 대응)
+    const date = new Date(birthDate)
+    if (Number.isNaN(date.getTime())) return birthDate
+    birthYear = date.getFullYear()
+    birthMonth = date.getMonth() + 1
+  }
   const now = new Date()
   const monthsDiff = (now.getFullYear() - birthYear) * 12 + (now.getMonth() + 1 - birthMonth)
   if (monthsDiff < 12) return `${monthsDiff}개월`

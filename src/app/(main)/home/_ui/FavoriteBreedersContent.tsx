@@ -1,10 +1,37 @@
+'use client'
+
+import { useInfiniteQuery } from '@tanstack/react-query'
 import { ChevronIcon } from '@/shared/assets/icons'
-import { Container } from '@/shared/ui'
-import { MOCK_FAVORITE_BREEDERS } from '@/shared/mocks/myHome'
+import { Container, InfiniteScrollTrigger } from '@/shared/ui'
+import { formatDate } from '@/shared/lib/formatDate'
+import { profileQueries } from '@/entities/profile'
+import type { FavoriteBreederCard } from '@/shared/types'
+import type { FavoriteBreeder } from '@/shared/mocks/myHome'
 import { BreederCard } from './BreederCard'
 
+// 즐겨찾는 브리더 카드(API) → BreederCard 뷰모델. badges/date 는 BreederCard 가 렌더하지 않는 충족용 필드.
+const toFavoriteBreeder = (b: FavoriteBreederCard): FavoriteBreeder => ({
+  id: b.breederId,
+  nickname: b.nickname,
+  imageUrl: b.profileImageUrl ?? null,
+  badges: [],
+  isBreeding: b.recentPetStatus === 'available',
+  location: b.breederLocation,
+  date: formatDate(b.addedAt),
+})
+
 const FavoriteBreedersContent = () => {
-  const breeders = MOCK_FAVORITE_BREEDERS
+  // 즐겨찾는 브리더 — /profile/me/favorite-breeders (adopter 전용, 무한 스크롤)
+  const {
+    data,
+    isLoading,
+    isError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery(profileQueries.favoriteBreeders())
+
+  const breeders = (data?.pages.flatMap((page) => page.items) ?? []).map(toFavoriteBreeder)
 
   return (
     <>
@@ -19,11 +46,28 @@ const FavoriteBreedersContent = () => {
 
       {/* 디자인(1023-38692): 모바일 2열 / PC 4열, gap-20. PC는 1188px로 묶어 가운데 정렬 */}
       <Container className="px-4 py-5 tab:py-10 pc:pb-27">
-        <div className="grid grid-cols-2 gap-x-2.5 gap-y-4 tab:grid-cols-3 tab:gap-5 pc:mx-auto pc:max-w-[74.25rem] pc:grid-cols-4">
-          {breeders.map((breeder) => (
-            <BreederCard key={breeder.id} breeder={breeder} />
-          ))}
-        </div>
+        {isLoading ? (
+          <p className="py-10 text-center text-sm text-[#6b6b6b]">불러오는 중...</p>
+        ) : isError ? (
+          <p className="py-10 text-center text-sm text-[#6b6b6b]">
+            즐겨찾는 브리더를 불러오지 못했습니다.
+          </p>
+        ) : breeders.length === 0 ? (
+          <p className="py-10 text-center text-sm text-[#6b6b6b]">즐겨찾는 브리더가 없습니다.</p>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 gap-x-2.5 gap-y-4 tab:grid-cols-3 tab:gap-5 pc:mx-auto pc:max-w-[74.25rem] pc:grid-cols-4">
+              {breeders.map((breeder) => (
+                <BreederCard key={breeder.id} breeder={breeder} />
+              ))}
+            </div>
+            <InfiniteScrollTrigger
+              onIntersect={fetchNextPage}
+              hasNextPage={hasNextPage ?? false}
+              isFetchingNextPage={isFetchingNextPage}
+            />
+          </>
+        )}
       </Container>
     </>
   )
