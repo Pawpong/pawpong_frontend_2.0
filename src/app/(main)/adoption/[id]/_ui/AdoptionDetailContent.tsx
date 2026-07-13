@@ -5,6 +5,7 @@ import type { ReactNode } from 'react'
 import { Container, Separator, ImageModal } from '@/shared/ui'
 import { ArrowBackIcon, MoreVertIcon } from '@/shared/assets/icons'
 import { useImageModal } from '@/shared/lib/useImageModal'
+import { useToggleAdoptionFavorite } from '@/features/adoption'
 import type { AdoptionDetailDto } from '@/shared/types'
 import { HealthInfoCard } from './HealthInfoCard'
 import { ParentInfoCard } from './ParentInfoCard'
@@ -28,6 +29,11 @@ const AdoptionDetailContent = ({ detail, isOwner }: AdoptionDetailContentProps) 
   const router = useRouter()
   const { imageModalOpen, setImageModalOpen, modalImages, modalInitialIndex, openImageModal } =
     useImageModal(detail.imageUrls)
+  // 관심(하트) 토글 — 히어로(pc)·하단 CTA 바(모바일·탭) 공용
+  const { isFavorite, toggleFavorite } = useToggleAdoptionFavorite(
+    detail.listingId,
+    detail.isFavorited,
+  )
 
   return (
     <div className="pb-[6rem] tab:pb-[6rem]">
@@ -47,7 +53,13 @@ const AdoptionDetailContent = ({ detail, isOwner }: AdoptionDetailContentProps) 
       </div>
 
       {/* ═══ 히어로 섹션 ═══ */}
-      <AdoptionDetailHero detail={detail} onImageClick={openImageModal} isOwner={isOwner} />
+      <AdoptionDetailHero
+        detail={detail}
+        onImageClick={openImageModal}
+        isOwner={isOwner}
+        isFavorite={isFavorite}
+        onToggleFavorite={toggleFavorite}
+      />
 
       {/* ═══ 하단 콘텐츠 ═══ 피그마 tab: 섹션별 컨테이너 px-48 py-12 */}
       {/* [refactored] 반복되던 <Container className="tab:py-[0.75rem] pc:py-[1.25rem]"> 를 Section으로 추출 */}
@@ -78,7 +90,12 @@ const AdoptionDetailContent = ({ detail, isOwner }: AdoptionDetailContentProps) 
       </Section>
 
       {/* ═══ CTA 하단 고정 바 ═══ */}
-      <AdoptionCtaBar listingId={detail.listingId} isOwner={isOwner} />
+      <AdoptionCtaBar
+        listingId={detail.listingId}
+        isOwner={isOwner}
+        isFavorite={isFavorite}
+        onToggleFavorite={toggleFavorite}
+      />
 
       {/* ═══ 이미지 모달 ═══ */}
       <ImageModal

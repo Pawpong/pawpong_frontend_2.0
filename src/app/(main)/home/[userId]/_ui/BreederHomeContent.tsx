@@ -11,6 +11,7 @@ import { breederQueries } from '@/entities/breeder'
 import { adoptionQueries } from '@/entities/adoption'
 import { communityQueries } from '@/entities/community'
 import { useCreateOrGetChatRoom } from '@/features/send-message'
+import { useToggleFollow } from '@/features/profile'
 import { mapAdoptionCard } from '@/app/(main)/explore/_lib/mapAdoptionCard'
 import { toMyHomePost } from '../../_lib/toMyHomePost'
 import { ProfileCard } from '../../_ui/ProfileCard'
@@ -44,6 +45,9 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
     )
   }
 
+  // 팔로우 토글 (브리더 공개 프로필엔 isFollowing 필드가 없어 초기값 false)
+  const { isFollowing, toggleFollow, isPending: isFollowPending } = useToggleFollow(userId, false)
+
   // 분양 개체 탭 — GET /adoption?breederId=userId
   const { data: listingsData } = useInfiniteQuery(adoptionQueries.breederPets(userId))
   const listings: AdoptionListingCard[] = (
@@ -73,6 +77,9 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
           mode="breeder"
           onMessage={handleMessage}
           isMessagePending={isStartingChat}
+          isFollowing={isFollowing}
+          onToggleFollow={toggleFollow}
+          isFollowPending={isFollowPending}
         />
       </Container>
 

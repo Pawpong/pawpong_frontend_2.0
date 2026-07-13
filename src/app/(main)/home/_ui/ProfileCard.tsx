@@ -10,10 +10,13 @@ import type { AdopterPublicProfile, BreederPublicProfile } from '@/shared/types'
 
 type ProfileMode = 'mine' | 'mine-breeder' | 'other' | 'breeder'
 
-// 하단 액션(메시지/상담 등)에 공통으로 전달되는 핸들러
+// 하단 액션(메시지/상담/팔로우 등)에 공통으로 전달되는 핸들러
 interface ProfileActionProps {
   onMessage?: () => void
   isMessagePending?: boolean
+  isFollowing?: boolean
+  onToggleFollow?: () => void
+  isFollowPending?: boolean
 }
 
 interface ProfileCardBaseProps extends ProfileActionProps {
@@ -75,9 +78,30 @@ const ProfileBio = ({ children, className }: { children: ReactNode; className?: 
 // [refactored] pill 버튼 공통 베이스 (h-40, 둥근, muted 배경) — 3개 버튼이 공유
 const PILL_BASE = 'flex h-10 items-center justify-center rounded-full bg-fill-muted p-2.5'
 
-const FollowButton = ({ className }: { className?: string }) => (
-  <button type="button" className={cn(PILL_BASE, 'text-sm font-medium text-white', className)}>
-    팔로우
+const FollowButton = ({
+  className,
+  isFollowing,
+  onClick,
+  disabled,
+}: {
+  className?: string
+  isFollowing?: boolean
+  onClick?: () => void
+  disabled?: boolean
+}) => (
+  <button
+    type="button"
+    onClick={onClick}
+    disabled={disabled}
+    aria-pressed={isFollowing}
+    className={cn(
+      PILL_BASE,
+      'text-sm font-medium text-white disabled:opacity-50',
+      isFollowing && 'border border-[#cacaca] bg-white text-[#3e3e3e]',
+      className,
+    )}
+  >
+    {isFollowing ? '팔로잉' : '팔로우'}
   </button>
 )
 
@@ -144,7 +168,13 @@ const EditButton = () => (
 
 const MineActions = () => <EditButton />
 
-const BreederActions = ({ onMessage, isMessagePending }: ProfileActionProps) => (
+const BreederActions = ({
+  onMessage,
+  isMessagePending,
+  isFollowing,
+  onToggleFollow,
+  isFollowPending,
+}: ProfileActionProps) => (
   <>
     <FavoriteButton className="hidden tab:flex tab:w-[12.5rem]" />
     <MessageButton
@@ -153,14 +183,30 @@ const BreederActions = ({ onMessage, isMessagePending }: ProfileActionProps) => 
       onClick={onMessage}
       disabled={isMessagePending}
     />
-    <FollowButton className="flex-1" />
+    <FollowButton
+      className="flex-1"
+      isFollowing={isFollowing}
+      onClick={onToggleFollow}
+      disabled={isFollowPending}
+    />
   </>
 )
 
-const OtherActions = ({ onMessage, isMessagePending }: ProfileActionProps) => (
+const OtherActions = ({
+  onMessage,
+  isMessagePending,
+  isFollowing,
+  onToggleFollow,
+  isFollowPending,
+}: ProfileActionProps) => (
   <>
     <MessageButton className="tab:w-[12.5rem]" onClick={onMessage} disabled={isMessagePending} />
-    <FollowButton className="flex-1" />
+    <FollowButton
+      className="flex-1"
+      isFollowing={isFollowing}
+      onClick={onToggleFollow}
+      disabled={isFollowPending}
+    />
   </>
 )
 
@@ -173,7 +219,15 @@ const ACTION_MAP = {
 
 /* ── ProfileCard ── */
 
-const ProfileCard = ({ profile, mode = 'mine', onMessage, isMessagePending }: ProfileCardProps) => {
+const ProfileCard = ({
+  profile,
+  mode = 'mine',
+  onMessage,
+  isMessagePending,
+  isFollowing,
+  onToggleFollow,
+  isFollowPending,
+}: ProfileCardProps) => {
   const Actions = ACTION_MAP[mode]
   // [refactored] 타입 단언(as) 대신 in-내로잉으로 브리더 프로필 판별
   const breederProfile = 'businessLocation' in profile ? profile : null
@@ -223,7 +277,13 @@ const ProfileCard = ({ profile, mode = 'mine', onMessage, isMessagePending }: Pr
         </div>
         {/* 하단: 모드별 버튼 (풀폭, gap-10, h-40) */}
         <div className="flex w-full items-start gap-2.5">
-          <Actions onMessage={onMessage} isMessagePending={isMessagePending} />
+          <Actions
+            onMessage={onMessage}
+            isMessagePending={isMessagePending}
+            isFollowing={isFollowing}
+            onToggleFollow={onToggleFollow}
+            isFollowPending={isFollowPending}
+          />
         </div>
       </div>
 
@@ -249,7 +309,13 @@ const ProfileCard = ({ profile, mode = 'mine', onMessage, isMessagePending }: Pr
         <div className="flex flex-col items-center gap-3 pb-8">
           <div className="h-px w-full bg-[#e4e4e4]" />
           <div className="flex w-full max-w-[36.625rem] items-center gap-6 px-5">
-            <Actions onMessage={onMessage} isMessagePending={isMessagePending} />
+            <Actions
+            onMessage={onMessage}
+            isMessagePending={isMessagePending}
+            isFollowing={isFollowing}
+            onToggleFollow={onToggleFollow}
+            isFollowPending={isFollowPending}
+          />
           </div>
         </div>
       </div>

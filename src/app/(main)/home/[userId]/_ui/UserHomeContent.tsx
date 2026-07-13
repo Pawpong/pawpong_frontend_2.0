@@ -7,6 +7,7 @@ import type { MyHomePost } from '@/shared/mocks/myHome'
 import { adopterQueries } from '@/entities/adopter'
 import { communityQueries } from '@/entities/community'
 import { useCreateOrGetChatRoom } from '@/features/send-message'
+import { useToggleFollow } from '@/features/profile'
 import { toMyHomePost } from '../../_lib/toMyHomePost'
 import { ProfileCard } from '../../_ui/ProfileCard'
 import { HomeTitle } from '../../_ui/HomeTitle'
@@ -38,6 +39,12 @@ const UserHomeContent = ({ userId }: UserHomeContentProps) => {
     )
   }
 
+  // 팔로우 토글
+  const { isFollowing, toggleFollow, isPending: isFollowPending } = useToggleFollow(
+    userId,
+    profile?.isFollowing ?? false,
+  )
+
   if (!profile) return null
 
   return (
@@ -50,6 +57,9 @@ const UserHomeContent = ({ userId }: UserHomeContentProps) => {
           mode="other"
           onMessage={handleMessage}
           isMessagePending={isStartingChat}
+          isFollowing={isFollowing}
+          onToggleFollow={toggleFollow}
+          isFollowPending={isFollowPending}
         />
       </Container>
 

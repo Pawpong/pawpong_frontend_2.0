@@ -25,10 +25,18 @@ interface AdoptionDetailHeroProps {
   onImageClick: (images: string[], index?: number) => void
   /** 로그인 사용자가 이 분양글의 브리더 본인인지 — 상태변경 노출 제어 */
   isOwner: boolean
+  isFavorite?: boolean
+  onToggleFavorite?: () => void
 }
 
 /* ── 입양 상세 히어로 (브레드크럼 + 이미지 + 브리더 프로필 | 정보) ── */
-const AdoptionDetailHero = ({ detail, onImageClick, isOwner }: AdoptionDetailHeroProps) => (
+const AdoptionDetailHero = ({
+  detail,
+  onImageClick,
+  isOwner,
+  isFavorite,
+  onToggleFavorite,
+}: AdoptionDetailHeroProps) => (
   // 좌우 패딩(모바일16/탭48/pc80)은 Container가 담당, 이미지만 음수마진으로 풀블리드. pc 섹션 py-20
   <Container className="px-[1rem] pc:py-[1.25rem]">
     <div className="pc:flex pc:items-start pc:gap-[1.25rem]">
@@ -172,7 +180,7 @@ const AdoptionDetailHero = ({ detail, onImageClick, isOwner }: AdoptionDetailHer
             viewCount={detail.viewCount}
             size="lg"
           />
-          <FavoriteShareActions />
+          <FavoriteShareActions isFavorite={isFavorite} onToggle={onToggleFavorite} />
         </div>
       </div>
     </div>
