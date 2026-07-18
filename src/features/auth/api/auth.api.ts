@@ -1,4 +1,5 @@
 import { apiClient, API_VERSION, unwrap, unwrapVoid } from '@/shared/api'
+import type { ApiRequestConfig } from '@/shared/api'
 import type {
   ApiResponse,
   AuthResponseDto,
@@ -100,8 +101,12 @@ export const uploadProfileImage = async (
 
 export const logout = async (): Promise<{ message: string; loggedOutAt: string }> => {
   try {
+    // skipAuthRefresh: 토큰이 만료돼 401이 나도 자동 refresh(→ 세션 재생성)를 타지 않도록 한다.
+    // (안 그러면 로그아웃 도중 set-cookie 가 쿠키를 다시 심어 "로그아웃했는데 로그인 상태"가 된다.)
     const response = await apiClient.post<ApiResponse<{ message: string; loggedOutAt: string }>>(
       `${API_VERSION}/auth/logout`,
+      undefined,
+      { skipAuthRefresh: true } as ApiRequestConfig,
     )
     await fetch('/api/auth/clear-cookie', { method: 'POST' })
     return unwrap(response, '로그아웃에 실패했습니다.')

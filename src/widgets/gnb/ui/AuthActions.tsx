@@ -21,10 +21,17 @@ const AuthActions = ({ variant = 'inline', onNavigate, className }: AuthActionsP
   const { isLoggedIn } = useAuthStatus()
   const { mutate: logout, isPending: isLoggingOut } = useLogout()
 
-  // 로그아웃: 쿠키 정리(성공/실패 무관) 후 홈으로 하드 내비게이션 → 비로그인 상태로 갱신
+  // 로그아웃: 요청 성공/실패와 무관하게, 이동 직전 쿠키를 한 번 더 확실히 지운 뒤
+  // 홈으로 하드 내비게이션 → 비로그인 상태로 갱신.
+  // (mutation 도중 어떤 경로로든 쿠키가 다시 심어져도 이 마지막 clear 가 권위를 갖는다.)
   const handleLogout = () => {
     onNavigate?.()
-    logout(undefined, { onSettled: () => window.location.assign('/') })
+    logout(undefined, {
+      onSettled: async () => {
+        await fetch('/api/auth/clear-cookie', { method: 'POST' }).catch(() => {})
+        window.location.assign('/')
+      },
+    })
   }
 
   const pill = cn(SIZE[variant], 'rounded-full text-center transition-colors')

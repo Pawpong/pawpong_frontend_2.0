@@ -8,6 +8,11 @@ import { ApiError, normalizeApiError } from './unwrap'
 
 export interface ApiRequestConfig extends AxiosRequestConfig {
   skipAuth?: boolean
+  /**
+   * 401 응답 시 자동 토큰 refresh(→ set-cookie 재로그인)를 건너뛴다.
+   * 로그아웃처럼 "세션을 되살리면 안 되는" 요청에서 사용한다.
+   */
+  skipAuthRefresh?: boolean
 }
 
 const getBaseURL = () => (process.env.NEXT_PUBLIC_API_BASE_URL ?? '').replace(/\/+$/, '')
@@ -65,6 +70,7 @@ function createApiClient(): AxiosInstance {
       const originalRequest = (error.config ?? {}) as InternalAxiosRequestConfig & {
         _retry?: boolean
         skipAuth?: boolean
+        skipAuthRefresh?: boolean
       }
 
       const errorData = error.response?.data
@@ -79,6 +85,11 @@ function createApiClient(): AxiosInstance {
         return Promise.reject(
           new ApiError(errorMessage, error.response?.status, undefined, errorData),
         )
+      }
+
+      // 로그아웃 등 세션 복구를 원치 않는 요청은 refresh 인터셉터를 타지 않고 그대로 실패시킨다.
+      if (error.response?.status === 401 && originalRequest.skipAuthRefresh) {
+        return Promise.reject(new ApiError(errorMessage || '인증이 필요합니다.', 401))
       }
 
       if (error.response?.status === 401 && !originalRequest._retry) {

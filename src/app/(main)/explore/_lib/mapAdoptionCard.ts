@@ -21,3 +21,13 @@ export const mapAdoptionCard = (c: AdoptionPetCard): AdoptionListingCard => ({
   isPopular: c.isPopular,
   postedAt: formatDate(c.createdAt),
 })
+
+/** listingId 기준 중복 제거 (무한스크롤 페이지 경계 중복 방어, 원래 순서 유지) */
+export const dedupeByListingId = (cards: AdoptionListingCard[]): AdoptionListingCard[] => {
+  const seen = new Set<string>()
+  return cards.filter((card) => {
+    if (seen.has(card.listingId)) return false
+    seen.add(card.listingId)
+    return true
+  })
+}
