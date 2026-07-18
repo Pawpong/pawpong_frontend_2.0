@@ -1,9 +1,8 @@
-import { apiClient, unwrap } from '@/shared/api'
+import { apiClient, unwrap, API_VERSION } from '@/shared/api'
 import type { ChatRoomResponseDto, ChatMessageResponseDto } from '@/shared/types'
 
-// 채팅 REST 는 v2 가 아니라 /api/chat 경로다 (백엔드 @Controller('chat') + global prefix 'api').
-// 다른 도메인과 달리 API_VERSION(/api/v2)을 붙이면 404 (Cannot POST /api/v2/chat/rooms).
-const CHAT_BASE = '/api/chat'
+// 채팅 REST 도 다른 도메인과 동일하게 v2 경로를 쓴다 (백엔드 @Controller('v2/chat') + global prefix 'api').
+const CHAT_BASE = `${API_VERSION}/chat`
 
 /** 내 채팅방 목록 조회 */
 export const getChatRooms = () =>
