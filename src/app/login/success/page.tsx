@@ -42,6 +42,16 @@ const LoginSuccessContent = () => {
         })
 
         if (!res.ok) throw new Error('set-cookie 실패')
+
+        // RN WebView 환경이면 네이티브로 accessToken을 전달해 FCM 디바이스 토큰 등록을 트리거한다.
+        // (RN HomeScreen이 REQUEST_FCM_TOKEN 수신 → messaging().getToken() → 백엔드 등록)
+        const native = (
+          window as unknown as { ReactNativeWebView?: { postMessage: (m: string) => void } }
+        ).ReactNativeWebView
+        if (native) {
+          native.postMessage(JSON.stringify({ type: 'REQUEST_FCM_TOKEN', accessToken }))
+        }
+
         router.replace(returnUrl)
       } catch (err) {
         console.error('로그인 처리 중 오류:', err)
