@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { type MouseEvent } from 'react'
 import { usePathname } from 'next/navigation'
@@ -16,8 +17,9 @@ const LogoButton = () => {
   }
 
   return (
-    <Link href="/" className="text-xl font-bold" aria-label="홈으로 이동" onClick={handleClick}>
-      Pawpong
+    <Link href="/" aria-label="홈으로 이동" onClick={handleClick}>
+      {/* Figma 로고 (742:67105) — 96x32 워드마크 */}
+      <Image src="/logo.svg" alt="Pawpong" width={96} height={32} priority />
     </Link>
   )
 }
