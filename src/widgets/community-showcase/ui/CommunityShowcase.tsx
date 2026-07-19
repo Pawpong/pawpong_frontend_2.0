@@ -1,18 +1,47 @@
+'use client'
+
+import { useInfiniteQuery } from '@tanstack/react-query'
 import { Container, SectionHeader } from '@/shared/ui'
-import { PostCard } from '@/entities/community'
+import { PostCard, communityQueries } from '@/entities/community'
+import type { CommunityPostCard } from '@/shared/types'
 import { MOCK_MY_HOME_POSTS, toPostCardProps } from '@/shared/mocks/myHome'
 
-// ponytail: 커뮤니티 API 미연결 — my-home mock 재사용. 연결 시 실제 게시글 목록으로 교체.
-const POSTS = MOCK_MY_HOME_POSTS.slice(0, 3)
+const CARD_COUNT = 3
+
+// CommunityPostCard → 공통 PostCard props 매핑
+const toShowcaseProps = (post: CommunityPostCard) => ({
+  author: {
+    id: post.authorId,
+    nickname: post.authorNickname,
+    profileImageUrl: post.authorProfileImageUrl,
+  },
+  createdAt: post.createdAt,
+  text: post.bodyExcerpt,
+  images: post.photoUrls,
+  likeCount: post.likeCount,
+  commentCount: post.commentCount,
+  detailHref: `/community/${post.postId}`,
+})
 
 /** 공통 PostCard를 테두리 카드로 감쌈 (Figma home-contents, SavedFeedsTab과 동일 패턴) */
-const ShowcaseCard = ({ post }: { post: (typeof POSTS)[number] }) => (
+const ShowcaseCard = ({ post }: { post: ReturnType<typeof toShowcaseProps> }) => (
   <div className="rounded-[0.5rem] border border-[#cacaca] bg-white">
-    <PostCard profileType="responsivePc" className="px-3" {...toPostCardProps(post)} />
+    <PostCard profileType="responsivePc" className="px-3" {...post} />
   </div>
 )
 
 const CommunityShowcase = () => {
+  // 홈은 부분 실패 허용 — throwOnError만 꺼서 실패 시 목업 유지 (커뮤니티 페이지는 기본 정책)
+  const { data } = useInfiniteQuery({
+    ...communityQueries.posts('latest', undefined, undefined, CARD_COUNT),
+    throwOnError: false,
+  })
+  const fetched = (data?.pages[0]?.items ?? []).slice(0, CARD_COUNT).map(toShowcaseProps)
+
+  // 데이터 없으면(로딩/실패/빈 목록) 목업으로 스켈레톤 유지
+  const posts =
+    fetched.length > 0 ? fetched : MOCK_MY_HOME_POSTS.slice(0, CARD_COUNT).map(toPostCardProps)
+
   return (
     <Container className="py-6 tab:py-8 pc:py-12">
       <div className="flex flex-col gap-[0.75rem]">
@@ -20,13 +49,13 @@ const CommunityShowcase = () => {
 
         {/* 모바일·태블릿: 풀폭 카드 1개 (Figma 940-38371 / 940-39191) */}
         <div className="pc:hidden">
-          <ShowcaseCard post={POSTS[0]} />
+          <ShowcaseCard post={posts[0]} />
         </div>
 
         {/* PC: 3열 그리드 (Figma 940-29281) */}
         <div className="hidden gap-[2.5rem] pc:grid pc:grid-cols-3">
-          {POSTS.map((post) => (
-            <ShowcaseCard key={post.id} post={post} />
+          {posts.map((post) => (
+            <ShowcaseCard key={post.detailHref} post={post} />
           ))}
         </div>
       </div>
