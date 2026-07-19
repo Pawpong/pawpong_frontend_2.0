@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, type ComponentType, type SVGProps } from 'react'
+import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ProfileAvatar, ProfileHeader } from '@/shared/ui'
+import { BOOKMARK_ACTIVE, PostActionButton, ProfileAvatar, ProfileHeader } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { formatRelativeTime } from '@/shared/lib/formatRelativeTime'
 import {
@@ -30,24 +30,10 @@ interface PostCardProps {
   commentCount: number
   /** 게시글 상세 링크 (있으면 본문 영역이 링크) */
   detailHref?: string
-  /** 지정 시 헤더를 공통 ProfileHeader(아바타 32/40·미리보기 1줄)로 렌더 + 이미지 tab 상단패딩 제거 (저장피드용) */
-  profileType?: 'sm' | 'md'
+  /** 지정 시 헤더를 공통 ProfileHeader로 렌더 + 이미지 tab 상단패딩 제거 (저장피드 sm / 홈 쇼케이스 responsivePc) */
+  profileType?: 'sm' | 'md' | 'responsivePc'
   className?: string
 }
-
-// 좋아요·댓글 카운트 (픽셀 아이콘 32 #a6a6a6 + 카운트 14px 볼드 #3e3e3e)
-const Stat = ({
-  icon: Icon,
-  count,
-}: {
-  icon: ComponentType<SVGProps<SVGSVGElement>>
-  count: number
-}) => (
-  <div className="flex items-center gap-1">
-    <Icon className="size-8 text-[#a6a6a6]" />
-    <span className="text-sm leading-[1.5] font-semibold text-[#3e3e3e]">{count}</span>
-  </div>
-)
 
 /**
  * 커뮤니티 게시글 카드 (Figma node 1054-28522 · community box -게시글)
@@ -67,6 +53,8 @@ const PostCard = ({
   className,
 }: PostCardProps) => {
   const hasImages = images.length > 0
+  // ponytail: API 미연결 — 좋아요/북마크는 로컬 상태로 색 토글만. 연결 시 mutation으로 교체.
+  const [liked, setLiked] = useState(false)
   const [isBookmarked, setIsBookmarked] = useState(false)
 
   const profileCluster = (
@@ -147,20 +135,25 @@ const PostCard = ({
 
       {/* 액션: 좋아요 · 댓글 · 북마크 (픽셀 아이콘) */}
       <div className="flex items-center gap-2">
-        <Stat icon={FavoriteIcon} count={likeCount} />
-        <Stat icon={PixelMessageIcon} count={commentCount} />
-        <button
-          type="button"
-          aria-label="북마크"
-          aria-pressed={isBookmarked}
+        {/* [refactored] 자체 Stat → 공통 PostActionButton (카운트 색·간격 Figma 통일) */}
+        <PostActionButton
+          icon={FavoriteIcon}
+          count={likeCount + (liked ? 1 : 0)}
+          iconClassName="size-8"
+          ariaLabel="좋아요"
+          active={liked}
+          onClick={() => setLiked((prev) => !prev)}
+        />
+        <PostActionButton icon={PixelMessageIcon} count={commentCount} iconClassName="size-8" />
+        {/* [refactored] 자체 북마크 버튼 → 공통 PostActionButton (active 색·a11y 통일) */}
+        <PostActionButton
+          icon={PixelBookmarkIcon}
+          iconClassName="size-8"
+          ariaLabel="북마크"
+          active={isBookmarked}
+          activeClassName={BOOKMARK_ACTIVE}
           onClick={() => setIsBookmarked((prev) => !prev)}
-          className="shrink-0"
-        >
-          {/* 활성(저장) 시 브랜드 브라운 #a9835a */}
-          <PixelBookmarkIcon
-            className={cn('size-8', isBookmarked ? 'text-[#a9835a]' : 'text-[#a6a6a6]')}
-          />
-        </button>
+        />
       </div>
     </article>
   )

@@ -3,7 +3,7 @@
 import { type MouseEvent } from 'react'
 import { tv, type VariantProps } from 'tailwind-variants'
 import { cn } from '@/shared/lib/cn'
-import { FavoriteIcon } from '@/shared/assets/icons'
+import { FavoriteHeart, FAVORITE_ACTIVE } from './FavoriteToggle'
 
 const favoriteButtonVariants = tv({
   base: 'flex items-center rounded-full font-medium text-[#5d5d5d]',
@@ -50,10 +50,11 @@ const FavoriteButton = ({
       type="button"
       onClick={handleClick}
       // 관심 시 하트+텍스트 모두 #FF8181
-      className={cn(favoriteButtonVariants({ size }), className, isFavorite && 'text-[#ff8181]')}
+      className={cn(favoriteButtonVariants({ size }), className, isFavorite && FAVORITE_ACTIVE)}
     >
-      <FavoriteIcon
-        className={cn(favoriteIconSize[size ?? 'lg'], iconClassName, isFavorite && 'text-[#ff8181]')}
+      <FavoriteHeart
+        isFavorite={isFavorite}
+        className={cn(favoriteIconSize[size ?? 'lg'], iconClassName)}
       />
       <span>관심있어요</span>
     </button>

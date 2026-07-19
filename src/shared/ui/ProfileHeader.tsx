@@ -6,9 +6,10 @@ import { MoreVertIcon } from '@/shared/assets/icons'
 import { cn } from '@/shared/lib/cn'
 
 // Figma chat-profile (1867-182359) — 아바타 + 이름·시각 + 미리보기 1줄 + (옵션)빨간 배지 + 더보기
-// 채팅 리스트·저장피드 카드 헤더 공용. type: sm(아바타 32·이름 14) / md(아바타 40·이름 16).
-const NAME_SIZE = { sm: 'text-sm', md: 'text-base' } as const
-const AVATAR_SIZE = { sm: 'small', md: 'medium' } as const
+// 채팅 리스트·저장피드 카드 헤더 공용.
+// type: sm(아바타 32·이름 14) / md(아바타 40·이름 16) / responsivePc(32·14 → pc 40·16, 홈 쇼케이스)
+const NAME_SIZE = { sm: 'text-sm', md: 'text-base', responsivePc: 'text-sm pc:text-base' } as const
+const AVATAR_SIZE = { sm: 'small', md: 'medium', responsivePc: 'responsivePc' } as const
 
 interface ProfileHeaderProps {
   nickname: string
@@ -16,7 +17,7 @@ interface ProfileHeaderProps {
   /** 미리보기 본문 (1줄 말줄임) */
   preview: string
   profileImageUrl?: string
-  type?: 'sm' | 'md'
+  type?: 'sm' | 'md' | 'responsivePc'
   /** 빨간 알림 배지 카운트 (채팅용) — 없으면 미노출 */
   badgeCount?: number
   /** 프로필·본문 클릭 시 이동 링크 */

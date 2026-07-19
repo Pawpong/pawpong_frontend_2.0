@@ -1,0 +1,67 @@
+import { cn } from '@/shared/lib/cn'
+import { FAVORITE_ACTIVE, FAVORITE_INACTIVE } from './FavoriteToggle'
+
+// Figma icon/bookmark press — 저장 시 브랜드 브라운
+export const BOOKMARK_ACTIVE = 'text-[#a9835a]'
+
+interface PostActionButtonProps {
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
+  count?: number
+  /** 활성(예: 좋아요 누름) 상태 — 아이콘 강조 색 */
+  active?: boolean
+  /** 활성 시 색 (기본 하트 #ff8181, 북마크는 BOOKMARK_ACTIVE 등) */
+  activeClassName?: string
+  /** 아이콘 크기 오버라이드 (기본 24px, Figma community-icon은 32px) */
+  iconClassName?: string
+  /** 아이콘 전용(카운트 없는) 버튼의 접근성 라벨 */
+  ariaLabel?: string
+  /** 있으면 버튼으로 렌더(클릭 가능), 없으면 표시전용 */
+  onClick?: () => void
+  disabled?: boolean
+}
+
+const PostActionButton = ({
+  icon: Icon,
+  count,
+  active,
+  activeClassName,
+  iconClassName,
+  ariaLabel,
+  onClick,
+  disabled,
+}: PostActionButtonProps) => {
+  const inner = (
+    <>
+      {/* Figma 아이콘 press 상태: 기본 #a6a6a6, 하트 #ff8181 / 북마크 #a9835a */}
+      <Icon
+        className={cn(
+          iconClassName ?? 'size-6',
+          active ? (activeClassName ?? FAVORITE_ACTIVE) : FAVORITE_INACTIVE,
+        )}
+      />
+      {count !== undefined && (
+        // Figma community-icon 카운트: 14px semibold #3e3e3e, line-height 1.5
+        <span className="text-sm leading-[1.5] font-semibold text-[#3e3e3e]">{count}</span>
+      )}
+    </>
+  )
+
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        disabled={disabled}
+        aria-label={ariaLabel}
+        aria-pressed={active}
+        className="flex items-center gap-1 disabled:opacity-50"
+      >
+        {inner}
+      </button>
+    )
+  }
+
+  return <div className="flex items-center gap-1">{inner}</div>
+}
+
+export { PostActionButton }
