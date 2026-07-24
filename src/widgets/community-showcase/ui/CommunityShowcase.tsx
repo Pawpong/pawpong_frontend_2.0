@@ -24,9 +24,15 @@ const toShowcaseProps = (post: CommunityPostCard) => ({
 })
 
 /** 공통 PostCard를 테두리 카드로 감쌈 (Figma home-contents, SavedFeedsTab과 동일 패턴) */
-const ShowcaseCard = ({ post }: { post: ReturnType<typeof toShowcaseProps> }) => (
+const ShowcaseCard = ({
+  post,
+  showMore,
+}: {
+  post: ReturnType<typeof toShowcaseProps>
+  showMore?: boolean
+}) => (
   <div className="rounded-[0.5rem] border border-[#cacaca] bg-white">
-    <PostCard profileType="responsivePc" className="px-3" {...post} />
+    <PostCard profileType="responsivePc" showMore={showMore} className="px-3" {...post} />
   </div>
 )
 
@@ -45,11 +51,11 @@ const CommunityShowcase = () => {
   return (
     <Container className="py-6 tab:py-8 pc:py-12">
       <div className="flex flex-col gap-[0.75rem]">
-        <SectionHeader title="우리 아이 자랑하기" linkText="커뮤니티 보러가기" linkHref="/community" />
+        <SectionHeader title="우리 아이 자랑하기" linkText="커뮤니티" linkHref="/community" />
 
-        {/* 모바일·태블릿: 풀폭 카드 1개 (Figma 940-38371 / 940-39191) */}
+        {/* 모바일·태블릿: 풀폭 카드 1개 + 미리보기 [더보기] (Figma 940-38371 / 940-39191) */}
         <div className="pc:hidden">
-          <ShowcaseCard post={posts[0]} />
+          <ShowcaseCard post={posts[0]} showMore />
         </div>
 
         {/* PC: 3열 그리드 (Figma 940-29281) */}
