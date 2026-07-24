@@ -46,9 +46,9 @@ const FaqSection = ({ userType = 'adopter' }: FaqSectionProps) => {
           </div>
           <Link
             href={cta.href}
-            className="flex h-[3rem] w-full items-center justify-center rounded-full bg-[#fffa94] px-[2rem] pc:w-[12.3125rem] pc:self-end"
+            className="group flex h-[3rem] w-full items-center justify-center rounded-full bg-[#fffa94] px-[2rem] transition-colors active:bg-[#f3ec59] pc:w-[12.3125rem] pc:self-end"
           >
-            <span className="text-[1rem] font-semibold whitespace-nowrap text-[#3e3e3e]">
+            <span className="text-[1rem] font-semibold whitespace-nowrap text-[#3e3e3e] group-hover:text-[#6b6b6b] group-active:text-[#3e3e3e]">
               {cta.action}
             </span>
           </Link>

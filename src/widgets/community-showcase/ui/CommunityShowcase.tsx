@@ -31,7 +31,7 @@ const ShowcaseCard = ({
   post: ReturnType<typeof toShowcaseProps>
   showMore?: boolean
 }) => (
-  <div className="rounded-[0.5rem] border border-[#cacaca] bg-white">
+  <div className="rounded-[0.5rem] border border-[#cacaca] bg-white transition-colors hover:bg-[#f6f6f6] hover:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)] active:bg-[#f6f6f6] active:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]">
     <PostCard profileType="responsivePc" showMore={showMore} className="px-3" {...post} />
   </div>
 )
