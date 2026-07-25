@@ -1,10 +1,9 @@
 'use client'
 
 import Image from 'next/image'
-import { AuthorInfo, DetailLink } from '@/shared/ui'
+import { AuthorInfo, DetailLink, PostActionButton } from '@/shared/ui'
 import { FavoriteIcon, ChatBubbleIcon } from '@/shared/assets/icons'
 import type { CommunityPostCard as CommunityPostCardType } from '@/shared/types'
-import { PostActionButton } from './PostActionButton'
 
 interface CommunityPostCardProps {
   post: CommunityPostCardType

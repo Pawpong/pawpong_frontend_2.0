@@ -21,8 +21,6 @@ const HomePage = () => {
       <HallOfFame />
       <CommunityShowcase />
       <FaqSection userType={userType} />
-
-      <div className="h-[22rem] bg-[#d9d9d9]" />
     </div>
   )
 }

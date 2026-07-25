@@ -7,13 +7,14 @@ const detailLinkVariants = tv({
   base: 'flex shrink-0 items-center text-text-primary whitespace-nowrap',
   variants: {
     variant: {
-      link: 'font-semibold',
+      // Figma txt btn: 좌우 padding 4px, gap 0
+      link: 'px-[0.25rem] font-semibold',
       button: 'gap-[0.375rem] font-medium',
     },
     size: {
-      sm: 'text-[0.75rem]',
-      md: 'text-[0.875rem] leading-[1.375rem]',
-      lg: 'text-[1rem] leading-[1.375rem]',
+      sm: 'text-[0.75rem] leading-[1.5]',
+      md: 'text-[0.875rem] leading-[1.5]',
+      lg: 'text-[1rem] leading-[1.5]',
     },
   },
   defaultVariants: {
@@ -52,18 +53,24 @@ const DetailLink = ({
 }: DetailLinkProps) => {
   const classes = cn(detailLinkVariants({ variant, size }), className)
 
+  const content = (
+    <>
+      {label}
+      <ArrowRightIcon className="size-[1.25rem] shrink-0" />
+    </>
+  )
+
   if (variant === 'button') {
     return (
       <button type="button" onClick={onClick} className={classes}>
-        {label}
-        <ArrowRightIcon className="size-[1.25rem] shrink-0" />
+        {content}
       </button>
     )
   }
 
   return (
     <Link href={href!} className={classes}>
-      {`${label} >`}
+      {content}
     </Link>
   )
 }

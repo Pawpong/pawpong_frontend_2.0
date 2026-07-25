@@ -20,12 +20,15 @@ export function createQuery<TData>(config: {
   queryFn: () => Promise<TData>
   enabled?: boolean
   staleTime?: number
+  /** 비필수 섹션은 false로 — 실패해도 에러 바운더리로 던지지 않고 degrade (기본: 전역 정책) */
+  throwOnError?: boolean
 }) {
   return queryOptions({
     queryKey: config.queryKey,
     queryFn: config.queryFn,
     enabled: config.enabled,
     staleTime: config.staleTime ?? DEFAULT_STALE_TIME,
+    ...(config.throwOnError !== undefined && { throwOnError: config.throwOnError }),
   })
 }
 

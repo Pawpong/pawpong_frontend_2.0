@@ -1,12 +1,10 @@
 'use client'
 
-import { type MouseEvent } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { cn } from '@/shared/lib/cn'
 
-import { FavoriteIcon } from '@/shared/assets/icons'
-import { Badge, FavoriteButton, ListingStats } from '@/shared/ui'
+import { Badge, FavoriteButton, FavoriteToggle, ListingStats } from '@/shared/ui'
 import type { AdoptionListingCard } from '@/shared/types'
 import { ADOPTION_STATUS_LABEL, GENDER_LABEL } from '@/shared/types'
 import { ADOPTION_STATUS_BG } from './statusBg'
@@ -94,13 +92,6 @@ const StatusBadge = ({
 const AdoptionCard = ({ listing, className, isFavorite, onToggle }: AdoptionCardProps) => {
   const isCompleted = listing.status === 'completed'
 
-  // 카드 Link 내부의 하트 클릭 시 네비게이션 방지 + 관심 토글
-  const handleFavoriteClick = (e: MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    onToggle?.()
-  }
-
   return (
     <Link href={`/adoption/${listing.listingId}`} className={cn('block', className)}>
       {/* ══════ 모바일 카드 (Figma 796-81670, medium) ══════ */}
@@ -108,16 +99,12 @@ const AdoptionCard = ({ listing, className, isFavorite, onToggle }: AdoptionCard
         {/* 이미지 + 우하단 하트 48px 오버레이 (medium은 하트가 정보영역이 아닌 이미지 위) */}
         <div className="relative">
           <CardImage listing={listing} isCompleted={isCompleted} className="rounded-[0.25rem]" />
-          <button
-            type="button"
-            onClick={handleFavoriteClick}
+          <FavoriteToggle
+            isFavorite={isFavorite}
+            onToggle={onToggle}
             className="absolute right-0 bottom-0"
-            aria-label="관심 등록"
-          >
-            <FavoriteIcon
-              className={cn('size-12', isFavorite ? 'text-[#ff8181]' : 'text-[#a6a6a6]')}
-            />
-          </button>
+            iconClassName="size-12"
+          />
         </div>
 
         {/* 정보: p-8 — 상단(제목 2줄/입양가능 배지) · 하단(stats) (Figma 796-81620) */}
@@ -166,7 +153,7 @@ const AdoptionCard = ({ listing, className, isFavorite, onToggle }: AdoptionCard
               isFavorite={isFavorite}
               onToggle={onToggle}
               className="p-0 text-[0.75rem] font-semibold text-[#3e3e3e]"
-              iconClassName="size-8 text-[#a6a6a6]"
+              iconClassName="size-8"
             />
           </div>
         </div>

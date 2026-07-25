@@ -5,8 +5,7 @@ import { usePathname } from 'next/navigation'
 import { type MouseEvent } from 'react'
 import { cn } from '@/shared/lib/cn'
 import { useNavigationGuardContext } from '@/shared/lib/NavigationGuardContext'
-import { HomeIcon } from '@/shared/assets/icons'
-import { NAV_ITEMS } from './NavItems'
+import { HEADER_NAV } from '@/shared/config/mainNav'
 import { NotificationBell } from './NotificationBell'
 
 const NavBar = ({ className }: { className?: string }) => {
@@ -20,30 +19,23 @@ const NavBar = ({ className }: { className?: string }) => {
   }
 
   return (
-    <nav className={cn('flex items-center gap-[1.75rem]', className)}>
-      {NAV_ITEMS.map((item) => {
-        const isActive = pathname.startsWith(item.href)
-
-        return (
-          <Link
-            key={item.name}
-            href={item.href}
-            onClick={(e) => handleLinkClick(e, item.href)}
-            className={cn(
-              'flex items-center text-[1rem] font-medium text-[#666] transition-colors',
-              isActive && 'text-primary-500 font-semibold',
-            )}
-          >
-            <div className="flex size-[3rem] items-center justify-center">
-              <HomeIcon className="size-[1.5rem]" />
-            </div>
-            <div className="flex h-[3rem] items-center justify-center px-[0.625rem]">
-              {item.name}
-            </div>
-          </Link>
-        )
-      })}
-      {/* 알림 — 링크 대신 유튜브식 드롭다운 */}
+    <nav className={cn('flex items-center gap-[1.25rem]', className)}>
+      {/* 아이콘·목적지는 BottomNav와 shared/config/mainNav 공유 (Figma NavBar 1596-97648) */}
+      {HEADER_NAV.map(({ href, label, Icon, isActive }) => (
+        <Link
+          key={href}
+          href={href}
+          onClick={(e) => handleLinkClick(e, href)}
+          className={cn(
+            'flex items-center text-[1rem] whitespace-nowrap transition-colors',
+            isActive(pathname) ? 'font-semibold text-[#3e3e3e]' : 'font-medium text-[#a6a6a6]',
+          )}
+        >
+          <Icon className="size-8" />
+          {label}
+        </Link>
+      ))}
+      {/* 알림 — 링크 대신 유튜브식 드롭다운 (test 통합 브랜치 기능 유지) */}
       <NotificationBell />
     </nav>
   )

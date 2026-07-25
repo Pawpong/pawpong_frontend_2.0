@@ -21,6 +21,7 @@ const BannerSlide = ({ banner }: { banner: BannerDto }) => {
     {
       key: 'desktop',
       src: banner.desktopImageUrl,
+      // 풀블리드 유지 위해 aspect-ratio 사용 (고정 높이 시 넓은 화면에서 object-cover 확대됨)
       wrapperClass: 'hidden aspect-[768/347] tab:block pc:aspect-[180/47]',
     },
     {
