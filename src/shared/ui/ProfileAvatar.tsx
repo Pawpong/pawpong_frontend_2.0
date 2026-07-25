@@ -6,9 +6,11 @@ interface ProfileAvatarProps {
   /** 프로필 이미지 URL (없으면 픽셀 글리프 placeholder) */
   src?: string
   alt?: string
-  size?: 'xsmall' | 'small' | 'medium' | 'large' | 'xlarge' | 'responsive'
+  size?: 'xsmall' | 'small' | 'medium' | 'large' | 'xlarge' | 'responsive' | 'responsivePc'
   className?: string
 }
+
+export type ProfileAvatarSize = NonNullable<ProfileAvatarProps['size']>
 
 // Figma Avatar 사이즈 시스템 (node 817:103336) — box / 내부 글리프
 const AVATAR_SIZE = {
@@ -17,8 +19,10 @@ const AVATAR_SIZE = {
   medium: { box: 'size-10', glyph: 'h-[1.375rem] w-[1.3125rem]' }, // 40 / 22×21
   large: { box: 'size-[3.25rem]', glyph: 'h-[1.875rem] w-[1.8125rem]' }, // 52 / 30×29
   xlarge: { box: 'size-[6.25rem]', glyph: 'h-[3.625rem] w-[3.5rem]' }, // 100 / 58×56
-  // 모바일 32 → 태블릿+ 40
+  // small(32) → medium(40): 태블릿+ 커짐 (피드 카드)
   responsive: { box: 'size-8 tab:size-10', glyph: 'size-4 tab:h-[1.375rem] tab:w-[1.3125rem]' },
+  // small(32) → medium(40): PC에서만 커짐 (홈 우리아이자랑 쇼케이스)
+  responsivePc: { box: 'size-8 pc:size-10', glyph: 'size-4 pc:h-[1.375rem] pc:w-[1.3125rem]' },
 } as const
 
 /**

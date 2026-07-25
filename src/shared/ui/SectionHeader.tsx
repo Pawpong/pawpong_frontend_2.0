@@ -1,6 +1,11 @@
 import { ArrowRightIcon } from '@/shared/assets/icons'
 import { DetailLink } from './DetailLink'
+import { textLabelVariants } from './TextLabel'
 import { cn } from '@/shared/lib/cn'
+
+// Figma: label txt btn (922-17441) — 라벨 + 우측 텍스트버튼(화살표).
+// 타이틀 사이즈 램프: mo 14(medium) -> tab 16(large) -> pc 20(xlarge).
+// titleClassName으로 덮을 땐 tab:/pc: 변형까지 함께 지정해야 기본값을 이긴다.
 
 interface SectionHeaderProps {
   title: string
@@ -31,9 +36,11 @@ const SectionHeader = ({
   return (
     <div className="flex flex-col gap-0.5 tab:gap-1">
       <div className="flex items-center justify-between">
+        {/* [refactored] 타이틀 스타일을 공통 TextLabel 토큰(p-2px·600·#3e3e3e)에 위임 */}
         <p
           className={cn(
-            'text-sm leading-[1.5] font-bold text-text-primary tab:text-xl',
+            textLabelVariants({ size: '14' }),
+            'tab:text-base pc:text-xl',
             titleClassName,
           )}
         >

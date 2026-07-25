@@ -8,9 +8,9 @@ const buttonVariants = tv({
   base: 'flex items-center justify-center leading-[1.5] font-semibold text-[#3e3e3e] transition-colors disabled:cursor-not-allowed disabled:opacity-50',
   variants: {
     variant: {
-      // primary: hover 텍스트 #6b6b6b / press 배경 #f5ec2c / disabled 배경·텍스트(opacity-100로 base opacity-50 무효화)
+      // primary: hover 텍스트 #6b6b6b / press 배경 #f3ec59 / disabled 배경·텍스트(opacity-100로 base opacity-50 무효화)
       primary:
-        'rounded-full bg-[#fffa94] p-2 hover:text-[#6b6b6b] active:bg-[#f5ec2c] disabled:bg-[#e4e4e4] disabled:text-[#b8b8b8] disabled:opacity-100',
+        'rounded-full bg-[#fffa94] p-2 transition-colors hover:text-[#6b6b6b] active:bg-[#f3ec59] disabled:bg-[#e4e4e4] disabled:text-[#b8b8b8] disabled:opacity-100',
       outline: 'rounded-full border border-[#cacaca] bg-white p-2',
       // text(txt btn): hover 배경 #f6f6f6 / press 배경 #ededed / disabled 텍스트 #c2c2c2, rounded-8
       text: 'rounded-lg px-1 text-sm hover:bg-[#f6f6f6] active:bg-[#ededed] disabled:text-[#c2c2c2] disabled:opacity-100',

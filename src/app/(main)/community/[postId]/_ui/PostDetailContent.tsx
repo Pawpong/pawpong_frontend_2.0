@@ -11,6 +11,7 @@ import {
   CtaModal,
   InfiniteScrollTrigger,
   PageHeader,
+  PostActionButton,
   Separator,
 } from '@/shared/ui'
 import { FavoriteIcon, ChatBubbleIcon } from '@/shared/assets/icons'
@@ -27,7 +28,6 @@ import { VisibilitySelect, type VisibilityType } from '@/widgets/post-form'
 import { useAuthStatus } from '@/features/auth'
 import type { CommunityComment } from '@/shared/types'
 import { CategorySidebar } from '../../_ui/CategorySidebar'
-import { PostActionButton } from '../../_ui/PostActionButton'
 import { OwnerActionsMenu } from '../../_ui/OwnerActionsMenu'
 import { CommentItem } from './CommentItem'
 import { CommentComposer } from './CommentComposer'

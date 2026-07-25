@@ -3,12 +3,7 @@ export interface NavItem {
   href: string
 }
 
-export const NAV_ITEMS: NavItem[] = [
-  { name: '마이홈', href: '/home' },
-  { name: '채팅', href: '/chat' },
-  { name: '알림', href: '/notifications' },
-]
-
+// 데스크탑 상단 nav는 shared/config/mainNav(HEADER_NAV)로 통일 (BottomNav와 공유)
 export const MOBILE_MENU_ITEMS: NavItem[] = [
   { name: '알림', href: '/notifications' },
   { name: '저장목록', href: '/bookmarks' },
