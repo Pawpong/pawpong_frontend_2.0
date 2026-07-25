@@ -10,7 +10,15 @@ import { profileSchema, type ProfileFormData, EMAIL_DOMAINS } from '../model/sch
 import { StepLayout } from './StepLayout'
 import { StepTitle } from './StepTitle'
 import { StepIndicator } from './StepIndicator'
-import { Dropdown, Input, InputField, HelpMessage, type HelpMessageState } from '@/shared/ui'
+import {
+  Dropdown,
+  Input,
+  InputField,
+  HelpMessage,
+  PolicyModal,
+  type HelpMessageState,
+} from '@/shared/ui'
+import { POLICIES, type Policy } from '../model/policyContent'
 import { StepActionButton } from './StepInput'
 import { StepNavButtons } from './StepNavButtons'
 import { CheckboxField } from './CheckboxField'
@@ -19,22 +27,23 @@ const AGREEMENTS = [
   {
     id: 'serviceAgreed' as const,
     label: '(필수) 서비스 이용약관 동의',
-    hasDetail: true,
+    policy: POLICIES.service,
   },
   {
     id: 'privacyAgreed' as const,
     label: '(필수) 개인정보 수집 및 이용 동의',
-    hasDetail: true,
+    policy: POLICIES.privacy,
   },
   {
     id: 'marketingAgreed' as const,
     label: '(선택) 마케팅 수신 동의',
-    hasDetail: false,
+    policy: null,
   },
 ]
 
 const ProfileStep = () => {
   const { goBack } = useOnboarding()
+  const [openPolicy, setOpenPolicy] = useState<Policy | null>(null)
 
   const { register, control, handleSubmit, watch, setValue, onSubmit, firstErrorMessage } =
     useStepForm<ProfileFormData>('profile', profileSchema, {
@@ -242,7 +251,8 @@ const ProfileStep = () => {
                     label={agreement.label}
                     checked={!!field.value}
                     onCheckedChange={(checked) => field.onChange(checked)}
-                    hasDetailLink={agreement.hasDetail}
+                    hasDetailLink={!!agreement.policy}
+                    onDetailClick={() => setOpenPolicy(agreement.policy)}
                   />
                 )}
               />
@@ -268,6 +278,15 @@ const ProfileStep = () => {
         onBack={goBack}
         error={firstErrorMessage}
       />
+
+      {openPolicy && (
+        <PolicyModal
+          open
+          onOpenChange={(o) => !o && setOpenPolicy(null)}
+          title={openPolicy.title}
+          content={openPolicy.content}
+        />
+      )}
     </StepLayout>
   )
 }
