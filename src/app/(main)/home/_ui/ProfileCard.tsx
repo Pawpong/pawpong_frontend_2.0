@@ -1,12 +1,25 @@
 'use client'
 
-import type { ComponentType, ReactNode } from 'react'
+import { useState, type ComponentType, type ReactNode } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Badge, ProfileAvatar } from '@/shared/ui'
+import { Badge, ProfileAvatar, FollowButton, FollowersModal, type FollowUser } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { LocationOnIcon } from '@/shared/assets/icons'
+import { useUnfollowUser } from '@/features/profile'
 import type { AdopterPublicProfile, BreederPublicProfile } from '@/shared/types'
+
+// ponytail: 팔로워/팔로잉 목록 조회 API가 없어 목데이터로 표시 (엔드포인트 생기면 교체).
+// 팔로워 수는 실데이터(profile.followerCount) 사용, 언팔로우는 실 mutation 연결.
+const MOCK_FOLLOWERS: FollowUser[] = Array.from({ length: 8 }, (_, i) => ({
+  id: `follower-${i}`,
+  nickname: `팔로워${i + 1}`,
+}))
+const MOCK_FOLLOWING: FollowUser[] = Array.from({ length: 6 }, (_, i) => ({
+  id: `following-${i}`,
+  nickname: `팔로잉${i + 1}`,
+  mutual: i % 3 === 0,
+}))
 
 type ProfileMode = 'mine' | 'mine-breeder' | 'other' | 'breeder'
 
@@ -26,12 +39,14 @@ const FollowerSection = ({
   followerCount,
   className,
   textClassName,
+  onClick,
 }: {
   followerCount: number
   className?: string
   textClassName?: string
+  onClick?: () => void
 }) => (
-  <div className={cn('flex items-center gap-0.5', className)}>
+  <button type="button" onClick={onClick} className={cn('flex items-center gap-0.5', className)}>
     {/* 팔로워 미리보기 — ProfileAvatar xsmall(24) + 회색 테두리, 살짝 겹침 */}
     <div className="flex items-center">
       {[0, 1, 2].map((i) => (
@@ -43,7 +58,7 @@ const FollowerSection = ({
       ))}
     </div>
     <span className={cn('font-medium text-[#3e3e3e]', textClassName)}>팔로워 {followerCount}</span>
-  </div>
+  </button>
 )
 
 const LocationInfo = ({ location, className }: { location: string; className?: string }) => (
@@ -66,14 +81,8 @@ const ProfileBio = ({ children, className }: { children: ReactNode; className?: 
 
 /* ── 공통 버튼 ── */
 
-// [refactored] pill 버튼 공통 베이스 (h-40, 둥근, muted 배경) — 3개 버튼이 공유
+// [refactored] pill 버튼 공통 베이스 (h-40, 둥근, muted 배경) — 메시지/즐겨찾기 아이콘 버튼이 공유
 const PILL_BASE = 'flex h-10 items-center justify-center rounded-full bg-fill-muted p-2.5'
-
-const FollowButton = ({ className }: { className?: string }) => (
-  <button type="button" className={cn(PILL_BASE, 'text-sm font-medium text-white', className)}>
-    팔로우
-  </button>
-)
 
 // [refactored] 아이콘+라벨 pill 버튼 — 메시지/즐겨찾기 공통 구조 통합
 const IconPillButton = ({
@@ -121,14 +130,14 @@ const BreederActions = () => (
   <>
     <FavoriteButton className="hidden tab:flex tab:w-[12.5rem]" />
     <MessageButton label="상담하기" className="tab:w-[12.5rem]" />
-    <FollowButton className="flex-1" />
+    <FollowButton status="follow" className="flex-1" />
   </>
 )
 
 const OtherActions = () => (
   <>
     <MessageButton className="tab:w-[12.5rem]" />
-    <FollowButton className="flex-1" />
+    <FollowButton status="follow" className="flex-1" />
   </>
 )
 
@@ -143,6 +152,19 @@ const ACTION_MAP = {
 
 const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
   const Actions = ACTION_MAP[mode]
+  const [followOpen, setFollowOpen] = useState(false)
+  // ponytail: 목록 API 부재로 목데이터. 언팔로우만 실 mutation, 팔로워 삭제는 엔드포인트 없어 로컬 제거.
+  const [followers, setFollowers] = useState(MOCK_FOLLOWERS)
+  const [following, setFollowing] = useState(MOCK_FOLLOWING)
+  const { mutate: unfollow } = useUnfollowUser()
+
+  const handleUnfollow = (userId: string) => {
+    unfollow(userId)
+    setFollowing((prev) => prev.filter((u) => u.id !== userId))
+  }
+  const handleRemoveFollower = (userId: string) => {
+    setFollowers((prev) => prev.filter((u) => u.id !== userId))
+  }
   // [refactored] 타입 단언(as) 대신 in-내로잉으로 브리더 프로필 판별
   const breederProfile = 'businessLocation' in profile ? profile : null
   const isBreederProfile = breederProfile !== null
@@ -207,7 +229,11 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
               <ProfileBio className="text-base">{profile.bio}</ProfileBio>
             </div>
             <div className="flex shrink-0 items-end gap-3">
-              <FollowerSection followerCount={profile.followerCount} textClassName="text-xs" />
+              <FollowerSection
+                followerCount={profile.followerCount}
+                textClassName="text-xs"
+                onClick={() => setFollowOpen(true)}
+              />
               <ProfileAvatar size="xlarge" src={profile.profileImageUrl} alt={profile.nickname} />
             </div>
           </div>
@@ -221,6 +247,18 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
           </div>
         </div>
       </div>
+
+      <FollowersModal
+        open={followOpen}
+        onOpenChange={setFollowOpen}
+        followerCount={profile.followerCount}
+        followingCount={following.length}
+        followers={followers}
+        following={following}
+        onRemoveFollower={handleRemoveFollower}
+        onUnfollow={handleUnfollow}
+        getProfileHref={(id) => `/home/${id}`}
+      />
     </>
   )
 }
