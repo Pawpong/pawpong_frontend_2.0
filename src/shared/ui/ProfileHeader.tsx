@@ -53,7 +53,7 @@ const ProfileHeader = ({
         className="shrink-0"
       />
       <div className="flex min-w-0 flex-1 flex-col justify-center">
-        <div className="flex items-center gap-0.5  pc:gap-2 tab:gap-1 p-0.5">
+        <div className="flex items-center gap-0.5 p-0.5 tab:gap-1 pc:gap-2">
           <span className={cn('truncate font-semibold text-[#3e3e3e]', NAME_SIZE[type])}>
             {nickname}
           </span>
@@ -76,9 +76,7 @@ const ProfileHeader = ({
             </span>
           </div>
         ) : (
-          <p
-            className={cn('truncate leading-[1.5] font-semibold text-[#3e3e3e]', previewSize)}
-          >
+          <p className={cn('truncate leading-[1.5] font-semibold text-[#3e3e3e]', previewSize)}>
             {preview}
           </p>
         )}

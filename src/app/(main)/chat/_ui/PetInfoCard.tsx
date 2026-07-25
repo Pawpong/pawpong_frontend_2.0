@@ -35,7 +35,9 @@ const PetInfoCard = () => {
           </div>
 
           <button type="button" className="flex shrink-0 items-center px-1">
-            <span className="text-sm leading-[1.5] font-semibold text-[#3e3e3e]">입양 상세보기</span>
+            <span className="text-sm leading-[1.5] font-semibold text-[#3e3e3e]">
+              입양 상세보기
+            </span>
             <ArrowRightIcon className="size-5 text-[#3e3e3e]" />
           </button>
         </div>

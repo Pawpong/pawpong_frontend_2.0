@@ -43,7 +43,10 @@ const Table = ({ children }: { children: ReactNode }) => (
 // [refactored] 테이블 행(border #cacaca, gap-8, 기본 py-8) — 7회 반복 제거 (헤더는 className으로 py-4)
 const TableRow = ({ className, children }: { className?: string; children: ReactNode }) => (
   <div
-    className={cn('flex items-center gap-[0.5rem] border-b border-[#cacaca] py-[0.5rem]', className)}
+    className={cn(
+      'flex items-center gap-[0.5rem] border-b border-[#cacaca] py-[0.5rem]',
+      className,
+    )}
   >
     {children}
   </div>

@@ -104,7 +104,7 @@ const PostCard = ({
           profileImageUrl={author.profileImageUrl}
           detailHref={detailHref}
           showMore={showMore}
-          className="p-2  pc:px-0"
+          className="p-2 pc:px-0"
         />
       ) : (
         <div className="flex items-start justify-between gap-4 py-2 tab:py-3">

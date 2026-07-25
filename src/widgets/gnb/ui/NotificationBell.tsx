@@ -19,7 +19,12 @@ const BellIcon = ({ className }: { className?: string }) => (
       strokeWidth="1.6"
       strokeLinejoin="round"
     />
-    <path d="M9.5 19a2.5 2.5 0 0 0 5 0" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    <path
+      d="M9.5 19a2.5 2.5 0 0 0 5 0"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+    />
   </svg>
 )
 
@@ -48,7 +53,9 @@ const NotificationItem = ({
     <div className="flex min-w-0 flex-1 flex-col gap-0.5">
       <p className="truncate text-sm font-semibold text-[#3e3e3e]">{item.title}</p>
       <p className="line-clamp-2 text-sm leading-[1.4] font-medium text-[#6b6b6b]">{item.body}</p>
-      <span className="text-xs font-medium text-[#a6a6a6]">{formatRelativeTime(item.createdAt)}</span>
+      <span className="text-xs font-medium text-[#a6a6a6]">
+        {formatRelativeTime(item.createdAt)}
+      </span>
     </div>
   </button>
 )
@@ -64,18 +71,12 @@ const NotificationBell = () => {
     enabled: isLoggedIn,
   })
 
-  const {
-    data,
-    isLoading,
-    isError,
-    hasNextPage,
-    fetchNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery({
-    ...notificationQueries.list(),
-    // 드롭다운을 열었을 때만 목록을 불러온다
-    enabled: isLoggedIn && open,
-  })
+  const { data, isLoading, isError, hasNextPage, fetchNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
+      ...notificationQueries.list(),
+      // 드롭다운을 열었을 때만 목록을 불러온다
+      enabled: isLoggedIn && open,
+    })
 
   const { mutate: markAsRead } = useMarkAsRead()
   const { mutate: markAllAsRead } = useMarkAllAsRead()
@@ -132,7 +133,7 @@ const NotificationBell = () => {
 
       {/* 유튜브식 드롭다운 패널 */}
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-1 w-[22.5rem] overflow-hidden rounded-xl border border-[#e4e4e4] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
+        <div className="absolute top-full right-0 z-50 mt-1 w-[22.5rem] overflow-hidden rounded-xl border border-[#e4e4e4] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
           <div className="flex items-center justify-between border-b border-[#ededed] px-4 py-3">
             <span className="text-base font-semibold text-[#3e3e3e]">알림</span>
             {unreadCount > 0 && (
@@ -158,11 +159,7 @@ const NotificationBell = () => {
             ) : (
               <div className="flex flex-col divide-y divide-[#f2f2f2]">
                 {notifications.map((item) => (
-                  <NotificationItem
-                    key={item.notificationId}
-                    item={item}
-                    onSelect={handleSelect}
-                  />
+                  <NotificationItem key={item.notificationId} item={item} onSelect={handleSelect} />
                 ))}
                 {hasNextPage && (
                   <button

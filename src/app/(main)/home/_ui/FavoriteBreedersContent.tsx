@@ -22,14 +22,8 @@ const toFavoriteBreeder = (b: FavoriteBreederCard): FavoriteBreeder => ({
 
 const FavoriteBreedersContent = () => {
   // 즐겨찾는 브리더 — /profile/me/favorite-breeders (adopter 전용, 무한 스크롤)
-  const {
-    data,
-    isLoading,
-    isError,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery(profileQueries.favoriteBreeders())
+  const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery(profileQueries.favoriteBreeders())
 
   const breeders = (data?.pages.flatMap((page) => page.items) ?? []).map(toFavoriteBreeder)
 

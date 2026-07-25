@@ -21,7 +21,8 @@ const normalizeDate = (raw: string): string => {
 }
 
 /** 날짜 형식(YYYY-MM-DD 또는 YYYYMMDD)인지 판별 */
-const isDateLike = (raw?: string): boolean => !!raw && /^(\d{4}-\d{2}-\d{2}|\d{8})$/.test(raw.trim())
+const isDateLike = (raw?: string): boolean =>
+  !!raw && /^(\d{4}-\d{2}-\d{2}|\d{8})$/.test(raw.trim())
 
 /** 폼 상태(접종 중/미접종 3종)를 DTO 2종(completed|incomplete)으로 축약 */
 const collapseStatus = (status: string): 'completed' | 'incomplete' =>

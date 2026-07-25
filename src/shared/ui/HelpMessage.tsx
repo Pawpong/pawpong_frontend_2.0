@@ -50,7 +50,13 @@ const STATUS_ICON: Record<HelpMessageStatus, ComponentType<{ className?: string 
   success: CheckRoundedIcon,
 }
 
-const HelpMessage = ({ status = 'default', children, icon, hideIcon, className }: HelpMessageProps) => {
+const HelpMessage = ({
+  status = 'default',
+  children,
+  icon,
+  hideIcon,
+  className,
+}: HelpMessageProps) => {
   const styles = helpMessage({ status })
   const Icon = icon ?? STATUS_ICON[status]
 

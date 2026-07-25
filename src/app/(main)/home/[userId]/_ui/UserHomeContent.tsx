@@ -40,10 +40,11 @@ const UserHomeContent = ({ userId }: UserHomeContentProps) => {
   }
 
   // 팔로우 토글
-  const { isFollowing, toggleFollow, isPending: isFollowPending } = useToggleFollow(
-    userId,
-    profile?.isFollowing ?? false,
-  )
+  const {
+    isFollowing,
+    toggleFollow,
+    isPending: isFollowPending,
+  } = useToggleFollow(userId, profile?.isFollowing ?? false)
 
   if (!profile) return null
 

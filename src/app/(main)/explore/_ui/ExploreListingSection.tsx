@@ -39,7 +39,11 @@ const ExploreListingSection = <T,>({
 }: ExploreListingSectionProps<T>) => {
   if (variant === 'featured') {
     return (
-      <TitledSection title={title} titleClassName={EXPLORE_SECTION_TITLE_CLASS} className={className}>
+      <TitledSection
+        title={title}
+        titleClassName={EXPLORE_SECTION_TITLE_CLASS}
+        className={className}
+      >
         {/* 4번째 카드는 모바일 전용(tab+ 숨김) */}
         <div className={FEATURED_GRID}>
           {items.slice(0, 4).map((item, index) => (

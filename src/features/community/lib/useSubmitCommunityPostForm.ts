@@ -53,7 +53,9 @@ export const useSubmitCommunityPostForm = () => {
         return post.postId
       } catch (err) {
         const message =
-          err instanceof Error ? err.message : '게시글 저장에 실패했습니다. 잠시 후 다시 시도해 주세요.'
+          err instanceof Error
+            ? err.message
+            : '게시글 저장에 실패했습니다. 잠시 후 다시 시도해 주세요.'
         setError(message)
         return null
       }

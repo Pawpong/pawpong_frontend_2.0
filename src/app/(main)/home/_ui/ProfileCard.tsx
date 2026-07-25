@@ -310,12 +310,12 @@ const ProfileCard = ({
           <div className="h-px w-full bg-[#e4e4e4]" />
           <div className="flex w-full max-w-[36.625rem] items-center gap-6 px-5">
             <Actions
-            onMessage={onMessage}
-            isMessagePending={isMessagePending}
-            isFollowing={isFollowing}
-            onToggleFollow={onToggleFollow}
-            isFollowPending={isFollowPending}
-          />
+              onMessage={onMessage}
+              isMessagePending={isMessagePending}
+              isFollowing={isFollowing}
+              onToggleFollow={onToggleFollow}
+              isFollowPending={isFollowPending}
+            />
           </div>
         </div>
       </div>

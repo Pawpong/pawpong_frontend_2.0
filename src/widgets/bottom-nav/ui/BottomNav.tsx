@@ -20,7 +20,7 @@ const BottomNav = () => {
           )}
         >
           <Icon className="size-8" />
-          <span className="text-sm font-semibold leading-[1.5]">{label}</span>
+          <span className="text-sm leading-[1.5] font-semibold">{label}</span>
         </Link>
       ))}
     </nav>

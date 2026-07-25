@@ -32,9 +32,11 @@ export const useSubmitPetPostingForm = () => {
   const isSubmitting = uploadMutation.isPending || createMutation.isPending
 
   const submit = useCallback(
-    async ({ files, representativePhotoIndex, buildRequest }: SubmitPetPostingInput): Promise<
-      string | null
-    > => {
+    async ({
+      files,
+      representativePhotoIndex,
+      buildRequest,
+    }: SubmitPetPostingInput): Promise<string | null> => {
       setError(null)
       try {
         // 백엔드는 사진 1~10장 필수

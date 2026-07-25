@@ -24,9 +24,10 @@ export async function POST() {
       )
     }
 
-    const backendUrl = (
-      process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8080'
-    ).replace(/\/+$/, '')
+    const backendUrl = (process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8080').replace(
+      /\/+$/,
+      '',
+    )
 
     const response = await fetch(`${backendUrl}/api/v2/auth/refresh`, {
       method: 'POST',

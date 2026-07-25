@@ -103,7 +103,7 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
 
         <TabsContent value="posts" className="mt-0">
           {/* 세로 여백은 PostList가 아닌 래퍼가 담당 (spacing-40) */}
-          <Container className="pc:px-[10rem] tab:py-10">
+          <Container className="tab:py-10 pc:px-[10rem]">
             <PostList posts={posts} />
           </Container>
         </TabsContent>

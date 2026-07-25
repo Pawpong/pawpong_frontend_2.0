@@ -46,7 +46,10 @@ const TextLabel = ({
     {/* Figma label-필수: 칩(14·medium·secondary)을 인라인으로 — 라벨이 줄바꿈돼도 텍스트 뒤에 흐름 */}
     {requirement && (
       <span
-        className={cn(textLabelVariants({ size: '14', weight: 'medium', color: 'secondary' }), 'ms-1')}
+        className={cn(
+          textLabelVariants({ size: '14', weight: 'medium', color: 'secondary' }),
+          'ms-1',
+        )}
       >
         {requirement}
       </span>

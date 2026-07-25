@@ -6,13 +6,7 @@ import { useInfiniteQuery } from '@tanstack/react-query'
 import { contestQueries } from '@/entities/contest'
 import { MOCK_RANKING_ENTRIES } from '@/shared/mocks/hallOfFame'
 import type { ContestEntry } from '@/shared/types'
-import {
-  Container,
-  DetailLink,
-  ImageDetailModal,
-  ProfileAvatar,
-  SectionHeader,
-} from '@/shared/ui'
+import { Container, DetailLink, ImageDetailModal, ProfileAvatar, SectionHeader } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 
 const CARD_COUNT = 3
@@ -72,11 +66,7 @@ const HallOfFameCard = ({ winner, onClick }: { winner?: ContestEntry; onClick?: 
       </p>
       <div className="flex items-center justify-between">
         <CardProfile winner={winner} />
-        <DetailLink
-          href={winner ? `/home/${winner.userId}` : '/home'}
-          label="브리더홈"
-          size="md"
-        />
+        <DetailLink href={winner ? `/home/${winner.userId}` : '/home'} label="브리더홈" size="md" />
       </div>
     </div>
   </div>
@@ -121,7 +111,11 @@ const HallOfFame = () => {
   return (
     <Container className="py-6 tab:py-8 pc:py-12">
       <div className="flex flex-col gap-[0.75rem]">
-        <SectionHeader title="명예의 전당" linkText="이번주 명예의 동물 투표하기" linkHref="/vote" />
+        <SectionHeader
+          title="명예의 전당"
+          linkText="이번주 명예의 동물 투표하기"
+          linkHref="/vote"
+        />
 
         {/* 모바일·태블릿: 가로형 카드 세로 스택 (Figma 940-37598) */}
         <div className="flex flex-col gap-[0.75rem] pc:hidden">
