@@ -16,6 +16,8 @@ const buttonVariants = tv({
       text: 'rounded-lg px-1 text-sm hover:bg-[#f6f6f6] active:bg-[#ededed] disabled:text-[#c2c2c2] disabled:opacity-100',
       // FillButton (다크) — h-40, rounded-8, 16px #f6f6f6
       fill: 'h-10 rounded-lg bg-[#3e3e3e] p-2 text-base text-[#f6f6f6]',
+      // ghost: 배경/보더 없는 텍스트 버튼 (CtaModal 보조 액션)
+      ghost: 'text-[#6b6b6b] hover:text-[#3e3e3e]',
     },
     size: {
       sm: 'h-8 text-sm',

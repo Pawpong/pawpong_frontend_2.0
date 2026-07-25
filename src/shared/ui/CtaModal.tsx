@@ -6,18 +6,19 @@ import { tv, type VariantProps } from 'tailwind-variants'
 import { CloseIcon, InfoIcon } from '@/shared/assets/icons'
 import { cn } from '@/shared/lib/cn'
 import { Dialog, DialogOverlay, DialogPortal } from './Dialog'
+import { Button } from './Button'
 
 /* 공통 CTA 모달 (Figma 1671-112002 / 모바일·탭 1716-144608)
    - 틀(레이아웃·색상·radius·아이콘 영역·버튼 높이)은 고정 공통
    - 가변: 제목/설명/아이콘/버튼 라벨·동작·배치
    - direction: row(가로, typeA) / column(세로, typeB) / responsive(모바일·탭 세로 → pc 가로) */ // [refactored]
 
-// 버튼 1개 스타일 — 라벨/동작만 가변, 높이·radius·정렬은 고정
+// 버튼 스타일 — 공통 Button(BaseButton) variant로 위임.
+// (variant 타입 소스로만 유지, 렌더는 아래 CTA_BUTTON 매핑으로 Button 사용)
 const ctaModalButton = tv({
   base: 'flex h-10 w-full items-center justify-center rounded-full p-2 text-base leading-normal font-semibold text-[#3e3e3e] transition-colors',
   variants: {
     variant: {
-      // 메인 노란 버튼 — hover/press 컨벤션은 입양 CTA 바와 동일 (AdoptionCtaBar)
       fill: 'bg-[#fffa94] hover:text-[#6b6b6b] active:bg-[#f3ec59] active:text-[#3e3e3e]',
       outline: 'border border-[#cacaca] bg-white hover:bg-[#f5f5f5] active:bg-[#ededed]',
       ghost: 'text-[#6b6b6b] hover:text-[#3e3e3e]',
@@ -26,20 +27,33 @@ const ctaModalButton = tv({
   defaultVariants: { variant: 'outline' },
 })
 
+// CtaModal 액션 variant → 공통 Button variant + 보정 클래스
+const CTA_BUTTON = {
+  fill: { variant: 'primary', className: '' },
+  outline: { variant: 'outline', className: 'hover:bg-[#f5f5f5] active:bg-[#ededed]' },
+  ghost: { variant: 'ghost', className: '' },
+} as const
+
 export interface CtaModalAction extends VariantProps<typeof ctaModalButton> {
   label: string
   onClick: () => void
+  /** 버튼 색 등 개별 오버라이드 (예: 삭제 빨강, 취소 회색) */
+  className?: string
 }
 
 interface CtaModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  /** 제목 (Body xl bold) */
-  title: string
+  /** 제목 (기본 Body xl bold) */
+  title: ReactNode
+  /** 제목 타이포 오버라이드 (예: 삭제 확인은 text-base) */
+  titleClassName?: string
   /** 설명 (Body lg medium) — 없으면 숨김. 반응형 줄바꿈 등은 ReactNode로 전달 */
   description?: ReactNode
   /** 상단 원형 아이콘 (기본: InfoIcon). null이면 아이콘 영역 숨김 */
   icon?: ReactNode | null
+  /** 아이콘을 회색 원형 배경 없이 그대로 노출 (예: 아바타) */
+  iconBare?: boolean
   /** 하단 버튼들 — variant로 fill/outline/ghost 지정.
    *  배열 순서는 pc 가로 기준 왼→오. responsive에선 모바일/탭에서 역순 세로 배치(주요 버튼이 위로). */
   actions: CtaModalAction[]
@@ -56,8 +70,10 @@ const CtaModal = ({
   open,
   onOpenChange,
   title,
+  titleClassName,
   description,
   icon = DEFAULT_ICON,
+  iconBare = false,
   actions,
   direction = 'column',
   showClose = true,
@@ -87,14 +103,22 @@ const CtaModal = ({
               </DialogPrimitive.Close>
             )}
           </div>
-          {icon && (
-            <div className="flex items-center justify-center rounded-full bg-[#ededed] p-2.5">
-              {icon}
-            </div>
-          )}
+          {icon &&
+            (iconBare ? (
+              icon
+            ) : (
+              <div className="flex items-center justify-center rounded-full bg-[#ededed] p-2.5">
+                {icon}
+              </div>
+            ))}
           <div className="flex flex-col items-center text-center text-[#3e3e3e]">
             {/* whitespace-pre-line: title에 \n 넣으면 원하는 위치에서 줄바꿈 (단일 줄은 영향 없음) */}
-            <DialogPrimitive.Title className="text-xl leading-normal font-semibold whitespace-pre-line">
+            <DialogPrimitive.Title
+              className={cn(
+                'text-xl leading-normal font-semibold whitespace-pre-line',
+                titleClassName,
+              )}
+            >
               {title}
             </DialogPrimitive.Title>
             {description && (
@@ -114,16 +138,23 @@ const CtaModal = ({
             'flex-col-reverse gap-2 pc:flex-row pc:gap-4': direction === 'responsive',
           })}
         >
-          {actions.map((action) => (
-            <button
-              key={action.label}
-              type="button"
-              onClick={action.onClick}
-              className={ctaModalButton({ variant: action.variant })}
-            >
-              {action.label}
-            </button>
-          ))}
+          {actions.map((action) => {
+            const map = CTA_BUTTON[action.variant ?? 'outline']
+            return (
+              <Button
+                key={action.label}
+                variant={map.variant}
+                onClick={action.onClick}
+                className={cn(
+                  'h-10 w-full text-base leading-normal transition-colors',
+                  map.className,
+                  action.className,
+                )}
+              >
+                {action.label}
+              </Button>
+            )
+          })}
         </div>
       </DialogPrimitive.Content>
     </DialogPortal>
