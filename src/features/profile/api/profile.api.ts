@@ -5,6 +5,7 @@ import type {
   UpdateMyProfileRequest,
   FollowResponse,
   UnfollowResponse,
+  RemoveFollowerResponse,
 } from '@/shared/types'
 
 /** 내 프로필 수정 */
@@ -30,4 +31,12 @@ export const unfollowUser = async (userId: string): Promise<UnfollowResponse> =>
     `${API_VERSION}/profile/users/${userId}/follow`,
   )
   return unwrap(response, '팔로우 취소에 실패했습니다.')
+}
+
+/** 내 팔로워 삭제 — 상대가 나를 팔로우한 관계를 끊음 (언팔로우와 방향 반대) */
+export const removeFollower = async (userId: string): Promise<RemoveFollowerResponse> => {
+  const response = await apiClient.delete<ApiResponseFull<RemoveFollowerResponse>>(
+    `${API_VERSION}/profile/me/followers/${userId}`,
+  )
+  return unwrap(response, '팔로워 삭제에 실패했습니다.')
 }

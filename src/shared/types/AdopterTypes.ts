@@ -29,6 +29,8 @@ export interface AdopterPublicProfile {
   bio: string
   bpm: number
   followerCount: number
+  /** 내가 팔로우하는 수 */
+  followingCount?: number
   isFollowing: boolean
 }
 

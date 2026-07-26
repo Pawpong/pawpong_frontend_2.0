@@ -19,6 +19,8 @@ export interface MyProfile {
   bio: string
   bpm: number
   followerCount: number
+  /** 내가 팔로우하는 수 (브리더는 항상 0) */
+  followingCount?: number
   /** Adopter only */
   favoriteBreederCount?: number
   /** Breeder only */
@@ -73,4 +75,24 @@ export interface FollowResponse {
 export interface UnfollowResponse {
   followeeId: string
   unfollowed: boolean
+}
+
+/** 친구 목록(팔로워/팔로잉) 사용자 카드 */
+export interface FollowUserCard {
+  userId: string
+  nickname: string
+  profileImageUrl?: string
+  /** 한 줄 소개 (없으면 "") */
+  bio: string
+  /** 내가 이 사람을 팔로우 중 */
+  isFollowing: boolean
+  /** 이 사람이 나를 팔로우 중 */
+  isFollowedBy: boolean
+  followedAt: string
+}
+
+/** 팔로워 삭제 응답 — removed: false면 원래 내 팔로워가 아니었음(멱등) */
+export interface RemoveFollowerResponse {
+  followerId: string
+  removed: boolean
 }
