@@ -2,19 +2,13 @@
 
 import type { ReactNode } from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { Dialog, DialogPortal, DialogOverlay, DialogClose } from '@/shared/ui'
 import { ProfileAvatar } from './ProfileAvatar'
 import { Badge } from './Badge'
+import { DetailLink } from './DetailLink'
 import { useImageCarousel } from '@/shared/lib/useImageCarousel'
-import {
-  VoteIcon,
-  CloseIcon,
-  ArrowBackIcon,
-  ArrowRightIcon,
-  PixelArrowRightIcon,
-} from '@/shared/assets/icons'
+import { VoteIcon, CloseIcon, ArrowBackIcon, PixelArrowRightIcon } from '@/shared/assets/icons'
 import { cn } from '@/shared/lib/cn'
 
 interface ImageDetailProfile {
@@ -114,13 +108,12 @@ const ImageDetailModal = ({
                 )}
               </div>
               {profile.homeHref && (
-                <Link
+                <DetailLink
                   href={profile.homeHref}
-                  className="flex shrink-0 items-center px-1 text-sm font-semibold text-[#f6f6f6]"
-                >
-                  브리더홈
-                  <ArrowRightIcon className="size-5" />
-                </Link>
+                  label="브리더홈"
+                  size="md"
+                  className="shrink-0 text-[#f6f6f6]"
+                />
               )}
             </div>
           )}

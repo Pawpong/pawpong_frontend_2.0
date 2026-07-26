@@ -1,12 +1,44 @@
 'use client'
 
-import type { ComponentType, ReactNode } from 'react'
+import { useState, type ComponentType, type ReactNode } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Badge, ProfileAvatar } from '@/shared/ui'
+import {
+  useInfiniteQuery,
+  type InfiniteData,
+  type UseInfiniteQueryResult,
+} from '@tanstack/react-query'
+import { Badge, ProfileAvatar, FollowButton, FollowersModal, type FollowUser } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { LocationOnIcon } from '@/shared/assets/icons'
-import type { AdopterPublicProfile, BreederPublicProfile } from '@/shared/types'
+import { profileQueries } from '@/entities/profile'
+import { useUnfollowUser, useRemoveFollower } from '@/features/profile'
+import type {
+  AdopterPublicProfile,
+  BreederPublicProfile,
+  FollowUserCard,
+  PaginationResponse,
+} from '@/shared/types'
+
+// 백엔드 FollowUserCard → 모달이 쓰는 FollowUser (맞팔 여부는 두 플래그 조합)
+const toFollowUser = (card: FollowUserCard): FollowUser => ({
+  id: card.userId,
+  nickname: card.nickname,
+  profileImageUrl: card.profileImageUrl,
+  mutual: card.isFollowing && card.isFollowedBy,
+})
+
+// [refactored] 팔로워/팔로잉 두 쿼리가 쓰던 변환·paging 조립을 헬퍼로 (중복 2회 → 1곳)
+type FollowListQuery = UseInfiniteQueryResult<InfiniteData<PaginationResponse<FollowUserCard>>>
+
+const toFollowUsers = (query: FollowListQuery): FollowUser[] =>
+  (query.data?.pages ?? []).flatMap((page) => page.items.map(toFollowUser))
+
+const toPaging = (query: FollowListQuery) => ({
+  hasMore: query.hasNextPage,
+  isLoadingMore: query.isFetchingNextPage,
+  onLoadMore: query.fetchNextPage,
+})
 
 type ProfileMode = 'mine' | 'mine-breeder' | 'other' | 'breeder'
 
@@ -35,12 +67,14 @@ const FollowerSection = ({
   followerCount,
   className,
   textClassName,
+  onClick,
 }: {
   followerCount: number
   className?: string
   textClassName?: string
+  onClick?: () => void
 }) => (
-  <div className={cn('flex items-center gap-0.5', className)}>
+  <button type="button" onClick={onClick} className={cn('flex items-center gap-0.5', className)}>
     {/* 팔로워 미리보기 — ProfileAvatar xsmall(24) + 회색 테두리, 살짝 겹침 */}
     <div className="flex items-center">
       {[0, 1, 2].map((i) => (
@@ -52,7 +86,7 @@ const FollowerSection = ({
       ))}
     </div>
     <span className={cn('font-medium text-[#3e3e3e]', textClassName)}>팔로워 {followerCount}</span>
-  </div>
+  </button>
 )
 
 const LocationInfo = ({ location, className }: { location: string; className?: string }) => (
@@ -75,36 +109,10 @@ const ProfileBio = ({ children, className }: { children: ReactNode; className?: 
 
 /* ── 공통 버튼 ── */
 
-// [refactored] pill 버튼 공통 베이스 (h-40, 둥근, muted 배경) — 3개 버튼이 공유
+// [refactored] pill 버튼 공통 베이스 (h-40, 둥근, muted 배경) — 메시지/즐겨찾기 아이콘 버튼이 공유
 const PILL_BASE = 'flex h-10 items-center justify-center rounded-full bg-fill-muted p-2.5'
 
-const FollowButton = ({
-  className,
-  isFollowing,
-  onClick,
-  disabled,
-}: {
-  className?: string
-  isFollowing?: boolean
-  onClick?: () => void
-  disabled?: boolean
-}) => (
-  <button
-    type="button"
-    onClick={onClick}
-    disabled={disabled}
-    aria-pressed={isFollowing}
-    className={cn(
-      PILL_BASE,
-      'text-sm font-medium text-white disabled:opacity-50',
-      isFollowing && 'border border-[#cacaca] bg-white text-[#3e3e3e]',
-      className,
-    )}
-  >
-    {isFollowing ? '팔로잉' : '팔로우'}
-  </button>
-)
-
+// [refactored] 팔로우 버튼은 shared/ui/FollowButton(공통)으로 통합 — 로컬 정의 제거
 // [refactored] 아이콘+라벨 pill 버튼 — 메시지/즐겨찾기 공통 구조 통합
 const IconPillButton = ({
   icon,
@@ -184,8 +192,8 @@ const BreederActions = ({
       disabled={isMessagePending}
     />
     <FollowButton
+      status={isFollowing ? 'following' : 'follow'}
       className="flex-1"
-      isFollowing={isFollowing}
       onClick={onToggleFollow}
       disabled={isFollowPending}
     />
@@ -202,8 +210,8 @@ const OtherActions = ({
   <>
     <MessageButton className="tab:w-[12.5rem]" onClick={onMessage} disabled={isMessagePending} />
     <FollowButton
+      status={isFollowing ? 'following' : 'follow'}
       className="flex-1"
-      isFollowing={isFollowing}
       onClick={onToggleFollow}
       disabled={isFollowPending}
     />
@@ -229,9 +237,18 @@ const ProfileCard = ({
   isFollowPending,
 }: ProfileCardProps) => {
   const Actions = ACTION_MAP[mode]
+  const [followOpen, setFollowOpen] = useState(false)
+
   // [refactored] 타입 단언(as) 대신 in-내로잉으로 브리더 프로필 판별
   const breederProfile = 'businessLocation' in profile ? profile : null
   const isBreederProfile = breederProfile !== null
+  const profileUserId = 'breederId' in profile ? profile.breederId : profile.userId
+
+  // 친구 목록 — 모달이 열릴 때만 조회
+  const followersQuery = useInfiniteQuery(profileQueries.followers(profileUserId, followOpen))
+  const followingsQuery = useInfiniteQuery(profileQueries.followings(profileUserId, followOpen))
+  const { mutate: unfollow } = useUnfollowUser()
+  const { mutate: removeFollower } = useRemoveFollower()
   const locationText = breederProfile
     ? `${breederProfile.businessLocation.city} ${breederProfile.businessLocation.district}`
     : null
@@ -273,7 +290,11 @@ const ProfileCard = ({
           <ProfileBio className="w-full text-sm">{profile.bio}</ProfileBio>
           {locationText && <LocationInfo location={locationText} />}
           {/* 팔로워 */}
-          <FollowerSection followerCount={profile.followerCount} textClassName="text-xs" />
+          <FollowerSection
+            followerCount={profile.followerCount}
+            textClassName="text-xs"
+            onClick={() => setFollowOpen(true)}
+          />
         </div>
         {/* 하단: 모드별 버튼 (풀폭, gap-10, h-40) */}
         <div className="flex w-full items-start gap-2.5">
@@ -299,7 +320,11 @@ const ProfileCard = ({
               <ProfileBio className="text-base">{profile.bio}</ProfileBio>
             </div>
             <div className="flex shrink-0 items-end gap-3">
-              <FollowerSection followerCount={profile.followerCount} textClassName="text-xs" />
+              <FollowerSection
+                followerCount={profile.followerCount}
+                textClassName="text-xs"
+                onClick={() => setFollowOpen(true)}
+              />
               <ProfileAvatar size="xlarge" src={profile.profileImageUrl} alt={profile.nickname} />
             </div>
           </div>
@@ -319,6 +344,19 @@ const ProfileCard = ({
           </div>
         </div>
       </div>
+
+      <FollowersModal
+        open={followOpen}
+        onOpenChange={setFollowOpen}
+        followerCount={profile.followerCount}
+        followingCount={profile.followingCount ?? 0}
+        followers={toFollowUsers(followersQuery)}
+        following={toFollowUsers(followingsQuery)}
+        onRemoveFollower={removeFollower}
+        onUnfollow={unfollow}
+        getProfileHref={(id) => `/home/${id}`}
+        paging={{ followers: toPaging(followersQuery), following: toPaging(followingsQuery) }}
+      />
     </>
   )
 }

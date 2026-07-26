@@ -108,7 +108,7 @@ const WithdrawReasonModal = ({ open, onOpenChange, onNext }: WithdrawReasonModal
             </div>
           )}
 
-          {/* 하단 버튼 — 모바일·탭 세로 → pc 가로 (CtaModal responsive 규칙과 동일) */}
+          {/* 하단 버튼 — 모바일·탭 세로 역순 → pc 가로 (CtaModal responsive-reverse 규칙과 동일) */}
           <div className="flex flex-col-reverse gap-2 pc:flex-row pc:gap-4">
             <button
               type="button"

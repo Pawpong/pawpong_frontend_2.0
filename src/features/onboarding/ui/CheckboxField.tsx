@@ -6,6 +6,8 @@ interface CheckboxFieldProps {
   checked: boolean
   onCheckedChange: (checked: boolean) => void
   hasDetailLink?: boolean
+  /** "자세히" 클릭 — label 안에 있어 기본 동작(체크 토글)은 막고 호출 */
+  onDetailClick?: () => void
   className?: string
 }
 
@@ -14,6 +16,7 @@ const CheckboxField = ({
   checked,
   onCheckedChange,
   hasDetailLink,
+  onDetailClick,
   className,
 }: CheckboxFieldProps) => (
   <label className={cn('flex cursor-pointer items-center', className)}>
@@ -22,7 +25,17 @@ const CheckboxField = ({
     <TextLabel size="16" weight="medium" className="flex-1">
       {label}
     </TextLabel>
-    {hasDetailLink && <DetailLink variant="button" size="lg" label="자세히" />}
+    {hasDetailLink && (
+      <DetailLink
+        variant="button"
+        size="lg"
+        label="자세히"
+        onClick={(e) => {
+          e.preventDefault()
+          onDetailClick?.()
+        }}
+      />
+    )}
   </label>
 )
 
