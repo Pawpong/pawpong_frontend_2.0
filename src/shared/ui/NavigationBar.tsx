@@ -8,25 +8,41 @@ interface NavigationBarProps {
   title: string
   /** 뒤로가기 링크 (없으면 화살표 미표시) */
   backHref?: string
+  /** 링크 대신 동작이 필요할 때 (모달 닫기 등). backHref보다 우선 */
+  onBack?: () => void
   /** 오른쪽 액션 슬롯 (아이콘 버튼 등) */
   right?: ReactNode
   className?: string
 }
 
 /** 서브 페이지 상단바 (가운데 정렬 타이틀 + 옵션 뒤로가기/오른쪽 액션) — Figma node 976:25817 · 2046:160967 */
-const NavigationBar = ({ title, backHref, right, className }: NavigationBarProps) => {
+const NavigationBar = ({ title, backHref, onBack, right, className }: NavigationBarProps) => {
+  const backIcon = <ArrowBackIcon className="size-6 text-[#3e3e3e]" />
+  // [refactored] 중첩 삼항/중복 조건을 명명 조건으로
+  const hasBack = Boolean(onBack || backHref)
+
   return (
     <div
       className={cn('flex items-center bg-white px-4 py-1 tab:px-12 tab:py-2 pc:px-20', className)}
     >
       <div className="flex min-w-0 flex-1 items-center">
-        {backHref && (
+        {onBack && (
+          <button type="button" onClick={onBack} aria-label="뒤로 가기" className="shrink-0">
+            {backIcon}
+          </button>
+        )}
+        {!onBack && backHref && (
           <Link href={backHref} aria-label="뒤로 가기" className="shrink-0">
-            <ArrowBackIcon className="size-6 text-[#3e3e3e]" />
+            {backIcon}
           </Link>
         )}
         <TextLabel className="min-w-0 flex-1 truncate text-center">{title}</TextLabel>
-        {right && <div className="shrink-0">{right}</div>}
+        {/* 오른쪽 액션이 없으면 뒤로가기 아이콘 폭만큼 자리를 채워 타이틀을 실제 가운데로 */}
+        {right ? (
+          <div className="shrink-0">{right}</div>
+        ) : (
+          hasBack && <div className="size-6 shrink-0" aria-hidden />
+        )}
       </div>
     </div>
   )

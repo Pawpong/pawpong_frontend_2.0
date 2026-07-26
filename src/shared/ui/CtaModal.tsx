@@ -11,7 +11,7 @@ import { Button } from './Button'
 /* 공통 CTA 모달 (Figma 1671-112002 / 모바일·탭 1716-144608)
    - 틀(레이아웃·색상·radius·아이콘 영역·버튼 높이)은 고정 공통
    - 가변: 제목/설명/아이콘/버튼 라벨·동작·배치
-   - direction: row(가로, typeA) / column(세로, typeB) / responsive(모바일·탭 세로 → pc 가로) */ // [refactored]
+   - direction: row(가로, typeA) / column(세로, typeB) / responsive·responsive-reverse(모바일·탭 세로 → pc 가로) */ // [refactored]
 
 // 버튼 스타일 — 공통 Button(BaseButton) variant로 위임.
 // (variant 타입 소스로만 유지, 렌더는 아래 CTA_BUTTON 매핑으로 Button 사용)
@@ -34,6 +34,18 @@ const CTA_BUTTON = {
   ghost: { variant: 'ghost', className: '' },
 } as const
 
+// [refactored] direction 분기를 cn 조건 객체 → 룩업 테이블로
+type CtaModalDirection = 'row' | 'column' | 'responsive' | 'responsive-reverse'
+
+const DIRECTION_CLASS: Record<CtaModalDirection, string> = {
+  row: 'gap-4',
+  column: 'flex-col gap-2',
+  // 모바일·탭 세로(배열 순서 그대로) → pc 가로
+  responsive: 'flex-col gap-2 pc:flex-row pc:gap-4',
+  // 모바일·탭 세로(역순으로 주요 버튼이 위) → pc 가로
+  'responsive-reverse': 'flex-col-reverse gap-2 pc:flex-row pc:gap-4',
+}
+
 export interface CtaModalAction extends VariantProps<typeof ctaModalButton> {
   label: string
   onClick: () => void
@@ -55,10 +67,12 @@ interface CtaModalProps {
   /** 아이콘을 회색 원형 배경 없이 그대로 노출 (예: 아바타) */
   iconBare?: boolean
   /** 하단 버튼들 — variant로 fill/outline/ghost 지정.
-   *  배열 순서는 pc 가로 기준 왼→오. responsive에선 모바일/탭에서 역순 세로 배치(주요 버튼이 위로). */
+   *  배열 순서는 pc 가로 기준 왼→오. responsive-reverse에선 모바일/탭에서 역순 세로 배치(주요 버튼이 위로). */
   actions: CtaModalAction[]
-  /** 버튼 배치 — row(가로, typeA) / column(세로, typeB) / responsive(모바일·탭 세로 → pc 가로). 기본 column */
-  direction?: 'row' | 'column' | 'responsive'
+  /** 버튼 배치 — row(가로, typeA) / column(세로, typeB) /
+   *  responsive(모바일·탭 세로, 배열 순서 유지 → pc 가로) /
+   *  responsive-reverse(모바일·탭 세로 역순 → pc 가로). 기본 column */
+  direction?: CtaModalDirection
   /** 우상단 X 닫기 노출 (기본 true) */
   showClose?: boolean
   className?: string
@@ -130,14 +144,7 @@ const CtaModal = ({
         </div>
 
         {/* 하단: 버튼 영역 */}
-        <div
-          className={cn('flex rounded-b-xl px-3 py-5', {
-            'gap-4': direction === 'row',
-            'flex-col gap-2': direction === 'column',
-            // 모바일·탭 세로(역순으로 주요 버튼이 위) → pc 가로
-            'flex-col-reverse gap-2 pc:flex-row pc:gap-4': direction === 'responsive',
-          })}
-        >
+        <div className={cn('flex rounded-b-xl px-3 py-5', DIRECTION_CLASS[direction])}>
           {actions.map((action) => {
             const map = CTA_BUTTON[action.variant ?? 'outline']
             return (

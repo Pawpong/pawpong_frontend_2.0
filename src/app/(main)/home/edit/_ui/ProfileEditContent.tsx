@@ -35,7 +35,7 @@ const BELOW_PC_QUERY = '(max-width: 89.99rem)' // pc(1440px) 미만 = 모바일�
 // [refactored] 아이콘·X 없는 반응형 확인 모달 프리셋 (적용/탈퇴 공용)
 const ConfirmModal = (
   props: Omit<ComponentProps<typeof CtaModal>, 'icon' | 'showClose' | 'direction'>,
-) => <CtaModal icon={null} showClose={false} direction="responsive" {...props} />
+) => <CtaModal icon={null} showClose={false} direction="responsive-reverse" {...props} />
 
 // [refactored] 탈퇴 모달 설명 — 줄바꿈 위치가 데스크탑/모바일·탭 다름
 const LEAVE_DESCRIPTION = (

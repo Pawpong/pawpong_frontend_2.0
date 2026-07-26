@@ -3,23 +3,42 @@
 import { useState, type ComponentType, type ReactNode } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import {
+  useInfiniteQuery,
+  type InfiniteData,
+  type UseInfiniteQueryResult,
+} from '@tanstack/react-query'
 import { Badge, ProfileAvatar, FollowButton, FollowersModal, type FollowUser } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { LocationOnIcon } from '@/shared/assets/icons'
-import { useUnfollowUser } from '@/features/profile'
-import type { AdopterPublicProfile, BreederPublicProfile } from '@/shared/types'
+import { profileQueries } from '@/entities/profile'
+import { useUnfollowUser, useRemoveFollower } from '@/features/profile'
+import type {
+  AdopterPublicProfile,
+  BreederPublicProfile,
+  FollowUserCard,
+  PaginationResponse,
+} from '@/shared/types'
 
-// ponytail: 팔로워/팔로잉 목록 조회 API가 없어 목데이터로 표시 (엔드포인트 생기면 교체).
-// 팔로워 수는 실데이터(profile.followerCount) 사용, 언팔로우는 실 mutation 연결.
-const MOCK_FOLLOWERS: FollowUser[] = Array.from({ length: 8 }, (_, i) => ({
-  id: `follower-${i}`,
-  nickname: `팔로워${i + 1}`,
-}))
-const MOCK_FOLLOWING: FollowUser[] = Array.from({ length: 6 }, (_, i) => ({
-  id: `following-${i}`,
-  nickname: `팔로잉${i + 1}`,
-  mutual: i % 3 === 0,
-}))
+// 백엔드 FollowUserCard → 모달이 쓰는 FollowUser (맞팔 여부는 두 플래그 조합)
+const toFollowUser = (card: FollowUserCard): FollowUser => ({
+  id: card.userId,
+  nickname: card.nickname,
+  profileImageUrl: card.profileImageUrl,
+  mutual: card.isFollowing && card.isFollowedBy,
+})
+
+// [refactored] 팔로워/팔로잉 두 쿼리가 쓰던 변환·paging 조립을 헬퍼로 (중복 2회 → 1곳)
+type FollowListQuery = UseInfiniteQueryResult<InfiniteData<PaginationResponse<FollowUserCard>>>
+
+const toFollowUsers = (query: FollowListQuery): FollowUser[] =>
+  (query.data?.pages ?? []).flatMap((page) => page.items.map(toFollowUser))
+
+const toPaging = (query: FollowListQuery) => ({
+  hasMore: query.hasNextPage,
+  isLoadingMore: query.isFetchingNextPage,
+  onLoadMore: query.fetchNextPage,
+})
 
 type ProfileMode = 'mine' | 'mine-breeder' | 'other' | 'breeder'
 
@@ -153,21 +172,17 @@ const ACTION_MAP = {
 const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
   const Actions = ACTION_MAP[mode]
   const [followOpen, setFollowOpen] = useState(false)
-  // ponytail: 목록 API 부재로 목데이터. 언팔로우만 실 mutation, 팔로워 삭제는 엔드포인트 없어 로컬 제거.
-  const [followers, setFollowers] = useState(MOCK_FOLLOWERS)
-  const [following, setFollowing] = useState(MOCK_FOLLOWING)
-  const { mutate: unfollow } = useUnfollowUser()
 
-  const handleUnfollow = (userId: string) => {
-    unfollow(userId)
-    setFollowing((prev) => prev.filter((u) => u.id !== userId))
-  }
-  const handleRemoveFollower = (userId: string) => {
-    setFollowers((prev) => prev.filter((u) => u.id !== userId))
-  }
   // [refactored] 타입 단언(as) 대신 in-내로잉으로 브리더 프로필 판별
   const breederProfile = 'businessLocation' in profile ? profile : null
   const isBreederProfile = breederProfile !== null
+  const profileUserId = 'breederId' in profile ? profile.breederId : profile.userId
+
+  // 친구 목록 — 모달이 열릴 때만 조회
+  const followersQuery = useInfiniteQuery(profileQueries.followers(profileUserId, followOpen))
+  const followingsQuery = useInfiniteQuery(profileQueries.followings(profileUserId, followOpen))
+  const { mutate: unfollow } = useUnfollowUser()
+  const { mutate: removeFollower } = useRemoveFollower()
   const locationText = breederProfile
     ? `${breederProfile.businessLocation.city} ${breederProfile.businessLocation.district}`
     : null
@@ -209,7 +224,11 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
           <ProfileBio className="w-full text-sm">{profile.bio}</ProfileBio>
           {locationText && <LocationInfo location={locationText} />}
           {/* 팔로워 */}
-          <FollowerSection followerCount={profile.followerCount} textClassName="text-xs" />
+          <FollowerSection
+            followerCount={profile.followerCount}
+            textClassName="text-xs"
+            onClick={() => setFollowOpen(true)}
+          />
         </div>
         {/* 하단: 모드별 버튼 (풀폭, gap-10, h-40) */}
         <div className="flex w-full items-start gap-2.5">
@@ -252,12 +271,13 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
         open={followOpen}
         onOpenChange={setFollowOpen}
         followerCount={profile.followerCount}
-        followingCount={following.length}
-        followers={followers}
-        following={following}
-        onRemoveFollower={handleRemoveFollower}
-        onUnfollow={handleUnfollow}
+        followingCount={profile.followingCount ?? 0}
+        followers={toFollowUsers(followersQuery)}
+        following={toFollowUsers(followingsQuery)}
+        onRemoveFollower={removeFollower}
+        onUnfollow={unfollow}
         getProfileHref={(id) => `/home/${id}`}
+        paging={{ followers: toPaging(followersQuery), following: toPaging(followingsQuery) }}
       />
     </>
   )
