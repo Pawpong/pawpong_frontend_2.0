@@ -1,129 +1,83 @@
 'use client'
 
-import { useState } from 'react'
-import Link from 'next/link'
+import { Fragment, useState } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import {
-  Breadcrumb,
   Container,
   InfiniteScrollTrigger,
-  PageHeader,
+  InputUpload,
+  NavigationBar,
+  SearchButton,
   Separator,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
 } from '@/shared/ui'
-import { MOCK_COMMUNITY_CATEGORIES } from '@/shared/mocks/community'
-import { communityQueries } from '@/entities/community'
-import type { CommunitySortType } from '@/shared/types'
-import { COMMUNITY_SORT_OPTIONS } from './constants'
-import { CategorySidebar } from './CategorySidebar'
-import { CommunityPostCard } from './CommunityPostCard'
+import { MOCK_COMMUNITY_POSTS } from '@/shared/mocks/community'
+import { PostCard, communityQueries, toPostCardProps } from '@/entities/community'
 
 const CommunityContent = () => {
-  const [sort, setSort] = useState<CommunitySortType>('latest')
-  const [selectedCategory, setSelectedCategory] = useState('')
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
+    ...communityQueries.posts('latest'),
+    // ponytail: dev-api 다운 중 화면 확인용 — 에러 바운더리로 던지지 않고 목데이터로 렌더.
+    // 서버 복구되면 이 옵션과 아래 MOCK_COMMUNITY_POSTS 폴백을 지운다.
+    throwOnError: false,
+  })
+  const posts = data?.pages.flatMap((page) => page.items) ?? MOCK_COMMUNITY_POSTS
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery(
-    communityQueries.posts(sort, undefined, selectedCategory || undefined),
-  )
-  const posts = data?.pages.flatMap((page) => page.items) ?? []
+  // ponytail: 서버 검색 API 미구현 → 지금은 검색바 펼치기 UI만. keyword 파라미터 생기면 query 연결.
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [query, setQuery] = useState('')
 
   return (
     <div className="flex w-full flex-col">
-      <PageHeader title="커뮤니티" backHref="/" />
+      {/* 상단바 — 공통 NavigationBar (Figma 2063-213675 navigation bar) */}
+      <NavigationBar title="포퐁커뮤니티" backHref="/" />
 
-      {/* 서브헤더: 설명 + 작성 버튼 */}
-      <Separator className="bg-border-light" />
-      <Container>
-        <div className="flex items-center justify-between py-[0.6875rem] tab:py-4">
-          {/* 모바일: 게시글을 작성해보세요 / PC: 아이를 자랑해보세요 */}
-          <p className="text-sm leading-[1.375rem] font-medium text-text-primary tab:text-base">
-            <span className="tab:hidden">게시글을 작성해보세요</span>
-            <span className="hidden tab:inline">아이를 자랑해보세요</span>
-          </p>
-          <Link
-            href="/community/write"
-            className="flex h-8 w-[4.4375rem] items-center justify-center rounded-full bg-fill-muted text-body-s font-semibold text-white tab:h-12 tab:w-auto tab:px-7"
-          >
-            작성
-          </Link>
-        </div>
+      {/* 작성 유도 바 — 공통 InputUpload (Figma 2063-213676, 상·하 보더 + px mo16/tab48/pc80) */}
+      <InputUpload text="게시글을 올려보세요" href="/community/write" />
+
+      {/* 검색 (Figma 1657-251460 — 버튼 클릭 시 focus 입력 pill로 전환)
+          padding: mo 8·16 / tab 12·48 (px-4=모바일 16, tab48은 Container 기본값) */}
+      <Container className="flex justify-end px-4 py-2 tab:py-3">
+        <SearchButton
+          active={searchOpen}
+          value={query}
+          onChange={setQuery}
+          onClick={() => setSearchOpen(true)}
+          // 비어 있을 때 포커스 잃으면 트리거로 복귀
+          onBlur={() => query.trim() === '' && setSearchOpen(false)}
+          // 모바일은 풀폭, tab+는 최대 300px
+          className="max-w-none tab:max-w-[18.75rem]"
+        />
       </Container>
-      <Separator className="bg-border-light" />
 
-      {/* 모바일: 필터 버튼 / PC: Breadcrumb + Sort */}
-      <Container>
-        <div className="flex items-center justify-end py-3 tab:justify-between tab:pt-8 tab:pb-4">
-          {/* PC only: Breadcrumb */}
-          <Breadcrumb items={['홈', '커뮤니티']} />
-
-          {/* 모바일: 필터 pill / PC: 정렬 드롭다운 */}
-          <button
-            type="button"
-            className="rounded-full border border-text-muted px-2.5 py-1 text-sm leading-[1.375rem] font-semibold text-text-muted tab:hidden"
-          >
-            필터
-          </button>
-          <div className="hidden tab:block">
-            <Select value={sort} onValueChange={(v) => setSort(v as CommunitySortType)}>
-              <SelectTrigger className="w-auto gap-2.5 rounded-full border-text-muted px-2.5 py-1 text-sm font-semibold text-text-muted">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {COMMUNITY_SORT_OPTIONS.map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+      {/* Main: Feed — 모바일은 카드 나열(gap 20), tab+는 border 박스 하나에 구분선 (Figma 1054-34769)
+          pc는 Figma(2063-215749) 기준 948px 고정 폭 가운데 정렬 */}
+      <Container className="px-4 pb-10 tab:pb-16">
+        <div className="mx-auto w-full pc:max-w-[59.25rem]">
+          <div className="flex min-w-0 flex-col gap-5 tab:gap-8 tab:rounded-lg tab:border tab:border-[#cacaca] tab:p-3">
+            {posts.map((post, index) => (
+              <Fragment key={post.postId}>
+                {index > 0 && <Separator className="bg-border-light" />}
+                <PostCard
+                  {...toPostCardProps(post)}
+                  // ponytail: 목록 API에 댓글 미리보기 없음 — 상세(commentPreview) 생기면 교체. 댓글 있는 글만.
+                  commentPreview={
+                    post.commentCount > 0
+                      ? {
+                          nickname: '댓글러',
+                          body: '미리보기 댓글입니다. 한줄만 보여줍니다. 두줄이상 넘어가면 쩜쩜쩜 보여줍니다.',
+                        }
+                      : undefined
+                  }
+                />
+              </Fragment>
+            ))}
           </div>
-        </div>
-      </Container>
 
-      {/* Main: Sidebar + Feed */}
-      <Container>
-        <div className="flex gap-6 pb-10 tab:pb-16">
-          {/* PC Category Sidebar */}
-          <CategorySidebar
-            categories={MOCK_COMMUNITY_CATEGORIES}
-            selected={selectedCategory}
-            onSelect={setSelectedCategory}
+          <InfiniteScrollTrigger
+            onIntersect={fetchNextPage}
+            hasNextPage={hasNextPage ?? false}
+            isFetchingNextPage={isFetchingNextPage}
           />
-
-          {/* Post Feed */}
-          <div className="min-w-0 flex-1">
-            {/* 모바일: 구분선 분리 */}
-            <div className="tab:hidden">
-              {posts.map((post, index) => (
-                <div key={post.postId}>
-                  <CommunityPostCard post={post} />
-                  {index < posts.length - 1 && <Separator fullWidth className="bg-border-light" />}
-                </div>
-              ))}
-            </div>
-
-            {/* PC: 카드 border */}
-            <div className="hidden tab:flex tab:flex-col tab:gap-3">
-              {posts.map((post) => (
-                <div
-                  key={post.postId}
-                  className="overflow-hidden rounded-2xl border border-border-light px-[3.125rem]"
-                >
-                  <CommunityPostCard post={post} />
-                </div>
-              ))}
-            </div>
-
-            <InfiniteScrollTrigger
-              onIntersect={fetchNextPage}
-              hasNextPage={hasNextPage ?? false}
-              isFetchingNextPage={isFetchingNextPage}
-            />
-          </div>
         </div>
       </Container>
     </div>

@@ -2,33 +2,17 @@
 
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { Container, SectionHeader } from '@/shared/ui'
-import { PostCard, communityQueries } from '@/entities/community'
-import type { CommunityPostCard } from '@/shared/types'
-import { MOCK_MY_HOME_POSTS, toPostCardProps } from '@/shared/mocks/myHome'
+import { PostCard, communityQueries, toPostCardProps } from '@/entities/community'
+import { MOCK_MY_HOME_POSTS, toPostCardProps as mockToPostCardProps } from '@/shared/mocks/myHome'
 
 const CARD_COUNT = 3
-
-// CommunityPostCard → 공통 PostCard props 매핑
-const toShowcaseProps = (post: CommunityPostCard) => ({
-  author: {
-    id: post.authorId,
-    nickname: post.authorNickname,
-    profileImageUrl: post.authorProfileImageUrl,
-  },
-  createdAt: post.createdAt,
-  text: post.bodyExcerpt,
-  images: post.photoUrls,
-  likeCount: post.likeCount,
-  commentCount: post.commentCount,
-  detailHref: `/community/${post.postId}`,
-})
 
 /** 공통 PostCard를 테두리 카드로 감쌈 (Figma home-contents, SavedFeedsTab과 동일 패턴) */
 const ShowcaseCard = ({
   post,
   showMore,
 }: {
-  post: ReturnType<typeof toShowcaseProps>
+  post: ReturnType<typeof toPostCardProps>
   showMore?: boolean
 }) => (
   <div className="rounded-[0.5rem] border border-[#cacaca] bg-white transition-colors hover:bg-[#f6f6f6] hover:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)] active:bg-[#f6f6f6] active:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]">
@@ -42,11 +26,11 @@ const CommunityShowcase = () => {
     ...communityQueries.posts('latest', undefined, undefined, CARD_COUNT),
     throwOnError: false,
   })
-  const fetched = (data?.pages[0]?.items ?? []).slice(0, CARD_COUNT).map(toShowcaseProps)
+  const fetched = (data?.pages[0]?.items ?? []).slice(0, CARD_COUNT).map(toPostCardProps)
 
   // 데이터 없으면(로딩/실패/빈 목록) 목업으로 스켈레톤 유지
   const posts =
-    fetched.length > 0 ? fetched : MOCK_MY_HOME_POSTS.slice(0, CARD_COUNT).map(toPostCardProps)
+    fetched.length > 0 ? fetched : MOCK_MY_HOME_POSTS.slice(0, CARD_COUNT).map(mockToPostCardProps)
 
   return (
     <Container className="py-6 tab:py-8 pc:py-12">

@@ -3,7 +3,13 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { BOOKMARK_ACTIVE, PostActionButton, ProfileAvatar, ProfileHeader } from '@/shared/ui'
+import {
+  BOOKMARK_ACTIVE,
+  PostActionButton,
+  ProfileAvatar,
+  ProfileHeader,
+  TextLabel,
+} from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { formatRelativeTime } from '@/shared/lib/formatRelativeTime'
 import {
@@ -12,6 +18,7 @@ import {
   PixelBookmarkIcon,
   MoreVertIcon,
 } from '@/shared/assets/icons'
+import type { CommunityPostCard } from '@/shared/types'
 
 interface PostCardAuthor {
   id: string
@@ -34,6 +41,8 @@ interface PostCardProps {
   profileType?: 'sm' | 'md' | 'responsivePc'
   /** 미리보기 끝에 [더보기] 라벨 노출 (profileType과 함께 사용) */
   showMore?: boolean
+  /** 댓글 미리보기 (작성자·본문 1줄) — 없으면 미노출 */
+  commentPreview?: { nickname: string; body: string }
   className?: string
 }
 
@@ -53,6 +62,7 @@ const PostCard = ({
   detailHref,
   profileType,
   showMore,
+  commentPreview,
   className,
 }: PostCardProps) => {
   const hasImages = images.length > 0
@@ -104,7 +114,7 @@ const PostCard = ({
           profileImageUrl={author.profileImageUrl}
           detailHref={detailHref}
           showMore={showMore}
-          className="p-2  pc:px-0"
+          className="p-2 pc:px-0"
         />
       ) : (
         <div className="flex items-start justify-between gap-4 py-2 tab:py-3">
@@ -121,46 +131,82 @@ const PostCard = ({
         </div>
       )}
 
-      {/* 이미지 (가로 스크롤) — 저장피드(profileType)는 상단패딩 제거 */}
-      {hasImages && (
-        <div className={cn('flex gap-3 overflow-x-auto pt-3 pc:pt-3', profileType && 'pt-0')}>
-          {images.map((src, index) => (
-            <div
-              key={index}
-              className="relative h-[13.1875rem] w-[17.5625rem] shrink-0 overflow-hidden rounded-lg bg-[#6b6b6b] tab:h-60 tab:w-80"
-            >
-              {src && (
-                <Image src={src} alt={`게시글 이미지 ${index + 1}`} fill className="object-cover" />
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+      {/* 이미지 + 액션 — 사진↔아이콘 8px gap */}
+      <div className="flex flex-col gap-2">
+        {/* 이미지 (가로 스크롤) — 저장피드(profileType)는 상단패딩 제거 */}
+        {hasImages && (
+          <div className={cn('flex gap-3 overflow-x-auto pt-3 pc:pt-3', profileType && 'pt-0')}>
+            {images.map((src, index) => (
+              <div
+                key={index}
+                className="relative h-[13.1875rem] w-[17.5625rem] shrink-0 overflow-hidden rounded-lg bg-[#6b6b6b] tab:h-60 tab:w-80"
+              >
+                {src && (
+                  <Image
+                    src={src}
+                    alt={`게시글 이미지 ${index + 1}`}
+                    fill
+                    className="object-cover"
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        )}
 
-      {/* 액션: 좋아요 · 댓글 · 북마크 (픽셀 아이콘) */}
-      <div className="flex items-center gap-2">
-        {/* [refactored] 자체 Stat → 공통 PostActionButton (카운트 색·간격 Figma 통일) */}
-        <PostActionButton
-          icon={FavoriteIcon}
-          count={likeCount + (liked ? 1 : 0)}
-          iconClassName="size-8"
-          ariaLabel="좋아요"
-          active={liked}
-          onClick={() => setLiked((prev) => !prev)}
-        />
-        <PostActionButton icon={PixelMessageIcon} count={commentCount} iconClassName="size-8" />
-        {/* [refactored] 자체 북마크 버튼 → 공통 PostActionButton (active 색·a11y 통일) */}
-        <PostActionButton
-          icon={PixelBookmarkIcon}
-          iconClassName="size-8"
-          ariaLabel="북마크"
-          active={isBookmarked}
-          activeClassName={BOOKMARK_ACTIVE}
-          onClick={() => setIsBookmarked((prev) => !prev)}
-        />
+        {/* 액션 + 댓글 미리보기 — 아이콘↔댓글 4px gap */}
+        <div className="flex flex-col gap-1">
+          {/* 액션: 좋아요 · 댓글 · 북마크 (픽셀 아이콘) */}
+          <div className="flex items-center gap-2">
+            {/* [refactored] 자체 Stat → 공통 PostActionButton (카운트 색·간격 Figma 통일) */}
+            <PostActionButton
+              icon={FavoriteIcon}
+              count={likeCount + (liked ? 1 : 0)}
+              iconClassName="size-8"
+              ariaLabel="좋아요"
+              active={liked}
+              onClick={() => setLiked((prev) => !prev)}
+            />
+            <PostActionButton icon={PixelMessageIcon} count={commentCount} iconClassName="size-8" />
+            {/* [refactored] 자체 북마크 버튼 → 공통 PostActionButton (active 색·a11y 통일) */}
+            <PostActionButton
+              icon={PixelBookmarkIcon}
+              iconClassName="size-8"
+              ariaLabel="북마크"
+              active={isBookmarked}
+              activeClassName={BOOKMARK_ACTIVE}
+              onClick={() => setIsBookmarked((prev) => !prev)}
+            />
+          </div>
+
+          {/* 댓글 미리보기 (Figma community-profile 2596-231732) — 작성자 + 본문 1줄 + [더보기] */}
+          {commentPreview && (
+            <div className="flex items-center gap-2">
+              <TextLabel size="14">{commentPreview.nickname}</TextLabel>
+              <div className="flex min-w-0 flex-1 items-center gap-2 text-xs leading-[1.5]">
+                <p className="truncate font-semibold text-[#3e3e3e]">{commentPreview.body}</p>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </article>
   )
 }
 
-export { PostCard }
+/** 백엔드 CommunityPostCard → PostCard props (커뮤니티 피드·홈 쇼케이스 공용) */
+const toPostCardProps = (post: CommunityPostCard) => ({
+  author: {
+    id: post.authorId,
+    nickname: post.authorNickname,
+    profileImageUrl: post.authorProfileImageUrl,
+  },
+  createdAt: post.createdAt,
+  text: post.bodyExcerpt,
+  images: post.photoUrls,
+  likeCount: post.likeCount,
+  commentCount: post.commentCount,
+  detailHref: `/community/${post.postId}`,
+})
+
+export { PostCard, toPostCardProps }

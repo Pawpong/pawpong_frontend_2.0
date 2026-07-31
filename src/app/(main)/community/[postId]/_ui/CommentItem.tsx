@@ -34,8 +34,9 @@ const CommentItem = ({ comment, currentUserId, onReply, isReply }: CommentItemPr
   }
 
   return (
-    <div className={`flex items-start gap-3 py-4 ${isReply ? 'pl-[3.0625rem]' : ''}`}>
+    <div className={`flex items-start gap-2 py-3 ${isReply ? 'pl-12' : ''}`}>
       <AuthorInfo
+        size="md"
         authorId={comment.authorId}
         nickname={comment.authorNickname}
         profileImageUrl={comment.authorProfileImageUrl}
