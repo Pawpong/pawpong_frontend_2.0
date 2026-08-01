@@ -174,28 +174,6 @@ const PixelFrame = ({
   )
 }
 
-const CardAvatar = ({ entry }: { entry?: ContestEntry }) => {
-  if (entry?.userProfileImageUrl) {
-    return (
-      <ProfileAvatar
-        size="responsivePc"
-        src={entry.userProfileImageUrl}
-        alt={entry.userDisplayName}
-        className="shrink-0"
-      />
-    )
-  }
-
-  return (
-    <span
-      className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#ededed] text-[#a6a6a6] pc:size-10"
-      aria-hidden="true"
-    >
-      <PawIcon className="h-3 w-[0.875rem] pc:h-[1.3125rem] pc:w-[1.5625rem]" />
-    </span>
-  )
-}
-
 const PodiumCard = ({
   entry,
   rank,
@@ -211,7 +189,13 @@ const PodiumCard = ({
 
       <div className="flex w-full items-center p-0.5 pc:p-1">
         <div className="flex min-w-0 flex-1 items-center gap-1 pc:gap-2">
-          <CardAvatar entry={entry} />
+          {/* [refactored] CardAvatar 제거 — ProfileAvatar 폴백(paw)으로 통일 */}
+          <ProfileAvatar
+            size="responsivePc"
+            src={entry?.userProfileImageUrl ?? undefined}
+            alt={entry?.userDisplayName}
+            className="shrink-0"
+          />
           <span className="min-w-0 truncate text-xs leading-[1.5] font-semibold text-[#3e3e3e] pc:text-base">
             {entry?.userDisplayName ?? 'profile'}
           </span>
