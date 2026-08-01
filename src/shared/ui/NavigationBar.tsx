@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { cn } from '@/shared/lib/cn'
 import { ArrowBackIcon } from '@/shared/assets/icons'
+import { Container } from './Container'
 import { TextLabel } from './TextLabel'
 
 interface NavigationBarProps {
@@ -22,9 +23,8 @@ const NavigationBar = ({ title, backHref, onBack, right, className }: Navigation
   const hasBack = Boolean(onBack || backHref)
 
   return (
-    <div
-      className={cn('flex items-center bg-white px-4 py-1 tab:px-12 tab:py-2 pc:px-20', className)}
-    >
+    // 좌우 여백은 공통 Container(tab 48 / pc 80) 사용, 모바일만 16으로 오버라이드
+    <Container className={cn('flex items-center bg-white px-4 py-1 tab:py-2', className)}>
       <div className="flex min-w-0 flex-1 items-center">
         {onBack && (
           <button type="button" onClick={onBack} aria-label="뒤로 가기" className="shrink-0">
@@ -44,7 +44,7 @@ const NavigationBar = ({ title, backHref, onBack, right, className }: Navigation
           hasBack && <div className="size-6 shrink-0" aria-hidden />
         )}
       </div>
-    </div>
+    </Container>
   )
 }
 
