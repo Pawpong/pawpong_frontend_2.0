@@ -2,11 +2,10 @@
 
 import { useMemo } from 'react'
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
-import { Container, PageHeader, SectionHeader } from '@/shared/ui'
+import { Container, ImageDetailModal, PageHeader, SectionHeader } from '@/shared/ui'
 import { contestQueries } from '@/entities/contest'
 import { useHallOfFameUI } from '../_lib/useHallOfFame'
 import { ContestBanner } from './ContestBanner'
-import { EntryDetailModal } from './EntryDetailModal'
 import { RankingCard } from './RankingCard'
 import { VoteCard } from './VoteCard'
 
@@ -122,14 +121,24 @@ const HallOfFameContent = () => {
         </div>
       </Container>
 
-      <EntryDetailModal
-        entry={selectedEntry}
-        open={selectedEntry !== null}
-        onOpenChange={(open) => {
-          if (!open) closeModal()
-        }}
-        userType="adopter"
-      />
+      {selectedEntry && (
+        <ImageDetailModal
+          open
+          onOpenChange={(open) => {
+            if (!open) closeModal()
+          }}
+          images={[selectedEntry.photoUrl]}
+          voteCount={selectedEntry.voteCount}
+          showVoteStatus={selectedEntry.hasVoted}
+          description={selectedEntry.description}
+          profile={{
+            nickname: selectedEntry.userDisplayName,
+            avatarUrl: selectedEntry.userProfileImageUrl ?? undefined,
+            homeHref: `/home/${selectedEntry.userId}`,
+          }}
+          showActions={false}
+        />
+      )}
     </div>
   )
 }

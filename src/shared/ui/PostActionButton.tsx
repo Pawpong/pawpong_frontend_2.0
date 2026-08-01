@@ -4,8 +4,12 @@ import { FAVORITE_ACTIVE, FAVORITE_INACTIVE } from './FavoriteToggle'
 // Figma icon/bookmark press — 저장 시 브랜드 브라운
 export const BOOKMARK_ACTIVE = 'text-[#a9835a]'
 
+interface PostActionIconProps extends React.SVGProps<SVGSVGElement> {
+  status?: 'default' | 'fill'
+}
+
 interface PostActionButtonProps {
-  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
+  icon: React.ComponentType<PostActionIconProps>
   count?: number
   /** 활성(예: 좋아요 누름) 상태 — 아이콘 강조 색 */
   active?: boolean
@@ -13,6 +17,8 @@ interface PostActionButtonProps {
   activeClassName?: string
   /** 아이콘 크기 오버라이드 (기본 24px, Figma community-icon은 32px) */
   iconClassName?: string
+  /** 상태별 SVG 경로가 있는 아이콘의 variant */
+  iconStatus?: 'default' | 'fill'
   /** 아이콘 전용(카운트 없는) 버튼의 접근성 라벨 */
   ariaLabel?: string
   /** 있으면 버튼으로 렌더(클릭 가능), 없으면 표시전용 */
@@ -26,6 +32,7 @@ const PostActionButton = ({
   active,
   activeClassName,
   iconClassName,
+  iconStatus,
   ariaLabel,
   onClick,
   disabled,
@@ -34,6 +41,7 @@ const PostActionButton = ({
     <>
       {/* Figma 아이콘 press 상태: 기본 #a6a6a6, 하트 #ff8181 / 북마크 #a9835a */}
       <Icon
+        {...(iconStatus && { status: iconStatus })}
         className={cn(
           iconClassName ?? 'size-6',
           active ? (activeClassName ?? FAVORITE_ACTIVE) : FAVORITE_INACTIVE,

@@ -14,7 +14,7 @@ interface ChatRoomHeaderProps {
 const ChatRoomHeader = ({ displayName, hasApplication, onBack }: ChatRoomHeaderProps) => {
   return (
     <div
-      className={cn('bg-white py-1 pc:py-2 shadow-[0px_7px_7px_rgba(55,55,55,0.1)]', CHAT_GUTTER_X)}
+      className={cn('bg-white py-1 shadow-[0px_7px_7px_rgba(55,55,55,0.1)] pc:py-2', CHAT_GUTTER_X)}
     >
       <div className={cn(CHAT_CONTENT_WIDTH, 'flex items-center justify-between')}>
         <div className="flex items-center gap-5">
@@ -24,9 +24,7 @@ const ChatRoomHeader = ({ displayName, hasApplication, onBack }: ChatRoomHeaderP
             </button>
             <div className="flex items-center gap-2">
               <ProfileAvatar size="responsive" />
-              <span className="text-body-s font-semibold text-[#3e3e3e]">
-                {displayName}
-              </span>
+              <span className="text-body-s font-semibold text-[#3e3e3e]">{displayName}</span>
             </div>
           </div>
           {hasApplication && <Badge variant="active">애정도</Badge>}

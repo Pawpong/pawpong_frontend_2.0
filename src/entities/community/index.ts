@@ -1,2 +1,6 @@
 export * from './api/community.queries'
-export { PostCard, toPostCardProps } from './ui/PostCard'
+export { PostCard } from './ui/PostCard'
+export { CommunityBox } from './ui/CommunityBox'
+export type { CommunityBoxAuthor, CommunityBoxProps } from './ui/CommunityBox'
+export { toCommunityPreviewProps } from './model/communityPreview'
+export type { CommunityPreviewAuthor, CommunityPreviewProps } from './model/communityPreview'

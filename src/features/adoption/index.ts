@@ -1,2 +1,6 @@
 export * from './api/adoption.mutations'
-export { FavoriteAdoptionCard, FavoriteAdoptionCardHorizontal } from './ui/FavoriteAdoptionCard'
+export {
+  FavoriteAdoptionCard,
+  FavoriteAdoptionCardHorizontal,
+  FavoriteAdoptionShowcaseCard,
+} from './ui/FavoriteAdoptionCard'

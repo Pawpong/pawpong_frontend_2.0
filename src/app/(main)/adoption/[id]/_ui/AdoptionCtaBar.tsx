@@ -20,13 +20,13 @@ const AdoptionCtaBar = ({ listingId }: AdoptionCtaBarProps) => (
     <div className="flex w-full items-center justify-center gap-[0.625rem] tab:w-[22.5rem] tab:max-w-[33.5rem] tab:min-w-[22.5rem] tab:justify-end tab:gap-[1.25rem]">
       {/* 관심(하트) — pc에서는 숨김 */}
       <button type="button" aria-label="관심있어요" className="shrink-0 pc:hidden">
-        <FavoriteIcon className="size-[3rem] text-[#5d5d5d]" />
+        <FavoriteIcon size="lg" className="text-[#5d5d5d]" />
       </button>
 
       <Link
         href={`/adoption/${listingId}/apply`}
         // hover: 글씨 #6b6b6b / press(active): 배경 #f3ec59 · 글씨 #3e3e3e (피그마 743-70327·743-70329)
-        className="flex h-[3rem] max-w-[18.5625rem] flex-1 items-center justify-center rounded-full bg-[#fffa94] px-[0.5rem] text-[1rem] font-semibold text-[#3e3e3e] tab:h-[2rem] tab:max-w-[16.125rem] tab:text-[0.875rem] hover:text-[#6b6b6b] active:bg-[#f3ec59] active:text-[#3e3e3e]"
+        className="flex h-[3rem] max-w-[18.5625rem] flex-1 items-center justify-center rounded-full bg-[#fffa94] px-[0.5rem] text-[1rem] font-semibold text-[#3e3e3e] hover:text-[#6b6b6b] active:bg-[#f3ec59] active:text-[#3e3e3e] tab:h-[2rem] tab:max-w-[16.125rem] tab:text-[0.875rem]"
       >
         입양 신청하기
       </Link>

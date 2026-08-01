@@ -220,10 +220,7 @@ const ProfileEditContent = () => {
         <div className="flex w-full max-w-[37.5rem] flex-col items-center gap-11">
           {/* 아바타 + 사진 변경 */}
           <div className="flex w-28 flex-col items-center gap-8">
-            <ProfileAvatar
-              size="xlarge"
-              src={photoPreview ?? myProfile?.profileImageUrl}
-            />
+            <ProfileAvatar size="xlarge" src={photoPreview ?? myProfile?.profileImageUrl} />
             <div className="flex w-full flex-col items-center gap-3">
               {/* TODO: 선택한 파일 업로드 연결 (onChange) */}
               <input
@@ -275,11 +272,7 @@ const ProfileEditContent = () => {
             {!isBreeder && (
               <InputField label="소셜 로그인">
                 {/* 표시 전용 — readOnly(수정X) + tabIndex/-1·focus 보더 중립화(focus X) */}
-                <Input
-                  value={email}
-                  readOnly
-                  className="cursor-default focus:border-[#e4e4e4]"
-                />
+                <Input value={email} readOnly className="cursor-default focus:border-[#e4e4e4]" />
               </InputField>
             )}
           </div>
@@ -363,7 +356,11 @@ const ProfileEditContent = () => {
       />
 
       {/* 탈퇴 사유 선택 (확인 모달 앞 단계) — 선택 완료 시 최종 확인 모달로 전환 */}
-      <WithdrawReasonModal open={showReason} onOpenChange={setShowReason} onNext={handleReasonNext} />
+      <WithdrawReasonModal
+        open={showReason}
+        onOpenChange={setShowReason}
+        onNext={handleReasonNext}
+      />
 
       {/* 계정 탈퇴 확인 (디자인 2145-193207 / 모바일·탭 2145-193342) */}
       <ConfirmModal

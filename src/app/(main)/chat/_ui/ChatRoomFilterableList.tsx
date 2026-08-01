@@ -29,7 +29,10 @@ const ChatRoomFilterableList = ({
   return (
     <>
       <div
-        className={cn('flex flex-col items-end border-b border-[#cacaca] py-3 pc:py-4', gutterClassName)}
+        className={cn(
+          'flex flex-col items-end border-b border-[#cacaca] py-3 pc:py-4',
+          gutterClassName,
+        )}
       >
         <ChatFilterTabs value={filter} onChange={setFilter} className="justify-end" />
       </div>

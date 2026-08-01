@@ -220,6 +220,7 @@ const PostDetailContent = ({ postId }: PostDetailContentProps) => {
                 iconClassName="size-8"
                 ariaLabel="좋아요"
                 active={post.isLiked}
+                iconStatus={post.isLiked ? 'fill' : 'default'}
                 onClick={() => toggleLike.mutate(post.isLiked)}
                 disabled={toggleLike.isPending}
               />

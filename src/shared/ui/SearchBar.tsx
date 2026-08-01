@@ -17,7 +17,7 @@ const DEFAULT_PLACEHOLDER = {
   desktop: '검색해서 원하는 아이 찾기',
 }
 
-// Figma: h56 / rounded8 / border #a6a6a6(포커스 #256EF4 — 모바일·탭 1px / PC 2px) / p12,
+// Figma: tab h48 / PC h56 / rounded8 / border #a6a6a6(포커스 #256EF4 — 모바일·탭 1px / PC 2px) / p12,
 // 입력 텍스트 #3E3E3E, placeholder Pretendard medium 16px #a6a6a6, 우측 32px 검색 아이콘
 export const SearchBar = ({ placeholder = DEFAULT_PLACEHOLDER, className }: SearchBarProps) => {
   const isTablet = useBreakpoint('tab')
@@ -25,7 +25,7 @@ export const SearchBar = ({ placeholder = DEFAULT_PLACEHOLDER, className }: Sear
   return (
     <div
       className={cn(
-        'flex h-14 w-full items-center justify-between gap-3 rounded-lg border border-[#a6a6a6] bg-white p-3 focus-within:border-[#256ef4] pc:focus-within:border-2',
+        'flex h-12 w-full items-center justify-between gap-3 rounded-lg border border-[#a6a6a6] bg-white p-3 focus-within:border-[#256ef4] pc:h-14 pc:focus-within:border-2',
         className,
       )}
     >

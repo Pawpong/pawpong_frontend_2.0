@@ -68,7 +68,12 @@ export interface MainNavItem {
 
 export const MAIN_NAV: MainNavItem[] = [
   { href: '/', label: '홈', Icon: NavHomeIcon, isActive: (p) => p === '/' },
-  { href: '/explore', label: '탐색', Icon: NavSearchIcon, isActive: (p) => p.startsWith('/explore') },
+  {
+    href: '/explore',
+    label: '탐색',
+    Icon: NavSearchIcon,
+    isActive: (p) => p.startsWith('/explore'),
+  },
   { href: '/chat', label: '채팅', Icon: NavChatIcon, isActive: (p) => p.startsWith('/chat') },
   {
     href: '/community',

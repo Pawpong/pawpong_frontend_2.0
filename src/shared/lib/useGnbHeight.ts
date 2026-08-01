@@ -1,29 +1,22 @@
 'use client'
 
-import { useLayoutEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
+
+const getGnb = () => {
+  const gnb = document.querySelector('[data-gnb], header')
+  return gnb instanceof HTMLElement ? gnb : null
+}
+
+const subscribe = (onStoreChange: () => void) => {
+  const gnb = getGnb()
+  if (!gnb) return () => undefined
+
+  const observer = new ResizeObserver(() => onStoreChange())
+  observer.observe(gnb)
+  return () => observer.disconnect()
+}
+
+const getSnapshot = () => getGnb()?.offsetHeight ?? 0
 
 /** GNB(header) 높이 런타임 측정 — sticky 헤더 top 오프셋용 */
-export const useGnbHeight = () => {
-  const [gnbH, setGnbH] = useState(0)
-
-  useLayoutEffect(() => {
-    const gnb = document.querySelector('[data-gnb], header')
-    if (!(gnb instanceof HTMLElement)) {
-      setGnbH(0)
-      return
-    }
-
-    const measure = () => {
-      setGnbH(gnb instanceof HTMLElement ? gnb.offsetHeight : 0)
-    }
-
-    measure()
-
-    const observer = new ResizeObserver(measure)
-    observer.observe(gnb)
-
-    return () => observer.disconnect()
-  }, [])
-
-  return gnbH
-}
+export const useGnbHeight = () => useSyncExternalStore(subscribe, getSnapshot, () => 0)

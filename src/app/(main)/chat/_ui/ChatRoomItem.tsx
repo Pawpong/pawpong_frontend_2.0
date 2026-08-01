@@ -30,9 +30,7 @@ const ChatRoomItem = ({ room, isActive, unreadCount = 0, onClick }: ChatRoomItem
           <ProfileAvatar size="responsive" />
           <div className="flex min-w-0 flex-col">
             <div className="flex items-center gap-2">
-              <span className="text-body-s font-semibold text-[#3e3e3e]">
-                {displayName}
-              </span>
+              <span className="text-body-s font-semibold text-[#3e3e3e]">{displayName}</span>
               <RelativeTime dateStr={room.lastMessageAt} />
             </div>
             <p className="max-w-[21.625rem] truncate text-sm leading-[1.5] font-semibold text-[#3e3e3e]">
