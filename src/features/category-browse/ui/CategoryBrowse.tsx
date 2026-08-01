@@ -60,41 +60,49 @@ const HomeCategoryButton = ({ label, href, src }: (typeof CATEGORIES)[number]) =
 
 const CategoryBrowse = () => {
   return (
-    <Container className="flex flex-col gap-0 px-4 py-0 pc:gap-8 pc:py-12">
-      {/* 브리더 CTA 스트립 (Figma 2752-266433) — 크림 바 + 안내문 + 픽셀 발자국(바 전역) */}
-      <div className="relative mx-auto my-2 flex w-full items-center overflow-hidden rounded-xl bg-[#f7e7d6] px-8 py-2 pc:my-0 pc:max-w-[70.875rem] pc:py-3">
-        {/* 배경 픽셀 발자국 — 텍스트 뒤(z-0) */}
-        <div className="pointer-events-none absolute inset-0" aria-hidden>
-          {CTA_PAWS.map((pos, i) => (
-            <span
-              key={i}
-              className={cn('absolute flex size-[3.02rem] items-center justify-center', pos)}
+    <>
+      {/* 브리더 CTA 스트립 밴드 (Figma 2752-266432) — 밴드 py-8 flush.
+          스트립 px-16 py-12(pc px-32) · 텍스트 12px→pc 14px */}
+      <Container className="px-4 py-2">
+        <div className="relative mx-auto flex w-full items-center justify-between overflow-hidden rounded-xl bg-[#f7e7d6] px-4 py-3 pc:max-w-[70.875rem] pc:px-8">
+          {/* 배경 픽셀 발자국 — 텍스트 뒤(z-0) */}
+          <div className="pointer-events-none absolute inset-0" aria-hidden>
+            {CTA_PAWS.map((pos, i) => (
+              <span
+                key={i}
+                className={cn('absolute flex size-[3.02rem] items-center justify-center', pos)}
+              >
+                <Image
+                  src="/images/category/cta-paw.svg"
+                  alt=""
+                  width={37}
+                  height={32}
+                  className="h-[1.9765rem] w-[2.2896rem] rotate-45"
+                />
+              </span>
+            ))}
+          </div>
+          <div className="relative z-10 flex items-center gap-[0.4375rem]">
+            <p
+              className={cn(cafe24Proup.className, 'text-xs leading-[1.5] text-[#6b6b6b] pc:text-sm')}
             >
-              <Image
-                src="/images/category/cta-paw.svg"
-                alt=""
-                width={37}
-                height={32}
-                className="h-[1.9765rem] w-[2.2896rem] rotate-45"
-              />
-            </span>
+              신뢰할 수 있는 브리더 포퐁에서 만나요 !
+            </p>
+            <CtaArrowIcon />
+          </div>
+        </div>
+      </Container>
+
+      {/* 카테고리 밴드 (Figma 2752-269648) — 밴드 py-16(pc py-10) flush.
+          모바일(~767px): 2×2 Grid / 태블릿 이상: 4개 한 줄 */}
+      <Container className="px-4 py-4 pc:py-[0.625rem]">
+        <div className="mx-auto grid w-full grid-cols-[repeat(2,6.640625rem)] place-items-center justify-center gap-x-[2.1875rem] gap-y-3 tab:flex tab:items-center tab:justify-center tab:gap-[2.1875rem] pc:grid pc:max-w-[60.5rem] pc:grid-cols-4 pc:gap-[4.1875rem]">
+          {CATEGORIES.map((category) => (
+            <HomeCategoryButton key={category.label} {...category} />
           ))}
         </div>
-        <div className="relative z-10 flex items-center gap-[0.4375rem]">
-          <p className={cn(cafe24Proup.className, 'text-sm leading-[1.5] text-[#6b6b6b]')}>
-            신뢰할 수 있는 브리더 포퐁에서 만나요 !
-          </p>
-          <CtaArrowIcon />
-        </div>
-      </div>
-
-      {/* 모바일(~767px): 고정 2×2 Grid / 태블릿 이상: 4개 한 줄 */}
-      <div className="mx-auto grid h-[16.1875rem] w-full grid-cols-[repeat(2,6.640625rem)] place-items-center justify-center gap-x-[2.1875rem] gap-y-3 py-4 tab:flex tab:h-[8.71875rem] tab:items-center tab:justify-center tab:gap-[2.1875rem] pc:grid pc:h-auto pc:max-w-[60rem] pc:grid-cols-4 pc:gap-[3.75rem] pc:py-0">
-        {CATEGORIES.map((category) => (
-          <HomeCategoryButton key={category.label} {...category} />
-        ))}
-      </div>
-    </Container>
+      </Container>
+    </>
   )
 }
 
