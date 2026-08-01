@@ -48,12 +48,15 @@ const HallOfFame = () => {
           open
           onOpenChange={(open) => !open && setSelected(null)}
           images={[selected.photoUrl]}
+          voteCount={selected.voteCount}
+          showVoteStatus={selected.hasVoted}
           description={selected.description}
           profile={{
             nickname: selected.userDisplayName,
             avatarUrl: selected.userProfileImageUrl ?? undefined,
             homeHref: `/home/${selected.userId}`,
           }}
+          showActions={false}
         />
       )}
     </section>
