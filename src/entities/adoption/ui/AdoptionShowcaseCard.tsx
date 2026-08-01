@@ -2,16 +2,21 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { GenderIcon } from '@/shared/assets/icons'
+import { FireIcon, GenderIcon } from '@/shared/assets/icons'
 import { cn } from '@/shared/lib/cn'
 import type { AdoptionListingCard } from '@/shared/types'
-import { ADOPTION_STATUS_LABEL } from '@/shared/types'
 import { Badge, FavoriteToggle } from '@/shared/ui'
 
 const STATUS_BADGE_CLASS: Record<AdoptionListingCard['status'], string> = {
   available: 'bg-[#406dff] text-white',
   reserved: 'bg-[#406dff] text-white',
   completed: 'bg-[#e4e4e4] text-[#b8b8b8]',
+}
+
+const STATUS_BADGE_LABEL: Record<AdoptionListingCard['status'], string> = {
+  available: '분양중',
+  reserved: '예약중',
+  completed: '분양완료',
 }
 
 interface AdoptionShowcaseCardProps {
@@ -33,18 +38,21 @@ const AdoptionShowcaseCard = ({
     className={cn('flex w-[10.25rem] flex-col pc:w-auto', className)}
   >
     <div className="relative h-[8.3649rem] w-[10.25rem] overflow-hidden rounded bg-[#6b6b6b] pc:aspect-[348/284] pc:h-auto pc:w-full pc:rounded-[0.5rem]">
-      <Image src={listing.thumbnailUrl} alt={listing.name} fill className="object-cover" />
+      <div className="absolute inset-0 pc:inset-auto pc:top-[-14.064%] pc:left-[-15.28%] pc:h-[132.476%] pc:w-[144.064%]">
+        <Image src={listing.thumbnailUrl} alt={listing.name} fill className="object-cover" />
+      </div>
       {listing.isPopular && (
         <Badge
           variant="outline"
-          className="absolute top-[0.5rem] left-[0.75rem] hidden border-[#406dff] bg-white px-2 py-1 text-sm font-semibold text-[#406dff] pc:flex"
+          className="absolute top-2 left-3 hidden h-[1.8125rem] gap-1 border-[#406dff] bg-white px-2 py-0 text-sm leading-[1.5] font-semibold text-[#406dff] pc:flex"
         >
-          🔥인기
+          <FireIcon className="h-[1.125rem] w-4 shrink-0" />
+          인기
         </Badge>
       )}
       <div className="absolute top-0 left-0 flex items-center gap-1 px-2 py-1 pc:hidden">
         <Badge className={cn('h-6 px-2 py-0 text-[0.625rem]', STATUS_BADGE_CLASS[listing.status])}>
-          {listing.status === 'completed' ? '분양완료' : '분양중'}
+          {STATUS_BADGE_LABEL[listing.status]}
         </Badge>
         {listing.isPopular && (
           <Badge
@@ -58,8 +66,8 @@ const AdoptionShowcaseCard = ({
       <FavoriteToggle
         isFavorite={isFavorite}
         onToggle={onToggle}
-        className="absolute right-[0.5rem] bottom-[0.25rem]"
-        iconClassName="size-8 pc:size-12"
+        className="absolute right-2 bottom-1 pc:right-3 pc:bottom-2"
+        iconClassName={cn('size-8 pc:size-12', !isFavorite && '!text-[#f6f6f6]')}
       />
     </div>
 
@@ -84,7 +92,7 @@ const AdoptionShowcaseCard = ({
           STATUS_BADGE_CLASS[listing.status],
         )}
       >
-        {ADOPTION_STATUS_LABEL[listing.status]}
+        {STATUS_BADGE_LABEL[listing.status]}
       </Badge>
     </div>
   </Link>
