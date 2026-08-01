@@ -2,12 +2,7 @@ import type { SVGProps } from 'react'
 
 const PixelUserIcon = (props: SVGProps<SVGSVGElement>) => {
   return (
-    <svg
-      viewBox="0 0 19.7647 20.7059"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      {...props}
-    >
+    <svg viewBox="0 0 19.7647 20.7059" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
       <path d="M12.3529 0H7.41177V1.29412H12.3529V0Z" fill="currentColor" />
       <path d="M13.5882 1.29412H6.17647V2.58824H13.5882V1.29412Z" fill="currentColor" />
       <path d="M14.8235 2.58824H4.94118V6.47059H14.8235V2.58824Z" fill="currentColor" />

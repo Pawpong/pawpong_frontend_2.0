@@ -38,9 +38,7 @@ const FavoriteStar = ({
     className={className}
   >
     <PixelStarIcon className={cn(iconClassName, pressed ? 'text-[#fffa94]' : 'text-[#a6a6a6]')} />
-    {label && (
-      <span className="text-xs leading-[1.5] font-semibold text-[#3e3e3e]">{label}</span>
-    )}
+    {label && <span className="text-xs leading-[1.5] font-semibold text-[#3e3e3e]">{label}</span>}
   </button>
 )
 

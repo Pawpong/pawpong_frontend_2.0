@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useSyncExternalStore } from 'react'
 
 const BREAKPOINTS = {
   mo: 375,
@@ -17,18 +17,20 @@ type Breakpoint = keyof typeof BREAKPOINTS
  * const isPC = useBreakpoint('pc');       // 1440px 이상이면 true
  */
 const useBreakpoint = (breakpoint: Breakpoint) => {
-  const [matches, setMatches] = useState(false)
+  const mediaQuery = `(min-width: ${BREAKPOINTS[breakpoint]}px)`
 
-  useEffect(() => {
-    const query = window.matchMedia(`(min-width: ${BREAKPOINTS[breakpoint]}px)`)
-    setMatches(query.matches)
+  const subscribe = useCallback(
+    (onStoreChange: () => void) => {
+      const query = window.matchMedia(mediaQuery)
+      query.addEventListener('change', onStoreChange)
+      return () => query.removeEventListener('change', onStoreChange)
+    },
+    [mediaQuery],
+  )
 
-    const handler = (e: MediaQueryListEvent) => setMatches(e.matches)
-    query.addEventListener('change', handler)
-    return () => query.removeEventListener('change', handler)
-  }, [breakpoint])
+  const getSnapshot = useCallback(() => window.matchMedia(mediaQuery).matches, [mediaQuery])
 
-  return matches
+  return useSyncExternalStore(subscribe, getSnapshot, () => false)
 }
 
 export { useBreakpoint }

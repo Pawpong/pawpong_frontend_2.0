@@ -1,3 +1,6 @@
+'use client'
+
+import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { BannerDto } from '@/shared/types'
@@ -7,38 +10,51 @@ const BannerLink = ({ banner, children }: { banner: BannerDto; children: React.R
   if (!banner.linkUrl) return <>{children}</>
   if (banner.linkType === 'external') {
     return (
-      <a href={banner.linkUrl} target="_blank" rel="noopener noreferrer">
+      <a href={banner.linkUrl} target="_blank" rel="noopener noreferrer" className="block">
         {children}
       </a>
     )
   }
-  return <Link href={banner.linkUrl}>{children}</Link>
+  return (
+    <Link href={banner.linkUrl} className="block">
+      {children}
+    </Link>
+  )
 }
 
 const BannerSlide = ({ banner }: { banner: BannerDto }) => {
-  // Desktop/Mobile 이미지 블록 (src/aspect만 차이)
-  const images = [
-    {
-      key: 'desktop',
-      src: banner.desktopImageUrl,
-      // 풀블리드 유지 위해 aspect-ratio 사용 (고정 높이 시 넓은 화면에서 object-cover 확대됨)
-      wrapperClass: 'hidden aspect-[768/347] tab:block pc:aspect-[180/47]',
-    },
-    {
-      key: 'mobile',
-      src: banner.mobileImageUrl,
-      wrapperClass: 'block aspect-[375/323] tab:hidden',
-    },
-  ]
+  const [mobileImageFailed, setMobileImageFailed] = useState(!banner.mobileImageUrl)
+  const mobileImageUrl = mobileImageFailed ? banner.desktopImageUrl : banner.mobileImageUrl
 
   return (
     <BannerLink banner={banner}>
-      <section className="relative w-full overflow-hidden bg-[#d9d9d9]">
-        {images.map(({ key, src, wrapperClass }) => (
-          <div key={key} className={wrapperClass}>
-            <Image src={src} alt={banner.title ?? ''} fill className="object-cover" priority />
-          </div>
-        ))}
+      <section className="relative w-full overflow-hidden rounded-[0.4455rem] bg-[#d9d9d9] tab:rounded pc:rounded-xl">
+        <div className="relative hidden tab:block tab:aspect-[673.61/268.494] pc:aspect-[1120/447]">
+          <Image
+            src={banner.desktopImageUrl}
+            alt={banner.title ?? ''}
+            fill
+            sizes="(min-width: 90rem) 70rem, 42.1007rem"
+            className="object-cover"
+            priority
+          />
+        </div>
+
+        <div className="relative block aspect-[315/161] tab:hidden">
+          <Image
+            src={mobileImageUrl}
+            alt={banner.title ?? ''}
+            fill
+            sizes="19.6875rem"
+            className="object-cover"
+            onError={() => {
+              if (!mobileImageFailed && mobileImageUrl !== banner.desktopImageUrl) {
+                setMobileImageFailed(true)
+              }
+            }}
+            priority
+          />
+        </div>
       </section>
     </BannerLink>
   )

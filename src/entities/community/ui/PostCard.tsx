@@ -1,42 +1,15 @@
 'use client'
 
-import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import {
-  BOOKMARK_ACTIVE,
-  PostActionButton,
-  ProfileAvatar,
-  ProfileHeader,
-  TextLabel,
-} from '@/shared/ui'
+import { ProfileHeader, TextLabel } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
-import { formatRelativeTime } from '@/shared/lib/formatRelativeTime'
-import {
-  FavoriteIcon,
-  PixelMessageIcon,
-  PixelBookmarkIcon,
-  MoreVertIcon,
-} from '@/shared/assets/icons'
-import type { CommunityPostCard } from '@/shared/types'
+import { MoreVertIcon } from '@/shared/assets/icons'
+import type { CommunityPreviewProps } from '../model/communityPreview'
+import { CommunityPostActions } from './CommunityPostActions'
+import { CommunityPostProfile } from './CommunityPostProfile'
 
-interface PostCardAuthor {
-  id: string
-  nickname: string
-  profileImageUrl?: string
-}
-
-interface PostCardProps {
-  author: PostCardAuthor
-  /** 작성 시각 — ISO 문자열이면 상대 시간으로 변환, 이미 포맷된 문자열은 그대로 표시 */
-  createdAt: string
-  /** 본문 미리보기 (이미지 있으면 1줄, 없으면 최대 5줄) */
-  text: string
-  images?: string[]
-  likeCount: number
-  commentCount: number
-  /** 게시글 상세 링크 (있으면 본문 영역이 링크) */
-  detailHref?: string
+interface PostCardProps extends CommunityPreviewProps {
   /** 지정 시 헤더를 공통 ProfileHeader로 렌더 + 이미지 tab 상단패딩 제거 (저장피드 sm / 홈 쇼케이스 responsivePc) */
   profileType?: 'sm' | 'md' | 'responsivePc'
   /** 미리보기 끝에 [더보기] 라벨 노출 (profileType과 함께 사용) */
@@ -66,40 +39,15 @@ const PostCard = ({
   className,
 }: PostCardProps) => {
   const hasImages = images.length > 0
-  // ponytail: API 미연결 — 좋아요/북마크는 로컬 상태로 색 토글만. 연결 시 mutation으로 교체.
-  const [liked, setLiked] = useState(false)
-  const [isBookmarked, setIsBookmarked] = useState(false)
 
   const profileCluster = (
-    <div className="flex min-w-0 flex-1 items-start gap-2">
-      <ProfileAvatar
-        size="responsive"
-        src={author.profileImageUrl}
-        alt={author.nickname}
-        className="shrink-0"
-      />
-      <div className="flex min-w-0 flex-1 flex-col justify-center">
-        <div className="flex items-center gap-2 p-0.5">
-          <span className="truncate text-body-s font-semibold text-[#3e3e3e]">
-            {author.nickname}
-          </span>
-          <span
-            className="shrink-0 text-xs leading-[1.5] font-medium text-[#6b6b6b]"
-            suppressHydrationWarning
-          >
-            {formatRelativeTime(createdAt)}
-          </span>
-        </div>
-        <p
-          className={cn(
-            'text-sm leading-[1.5] font-semibold break-words text-[#3e3e3e]',
-            hasImages ? 'truncate' : 'line-clamp-5',
-          )}
-        >
-          {text}
-        </p>
-      </div>
-    </div>
+    <CommunityPostProfile
+      author={author}
+      createdAt={createdAt}
+      text={text}
+      variant="feed"
+      hasImages={hasImages}
+    />
   )
 
   return (
@@ -157,27 +105,7 @@ const PostCard = ({
         {/* 액션 + 댓글 미리보기 — 아이콘↔댓글 4px gap */}
         <div className="flex flex-col gap-1">
           {/* 액션: 좋아요 · 댓글 · 북마크 (픽셀 아이콘) */}
-          <div className="flex items-center gap-2">
-            {/* [refactored] 자체 Stat → 공통 PostActionButton (카운트 색·간격 Figma 통일) */}
-            <PostActionButton
-              icon={FavoriteIcon}
-              count={likeCount + (liked ? 1 : 0)}
-              iconClassName="size-8"
-              ariaLabel="좋아요"
-              active={liked}
-              onClick={() => setLiked((prev) => !prev)}
-            />
-            <PostActionButton icon={PixelMessageIcon} count={commentCount} iconClassName="size-8" />
-            {/* [refactored] 자체 북마크 버튼 → 공통 PostActionButton (active 색·a11y 통일) */}
-            <PostActionButton
-              icon={PixelBookmarkIcon}
-              iconClassName="size-8"
-              ariaLabel="북마크"
-              active={isBookmarked}
-              activeClassName={BOOKMARK_ACTIVE}
-              onClick={() => setIsBookmarked((prev) => !prev)}
-            />
-          </div>
+          <CommunityPostActions likeCount={likeCount} commentCount={commentCount} />
 
           {/* 댓글 미리보기 (Figma community-profile 2596-231732) — 작성자 + 본문 1줄 + [더보기] */}
           {commentPreview && (
@@ -194,19 +122,4 @@ const PostCard = ({
   )
 }
 
-/** 백엔드 CommunityPostCard → PostCard props (커뮤니티 피드·홈 쇼케이스 공용) */
-const toPostCardProps = (post: CommunityPostCard) => ({
-  author: {
-    id: post.authorId,
-    nickname: post.authorNickname,
-    profileImageUrl: post.authorProfileImageUrl,
-  },
-  createdAt: post.createdAt,
-  text: post.bodyExcerpt,
-  images: post.photoUrls,
-  likeCount: post.likeCount,
-  commentCount: post.commentCount,
-  detailHref: `/community/${post.postId}`,
-})
-
-export { PostCard, toPostCardProps }
+export { PostCard }

@@ -12,12 +12,7 @@ interface TitledSectionProps {
 }
 
 // 섹션 헤더(제목) + 콘텐츠 래퍼
-const TitledSection = ({
-  title,
-  titleClassName,
-  className,
-  children,
-}: TitledSectionProps) => (
+const TitledSection = ({ title, titleClassName, className, children }: TitledSectionProps) => (
   <section className={cn('flex flex-col gap-[0.75rem]', className)}>
     <SectionHeader title={title} titleClassName={titleClassName} />
     {children}

@@ -59,15 +59,11 @@ const ParentInfoSection = ({ control, register }: ParentInfoSectionProps) => {
             />
           </div>
           <div className="flex flex-col gap-1.5 tab:px-0">
-            <p className="text-body-s font-bold text-text-primary">
-              품종 및 이름
-            </p>
+            <p className="text-body-s font-bold text-text-primary">품종 및 이름</p>
             <Input placeholder="입력" {...register('parents.0.breedAndName')} />
           </div>
           <div className="flex flex-col gap-1.5 tab:px-0">
-            <p className="text-body-s font-bold text-text-primary">
-              태어난 날짜
-            </p>
+            <p className="text-body-s font-bold text-text-primary">태어난 날짜</p>
             <Input placeholder="입력" {...register('parents.0.birthDate')} />
           </div>
           {/* 이미지 (모바일에서 하단) */}

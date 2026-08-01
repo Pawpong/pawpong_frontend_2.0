@@ -1,36 +1,100 @@
 import Image from 'next/image'
-import { PixelCategoryButton, PIXEL_CATEGORY_GRID } from '@/shared/ui'
+import Link from 'next/link'
+import { cafe24Proup } from '@/shared/lib/fonts'
+import { cn } from '@/shared/lib/cn'
+import { Container } from '@/shared/ui'
 
-// [refactored] 에셋 경로 상수화
-const ASSETS = {
-  buttonBg: '/images/category/btn-pixel-category.svg',
-  searchIcon: '/images/category/search.svg',
-}
-
-const CATEGORIES = [
-  { label: '강아지', href: '/explore?category=dog', icon: false },
-  { label: '고양이', href: '/explore?category=cat', icon: false },
-  { label: '도마뱀', href: '/explore?category=lizard', icon: false },
-  { label: '브리더 탐색', href: '/explore?type=breeder', icon: true },
+// 브리더 CTA 스트립 픽셀 발자국 (Figma 2752-266393) — 회전 전 48px wrapper 좌표
+const CTA_PAWS = [
+  'left-[75.31%] top-[5.86%]',
+  'left-[83.03%] top-[40.17%]',
+  'left-[93.87%] top-[-5.32%]',
+  'left-[87.75%] top-[-55.9%]',
 ]
+
+const CtaArrowIcon = () => (
+  <span className="flex h-4 shrink-0 items-center justify-center" aria-hidden>
+    <svg
+      viewBox="0 0 10.8333 16.6667"
+      className="h-[0.8125rem] w-[0.5279rem] text-[#6b6b6b]"
+      fill="none"
+    >
+      <path d="M4.33333 0H0V4.16667H4.33333V0Z" fill="currentColor" />
+      <path d="M7.58333 3.125H3.25V7.29167H7.58333V3.125Z" fill="currentColor" />
+      <path d="M10.8333 6.25H6.5V10.4167H10.8333V6.25Z" fill="currentColor" />
+      <path d="M7.58333 9.375H3.25V13.5417H7.58333V9.375Z" fill="currentColor" />
+      <path d="M4.33333 12.5H0V16.6667H4.33333V12.5Z" fill="currentColor" />
+    </svg>
+  </span>
+)
+
+// Figma 2752-269487 — 카테고리 버튼(동물+pill+라벨)은 통짜 SVG. default/hover 2상태.
+// ponytail: 3번째(도마뱀) 전용 아트가 없어 강아지 SVG로 임시 표기 — 리자드 SVG 나오면 src 교체.
+const CATEGORIES = [
+  { label: '고양이 찾기', href: '/explore?category=cat', src: 'cat' },
+  { label: '강아지 찾기', href: '/explore?category=dog', src: 'dog' },
+  { label: '도마뱀 찾기', href: '/explore?category=lizard', src: 'dog' },
+  { label: '브리더 탐색', href: '/explore?type=breeder', src: 'explore' },
+]
+
+const HomeCategoryButton = ({ label, href, src }: (typeof CATEGORIES)[number]) => (
+  <Link
+    href={href}
+    aria-label={label}
+    className="group relative block h-[6.71875rem] w-[6.640625rem] pc:aspect-[192/177] pc:h-auto pc:w-full"
+  >
+    <Image
+      src={`/images/category/${src}-default-md.svg`}
+      alt={label}
+      fill
+      className="object-contain transition-opacity group-hover:opacity-0"
+    />
+    <Image
+      src={`/images/category/${src}-hover-md.svg`}
+      alt=""
+      fill
+      className="object-contain opacity-0 transition-opacity group-hover:opacity-100"
+    />
+  </Link>
+)
 
 const CategoryBrowse = () => {
   return (
-    /* 카테고리 영역 (Figma home-layout: mo py24/px16/gap8, tab py32/px48/gap12, pc py48/px80/gap12) */
-    <div className="flex flex-col items-center justify-center gap-2 px-4 py-6 tab:gap-3 tab:px-12 tab:py-8 pc:px-20 pc:py-12">
-      {/* [refactored] 픽셀 버튼을 공통 PixelCategoryButton으로 위임 */}
-      <div className={PIXEL_CATEGORY_GRID}>
-        {CATEGORIES.map(({ label, href, icon }) => (
-          <PixelCategoryButton key={label} label={label} href={href} defaultSrc={ASSETS.buttonBg}>
-            {icon && (
-              <span className="relative z-10 size-[1.25rem] shrink-0 pc:size-[2rem]">
-                <Image src={ASSETS.searchIcon} alt="" fill className="object-contain" />
-              </span>
-            )}
-          </PixelCategoryButton>
+    <Container className="flex flex-col gap-0 px-4 py-0 pc:gap-8 pc:py-12">
+      {/* 브리더 CTA 스트립 (Figma 2752-266433) — 크림 바 + 안내문 + 픽셀 발자국(바 전역) */}
+      <div className="relative mx-auto my-2 flex w-full items-center overflow-hidden rounded-xl bg-[#f7e7d6] px-8 py-2 pc:my-0 pc:max-w-[70.875rem] pc:py-3">
+        {/* 배경 픽셀 발자국 — 텍스트 뒤(z-0) */}
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          {CTA_PAWS.map((pos, i) => (
+            <span
+              key={i}
+              className={cn('absolute flex size-[3.02rem] items-center justify-center', pos)}
+            >
+              <Image
+                src="/images/category/cta-paw.svg"
+                alt=""
+                width={37}
+                height={32}
+                className="h-[1.9765rem] w-[2.2896rem] rotate-45"
+              />
+            </span>
+          ))}
+        </div>
+        <div className="relative z-10 flex items-center gap-[0.4375rem]">
+          <p className={cn(cafe24Proup.className, 'text-sm leading-[1.5] text-[#6b6b6b]')}>
+            신뢰할 수 있는 브리더 포퐁에서 만나요 !
+          </p>
+          <CtaArrowIcon />
+        </div>
+      </div>
+
+      {/* 모바일(~767px): 고정 2×2 Grid / 태블릿 이상: 4개 한 줄 */}
+      <div className="mx-auto grid h-[16.1875rem] w-full grid-cols-[repeat(2,6.640625rem)] place-items-center justify-center gap-x-[2.1875rem] gap-y-3 py-4 tab:flex tab:h-[8.71875rem] tab:items-center tab:justify-center tab:gap-[2.1875rem] pc:grid pc:h-auto pc:max-w-[60rem] pc:grid-cols-4 pc:gap-[3.75rem] pc:py-0">
+        {CATEGORIES.map((category) => (
+          <HomeCategoryButton key={category.label} {...category} />
         ))}
       </div>
-    </div>
+    </Container>
   )
 }
 

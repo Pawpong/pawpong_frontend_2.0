@@ -184,9 +184,7 @@ const ImageDetailModal = ({
           )}
 
           {/* 하단 버튼 */}
-          {footer && (
-            <div className="flex items-center justify-end gap-5 px-6 py-3">{footer}</div>
-          )}
+          {footer && <div className="flex items-center justify-end gap-5 px-6 py-3">{footer}</div>}
         </DialogPrimitive.Content>
       </DialogPortal>
     </Dialog>
