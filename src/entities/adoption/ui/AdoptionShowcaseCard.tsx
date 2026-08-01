@@ -43,7 +43,7 @@ const AdoptionShowcaseCard = ({
         </Badge>
       )}
       <div className="absolute top-0 left-0 flex items-center gap-1 px-2 py-1 pc:hidden">
-        <Badge className={`h-6 px-2 py-0 text-[0.625rem] ${STATUS_BADGE_CLASS[listing.status]}`}>
+        <Badge className={cn('h-6 px-2 py-0 text-[0.625rem]', STATUS_BADGE_CLASS[listing.status])}>
           {listing.status === 'completed' ? '분양완료' : '분양중'}
         </Badge>
         {listing.isPopular && (
@@ -79,7 +79,10 @@ const AdoptionShowcaseCard = ({
         </p>
       </div>
       <Badge
-        className={`hidden h-[1.8125rem] shrink-0 px-2 py-1 text-sm pc:flex ${STATUS_BADGE_CLASS[listing.status]}`}
+        className={cn(
+          'hidden h-[1.8125rem] shrink-0 px-2 py-1 text-sm pc:flex',
+          STATUS_BADGE_CLASS[listing.status],
+        )}
       >
         {ADOPTION_STATUS_LABEL[listing.status]}
       </Badge>
