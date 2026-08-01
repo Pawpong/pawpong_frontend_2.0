@@ -92,11 +92,8 @@
   }
 }
 
-@media (width >= 90rem) {
-  .banner-swiper {
-    --swiper-pagination-bottom: 2.5rem;
-  }
-
+/* 중앙 배너 외 이전/다음 슬라이드는 태블릿 이상에서 흐리게 표시 */
+@media (width >= 48rem) {
   .banner-swiper .swiper-slide {
     opacity: 0.3;
     transition: opacity 200ms ease;
@@ -104,5 +101,11 @@
 
   .banner-swiper .swiper-slide-active {
     opacity: 1;
+  }
+}
+
+@media (width >= 90rem) {
+  .banner-swiper {
+    --swiper-pagination-bottom: 2.5rem;
   }
 }

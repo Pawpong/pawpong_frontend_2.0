@@ -25,7 +25,7 @@ const CommunityShowcase = () => {
       <div className="grid grid-cols-[20.0625rem] justify-center gap-y-2 tab:grid-cols-[repeat(2,20.0625rem)] tab:justify-between pc:grid-cols-[repeat(3,25.4375rem)] pc:gap-y-0">
         {posts.map((post, index) => (
           <CommunityBox
-            key={`${post.author.id}-${post.createdAt}`}
+            key={post.detailHref ?? index}
             {...post}
             className={index === 2 ? 'hidden pc:flex' : undefined}
           />
