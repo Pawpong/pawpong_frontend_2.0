@@ -7,10 +7,8 @@ import type {
   ProfileUpdateRequestDto,
   ApplicationStatusUpdateRequest,
   SendChatMessageRequest,
-  AvailablePetAddRequest,
   ParentPetAddRequest,
   ParentPetUpdateRequest,
-  PetStatusUpdateRequest,
   ReviewReplyRequest,
   VerificationSubmitRequest,
   SubmitDocumentsRequest,
@@ -21,10 +19,6 @@ import {
   updateBreederProfile,
   updateBreederApplicationStatus,
   sendApplicationChatMessage,
-  addAvailablePet,
-  updateAvailablePet,
-  deleteAvailablePet,
-  updateAvailablePetStatus,
   addParentPet,
   updateParentPet,
   deleteParentPet,
@@ -72,50 +66,6 @@ export const useSendChatMessage = (applicationId: string) => {
     mutationFn: (data: SendChatMessageRequest) => sendApplicationChatMessage(applicationId, data),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: breederQueries.chatMessages(applicationId).queryKey })
-    },
-  })
-}
-
-// ==================== 분양 개체 ====================
-
-export const useAddAvailablePet = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (data: AvailablePetAddRequest) => addAvailablePet(data),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: breederQueries.all() })
-    },
-  })
-}
-
-export const useUpdateAvailablePet = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: ({ petId, data }: { petId: string; data: AvailablePetAddRequest }) =>
-      updateAvailablePet(petId, data),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: breederQueries.all() })
-    },
-  })
-}
-
-export const useDeleteAvailablePet = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (petId: string) => deleteAvailablePet(petId),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: breederQueries.all() })
-    },
-  })
-}
-
-export const useUpdateAvailablePetStatus = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: ({ petId, data }: { petId: string; data: PetStatusUpdateRequest }) =>
-      updateAvailablePetStatus(petId, data),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: breederQueries.all() })
     },
   })
 }

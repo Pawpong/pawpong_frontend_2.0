@@ -7,12 +7,10 @@ import type {
   ApplicationStatusUpdateResponseDto,
   ChatMessageDto,
   SendChatMessageRequest,
-  AvailablePetAddRequest,
   ParentPetAddRequest,
   ParentPetUpdateRequest,
   PetAddResponse,
   PetMessageResponse,
-  PetStatusUpdateRequest,
   ReviewReplyRequest,
   ReviewReplyResponseDto,
   ReviewReplyDeleteResponseDto,
@@ -52,38 +50,6 @@ export const sendApplicationChatMessage = (applicationId: string, data: SendChat
       ApiResponseFull<ChatMessageDto | null>
     >(`${API_VERSION}/breeder-management/applications/${applicationId}/chat/messages`, data)
     .then((res) => unwrapNullable(res, '채팅 메시지 전송에 실패했습니다.'))
-
-// ==================== 분양 개체 (available-pets) ====================
-
-/** 분양 개체 추가 */
-export const addAvailablePet = (data: AvailablePetAddRequest) =>
-  apiClient
-    .post<ApiResponseFull<PetAddResponse>>(`${API_VERSION}/breeder-management/available-pets`, data)
-    .then(unwrap)
-
-/** 분양 개체 수정 */
-export const updateAvailablePet = (petId: string, data: AvailablePetAddRequest) =>
-  apiClient
-    .patch<
-      ApiResponseFull<PetMessageResponse>
-    >(`${API_VERSION}/breeder-management/available-pets/${petId}`, data)
-    .then(unwrap)
-
-/** 분양 개체 삭제 */
-export const deleteAvailablePet = (petId: string) =>
-  apiClient
-    .delete<
-      ApiResponseFull<PetMessageResponse>
-    >(`${API_VERSION}/breeder-management/available-pets/${petId}`)
-    .then(unwrap)
-
-/** 분양 개체 상태 변경 */
-export const updateAvailablePetStatus = (petId: string, data: PetStatusUpdateRequest) =>
-  apiClient
-    .patch<
-      ApiResponseFull<PetMessageResponse>
-    >(`${API_VERSION}/breeder-management/available-pets/${petId}/status`, data)
-    .then(unwrap)
 
 // ==================== 부모견/묘 (parent-pets) ====================
 

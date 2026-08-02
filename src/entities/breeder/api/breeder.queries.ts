@@ -6,8 +6,6 @@ import type {
   ParentPetSummaryDto,
   PublicReviewDto,
   ReceivedApplicationItemDto,
-  BreederMyPetItem,
-  MyPetsParams,
   BreederMyReviewItem,
   MyReviewsParams,
 } from '@/shared/types'
@@ -25,7 +23,6 @@ import {
   getReceivedApplications,
   getReceivedApplicationDetail,
   getApplicationChatMessages,
-  getMyPets,
   getMyReceivedReviews,
   getBreederVerification,
 } from './breeder.api'
@@ -120,12 +117,6 @@ export const breederQueries = {
       queryFn: () => getApplicationChatMessages(applicationId),
       enabled: !!applicationId,
       staleTime: STALE_TIME.REALTIME,
-    }),
-
-  myPets: (params: MyPetsParams = {}, limit = 20) =>
-    createInfiniteQuery<BreederMyPetItem>({
-      queryKey: [...breederQueries.all(), 'my-pets', params, limit],
-      queryFn: (page) => getMyPets({ ...params, page, limit }),
     }),
 
   myReviews: (params: MyReviewsParams = {}, limit = 10) =>

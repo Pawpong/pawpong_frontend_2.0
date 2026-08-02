@@ -15,8 +15,6 @@ import type {
   ReceivedApplicationDetailDto,
   BreederApplicationFormDto,
   ChatMessageDto,
-  BreederMyPetItem,
-  MyPetsParams,
   BreederMyReviewItem,
   MyReviewsParams,
   VerificationStatusResponse,
@@ -125,14 +123,6 @@ export const getReceivedApplicationDetail = (applicationId: string) =>
     .get<
       ApiResponseFull<ReceivedApplicationDetailDto>
     >(`${API_VERSION}/breeder-management/applications/${applicationId}`)
-    .then(unwrap)
-
-/** 내 개체 목록 조회 (브리더 관리) */
-export const getMyPets = (params: MyPetsParams = {}) =>
-  apiClient
-    .get<
-      ApiResponseFull<PaginationResponse<BreederMyPetItem>>
-    >(`${API_VERSION}/breeder-management/my-pets`, { params })
     .then(unwrap)
 
 /** 내게 달린 후기 목록 조회 (브리더 관리) */

@@ -90,16 +90,6 @@ export interface ParentPetAddRequest extends PetBase {
 /** 수정 요청: 부모 동물 (PATCH) — 전 필드 선택 */
 export type ParentPetUpdateRequest = Partial<ParentPetAddRequest>
 
-/** 등록/수정 요청: 분양 동물 (POST/PATCH /breeder-management/available-pets) */
-export interface AvailablePetAddRequest extends PetBase {
-  price: number
-  parentInfo?: {
-    mother?: string
-    father?: string
-  }
-  photos?: string[]
-}
-
 /** 공개 프로필용 부모 동물 요약 */
 export type ParentPetSummaryDto = Pick<
   MyPetItemDto,
@@ -263,36 +253,7 @@ export interface DashboardResponseDto {
   }>
 }
 
-// ==================== 내 개체 목록 (breeder-management) ====================
-
-/** 내 개체 목록 아이템 (GET /breeder-management/my-pets) */
-export interface BreederMyPetItem {
-  petId: string
-  name: string
-  breed: string
-  gender: PetGender
-  birthDate: string
-  ageInMonths: number
-  price: number
-  status: PetStatus
-  isActive: boolean
-  mainPhoto: string
-  photoCount: number
-  viewCount: number
-  applicationCount: number
-  createdAt: string
-  updatedAt: string
-}
-
-/** 내 개체 목록 조회 파라미터 */
-export interface MyPetsParams {
-  status?: PetStatus
-  includeInactive?: boolean
-  page?: number
-  limit?: number
-}
-
-// ==================== 개체 등록/수정/상태 응답 ====================
+// ==================== 개체 등록/수정 응답 ====================
 
 export interface PetAddResponse {
   petId: string
@@ -301,11 +262,6 @@ export interface PetAddResponse {
 
 export interface PetMessageResponse {
   message: string
-}
-
-/** 개체 상태 변경 요청 (PATCH available-pets/{petId}/status) */
-export interface PetStatusUpdateRequest {
-  petStatus: PetStatus
 }
 
 // ==================== 브리더 후기 (브리더 수신) ====================
