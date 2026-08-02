@@ -16,7 +16,7 @@ const CtaArrowIcon = () => (
   <span className="flex h-4 shrink-0 items-center justify-center" aria-hidden>
     <svg
       viewBox="0 0 10.8333 16.6667"
-      className="h-[0.8125rem] w-[0.5279rem] text-[#6b6b6b]"
+      className="h-[0.8125rem] w-[0.5279rem] text-neutral-700"
       fill="none"
     >
       <path d="M4.33333 0H0V4.16667H4.33333V0Z" fill="currentColor" />
@@ -64,7 +64,7 @@ const CategoryBrowse = () => {
       {/* 브리더 CTA 스트립 밴드 (Figma 2752-266432) — 밴드 py-8 flush.
           스트립 px-16 py-12(pc px-32) · 텍스트 12px→pc 14px */}
       <Container className="px-4 py-2">
-        <div className="relative mx-auto flex w-full items-center justify-between overflow-hidden rounded-xl bg-[#f7e7d6] px-4 py-3 pc:max-w-[70.875rem] pc:px-8">
+        <div className="relative mx-auto flex w-full items-center justify-between overflow-hidden rounded-xl bg-secondary-200 px-4 py-3 pc:max-w-[70.875rem] pc:px-8">
           {/* 배경 픽셀 발자국 — 텍스트 뒤(z-0) */}
           <div className="pointer-events-none absolute inset-0" aria-hidden>
             {CTA_PAWS.map((pos, i) => (
@@ -84,7 +84,7 @@ const CategoryBrowse = () => {
           </div>
           <div className="relative z-10 flex items-center gap-[0.4375rem]">
             <p
-              className={cn(cafe24Proup.className, 'text-xs leading-[1.5] text-[#6b6b6b] pc:text-sm')}
+              className={cn(cafe24Proup.className, 'text-xs leading-[1.5] text-neutral-700 pc:text-sm')}
             >
               신뢰할 수 있는 브리더 포퐁에서 만나요 !
             </p>

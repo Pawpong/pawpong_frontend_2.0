@@ -93,7 +93,7 @@ const SlideNavButton = ({
     aria-label={label}
     className={`absolute top-1/2 z-10 hidden -translate-y-1/2 pc:block ${className}`}
   >
-    <PixelArrowRightIcon className="size-[3rem] text-[#f6f6f6]" />
+    <PixelArrowRightIcon className="size-[3rem] text-neutral-50" />
   </button>
 )
 

@@ -16,8 +16,8 @@ const textLabelVariants = tv({
     },
     // text-interactive-primary #3E3E3E / secondary #6B6B6B
     color: {
-      primary: 'text-[#3e3e3e]',
-      secondary: 'text-[#6b6b6b]',
+      primary: 'text-neutral-850',
+      secondary: 'text-neutral-700',
     },
   },
   defaultVariants: { size: '16', weight: 'bold', color: 'primary' },

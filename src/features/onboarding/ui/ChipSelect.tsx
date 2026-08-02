@@ -39,8 +39,8 @@ const ChipSelect = ({ label, items, value, onChange }: ChipSelectProps) => {
                 className={cn(
                   'rounded-full px-2 py-1 text-body-s font-medium',
                   isSelected
-                    ? 'border border-[#3e3e3e] bg-[#3e3e3e] text-white'
-                    : 'border border-[#cacaca] text-[#6b6b6b]',
+                    ? 'border border-neutral-850 bg-neutral-850 text-white'
+                    : 'border border-neutral-300 text-neutral-700',
                 )}
               >
                 {item}

@@ -58,10 +58,10 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
         <div className="flex flex-col items-center bg-white px-4 py-1 tab:px-12 pc:px-20 pc:py-2">
           <div className="flex w-full items-center">
             <button type="button" onClick={handleCloseClick} aria-label="닫기">
-              <CloseIcon className="size-6 text-[#6b6b6b]" />
+              <CloseIcon className="size-6 text-neutral-700" />
             </button>
             <div className="flex flex-1 items-center justify-center p-0.5">
-              <p className="text-base leading-normal font-semibold text-[#3e3e3e]">입양 신청</p>
+              <p className="text-base leading-normal font-semibold text-neutral-850">입양 신청</p>
             </div>
           </div>
         </div>
@@ -72,7 +72,7 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
 
       {/* ═══ 안내 배너 (정보 카드 하단) — px mo16/tab48/pc16, py32 / 정보 카드와 동일하게 max-w-[57.5rem] 중앙 컬럼, 텍스트 좌측 정렬 ═══ */}
       <div className="flex flex-col items-center px-4 py-8 tab:px-12 pc:px-4">
-        <p className="w-full max-w-[57.5rem] font-cafe24 text-sm leading-[1.5] text-[#3e3e3e]">
+        <p className="w-full max-w-[57.5rem] font-cafe24 text-sm leading-[1.5] text-neutral-850">
           입양 신청서 작성 이후,
           <br />
           담당 브리더와 채팅을 통해 더 자세한 입양 계획을 세워보세요
@@ -84,7 +84,7 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
         <Container className="px-[1rem] pb-12">
           <div className="pc:mx-auto pc:max-w-[55rem]">
             {/* 폼 박스 — 섹션 간 gap 40 */}
-            <div className="flex flex-col gap-10 tab:rounded-xl tab:bg-[#f6f6f6] tab:p-10">
+            <div className="flex flex-col gap-10 tab:rounded-xl tab:bg-neutral-50 tab:p-10">
               {/* [refactored] 라벨+필드 래퍼를 LabeledField로 통일 */}
               {/* 입양하는 동물 (읽기 전용) */}
               <LabeledField title="입양하는 동물">
@@ -156,7 +156,7 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
       <CtaModal
         open={showConsultConfirm}
         onOpenChange={(isOpen) => !isOpen && cancelConsult()}
-        icon={<PawIcon className="size-8 text-[#6b6b6b]" />}
+        icon={<PawIcon className="size-8 text-neutral-700" />}
         title={'브리더와 더 자세한 입양 상담이\n이루어집니다.'}
         direction="row"
         actions={[

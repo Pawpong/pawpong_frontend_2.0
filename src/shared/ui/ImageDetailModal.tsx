@@ -57,7 +57,7 @@ const CarouselIndicator = ({ count, currentIndex }: CarouselIndicatorProps) => (
         key={index}
         className={cn(
           'h-2 rounded-lg transition-[width,background-color]',
-          index === currentIndex ? 'w-5 bg-[#eac499]' : 'w-2 bg-white/30',
+          index === currentIndex ? 'w-5 bg-secondary-500' : 'w-2 bg-white/30',
         )}
       />
     ))}
@@ -91,7 +91,7 @@ const ImageDetailModal = ({
         <DialogPrimitive.Content
           onOpenAutoFocus={(event) => event.preventDefault()}
           className={cn(
-            'fixed top-1/2 left-1/2 z-50 flex h-[min(45.625rem,100dvh)] w-[min(23.4375rem,100vw)] -translate-x-1/2 -translate-y-1/2 flex-col items-center overflow-hidden bg-[#121212] py-5 shadow-[0_7px_7px_rgba(55,55,55,0.1)]',
+            'fixed top-1/2 left-1/2 z-50 flex h-[min(45.625rem,100dvh)] w-[min(23.4375rem,100vw)] -translate-x-1/2 -translate-y-1/2 flex-col items-center overflow-hidden bg-neutral-0 py-5 shadow-[0_7px_7px_rgba(55,55,55,0.1)]',
             'tab:h-auto tab:max-h-[calc(100dvh-2rem)] tab:w-[48rem]',
             'pc:h-[40.875rem] pc:w-[64.125rem] pc:rounded-[1.25rem] pc:py-0',
             className,
@@ -102,7 +102,7 @@ const ImageDetailModal = ({
           <div className="flex min-h-0 w-full flex-1 flex-col gap-2 tab:flex-none tab:gap-0 pc:flex-1">
             {/* 투표 정보 + 닫기 */}
             <div className="flex h-[3.25rem] shrink-0 items-center gap-5 px-4 py-3 tab:px-12 pc:px-6">
-              <div className="flex min-w-0 flex-1 items-center gap-8 text-[#f6f6f6] tab:gap-8">
+              <div className="flex min-w-0 flex-1 items-center gap-8 text-neutral-50 tab:gap-8">
                 {showVoteStatus && (
                   <span className="flex min-w-0 items-center gap-0.5 text-base leading-[1.5] font-semibold">
                     <VoteIcon className="size-6 shrink-0" />
@@ -121,7 +121,7 @@ const ImageDetailModal = ({
                   </button>
                 )}
               </div>
-              <DialogClose className="shrink-0 cursor-pointer text-[#f6f6f6]" aria-label="닫기">
+              <DialogClose className="shrink-0 cursor-pointer text-neutral-50" aria-label="닫기">
                 <CloseIcon className="size-6" />
               </DialogClose>
             </div>
@@ -130,21 +130,21 @@ const ImageDetailModal = ({
             {profile && (
               <div className="flex h-10 shrink-0 items-center justify-between gap-2 px-4 py-1 tab:px-12 pc:px-20">
                 <div className="flex min-w-0 items-center gap-2">
-                  <ArrowBackIcon className="size-8 shrink-0 text-[#f6f6f6]" />
+                  <ArrowBackIcon className="size-8 shrink-0 text-neutral-50" />
                   <ProfileAvatar
                     src={profile.avatarUrl}
                     alt={profile.nickname}
                     size="small"
-                    className="bg-[#ededed]"
+                    className="bg-neutral-100"
                   />
-                  <span className="max-w-[9rem] truncate text-sm leading-[1.5] font-semibold text-[#f6f6f6] tab:max-w-[21.625rem]">
+                  <span className="max-w-[9rem] truncate text-sm leading-[1.5] font-semibold text-neutral-50 tab:max-w-[21.625rem]">
                     {profile.nickname}
                   </span>
                   {profile.badgeText && (
                     <Badge
                       variant="active"
                       size="md"
-                      className="h-6 shrink-0 border-0 bg-[#406dff] text-[0.625rem] text-white"
+                      className="h-6 shrink-0 border-0 bg-primary-500 text-[0.625rem] text-white"
                     >
                       {profile.badgeText}
                     </Badge>
@@ -155,7 +155,7 @@ const ImageDetailModal = ({
                     href={profile.homeHref}
                     label="브리더홈"
                     size="md"
-                    className="shrink-0 text-[#f6f6f6]"
+                    className="shrink-0 text-neutral-50"
                   />
                 )}
               </div>
@@ -163,7 +163,7 @@ const ImageDetailModal = ({
 
             {/* 이미지 + 좌우 네비게이션 */}
             <div className="relative flex min-h-0 w-full flex-1 shrink-0 items-center justify-center tab:h-[28.40625rem] tab:flex-none pc:h-auto pc:flex-1">
-              <div className="relative size-full max-w-[37.875rem] overflow-hidden bg-[#6b6b6b] tab:rounded-lg pc:aspect-[4/3] pc:h-full pc:w-auto">
+              <div className="relative size-full max-w-[37.875rem] overflow-hidden bg-neutral-700 tab:rounded-lg pc:aspect-[4/3] pc:h-full pc:w-auto">
                 {images[currentIndex] && (
                   <Image
                     src={images[currentIndex]}
@@ -176,7 +176,7 @@ const ImageDetailModal = ({
                 )}
 
                 {representativeIndex === currentIndex && (
-                  <span className="absolute top-[1.125rem] left-5 rounded-lg bg-[#3e3e3e] px-2 py-1 text-xs leading-[1.5] font-semibold text-[#f6f6f6] pc:p-2 pc:text-sm">
+                  <span className="absolute top-[1.125rem] left-5 rounded-lg bg-neutral-850 px-2 py-1 text-xs leading-[1.5] font-semibold text-neutral-50 pc:p-2 pc:text-sm">
                     대표이미지
                   </span>
                 )}
@@ -189,7 +189,7 @@ const ImageDetailModal = ({
                   disabled={!hasCarousel}
                   aria-label="이전 이미지"
                   className={cn(
-                    'pointer-events-auto shrink-0 cursor-pointer text-[#f6f6f6] transition-opacity hover:opacity-70',
+                    'pointer-events-auto shrink-0 cursor-pointer text-neutral-50 transition-opacity hover:opacity-70',
                     !hasCarousel && 'invisible',
                   )}
                 >
@@ -201,7 +201,7 @@ const ImageDetailModal = ({
                   disabled={!hasCarousel}
                   aria-label="다음 이미지"
                   className={cn(
-                    'pointer-events-auto shrink-0 cursor-pointer text-[#f6f6f6] transition-opacity hover:opacity-70',
+                    'pointer-events-auto shrink-0 cursor-pointer text-neutral-50 transition-opacity hover:opacity-70',
                     !hasCarousel && 'invisible',
                   )}
                 >
@@ -225,7 +225,7 @@ const ImageDetailModal = ({
             {/* 모바일/태블릿 설명 */}
             {description && (
               <div className="flex min-h-0 flex-1 shrink-0 bg-black/60 px-4 py-2.5 tab:h-[6.625rem] tab:flex-none tab:px-12 pc:hidden">
-                <p className="overflow-y-auto text-sm leading-[1.5] font-semibold text-[#f6f6f6]">
+                <p className="overflow-y-auto text-sm leading-[1.5] font-semibold text-neutral-50">
                   {description}
                 </p>
               </div>
@@ -235,7 +235,7 @@ const ImageDetailModal = ({
           {/* PC 설명은 Figma처럼 하단 버튼 영역 위에 오버레이 */}
           {description && (
             <div className="absolute right-0 bottom-0 left-0 hidden h-[6.625rem] bg-black/60 px-[14.6875rem] py-2.5 pc:flex pc:flex-col pc:items-center">
-              <p className="w-full max-w-[36.5rem] overflow-y-auto text-sm leading-[1.5] font-semibold text-[#f6f6f6]">
+              <p className="w-full max-w-[36.5rem] overflow-y-auto text-sm leading-[1.5] font-semibold text-neutral-50">
                 {description}
               </p>
             </div>

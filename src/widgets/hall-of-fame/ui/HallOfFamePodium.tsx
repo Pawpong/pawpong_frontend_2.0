@@ -87,7 +87,7 @@ const PawPattern = ({ variant, className }: { variant: PawPatternSize; className
         <span
           key={index}
           className={cn(
-            'absolute flex items-center justify-center text-[#eed0ad]',
+            'absolute flex items-center justify-center text-secondary-400',
             compact ? 'size-[2.708rem]' : 'size-[4.189rem]',
           )}
           style={position}
@@ -184,7 +184,7 @@ const PodiumCard = ({
   onClick?: () => void
 }) => {
   return (
-    <article className="relative z-10 flex w-[9.25rem] shrink-0 flex-col items-center gap-2 rounded-xl bg-[#fdf9f5] p-2 shadow-[0_7px_7px_rgba(55,55,55,0.1)] pc:w-[16.3125rem] pc:px-4 pc:py-2">
+    <article className="relative z-10 flex w-[9.25rem] shrink-0 flex-col items-center gap-2 rounded-xl bg-secondary-50 p-2 shadow-[0_7px_7px_rgba(55,55,55,0.1)] pc:w-[16.3125rem] pc:px-4 pc:py-2">
       <PixelFrame entry={entry} rank={rank} onClick={onClick} />
 
       <div className="flex w-full items-center p-0.5 pc:p-1">
@@ -196,14 +196,14 @@ const PodiumCard = ({
             alt={entry?.userDisplayName}
             className="shrink-0"
           />
-          <span className="min-w-0 truncate text-xs leading-[1.5] font-semibold text-[#3e3e3e] pc:text-base">
+          <span className="min-w-0 truncate text-xs leading-[1.5] font-semibold text-neutral-850 pc:text-base">
             {entry?.userDisplayName ?? 'profile'}
           </span>
         </div>
 
         <Link
           href={entry ? `/home/${entry.userId}` : '/home'}
-          className="hidden shrink-0 items-center px-1 text-sm leading-[1.5] font-semibold whitespace-nowrap text-[#3e3e3e] pc:flex"
+          className="hidden shrink-0 items-center px-1 text-sm leading-[1.5] font-semibold whitespace-nowrap text-neutral-850 pc:flex"
         >
           브리더홈
           <ArrowRightIcon className="size-5" />
@@ -219,7 +219,7 @@ const HallOfFamePodium = ({ entries, onEntryClick, className }: HallOfFamePodium
   return (
     <div
       className={cn(
-        'relative flex h-[13.8125rem] w-full shrink-0 items-center overflow-hidden rounded-xl bg-[#f7e7d6] px-4 py-8 tab:h-[16.8rem] tab:items-start tab:justify-center tab:p-8 pc:h-[26.425rem] pc:w-[66.0625rem]',
+        'relative flex h-[13.8125rem] w-full shrink-0 items-center overflow-hidden rounded-xl bg-secondary-200 px-4 py-8 tab:h-[16.8rem] tab:items-start tab:justify-center tab:p-8 pc:h-[26.425rem] pc:w-[66.0625rem]',
         className,
       )}
     >

@@ -6,16 +6,16 @@ import { Textarea, type TextareaProps } from './Textarea'
 
 // [refactored] Figma color token(text/interactive/*) — 흩어져 있던 hex를 의미 단위로 명명
 const TEXT = {
-  primary: 'text-[#3e3e3e]',
-  secondary: 'text-[#6b6b6b]',
-  disabled: 'text-[#b8b8b8]',
-  info: 'text-[#256ef4]',
-  error: 'text-[#d63d4a]',
+  primary: 'text-neutral-850',
+  secondary: 'text-neutral-700',
+  disabled: 'text-neutral-400',
+  info: 'text-info-500',
+  error: 'text-error-500',
 } as const
 
 // [refactored] Figma status → 카운터(숫자/총량) 색 테이블 — 반복되던 삼항 체인을 선언적 lookup으로
 const COUNTER_TONE = {
-  default: { number: cn(TEXT.secondary, 'group-focus-within:text-[#256ef4]'), max: TEXT.secondary },
+  default: { number: cn(TEXT.secondary, 'group-focus-within:text-info-500'), max: TEXT.secondary },
   fill: { number: TEXT.info, max: TEXT.secondary },
   error: { number: TEXT.error, max: TEXT.error },
   disabled: { number: TEXT.disabled, max: TEXT.disabled },

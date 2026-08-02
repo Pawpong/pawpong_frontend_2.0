@@ -27,7 +27,7 @@ const NavBar = ({ className }: { className?: string }) => {
           onClick={(e) => handleLinkClick(e, href)}
           className={cn(
             'flex items-center text-[1rem] whitespace-nowrap transition-colors',
-            isActive(pathname) ? 'font-semibold text-[#3e3e3e]' : 'font-medium text-[#a6a6a6]',
+            isActive(pathname) ? 'font-semibold text-neutral-850' : 'font-medium text-neutral-500',
           )}
         >
           <Icon className="size-8" />

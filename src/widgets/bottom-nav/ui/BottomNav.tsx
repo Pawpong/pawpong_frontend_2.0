@@ -10,7 +10,7 @@ import { PAGE_WIDTH_CLASS } from '@/shared/config/layout'
 const BottomNav = () => {
   const pathname = usePathname()
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-[#ededed] bg-white pc:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-neutral-100 bg-white pc:hidden">
       <div
         className={cn(PAGE_WIDTH_CLASS, 'flex items-center justify-between px-4 py-3 tab:px-12')}
       >
@@ -20,7 +20,7 @@ const BottomNav = () => {
             href={href}
             className={cn(
               'flex flex-col items-center gap-[0.125rem]',
-              isActive(pathname) ? 'text-[#3e3e3e]' : 'text-[#a6a6a6]',
+              isActive(pathname) ? 'text-neutral-850' : 'text-neutral-500',
             )}
           >
             <Icon className="size-8" />

@@ -17,10 +17,10 @@ const Bubble = ({ content, isMine }: { content: string; isMine: boolean }) => (
       'rounded-tl-2xl rounded-tr-2xl px-4 py-3 pc:p-5',
       isMine
         ? 'rounded-bl-2xl bg-[#fff26a]'
-        : 'rounded-br-2xl border border-[#cacaca] bg-[#f6f6f6]',
+        : 'rounded-br-2xl border border-neutral-300 bg-neutral-50',
     )}
   >
-    <p className="text-sm leading-[1.5] font-semibold break-words whitespace-pre-wrap text-[#3e3e3e] pc:text-base">
+    <p className="text-sm leading-[1.5] font-semibold break-words whitespace-pre-wrap text-neutral-850 pc:text-base">
       {content}
     </p>
   </div>
@@ -52,7 +52,7 @@ const ChatMessageBubble = ({
       {showProfile && (
         <div className="flex items-center gap-2">
           <ProfileAvatar size="small" />
-          <span className="text-sm leading-[1.5] font-semibold text-[#3e3e3e]">{senderName}</span>
+          <span className="text-sm leading-[1.5] font-semibold text-neutral-850">{senderName}</span>
         </div>
       )}
       <div className="flex max-w-[85%] items-end gap-3 pc:max-w-[21.9375rem]">

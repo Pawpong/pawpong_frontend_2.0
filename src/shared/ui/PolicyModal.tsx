@@ -28,12 +28,12 @@ const PolicyModal = ({ open, onOpenChange, title, content, className }: PolicyMo
         )}
       >
         <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border-light px-6 py-4">
-          <DialogPrimitive.Title className="text-body-lg font-semibold text-[#3e3e3e]">
+          <DialogPrimitive.Title className="text-body-lg font-semibold text-neutral-850">
             {title}
           </DialogPrimitive.Title>
           <DialogPrimitive.Close
             aria-label="닫기"
-            className="flex size-6 shrink-0 items-center justify-center text-[#6b6b6b]"
+            className="flex size-6 shrink-0 items-center justify-center text-neutral-700"
           >
             <CloseIcon className="size-[1.125rem]" />
           </DialogPrimitive.Close>

@@ -51,7 +51,7 @@ const CommentComposer = ({
             <AvatarFallback className="bg-fill-muted" />
           )}
         </Avatar>
-        <div className="flex h-14 flex-1 items-center justify-between gap-2 rounded-lg border border-[#a6a6a6] p-3">
+        <div className="flex h-14 flex-1 items-center justify-between gap-2 rounded-lg border border-neutral-500 p-3">
           <input
             type="text"
             value={value}
@@ -59,13 +59,13 @@ const CommentComposer = ({
             onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
             placeholder="댓글달기"
             maxLength={1000}
-            className="min-w-0 flex-1 bg-transparent text-base leading-[1.5] font-medium text-[#3e3e3e] outline-none placeholder:text-[#a6a6a6]"
+            className="min-w-0 flex-1 bg-transparent text-base leading-[1.5] font-medium text-neutral-850 outline-none placeholder:text-neutral-500"
           />
           <button
             type="button"
             onClick={handleSubmit}
             disabled={!trimmed || isSubmitting}
-            className="shrink-0 text-sm font-medium text-[#3e3e3e] disabled:text-[#b8b8b8]"
+            className="shrink-0 text-sm font-medium text-neutral-850 disabled:text-neutral-400"
           >
             게시
           </button>

@@ -16,12 +16,12 @@ import { Button } from './Button'
 // 버튼 스타일 — 공통 Button(BaseButton) variant로 위임.
 // (variant 타입 소스로만 유지, 렌더는 아래 CTA_BUTTON 매핑으로 Button 사용)
 const ctaModalButton = tv({
-  base: 'flex h-10 w-full items-center justify-center rounded-full p-2 text-base leading-normal font-semibold text-[#3e3e3e] transition-colors',
+  base: 'flex h-10 w-full items-center justify-center rounded-full p-2 text-base leading-normal font-semibold text-neutral-850 transition-colors',
   variants: {
     variant: {
-      fill: 'bg-[#fffa94] hover:text-[#6b6b6b] active:bg-[#f3ec59] active:text-[#3e3e3e]',
-      outline: 'border border-[#cacaca] bg-white hover:bg-[#f5f5f5] active:bg-[#ededed]',
-      ghost: 'text-[#6b6b6b] hover:text-[#3e3e3e]',
+      fill: 'bg-[#fffa94] hover:text-neutral-700 active:bg-[#f3ec59] active:text-neutral-850',
+      outline: 'border border-neutral-300 bg-white hover:bg-[#f5f5f5] active:bg-neutral-100',
+      ghost: 'text-neutral-700 hover:text-neutral-850',
     },
   },
   defaultVariants: { variant: 'outline' },
@@ -30,7 +30,7 @@ const ctaModalButton = tv({
 // CtaModal 액션 variant → 공통 Button variant + 보정 클래스
 const CTA_BUTTON = {
   fill: { variant: 'primary', className: '' },
-  outline: { variant: 'outline', className: 'hover:bg-[#f5f5f5] active:bg-[#ededed]' },
+  outline: { variant: 'outline', className: 'hover:bg-[#f5f5f5] active:bg-neutral-100' },
   ghost: { variant: 'ghost', className: '' },
 } as const
 
@@ -78,7 +78,7 @@ interface CtaModalProps {
   className?: string
 }
 
-const DEFAULT_ICON = <InfoIcon className="size-8 text-[#6b6b6b]" />
+const DEFAULT_ICON = <InfoIcon className="size-8 text-neutral-700" />
 
 const CtaModal = ({
   open,
@@ -111,7 +111,7 @@ const CtaModal = ({
             {showClose && (
               <DialogPrimitive.Close
                 aria-label="닫기"
-                className="flex size-6 items-center justify-center text-[#6b6b6b]"
+                className="flex size-6 items-center justify-center text-neutral-700"
               >
                 <CloseIcon className="size-[1.125rem]" />
               </DialogPrimitive.Close>
@@ -121,11 +121,11 @@ const CtaModal = ({
             (iconBare ? (
               icon
             ) : (
-              <div className="flex items-center justify-center rounded-full bg-[#ededed] p-2.5">
+              <div className="flex items-center justify-center rounded-full bg-neutral-100 p-2.5">
                 {icon}
               </div>
             ))}
-          <div className="flex flex-col items-center text-center text-[#3e3e3e]">
+          <div className="flex flex-col items-center text-center text-neutral-850">
             {/* whitespace-pre-line: title에 \n 넣으면 원하는 위치에서 줄바꿈 (단일 줄은 영향 없음) */}
             <DialogPrimitive.Title
               className={cn(

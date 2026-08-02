@@ -26,7 +26,7 @@ const ChatAttachMenu = ({ disabled }: ChatAttachMenuProps) => {
           type="button"
           aria-label="첨부"
           disabled={disabled}
-          className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[#3e3e3e] disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-neutral-850 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <PlusIcon className="size-[0.875rem] text-white" />
         </button>

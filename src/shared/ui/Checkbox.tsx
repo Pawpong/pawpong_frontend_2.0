@@ -13,7 +13,7 @@ import { cn } from '@/shared/lib/cn'
 const checkbox = tv({
   slots: {
     root: 'group peer shrink-0 p-1 focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50',
-    box: 'flex size-full items-center justify-center rounded-sm border-2 border-[#a6a6a6] bg-white shadow-none group-data-[state=checked]:border-[#fffa94] group-data-[state=checked]:bg-[#fffa94] group-data-[state=checked]:text-[#3e3e3e]',
+    box: 'flex size-full items-center justify-center rounded-sm border-2 border-neutral-500 bg-white shadow-none group-data-[state=checked]:border-[#fffa94] group-data-[state=checked]:bg-[#fffa94] group-data-[state=checked]:text-neutral-850',
     icon: '',
   },
   variants: {

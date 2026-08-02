@@ -161,7 +161,7 @@ const PostDetailContent = ({ postId }: PostDetailContentProps) => {
                           <button
                             type="button"
                             onClick={() => setIsEditingPost(false)}
-                            className="rounded-full border border-[#cacaca] px-4 py-1.5 text-sm font-semibold text-text-secondary"
+                            className="rounded-full border border-neutral-300 px-4 py-1.5 text-sm font-semibold text-text-secondary"
                           >
                             취소
                           </button>

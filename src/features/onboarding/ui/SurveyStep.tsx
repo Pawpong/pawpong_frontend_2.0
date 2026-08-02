@@ -163,7 +163,7 @@ const SurveyStep = () => {
                 label="동의합니다"
                 checked={!!field.value}
                 onCheckedChange={(checked) => field.onChange(checked)}
-                className="rounded-lg bg-[#ededed] px-2"
+                className="rounded-lg bg-neutral-100 px-2"
               />
             )}
           />
@@ -173,7 +173,7 @@ const SurveyStep = () => {
         <div className="flex w-full flex-col gap-3">
           <button
             type="button"
-            className="flex items-center gap-0 self-end rounded-lg bg-[#3e3e3e] px-2 py-1 text-[0.875rem] font-semibold text-[#f6f6f6]"
+            className="flex items-center gap-0 self-end rounded-lg bg-neutral-850 px-2 py-1 text-[0.875rem] font-semibold text-neutral-50"
           >
             다음에 작성하기
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="size-4">

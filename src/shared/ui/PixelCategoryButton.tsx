@@ -55,7 +55,7 @@ const PixelCategoryButton = ({
         className={cn(
           cafe24Proup.className,
           'relative z-10 font-cafe24 text-[0.625rem] leading-[1.5] font-normal whitespace-nowrap pc:text-[1rem]',
-          active ? 'text-[#a9835a]' : 'text-[#6b6b6b] group-hover:text-[#a9835a]',
+          active ? 'text-[#a9835a]' : 'text-neutral-700 group-hover:text-[#a9835a]',
         )}
       >
         {label}

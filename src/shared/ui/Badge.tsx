@@ -14,9 +14,9 @@ const badgeVariants = tv({
         'bg-[#5d5d5d] text-white px-[0.625rem] py-[0.25rem] text-[0.875rem] leading-[1.375rem]',
       // Figma 디자인 시스템 뱃지 (743-68292) — large 기준, size="md"로 medium 전환
       default:
-        'border border-[#cacaca] bg-white px-2 py-1 text-base leading-[1.5] font-medium text-[#6b6b6b]',
-      active: 'bg-[#3e3e3e] px-2 py-1 text-base leading-[1.5] font-medium text-[#f6f6f6]',
-      disabled: 'bg-[#e4e4e4] px-2 py-1 text-base leading-[1.5] font-medium text-[#b8b8b8]',
+        'border border-neutral-300 bg-white px-2 py-1 text-base leading-[1.5] font-medium text-neutral-700',
+      active: 'bg-neutral-850 px-2 py-1 text-base leading-[1.5] font-medium text-neutral-50',
+      disabled: 'bg-neutral-150 px-2 py-1 text-base leading-[1.5] font-medium text-neutral-400',
     },
     size: {
       lg: '',

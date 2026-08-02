@@ -37,7 +37,7 @@ const Table = ({ children }: { children: ReactNode }) => (
 const TableRow = ({ className, children }: { className?: string; children: ReactNode }) => (
   <div
     className={cn(
-      'flex items-center gap-[0.5rem] border-b border-[#cacaca] py-[0.5rem]',
+      'flex items-center gap-[0.5rem] border-b border-neutral-300 py-[0.5rem]',
       className,
     )}
   >
@@ -55,13 +55,13 @@ const HealthInfoCard = ({ detail }: { detail: AdoptionDetailDto }) => (
 
         {/* [refactored] Table/TableRow 사용 (3컬럼: 접종명/접종일/차수) */}
         <Table>
-          <TableRow className="py-[0.25rem] font-medium text-[#6b6b6b]">
+          <TableRow className="py-[0.25rem] font-medium text-neutral-700">
             <span className="min-w-px flex-1">접종명</span>
             <span className="min-w-px flex-1">접종일</span>
             <span className="shrink-0 whitespace-nowrap">차수</span>
           </TableRow>
           {detail.health.vaccinations.map((v, i) => (
-            <TableRow key={`${v.name}-${v.dose}-${i}`} className="text-[#3e3e3e]">
+            <TableRow key={`${v.name}-${v.dose}-${i}`} className="text-neutral-850">
               <span className="min-w-px flex-1">{v.name}</span>
               <span className="min-w-px flex-1">{v.date}</span>
               <span className="shrink-0 whitespace-nowrap">{v.dose}</span>
@@ -78,22 +78,22 @@ const HealthInfoCard = ({ detail }: { detail: AdoptionDetailDto }) => (
         {/* [refactored] Table/TableRow 사용 (접종일 컬럼 없음) */}
         <Table>
           <TableRow>
-            <span className="min-w-px flex-1 text-[#6b6b6b]">검진일</span>
-            <span className="shrink-0 whitespace-nowrap text-[#3e3e3e]">
+            <span className="min-w-px flex-1 text-neutral-700">검진일</span>
+            <span className="shrink-0 whitespace-nowrap text-neutral-850">
               {detail.health.geneticTest.date}
             </span>
           </TableRow>
           <TableRow>
-            <span className="min-w-px flex-1 text-[#6b6b6b]">검사기관</span>
-            <span className="shrink-0 whitespace-nowrap text-[#3e3e3e]">
+            <span className="min-w-px flex-1 text-neutral-700">검사기관</span>
+            <span className="shrink-0 whitespace-nowrap text-neutral-850">
               {detail.health.geneticTest.institution}
             </span>
           </TableRow>
           {detail.health.geneticTest.results.map((r, i) => (
             <TableRow key={`${r.disease}-${i}`}>
-              <span className="min-w-px flex-1 text-[#6b6b6b]">{i === 0 ? '결과' : ''}</span>
-              <span className="min-w-px flex-1 text-[#3e3e3e]">{r.disease}</span>
-              <span className="shrink-0 whitespace-nowrap text-[#3e3e3e]">{r.result}</span>
+              <span className="min-w-px flex-1 text-neutral-700">{i === 0 ? '결과' : ''}</span>
+              <span className="min-w-px flex-1 text-neutral-850">{r.disease}</span>
+              <span className="shrink-0 whitespace-nowrap text-neutral-850">{r.result}</span>
             </TableRow>
           ))}
         </Table>

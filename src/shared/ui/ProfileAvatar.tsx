@@ -34,7 +34,7 @@ const ProfileAvatar = ({ src, alt, size = 'small', className }: ProfileAvatarPro
     <Avatar className={cn(AVATAR_SIZE[size].box, className)}>
       {src && <AvatarImage src={src} alt={alt} />}
       {/* [refactored] PixelUserIcon → PawIcon, 색 #ededed/#a6a6a6 (Figma) */}
-      <AvatarFallback className="bg-[#ededed] text-[#a6a6a6]">
+      <AvatarFallback className="bg-neutral-100 text-neutral-500">
         <PawIcon className={AVATAR_SIZE[size].glyph} />
       </AvatarFallback>
     </Avatar>

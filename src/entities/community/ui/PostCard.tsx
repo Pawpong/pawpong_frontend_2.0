@@ -74,7 +74,7 @@ const PostCard = ({
             profileCluster
           )}
           <button type="button" aria-label="더보기" className="shrink-0">
-            <MoreVertIcon className="size-6 text-[#3e3e3e]" />
+            <MoreVertIcon className="size-6 text-neutral-850" />
           </button>
         </div>
       )}
@@ -87,7 +87,7 @@ const PostCard = ({
             {images.map((src, index) => (
               <div
                 key={index}
-                className="relative h-[13.1875rem] w-[17.5625rem] shrink-0 overflow-hidden rounded-lg bg-[#6b6b6b] tab:h-60 tab:w-80"
+                className="relative h-[13.1875rem] w-[17.5625rem] shrink-0 overflow-hidden rounded-lg bg-neutral-700 tab:h-60 tab:w-80"
               >
                 {src && (
                   <Image
@@ -112,7 +112,7 @@ const PostCard = ({
             <div className="flex items-center gap-2">
               <TextLabel size="14">{commentPreview.nickname}</TextLabel>
               <div className="flex min-w-0 flex-1 items-center gap-2 text-xs leading-[1.5]">
-                <p className="truncate font-semibold text-[#3e3e3e]">{commentPreview.body}</p>
+                <p className="truncate font-semibold text-neutral-850">{commentPreview.body}</p>
               </div>
             </div>
           )}

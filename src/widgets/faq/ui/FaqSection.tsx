@@ -35,12 +35,12 @@ const FaqSection = ({ userType = 'adopter' }: FaqSectionProps) => {
             <p
               className={cn(
                 cafe24Proup.className,
-                'font-cafe24 text-[1rem] text-[#3e3e3e] pc:text-[1.25rem]',
+                'font-cafe24 text-[1rem] text-neutral-850 pc:text-[1.25rem]',
               )}
             >
               신뢰할 수 있는 {cta.subject}
             </p>
-            <p className="text-[1rem] font-semibold text-[#f6f6f6] pc:text-[1.25rem]">
+            <p className="text-[1rem] font-semibold text-neutral-50 pc:text-[1.25rem]">
               포퐁에서 만나요 !
             </p>
           </div>
@@ -48,7 +48,7 @@ const FaqSection = ({ userType = 'adopter' }: FaqSectionProps) => {
             href={cta.href}
             className="group flex h-[3rem] w-full items-center justify-center rounded-full bg-[#fffa94] px-[2rem] transition-colors active:bg-[#f3ec59] pc:w-[12.3125rem] pc:self-end"
           >
-            <span className="text-[1rem] font-semibold whitespace-nowrap text-[#3e3e3e] group-hover:text-[#6b6b6b] group-active:text-[#3e3e3e]">
+            <span className="text-[1rem] font-semibold whitespace-nowrap text-neutral-850 group-hover:text-neutral-700 group-active:text-neutral-850">
               {cta.action}
             </span>
           </Link>
@@ -59,16 +59,16 @@ const FaqSection = ({ userType = 'adopter' }: FaqSectionProps) => {
       <div className="flex-1 py-6 tab:py-8 pc:py-12 pc:pl-20">
         <SectionHeader title="자주 묻는 질문" linkText="자세히" linkHref="/faq" />
         {/* 항목: mo·tab 5개 1열, pc 10개 2열(컬럼 우선 채움, 간격 12px — Figma FaqLayout) */}
-        <div className="mt-[0.75rem] grid grid-cols-1 border-b border-[#a6a6a6] pc:grid-flow-col pc:grid-cols-2 pc:grid-rows-5 pc:gap-x-[0.75rem]">
+        <div className="mt-[0.75rem] grid grid-cols-1 border-b border-neutral-500 pc:grid-flow-col pc:grid-cols-2 pc:grid-rows-5 pc:gap-x-[0.75rem]">
           {faqs?.slice(0, 10).map((faq, index) => (
             <div
               key={faq.faqId}
               className={cn(
-                'border-t border-[#a6a6a6] px-[0.25rem] py-[0.75rem]',
+                'border-t border-neutral-500 px-[0.25rem] py-[0.75rem]',
                 index >= 5 && 'hidden pc:block', // mo·tab는 5개만 노출
               )}
             >
-              <p className="truncate text-[0.875rem] font-semibold text-[#3e3e3e] tab:text-[1rem]">
+              <p className="truncate text-[0.875rem] font-semibold text-neutral-850 tab:text-[1rem]">
                 {faq.question}
               </p>
             </div>

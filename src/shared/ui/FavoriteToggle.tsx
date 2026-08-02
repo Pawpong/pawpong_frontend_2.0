@@ -7,7 +7,7 @@ import { FavoriteIcon } from '@/shared/assets/icons'
 // Figma icon/heart press 상태 — 관심 #ff8181 / 기본 #a6a6a6.
 // 모든 하트(FavoriteToggle·FavoriteButton·PostActionButton)가 참조하는 단일 색 정의.
 export const FAVORITE_ACTIVE = 'text-[#ff8181]'
-export const FAVORITE_INACTIVE = 'text-[#a6a6a6]'
+export const FAVORITE_INACTIVE = 'text-neutral-500'
 
 interface FavoriteHeartProps extends SVGProps<SVGSVGElement> {
   isFavorite?: boolean

@@ -30,7 +30,7 @@ const ChatRoomFilterableList = ({
     <>
       <div
         className={cn(
-          'flex flex-col items-end border-b border-[#cacaca] py-3 pc:py-4',
+          'flex flex-col items-end border-b border-neutral-300 py-3 pc:py-4',
           gutterClassName,
         )}
       >
@@ -39,7 +39,7 @@ const ChatRoomFilterableList = ({
 
       {filteredRooms.length === 0 ? (
         <div className="flex items-center justify-center py-20">
-          <p className="text-sm font-medium text-[#6b6b6b]">채팅방이 없습니다</p>
+          <p className="text-sm font-medium text-neutral-700">채팅방이 없습니다</p>
         </div>
       ) : (
         <div className={cn('flex flex-col gap-5 py-6 pc:py-10', gutterClassName, listClassName)}>

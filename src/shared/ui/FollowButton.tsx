@@ -8,7 +8,7 @@ type FollowStatus = 'follow' | 'following' | 'mutual'
 const STATUS: Record<FollowStatus, { className: string; label: string }> = {
   follow: { className: 'border-transparent bg-fill-muted font-medium text-white', label: '팔로우' },
   following: { className: '', label: '팔로잉' },
-  mutual: { className: 'border-transparent bg-[#3e3e3e] text-[#f6f6f6]', label: '맞팔로잉' },
+  mutual: { className: 'border-transparent bg-neutral-850 text-neutral-50', label: '맞팔로잉' },
 }
 
 // sm: 팔로워 모달 pill(h-32) / lg: 프로필 카드(h-40)
