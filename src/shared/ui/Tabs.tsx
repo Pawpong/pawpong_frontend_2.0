@@ -40,12 +40,12 @@ const tabsTriggerVariants = tv({
   variants: {
     variant: {
       default: '',
-      // Figma: 라벨 상단 + 하단 갈색 바, 고정 높이(텍스트-바 간격). 활성 갈색/비활성 회색.
+      // Figma: 라벨 상단 + 하단 바, 고정 높이(텍스트-바 간격). 활성 primary/비활성 회색.
       // cafe24 폰트 — 변수 단독으론 미적용이라 className 병행
       underline: cn(
         cafe24Proup.className,
-        'relative flex-1 items-start font-cafe24 text-neutral-500 data-[state=active]:text-[#a9835a]',
-        'after:absolute after:bottom-0 after:left-0 after:w-full after:bg-[#a9835a]',
+        'relative flex-1 items-start font-cafe24 text-neutral-500 data-[state=active]:text-primary-500',
+        'after:absolute after:bottom-0 after:left-0 after:w-full after:bg-primary-500',
         'after:opacity-0 data-[state=active]:after:opacity-100',
       ),
     },
