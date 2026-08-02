@@ -24,6 +24,9 @@ interface ExploreListingSectionProps<T> {
   /** featured: 인기 섹션(모바일 4개 2x2, tab+ 3개 중앙) / grid(기본): 전체 소식 그리드 */
   variant?: 'featured' | 'grid'
   className?: string
+  headerSlot?: ReactNode
+  /** 필터링 전 전체 개수처럼 items.length와 다른 값을 제목에 표시할 때 사용 */
+  totalCount?: number
 }
 
 const ExploreListingSection = <T,>({
@@ -33,6 +36,8 @@ const ExploreListingSection = <T,>({
   renderCard,
   variant = 'grid',
   className,
+  headerSlot,
+  totalCount,
 }: ExploreListingSectionProps<T>) => {
   if (variant === 'featured') {
     return (
@@ -55,9 +60,10 @@ const ExploreListingSection = <T,>({
 
   return (
     <TitledSection
-      title={`${title} ${items.length}`}
+      title={`${title} ${totalCount ?? items.length}`}
       titleClassName={EXPLORE_SECTION_TITLE_CLASS}
       className={cn(GRID_SECTION_CLASS, className)}
+      headerSlot={headerSlot}
     >
       <div className={CARD_GRID}>
         {items.map((item) => (

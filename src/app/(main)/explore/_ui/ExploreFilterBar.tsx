@@ -76,14 +76,16 @@ const ExploreFilterBar = ({ selected, onChange, className }: ExploreFilterBarPro
         </>
       ) : (
         <>
-          {/* 카테고리 칩 — 공통 Badge(default/active) */}
+          {/* 카테고리 칩 — 공통 Badge(primary 채움/아웃라인, Figma 1652-81786) */}
           <div className="flex flex-wrap items-center gap-2">
             {ANIMAL_CATEGORIES.map((category) => (
               <button
                 key={category}
                 type="button"
                 onClick={() => onChange(category)}
-                className={badgeVariants({ variant: selected === category ? 'active' : 'default' })}
+                className={badgeVariants({
+                  variant: selected === category ? 'primaryFilled' : 'primaryOutline',
+                })}
               >
                 {CATEGORY_LABEL[category]}
               </button>

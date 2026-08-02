@@ -1,5 +1,7 @@
 export { AdoptionCard, AdoptionCardHorizontal } from './ui/AdoptionCard'
+export { AdoptionGridCard } from './ui/AdoptionGridCard'
 export { AdoptionShowcaseCard } from './ui/AdoptionShowcaseCard'
 export type { AdoptionShowcaseCardProps } from './ui/AdoptionShowcaseCard'
 export { ADOPTION_STATUS_BG } from './ui/statusBg'
+export { ADOPTION_CARD_STATUS_LABEL, ADOPTION_CARD_STATUS_VARIANT } from './ui/adoptionCardStatus'
 export * from './api/adoption.queries'

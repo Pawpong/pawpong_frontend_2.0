@@ -1,8 +1,15 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
-import { Container, Tabs, TabsList, TabsTrigger } from '@/shared/ui'
+import {
+  badgeVariants,
+  Container,
+  PopularBadgeContent,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+} from '@/shared/ui'
 import { SearchSection } from '@/features/search'
 import { CategorySection } from '@/features/category-filter'
 import { cn } from '@/shared/lib/cn'
@@ -11,15 +18,22 @@ import { useGnbHeight } from '@/shared/lib/useGnbHeight'
 import { createMockListings } from '@/shared/mocks/adoption'
 import { ANIMAL_CATEGORIES } from '@/shared/types'
 import type { AnimalCategory } from '@/shared/types'
-import { FavoriteAdoptionCard } from '@/features/adoption'
 import { BreederExploreContent } from './BreederExploreContent'
+import { ExploreAdoptionCard } from './ExploreAdoptionCard'
 import { ExploreListingSection } from './ExploreListingSection'
 import { ExploreFilterBar } from './ExploreFilterBar'
 import { EXPLORE_TABS, SEARCH_PLACEHOLDERS, EXPLORE_SECTION_CONTAINER } from '../_lib/constants'
 import type { ExploreType } from '../_lib/constants'
 
 const mockListings = createMockListings()
-const popularListings = mockListings.filter((l) => l.isPopular)
+
+type AdoptionListFilter = 'all' | 'available' | 'popular'
+
+const ADOPTION_LIST_FILTERS: Array<{ value: AdoptionListFilter; label: string }> = [
+  { value: 'all', label: '전체' },
+  { value: 'available', label: '분양중' },
+  { value: 'popular', label: '인기' },
+]
 
 const ExploreContent = () => {
   const searchParams = useSearchParams()
@@ -28,6 +42,17 @@ const ExploreContent = () => {
 
   const typeParam = searchParams.get('type')
   const selectedType: ExploreType = typeParam === 'breeder' ? 'breeder' : 'adoption'
+  const [adoptionListFilter, setAdoptionListFilter] = useState<AdoptionListFilter>('all')
+
+  const filteredListings = useMemo(() => {
+    if (adoptionListFilter === 'available') {
+      return mockListings.filter((listing) => listing.status === 'available')
+    }
+    if (adoptionListFilter === 'popular') {
+      return mockListings.filter((listing) => listing.isPopular)
+    }
+    return mockListings
+  }, [adoptionListFilter])
 
   const categoryParam = searchParams.get('category')
   const selectedCategory: AnimalCategory =
@@ -145,23 +170,43 @@ const ExploreContent = () => {
         <BreederExploreContent />
       ) : (
         <>
-          {/* 인기 브리더와 동일 — 섹션별 Container, padding 세로 mo 20px→tab+ 40px, 가로 mo 16px/tab 48/pc 80 */}
-          {/* [refactored] 공용 ExploreListingSection — 인기 동물만 tab 가로 80px(margin/pc, Figma 1652-125625) */}
-          <Container className={cn(EXPLORE_SECTION_CONTAINER, 'tab:px-20')}>
-            <ExploreListingSection
-              title="인기 동물"
-              items={popularListings}
-              getKey={(listing) => listing.listingId}
-              renderCard={(listing) => <FavoriteAdoptionCard listing={listing} />}
-              variant="featured"
-            />
-          </Container>
           <Container className={EXPLORE_SECTION_CONTAINER}>
             <ExploreListingSection
-              title="전체 입양 소식"
-              items={mockListings}
+              title="전체 분양 소식"
+              items={filteredListings}
+              totalCount={mockListings.length}
               getKey={(listing) => listing.listingId}
-              renderCard={(listing) => <FavoriteAdoptionCard listing={listing} />}
+              renderCard={(listing) => <ExploreAdoptionCard listing={listing} />}
+              headerSlot={
+                <div className="flex shrink-0 items-center gap-2" aria-label="분양 소식 필터">
+                  {ADOPTION_LIST_FILTERS.map((filter) => {
+                    const isSelected = adoptionListFilter === filter.value
+
+                    return (
+                      <button
+                        key={filter.value}
+                        type="button"
+                        aria-pressed={isSelected}
+                        onClick={() => setAdoptionListFilter(filter.value)}
+                        className={cn(
+                          badgeVariants({
+                            variant: isSelected ? 'primaryFilled' : 'primaryOutline',
+                            size: 'md',
+                          }),
+                          // 모바일 md(10px) → tab+ lg(14px·h-29)
+                          'tab:h-[1.8125rem] tab:py-1 tab:text-sm',
+                        )}
+                      >
+                        {filter.value === 'popular' ? (
+                          <PopularBadgeContent size="responsive" />
+                        ) : (
+                          filter.label
+                        )}
+                      </button>
+                    )
+                  })}
+                </div>
+              }
             />
           </Container>
         </>
