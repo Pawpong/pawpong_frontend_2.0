@@ -27,7 +27,7 @@ const HallOfFame = () => {
       <Container className="px-4 py-4 tab:py-[0.625rem] pc:h-[36rem] pc:py-20">
         <div className="flex w-full flex-col items-start gap-[0.625rem] tab:gap-4 pc:flex-row pc:gap-9">
           <div className="flex h-[2.625rem] w-full shrink-0 flex-row items-center justify-between gap-2 tab:h-[1.875rem] pc:h-auto pc:w-[12.75rem] pc:flex-col pc:items-start pc:justify-start">
-            <h2 className="max-w-[12.9375rem] font-cafe24 text-sm leading-[1.5] font-bold text-[#3e3e3e] tab:max-w-none tab:whitespace-nowrap pc:text-xl pc:whitespace-normal">
+            <h2 className="max-w-[12.9375rem] font-cafe24 text-sm leading-[1.5] font-bold text-neutral-850 tab:max-w-none tab:whitespace-nowrap pc:text-xl pc:whitespace-normal">
               <span className="block tab:inline pc:block">이번주 명예의 동물들을 </span>
               <span className="block tab:inline pc:block">소개합니다 !</span>
             </h2>
@@ -35,7 +35,7 @@ const HallOfFame = () => {
               href="/vote"
               label="명예의 동물 투표하기"
               size="sm"
-              className="text-[#3e3e3e] pc:text-sm"
+              className="text-neutral-850 pc:text-sm"
             />
           </div>
 

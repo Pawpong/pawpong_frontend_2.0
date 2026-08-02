@@ -31,14 +31,14 @@ const SearchSection = ({
         <SearchBar placeholder={placeholder} />
         {popularKeywords && popularKeywords.length > 0 && (
           <div className="flex min-w-0 items-center gap-3 overflow-hidden">
-            <span className="shrink-0 text-xs leading-[1.5] font-medium text-[#6b6b6b] tab:text-sm">
+            <span className="shrink-0 text-xs leading-[1.5] font-medium text-neutral-700 tab:text-sm">
               인기 검색어
             </span>
             <div className="flex min-w-max items-center gap-1 tab:gap-2">
               {popularKeywords.map((keyword) => (
                 <span
                   key={keyword}
-                  className="flex h-6 items-center rounded-full border border-[#406dff] px-2 text-[0.625rem] leading-[1.5] font-medium whitespace-nowrap text-[#406dff] tab:h-auto tab:py-0.5 tab:text-sm"
+                  className="flex h-6 items-center rounded-full border border-primary-500 px-2 text-[0.625rem] leading-[1.5] font-medium whitespace-nowrap text-primary-500 tab:h-auto tab:py-0.5 tab:text-sm"
                 >
                   {keyword}
                 </span>

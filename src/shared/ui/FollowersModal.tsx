@@ -124,18 +124,18 @@ const FollowersModal = ({
             {/* pc: 닫기 */}
             <div className="hidden h-12 shrink-0 items-center justify-end px-6 py-3 pc:flex">
               <DialogClose aria-label="닫기">
-                <CloseIcon className="size-6 text-[#3e3e3e]" />
+                <CloseIcon className="size-6 text-neutral-850" />
               </DialogClose>
             </div>
 
             {/* 탭 */}
-            <div className="flex shrink-0 border-b border-[#e4e4e4] px-4 tab:px-12">
+            <div className="flex shrink-0 border-b border-neutral-150 px-4 tab:px-12">
               {TABS.map(({ key, label }) => {
                 const active = tab === key
                 // [refactored] 라벨·개수가 공유하는 active 스타일을 한 번만 계산
                 const textClass = cn(
                   'text-sm leading-[1.5]',
-                  active ? 'font-semibold text-[#3e3e3e]' : 'font-medium text-[#a6a6a6]',
+                  active ? 'font-semibold text-neutral-850' : 'font-medium text-neutral-500',
                 )
                 return (
                   <button
@@ -145,7 +145,7 @@ const FollowersModal = ({
                     className={cn(
                       // 모바일·탭: 한 줄(라벨 개수) / pc: 라벨 위, 개수 아래
                       'flex flex-1 items-center justify-center gap-1 p-3 pc:flex-col pc:gap-0 pc:py-2',
-                      active && 'border-b border-[#3e3e3e]',
+                      active && 'border-b border-neutral-850',
                     )}
                   >
                     <span className={cn(textClass, 'pc:text-base')}>{label}</span>
@@ -173,7 +173,7 @@ const FollowersModal = ({
                     <Button
                       variant="text"
                       onClick={() => setPending({ user, mode: 'remove' })}
-                      className="shrink-0 font-medium text-[#a6a6a6]"
+                      className="shrink-0 font-medium text-neutral-500"
                     >
                       삭제
                     </Button>
@@ -227,7 +227,7 @@ const FollowersModal = ({
           {
             label: pending ? CONFIRM[pending.mode].actionLabel : '',
             variant: 'outline',
-            className: 'text-[#d63d4a]',
+            className: 'text-error-500',
             onClick: () => {
               if (!pending) return
               const confirmAction = pending.mode === 'unfollow' ? onUnfollow : onRemoveFollower
@@ -238,7 +238,7 @@ const FollowersModal = ({
           {
             label: '취소',
             variant: 'outline',
-            className: 'border-transparent bg-[#ededed]',
+            className: 'border-transparent bg-neutral-100',
             onClick: () => setPending(null),
           },
         ]}

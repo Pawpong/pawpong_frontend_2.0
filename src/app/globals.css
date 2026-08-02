@@ -38,6 +38,89 @@
 
   /* border */
   --color-border-light: color(display-p3 0.7777 0.7777 0.7777);
+
+  /* ══════ 디자인 시스템 색상 팔레트 (Figma 2026_pawpong / Mode 1) ══════
+     시맨틱 이름: primary/secondary/error/info/success/neutral/base */
+
+  /* primary */
+  --color-primary-50: #ecf0ff;
+  --color-primary-100: #d9e2ff;
+  --color-primary-200: #b3c5ff;
+  --color-primary-300: #8ca7ff;
+  --color-primary-400: #668aff;
+  --color-primary-500: #406dff;
+  --color-primary-600: #3358d1;
+  --color-primary-700: #2643a2;
+  --color-primary-800: #1a2f74;
+  --color-primary-900: #0d1a45;
+
+  /* secondary */
+  --color-secondary-50: #fdf9f5;
+  --color-secondary-100: #fbf3eb;
+  --color-secondary-200: #f7e7d6;
+  --color-secondary-300: #f2dcc2;
+  --color-secondary-400: #eed0ad;
+  --color-secondary-500: #eac499;
+  --color-secondary-600: #caa67e;
+  --color-secondary-700: #ab8862;
+  --color-secondary-800: #8b6b47;
+  --color-secondary-900: #6c4d2b;
+
+  /* error */
+  --color-error-50: #f7d8db;
+  --color-error-100: #f3c5c9;
+  --color-error-200: #efb1b7;
+  --color-error-300: #e68b92;
+  --color-error-400: #de646e;
+  --color-error-500: #d63d4a;
+  --color-error-600: #ab313b;
+  --color-error-700: #80252c;
+  --color-error-800: #56181e;
+  --color-error-900: #401216;
+
+  /* info */
+  --color-info-50: #d3e2fd;
+  --color-info-100: #bed4fc;
+  --color-info-200: #a8c5fb;
+  --color-info-300: #7ca8f8;
+  --color-info-400: #518bf6;
+  --color-info-500: #256ef4;
+  --color-info-600: #1e58c3;
+  --color-info-700: #164292;
+  --color-info-800: #0f2c62;
+  --color-info-900: #0b2149;
+
+  /* success */
+  --color-success-50: #acefac;
+  --color-success-100: #97e797;
+  --color-success-200: #81df81;
+  --color-success-300: #56ce56;
+  --color-success-400: #2bbe2b;
+  --color-success-500: #00ae00;
+  --color-success-600: #008b00;
+  --color-success-700: #006800;
+  --color-success-800: #004600;
+  --color-success-900: #003400;
+
+  /* neutral (0=가장 어두움, 150/850/950 추가 단계) */
+  --color-neutral-0: #121212;
+  --color-neutral-50: #f6f6f6;
+  --color-neutral-100: #ededed;
+  --color-neutral-150: #e4e4e4;
+  --color-neutral-200: #dbdbdb;
+  --color-neutral-300: #cacaca;
+  --color-neutral-400: #b8b8b8;
+  --color-neutral-500: #a6a6a6;
+  --color-neutral-600: #888888;
+  --color-neutral-700: #6b6b6b;
+  --color-neutral-800: #4d4d4d;
+  --color-neutral-850: #3e3e3e;
+  --color-neutral-900: #303030;
+  --color-neutral-950: #212121;
+
+  /* base */
+  --color-base-white: #ffffff;
+  --color-base-black: #121212;
 }
 
 /* 반응형 타이포 토큰 브레이크포인트 오버라이드 (tab = 768px) */

@@ -49,7 +49,7 @@ const PostActionButton = ({
       />
       {count !== undefined && (
         // Figma community-icon 카운트: 14px semibold #3e3e3e, line-height 1.5
-        <span className="text-sm leading-[1.5] font-semibold text-[#3e3e3e]">{count}</span>
+        <span className="text-sm leading-[1.5] font-semibold text-neutral-850">{count}</span>
       )}
     </>
   )

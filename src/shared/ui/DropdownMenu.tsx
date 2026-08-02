@@ -72,7 +72,7 @@ export const DropdownMenuContent = React.forwardRef<
       sideOffset={sideOffset}
       className={cn(
         // 디자인시스템 드롭다운 (node 1159:48679): 흰 배경 · #e4e4e4 border · rounded-8 · 그림자
-        'z-50 min-w-[8rem] overflow-hidden rounded-lg border border-[#e4e4e4] bg-white p-0 shadow-[0px_7px_7px_rgba(55,55,55,0.1)]',
+        'z-50 min-w-[8rem] overflow-hidden rounded-lg border border-neutral-150 bg-white p-0 shadow-[0px_7px_7px_rgba(55,55,55,0.1)]',
         className,
       )}
       {...props}
@@ -91,7 +91,7 @@ export const DropdownMenuItem = React.forwardRef<
     ref={ref}
     className={cn(
       // 디자인시스템 드롭다운 항목: 14px medium #6b6b6b, hover 시 #ededed 배경 + #3e3e3e
-      'flex cursor-pointer items-center gap-1 p-3 text-sm font-medium text-[#6b6b6b] transition-colors outline-none select-none focus:bg-[#ededed] focus:font-semibold focus:text-[#3e3e3e] data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+      'flex cursor-pointer items-center gap-1 p-3 text-sm font-medium text-neutral-700 transition-colors outline-none select-none focus:bg-neutral-100 focus:font-semibold focus:text-neutral-850 data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
       inset && 'pl-8',
       className,
     )}

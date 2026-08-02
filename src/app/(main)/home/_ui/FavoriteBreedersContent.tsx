@@ -11,9 +11,9 @@ const FavoriteBreedersContent = () => {
       {/* 모바일 전용: 나만 보기 버튼 (디자인 1023-39468 · 1023-39688) */}
       {/* ponytail: 필터 동작 미연결, 실데이터 붙을 때 드롭다운 연결 */}
       <div className="px-4 pt-5 tab:hidden">
-        <button type="button" className="flex h-10 items-center gap-1 rounded-lg bg-[#3e3e3e] px-2">
-          <span className="text-base leading-[1.5] font-semibold text-[#f6f6f6]">나만 보기</span>
-          <ChevronIcon className="size-4 text-[#f6f6f6]" />
+        <button type="button" className="flex h-10 items-center gap-1 rounded-lg bg-neutral-850 px-2">
+          <span className="text-base leading-[1.5] font-semibold text-neutral-50">나만 보기</span>
+          <ChevronIcon className="size-4 text-neutral-50" />
         </button>
       </div>
 

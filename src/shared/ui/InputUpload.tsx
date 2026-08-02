@@ -21,13 +21,13 @@ const InputUpload = ({ text, buttonText = '작성하기', href, className }: Inp
     <Link
       href={href}
       className={cn(
-        'flex items-center border-y border-[#cacaca] bg-white px-4 py-2 tab:px-12 pc:px-20',
+        'flex items-center border-y border-neutral-300 bg-white px-4 py-2 tab:px-12 pc:px-20',
         className,
       )}
     >
       <div className="flex min-w-0 flex-1 items-center justify-between gap-3">
-        <span className="truncate text-sm leading-[1.5] font-medium text-[#6b6b6b]">{text}</span>
-        <span className="hidden h-8 shrink-0 items-center justify-center rounded-lg bg-[#3e3e3e] px-2 text-sm leading-[1.5] font-semibold text-[#f6f6f6] tab:flex">
+        <span className="truncate text-sm leading-[1.5] font-medium text-neutral-700">{text}</span>
+        <span className="hidden h-8 shrink-0 items-center justify-center rounded-lg bg-neutral-850 px-2 text-sm leading-[1.5] font-semibold text-neutral-50 tab:flex">
           {buttonText}
         </span>
       </div>

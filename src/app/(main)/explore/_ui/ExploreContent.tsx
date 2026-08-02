@@ -98,7 +98,7 @@ const ExploreContent = () => {
           (모바일은 탭 바 비고정, GNB만 sticky) */}
       <div ref={headerRef} className="bg-white tab:sticky tab:z-40" style={{ top: gnbH }}>
         {/* 탐색 탭 바 (Figma 'tab bar-layout') — full-width + margin/pc inset, 하단 회색선 */}
-        <div className="w-full border-b border-[#cacaca] px-[1.25rem] pt-3 tab:px-[3rem] tab:pt-4 pc:px-[5rem]">
+        <div className="w-full border-b border-neutral-300 px-[1.25rem] pt-3 tab:px-[3rem] tab:pt-4 pc:px-[5rem]">
           <Tabs
             value={selectedType}
             onValueChange={(value) => handleTypeChange(value as ExploreType)}

@@ -72,11 +72,11 @@ const FollowerSection = ({
         <ProfileAvatar
           key={i}
           size="xsmall"
-          className={cn('border-2 border-[#e4e4e4]', i < 2 && '-mr-[0.3125rem]')}
+          className={cn('border-2 border-neutral-150', i < 2 && '-mr-[0.3125rem]')}
         />
       ))}
     </div>
-    <span className={cn('font-medium text-[#3e3e3e]', textClassName)}>팔로워 {followerCount}</span>
+    <span className={cn('font-medium text-neutral-850', textClassName)}>팔로워 {followerCount}</span>
   </button>
 )
 
@@ -89,11 +89,11 @@ const LocationInfo = ({ location, className }: { location: string; className?: s
 
 // [refactored] 프로필 이름/소개 타이포 — 공통 스타일을 한 곳에, 크기만 className으로 분기
 const ProfileName = ({ children, className }: { children: ReactNode; className?: string }) => (
-  <p className={cn('leading-[1.5] font-semibold text-[#3e3e3e]', className)}>{children}</p>
+  <p className={cn('leading-[1.5] font-semibold text-neutral-850', className)}>{children}</p>
 )
 
 const ProfileBio = ({ children, className }: { children: ReactNode; className?: string }) => (
-  <p className={cn('leading-[1.5] font-semibold break-words text-[#3e3e3e]', className)}>
+  <p className={cn('leading-[1.5] font-semibold break-words text-neutral-850', className)}>
     {children}
   </p>
 )
@@ -137,7 +137,7 @@ const FavoriteButton = ({ className }: { className?: string }) => (
 const EditButton = () => (
   <Link
     href="/home/edit"
-    className="flex h-10 flex-1 items-center justify-center rounded-full border border-[#cacaca] p-2 text-base leading-[1.5] font-semibold text-[#3e3e3e] tab:h-12"
+    className="flex h-10 flex-1 items-center justify-center rounded-full border border-neutral-300 p-2 text-base leading-[1.5] font-semibold text-neutral-850 tab:h-12"
   >
     프로필 편집
   </Link>
@@ -237,7 +237,7 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
       </div>
 
       {/* ===== Desktop (디자인 node 1021-20324) ===== */}
-      <div className="mx-auto hidden max-w-[59.25rem] overflow-hidden rounded-lg bg-[#f6f6f6] tab:block">
+      <div className="mx-auto hidden max-w-[59.25rem] overflow-hidden rounded-lg bg-neutral-50 tab:block">
         {/* 상단: 좌(뱃지·이름·소개) / 우(팔로워·아바타) — h-204 고정, 콘텐츠 가운데 정렬 */}
         <div className="flex h-[12.75rem] items-center justify-center overflow-hidden px-5 py-8">
           <div className="flex w-full max-w-[48.75rem] items-end justify-between gap-3">
@@ -260,7 +260,7 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
 
         {/* 하단: 구분선 + 모드별 버튼 */}
         <div className="flex flex-col items-center gap-3 pb-8">
-          <div className="h-px w-full bg-[#e4e4e4]" />
+          <div className="h-px w-full bg-neutral-150" />
           <div className="flex w-full max-w-[36.625rem] items-center gap-6 px-5">
             <Actions />
           </div>

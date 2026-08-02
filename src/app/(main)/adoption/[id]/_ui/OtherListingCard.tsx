@@ -48,7 +48,7 @@ const DesktopOtherListingCard = ({
   isFavorite: boolean
   onToggle: () => void
 }) => (
-  <div className="flex items-center rounded-[0.5rem] bg-[#f6f6f6] px-[1.25rem] py-[0.75rem]">
+  <div className="flex items-center rounded-[0.5rem] bg-neutral-50 px-[1.25rem] py-[0.75rem]">
     <div className="flex w-full items-center gap-[1.75rem]">
       {/* 이미지 + 인기 배지 */}
       <div className="relative aspect-[4/3] h-[13.125rem] w-[17.5rem] shrink-0 overflow-hidden rounded-[0.5rem] bg-[#c6c6c6]">
@@ -66,7 +66,7 @@ const DesktopOtherListingCard = ({
         <div className="flex flex-col gap-[0.75rem]">
           {/* 제목 + 상태 배지 */}
           <div className="flex items-center gap-[0.5rem]">
-            <p className="min-w-px truncate text-[1.25rem] leading-[1.5] font-semibold text-[#3e3e3e]">
+            <p className="min-w-px truncate text-[1.25rem] leading-[1.5] font-semibold text-neutral-850">
               {listing.name} | {GENDER_LABEL[listing.gender]} {listing.ageText}
             </p>
             {/* [refactored] raw span → 공통 Badge(active 변형) */}
@@ -75,7 +75,7 @@ const DesktopOtherListingCard = ({
             </Badge>
           </div>
           {listing.description && (
-            <p className="line-clamp-3 text-[1rem] leading-[1.5] font-semibold text-[#3e3e3e]">
+            <p className="line-clamp-3 text-[1rem] leading-[1.5] font-semibold text-neutral-850">
               {listing.description}
             </p>
           )}
@@ -88,7 +88,7 @@ const DesktopOtherListingCard = ({
             favoriteCount={listing.favoriteCount}
             viewCount={listing.viewCount}
             size="lg"
-            className="flex-1 gap-[0.5rem] text-[#6b6b6b]"
+            className="flex-1 gap-[0.5rem] text-neutral-700"
           />
           {/* [refactored] 공통 FavoriteShareActions 사용 */}
           <FavoriteShareActions isFavorite={isFavorite} onToggle={onToggle} />

@@ -33,14 +33,14 @@ const CommunityPostProfile = ({
         <div className={cn('flex items-center gap-2', showcase ? 'w-full' : 'p-0.5')}>
           <span
             className={cn(
-              'min-w-0 truncate font-semibold text-[#3e3e3e]',
+              'min-w-0 truncate font-semibold text-neutral-850',
               showcase ? 'p-0.5 text-sm leading-[1.5] pc:text-base' : 'text-body-s',
             )}
           >
             {author.nickname}
           </span>
           <span
-            className="shrink-0 text-xs leading-[1.5] font-medium whitespace-nowrap text-[#6b6b6b]"
+            className="shrink-0 text-xs leading-[1.5] font-medium whitespace-nowrap text-neutral-700"
             suppressHydrationWarning
           >
             {formatRelativeTime(createdAt)}
@@ -48,7 +48,7 @@ const CommunityPostProfile = ({
         </div>
         <p
           className={cn(
-            'text-sm leading-[1.5] font-semibold break-words text-[#3e3e3e]',
+            'text-sm leading-[1.5] font-semibold break-words text-neutral-850',
             showcase ? 'w-full truncate' : hasImages ? 'truncate' : 'line-clamp-5',
           )}
         >

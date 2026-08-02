@@ -25,16 +25,16 @@ export const SearchBar = ({ placeholder = DEFAULT_PLACEHOLDER, className }: Sear
   return (
     <div
       className={cn(
-        'flex h-12 w-full items-center justify-between gap-3 rounded-lg border border-[#a6a6a6] bg-white p-3 focus-within:border-[#256ef4] pc:h-14 pc:focus-within:border-2',
+        'flex h-12 w-full items-center justify-between gap-3 rounded-lg border border-neutral-500 bg-white p-3 focus-within:border-info-500 pc:h-14 pc:focus-within:border-2',
         className,
       )}
     >
       <input
         type="text"
         placeholder={isTablet ? placeholder.desktop : placeholder.mobile}
-        className="min-w-0 flex-1 bg-transparent text-base leading-[1.5] font-medium text-[#3e3e3e] outline-none placeholder:text-[#a6a6a6]"
+        className="min-w-0 flex-1 bg-transparent text-base leading-[1.5] font-medium text-neutral-850 outline-none placeholder:text-neutral-500"
       />
-      <SearchIcon className="size-8 shrink-0 text-[#6b6b6b]" />
+      <SearchIcon className="size-8 shrink-0 text-neutral-700" />
     </div>
   )
 }

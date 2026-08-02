@@ -10,7 +10,7 @@ interface ChatSidebarProps {
 
 const ChatSidebar = ({ activeRoomId, onSelectRoom }: ChatSidebarProps) => {
   return (
-    <aside className="flex h-full w-[26.6875rem] shrink-0 flex-col border-r border-[#cacaca] bg-white">
+    <aside className="flex h-full w-[26.6875rem] shrink-0 flex-col border-r border-neutral-300 bg-white">
       {/* navigation bar spacer */}
       <div className="h-[3.125rem] shrink-0" />
 

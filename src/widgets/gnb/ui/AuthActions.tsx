@@ -56,7 +56,7 @@ const AuthActions = ({ variant = 'inline', onNavigate, className }: AuthActionsP
             onClick={onNavigate}
             className={cn(
               pill,
-              'bg-[#fffa94] font-semibold text-[#3e3e3e]',
+              'bg-[#fffa94] font-semibold text-neutral-850',
               variant === 'inline' && 'hover:bg-[#fff066]',
             )}
           >

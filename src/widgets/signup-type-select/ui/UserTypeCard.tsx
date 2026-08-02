@@ -49,7 +49,7 @@ const UserTypeCard = ({ label, selected, onClick }: UserTypeCardProps) => (
       className={cn(
         cafe24Proup.className,
         'relative z-10 font-cafe24 text-[2rem] leading-[1.5] font-bold tab:text-[2.5rem]',
-        selected ? 'text-[#a9835a]' : 'text-[#6b6b6b] group-hover:text-[#a9835a]',
+        selected ? 'text-[#a9835a]' : 'text-neutral-700 group-hover:text-[#a9835a]',
       )}
     >
       {label}

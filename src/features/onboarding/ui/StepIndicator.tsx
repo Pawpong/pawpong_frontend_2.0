@@ -39,7 +39,7 @@ const StepItem = ({ label, index, isActive, showArrowBefore }: StepItemProps) =>
         className={cn(
           cafe24Proup.className,
           'relative z-10 font-cafe24 text-[0.625rem] leading-[1.5] font-bold whitespace-nowrap tab:text-base',
-          isActive ? 'text-[#a9835a]' : 'text-[#dbdbdb]',
+          isActive ? 'text-[#a9835a]' : 'text-neutral-200',
         )}
       >
         {index + 1}. {label}

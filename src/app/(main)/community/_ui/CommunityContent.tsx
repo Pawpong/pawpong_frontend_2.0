@@ -53,7 +53,7 @@ const CommunityContent = () => {
           pc는 Figma(2063-215749) 기준 948px 고정 폭 가운데 정렬 */}
       <Container className="px-4 pb-10 tab:pb-16">
         <div className="mx-auto w-full pc:max-w-[59.25rem]">
-          <div className="flex min-w-0 flex-col gap-5 tab:gap-8 tab:rounded-lg tab:border tab:border-[#cacaca] tab:p-3">
+          <div className="flex min-w-0 flex-col gap-5 tab:gap-8 tab:rounded-lg tab:border tab:border-neutral-300 tab:p-3">
             {posts.map((post, index) => (
               <Fragment key={post.postId}>
                 {index > 0 && <Separator className="bg-border-light" />}

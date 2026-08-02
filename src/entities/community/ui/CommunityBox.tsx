@@ -35,7 +35,7 @@ const CommunityBox = ({
   )
 
   const image = (
-    <div className="relative size-full overflow-hidden rounded-lg bg-[#ededed] pc:rounded-xl">
+    <div className="relative size-full overflow-hidden rounded-lg bg-neutral-100 pc:rounded-xl">
       {primaryImage && (
         <Image
           src={primaryImage}
@@ -51,9 +51,9 @@ const CommunityBox = ({
   return (
     <article
       className={cn(
-        'flex h-[20.5625rem] w-[20.0625rem] flex-col items-start overflow-hidden rounded-lg border border-[#cacaca] bg-white p-3 pc:h-[23.5rem] pc:w-[25.4375rem]',
+        'flex h-[20.5625rem] w-[20.0625rem] flex-col items-start overflow-hidden rounded-lg border border-neutral-300 bg-white p-3 pc:h-[23.5rem] pc:w-[25.4375rem]',
         // Figma hover/press (923-18992): 배경 #f6f6f6 + drop shadow
-        'transition-[background-color,box-shadow] hover:bg-[#f6f6f6] hover:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)] active:bg-[#f6f6f6] active:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]',
+        'transition-[background-color,box-shadow] hover:bg-neutral-50 hover:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)] active:bg-neutral-50 active:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]',
         className,
       )}
     >
@@ -65,7 +65,7 @@ const CommunityBox = ({
         ) : (
           profile
         )}
-        <button type="button" aria-label="게시글 더보기" className="size-6 shrink-0 text-[#3e3e3e]">
+        <button type="button" aria-label="게시글 더보기" className="size-6 shrink-0 text-neutral-850">
           <MoreVertIcon className="size-6" />
         </button>
       </header>

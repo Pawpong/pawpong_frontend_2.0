@@ -24,7 +24,7 @@ const CardImage = ({
   className?: string
   badgeClassName?: string
 }) => (
-  <div className={cn('relative shrink-0 overflow-hidden bg-[#6b6b6b]', className)}>
+  <div className={cn('relative shrink-0 overflow-hidden bg-neutral-700', className)}>
     <Image src={listing.thumbnailUrl} alt={listing.name} fill className="object-cover" />
     {isCompleted && <div className="absolute inset-0 bg-white/70" />}
     {listing.isPopular && (
@@ -67,7 +67,7 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
       <button
         type="button"
         onClick={() => setModalOpen(true)}
-        className="mx-auto flex w-full max-w-[37.5rem] items-center gap-4 rounded-lg bg-[#f6f6f6] p-2 text-left pc:hidden"
+        className="mx-auto flex w-full max-w-[37.5rem] items-center gap-4 rounded-lg bg-neutral-50 p-2 text-left pc:hidden"
       >
         {/* [refactored] CardImage — 110×110 rounded-4 */}
         <CardImage
@@ -80,7 +80,7 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
         {/* 정보: 상단(제목 1줄 + 상태배지) · 하단(stats) — 위/아래 분배, 상하 5px 여백 */}
         <div className="flex min-w-0 flex-1 flex-col justify-between self-stretch overflow-hidden py-[0.3125rem]">
           <div className="flex w-full flex-col items-start gap-1">
-            <p className="w-full truncate text-base leading-[1.5] font-bold text-[#3e3e3e]">
+            <p className="w-full truncate text-base leading-[1.5] font-bold text-neutral-850">
               {listing.name}
             </p>
             <Badge variant="active" size="md">
@@ -88,13 +88,13 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
             </Badge>
           </div>
           {/* [refactored] CardStats */}
-          <CardStats listing={listing} size="sm" className="w-full text-xs text-[#6b6b6b]" />
+          <CardStats listing={listing} size="sm" className="w-full text-xs text-neutral-700" />
         </div>
       </button>
 
       {/* PC 카드 (Figma 797-87156 · Card2 large) — pc 전용. bg #f6f6f6, 이미지 280×210, 제목+상태배지/설명 3줄, stats + 대화중인 채팅
           카드 고정폭 920px 중앙정렬 (콘텐츠 폭이 더 넓으면 좌우 여백) */}
-      <div className="mx-auto hidden w-full max-w-[57.5rem] gap-7 rounded-lg bg-[#f6f6f6] px-5 py-3 pc:flex pc:items-center">
+      <div className="mx-auto hidden w-full max-w-[57.5rem] gap-7 rounded-lg bg-neutral-50 px-5 py-3 pc:flex pc:items-center">
         {/* [refactored] CardImage — 280×210 rounded-8 */}
         <CardImage
           listing={listing}
@@ -107,7 +107,7 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
         <div className="flex min-w-0 flex-1 flex-col justify-between self-stretch">
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2">
-              <p className="truncate text-xl leading-[1.5] font-bold text-[#3e3e3e]">
+              <p className="truncate text-xl leading-[1.5] font-bold text-neutral-850">
                 {`${listing.name} | ${GENDER_LABEL[listing.gender]} ${listing.ageText}`}
               </p>
               <Badge variant="active" className="shrink-0">
@@ -115,7 +115,7 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
               </Badge>
             </div>
             {listing.description && (
-              <p className="line-clamp-3 text-base leading-[1.5] font-semibold text-[#3e3e3e]">
+              <p className="line-clamp-3 text-base leading-[1.5] font-semibold text-neutral-850">
                 {listing.description}
               </p>
             )}
@@ -123,7 +123,7 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
 
           <div className="flex items-center gap-2">
             {/* [refactored] CardStats */}
-            <CardStats listing={listing} className="flex-1 text-sm leading-[1.5] text-[#6b6b6b]" />
+            <CardStats listing={listing} className="flex-1 text-sm leading-[1.5] text-neutral-700" />
             <Button
               variant="primary"
               onClick={() => router.push('/chat')}

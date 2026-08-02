@@ -106,7 +106,7 @@ const Banner = () => {
             }
             className={cn(
               'h-[0.556875rem] rounded-full transition-[width,background-color]',
-              index === activeIndex ? 'w-[1.3922rem] bg-[#eac499]' : 'w-[0.556875rem] bg-[#ededed]',
+              index === activeIndex ? 'w-[1.3922rem] bg-secondary-500' : 'w-[0.556875rem] bg-neutral-100',
             )}
           />
         ))}
@@ -120,7 +120,7 @@ const Banner = () => {
             type="button"
             aria-label={label}
             className={cn(
-              'absolute top-[6.19rem] z-10 flex size-5 -translate-y-1/2 items-center justify-center text-[#256ef4] tab:top-1/2 tab:size-[2.2275rem] pc:size-[3rem] [&.swiper-button-disabled]:cursor-default [&.swiper-button-disabled]:text-[#a6a6a6]',
+              'absolute top-[6.19rem] z-10 flex size-5 -translate-y-1/2 items-center justify-center text-info-500 tab:top-1/2 tab:size-[2.2275rem] pc:size-[3rem] [&.swiper-button-disabled]:cursor-default [&.swiper-button-disabled]:text-neutral-500',
               position,
               className,
             )}

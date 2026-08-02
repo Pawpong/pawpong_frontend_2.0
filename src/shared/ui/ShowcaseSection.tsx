@@ -28,7 +28,7 @@ const ShowcaseSection = ({
         linkText={linkText}
         linkHref={linkHref}
         className="h-[1.875rem] justify-center pc:h-auto"
-        titleClassName="p-0 font-cafe24 text-sm leading-[1.5] font-bold whitespace-nowrap text-[#3e3e3e] tab:text-sm pc:text-xl"
+        titleClassName="p-0 font-cafe24 text-sm leading-[1.5] font-bold whitespace-nowrap text-neutral-850 tab:text-sm pc:text-xl"
       />
       {children}
     </section>

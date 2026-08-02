@@ -49,7 +49,7 @@ const ChatMessageInput = ({ onSend, disabled }: ChatMessageInputProps) => {
           type="button"
           onClick={handleSubmit}
           disabled={disabled || !value.trim()}
-          className="flex h-10 shrink-0 items-center justify-center rounded-lg bg-[#3e3e3e] px-3 text-base leading-[1.5] font-semibold text-[#f6f6f6] disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex h-10 shrink-0 items-center justify-center rounded-lg bg-neutral-850 px-3 text-base leading-[1.5] font-semibold text-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
         >
           보내기
         </button>

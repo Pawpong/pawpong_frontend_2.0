@@ -47,7 +47,7 @@ const BreedingEnvironmentCard = ({
     >
       {/* [refactored] 모바일/pc 단일 레이아웃 — 제목·설명·이미지맵 1벌, 순서만 flex order로 분기 */}
       {/* 제목 (모바일 12px #5d5d5d / pc 20px #3e3e3e) */}
-      <p className="text-[0.75rem] leading-[1.375rem] font-medium text-[#5d5d5d] pc:text-[1.25rem] pc:leading-[1.5] pc:font-semibold pc:text-[#3e3e3e]">
+      <p className="text-[0.75rem] leading-[1.375rem] font-medium text-[#5d5d5d] pc:text-[1.25rem] pc:leading-[1.5] pc:font-semibold pc:text-neutral-850">
         사육 환경
       </p>
 

@@ -23,7 +23,7 @@ const AdoptionListTab = ({ listings }: AdoptionListTabProps) => {
         {Object.entries(groupedByDate).map(([date, items]) => (
           <div key={date} className="flex flex-col gap-[0.375rem] tab:gap-[0.625rem]">
             {/* 입양 날짜 — 모바일·탭 body-sm(12) / pc body-md(14), medium, #6b6b6b */}
-            <p className="text-body-sm font-medium text-[#6b6b6b] pc:text-body-md">
+            <p className="text-body-sm font-medium text-neutral-700 pc:text-body-md">
               입양 날짜 : {date}
             </p>
             {items.map((listing) => (

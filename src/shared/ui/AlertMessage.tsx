@@ -16,9 +16,9 @@ const alertMessage = tv({
   },
   variants: {
     status: {
-      info: { base: 'bg-[#d3e2fd] text-[#256ef4]' },
-      error: { base: 'bg-[#f7d8db] text-[#d63d4a]' },
-      default: { base: 'bg-[#3e3e3e] text-[#f6f6f6]' },
+      info: { base: 'bg-info-50 text-info-500' },
+      error: { base: 'bg-error-50 text-error-500' },
+      default: { base: 'bg-neutral-850 text-neutral-50' },
     },
     size: {
       md: {

@@ -58,10 +58,10 @@ const LoginSuccessContent = () => {
       {error ? (
         <div className="text-center">
           <p className="text-red-500">{error}</p>
-          <p className="mt-2 text-sm text-[#6b6b6b]">로그인 페이지로 이동합니다...</p>
+          <p className="mt-2 text-sm text-neutral-700">로그인 페이지로 이동합니다...</p>
         </div>
       ) : (
-        <p className="text-sm text-[#6b6b6b]">로그인 처리 중...</p>
+        <p className="text-sm text-neutral-700">로그인 처리 중...</p>
       )}
     </div>
   )
@@ -71,7 +71,7 @@ const LoginSuccessPage = () => (
   <Suspense
     fallback={
       <div className="flex min-h-screen items-center justify-center">
-        <p className="text-sm text-[#6b6b6b]">로그인 처리 중...</p>
+        <p className="text-sm text-neutral-700">로그인 처리 중...</p>
       </div>
     }
   >

@@ -67,7 +67,7 @@ const CommentItem = ({ comment, currentUserId, onReply, isReply }: CommentItemPr
                       setIsEditing(false)
                       setEditValue(comment.body)
                     }}
-                    className="rounded-full border border-[#cacaca] px-3 py-1 text-sm font-semibold text-text-secondary"
+                    className="rounded-full border border-neutral-300 px-3 py-1 text-sm font-semibold text-text-secondary"
                   >
                     취소
                   </button>
