@@ -22,7 +22,6 @@ import {
   getBreederApplicationForm,
   getReceivedApplications,
   getReceivedApplicationDetail,
-  getApplicationChatMessages,
   getMyReceivedReviews,
   getBreederVerification,
 } from './breeder.api'
@@ -109,14 +108,6 @@ export const breederQueries = {
       queryKey: [...breederQueries.all(), 'received-application', applicationId],
       queryFn: () => getReceivedApplicationDetail(applicationId),
       enabled: !!applicationId,
-    }),
-
-  chatMessages: (applicationId: string) =>
-    createQuery({
-      queryKey: [...breederQueries.all(), 'chat', applicationId],
-      queryFn: () => getApplicationChatMessages(applicationId),
-      enabled: !!applicationId,
-      staleTime: STALE_TIME.REALTIME,
     }),
 
   myReviews: (params: MyReviewsParams = {}, limit = 10) =>

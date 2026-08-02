@@ -3,7 +3,6 @@ import type { ApiRequestConfig } from '@/shared/api'
 import type {
   AdopterProfileDto,
   AdopterPublicProfile,
-  FavoriteItemDto,
   MyReviewItemDto,
   PaginationResponse,
   ApiResponseFull,
@@ -25,16 +24,6 @@ export const getAdopterProfile = () =>
       data: AdopterProfileDto
       message?: string
     }>(`${API_VERSION}/adopter/profile`)
-    .then(unwrap)
-
-/** 즐겨찾기 목록 */
-export const getFavorites = (page = 1, limit = 20) =>
-  apiClient
-    .get<{
-      success: boolean
-      data: PaginationResponse<FavoriteItemDto>
-      message?: string
-    }>(`${API_VERSION}/adopter/favorites`, { params: { page, limit } })
     .then(unwrap)
 
 /** 내 후기 목록 */

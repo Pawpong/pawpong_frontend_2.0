@@ -1,12 +1,10 @@
-import { apiClient, API_VERSION, unwrap, unwrapNullable } from '@/shared/api'
+import { apiClient, API_VERSION, unwrap } from '@/shared/api'
 import type {
   ApiResponseFull,
   ProfileUpdateRequestDto,
   BreederProfileUpdateResponseDto,
   ApplicationStatusUpdateRequest,
   ApplicationStatusUpdateResponseDto,
-  ChatMessageDto,
-  SendChatMessageRequest,
   ParentPetAddRequest,
   ParentPetUpdateRequest,
   PetAddResponse,
@@ -42,14 +40,6 @@ export const updateBreederApplicationStatus = (
       ApiResponseFull<ApplicationStatusUpdateResponseDto>
     >(`${API_VERSION}/breeder-management/applications/${applicationId}`, data)
     .then(unwrap)
-
-/** 채팅 메시지 전송 */
-export const sendApplicationChatMessage = (applicationId: string, data: SendChatMessageRequest) =>
-  apiClient
-    .post<
-      ApiResponseFull<ChatMessageDto | null>
-    >(`${API_VERSION}/breeder-management/applications/${applicationId}/chat/messages`, data)
-    .then((res) => unwrapNullable(res, '채팅 메시지 전송에 실패했습니다.'))
 
 // ==================== 부모견/묘 (parent-pets) ====================
 

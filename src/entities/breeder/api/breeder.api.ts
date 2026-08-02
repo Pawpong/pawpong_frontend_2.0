@@ -14,7 +14,6 @@ import type {
   ReceivedApplicationItemDto,
   ReceivedApplicationDetailDto,
   BreederApplicationFormDto,
-  ChatMessageDto,
   BreederMyReviewItem,
   MyReviewsParams,
   VerificationStatusResponse,
@@ -140,18 +139,3 @@ export const getBreederVerification = () =>
       ApiResponseFull<VerificationStatusResponse>
     >(`${API_VERSION}/breeder-management/verification`)
     .then(unwrap)
-
-/** 채팅 메시지 조회 */
-export const getApplicationChatMessages = async (
-  applicationId: string,
-): Promise<ChatMessageDto[]> => {
-  const res = await apiClient.get<
-    ApiResponseFull<ChatMessageDto[] | { messages?: ChatMessageDto[]; items?: ChatMessageDto[] }>
-  >(`${API_VERSION}/breeder-management/applications/${applicationId}/chat/messages`)
-
-  const data = unwrap(res)
-  if (Array.isArray(data)) return data
-  if ('messages' in data && Array.isArray(data.messages)) return data.messages
-  if ('items' in data && Array.isArray(data.items)) return data.items!
-  return []
-}

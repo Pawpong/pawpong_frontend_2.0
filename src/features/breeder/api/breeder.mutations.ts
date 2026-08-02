@@ -6,7 +6,6 @@ import { communityQueries } from '@/entities/community'
 import type {
   ProfileUpdateRequestDto,
   ApplicationStatusUpdateRequest,
-  SendChatMessageRequest,
   ParentPetAddRequest,
   ParentPetUpdateRequest,
   ReviewReplyRequest,
@@ -18,7 +17,6 @@ import type {
 import {
   updateBreederProfile,
   updateBreederApplicationStatus,
-  sendApplicationChatMessage,
   addParentPet,
   updateParentPet,
   deleteParentPet,
@@ -56,16 +54,6 @@ export const useUpdateBreederApplicationStatus = () => {
     }) => updateBreederApplicationStatus(applicationId, data),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: breederQueries.all() })
-    },
-  })
-}
-
-export const useSendChatMessage = (applicationId: string) => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (data: SendChatMessageRequest) => sendApplicationChatMessage(applicationId, data),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: breederQueries.chatMessages(applicationId).queryKey })
     },
   })
 }

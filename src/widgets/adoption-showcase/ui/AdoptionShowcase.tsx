@@ -1,13 +1,25 @@
+'use client'
+
+import { useQuery } from '@tanstack/react-query'
 import { ShowcaseSection } from '@/shared/ui'
+import { adoptionQueries } from '@/entities/adoption'
+import { mapAdoptionCard } from '@/app/(main)/explore/_lib/mapAdoptionCard'
 import { createMockListings } from '@/shared/mocks/adoption'
 import { FavoriteAdoptionShowcaseCard } from '@/features/adoption'
 
 const CARD_COUNT = 4
 
-// ponytail: 분양 목록 API(AdoptionPetCard)가 카드 타입(AdoptionListingCard)과 아직 불일치 —
-// explore도 동일하게 이 카드엔 목데이터 사용. 타입 정합되면 adoptionQueries.list로 교체.
 const AdoptionShowcase = () => {
-  const listings = createMockListings().slice(0, CARD_COUNT)
+  // 홈은 부분 실패 허용 — throwOnError만 꺼서 실패 시 목업으로 스켈레톤 유지
+  // (AdoptionPetCard → AdoptionListingCard 변환은 explore와 동일하게 mapAdoptionCard 재사용)
+  const { data } = useQuery({
+    ...adoptionQueries.popular(undefined, CARD_COUNT),
+    throwOnError: false,
+  })
+  const fetched = (data ?? []).slice(0, CARD_COUNT).map(mapAdoptionCard)
+
+  // 데이터 없으면(로딩/실패/빈 목록) 목업으로 스켈레톤 유지
+  const listings = fetched.length > 0 ? fetched : createMockListings().slice(0, CARD_COUNT)
 
   return (
     <ShowcaseSection title="분양중인 동물" linkText="탐색 바로가기" linkHref="/explore">

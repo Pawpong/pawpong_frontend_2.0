@@ -31,11 +31,13 @@ export const updateApplicationStatus = (
     .then(unwrap)
 
 /** 브리더 신청 폼 업데이트 */
+// 백엔드는 PATCH /breeder-management/application-form/simple (질문 텍스트만 받는 간소화 폼).
+// PUT · /application-form(전체 폼)로 보내면 404 → 메서드·경로를 백엔드 컨트롤러에 맞춘다.
 export const updateApplicationForm = (data: ApplicationFormSimpleUpdateRequest) =>
   apiClient
-    .put<{
+    .patch<{
       success: boolean
       data: ApplicationFormSimpleUpdateResponse
       message?: string
-    }>(`${API_VERSION}/breeder-management/application-form`, data)
+    }>(`${API_VERSION}/breeder-management/application-form/simple`, data)
     .then(unwrap)
