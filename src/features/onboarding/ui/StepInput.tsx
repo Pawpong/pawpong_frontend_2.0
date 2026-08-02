@@ -13,7 +13,7 @@ const StepActionButton = ({
     {...props}
     className={cn(
       'h-10 w-[6.25rem] shrink-0 rounded-lg px-2 text-base font-semibold',
-      disabled ? 'bg-[#e4e4e4] text-[#b8b8b8]' : 'bg-[#3e3e3e] text-[#f6f6f6]',
+      disabled ? 'bg-neutral-150 text-neutral-400' : 'bg-neutral-850 text-neutral-50',
       className,
     )}
   >
@@ -33,7 +33,7 @@ const StepSelect = ({ value, onValueChange, options, placeholder, className }: S
   <Select value={value} onValueChange={onValueChange}>
     <SelectTrigger
       className={cn(
-        'h-[2.8125rem] w-full rounded-lg border border-[#e4e4e4] bg-white px-3 text-[0.875rem] leading-[1.5] font-medium text-[#3e3e3e] shadow-none ring-0 ring-offset-0 focus:ring-0 focus:ring-offset-0',
+        'h-[2.8125rem] w-full rounded-lg border border-neutral-150 bg-white px-3 text-[0.875rem] leading-[1.5] font-medium text-neutral-850 shadow-none ring-0 ring-offset-0 focus:ring-0 focus:ring-offset-0',
         className,
       )}
     >

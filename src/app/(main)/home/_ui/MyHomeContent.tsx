@@ -149,7 +149,7 @@ const MyHomeContent = () => {
           className="px-12"
           right={
             <button type="button" aria-label="북마크">
-              <BookmarkIcon className="size-6 text-[#3e3e3e]" />
+              <BookmarkIcon className="size-6 text-neutral-850" />
             </button>
           }
         />

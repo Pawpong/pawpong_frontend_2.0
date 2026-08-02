@@ -12,10 +12,10 @@ const helpMessage = tv({
   },
   variants: {
     status: {
-      default: { base: 'text-[#3e3e3e]' },
-      info: { base: 'text-[#256ef4]' },
-      error: { base: 'text-[#d63d4a]' },
-      success: { base: 'text-[#00ae00]' },
+      default: { base: 'text-neutral-850' },
+      info: { base: 'text-info-500' },
+      error: { base: 'text-error-500' },
+      success: { base: 'text-success-500' },
     },
   },
   defaultVariants: { status: 'default' },

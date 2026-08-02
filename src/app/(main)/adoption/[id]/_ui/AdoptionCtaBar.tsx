@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { FavoriteIcon } from '@/shared/assets/icons'
-import { cn } from '@/shared/lib/cn'
 
 interface AdoptionCtaBarProps {
   listingId: string
@@ -16,8 +15,9 @@ interface AdoptionCtaBarProps {
    - 탭:    px-48 py-12, 우측 정렬 · 하트(48) + 노란 버튼(h-32, max-258)
    - pc:    px-80 py-12, 우측 정렬 · 노란 버튼만 (하트 숨김)
    내부 그룹은 콘텐츠(max-w-90rem)와 동일 폭으로 중앙 정렬해 넓은 화면 정렬 유지 */
+// hover: 글씨 neutral-700 / press(active): 배경 #f3ec59 · 글씨 neutral-850 (피그마 743-70327·743-70329)
 const CTA_BUTTON_CLASS =
-  'flex h-[3rem] max-w-[18.5625rem] flex-1 items-center justify-center rounded-full bg-[#fffa94] px-[0.5rem] text-[1rem] font-semibold text-[#3e3e3e] tab:h-[2rem] tab:max-w-[16.125rem] tab:text-[0.875rem] hover:text-[#6b6b6b] active:bg-[#f3ec59] active:text-[#3e3e3e]'
+  'flex h-[3rem] max-w-[18.5625rem] flex-1 items-center justify-center rounded-full bg-[#fffa94] px-[0.5rem] text-[1rem] font-semibold text-neutral-850 hover:text-neutral-700 active:bg-[#f3ec59] active:text-neutral-850 tab:h-[2rem] tab:max-w-[16.125rem] tab:text-[0.875rem]'
 
 const AdoptionCtaBar = ({
   listingId,
@@ -38,7 +38,7 @@ const AdoptionCtaBar = ({
           </Link>
         ) : (
           <>
-            {/* 관심(하트) — pc에서는 숨김 */}
+            {/* 관심(하트) — pc에서는 숨김. 채워짐 여부는 FavoriteIcon status로 표현 */}
             <button
               type="button"
               aria-label="관심있어요"
@@ -47,7 +47,9 @@ const AdoptionCtaBar = ({
               className="shrink-0 pc:hidden"
             >
               <FavoriteIcon
-                className={cn('size-[3rem]', isFavorite ? 'text-[#ff8181]' : 'text-[#5d5d5d]')}
+                size="lg"
+                status={isFavorite ? 'fill' : 'default'}
+                className={isFavorite ? 'text-[#ff8181]' : 'text-[#5d5d5d]'}
               />
             </button>
 

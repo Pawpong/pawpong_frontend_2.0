@@ -2,8 +2,16 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
-import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
-import { Container, Tabs, TabsList, TabsTrigger, InfiniteScrollTrigger } from '@/shared/ui'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import {
+  badgeVariants,
+  Container,
+  InfiniteScrollTrigger,
+  PopularBadgeContent,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+} from '@/shared/ui'
 import { SearchSection } from '@/features/search'
 import { CategorySection } from '@/features/category-filter'
 import { cn } from '@/shared/lib/cn'
@@ -13,13 +21,28 @@ import { CATEGORY_TO_PET_TYPE } from '@/shared/lib/petCategory'
 import { ANIMAL_CATEGORIES } from '@/shared/types'
 import type { AnimalCategory } from '@/shared/types'
 import { adoptionQueries } from '@/entities/adoption'
-import { FavoriteAdoptionCard } from '@/features/adoption'
 import { BreederExploreContent } from './BreederExploreContent'
+import { ExploreAdoptionCard } from './ExploreAdoptionCard'
 import { ExploreListingSection } from './ExploreListingSection'
 import { ExploreFilterBar } from './ExploreFilterBar'
 import { mapAdoptionCard, dedupeByListingId } from '../_lib/mapAdoptionCard'
 import { EXPLORE_TABS, SEARCH_PLACEHOLDERS, EXPLORE_SECTION_CONTAINER } from '../_lib/constants'
 import type { ExploreType } from '../_lib/constants'
+
+type AdoptionListFilter = 'all' | 'available' | 'popular'
+
+const ADOPTION_LIST_FILTERS: Array<{ value: AdoptionListFilter; label: string }> = [
+  { value: 'all', label: '전체' },
+  { value: 'available', label: '분양중' },
+  { value: 'popular', label: '인기' },
+]
+
+// 필터 칩 → v2 /adoption 쿼리 파라미터 (서버 필터링 — 클라이언트 slice 금지)
+const FILTER_TO_QUERY = {
+  all: { sort: 'latest', status: undefined },
+  available: { sort: 'latest', status: 'available' },
+  popular: { sort: 'popular', status: undefined },
+} as const
 
 const ExploreContent = () => {
   const searchParams = useSearchParams()
@@ -28,6 +51,7 @@ const ExploreContent = () => {
 
   const typeParam = searchParams.get('type')
   const selectedType: ExploreType = typeParam === 'breeder' ? 'breeder' : 'adoption'
+  const [adoptionListFilter, setAdoptionListFilter] = useState<AdoptionListFilter>('all')
 
   const categoryParam = searchParams.get('category')
   const selectedCategory: AnimalCategory =
@@ -35,14 +59,11 @@ const ExploreContent = () => {
       ? (categoryParam as AnimalCategory)
       : 'all'
 
-  // 입양 탐색 실데이터 — 카테고리 칩을 petType 필터로 매핑해 v2 API 조회 (입양 탭에서만 활성화)
+  // 입양 탐색 실데이터 — 카테고리 칩은 petType, 필터 칩은 sort/status로 매핑해 v2 API 조회
+  // (입양 탭에서만 활성화). 필터가 바뀌면 queryKey가 바뀌어 서버에서 다시 받아온다.
   const isAdoptionTab = selectedType === 'adoption'
   const petType = CATEGORY_TO_PET_TYPE[selectedCategory]
-  // featured 그리드는 모바일 2x2 4개 노출이라 limit 4
-  const { data: popularData } = useQuery({
-    ...adoptionQueries.popular(petType, 4),
-    enabled: isAdoptionTab,
-  })
+  const { sort, status } = FILTER_TO_QUERY[adoptionListFilter]
   const {
     data: listData,
     isLoading: isListLoading,
@@ -51,11 +72,10 @@ const ExploreContent = () => {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    ...adoptionQueries.list('latest', petType),
+    ...adoptionQueries.list(sort, petType, status),
     enabled: isAdoptionTab,
   })
 
-  const popularListings = (popularData ?? []).map(mapAdoptionCard)
   // 무한스크롤 페이지 병합 시 listingId 중복 제거 — 서버 페이지네이션이 경계에서 항목을
   // 겹쳐 주더라도 React key 중복(카드 중복/누락)이 발생하지 않도록 방어한다.
   const listings = dedupeByListingId(
@@ -126,7 +146,7 @@ const ExploreContent = () => {
           (모바일은 탭 바 비고정, GNB만 sticky) */}
       <div ref={headerRef} className="bg-white tab:sticky tab:z-40" style={{ top: gnbH }}>
         {/* 탐색 탭 바 (Figma 'tab bar-layout') — full-width + margin/pc inset, 하단 회색선 */}
-        <div className="w-full border-b border-[#cacaca] px-[1.25rem] pt-3 tab:px-[3rem] tab:pt-4 pc:px-[5rem]">
+        <div className="w-full border-b border-neutral-300 px-[1.25rem] pt-3 tab:px-[3rem] tab:pt-4 pc:px-[5rem]">
           <Tabs
             value={selectedType}
             onValueChange={(value) => handleTypeChange(value as ExploreType)}
@@ -173,46 +193,60 @@ const ExploreContent = () => {
         <BreederExploreContent selectedCategory={selectedCategory} />
       ) : isListLoading ? (
         <Container className="flex items-center justify-center py-10">
-          <p className="text-sm text-[#6b6b6b]">불러오는 중...</p>
+          <p className="text-sm text-neutral-700">불러오는 중...</p>
         </Container>
       ) : isListError ? (
         <Container className="flex items-center justify-center py-10">
-          <p className="text-sm text-[#6b6b6b]">분양글을 불러오지 못했습니다.</p>
+          <p className="text-sm text-neutral-700">분양글을 불러오지 못했습니다.</p>
         </Container>
       ) : (
-        <>
-          {/* 인기 브리더와 동일 — 섹션별 Container, padding 세로 mo 20px→tab+ 40px, 가로 mo 16px/tab 48/pc 80 */}
-          {/* [refactored] 공용 ExploreListingSection — 인기 동물만 tab 가로 80px(margin/pc, Figma 1652-125625) */}
-          {popularListings.length > 0 && (
-            <Container className={cn(EXPLORE_SECTION_CONTAINER, 'tab:px-20')}>
-              <ExploreListingSection
-                title="인기 동물"
-                items={popularListings}
-                getKey={(listing) => listing.listingId}
-                renderCard={(listing) => <FavoriteAdoptionCard listing={listing} />}
-                variant="featured"
-              />
-            </Container>
+        <Container className={EXPLORE_SECTION_CONTAINER}>
+          <ExploreListingSection
+            title="전체 분양 소식"
+            items={listings}
+            totalCount={totalCount}
+            getKey={(listing) => listing.listingId}
+            renderCard={(listing) => <ExploreAdoptionCard listing={listing} />}
+            headerSlot={
+              <div className="flex shrink-0 items-center gap-2" aria-label="분양 소식 필터">
+                {ADOPTION_LIST_FILTERS.map((filter) => {
+                  const isSelected = adoptionListFilter === filter.value
+
+                  return (
+                    <button
+                      key={filter.value}
+                      type="button"
+                      aria-pressed={isSelected}
+                      onClick={() => setAdoptionListFilter(filter.value)}
+                      className={cn(
+                        badgeVariants({
+                          variant: isSelected ? 'primaryFilled' : 'primaryOutline',
+                          size: 'md',
+                        }),
+                        // 모바일 md(10px) → tab+ lg(14px·h-29)
+                        'tab:h-[1.8125rem] tab:py-1 tab:text-sm',
+                      )}
+                    >
+                      {filter.value === 'popular' ? (
+                        <PopularBadgeContent size="responsive" />
+                      ) : (
+                        filter.label
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
+            }
+          />
+          {listings.length === 0 && (
+            <p className="py-10 text-center text-sm text-neutral-700">등록된 분양글이 없습니다.</p>
           )}
-          <Container className={EXPLORE_SECTION_CONTAINER}>
-            {listings.length === 0 ? (
-              <p className="py-10 text-center text-sm text-[#6b6b6b]">등록된 분양글이 없습니다.</p>
-            ) : (
-              <ExploreListingSection
-                title="전체 입양 소식"
-                items={listings}
-                count={totalCount}
-                getKey={(listing) => listing.listingId}
-                renderCard={(listing) => <FavoriteAdoptionCard listing={listing} />}
-              />
-            )}
-            <InfiniteScrollTrigger
-              onIntersect={fetchNextPage}
-              hasNextPage={hasNextPage ?? false}
-              isFetchingNextPage={isFetchingNextPage}
-            />
-          </Container>
-        </>
+          <InfiniteScrollTrigger
+            onIntersect={fetchNextPage}
+            hasNextPage={hasNextPage ?? false}
+            isFetchingNextPage={isFetchingNextPage}
+          />
+        </Container>
       )}
     </>
   )

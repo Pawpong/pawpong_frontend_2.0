@@ -39,7 +39,7 @@ const NotificationItem = ({
     type="button"
     onClick={() => onSelect(item)}
     className={cn(
-      'flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-[#f6f6f6]',
+      'flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-neutral-50',
       !item.isRead && 'bg-[#fafaf0]',
     )}
   >
@@ -47,13 +47,13 @@ const NotificationItem = ({
     <span
       className={cn(
         'mt-1.5 size-2 shrink-0 rounded-full',
-        item.isRead ? 'bg-transparent' : 'bg-[#d63d4a]',
+        item.isRead ? 'bg-transparent' : 'bg-error-500',
       )}
     />
     <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-      <p className="truncate text-sm font-semibold text-[#3e3e3e]">{item.title}</p>
-      <p className="line-clamp-2 text-sm leading-[1.4] font-medium text-[#6b6b6b]">{item.body}</p>
-      <span className="text-xs font-medium text-[#a6a6a6]">
+      <p className="truncate text-sm font-semibold text-neutral-850">{item.title}</p>
+      <p className="line-clamp-2 text-sm leading-[1.4] font-medium text-neutral-700">{item.body}</p>
+      <span className="text-xs font-medium text-neutral-500">
         {formatRelativeTime(item.createdAt)}
       </span>
     </div>
@@ -117,13 +117,13 @@ const NotificationBell = () => {
         aria-expanded={open}
         className={cn(
           'flex items-center text-[1rem] font-medium text-[#666] transition-colors',
-          open && 'text-primary-500 font-semibold',
+          open && 'font-semibold text-primary-500',
         )}
       >
         <div className="relative flex size-[3rem] items-center justify-center">
           <BellIcon className="size-[1.5rem]" />
           {unreadCount > 0 && (
-            <span className="absolute top-2 right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#d63d4a] px-1 text-[0.625rem] leading-none font-semibold text-white">
+            <span className="absolute top-2 right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-error-500 px-1 text-[0.625rem] leading-none font-semibold text-white">
               {unreadCount > 99 ? '99+' : unreadCount}
             </span>
           )}
@@ -133,14 +133,14 @@ const NotificationBell = () => {
 
       {/* 유튜브식 드롭다운 패널 */}
       {open && (
-        <div className="absolute top-full right-0 z-50 mt-1 w-[22.5rem] overflow-hidden rounded-xl border border-[#e4e4e4] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
-          <div className="flex items-center justify-between border-b border-[#ededed] px-4 py-3">
-            <span className="text-base font-semibold text-[#3e3e3e]">알림</span>
+        <div className="absolute top-full right-0 z-50 mt-1 w-[22.5rem] overflow-hidden rounded-xl border border-neutral-150 bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
+          <div className="flex items-center justify-between border-b border-neutral-100 px-4 py-3">
+            <span className="text-base font-semibold text-neutral-850">알림</span>
             {unreadCount > 0 && (
               <button
                 type="button"
                 onClick={() => markAllAsRead()}
-                className="text-xs font-medium text-[#6b6b6b] transition-colors hover:text-[#3e3e3e]"
+                className="text-xs font-medium text-neutral-700 transition-colors hover:text-neutral-850"
               >
                 모두 읽음
               </button>
@@ -149,13 +149,13 @@ const NotificationBell = () => {
 
           <div className="max-h-[26rem] overflow-y-auto">
             {isLoading ? (
-              <p className="px-4 py-10 text-center text-sm text-[#6b6b6b]">불러오는 중...</p>
+              <p className="px-4 py-10 text-center text-sm text-neutral-700">불러오는 중...</p>
             ) : isError ? (
-              <p className="px-4 py-10 text-center text-sm text-[#6b6b6b]">
+              <p className="px-4 py-10 text-center text-sm text-neutral-700">
                 알림을 불러오지 못했습니다.
               </p>
             ) : notifications.length === 0 ? (
-              <p className="px-4 py-10 text-center text-sm text-[#6b6b6b]">알림이 없습니다.</p>
+              <p className="px-4 py-10 text-center text-sm text-neutral-700">알림이 없습니다.</p>
             ) : (
               <div className="flex flex-col divide-y divide-[#f2f2f2]">
                 {notifications.map((item) => (
@@ -166,7 +166,7 @@ const NotificationBell = () => {
                     type="button"
                     onClick={() => fetchNextPage()}
                     disabled={isFetchingNextPage}
-                    className="py-3 text-center text-sm font-medium text-[#6b6b6b] transition-colors hover:bg-[#f6f6f6] disabled:opacity-50"
+                    className="py-3 text-center text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 disabled:opacity-50"
                   >
                     {isFetchingNextPage ? '불러오는 중...' : '더 보기'}
                   </button>

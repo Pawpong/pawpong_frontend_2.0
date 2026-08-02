@@ -54,7 +54,7 @@ const ProfileImageUpload = ({ value, onChange, className }: ProfileImageUploadPr
         type="button"
         onClick={() => inputRef.current?.click()}
         disabled={isPending}
-        className="flex size-[5rem] items-center justify-center overflow-hidden rounded-full bg-[#a6a6a6] disabled:opacity-60 tab:size-[6.25rem]"
+        className="flex size-[5rem] items-center justify-center overflow-hidden rounded-full bg-neutral-500 disabled:opacity-60 tab:size-[6.25rem]"
       >
         {shownImage ? (
           // 사용자가 고른 파일(blob)·CDN URL 모두 표시 — next/image는 blob 미지원이라 img 사용
@@ -71,7 +71,7 @@ const ProfileImageUpload = ({ value, onChange, className }: ProfileImageUploadPr
         className="hidden"
         onChange={handleFileChange}
       />
-      {isPending && <p className="text-[0.75rem] text-[#6b6b6b]">업로드 중...</p>}
+      {isPending && <p className="text-[0.75rem] text-neutral-700">업로드 중...</p>}
       {error && <HelpMessage status="error">{error}</HelpMessage>}
     </div>
   )

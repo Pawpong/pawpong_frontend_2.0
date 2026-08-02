@@ -40,15 +40,15 @@ const AdoptionDetailContent = ({ detail, isOwner }: AdoptionDetailContentProps) 
       {/* ── 네비게이션 바 ── 피그마 976:25819: 뒤로가기 + 가운데 정렬 제목 + 더보기(케밥) px-16 py-4 */}
       <div className="flex items-center px-[1rem] py-[0.25rem] pc:hidden">
         <button type="button" onClick={() => router.back()}>
-          <ArrowBackIcon className="size-[1.5rem] text-[#3e3e3e]" />
+          <ArrowBackIcon className="size-[1.5rem] text-neutral-850" />
         </button>
         <div className="flex min-w-px flex-1 items-center justify-center p-[0.125rem]">
-          <p className="text-[0.875rem] leading-[1.5] font-semibold whitespace-nowrap text-[#3e3e3e]">
+          <p className="text-[0.875rem] leading-[1.5] font-semibold whitespace-nowrap text-neutral-850">
             {detail.name}
           </p>
         </div>
         <button type="button">
-          <MoreVertIcon className="size-[1.5rem] text-[#3e3e3e]" />
+          <MoreVertIcon className="size-[1.5rem] text-neutral-850" />
         </button>
       </div>
 
@@ -80,7 +80,7 @@ const AdoptionDetailContent = ({ detail, isOwner }: AdoptionDetailContentProps) 
       <Section>
         <Separator className="bg-[#d4d4d4]" />
         <div className="mt-[1rem] flex flex-col gap-[0.75rem] pc:mx-auto pc:mt-[3rem] pc:max-w-[57.5rem] pc:gap-[2.4375rem]">
-          <p className="text-[0.75rem] leading-[1.375rem] font-medium text-[#5d5d5d] pc:text-[1.25rem] pc:font-semibold pc:text-[#3e3e3e]">
+          <p className="text-[0.75rem] leading-[1.375rem] font-medium text-[#5d5d5d] pc:text-[1.25rem] pc:font-semibold pc:text-neutral-850">
             브리더의 다른 분양건 {detail.otherListings.length}
           </p>
           {detail.otherListings.map((listing) => (

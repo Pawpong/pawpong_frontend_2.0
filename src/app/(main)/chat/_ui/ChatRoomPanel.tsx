@@ -42,7 +42,7 @@ const ChatRoomPanel = ({ room, onBack }: ChatRoomPanelProps) => {
   }, [messages.length])
 
   return (
-    <div className="flex h-[calc(100dvh-4rem)] flex-col bg-[#ededed]">
+    <div className="flex h-[calc(100dvh-4rem)] flex-col bg-neutral-100">
       {/* [refactored] 헤더 JSX를 ChatRoomHeader 컴포넌트로 추출 */}
       <ChatRoomHeader
         displayName={displayName}

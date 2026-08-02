@@ -1,4 +1,5 @@
 import { cn } from '@/shared/lib/cn'
+import { PAGE_WIDTH_CLASS } from '@/shared/config/layout'
 
 interface ContainerProps {
   children: React.ReactNode
@@ -7,12 +8,7 @@ interface ContainerProps {
 
 const Container = ({ children, className }: ContainerProps) => {
   return (
-    <div
-      className={cn(
-        'mx-auto w-full max-w-[90rem] px-[1.25rem] tab:px-[3rem] pc:px-[5rem]',
-        className,
-      )}
-    >
+    <div className={cn(PAGE_WIDTH_CLASS, 'px-[1.25rem] tab:px-[3rem] pc:px-[5rem]', className)}>
       {children}
     </div>
   )

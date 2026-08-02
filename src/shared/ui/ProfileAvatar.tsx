@@ -1,5 +1,5 @@
 import { cn } from '@/shared/lib/cn'
-import { PixelUserIcon } from '@/shared/assets/icons'
+import { PawIcon } from '@/shared/assets/icons' // [refactored] 빈 아바타 폴백 아이콘 유저글리프 → paw
 import { Avatar, AvatarFallback, AvatarImage } from './Avatar'
 
 interface ProfileAvatarProps {
@@ -26,15 +26,16 @@ const AVATAR_SIZE = {
 } as const
 
 /**
- * 프로필 아바타 — 사진 있으면 이미지, 없으면 픽셀 유저 글리프 placeholder.
- * 색: 배경 #a6a6a6(icon/interactive/tertiary) · 글리프 #f6f6f6(text/interactive/invert)
+ * 프로필 아바타 — 사진 있으면 이미지, 없으면 paw 글리프 placeholder.
+ * 색: 배경 #ededed(bg/tertiary) · 글리프 #a6a6a6(icon/tertiary) — Figma 817-103336
  */
 const ProfileAvatar = ({ src, alt, size = 'small', className }: ProfileAvatarProps) => {
   return (
     <Avatar className={cn(AVATAR_SIZE[size].box, className)}>
       {src && <AvatarImage src={src} alt={alt} />}
-      <AvatarFallback className="bg-[#a6a6a6] text-[#f6f6f6]">
-        <PixelUserIcon className={AVATAR_SIZE[size].glyph} />
+      {/* [refactored] PixelUserIcon → PawIcon, 색 #ededed/#a6a6a6 (Figma) */}
+      <AvatarFallback className="bg-neutral-100 text-neutral-500">
+        <PawIcon className={AVATAR_SIZE[size].glyph} />
       </AvatarFallback>
     </Avatar>
   )

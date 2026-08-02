@@ -233,7 +233,7 @@ const ProfileEditContent = () => {
               <Button variant="fill" className="w-full" onClick={requestChange}>
                 사진 변경
               </Button>
-              <span className="text-base leading-[1.5] font-semibold text-[#3e3e3e]">
+              <span className="text-base leading-[1.5] font-semibold text-neutral-850">
                 기본 프로필
               </span>
             </div>
@@ -249,10 +249,10 @@ const ProfileEditContent = () => {
                 maxLength={NAME_MAX_LENGTH} // [refactored]
                 placeholder="입력해보세요"
                 readOnly={isBreeder}
-                className={isBreeder ? 'cursor-default focus:border-[#e4e4e4]' : undefined}
+                className={isBreeder ? 'cursor-default focus:border-neutral-150' : undefined}
               />
               {!isBreeder && (
-                <p className="mt-1 self-end text-[0.625rem] leading-[1.5] font-medium text-[#6b6b6b]">
+                <p className="mt-1 self-end text-[0.625rem] leading-[1.5] font-medium text-neutral-700">
                   {name.length}/{NAME_MAX_LENGTH} {/* [refactored] */}
                 </p>
               )}
@@ -272,7 +272,7 @@ const ProfileEditContent = () => {
             {!isBreeder && (
               <InputField label="소셜 로그인">
                 {/* 표시 전용 — readOnly(수정X) + tabIndex/-1·focus 보더 중립화(focus X) */}
-                <Input value={email} readOnly className="cursor-default focus:border-[#e4e4e4]" />
+                <Input value={email} readOnly className="cursor-default focus:border-neutral-150" />
               </InputField>
             )}
           </div>

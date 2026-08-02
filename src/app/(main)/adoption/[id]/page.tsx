@@ -19,7 +19,7 @@ const AdoptionDetailPage = () => {
   if (isLoading) {
     return (
       <Container className="flex min-h-screen items-center justify-center py-10">
-        <p className="text-sm text-[#6b6b6b]">불러오는 중...</p>
+        <p className="text-sm text-neutral-700">불러오는 중...</p>
       </Container>
     )
   }
@@ -27,7 +27,7 @@ const AdoptionDetailPage = () => {
   if (isError || !data) {
     return (
       <Container className="flex min-h-screen items-center justify-center py-10">
-        <p className="text-sm text-[#6b6b6b]">분양글을 불러오지 못했습니다.</p>
+        <p className="text-sm text-neutral-700">분양글을 불러오지 못했습니다.</p>
       </Container>
     )
   }

@@ -19,8 +19,8 @@ const ChatRoomItem = ({ room, isActive, unreadCount = 0, onClick }: ChatRoomItem
   return (
     <div
       className={cn(
-        'flex items-start justify-between p-2 hover:bg-[#ededed] tab:p-3',
-        isActive && 'bg-[#ededed]',
+        'flex items-start justify-between p-2 hover:bg-neutral-100 tab:p-3',
+        isActive && 'bg-neutral-100',
       )}
     >
       <button type="button" onClick={onClick} className="flex min-w-0 items-center gap-4 text-left">
@@ -29,22 +29,22 @@ const ChatRoomItem = ({ room, isActive, unreadCount = 0, onClick }: ChatRoomItem
           <ProfileAvatar size="responsive" />
           <div className="flex min-w-0 flex-col">
             <div className="flex items-center gap-2">
-              <span className="text-body-s font-semibold text-[#3e3e3e]">{displayName}</span>
+              <span className="text-body-s font-semibold text-neutral-850">{displayName}</span>
               <RelativeTime dateStr={room.lastMessageAt} />
             </div>
-            <p className="max-w-[21.625rem] truncate text-sm leading-[1.5] font-semibold text-[#3e3e3e]">
+            <p className="max-w-[21.625rem] truncate text-sm leading-[1.5] font-semibold text-neutral-850">
               {room.lastMessage ?? ''}
             </p>
           </div>
         </div>
         {unreadCount > 0 && (
-          <span className="flex h-5 shrink-0 items-center justify-center rounded-full bg-[#d63d4a] px-2 text-sm leading-[1.5] font-normal text-white">
+          <span className="flex h-5 shrink-0 items-center justify-center rounded-full bg-error-500 px-2 text-sm leading-[1.5] font-normal text-white">
             {unreadCount}
           </span>
         )}
       </button>
       <button type="button" aria-label="더보기" className="shrink-0">
-        <MoreVertIcon className="size-6 text-[#3e3e3e]" />
+        <MoreVertIcon className="size-6 text-neutral-850" />
       </button>
     </div>
   )

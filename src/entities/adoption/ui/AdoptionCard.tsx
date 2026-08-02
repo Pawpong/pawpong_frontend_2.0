@@ -17,7 +17,7 @@ const STATUS_BADGE_VARIANT: Record<AdoptionListingCard['status'], 'active' | 'di
 }
 
 // [refactored] 세로형 카드 제목 공통 클래스 (모바일/태블릿 — 사이즈만 각 카드에서 cn으로 덧붙임)
-const CARD_TITLE_BASE = 'line-clamp-2 leading-[1.5] font-semibold text-[#3e3e3e]'
+const CARD_TITLE_BASE = 'line-clamp-2 leading-[1.5] font-semibold text-neutral-850'
 
 interface AdoptionCardProps {
   listing: AdoptionListingCard
@@ -37,14 +37,14 @@ const CardImage = ({
   isCompleted: boolean
   className?: string
 }) => (
-  <div className={cn('relative aspect-[348/284] w-full overflow-hidden bg-[#6b6b6b]', className)}>
+  <div className={cn('relative aspect-[348/284] w-full overflow-hidden bg-neutral-700', className)}>
     <Image src={listing.thumbnailUrl} alt={listing.name} fill className="object-cover" />
     {isCompleted && <div className="absolute inset-0 bg-white/70" />}
     {/* 인기(bestBadge) 좌상단 배지 — Figma 796-81671 (mo 14px/py-2 · tab 16px/py-4) */}
     {listing.isPopular && (
       <Badge
         variant="outline"
-        className="absolute top-[0.6875rem] left-[0.6875rem] bg-white px-2 py-0.5 text-sm leading-[1.5] font-medium text-[#6b6b6b] tab:top-[0.875rem] tab:left-[0.9219rem] tab:py-1 tab:text-base"
+        className="absolute top-[0.6875rem] left-[0.6875rem] bg-white px-2 py-0.5 text-sm leading-[1.5] font-medium text-neutral-700 tab:top-[0.875rem] tab:left-[0.9219rem] tab:py-1 tab:text-base"
       >
         인기
       </Badge>
@@ -119,7 +119,7 @@ const AdoptionCard = ({ listing, className, isFavorite, onToggle }: AdoptionCard
           {/* 하단: 문의/관심/조회 */}
           <CardStats
             listing={listing}
-            className="gap-[0.25rem] text-[0.75rem] leading-[1.5] whitespace-nowrap text-[#6b6b6b]"
+            className="gap-[0.25rem] text-[0.75rem] leading-[1.5] whitespace-nowrap text-neutral-700"
           />
         </div>
       </div>
@@ -141,7 +141,7 @@ const AdoptionCard = ({ listing, className, isFavorite, onToggle }: AdoptionCard
             </p>
             <CardStats
               listing={listing}
-              className="gap-[0.5rem] text-[0.875rem] leading-[1.5] text-[#6b6b6b]"
+              className="gap-[0.5rem] text-[0.875rem] leading-[1.5] text-neutral-700"
             />
           </div>
           {/* 우측: 상태배지(상단, 다크) + 관심있어요(하단, 하트+텍스트) */}
@@ -152,7 +152,7 @@ const AdoptionCard = ({ listing, className, isFavorite, onToggle }: AdoptionCard
               size="md"
               isFavorite={isFavorite}
               onToggle={onToggle}
-              className="p-0 text-[0.75rem] font-semibold text-[#3e3e3e]"
+              className="p-0 text-[0.75rem] font-semibold text-neutral-850"
               iconClassName="size-8"
             />
           </div>

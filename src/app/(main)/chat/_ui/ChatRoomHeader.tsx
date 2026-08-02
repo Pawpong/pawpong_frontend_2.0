@@ -20,17 +20,17 @@ const ChatRoomHeader = ({ displayName, hasApplication, onBack }: ChatRoomHeaderP
         <div className="flex items-center gap-5">
           <div className="flex items-center gap-1">
             <button type="button" onClick={onBack} className="shrink-0" aria-label="뒤로 가기">
-              <ArrowBackIcon className="size-8 text-[#6b6b6b]" />
+              <ArrowBackIcon className="size-8 text-neutral-700" />
             </button>
             <div className="flex items-center gap-2">
               <ProfileAvatar size="responsive" />
-              <span className="text-body-s font-semibold text-[#3e3e3e]">{displayName}</span>
+              <span className="text-body-s font-semibold text-neutral-850">{displayName}</span>
             </div>
           </div>
           {hasApplication && <Badge variant="active">애정도</Badge>}
         </div>
         <button type="button" className="shrink-0" aria-label="더보기">
-          <MoreVertIcon className="size-6 text-[#3e3e3e]" />
+          <MoreVertIcon className="size-6 text-neutral-850" />
         </button>
       </div>
     </div>

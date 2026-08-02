@@ -212,7 +212,7 @@ const ProfileStep = () => {
                   disabled={!isCodeSent || isPhoneVerified}
                 />
                 {isCodeSent && !isPhoneVerified && (
-                  <span className="absolute top-1/2 right-3 -translate-y-1/2 text-[0.875rem] font-medium text-[#3e3e3e]">
+                  <span className="absolute top-1/2 right-3 -translate-y-1/2 text-[0.875rem] font-medium text-neutral-850">
                     {formatTimer(secondsLeft)}
                   </span>
                 )}

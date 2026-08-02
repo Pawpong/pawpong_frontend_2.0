@@ -24,7 +24,7 @@ type SocialProvider = 'kakao' | 'naver' | 'google'
 const SOCIAL_BUTTONS: { provider: SocialProvider; label: string; className: string }[] = [
   { provider: 'kakao', label: '카카오로 시작하기', className: 'bg-[#FEE500] text-black' },
   { provider: 'naver', label: '네이버로 시작하기', className: 'bg-[#03C75A] text-white' },
-  { provider: 'google', label: '구글로 시작하기', className: 'border border-[#cacaca] bg-white' },
+  { provider: 'google', label: '구글로 시작하기', className: 'border border-neutral-300 bg-white' },
 ]
 
 const getApiBaseUrl = () => {

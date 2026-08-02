@@ -32,22 +32,22 @@ const FavoriteBreedersContent = () => {
       {/* 모바일 전용: 나만 보기 버튼 (디자인 1023-39468 · 1023-39688) */}
       {/* ponytail: 필터 동작 미연결, 실데이터 붙을 때 드롭다운 연결 */}
       <div className="px-4 pt-5 tab:hidden">
-        <button type="button" className="flex h-10 items-center gap-1 rounded-lg bg-[#3e3e3e] px-2">
-          <span className="text-base leading-[1.5] font-semibold text-[#f6f6f6]">나만 보기</span>
-          <ChevronIcon className="size-4 text-[#f6f6f6]" />
+        <button type="button" className="flex h-10 items-center gap-1 rounded-lg bg-neutral-850 px-2">
+          <span className="text-base leading-[1.5] font-semibold text-neutral-50">나만 보기</span>
+          <ChevronIcon className="size-4 text-neutral-50" />
         </button>
       </div>
 
       {/* 디자인(1023-38692): 모바일 2열 / PC 4열, gap-20. PC는 1188px로 묶어 가운데 정렬 */}
       <Container className="px-4 py-5 tab:py-10 pc:pb-27">
         {isLoading ? (
-          <p className="py-10 text-center text-sm text-[#6b6b6b]">불러오는 중...</p>
+          <p className="py-10 text-center text-sm text-neutral-700">불러오는 중...</p>
         ) : isError ? (
-          <p className="py-10 text-center text-sm text-[#6b6b6b]">
+          <p className="py-10 text-center text-sm text-neutral-700">
             즐겨찾는 브리더를 불러오지 못했습니다.
           </p>
         ) : breeders.length === 0 ? (
-          <p className="py-10 text-center text-sm text-[#6b6b6b]">즐겨찾는 브리더가 없습니다.</p>
+          <p className="py-10 text-center text-sm text-neutral-700">즐겨찾는 브리더가 없습니다.</p>
         ) : (
           <>
             <div className="grid grid-cols-2 gap-x-2.5 gap-y-4 tab:grid-cols-3 tab:gap-5 pc:mx-auto pc:max-w-[74.25rem] pc:grid-cols-4">

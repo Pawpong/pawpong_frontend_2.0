@@ -19,7 +19,7 @@ const InputField = ({ label, required, error, className, children }: InputFieldP
       </TextLabel>
     )}
     {children}
-    {error && <p className="mt-1 text-xs text-[#d63d4a]">{error}</p>}
+    {error && <p className="mt-1 text-xs text-error-500">{error}</p>}
   </div>
 )
 

@@ -19,6 +19,7 @@
 *.pem
 .claude/
 CLAUDE.md
+AGENT.md
 
 # debug
 npm-debug.log*

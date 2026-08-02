@@ -28,7 +28,7 @@ const HomeTabs = ({ tabs, activeTab, onTabChange, children, stickyTop }: HomeTab
       {/* 공통 TabBar (디자인 976-32388 / 마이홈 2046-160969) — 모바일 medium / 탭·PC large */}
       {/* 스크롤 시 GNB(+navbar) 아래 고정(sticky) — tab+만, 모바일은 비고정 */}
       <div
-        className="w-full border-b border-[#cacaca] bg-white px-4 pt-3 tab:sticky tab:z-30 tab:px-12 tab:pt-4 pc:px-20"
+        className="w-full border-b border-neutral-300 bg-white px-4 pt-3 tab:sticky tab:z-30 tab:px-12 tab:pt-4 pc:px-20"
         style={{ top }}
       >
         <TabsList variant="underline">

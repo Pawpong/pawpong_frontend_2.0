@@ -37,7 +37,7 @@ const BreederExploreContent = ({ selectedCategory }: { selectedCategory: AnimalC
   if (isLoading) {
     return (
       <Container className="flex items-center justify-center py-10">
-        <p className="text-sm text-[#6b6b6b]">불러오는 중...</p>
+        <p className="text-sm text-neutral-700">불러오는 중...</p>
       </Container>
     )
   }
@@ -45,7 +45,7 @@ const BreederExploreContent = ({ selectedCategory }: { selectedCategory: AnimalC
   if (isError) {
     return (
       <Container className="flex items-center justify-center py-10">
-        <p className="text-sm text-[#6b6b6b]">브리더를 불러오지 못했습니다.</p>
+        <p className="text-sm text-neutral-700">브리더를 불러오지 못했습니다.</p>
       </Container>
     )
   }
@@ -68,12 +68,12 @@ const BreederExploreContent = ({ selectedCategory }: { selectedCategory: AnimalC
       {/* 전체 브리더 소식 — 전체 입양 소식과 동일 그리드 */}
       <Container className={EXPLORE_SECTION_CONTAINER}>
         {breeders.length === 0 ? (
-          <p className="py-10 text-center text-sm text-[#6b6b6b]">등록된 브리더가 없습니다.</p>
+          <p className="py-10 text-center text-sm text-neutral-700">등록된 브리더가 없습니다.</p>
         ) : (
           <ExploreListingSection
             title="전체 브리더 소식"
             items={breeders}
-            count={totalCount}
+            totalCount={totalCount}
             getKey={(breeder) => breeder.id}
             renderCard={(breeder) => <BreederCard breeder={breeder} />}
           />

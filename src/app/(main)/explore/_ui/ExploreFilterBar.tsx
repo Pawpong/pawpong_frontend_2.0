@@ -15,7 +15,7 @@ interface ExploreFilterBarProps {
 
 // [refactored] 반복되던 pill 베이스 / 검색 라벨 스타일 상수화
 const PILL_BASE = 'flex h-8 items-center rounded-full border bg-white'
-const SEARCH_TEXT = 'text-[0.875rem] font-semibold text-[#6b6b6b]'
+const SEARCH_TEXT = 'text-[0.875rem] font-semibold text-neutral-700'
 
 /* ═══════════════════════════════════════════════
    탭/모바일 카테고리 + 검색 한 줄 (Figma 1652-75035 / 1652-81824)
@@ -31,7 +31,7 @@ const ExploreFilterBar = ({ selected, onChange, className }: ExploreFilterBarPro
   const searchContent = (
     <>
       <span className={SEARCH_TEXT}>검색</span>
-      <SearchIcon className="size-5 shrink-0 text-[#6b6b6b]" />
+      <SearchIcon className="size-5 shrink-0 text-neutral-700" />
     </>
   )
 
@@ -45,7 +45,7 @@ const ExploreFilterBar = ({ selected, onChange, className }: ExploreFilterBarPro
             onClick={() => setSearchExpanded(false)}
             className={cn(
               PILL_BASE,
-              'shrink-0 gap-1 border-[#cacaca] px-2 text-[0.875rem] font-semibold whitespace-nowrap text-[#3e3e3e]',
+              'shrink-0 gap-1 border-neutral-300 px-2 text-[0.875rem] font-semibold whitespace-nowrap text-neutral-850',
             )}
           >
             <Image
@@ -62,28 +62,30 @@ const ExploreFilterBar = ({ selected, onChange, className }: ExploreFilterBarPro
           <div
             className={cn(
               PILL_BASE,
-              'min-w-0 flex-1 justify-between gap-2 border-[#a6a6a6] px-2 focus-within:border-[#256ef4]',
+              'min-w-0 flex-1 justify-between gap-2 border-neutral-500 px-2 focus-within:border-info-500',
             )}
           >
             <input
               autoFocus
               type="text"
               placeholder="검색"
-              className="min-w-0 flex-1 bg-transparent text-[0.875rem] font-semibold text-[#3e3e3e] outline-none placeholder:text-[#6b6b6b]"
+              className="min-w-0 flex-1 bg-transparent text-[0.875rem] font-semibold text-neutral-850 outline-none placeholder:text-neutral-700"
             />
-            <SearchIcon className="size-5 shrink-0 text-[#6b6b6b]" />
+            <SearchIcon className="size-5 shrink-0 text-neutral-700" />
           </div>
         </>
       ) : (
         <>
-          {/* 카테고리 칩 — 공통 Badge(default/active) */}
+          {/* 카테고리 칩 — 공통 Badge(primary 채움/아웃라인, Figma 1652-81786) */}
           <div className="flex flex-wrap items-center gap-2">
             {ANIMAL_CATEGORIES.map((category) => (
               <button
                 key={category}
                 type="button"
                 onClick={() => onChange(category)}
-                className={badgeVariants({ variant: selected === category ? 'active' : 'default' })}
+                className={badgeVariants({
+                  variant: selected === category ? 'primaryFilled' : 'primaryOutline',
+                })}
               >
                 {CATEGORY_LABEL[category]}
               </button>
@@ -96,7 +98,7 @@ const ExploreFilterBar = ({ selected, onChange, className }: ExploreFilterBarPro
             onClick={() => setSearchExpanded(true)}
             className={cn(
               PILL_BASE,
-              'max-w-[18.75rem] shrink-0 justify-center gap-0 border-[#a6a6a6] p-2 whitespace-nowrap',
+              'max-w-[18.75rem] shrink-0 justify-center gap-0 border-neutral-500 p-2 whitespace-nowrap',
             )}
           >
             {searchContent}

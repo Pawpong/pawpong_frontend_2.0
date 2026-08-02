@@ -12,6 +12,7 @@ interface SectionHeaderProps {
   subtitle?: string
   linkText?: string
   linkHref?: string
+  className?: string
   /** 타이틀 텍스트 스타일 오버라이드 (색·크기·굵기 등) */
   titleClassName?: string
   /** PC 우측에 렌더링할 커스텀 요소 */
@@ -27,6 +28,7 @@ const SectionHeader = ({
   subtitle,
   linkText,
   linkHref,
+  className,
   titleClassName,
   rightSlot,
   collapsible,
@@ -34,7 +36,7 @@ const SectionHeader = ({
   onToggle,
 }: SectionHeaderProps) => {
   return (
-    <div className="flex flex-col gap-0.5 tab:gap-1">
+    <div className={cn('flex flex-col gap-0.5 tab:gap-1', className)}>
       <div className="flex items-center justify-between">
         {/* [refactored] 타이틀 스타일을 공통 TextLabel 토큰(p-2px·600·#3e3e3e)에 위임 */}
         <p

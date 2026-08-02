@@ -9,13 +9,13 @@ const FieldLabel = ({ title, size = 'md' }: { title: string; size?: 'md' | 'lg' 
   <div className="flex items-center gap-1">
     <span
       className={cn(
-        'leading-[1.5] font-semibold text-[#3e3e3e]',
+        'leading-[1.5] font-semibold text-neutral-850',
         size === 'lg' ? 'text-sm pc:text-base' : 'text-sm',
       )}
     >
       {title}
     </span>
-    <span className="text-sm leading-[1.5] font-medium text-[#6b6b6b]">필수</span>
+    <span className="text-sm leading-[1.5] font-medium text-neutral-700">필수</span>
   </div>
 )
 
@@ -39,8 +39,8 @@ const LabeledField = ({
 
 // 읽기 전용 입력 (입양하는 동물) — border #e4e4e4, h-45, rounded-8, p-12
 const ReadonlyInput = ({ value }: { value: string }) => (
-  <div className="flex h-[2.8125rem] items-center rounded-lg border border-[#e4e4e4] bg-white p-3">
-    <p className="text-sm leading-[1.5] font-medium text-[#3e3e3e]">{value}</p>
+  <div className="flex h-[2.8125rem] items-center rounded-lg border border-neutral-150 bg-white p-3">
+    <p className="text-sm leading-[1.5] font-medium text-neutral-850">{value}</p>
   </div>
 )
 
@@ -61,7 +61,7 @@ const CheckboxField = ({
       // [refactored] 브랜드 스타일이 공통 Checkbox 기본값으로 이동 — 커스텀 className 제거
       <label className="flex w-full cursor-pointer items-center gap-1.5">
         <Checkbox checked={!!field.value} onCheckedChange={(v) => field.onChange(v === true)} />
-        <span className="flex-1 text-sm leading-[1.5] font-medium text-[#3e3e3e] pc:text-base">
+        <span className="flex-1 text-sm leading-[1.5] font-medium text-neutral-850 pc:text-base">
           {label}
         </span>
       </label>
@@ -78,7 +78,7 @@ const CancelButton = ({ onClick, className }: { onClick: () => void; className?:
   <button
     type="button"
     onClick={onClick}
-    className={cn(CTA_BUTTON_BASE, 'border border-[#cacaca] text-[#3e3e3e]', className)}
+    className={cn(CTA_BUTTON_BASE, 'border border-neutral-300 text-neutral-850', className)}
   >
     <span className="pc:hidden">신청 취소</span>
     <span className="hidden pc:inline">신청 취소하기</span>
@@ -101,7 +101,7 @@ const SubmitButton = ({
     className={cn(
       CTA_BUTTON_BASE,
       'transition-colors',
-      isValid && !isPending ? 'bg-[#fffa94] text-[#3e3e3e]' : 'bg-[#d4d4d4] text-[#5d5d5d]',
+      isValid && !isPending ? 'bg-[#fffa94] text-neutral-850' : 'bg-[#d4d4d4] text-[#5d5d5d]',
       className,
     )}
   >

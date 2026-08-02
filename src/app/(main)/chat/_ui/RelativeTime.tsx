@@ -20,7 +20,7 @@ const RelativeTime = ({ dateStr, className }: RelativeTimeProps) => {
 
   return (
     <span
-      className={cn('shrink-0 text-xs leading-[1.5] font-medium text-[#6b6b6b]', className)}
+      className={cn('shrink-0 text-xs leading-[1.5] font-medium text-neutral-700', className)}
       suppressHydrationWarning
     >
       {label}

@@ -18,7 +18,7 @@ interface NavigationBarProps {
 
 /** 서브 페이지 상단바 (가운데 정렬 타이틀 + 옵션 뒤로가기/오른쪽 액션) — Figma node 976:25817 · 2046:160967 */
 const NavigationBar = ({ title, backHref, onBack, right, className }: NavigationBarProps) => {
-  const backIcon = <ArrowBackIcon className="size-6 text-[#3e3e3e]" />
+  const backIcon = <ArrowBackIcon className="size-6 text-neutral-850" />
   // [refactored] 중첩 삼항/중복 조건을 명명 조건으로
   const hasBack = Boolean(onBack || backHref)
 

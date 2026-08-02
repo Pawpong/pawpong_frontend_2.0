@@ -45,11 +45,11 @@ const MyListingsContent = () => {
         </div>
 
         {isLoading ? (
-          <p className="py-10 text-center text-sm text-[#6b6b6b]">불러오는 중...</p>
+          <p className="py-10 text-center text-sm text-neutral-700">불러오는 중...</p>
         ) : isError ? (
-          <p className="py-10 text-center text-sm text-[#6b6b6b]">분양글을 불러오지 못했습니다.</p>
+          <p className="py-10 text-center text-sm text-neutral-700">분양글을 불러오지 못했습니다.</p>
         ) : filteredListings.length === 0 ? (
-          <p className="py-10 text-center text-sm text-[#6b6b6b]">등록된 분양글이 없습니다.</p>
+          <p className="py-10 text-center text-sm text-neutral-700">등록된 분양글이 없습니다.</p>
         ) : isGroupedView && groupedByDate ? (
           /* 예약중: 날짜 그룹 + 가로형 리스트 */
           <div className="flex flex-col gap-3 py-5 tab:gap-[3.787rem] tab:py-8">

@@ -1,6 +1,6 @@
 'use client'
 
-import { AdoptionCard, AdoptionCardHorizontal } from '@/entities/adoption'
+import { AdoptionCard, AdoptionCardHorizontal, AdoptionShowcaseCard } from '@/entities/adoption'
 import type { AdoptionListingCard } from '@/shared/types'
 import { useToggleAdoptionFavorite } from '../api/adoption.mutations'
 
@@ -15,7 +15,7 @@ interface FavoriteAdoptionCardProps {
  */
 // [refactored] 세로형/가로형 래퍼가 렌더 카드만 다르고 훅·prop 주입이 동일 → 팩토리로 통합
 const createFavoriteCard = (
-  Card: typeof AdoptionCard | typeof AdoptionCardHorizontal,
+  Card: typeof AdoptionCard | typeof AdoptionCardHorizontal | typeof AdoptionShowcaseCard,
   displayName: string,
 ) => {
   const FavoriteCard = ({ listing, className }: FavoriteAdoptionCardProps) => {
@@ -42,5 +42,9 @@ const FavoriteAdoptionCardHorizontal = createFavoriteCard(
   AdoptionCardHorizontal,
   'FavoriteAdoptionCardHorizontal',
 )
+const FavoriteAdoptionShowcaseCard = createFavoriteCard(
+  AdoptionShowcaseCard,
+  'FavoriteAdoptionShowcaseCard',
+)
 
-export { FavoriteAdoptionCard, FavoriteAdoptionCardHorizontal }
+export { FavoriteAdoptionCard, FavoriteAdoptionCardHorizontal, FavoriteAdoptionShowcaseCard }

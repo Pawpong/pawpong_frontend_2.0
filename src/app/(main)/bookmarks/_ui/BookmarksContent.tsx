@@ -36,7 +36,7 @@ const BookmarksContent = () => {
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         {/* 공통 TabBar (디자인 976-32388) — 모바일 medium / 탭·PC large
             border는 풀폭, 탭 목록은 Container(mx-auto max-w)로 가운데 정렬 */}
-        <div className="w-full border-b border-[#cacaca] bg-white">
+        <div className="w-full border-b border-neutral-300 bg-white">
           <Container className="pt-3 tab:pt-4">
             <TabsList variant="underline">
               {BOOKMARK_TABS.map((tab) => (

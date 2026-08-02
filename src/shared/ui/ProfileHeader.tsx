@@ -54,10 +54,10 @@ const ProfileHeader = ({
       />
       <div className="flex min-w-0 flex-1 flex-col justify-center">
         <div className="flex items-center gap-0.5 p-0.5 tab:gap-1 pc:gap-2">
-          <span className={cn('truncate font-semibold text-[#3e3e3e]', NAME_SIZE[type])}>
+          <span className={cn('truncate font-semibold text-neutral-850', NAME_SIZE[type])}>
             {nickname}
           </span>
-          <span className={cn('shrink-0 leading-[1.5] font-medium text-[#6b6b6b]', timeSize)}>
+          <span className={cn('shrink-0 leading-[1.5] font-medium text-neutral-700', timeSize)}>
             {createdAt}
           </span>
         </div>
@@ -65,18 +65,20 @@ const ProfileHeader = ({
           <div className="flex items-center gap-0.5">
             <p
               className={cn(
-                'min-w-0 flex-1 truncate leading-[1.5] font-semibold text-[#3e3e3e]',
+                'min-w-0 flex-1 truncate leading-[1.5] font-semibold text-neutral-850',
                 previewSize,
               )}
             >
               {preview}
             </p>
-            <span className={cn('shrink-0 leading-[1.5] font-medium text-[#6b6b6b]', previewSize)}>
+            <span
+              className={cn('shrink-0 leading-[1.5] font-medium text-neutral-700', previewSize)}
+            >
               [더보기]
             </span>
           </div>
         ) : (
-          <p className={cn('truncate leading-[1.5] font-semibold text-[#3e3e3e]', previewSize)}>
+          <p className={cn('truncate leading-[1.5] font-semibold text-neutral-850', previewSize)}>
             {preview}
           </p>
         )}
@@ -95,14 +97,14 @@ const ProfileHeader = ({
           profile
         )}
         {badgeCount !== undefined && (
-          <span className="flex h-5 shrink-0 items-center justify-center rounded-full bg-[#d63d4a] px-2 text-sm leading-[1.5] text-white">
+          <span className="flex h-5 shrink-0 items-center justify-center rounded-full bg-error-500 px-2 text-sm leading-[1.5] text-white">
             {badgeCount}
           </span>
         )}
       </div>
       <button type="button" aria-label="더보기" onClick={onMore} className="shrink-0">
         {/* 쇼케이스는 가로 더보기(⋯) — 세로 아이콘 90도 회전 재사용 */}
-        <MoreVertIcon className={cn('size-6 text-[#3e3e3e]', isShowcase && 'rotate-90')} />
+        <MoreVertIcon className={cn('size-6 text-neutral-850', isShowcase && 'rotate-90')} />
       </button>
     </div>
   )

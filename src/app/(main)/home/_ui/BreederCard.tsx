@@ -37,8 +37,8 @@ const FavoriteStar = ({
     onClick={onClick}
     className={className}
   >
-    <PixelStarIcon className={cn(iconClassName, pressed ? 'text-[#fffa94]' : 'text-[#a6a6a6]')} />
-    {label && <span className="text-xs leading-[1.5] font-semibold text-[#3e3e3e]">{label}</span>}
+    <PixelStarIcon className={cn(iconClassName, pressed ? 'text-[#fffa94]' : 'text-neutral-500')} />
+    {label && <span className="text-xs leading-[1.5] font-semibold text-neutral-850">{label}</span>}
   </button>
 )
 
@@ -63,7 +63,7 @@ const BreederCard = ({ breeder, showPopularBadge }: BreederCardProps) => {
   return (
     <Link href={`/home/${breeder.id}`} className="flex flex-col">
       {/* 이미지: 인기 뱃지(좌상단) / 모바일 별(우하단) */}
-      <div className="relative aspect-[282/230] w-full overflow-hidden rounded bg-[#6b6b6b] tab:rounded-lg">
+      <div className="relative aspect-[282/230] w-full overflow-hidden rounded bg-neutral-700 tab:rounded-lg">
         {breeder.imageUrl && (
           <Image src={breeder.imageUrl} alt={breeder.nickname} fill className="object-cover" />
         )}
@@ -95,8 +95,8 @@ const BreederCard = ({ breeder, showPopularBadge }: BreederCardProps) => {
               {breeder.nickname}
             </TextLabel>
             <div className="flex items-center">
-              <LocationOnIcon className="size-6 shrink-0 text-[#6b6b6b]" />
-              <span className="truncate text-xs leading-[1.5] font-medium text-[#6b6b6b]">
+              <LocationOnIcon className="size-6 shrink-0 text-neutral-700" />
+              <span className="truncate text-xs leading-[1.5] font-medium text-neutral-700">
                 {breeder.location}
               </span>
             </div>

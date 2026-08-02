@@ -10,8 +10,8 @@ const pill = tv({
   base: 'flex h-8 items-center gap-1 rounded-full border bg-white px-3 py-2 whitespace-nowrap',
   variants: {
     active: {
-      false: 'w-auto justify-center border-[#a6a6a6]',
-      true: 'w-full max-w-[18.75rem] justify-between border-[#256ef4]',
+      false: 'w-auto justify-center border-neutral-500',
+      true: 'w-full max-w-[18.75rem] justify-between border-info-500',
     },
   },
   defaultVariants: { active: false },
@@ -49,10 +49,10 @@ const SearchButton = ({
           onKeyDown={(e) => e.key === 'Enter' && onSubmit?.()}
           onBlur={onBlur}
           placeholder="검색"
-          className="min-w-0 flex-1 bg-transparent text-sm leading-[1.5] font-semibold text-[#3e3e3e] outline-none placeholder:text-[#6b6b6b]"
+          className="min-w-0 flex-1 bg-transparent text-sm leading-[1.5] font-semibold text-neutral-850 outline-none placeholder:text-neutral-700"
         />
         <button type="button" onClick={() => onSubmit?.()} aria-label="검색">
-          <SearchIcon className="size-5 shrink-0 text-[#6b6b6b]" />
+          <SearchIcon className="size-5 shrink-0 text-neutral-700" />
         </button>
       </div>
     )
@@ -60,8 +60,8 @@ const SearchButton = ({
 
   return (
     <button type="button" onClick={onClick} className={cn(pill({ active: false }), className)}>
-      <span className="text-sm leading-[1.5] font-semibold text-[#a6a6a6]">검색</span>
-      <SearchIcon className="size-5 shrink-0 text-[#a6a6a6]" />
+      <span className="text-sm leading-[1.5] font-semibold text-neutral-500">검색</span>
+      <SearchIcon className="size-5 shrink-0 text-neutral-500" />
     </button>
   )
 }

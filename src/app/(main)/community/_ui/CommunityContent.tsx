@@ -11,7 +11,7 @@ import {
   Separator,
 } from '@/shared/ui'
 import { MOCK_COMMUNITY_POSTS } from '@/shared/mocks/community'
-import { PostCard, communityQueries, toPostCardProps } from '@/entities/community'
+import { PostCard, communityQueries, toCommunityPreviewProps } from '@/entities/community'
 
 const CommunityContent = () => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
@@ -53,12 +53,12 @@ const CommunityContent = () => {
           pc는 Figma(2063-215749) 기준 948px 고정 폭 가운데 정렬 */}
       <Container className="px-4 pb-10 tab:pb-16">
         <div className="mx-auto w-full pc:max-w-[59.25rem]">
-          <div className="flex min-w-0 flex-col gap-5 tab:gap-8 tab:rounded-lg tab:border tab:border-[#cacaca] tab:p-3">
+          <div className="flex min-w-0 flex-col gap-5 tab:gap-8 tab:rounded-lg tab:border tab:border-neutral-300 tab:p-3">
             {posts.map((post, index) => (
               <Fragment key={post.postId}>
                 {index > 0 && <Separator className="bg-border-light" />}
                 <PostCard
-                  {...toPostCardProps(post)}
+                  {...toCommunityPreviewProps(post)}
                   // ponytail: 목록 API에 댓글 미리보기 없음 — 상세(commentPreview) 생기면 교체. 댓글 있는 글만.
                   commentPreview={
                     post.commentCount > 0

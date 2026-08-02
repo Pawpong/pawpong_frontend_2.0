@@ -42,7 +42,7 @@ const ParentInfoCard = ({ detail, onImageClick }: ParentInfoCardProps) => {
             </button>
 
             {/* 배지(role + 성별 아이콘) + 이름/생일 */}
-            <div className="flex items-start gap-[0.5rem] text-[1rem] leading-[1.5] font-semibold text-[#3e3e3e]">
+            <div className="flex items-start gap-[0.5rem] text-[1rem] leading-[1.5] font-semibold text-neutral-850">
               <Badge variant="active" size="md" className="shrink-0">
                 {parent.role}
                 <GenderIcon

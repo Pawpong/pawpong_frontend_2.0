@@ -46,8 +46,8 @@ const AdoptionDetailHero = ({
         <div className="hidden items-end py-[0.625rem] pc:flex">
           {['홈', '입양', CATEGORY_LABEL[detail.category]].map((label, index) => (
             <Fragment key={label}>
-              {index > 0 && <ArrowRightIcon className="size-[1.5rem] text-[#6b6b6b]" />}
-              <span className="p-[0.125rem] text-[0.875rem] leading-[1.5] font-semibold text-[#6b6b6b]">
+              {index > 0 && <ArrowRightIcon className="size-[1.5rem] text-neutral-700" />}
+              <span className="p-[0.125rem] text-[0.875rem] leading-[1.5] font-semibold text-neutral-700">
                 {label}
               </span>
             </Fragment>
@@ -71,7 +71,7 @@ const AdoptionDetailHero = ({
                 alt={detail.breeder.nickname}
                 className="size-[2.5rem]"
               />
-              <p className="text-[1rem] leading-[1.5] font-semibold text-[#3e3e3e]">
+              <p className="text-[1rem] leading-[1.5] font-semibold text-neutral-850">
                 {detail.breeder.nickname}
               </p>
             </div>
@@ -79,7 +79,7 @@ const AdoptionDetailHero = ({
           </div>
           <Link
             href={`/home/${detail.breeder.id}`}
-            className="flex items-center gap-[0.125rem] px-[0.25rem] text-[0.875rem] leading-[1.5] font-semibold text-[#3e3e3e]"
+            className="flex items-center gap-[0.125rem] px-[0.25rem] text-[0.875rem] leading-[1.5] font-semibold text-neutral-850"
           >
             브리더홈
             <ArrowRightIcon className="size-[1.25rem]" />
@@ -121,7 +121,7 @@ const AdoptionDetailHero = ({
         <div className="flex w-full flex-col gap-[1.25rem]">
           {/* 이름 + 상태 배지(드롭다운) + 인기 배지 (피그마: body/2xl/bolder 24px) */}
           <div className="flex flex-wrap items-center gap-[0.4375rem] pc:gap-[0.5rem]">
-            <p className="text-[0.875rem] leading-[1.5] font-bold text-[#5d5d5d] pc:text-[1.5rem] pc:text-[#3e3e3e]">
+            <p className="text-[0.875rem] leading-[1.5] font-bold text-[#5d5d5d] pc:text-[1.5rem] pc:text-neutral-850">
               {detail.name}
             </p>
             {isOwner ? (
@@ -146,16 +146,16 @@ const AdoptionDetailHero = ({
             label="성별"
             value={GENDER_LABEL[detail.gender]}
             trailing={
-              <GenderIcon gender={detail.gender} className="size-[1.5rem] text-[#6b6b6b]" />
+              <GenderIcon gender={detail.gender} className="size-[1.5rem] text-neutral-700" />
             }
           />
 
           {/* 소개 (라벨 ↔ 내용 gap-4px, 내용 body/lg/bold 16px) */}
           <div className="flex flex-col gap-[0.25rem] text-[#5d5d5d]">
-            <p className="text-[0.75rem] leading-[1.5] font-medium pc:text-[1.25rem] pc:text-[#6b6b6b]">
+            <p className="text-[0.75rem] leading-[1.5] font-medium pc:text-[1.25rem] pc:text-neutral-700">
               소개
             </p>
-            <p className="text-[0.875rem] leading-[1.5] font-semibold whitespace-pre-wrap pc:text-[1rem] pc:text-[#3e3e3e]">
+            <p className="text-[0.875rem] leading-[1.5] font-semibold whitespace-pre-wrap pc:text-[1rem] pc:text-neutral-850">
               {detail.description}
             </p>
           </div>
@@ -215,11 +215,11 @@ const InfoItem = ({
   trailing?: ReactNode
 }) => (
   <div className="flex items-center gap-[0.75rem] text-[#5d5d5d]">
-    <p className="shrink-0 text-[0.75rem] leading-[1.5] font-medium pc:text-[1.25rem] pc:text-[#6b6b6b]">
+    <p className="shrink-0 text-[0.75rem] leading-[1.5] font-medium pc:text-[1.25rem] pc:text-neutral-700">
       {label}
     </p>
     <div className="flex items-center gap-[0.25rem]">
-      <p className="text-[0.875rem] leading-[1.5] font-semibold pc:text-[1.25rem] pc:text-[#3e3e3e]">
+      <p className="text-[0.875rem] leading-[1.5] font-semibold pc:text-[1.25rem] pc:text-neutral-850">
         {value}
       </p>
       {trailing}

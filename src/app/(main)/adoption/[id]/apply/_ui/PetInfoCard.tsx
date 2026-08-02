@@ -32,7 +32,7 @@ const PetInfoCard = ({ detail }: PetInfoCardProps) => {
           </div>
 
           {/* 우측 정보 — pc: 텍스트(좌) + 입양 상세보기(우하단) 가로 배치 (Figma 1862-173645) */}
-          <div className="flex min-w-px flex-1 flex-col justify-center self-stretch text-[#3e3e3e] pc:flex-row pc:items-end pc:gap-4">
+          <div className="flex min-w-px flex-1 flex-col justify-center self-stretch text-neutral-850 pc:flex-row pc:items-end pc:gap-4">
             <div className="flex min-w-0 flex-col gap-1 pc:h-full pc:flex-1 pc:justify-between pc:gap-0">
               {/* 상태 + 제목(제목은 pc에서만 같은 줄) */}
               <div className="flex items-center gap-4 whitespace-nowrap">
@@ -53,7 +53,7 @@ const PetInfoCard = ({ detail }: PetInfoCardProps) => {
             <div className="hidden shrink-0 pc:flex">
               <Link
                 href={`/adoption/${detail.listingId}`}
-                className="flex items-center rounded-md px-1 text-sm leading-normal font-semibold text-[#3e3e3e] transition-colors hover:bg-[#f6f6f6] active:bg-[#ededed]"
+                className="flex items-center rounded-md px-1 text-sm leading-normal font-semibold text-neutral-850 transition-colors hover:bg-neutral-50 active:bg-neutral-100"
               >
                 입양 상세보기
                 <ArrowRightIcon className="size-5" />

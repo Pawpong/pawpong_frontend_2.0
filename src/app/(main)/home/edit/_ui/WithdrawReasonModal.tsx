@@ -62,7 +62,7 @@ const WithdrawReasonModal = ({ open, onOpenChange, onNext }: WithdrawReasonModal
           aria-describedby={undefined}
           className="fixed top-1/2 left-1/2 z-50 flex w-[calc(100vw-2.5rem)] max-w-[19.5rem] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 rounded-xl bg-white p-5 data-[state=closed]:opacity-0 data-[state=open]:opacity-100 pc:max-w-[22.5rem]"
         >
-          <DialogPrimitive.Title className="text-center text-xl leading-normal font-semibold text-[#3e3e3e]">
+          <DialogPrimitive.Title className="text-center text-xl leading-normal font-semibold text-neutral-850">
             탈퇴하는 이유를 알려주세요
           </DialogPrimitive.Title>
 
@@ -80,12 +80,12 @@ const WithdrawReasonModal = ({ open, onOpenChange, onNext }: WithdrawReasonModal
                   className={cn(
                     'flex items-center justify-between gap-2 rounded-lg border px-3 py-2.5 text-left text-sm font-medium transition-colors',
                     selected
-                      ? 'border-[#3e3e3e] bg-[#f5f5f5] text-[#3e3e3e]'
-                      : 'border-[#e4e4e4] text-[#6b6b6b] hover:bg-[#f5f5f5]',
+                      ? 'border-neutral-850 bg-[#f5f5f5] text-neutral-850'
+                      : 'border-neutral-150 text-neutral-700 hover:bg-[#f5f5f5]',
                   )}
                 >
                   <span>{label}</span>
-                  {selected && <CheckIcon className="size-4 shrink-0 text-[#3e3e3e]" />}
+                  {selected && <CheckIcon className="size-4 shrink-0 text-neutral-850" />}
                 </button>
               )
             })}
@@ -102,7 +102,7 @@ const WithdrawReasonModal = ({ open, onOpenChange, onNext }: WithdrawReasonModal
                 state={otherReason.trim().length > 0 ? 'fill' : 'default'}
                 className="h-[5rem]"
               />
-              <p className="self-end text-[0.625rem] leading-[1.5] font-medium text-[#6b6b6b]">
+              <p className="self-end text-[0.625rem] leading-[1.5] font-medium text-neutral-700">
                 {otherReason.length}/{OTHER_REASON_MAX_LENGTH}
               </p>
             </div>

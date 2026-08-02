@@ -30,7 +30,7 @@ interface BottomSheetProps {
 
 // 시트 안 액션 텍스트 버튼 — 라벨/동작만 가변
 const sheetItemClass =
-  'flex w-full items-center justify-center px-2.5 py-4 text-base leading-[1.5] font-semibold text-[#3e3e3e] transition-colors hover:bg-[#ededed] active:bg-[#e4e4e4]'
+  'flex w-full items-center justify-center px-2.5 py-4 text-base leading-[1.5] font-semibold text-neutral-850 transition-colors hover:bg-neutral-100 active:bg-neutral-150'
 
 const BottomSheet = ({
   open,
@@ -51,13 +51,13 @@ const BottomSheet = ({
         )}
       >
         {/* 상단: 제목 + X 닫기 */}
-        <div className="flex items-center gap-2 border-b border-[#e4e4e4] px-4 pt-5 pb-2">
-          <DialogPrimitive.Title className="flex-1 text-base leading-[1.5] font-semibold text-[#3e3e3e]">
+        <div className="flex items-center gap-2 border-b border-neutral-150 px-4 pt-5 pb-2">
+          <DialogPrimitive.Title className="flex-1 text-base leading-[1.5] font-semibold text-neutral-850">
             {title}
           </DialogPrimitive.Title>
           <DialogPrimitive.Close
             aria-label="닫기"
-            className="flex size-6 items-center justify-center text-[#3e3e3e]"
+            className="flex size-6 items-center justify-center text-neutral-850"
           >
             <CloseIcon className="size-[1.125rem]" />
           </DialogPrimitive.Close>
@@ -65,13 +65,13 @@ const BottomSheet = ({
 
         {/* 본문: 묶음 액션 박스 + 취소 박스 */}
         <div className="flex flex-col gap-3 px-4 py-3">
-          <div className="flex flex-col overflow-hidden rounded-lg bg-[#f6f6f6]">
+          <div className="flex flex-col overflow-hidden rounded-lg bg-neutral-50">
             {actions.map((action, index) => (
               <button
                 key={action.label}
                 type="button"
                 onClick={action.onClick}
-                className={cn(sheetItemClass, index > 0 && 'border-t border-[#e4e4e4]')}
+                className={cn(sheetItemClass, index > 0 && 'border-t border-neutral-150')}
               >
                 {action.label}
               </button>
@@ -79,7 +79,7 @@ const BottomSheet = ({
           </div>
 
           {cancelLabel && (
-            <DialogPrimitive.Close className={cn(sheetItemClass, 'rounded-lg bg-[#f6f6f6]')}>
+            <DialogPrimitive.Close className={cn(sheetItemClass, 'rounded-lg bg-neutral-50')}>
               {cancelLabel}
             </DialogPrimitive.Close>
           )}
