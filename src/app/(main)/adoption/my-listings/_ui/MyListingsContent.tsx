@@ -5,6 +5,7 @@ import { useInfiniteQuery } from '@tanstack/react-query'
 import { Container, PageHeader, Separator, InfiniteScrollTrigger } from '@/shared/ui'
 import { FavoriteAdoptionCard } from '@/features/adoption'
 import { petPostingQueries, toListingCard } from '@/entities/pet-posting'
+import { uniqueBy } from '@/shared/lib/uniqueBy'
 import { useListingsFilter } from '../_lib/useListingsFilter'
 import { StatusFilterChips } from './StatusFilterChips'
 import { ReservedListingCard } from './ReservedListingCard'
@@ -15,7 +16,11 @@ const MyListingsContent = () => {
   // 상태 칩은 로드된 아이템에 대한 클라이언트 필터(useListingsFilter)로 유지
   const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery(petPostingQueries.myList())
-  const allListings = (data?.pages.flatMap((page) => page.items) ?? []).map(toListingCard)
+  // 무한스크롤 페이지 병합 시 listingId 중복 제거 (React key 중복 방어)
+  const allListings = uniqueBy(
+    (data?.pages.flatMap((page) => page.items) ?? []).map(toListingCard),
+    (listing) => listing.listingId,
+  )
   const { activeStatus, setActiveStatus, filteredListings, isGroupedView, groupedByDate } =
     useListingsFilter(allListings)
 
@@ -47,7 +52,9 @@ const MyListingsContent = () => {
         {isLoading ? (
           <p className="py-10 text-center text-sm text-neutral-700">불러오는 중...</p>
         ) : isError ? (
-          <p className="py-10 text-center text-sm text-neutral-700">분양글을 불러오지 못했습니다.</p>
+          <p className="py-10 text-center text-sm text-neutral-700">
+            분양글을 불러오지 못했습니다.
+          </p>
         ) : filteredListings.length === 0 ? (
           <p className="py-10 text-center text-sm text-neutral-700">등록된 분양글이 없습니다.</p>
         ) : isGroupedView && groupedByDate ? (

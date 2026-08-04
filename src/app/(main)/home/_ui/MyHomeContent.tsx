@@ -9,6 +9,7 @@ import { type MyHomePost } from '@/shared/mocks/myHome'
 import { profileQueries } from '@/entities/profile'
 import { communityQueries } from '@/entities/community'
 import { petPostingQueries, toListingCard } from '@/entities/pet-posting'
+import { uniqueBy } from '@/shared/lib/uniqueBy'
 import type {
   AdopterPublicProfile,
   BreederPublicProfile,
@@ -100,7 +101,10 @@ const MyHomeContent = () => {
     commentCount: post.commentCount,
   }))
   const listings: AdoptionListingCard[] = isBreeder
-    ? (myListingsData?.pages.flatMap((page) => page.items) ?? []).map(toListingCard)
+    ? uniqueBy(
+        (myListingsData?.pages.flatMap((page) => page.items) ?? []).map(toListingCard),
+        (listing) => listing.listingId,
+      )
     : []
 
   // /profile/me 응답을 ProfileCard 가 쓰는 공개 프로필 형태로 매핑 (프로필 이미지는 profileImageUrl)

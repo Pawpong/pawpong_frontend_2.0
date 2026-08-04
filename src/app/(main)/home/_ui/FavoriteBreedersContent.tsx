@@ -4,6 +4,7 @@ import { useInfiniteQuery } from '@tanstack/react-query'
 import { ChevronIcon } from '@/shared/assets/icons'
 import { Container, InfiniteScrollTrigger } from '@/shared/ui'
 import { formatDate } from '@/shared/lib/formatDate'
+import { uniqueBy } from '@/shared/lib/uniqueBy'
 import { profileQueries } from '@/entities/profile'
 import type { FavoriteBreederCard } from '@/shared/types'
 import type { FavoriteBreeder } from '@/shared/mocks/myHome'
@@ -25,14 +26,21 @@ const FavoriteBreedersContent = () => {
   const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery(profileQueries.favoriteBreeders())
 
-  const breeders = (data?.pages.flatMap((page) => page.items) ?? []).map(toFavoriteBreeder)
+  // 무한스크롤 페이지 병합 시 브리더 id 중복 제거 (React key 중복 방어)
+  const breeders = uniqueBy(
+    (data?.pages.flatMap((page) => page.items) ?? []).map(toFavoriteBreeder),
+    (breeder) => breeder.id,
+  )
 
   return (
     <>
       {/* 모바일 전용: 나만 보기 버튼 (디자인 1023-39468 · 1023-39688) */}
       {/* ponytail: 필터 동작 미연결, 실데이터 붙을 때 드롭다운 연결 */}
       <div className="px-4 pt-5 tab:hidden">
-        <button type="button" className="flex h-10 items-center gap-1 rounded-lg bg-neutral-850 px-2">
+        <button
+          type="button"
+          className="flex h-10 items-center gap-1 rounded-lg bg-neutral-850 px-2"
+        >
           <span className="text-base leading-[1.5] font-semibold text-neutral-50">나만 보기</span>
           <ChevronIcon className="size-4 text-neutral-50" />
         </button>

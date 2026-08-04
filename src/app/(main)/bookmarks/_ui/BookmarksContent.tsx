@@ -6,6 +6,7 @@ import { Container, NavigationBar, Tabs, TabsList, TabsTrigger, TabsContent } fr
 import { adoptionQueries } from '@/entities/adoption'
 import { mapAdoptionCard } from '@/app/(main)/explore/_lib/mapAdoptionCard'
 import { formatDate } from '@/shared/lib/formatDate'
+import { uniqueBy } from '@/shared/lib/uniqueBy'
 import { MOCK_MY_HOME_POSTS } from '@/shared/mocks/myHome'
 import type { AdoptedListingCard } from '@/shared/types'
 import { BOOKMARK_TABS } from './constants'
@@ -18,13 +19,20 @@ const BookmarksContent = () => {
 
   // 관심 목록 탭 — GET /adoption/me/favorites
   const { data: favoritesData } = useInfiniteQuery(adoptionQueries.myFavorites())
-  const listings = (favoritesData?.pages.flatMap((page) => page.items) ?? []).map(mapAdoptionCard)
+  const listings = uniqueBy(
+    (favoritesData?.pages.flatMap((page) => page.items) ?? []).map(mapAdoptionCard),
+    (listing) => listing.listingId,
+  )
 
   // 입양목록 탭 — GET /adoption/me/adopted
   const { data: adoptedData } = useInfiniteQuery(adoptionQueries.myAdopted())
-  const adoptedListings: AdoptedListingCard[] = (
-    adoptedData?.pages.flatMap((page) => page.items) ?? []
-  ).map((card) => ({ ...mapAdoptionCard(card), adoptedAt: formatDate(card.adoptedAt) }))
+  const adoptedListings: AdoptedListingCard[] = uniqueBy(
+    (adoptedData?.pages.flatMap((page) => page.items) ?? []).map((card) => ({
+      ...mapAdoptionCard(card),
+      adoptedAt: formatDate(card.adoptedAt),
+    })),
+    (listing) => listing.listingId,
+  )
 
   // 저장피드 탭 — '저장피드' 제품 정의 확정 전까지 목업 유지 (백엔드는 좋아요한 영상만 제공)
   const savedFeeds = MOCK_MY_HOME_POSTS

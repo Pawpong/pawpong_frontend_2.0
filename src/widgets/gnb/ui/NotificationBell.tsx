@@ -7,6 +7,7 @@ import { cn } from '@/shared/lib/cn'
 import { formatRelativeTime } from '@/shared/lib/formatRelativeTime'
 import { useAuthStatus } from '@/features/auth'
 import { notificationQueries } from '@/entities/notification'
+import { uniqueBy } from '@/shared/lib/uniqueBy'
 import { useMarkAsRead, useMarkAllAsRead } from '@/features/notification'
 import type { NotificationResponseDto } from '@/shared/types'
 
@@ -81,7 +82,10 @@ const NotificationBell = () => {
   const { mutate: markAsRead } = useMarkAsRead()
   const { mutate: markAllAsRead } = useMarkAllAsRead()
 
-  const notifications = data?.pages.flatMap((page) => page.items) ?? []
+  const notifications = uniqueBy(
+    data?.pages.flatMap((page) => page.items) ?? [],
+    (item) => item.notificationId,
+  )
 
   // 바깥 클릭 / ESC 로 닫기
   useEffect(() => {

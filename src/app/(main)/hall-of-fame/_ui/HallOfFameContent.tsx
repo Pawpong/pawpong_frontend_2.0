@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
 import { Container, ImageDetailModal, PageHeader, SectionHeader } from '@/shared/ui'
 import { contestQueries } from '@/entities/contest'
+import { uniqueBy } from '@/shared/lib/uniqueBy'
 import { useHallOfFameUI } from '../_lib/useHallOfFame'
 import { ContestBanner } from './ContestBanner'
 import { RankingCard } from './RankingCard'
@@ -43,7 +44,7 @@ const HallOfFameContent = () => {
   }, [rankingPeriod, currentContest, previousRanking])
 
   const entries = useMemo(
-    () => entriesData?.pages.flatMap((page) => page.items) ?? [],
+    () => uniqueBy(entriesData?.pages.flatMap((page) => page.items) ?? [], (entry) => entry.id),
     [entriesData],
   )
 

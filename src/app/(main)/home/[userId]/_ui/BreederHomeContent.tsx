@@ -10,6 +10,7 @@ import type { MyHomePost } from '@/shared/mocks/myHome'
 import { breederQueries } from '@/entities/breeder'
 import { adoptionQueries } from '@/entities/adoption'
 import { communityQueries } from '@/entities/community'
+import { uniqueBy } from '@/shared/lib/uniqueBy'
 import { useCreateOrGetChatRoom } from '@/features/send-message'
 import { useToggleFollow } from '@/features/profile'
 import { mapAdoptionCard } from '@/app/(main)/explore/_lib/mapAdoptionCard'
@@ -50,9 +51,10 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
 
   // 분양 개체 탭 — GET /adoption?breederId=userId
   const { data: listingsData } = useInfiniteQuery(adoptionQueries.breederPets(userId))
-  const listings: AdoptionListingCard[] = (
-    listingsData?.pages.flatMap((page) => page.items) ?? []
-  ).map(mapAdoptionCard)
+  const listings: AdoptionListingCard[] = uniqueBy(
+    (listingsData?.pages.flatMap((page) => page.items) ?? []).map(mapAdoptionCard),
+    (listing) => listing.listingId,
+  )
 
   // 게시글 탭 — GET /community/posts?authorId=userId
   const { data: postsData } = useQuery(communityQueries.userPosts(userId))

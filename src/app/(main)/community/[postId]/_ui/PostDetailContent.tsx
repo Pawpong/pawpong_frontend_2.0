@@ -16,6 +16,7 @@ import {
 } from '@/shared/ui'
 import { FavoriteIcon, PixelMessageIcon, PixelBookmarkIcon } from '@/shared/assets/icons'
 import { cn } from '@/shared/lib/cn'
+import { uniqueBy } from '@/shared/lib/uniqueBy'
 import { MOCK_COMMUNITY_POST_DETAIL, MOCK_COMMUNITY_COMMENTS } from '@/shared/mocks/community'
 import { communityQueries } from '@/entities/community'
 import { profileQueries } from '@/entities/profile'
@@ -67,7 +68,10 @@ const PostDetailContent = ({ postId }: PostDetailContentProps) => {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({ ...communityQueries.comments(postId), throwOnError: false })
-  const comments = commentsData?.pages.flatMap((page) => page.items) ?? MOCK_COMMUNITY_COMMENTS
+  const comments = uniqueBy(
+    commentsData?.pages.flatMap((page) => page.items) ?? MOCK_COMMUNITY_COMMENTS,
+    (comment) => comment.commentId,
+  )
 
   const toggleLike = useToggleCommunityPostLike(postId)
   const bookmark = useBookmarkCommunityPost()
@@ -203,6 +207,7 @@ const PostDetailContent = ({ postId }: PostDetailContentProps) => {
                       src={url}
                       alt={`게시글 이미지 ${index + 1}`}
                       fill
+                      sizes="(max-width: 768px) 234px, 349px"
                       className="object-cover"
                     />
                   )}

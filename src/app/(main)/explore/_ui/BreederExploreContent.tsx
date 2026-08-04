@@ -8,6 +8,7 @@ import { breederQueries } from '@/entities/breeder'
 import { BreederCard } from '@/app/(main)/home/_ui/BreederCard'
 import { ExploreListingSection } from './ExploreListingSection'
 import { mapBreederCard } from '../_lib/mapBreederCard'
+import { uniqueBy } from '@/shared/lib/uniqueBy'
 import { EXPLORE_SECTION_CONTAINER } from '../_lib/constants'
 
 // 상단 카테고리/검색(픽셀 카테고리 + 큰 검색바)은 ExploreContent에서 공통 렌더
@@ -18,6 +19,8 @@ const BreederExploreContent = ({ selectedCategory }: { selectedCategory: AnimalC
     selectedCategory === 'dog' || selectedCategory === 'cat' ? selectedCategory : undefined
 
   // queryKey 안정성: params 객체는 결정적으로 생성 (칩 토글 시 동일 키 재사용)
+  // 네트워크 에러(백엔드 다운=status undefined)·5xx 는 전역 설정상 에러 바운더리로 튄다.
+  // 이 컴포넌트는 자체 isError UI 를 가지므로 throwOnError:false 로 인라인 처리한다(분양/커뮤니티 탭과 동일).
   const {
     data: exploreData,
     isLoading,
@@ -25,12 +28,16 @@ const BreederExploreContent = ({ selectedCategory }: { selectedCategory: AnimalC
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useInfiniteQuery(breederQueries.explore(petType ? { petType } : {}))
-  const { data: popularData } = useQuery(breederQueries.popular())
+  } = useInfiniteQuery({
+    ...breederQueries.explore(petType ? { petType } : {}),
+    throwOnError: false,
+  })
+  const { data: popularData } = useQuery({ ...breederQueries.popular(), throwOnError: false })
 
   const featuredBreeders = (popularData ?? []).slice(0, 4).map((b) => mapBreederCard(b, true))
-  const breeders = (exploreData?.pages.flatMap((page) => page.items) ?? []).map((b) =>
-    mapBreederCard(b),
+  const breeders = uniqueBy(
+    (exploreData?.pages.flatMap((page) => page.items) ?? []).map((b) => mapBreederCard(b)),
+    (breeder) => breeder.id,
   )
   const totalCount = exploreData?.pages[0]?.pagination.totalItems
 

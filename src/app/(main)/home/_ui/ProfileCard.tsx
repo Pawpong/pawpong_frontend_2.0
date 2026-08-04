@@ -10,6 +10,7 @@ import {
 } from '@tanstack/react-query'
 import { Badge, ProfileAvatar, FollowButton, FollowersModal, type FollowUser } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
+import { uniqueBy } from '@/shared/lib/uniqueBy'
 import { LocationOnIcon } from '@/shared/assets/icons'
 import { profileQueries } from '@/entities/profile'
 import { useUnfollowUser, useRemoveFollower } from '@/features/profile'
@@ -32,7 +33,11 @@ const toFollowUser = (card: FollowUserCard): FollowUser => ({
 type FollowListQuery = UseInfiniteQueryResult<InfiniteData<PaginationResponse<FollowUserCard>>>
 
 const toFollowUsers = (query: FollowListQuery): FollowUser[] =>
-  (query.data?.pages ?? []).flatMap((page) => page.items.map(toFollowUser))
+  // 무한스크롤 페이지 병합 시 user.id 중복 제거 (FollowersModal key 중복 방어)
+  uniqueBy(
+    (query.data?.pages ?? []).flatMap((page) => page.items.map(toFollowUser)),
+    (user) => user.id,
+  )
 
 const toPaging = (query: FollowListQuery) => ({
   hasMore: query.hasNextPage,
@@ -85,7 +90,9 @@ const FollowerSection = ({
         />
       ))}
     </div>
-    <span className={cn('font-medium text-neutral-850', textClassName)}>팔로워 {followerCount}</span>
+    <span className={cn('font-medium text-neutral-850', textClassName)}>
+      팔로워 {followerCount}
+    </span>
   </button>
 )
 
