@@ -23,7 +23,13 @@ const PetInfoCard = ({ detail }: PetInfoCardProps) => {
         <div className="flex w-full max-w-[57.5rem] items-center gap-4 pc:gap-7">
           {/* 썸네일 + 인기 뱃지 */}
           <div className="relative h-[4.0625rem] w-[5.4375rem] shrink-0 overflow-hidden rounded bg-[#c6c6c6] pc:h-[6.25rem] pc:w-[8.333rem] pc:rounded-lg">
-            <Image src={detail.imageUrls[0]} alt={detail.name} fill className="object-cover" />
+            <Image
+              src={detail.imageUrls[0]}
+              alt={detail.name}
+              fill
+              sizes="(max-width: 1440px) 87px, 133px"
+              className="object-cover"
+            />
             {detail.isPopular && (
               <Badge variant="default" className="absolute top-[0.875rem] left-4">
                 인기

@@ -38,7 +38,13 @@ const CardImage = ({
   className?: string
 }) => (
   <div className={cn('relative aspect-[348/284] w-full overflow-hidden bg-neutral-700', className)}>
-    <Image src={listing.thumbnailUrl} alt={listing.name} fill className="object-cover" />
+    <Image
+      src={listing.thumbnailUrl}
+      alt={listing.name}
+      fill
+      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+      className="object-cover"
+    />
     {isCompleted && <div className="absolute inset-0 bg-white/70" />}
     {/* 인기(bestBadge) 좌상단 배지 — Figma 796-81671 (mo 14px/py-2 · tab 16px/py-4) */}
     {listing.isPopular && (
@@ -182,7 +188,13 @@ const AdoptionCardHorizontal = ({
     >
       {/* 이미지 100x100 */}
       <div className="relative size-[6.25rem] shrink-0 overflow-hidden">
-        <Image src={listing.thumbnailUrl} alt={listing.name} fill className="object-cover" />
+        <Image
+          src={listing.thumbnailUrl}
+          alt={listing.name}
+          fill
+          sizes="100px"
+          className="object-cover"
+        />
       </div>
 
       {/* 정보 */}

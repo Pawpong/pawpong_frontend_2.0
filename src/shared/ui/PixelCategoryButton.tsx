@@ -43,12 +43,30 @@ const PixelCategoryButton = ({
   const content = (
     <>
       {active ? (
-        <Image src={ASSETS.active} alt="" fill className="object-fill" />
+        <Image
+          src={ASSETS.active}
+          alt=""
+          fill
+          sizes="(max-width: 1440px) 106px, 192px"
+          className="object-fill"
+        />
       ) : (
         <>
           {/* 기본 / hover 시 골드 보더로 전환 (display 토글) */}
-          <Image src={defaultSrc} alt="" fill className="object-fill group-hover:hidden" />
-          <Image src={ASSETS.hover} alt="" fill className="hidden object-fill group-hover:block" />
+          <Image
+            src={defaultSrc}
+            alt=""
+            fill
+            sizes="(max-width: 1440px) 106px, 192px"
+            className="object-fill group-hover:hidden"
+          />
+          <Image
+            src={ASSETS.hover}
+            alt=""
+            fill
+            sizes="(max-width: 1440px) 106px, 192px"
+            className="hidden object-fill group-hover:block"
+          />
         </>
       )}
       <span

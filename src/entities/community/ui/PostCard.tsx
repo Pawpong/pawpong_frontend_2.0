@@ -94,6 +94,7 @@ const PostCard = ({
                     src={src}
                     alt={`게시글 이미지 ${index + 1}`}
                     fill
+                    sizes="(max-width: 768px) 281px, 320px"
                     className="object-cover"
                   />
                 )}

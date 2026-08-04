@@ -47,12 +47,14 @@ const HomeCategoryButton = ({ label, href, src }: (typeof CATEGORIES)[number]) =
       src={`/images/category/${src}-default-md.svg`}
       alt={label}
       fill
+      sizes="(max-width: 768px) 106px, 192px"
       className="object-contain transition-opacity group-hover:opacity-0"
     />
     <Image
       src={`/images/category/${src}-hover-md.svg`}
       alt=""
       fill
+      sizes="(max-width: 768px) 106px, 192px"
       className="object-contain opacity-0 transition-opacity group-hover:opacity-100"
     />
   </Link>
@@ -84,7 +86,10 @@ const CategoryBrowse = () => {
           </div>
           <div className="relative z-10 flex items-center gap-[0.4375rem]">
             <p
-              className={cn(cafe24Proup.className, 'text-xs leading-[1.5] text-neutral-700 pc:text-sm')}
+              className={cn(
+                cafe24Proup.className,
+                'text-xs leading-[1.5] text-neutral-700 pc:text-sm',
+              )}
             >
               신뢰할 수 있는 브리더 포퐁에서 만나요 !
             </p>

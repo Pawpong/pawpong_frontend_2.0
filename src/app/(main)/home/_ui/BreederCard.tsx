@@ -65,7 +65,13 @@ const BreederCard = ({ breeder, showPopularBadge }: BreederCardProps) => {
       {/* 이미지: 인기 뱃지(좌상단) / 모바일 별(우하단) */}
       <div className="relative aspect-[282/230] w-full overflow-hidden rounded bg-neutral-700 tab:rounded-lg">
         {breeder.imageUrl && (
-          <Image src={breeder.imageUrl} alt={breeder.nickname} fill className="object-cover" />
+          <Image
+            src={breeder.imageUrl}
+            alt={breeder.nickname}
+            fill
+            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+            className="object-cover"
+          />
         )}
         {showPopularBadge && (
           <Badge

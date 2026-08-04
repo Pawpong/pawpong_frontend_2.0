@@ -28,7 +28,13 @@ const AdoptionGridCard = ({ listing, isFavorite, onToggle, className }: Adoption
       )}
     >
       <div className="relative aspect-[348/284] w-full overflow-hidden rounded-[0.5rem] bg-neutral-700">
-        <Image src={listing.thumbnailUrl} alt={listing.name} fill className="object-cover" />
+        <Image
+          src={listing.thumbnailUrl}
+          alt={listing.name}
+          fill
+          sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+          className="object-cover"
+        />
 
         {status === 'completed' && <div className="absolute inset-0 bg-white/70" />}
 

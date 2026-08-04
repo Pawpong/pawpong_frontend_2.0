@@ -18,7 +18,13 @@ const VoteCard = ({ entry, onImageClick }: VoteCardProps) => {
         onClick={onImageClick}
         className="relative aspect-square w-full overflow-hidden rounded-[0.375rem] tab:aspect-[4/3] tab:rounded-none"
       >
-        <Image src={entry.photoUrl} alt={entry.description} fill className="object-cover" />
+        <Image
+          src={entry.photoUrl}
+          alt={entry.description}
+          fill
+          sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+          className="object-cover"
+        />
       </button>
 
       {/* 설명 */}

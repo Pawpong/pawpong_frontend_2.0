@@ -37,6 +37,7 @@ const ParentInfoCard = ({ detail, onImageClick }: ParentInfoCardProps) => {
                 src={parent.imageUrl}
                 alt={`${parent.role} 사진`}
                 fill
+                sizes="(max-width: 768px) 100vw, 50vw"
                 className="object-cover"
               />
             </button>

@@ -25,7 +25,13 @@ const ReservedListingCard = ({ listing, className }: ReservedListingCardProps) =
     >
       {/* 이미지 */}
       <div className="relative m-[0.438rem] size-[6.25rem] shrink-0 overflow-hidden rounded-[0.375rem] tab:m-0 tab:my-auto tab:ml-[1.719rem] tab:h-[14.124rem] tab:w-[13.647rem] tab:rounded-[0.437rem]">
-        <Image src={listing.thumbnailUrl} alt={listing.name} fill className="object-cover" />
+        <Image
+          src={listing.thumbnailUrl}
+          alt={listing.name}
+          fill
+          sizes="(max-width: 768px) 100px, 218px"
+          className="object-cover"
+        />
         {isCompleted && <div className="absolute inset-0 bg-white/70" />}
         {listing.isPopular && (
           <Badge

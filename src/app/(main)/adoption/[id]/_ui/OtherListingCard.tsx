@@ -52,7 +52,13 @@ const DesktopOtherListingCard = ({
     <div className="flex w-full items-center gap-[1.75rem]">
       {/* 이미지 + 인기 배지 */}
       <div className="relative aspect-[4/3] h-[13.125rem] w-[17.5rem] shrink-0 overflow-hidden rounded-[0.5rem] bg-[#c6c6c6]">
-        <Image src={listing.thumbnailUrl} alt={listing.name} fill className="object-cover" />
+        <Image
+          src={listing.thumbnailUrl}
+          alt={listing.name}
+          fill
+          sizes="280px"
+          className="object-cover"
+        />
         {listing.isPopular && (
           // [refactored] raw span → 공통 Badge(default 변형)
           <Badge variant="default" className="absolute top-[0.875rem] left-[1rem]">

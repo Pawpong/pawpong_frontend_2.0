@@ -199,7 +199,7 @@ const BreederAvatar = ({
 }) => (
   <div className={cn('relative shrink-0 overflow-hidden rounded-full bg-[#d4d4d4]', className)}>
     {/* src가 없으면(빈 문자열/null) fallback 배경만 노출 — Image에 빈 src 전달 방지 */}
-    {src && <Image src={src} alt={alt} fill className="object-cover" />}
+    {src && <Image src={src} alt={alt} fill sizes="44px" className="object-cover" />}
   </div>
 )
 

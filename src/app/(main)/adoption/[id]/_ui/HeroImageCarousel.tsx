@@ -37,7 +37,14 @@ const HeroImageCarousel = ({
               className="relative block size-full"
             >
               {/* draggable=false: 네이티브 이미지 드래그가 Swiper 스와이프를 가로채는 것 방지 */}
-              <Image src={url} alt={alt} fill draggable={false} className="object-cover" />
+              <Image
+                src={url}
+                alt={alt}
+                fill
+                sizes="(max-width: 1440px) 100vw, 500px"
+                draggable={false}
+                className="object-cover"
+              />
             </button>
           </SwiperSlide>
         ))}

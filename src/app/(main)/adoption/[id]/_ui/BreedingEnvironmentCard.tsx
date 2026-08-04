@@ -27,7 +27,13 @@ const EnvImageButton = ({
     onClick={onClick}
     className={cn('relative shrink-0 overflow-hidden rounded-[0.5rem] bg-[#c6c6c6]', className)}
   >
-    <Image src={src} alt={`사육 환경 ${index + 1}`} fill className="object-cover" />
+    <Image
+      src={src}
+      alt={`사육 환경 ${index + 1}`}
+      fill
+      sizes="(max-width: 1440px) 191px, 320px"
+      className="object-cover"
+    />
   </button>
 )
 

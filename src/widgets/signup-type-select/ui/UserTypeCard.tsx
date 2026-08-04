@@ -25,13 +25,21 @@ const UserTypeCard = ({ label, selected, onClick }: UserTypeCardProps) => (
     className="group relative flex h-[10rem] w-[11.728rem] items-center justify-center tab:h-[13.375rem] tab:w-[15.656rem]"
   >
     {selected ? (
-      <Image src={FRAME_ACTIVE} alt="" fill className="object-contain" priority />
+      <Image
+        src={FRAME_ACTIVE}
+        alt=""
+        fill
+        sizes="(max-width: 768px) 188px, 250px"
+        className="object-contain"
+        priority
+      />
     ) : (
       <>
         <Image
           src={FRAME_DEFAULT}
           alt=""
           fill
+          sizes="(max-width: 768px) 188px, 250px"
           className="object-contain group-hover:hidden"
           priority
         />
@@ -40,6 +48,7 @@ const UserTypeCard = ({ label, selected, onClick }: UserTypeCardProps) => (
           src={FRAME_HOVER}
           alt=""
           fill
+          sizes="(max-width: 768px) 188px, 250px"
           className="hidden object-contain group-hover:block"
           priority
         />

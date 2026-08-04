@@ -124,7 +124,13 @@ const ImageUploadArea = ({
               onClick={() => handleImageClick(index)}
               aria-label={`이미지 ${index + 1} ${isRepresentative(index) ? '대표사진' : '미리보기'}`}
             >
-              <Image src={src} alt={`업로드 이미지 ${index + 1}`} fill className="object-cover" />
+              <Image
+                src={src}
+                alt={`업로드 이미지 ${index + 1}`}
+                fill
+                sizes="(max-width: 768px) 61px, 198px"
+                className="object-cover"
+              />
             </button>
 
             {/* 대표사진 뱃지 */}

@@ -25,7 +25,13 @@ const CardImage = ({
   badgeClassName?: string
 }) => (
   <div className={cn('relative shrink-0 overflow-hidden bg-neutral-700', className)}>
-    <Image src={listing.thumbnailUrl} alt={listing.name} fill className="object-cover" />
+    <Image
+      src={listing.thumbnailUrl}
+      alt={listing.name}
+      fill
+      sizes="(max-width: 1440px) 110px, 280px"
+      className="object-cover"
+    />
     {isCompleted && <div className="absolute inset-0 bg-white/70" />}
     {listing.isPopular && (
       <Badge variant="outline" className={cn('absolute', badgeClassName)}>
@@ -123,7 +129,10 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
 
           <div className="flex items-center gap-2">
             {/* [refactored] CardStats */}
-            <CardStats listing={listing} className="flex-1 text-sm leading-[1.5] text-neutral-700" />
+            <CardStats
+              listing={listing}
+              className="flex-1 text-sm leading-[1.5] text-neutral-700"
+            />
             <Button
               variant="primary"
               onClick={() => router.push('/chat')}

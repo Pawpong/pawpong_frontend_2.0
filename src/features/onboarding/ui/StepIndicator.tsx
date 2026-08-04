@@ -20,6 +20,7 @@ const StepItem = ({ label, index, isActive, showArrowBefore }: StepItemProps) =>
           src="/images/onboarding/arrow-onboarding.svg"
           alt=""
           fill
+          sizes="(max-width: 768px) 14px, 32px"
           className="object-contain"
         />
       </div>
@@ -33,6 +34,7 @@ const StepItem = ({ label, index, isActive, showArrowBefore }: StepItemProps) =>
         }
         alt=""
         fill
+        sizes="(max-width: 768px) 106px, 192px"
         className="object-contain"
       />
       <span

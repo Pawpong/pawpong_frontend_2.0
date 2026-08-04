@@ -21,7 +21,13 @@ const RankingCard = ({ entry, onImageClick }: RankingCardProps) => {
           onClick={onImageClick}
           className="relative size-[6.25rem] shrink-0 overflow-hidden rounded-[0.375rem]"
         >
-          <Image src={entry.photoUrl} alt={entry.description} fill className="object-cover" />
+          <Image
+            src={entry.photoUrl}
+            alt={entry.description}
+            fill
+            sizes="100px"
+            className="object-cover"
+          />
           {/* 랭킹 뱃지 */}
           {entry.rank && (
             <RankBadgeIcon
@@ -48,7 +54,13 @@ const RankingCard = ({ entry, onImageClick }: RankingCardProps) => {
       {/* PC: 세로형 카드 */}
       <div className="relative hidden overflow-hidden rounded-2xl bg-[#e7e7e7] tab:block">
         <button type="button" onClick={onImageClick} className="relative aspect-[4/3] w-full">
-          <Image src={entry.photoUrl} alt={entry.description} fill className="object-cover" />
+          <Image
+            src={entry.photoUrl}
+            alt={entry.description}
+            fill
+            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+            className="object-cover"
+          />
         </button>
 
         {/* 랭킹 뱃지 */}
