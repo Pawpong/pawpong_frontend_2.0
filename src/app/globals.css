@@ -40,31 +40,44 @@
   --color-border-light: color(display-p3 0.7777 0.7777 0.7777);
 
   /* ══════ 디자인 시스템 색상 팔레트 (Figma 2026_pawpong / Mode 1) ══════
-     시맨틱 이름: primary/secondary/error/info/success/neutral/base */
+     Figma main→primary(브라운), sub→secondary(골드), point 신규.
+     error/info/success/neutral/base 동일 */
 
-  /* primary */
-  --color-primary-50: #ecf0ff;
-  --color-primary-100: #d9e2ff;
-  --color-primary-200: #b3c5ff;
-  --color-primary-300: #8ca7ff;
-  --color-primary-400: #668aff;
-  --color-primary-500: #406dff;
-  --color-primary-600: #3358d1;
-  --color-primary-700: #2643a2;
-  --color-primary-800: #1a2f74;
-  --color-primary-900: #0d1a45;
+  /* primary (Figma main) */
+  --color-primary-50: #f5eadf;
+  --color-primary-100: #eddbca;
+  --color-primary-200: #ddbe9f;
+  --color-primary-300: #cda073;
+  --color-primary-400: #bd8348;
+  --color-primary-500: #ad651d;
+  --color-primary-600: #8a5117;
+  --color-primary-700: #683d11;
+  --color-primary-800: #45280c;
+  --color-primary-900: #231406;
 
-  /* secondary */
-  --color-secondary-50: #fdf9f5;
-  --color-secondary-100: #fbf3eb;
-  --color-secondary-200: #f7e7d6;
-  --color-secondary-300: #f2dcc2;
-  --color-secondary-400: #eed0ad;
-  --color-secondary-500: #eac499;
-  --color-secondary-600: #caa67e;
-  --color-secondary-700: #ab8862;
-  --color-secondary-800: #8b6b47;
-  --color-secondary-900: #6c4d2b;
+  /* secondary (Figma sub) */
+  --color-secondary-50: #fef9ef;
+  --color-secondary-100: #fdf4df;
+  --color-secondary-200: #fbe8be;
+  --color-secondary-300: #fadd9e;
+  --color-secondary-400: #f8d17d;
+  --color-secondary-500: #f6c65d;
+  --color-secondary-600: #cda44b;
+  --color-secondary-700: #a48239;
+  --color-secondary-800: #7b6126;
+  --color-secondary-900: #523f14;
+
+  /* point (Figma point) */
+  --color-point-50: #fffff1;
+  --color-point-100: #ffffe3;
+  --color-point-200: #ffffc7;
+  --color-point-300: #fffeaa;
+  --color-point-400: #fffe8e;
+  --color-point-500: #fffe72;
+  --color-point-600: #dbda5b;
+  --color-point-700: #b6b644;
+  --color-point-800: #92912e;
+  --color-point-900: #6d6d17;
 
   /* error */
   --color-error-50: #f7d8db;
