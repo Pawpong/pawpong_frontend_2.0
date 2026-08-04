@@ -4,13 +4,11 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import {
-  badgeVariants,
   Container,
+  FilterChip,
   InfiniteScrollTrigger,
   PopularBadgeContent,
-  Tabs,
-  TabsList,
-  TabsTrigger,
+  TabBar,
 } from '@/shared/ui'
 import { SearchSection } from '@/features/search'
 import { CategorySection } from '@/features/category-filter'
@@ -145,28 +143,12 @@ const ExploreContent = () => {
       {/* ══════ 탭 바(+모바일·탭 필터바) — tab+ 상단 고정(sticky), GNB 아래에 스택 ══════
           (모바일은 탭 바 비고정, GNB만 sticky) */}
       <div ref={headerRef} className="bg-white tab:sticky tab:z-40" style={{ top: gnbH }}>
-        {/* 탐색 탭 바 (Figma 'tab bar-layout') — full-width + margin/pc inset, 하단 회색선 */}
-        <div className="w-full border-b border-neutral-300 px-[1.25rem] pt-3 tab:px-[3rem] tab:pt-4 pc:px-[5rem]">
-          <Tabs
-            value={selectedType}
-            onValueChange={(value) => handleTypeChange(value as ExploreType)}
-            className="w-full"
-          >
-            <TabsList variant="underline">
-              {EXPLORE_TABS.map((tab) => (
-                <TabsTrigger
-                  key={tab.type}
-                  value={tab.type}
-                  variant="underline"
-                  size="md"
-                  className="tab:h-[3.8125rem] tab:pt-2 tab:text-base tab:after:h-[0.5625rem]"
-                >
-                  {tab.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
-        </div>
+        <TabBar
+          items={EXPLORE_TABS.map((tab) => ({ value: tab.type, label: tab.label }))}
+          value={selectedType}
+          onValueChange={(value) => handleTypeChange(value as ExploreType)}
+          ariaLabel="탐색 유형"
+        />
       </div>
 
       {/* 스크롤 시 GNB(+tab: 탭바) 아래 고정 컴팩트 칩바 (fixed → 레이아웃 점프 없음, 구분선 없음) */}
@@ -209,32 +191,21 @@ const ExploreContent = () => {
             renderCard={(listing) => <ExploreAdoptionCard listing={listing} />}
             headerSlot={
               <div className="flex shrink-0 items-center gap-2" aria-label="분양 소식 필터">
-                {ADOPTION_LIST_FILTERS.map((filter) => {
-                  const isSelected = adoptionListFilter === filter.value
-
-                  return (
-                    <button
-                      key={filter.value}
-                      type="button"
-                      aria-pressed={isSelected}
-                      onClick={() => setAdoptionListFilter(filter.value)}
-                      className={cn(
-                        badgeVariants({
-                          variant: isSelected ? 'primaryFilled' : 'primaryOutline',
-                          size: 'md',
-                        }),
-                        // 모바일 md(10px) → tab+ lg(14px·h-29)
-                        'tab:h-[1.8125rem] tab:py-1 tab:text-sm',
-                      )}
-                    >
-                      {filter.value === 'popular' ? (
-                        <PopularBadgeContent size="responsive" />
-                      ) : (
-                        filter.label
-                      )}
-                    </button>
-                  )
-                })}
+                {/* [refactored] 칩 버튼 스타일 → 공통 FilterChip */}
+                {ADOPTION_LIST_FILTERS.map((filter) => (
+                  <FilterChip
+                    key={filter.value}
+                    selected={adoptionListFilter === filter.value}
+                    onClick={() => setAdoptionListFilter(filter.value)}
+                    size="responsive"
+                  >
+                    {filter.value === 'popular' ? (
+                      <PopularBadgeContent size="responsive" />
+                    ) : (
+                      filter.label
+                    )}
+                  </FilterChip>
+                ))}
               </div>
             }
           />

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { Container, NavigationBar, Tabs, TabsList, TabsTrigger, TabsContent } from '@/shared/ui'
+import { NavigationBar, TabBar, TabsContent } from '@/shared/ui'
 import { adoptionQueries } from '@/entities/adoption'
 import { mapAdoptionCard } from '@/app/(main)/explore/_lib/mapAdoptionCard'
 import { formatDate } from '@/shared/lib/formatDate'
@@ -41,27 +41,12 @@ const BookmarksContent = () => {
     <div className="flex w-full flex-1 flex-col">
       <NavigationBar title="저장목록" backHref="/home" />
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        {/* 공통 TabBar (디자인 976-32388) — 모바일 medium / 탭·PC large
-            border는 풀폭, 탭 목록은 Container(mx-auto max-w)로 가운데 정렬 */}
-        <div className="w-full border-b border-neutral-300 bg-white">
-          <Container className="pt-3 tab:pt-4">
-            <TabsList variant="underline">
-              {BOOKMARK_TABS.map((tab) => (
-                <TabsTrigger
-                  key={tab.id}
-                  value={tab.id}
-                  variant="underline"
-                  size="md"
-                  className="tab:h-[3.8125rem] tab:pt-2 tab:text-base tab:after:h-[0.5625rem]"
-                >
-                  {tab.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Container>
-        </div>
-
+      <TabBar
+        items={BOOKMARK_TABS.map((tab) => ({ value: tab.id, label: tab.label }))}
+        value={activeTab}
+        onValueChange={setActiveTab}
+        ariaLabel="저장목록"
+      >
         <TabsContent value="favorites" className="mt-0">
           <FavoritesTab listings={listings} />
         </TabsContent>
@@ -73,7 +58,7 @@ const BookmarksContent = () => {
         <TabsContent value="adoption-list" className="mt-0">
           <AdoptionListTab listings={adoptedListings} />
         </TabsContent>
-      </Tabs>
+      </TabBar>
     </div>
   )
 }

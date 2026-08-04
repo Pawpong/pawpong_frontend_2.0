@@ -21,6 +21,8 @@ const badgeVariants = tv({
       // Figma label-badge (975-19584) — primary 채움/아웃라인, lg 14px·h-29 / md 10px·h-24
       primaryFilled: 'bg-primary-500 text-white',
       primaryOutline: 'border border-primary-500 bg-white text-primary-500',
+      // 필터 칩 선택 상태 (975-19584 active) — point 채움 + primary 테두리/텍스트
+      pointFilled: 'border border-primary-500 bg-point-500 text-primary-500',
       // primaryFilled와 동일 사이즈의 회색 채움 (분양완료 등 비활성 상태)
       neutralFilled: 'bg-neutral-150 text-neutral-400',
     },
@@ -34,12 +36,12 @@ const badgeVariants = tv({
     { variant: ['default', 'active', 'disabled'], size: 'md', class: 'h-6 px-2 py-0.5 text-sm' },
     // label-badge primary: lg 14px·h-29 / md 10px·h-24
     {
-      variant: ['primaryFilled', 'primaryOutline', 'neutralFilled'],
+      variant: ['primaryFilled', 'primaryOutline', 'pointFilled', 'neutralFilled'],
       size: 'lg',
       class: 'h-[1.8125rem] px-2 py-1 text-sm',
     },
     {
-      variant: ['primaryFilled', 'primaryOutline', 'neutralFilled'],
+      variant: ['primaryFilled', 'primaryOutline', 'pointFilled', 'neutralFilled'],
       size: 'md',
       class: 'h-6 px-2 py-0 text-[0.625rem]',
     },
