@@ -92,12 +92,15 @@ const ExploreContent = () => {
   const stickyBarTop = gnbH + (isTabUp ? headerH : 0)
 
   useEffect(() => {
-    const measure = () => {
-      if (headerRef.current) setHeaderH(headerRef.current.offsetHeight)
-    }
+    const el = headerRef.current
+    if (!el) return
+    // ResizeObserver로 탭바 높이 상시 추적 (window resize만으론 폰트로드·HMR·동적변경 시
+    // 높이 변화를 못 잡아 headerH가 stale → 컴팩트바가 탭바에 겹쳐 칩이 잘림)
+    const measure = () => setHeaderH(el.offsetHeight)
     measure()
-    window.addEventListener('resize', measure)
-    return () => window.removeEventListener('resize', measure)
+    const observer = new ResizeObserver(measure)
+    observer.observe(el)
+    return () => observer.disconnect()
   }, [])
 
   useEffect(() => {
