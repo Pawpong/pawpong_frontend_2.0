@@ -39,6 +39,8 @@ const TabBar = ({
   barStyle,
   ariaLabel,
 }: TabBarProps) => {
+  // 2탭은 PC 1440 풀폭(large 2탭), 3탭 이상은 940 레이아웃 — 탭 수가 런타임에 변하는
+  // 마이홈(브리더 3탭 / 입양자 2탭)을 커버하려고 개수로 판단한다.
   const isTwoTabs = items.length === 2
 
   return (

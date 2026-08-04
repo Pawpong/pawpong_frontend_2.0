@@ -45,7 +45,7 @@ const AdoptionGridCard = ({ listing, isFavorite, onToggle, className }: Adoption
           <Badge
             variant={ADOPTION_CARD_STATUS_VARIANT[status]}
             size="md"
-            className="ml-auto shrink-0 tab:hidden"
+            className="shrink-0 tab:hidden"
           >
             {ADOPTION_CARD_STATUS_LABEL[status]}
           </Badge>
