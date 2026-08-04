@@ -15,7 +15,7 @@ interface CategorySectionProps {
 // 모바일 2x2 (gap 20px, medium 픽셀 버튼) / tab+ 4열
 const CategorySection = ({ selected, onChange }: CategorySectionProps) => (
   <Container className="flex flex-col items-center justify-center px-4 py-6 tab:py-8 pc:py-12">
-    <CategoryFilter selected={selected} onChange={onChange} className="gap-y-5 tab:gap-y-0" />
+    <CategoryFilter selected={selected} onChange={onChange} className="gap-y-2 tab:gap-y-0" />
   </Container>
 )
 
