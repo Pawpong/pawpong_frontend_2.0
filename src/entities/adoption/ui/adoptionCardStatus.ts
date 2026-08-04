@@ -9,12 +9,12 @@ export const ADOPTION_CARD_STATUS_LABEL: Record<AdoptionListingCard['status'], s
   completed: '분양완료',
 }
 
-// 분양중/예약중 → 파랑 채움, 분양완료 → 회색 채움
+// 분양중/예약중 → primary 아웃라인(743-68288), 분양완료 → 회색 채움
 export const ADOPTION_CARD_STATUS_VARIANT: Record<
   AdoptionListingCard['status'],
-  'primaryFilled' | 'neutralFilled'
+  'primaryOutline' | 'neutralFilled'
 > = {
-  available: 'primaryFilled',
-  reserved: 'primaryFilled',
+  available: 'primaryOutline',
+  reserved: 'primaryOutline',
   completed: 'neutralFilled',
 }

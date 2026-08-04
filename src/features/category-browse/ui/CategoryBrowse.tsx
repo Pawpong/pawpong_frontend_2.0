@@ -16,7 +16,7 @@ const CtaArrowIcon = () => (
   <span className="flex h-4 shrink-0 items-center justify-center" aria-hidden>
     <svg
       viewBox="0 0 10.8333 16.6667"
-      className="h-[0.8125rem] w-[0.5279rem] text-neutral-700"
+      className="h-[0.8125rem] w-[0.5279rem] text-primary-600"
       fill="none"
     >
       <path d="M4.33333 0H0V4.16667H4.33333V0Z" fill="currentColor" />
@@ -84,7 +84,7 @@ const CategoryBrowse = () => {
           </div>
           <div className="relative z-10 flex items-center gap-[0.4375rem]">
             <p
-              className={cn(cafe24Proup.className, 'text-xs leading-[1.5] text-neutral-700 pc:text-sm')}
+              className={cn(cafe24Proup.className, 'text-xs leading-[1.5] text-primary-600 pc:text-sm')}
             >
               신뢰할 수 있는 브리더 포퐁에서 만나요 !
             </p>

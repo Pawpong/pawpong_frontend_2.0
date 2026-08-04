@@ -152,22 +152,22 @@ const PixelFrame = ({
         viewBox="0 0 132 113"
         preserveAspectRatio="none"
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 size-full pc:hidden"
+        className="pointer-events-none absolute inset-0 size-full text-secondary-500 pc:hidden"
       >
         <path
           d="M116.16 5.302h10.561v5.3H132v18.554h-.002V113H10.56v-6.165H5.28v-6.559h10.561v6.56h100.318v-6.56h10.561V10.603h-10.561V5.302H15.84v5.3H5.281v-5.3H15.84V0h100.32v5.302Zm-110.88 94.974H0V10.602h5.28v89.674Z"
-          fill="#EED0AD"
+          fill="currentColor"
         />
       </svg>
       <svg
         viewBox="0 0 229 195"
         preserveAspectRatio="none"
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 hidden size-full pc:block"
+        className="pointer-events-none absolute inset-0 hidden size-full text-secondary-500 pc:block"
       >
         <path
           d="M229 18.296v32.019h-.003V195H18.318v-10.639H9.163v-11.318h18.318v11.319h174.04v-11.319h18.32V18.296H229ZM9.16 173.043H0V18.296h9.16v154.747ZM201.52 9.148H27.48v9.148H9.163V9.148h18.318V0H201.52v9.148Zm18.321 0v9.148h-18.32V9.148h18.32Z"
-          fill="#EED0AD"
+          fill="currentColor"
         />
       </svg>
     </div>
