@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/shared/ui/Button'
 
@@ -39,13 +40,19 @@ export const SocialLoginList = () => {
   const searchParams = useSearchParams()
   const returnUrl = searchParams.get('returnUrl') || ''
 
-  // 이미 로그인된 상태면 바로 이동 (accessToken 쿠키 존재 여부로 판단)
+  const hasAccessToken = () =>
+    document.cookie.split(';').some((c) => c.trim().startsWith('accessToken='))
+
+  // 이미 로그인된 상태로 /login 에 진입하면(뒤로가기 등) 즉시 벗어난다 — 로그인 페이지 트랩 방지.
+  // replace 로 이동해 /login 이 히스토리에 남지 않게 한다.
+  useEffect(() => {
+    if (hasAccessToken()) router.replace(returnUrl || '/')
+  }, [router, returnUrl])
+
+  // 버튼 클릭 시점에도 한 번 더 확인 (마운트 이후 다른 탭에서 로그인된 경우 등)
   const redirectIfLoggedIn = (): boolean => {
-    const hasAccessToken = document.cookie
-      .split(';')
-      .some((c) => c.trim().startsWith('accessToken='))
-    if (hasAccessToken) {
-      router.push(returnUrl || '/')
+    if (hasAccessToken()) {
+      router.replace(returnUrl || '/')
       return true
     }
     return false

@@ -142,7 +142,12 @@ function createApiClient(): AxiosInstance {
           )
 
           if (typeof window !== 'undefined') {
-            fetch('/api/auth/clear-cookie', { method: 'POST' }).catch(() => {})
+            // 무효 토큰이 남아 재-401 → /login 무한 루프에 빠지지 않도록 클라이언트 쿠키를 즉시 동기 제거한다.
+            // (httpOnly=false 인 accessToken/userRole 은 JS 로 지울 수 있고, isLoggedIn 판정이 이 쿠키에 의존한다)
+            document.cookie = 'accessToken=; path=/; max-age=0'
+            document.cookie = 'userRole=; path=/; max-age=0'
+            // refreshToken(httpOnly)은 서버 라우트로만 제거 가능 — 네비게이션이 요청을 끊지 않도록 완료를 기다린다.
+            await fetch('/api/auth/clear-cookie', { method: 'POST' }).catch(() => {})
             try {
               localStorage.removeItem('auth-storage')
             } catch {
@@ -150,7 +155,12 @@ function createApiClient(): AxiosInstance {
             }
 
             if (!window.location.pathname.startsWith('/login')) {
-              window.location.href = '/login'
+              // href 할당(=history push) 대신 replace 로 이동해 /login 이 히스토리에 중복 축적되는 것을 막는다.
+              // (여러 번 401 이 나도 뒤로가기가 /login 사이를 맴도는 트랩 방지 + 로그인 후 원래 위치로 복귀)
+              const returnUrl = encodeURIComponent(
+                window.location.pathname + window.location.search,
+              )
+              window.location.replace(`/login?returnUrl=${returnUrl}`)
             }
           }
 
