@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { SearchIcon, badgeVariants } from '@/shared/ui'
+import { FilterChip, SearchIcon } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { ANIMAL_CATEGORIES, CATEGORY_LABEL } from '@/shared/types'
 import type { AnimalCategory } from '@/shared/types'
@@ -78,17 +78,15 @@ const ExploreFilterBar = ({ selected, onChange, className }: ExploreFilterBarPro
         <>
           {/* 카테고리 칩 — 공통 Badge(primary 채움/아웃라인, Figma 1652-81786) */}
           <div className="flex flex-wrap items-center gap-2">
+            {/* [refactored] 칩 버튼 스타일 → 공통 FilterChip */}
             {ANIMAL_CATEGORIES.map((category) => (
-              <button
+              <FilterChip
                 key={category}
-                type="button"
+                selected={selected === category}
                 onClick={() => onChange(category)}
-                className={badgeVariants({
-                  variant: selected === category ? 'primaryFilled' : 'primaryOutline',
-                })}
               >
                 {CATEGORY_LABEL[category]}
-              </button>
+              </FilterChip>
             ))}
           </div>
 
