@@ -6,7 +6,8 @@ import Image from 'next/image'
 import { Badge, Button, CtaModal, ListingStats } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import type { AdoptedListingCard as AdoptedListingCardType } from '@/shared/types'
-import { ADOPTION_STATUS_LABEL, GENDER_LABEL } from '@/shared/types'
+import { GENDER_LABEL } from '@/shared/types'
+import { AdoptionStatusBadge } from '@/entities/adoption'
 
 interface AdoptedListingCardProps {
   listing: AdoptedListingCardType
@@ -83,9 +84,7 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
             <p className="w-full truncate text-base leading-[1.5] font-bold text-neutral-850">
               {listing.name}
             </p>
-            <Badge variant="active" size="md">
-              {ADOPTION_STATUS_LABEL[listing.status]}
-            </Badge>
+            <AdoptionStatusBadge status={listing.status} size="md" />
           </div>
           {/* [refactored] CardStats */}
           <CardStats listing={listing} size="sm" className="w-full text-xs text-neutral-700" />
@@ -110,9 +109,7 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
               <p className="truncate text-xl leading-[1.5] font-bold text-neutral-850">
                 {`${listing.name} | ${GENDER_LABEL[listing.gender]} ${listing.ageText}`}
               </p>
-              <Badge variant="active" className="shrink-0">
-                {ADOPTION_STATUS_LABEL[listing.status]}
-              </Badge>
+              <AdoptionStatusBadge status={listing.status} className="shrink-0" />
             </div>
             {listing.description && (
               <p className="line-clamp-3 text-base leading-[1.5] font-semibold text-neutral-850">

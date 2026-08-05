@@ -2,10 +2,11 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { Badge, ListingStats, PostedDate } from '@/shared/ui'
+import { ListingStats, PopularBadge, PostedDate } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import type { AdoptionListingCard } from '@/shared/types'
-import { ADOPTION_STATUS_LABEL, GENDER_LABEL } from '@/shared/types'
+import { GENDER_LABEL } from '@/shared/types'
+import { AdoptionStatusBadge } from '@/entities/adoption'
 
 interface ReservedListingCardProps {
   listing: AdoptionListingCard
@@ -28,12 +29,10 @@ const ReservedListingCard = ({ listing, className }: ReservedListingCardProps) =
         <Image src={listing.thumbnailUrl} alt={listing.name} fill className="object-cover" />
         {isCompleted && <div className="absolute inset-0 bg-white/70" />}
         {listing.isPopular && (
-          <Badge
+          <PopularBadge
             variant="outline"
             className="absolute top-2 left-2 bg-white tab:top-[1.125rem] tab:left-[0.625rem]"
-          >
-            인기🔥
-          </Badge>
+          />
         )}
       </div>
 
@@ -46,12 +45,11 @@ const ReservedListingCard = ({ listing, className }: ReservedListingCardProps) =
 
         {/* 뱃지 + 데스크탑 성별·나이 */}
         <div className="flex flex-wrap items-center gap-1 tab:gap-[1.125rem]">
-          <Badge
-            variant="status"
-            className="bg-text-primary px-2 py-[0.125rem] text-xs leading-[1.375rem] tab:px-[0.585rem] tab:py-[0.234rem] tab:text-sm tab:leading-[1.286rem]"
-          >
-            {ADOPTION_STATUS_LABEL[listing.status]}
-          </Badge>
+          <AdoptionStatusBadge
+            status={listing.status}
+            size="md"
+            className="px-2 py-[0.125rem] text-xs leading-[1.375rem] tab:px-[0.585rem] tab:py-[0.234rem] tab:text-sm tab:leading-[1.286rem]"
+          />
           <span className="hidden size-[0.253rem] rounded-full bg-text-primary tab:block" />
           <span className="hidden text-xl leading-[1.375rem] font-semibold text-text-primary tab:block">
             {GENDER_LABEL[listing.gender]}
