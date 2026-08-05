@@ -1,4 +1,7 @@
-import { FavoriteButton } from '@/shared/ui'
+'use client'
+
+import { useState } from 'react'
+import { FavoriteButton, ShareModal } from '@/shared/ui'
 import { ShareIcon } from '@/shared/assets/icons'
 import { cn } from '@/shared/lib/cn'
 
@@ -19,27 +22,33 @@ const FavoriteShareActions = ({
   showFavorite = true,
   showShare = true,
   className,
-}: FavoriteShareActionsProps) => (
-  <div className={cn('flex items-center gap-[1rem]', className)}>
-    {showFavorite && (
-      <FavoriteButton
-        size="lg"
-        className="gap-0 p-0 text-[0.75rem] font-semibold text-neutral-850"
-        iconClassName="size-[2rem]"
-        isFavorite={isFavorite}
-        onToggle={onToggle}
-      />
-    )}
-    {showShare && (
-      <button
-        type="button"
-        className="flex items-center gap-0 text-[0.75rem] font-semibold text-neutral-850"
-      >
-        <ShareIcon className="size-[2rem]" />
-        <span>공유</span>
-      </button>
-    )}
-  </div>
-)
+}: FavoriteShareActionsProps) => {
+  const [shareOpen, setShareOpen] = useState(false)
+
+  return (
+    <div className={cn('flex items-center gap-[1rem]', className)}>
+      {showFavorite && (
+        <FavoriteButton
+          size="lg"
+          className="gap-0 p-0 text-[0.75rem] font-semibold text-neutral-850"
+          iconClassName="size-[2rem]"
+          isFavorite={isFavorite}
+          onToggle={onToggle}
+        />
+      )}
+      {showShare && (
+        <button
+          type="button"
+          onClick={() => setShareOpen(true)}
+          className="flex items-center gap-0 text-[0.75rem] font-semibold text-neutral-850"
+        >
+          <ShareIcon className="size-[2rem]" />
+          <span>공유</span>
+        </button>
+      )}
+      <ShareModal open={shareOpen} onOpenChange={setShareOpen} />
+    </div>
+  )
+}
 
 export { FavoriteShareActions }
