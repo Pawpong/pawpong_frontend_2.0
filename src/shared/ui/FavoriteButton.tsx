@@ -26,6 +26,8 @@ const favoriteIconSize = {
 interface FavoriteButtonProps extends VariantProps<typeof favoriteButtonVariants> {
   className?: string
   iconClassName?: string
+  /** 라벨 스타일 — 브레이크포인트별 노출/색 제어용 (예: 'hidden tab:inline') */
+  labelClassName?: string
   // 제어형: 관심 여부와 토글 콜백은 상위(카드)에서 mutation과 연결한다
   isFavorite?: boolean
   onToggle?: () => void
@@ -35,6 +37,7 @@ const FavoriteButton = ({
   size = 'lg',
   className,
   iconClassName,
+  labelClassName,
   isFavorite = false,
   onToggle,
 }: FavoriteButtonProps) => {
@@ -56,7 +59,7 @@ const FavoriteButton = ({
         isFavorite={isFavorite}
         className={cn(favoriteIconSize[size ?? 'lg'], iconClassName)}
       />
-      <span>관심있어요</span>
+      <span className={labelClassName}>관심있어요</span>
     </button>
   )
 }
