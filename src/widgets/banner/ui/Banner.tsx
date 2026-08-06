@@ -106,7 +106,9 @@ const Banner = () => {
             }
             className={cn(
               'h-[0.556875rem] rounded-full transition-[width,background-color]',
-              index === activeIndex ? 'w-[1.3922rem] bg-secondary-500' : 'w-[0.556875rem] bg-neutral-100',
+              index === activeIndex
+                ? 'w-[1.3922rem] bg-secondary-500'
+                : 'w-[0.556875rem] bg-neutral-100',
             )}
           />
         ))}

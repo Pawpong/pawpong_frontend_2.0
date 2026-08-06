@@ -84,7 +84,10 @@ const CategoryBrowse = () => {
           </div>
           <div className="relative z-10 flex items-center gap-[0.4375rem]">
             <p
-              className={cn(cafe24Proup.className, 'text-xs leading-[1.5] text-primary-600 pc:text-sm')}
+              className={cn(
+                cafe24Proup.className,
+                'text-xs leading-[1.5] text-primary-600 pc:text-sm',
+              )}
             >
               신뢰할 수 있는 브리더 포퐁에서 만나요 !
             </p>

@@ -120,7 +120,10 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
 
           <div className="flex items-center gap-2">
             {/* [refactored] CardStats */}
-            <CardStats listing={listing} className="flex-1 text-sm leading-[1.5] text-neutral-700" />
+            <CardStats
+              listing={listing}
+              className="flex-1 text-sm leading-[1.5] text-neutral-700"
+            />
             <Button
               variant="primary"
               onClick={() => router.push('/chat')}

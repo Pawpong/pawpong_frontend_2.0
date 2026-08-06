@@ -65,7 +65,11 @@ const CommunityBox = ({
         ) : (
           profile
         )}
-        <button type="button" aria-label="게시글 더보기" className="size-6 shrink-0 text-neutral-850">
+        <button
+          type="button"
+          aria-label="게시글 더보기"
+          className="size-6 shrink-0 text-neutral-850"
+        >
           <MoreVertIcon className="size-6" />
         </button>
       </header>

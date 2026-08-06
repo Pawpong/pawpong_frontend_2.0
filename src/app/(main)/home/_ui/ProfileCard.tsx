@@ -76,7 +76,9 @@ const FollowerSection = ({
         />
       ))}
     </div>
-    <span className={cn('font-medium text-neutral-850', textClassName)}>팔로워 {followerCount}</span>
+    <span className={cn('font-medium text-neutral-850', textClassName)}>
+      팔로워 {followerCount}
+    </span>
   </button>
 )
 

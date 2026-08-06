@@ -11,9 +11,7 @@ const ExploreAdoptionCard = ({ listing }: { listing: AdoptionListingCard }) => {
     listing.isFavorited,
   )
 
-  return (
-    <AdoptionGridCard listing={listing} isFavorite={isFavorite} onToggle={toggleFavorite} />
-  )
+  return <AdoptionGridCard listing={listing} isFavorite={isFavorite} onToggle={toggleFavorite} />
 }
 
 export { ExploreAdoptionCard }
