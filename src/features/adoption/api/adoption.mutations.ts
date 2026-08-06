@@ -51,26 +51,36 @@ const patchAdoptionCache = (
   return applyToPet(data)
 }
 
+interface ToggleFavoriteVariables {
+  petId: string
+  nextFavorited: boolean
+}
+
 /**
- * 관심 등록/해제 공통 mutation — 캐시를 직접 패치해 refetch 없이 즉시 반영한다.
+ * 관심 등록/해제 mutation — 캐시를 직접 패치해 refetch 없이 즉시 반영한다.
  *
  * 예전에는 onSuccess에서 adoptionQueries.all()을 통째로 invalidate 했는데,
  * 하트 한 번에 list/popular/breederPets/detail이 전부 재요청됐다.
  * 지금은 onMutate에서 해당 펫만 갈아끼우고, onSettled는 refetchType 'none'으로
  * "다음 마운트 때 최신화" 표시만 남긴다 → 토글당 네트워크 요청은 mutation 1건뿐.
+ *
+ * 등록/해제를 분리하지 않고 nextFavorited를 variables로 받는다.
+ * 카드마다 호출되는 훅이라 mutation을 두 개 만들면 목록 하나에 observer가 2배로 붙는다.
  */
-const useToggleFavoriteMutation = (
-  mutationFn: (petId: string) => Promise<AdoptionFavoriteResponse>,
-  nextFavorited: boolean,
-) => {
+const useToggleFavoriteMutation = () => {
   const qc = useQueryClient()
   const scope = { queryKey: adoptionQueries.all() }
 
   return useMutation({
-    mutationFn,
-    onMutate: async (petId: string) => {
-      // 진행 중인 refetch가 낙관적 패치를 덮어쓰지 않도록 먼저 취소
-      await qc.cancelQueries(scope)
+    mutationFn: ({ petId, nextFavorited }: ToggleFavoriteVariables) =>
+      nextFavorited ? addAdoptionFavorite(petId) : removeAdoptionFavorite(petId),
+    onMutate: async ({ petId, nextFavorited }) => {
+      // 진행 중인 refetch가 낙관적 패치를 덮어쓰지 않도록 먼저 취소.
+      // 단 최초 로딩(데이터 없음)까지 끊으면 재요청 없이 pending으로 남으므로 제외한다.
+      await qc.cancelQueries({
+        ...scope,
+        predicate: (query) => query.state.data !== undefined,
+      })
       const snapshot = qc.getQueriesData(scope)
       qc.setQueriesData(scope, (data) =>
         patchAdoptionCache(data, petId, (pet) => ({
@@ -85,11 +95,11 @@ const useToggleFavoriteMutation = (
       )
       return { snapshot }
     },
-    onError: (_error, _petId, context) => {
+    onError: (_error, _variables, context) => {
       context?.snapshot.forEach(([queryKey, data]) => qc.setQueryData(queryKey, data))
     },
     // 서버가 확정 카운트를 돌려주므로 낙관적 ±1을 실제 값으로 교정
-    onSuccess: (result) => {
+    onSuccess: (result: AdoptionFavoriteResponse) => {
       qc.setQueriesData(scope, (data) =>
         patchAdoptionCache(data, result.petId, (pet) => ({
           ...pet,
@@ -101,25 +111,17 @@ const useToggleFavoriteMutation = (
   })
 }
 
-export const useAddAdoptionFavorite = () => useToggleFavoriteMutation(addAdoptionFavorite, true)
-
-export const useRemoveAdoptionFavorite = () =>
-  useToggleFavoriteMutation(removeAdoptionFavorite, false)
-
 /**
  * 관심(좋아요) 토글 — 캐시가 단일 진실이라 로컬 state가 없다.
  * 낙관적 반영/롤백은 mutation의 캐시 패치가 담당하고, isFavorite은 호출부가 넘긴 쿼리 값이 그대로 흐른다.
  */
 export const useToggleAdoptionFavorite = (petId: string, isFavorite: boolean) => {
-  const addFavorite = useAddAdoptionFavorite()
-  const removeFavorite = useRemoveAdoptionFavorite()
+  const { mutate } = useToggleFavoriteMutation()
 
-  const toggleFavorite = () => {
-    if (isFavorite) removeFavorite.mutate(petId)
-    else addFavorite.mutate(petId)
+  return {
+    isFavorite,
+    toggleFavorite: () => mutate({ petId, nextFavorited: !isFavorite }),
   }
-
-  return { isFavorite, toggleFavorite }
 }
 
 export const useCreateAdoptionApplication = () => {
