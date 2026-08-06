@@ -80,4 +80,34 @@ export const PopularBadgeContent = ({
   </>
 )
 
+/** 애정도 뱃지 (Figma 743-68293) — pointFilled(bg-point-500 + primary 테두리/텍스트) */
+export const AffectionBadge = ({
+  children = '애정도',
+  className,
+}: {
+  children?: React.ReactNode
+  className?: string
+}) => (
+  <Badge variant="pointFilled" size="lg" className={className}>
+    {children}
+  </Badge>
+)
+
+/** 인기 뱃지 — 불 아이콘 + "인기" (variant/size/위치는 사용처에서 주입). 콘텐츠는 FireIcon로 통일 */
+export const PopularBadge = ({
+  variant = 'primaryOutline',
+  size,
+  iconSize = 'md',
+  className,
+}: {
+  variant?: BadgeProps['variant']
+  size?: BadgeProps['size']
+  iconSize?: PopularBadgeContentSize
+  className?: string
+}) => (
+  <Badge variant={variant} size={size} className={cn('gap-1', className)}>
+    <PopularBadgeContent size={iconSize} />
+  </Badge>
+)
+
 export { badgeVariants }

@@ -1,10 +1,10 @@
 'use client'
 
 import Image from 'next/image'
-import { Badge, ListingStats } from '@/shared/ui'
-import { ADOPTION_STATUS_LABEL, GENDER_LABEL } from '@/shared/types'
+import { Badge } from '@/shared/ui'
+import { GenderIcon } from '@/shared/assets/icons'
 import { FavoriteShareActions } from './FavoriteShareActions'
-import { AdoptionCardHorizontal } from '@/entities/adoption'
+import { AdoptionCardHorizontal, AdoptionStatusBadge } from '@/entities/adoption'
 import { useToggleAdoptionFavorite } from '@/features/adoption'
 import type { AdoptionListingCard } from '@/shared/types'
 
@@ -48,14 +48,14 @@ const DesktopOtherListingCard = ({
   isFavorite: boolean
   onToggle: () => void
 }) => (
-  <div className="flex items-center rounded-[0.5rem] bg-neutral-50 px-[1.25rem] py-[0.75rem]">
-    <div className="flex w-full items-center gap-[1.75rem]">
+  <div className="flex items-center rounded-lg bg-neutral-50 px-5 py-3">
+    <div className="flex w-full items-center gap-7">
       {/* 이미지 + 인기 배지 */}
-      <div className="relative aspect-[4/3] h-[13.125rem] w-[17.5rem] shrink-0 overflow-hidden rounded-[0.5rem] bg-[#c6c6c6]">
+      <div className="relative aspect-[4/3] h-[13.125rem] w-[17.5rem] shrink-0 overflow-hidden rounded-lg bg-neutral-700">
         <Image src={listing.thumbnailUrl} alt={listing.name} fill className="object-cover" />
         {listing.isPopular && (
           // [refactored] raw span → 공통 Badge(default 변형)
-          <Badge variant="default" className="absolute top-[0.875rem] left-[1rem]">
+          <Badge variant="default" className="absolute top-[0.875rem] left-4">
             인기
           </Badge>
         )}
@@ -63,16 +63,21 @@ const DesktopOtherListingCard = ({
 
       {/* 우측 정보 */}
       <div className="flex min-w-px flex-1 flex-col justify-between self-stretch">
-        <div className="flex flex-col gap-[0.75rem]">
-          {/* 제목 + 상태 배지 */}
-          <div className="flex items-center gap-[0.5rem]">
-            <p className="min-w-px truncate text-[1.25rem] leading-[1.5] font-semibold text-neutral-850">
-              {listing.name} | {GENDER_LABEL[listing.gender]} {listing.ageText}
+        <div className="flex flex-col gap-3">
+          {/* 제목(이름 + 성별 아이콘) + 상태 배지 / 아래 나이 (Figma 1226-54636) */}
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-3">
+              <div className="flex min-w-px items-center gap-[0.125rem]">
+                <p className="min-w-px truncate text-[1.25rem] leading-[1.5] font-semibold text-neutral-850">
+                  {listing.name}
+                </p>
+                <GenderIcon gender={listing.gender} className="size-8 shrink-0" />
+              </div>
+              <AdoptionStatusBadge status={listing.status} className="shrink-0" />
+            </div>
+            <p className="truncate text-[0.875rem] leading-[1.5] font-medium text-neutral-850">
+              {listing.ageText}
             </p>
-            {/* [refactored] raw span → 공통 Badge(active 변형) */}
-            <Badge variant="active" className="shrink-0">
-              {ADOPTION_STATUS_LABEL[listing.status]}
-            </Badge>
           </div>
           {listing.description && (
             <p className="line-clamp-3 text-[1rem] leading-[1.5] font-semibold text-neutral-850">
@@ -81,16 +86,9 @@ const DesktopOtherListingCard = ({
           )}
         </div>
 
-        {/* 하단: 문의/관심/조회 + 관심있어요/공유 */}
-        <div className="flex w-full items-center gap-[0.5rem]">
-          <ListingStats
-            inquiryCount={listing.inquiryCount}
-            favoriteCount={listing.favoriteCount}
-            viewCount={listing.viewCount}
-            size="lg"
-            className="flex-1 gap-[0.5rem] text-neutral-700"
-          />
-          {/* [refactored] 공통 FavoriteShareActions 사용 */}
+        {/* 하단: 관심있어요/공유 (우측 정렬) */}
+        {/* [refactored] 공통 FavoriteShareActions 사용 */}
+        <div className="flex w-full items-center justify-end gap-2">
           <FavoriteShareActions isFavorite={isFavorite} onToggle={onToggle} />
         </div>
       </div>

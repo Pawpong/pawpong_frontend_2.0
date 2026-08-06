@@ -5,8 +5,8 @@ import Link from 'next/link'
 import { GenderIcon } from '@/shared/assets/icons'
 import { cn } from '@/shared/lib/cn'
 import type { AdoptionListingCard } from '@/shared/types'
-import { Badge, FavoriteToggle, PopularBadgeContent } from '@/shared/ui'
-import { ADOPTION_CARD_STATUS_LABEL, ADOPTION_CARD_STATUS_VARIANT } from './adoptionCardStatus'
+import { FavoriteToggle, PopularBadge } from '@/shared/ui'
+import { AdoptionStatusBadge } from './AdoptionStatusBadge'
 
 interface AdoptionGridCardProps {
   listing: AdoptionListingCard
@@ -34,21 +34,14 @@ const AdoptionGridCard = ({ listing, isFavorite, onToggle, className }: Adoption
 
         <div className="absolute top-2 right-3 left-3 flex items-center gap-1">
           {listing.isPopular && (
-            <Badge
+            <PopularBadge
               variant="primaryOutline"
               size="md"
-              className="gap-1 bg-white tab:h-[1.8125rem] tab:py-1 tab:text-sm"
-            >
-              <PopularBadgeContent size="responsive" />
-            </Badge>
+              iconSize="responsive"
+              className="bg-white tab:h-[1.8125rem] tab:py-1 tab:text-sm"
+            />
           )}
-          <Badge
-            variant={ADOPTION_CARD_STATUS_VARIANT[status]}
-            size="md"
-            className="shrink-0 tab:hidden"
-          >
-            {ADOPTION_CARD_STATUS_LABEL[status]}
-          </Badge>
+          <AdoptionStatusBadge status={status} size="md" className="shrink-0 tab:hidden" />
         </div>
 
         <FavoriteToggle
@@ -75,13 +68,11 @@ const AdoptionGridCard = ({ listing, isFavorite, onToggle, className }: Adoption
           </p>
         </div>
 
-        <Badge
-          variant={ADOPTION_CARD_STATUS_VARIANT[status]}
+        <AdoptionStatusBadge
+          status={status}
           size="md"
           className="hidden shrink-0 tab:flex tab:h-[1.8125rem] tab:py-1 tab:text-sm"
-        >
-          {ADOPTION_CARD_STATUS_LABEL[status]}
-        </Badge>
+        />
       </div>
     </Link>
   )

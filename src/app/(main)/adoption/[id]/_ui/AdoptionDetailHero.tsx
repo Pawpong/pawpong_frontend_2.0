@@ -1,11 +1,13 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { Fragment, type ReactNode } from 'react'
 import {
+  AffectionBadge,
   Badge,
   Container,
+  PopularBadge,
+  ProfileAvatar,
   ListingStats,
   Separator,
   DropdownMenu,
@@ -13,10 +15,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from '@/shared/ui'
-import { cn } from '@/shared/lib/cn'
 import { ArrowRightIcon, CheckIcon, GenderIcon } from '@/shared/assets/icons'
-import { ADOPTION_STATUS_LABEL, GENDER_LABEL } from '@/shared/types'
+import { GENDER_LABEL } from '@/shared/types'
 import type { AdoptionDetailDto, AdoptionStatus } from '@/shared/types'
+import { ADOPTION_CARD_STATUS } from '@/entities/adoption'
 import { HeroImageCarousel } from './HeroImageCarousel'
 import { FavoriteShareActions } from './FavoriteShareActions'
 
@@ -55,17 +57,18 @@ const AdoptionDetailHero = ({ detail, onImageClick }: AdoptionDetailHeroProps) =
         <div className="hidden items-center gap-[1.75rem] pc:flex">
           <div className="flex flex-1 items-center gap-[1.25rem]">
             <div className="flex items-center gap-[0.5rem]">
-              {/* [refactored] BreederAvatar 사용 */}
-              <BreederAvatar
+              {/* [refactored] 로컬 아바타 → 공통 ProfileAvatar (빈 src 폴백 내장) */}
+              <ProfileAvatar
                 src={detail.breeder.profileImageUrl}
                 alt={detail.breeder.nickname}
-                className="size-[2.5rem]"
+                size="medium"
+                className="shrink-0"
               />
               <p className="text-[1rem] leading-[1.5] font-semibold text-neutral-850">
                 {detail.breeder.nickname}
               </p>
             </div>
-            <Badge variant="active">애정도</Badge>
+            <AffectionBadge />
           </div>
           <Link
             href={`/home/${detail.breeder.id}`}
@@ -83,11 +86,12 @@ const AdoptionDetailHero = ({ detail, onImageClick }: AdoptionDetailHeroProps) =
         {/* 브리더 프로필 (모바일만 여기서 표시) */}
         <div className="w-full pc:hidden">
           <div className="flex items-center gap-[0.375rem]">
-            {/* [refactored] BreederAvatar 사용 */}
-            <BreederAvatar
+            {/* [refactored] 로컬 아바타 → 공통 ProfileAvatar (빈 src 폴백 내장) */}
+            <ProfileAvatar
               src={detail.breeder.profileImageUrl}
               alt={detail.breeder.nickname}
-              className="size-[2.75rem]"
+              size="medium"
+              className="size-11 shrink-0"
             />
             <div className="flex flex-1 flex-col">
               <p className="text-[0.875rem] leading-[1.5] font-bold text-[#5d5d5d]">
@@ -116,12 +120,10 @@ const AdoptionDetailHero = ({ detail, onImageClick }: AdoptionDetailHeroProps) =
             </p>
             <StatusDropdown currentStatus={detail.status} />
             {detail.isPopular && (
-              <Badge
+              <PopularBadge
                 variant="outline"
                 className="h-[1.375rem] bg-white px-[0.5rem] py-[0.125rem] text-[0.75rem] leading-normal"
-              >
-                인기🔥
-              </Badge>
+              />
             )}
           </div>
 
@@ -173,21 +175,6 @@ const AdoptionDetailHero = ({ detail, onImageClick }: AdoptionDetailHeroProps) =
   </Container>
 )
 
-// [refactored] 브리더 아바타 (원형 이미지 + fallback 배경) — 데스크탑/모바일 중복 제거 (크기만 className)
-const BreederAvatar = ({
-  src,
-  alt,
-  className,
-}: {
-  src: string
-  alt: string
-  className: string
-}) => (
-  <div className={cn('relative shrink-0 overflow-hidden rounded-full bg-[#d4d4d4]', className)}>
-    <Image src={src} alt={alt} fill className="object-cover" />
-  </div>
-)
-
 /* ── 정보 항목 (라벨 ↔ 내용: 가로 배치 gap-12px) ── */
 /* 피그마: 라벨 body/xl/medium #6b6b6b, 내용 body/xl/bold #3e3e3e (leading 1.5) */
 const InfoItem = ({
@@ -220,10 +207,9 @@ const StatusDropdown = ({ currentStatus }: { currentStatus: AdoptionStatus }) =>
     <DropdownMenuTrigger asChild>
       <button
         type="button"
-        className="inline-flex items-center gap-[0.625rem] rounded-full bg-[#5d5d5d] px-[0.625rem] py-[0.25rem] text-[0.75rem] leading-[1.375rem] font-semibold text-white pc:text-[0.875rem]"
+        className="inline-flex items-center rounded-full border border-primary-500 bg-white px-[0.625rem] py-[0.25rem] text-[0.75rem] leading-[1.375rem] font-semibold text-primary-500 pc:text-[0.875rem]"
       >
-        {ADOPTION_STATUS_LABEL[currentStatus]}
-        <CheckIcon className="size-[1.25rem]" />
+        {ADOPTION_CARD_STATUS[currentStatus].label}
       </button>
     </DropdownMenuTrigger>
     <DropdownMenuContent
@@ -235,7 +221,7 @@ const StatusDropdown = ({ currentStatus }: { currentStatus: AdoptionStatus }) =>
           key={status}
           className="flex items-center justify-between rounded-none px-0 py-0 text-[0.875rem] leading-[1.375rem] font-medium text-white hover:bg-transparent focus:bg-transparent"
         >
-          <span>{ADOPTION_STATUS_LABEL[status]}</span>
+          <span>{ADOPTION_CARD_STATUS[status].label}</span>
           {status === currentStatus && <CheckIcon className="size-[1.25rem]" />}
         </DropdownMenuItem>
       ))}

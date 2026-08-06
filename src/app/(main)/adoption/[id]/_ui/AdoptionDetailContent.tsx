@@ -65,13 +65,15 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
       {/* 브리더의 다른 분양건 — 피그마: 컬럼 920px 중앙(외곽서 260px), 제목 위 48px, gap 39px */}
       <Section>
         <Separator className="bg-[#d4d4d4]" />
-        <div className="mt-[1rem] flex flex-col gap-[0.75rem] pc:mx-auto pc:mt-[3rem] pc:max-w-[57.5rem] pc:gap-[2.4375rem]">
-          <p className="text-[0.75rem] leading-[1.375rem] font-medium text-[#5d5d5d] pc:text-[1.25rem] pc:font-semibold pc:text-neutral-850">
+        <div className="mt-[1rem] flex flex-col gap-[0.75rem] pc:mx-auto pc:mt-[3rem] pc:max-w-[57.5rem] pc:gap-2">
+          <p className="text-[0.75rem] leading-[1.375rem] font-medium text-[#5d5d5d] pc:text-[1.25rem] pc:leading-[1.5] pc:font-semibold pc:text-neutral-850">
             브리더의 다른 분양건 {detail.otherListings.length}
           </p>
-          {detail.otherListings.map((listing) => (
-            <OtherListingCard key={listing.listingId} listing={listing} />
-          ))}
+          <div className="flex flex-col gap-[0.75rem] pc:gap-6">
+            {detail.otherListings.map((listing) => (
+              <OtherListingCard key={listing.listingId} listing={listing} />
+            ))}
+          </div>
         </div>
       </Section>
 

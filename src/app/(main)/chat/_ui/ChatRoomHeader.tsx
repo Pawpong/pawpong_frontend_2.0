@@ -1,6 +1,6 @@
 'use client'
 
-import { Badge, ProfileAvatar } from '@/shared/ui'
+import { AffectionBadge, ProfileAvatar } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { ArrowBackIcon, MoreVertIcon } from '@/shared/assets/icons'
 import { CHAT_CONTENT_WIDTH, CHAT_GUTTER_X } from '../_lib/constants'
@@ -27,7 +27,7 @@ const ChatRoomHeader = ({ displayName, hasApplication, onBack }: ChatRoomHeaderP
               <span className="text-body-s font-semibold text-neutral-850">{displayName}</span>
             </div>
           </div>
-          {hasApplication && <Badge variant="active">애정도</Badge>}
+          {hasApplication && <AffectionBadge />}
         </div>
         <button type="button" className="shrink-0" aria-label="더보기">
           <MoreVertIcon className="size-6 text-neutral-850" />

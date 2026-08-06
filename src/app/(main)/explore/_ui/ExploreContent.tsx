@@ -2,13 +2,22 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
-import { Container, FilterChip, PopularBadgeContent, TabBar } from '@/shared/ui'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import {
+  Container,
+  FilterChip,
+  InfiniteScrollTrigger,
+  PopularBadgeContent,
+  TabBar,
+} from '@/shared/ui'
+import { CATEGORY_TO_PET_TYPE } from '@/shared/lib/petCategory'
+import { adoptionQueries } from '@/entities/adoption'
+import { mapAdoptionCard, dedupeByListingId } from '@/shared/lib/mapAdoptionCard'
 import { SearchSection } from '@/features/search'
 import { CategorySection } from '@/features/category-filter'
 import { cn } from '@/shared/lib/cn'
 import { useBreakpoint } from '@/shared/lib/useBreakpoint'
 import { useGnbHeight } from '@/shared/lib/useGnbHeight'
-import { createMockListings } from '@/shared/mocks/adoption'
 import { ANIMAL_CATEGORIES } from '@/shared/types'
 import type { AnimalCategory } from '@/shared/types'
 import { BreederExploreContent } from './BreederExploreContent'
@@ -18,8 +27,6 @@ import { ExploreFilterBar } from './ExploreFilterBar'
 import { EXPLORE_TABS, SEARCH_PLACEHOLDERS, EXPLORE_SECTION_CONTAINER } from '../_lib/constants'
 import type { ExploreType } from '../_lib/constants'
 
-const mockListings = createMockListings()
-
 type AdoptionListFilter = 'all' | 'available' | 'popular'
 
 const ADOPTION_LIST_FILTERS: Array<{ value: AdoptionListFilter; label: string }> = [
@@ -27,6 +34,13 @@ const ADOPTION_LIST_FILTERS: Array<{ value: AdoptionListFilter; label: string }>
   { value: 'available', label: '분양중' },
   { value: 'popular', label: '인기' },
 ]
+
+// 필터 칩 → v2 /adoption 쿼리 파라미터 (서버 필터링 — 클라이언트 slice 금지)
+const FILTER_TO_QUERY = {
+  all: { sort: 'latest', status: undefined },
+  available: { sort: 'latest', status: 'available' },
+  popular: { sort: 'popular', status: undefined },
+} as const
 
 const ExploreContent = () => {
   const searchParams = useSearchParams()
@@ -37,21 +51,34 @@ const ExploreContent = () => {
   const selectedType: ExploreType = typeParam === 'breeder' ? 'breeder' : 'adoption'
   const [adoptionListFilter, setAdoptionListFilter] = useState<AdoptionListFilter>('all')
 
-  const filteredListings = useMemo(() => {
-    if (adoptionListFilter === 'available') {
-      return mockListings.filter((listing) => listing.status === 'available')
-    }
-    if (adoptionListFilter === 'popular') {
-      return mockListings.filter((listing) => listing.isPopular)
-    }
-    return mockListings
-  }, [adoptionListFilter])
-
   const categoryParam = searchParams.get('category')
   const selectedCategory: AnimalCategory =
     categoryParam && ANIMAL_CATEGORIES.includes(categoryParam as AnimalCategory)
       ? (categoryParam as AnimalCategory)
       : 'all'
+
+  // 입양 탐색 실데이터 — 카테고리 칩은 petType, 필터 칩은 sort/status로 매핑해 v2 API 조회
+  // (입양 탭에서만 활성화). 필터가 바뀌면 queryKey가 바뀌어 서버에서 다시 받아온다.
+  const petType = CATEGORY_TO_PET_TYPE[selectedCategory]
+  const { sort, status } = FILTER_TO_QUERY[adoptionListFilter]
+  const {
+    data: listData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    ...adoptionQueries.list(sort, petType, status),
+    enabled: selectedType === 'adoption',
+  })
+
+  // 무한스크롤 페이지 병합 시 listingId 중복 제거 — 서버 페이지네이션이 경계에서 항목을
+  // 겹쳐 주더라도 React key 중복(카드 중복/누락)이 발생하지 않도록 방어한다.
+  const listings = useMemo(
+    () =>
+      dedupeByListingId((listData?.pages.flatMap((page) => page.items) ?? []).map(mapAdoptionCard)),
+    [listData],
+  )
+  const totalCount = listData?.pages[0]?.pagination.totalItems
 
   const handleTypeChange = useCallback(
     (type: ExploreType) => {
@@ -153,8 +180,8 @@ const ExploreContent = () => {
           <Container className={EXPLORE_SECTION_CONTAINER}>
             <ExploreListingSection
               title="전체 분양 소식"
-              items={filteredListings}
-              totalCount={mockListings.length}
+              items={listings}
+              totalCount={totalCount}
               getKey={(listing) => listing.listingId}
               renderCard={(listing) => <ExploreAdoptionCard listing={listing} />}
               headerSlot={
@@ -176,6 +203,16 @@ const ExploreContent = () => {
                   ))}
                 </div>
               }
+            />
+            {listings.length === 0 && (
+              <p className="py-10 text-center text-sm text-neutral-700">
+                등록된 분양글이 없습니다.
+              </p>
+            )}
+            <InfiniteScrollTrigger
+              onIntersect={fetchNextPage}
+              hasNextPage={hasNextPage ?? false}
+              isFetchingNextPage={isFetchingNextPage}
             />
           </Container>
         </>
