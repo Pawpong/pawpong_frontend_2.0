@@ -7,10 +7,7 @@ import type { AnimalCategory } from '@/shared/types'
 
 // 카테고리별 완성 칩 SVG (기본/선택). 도마뱀은 강아지 칩 재사용 (전용 아트 나오면 교체).
 // 칩은 동물머리+pill+라벨이 한 장에 포함 — 높이는 pill이 하단에 정렬되도록 items-end + uniform scale.
-const CHIP: Record<
-  AnimalCategory,
-  { src: string; on: string; ratio: string; height: string }
-> = {
+const CHIP: Record<AnimalCategory, { src: string; on: string; ratio: string; height: string }> = {
   all: {
     src: '/images/category/filter-all.svg',
     on: '/images/category/filter-all-active.svg',
@@ -66,12 +63,7 @@ const CategoryFilter = ({ selected, onChange, className }: CategoryFilterProps) 
             className={cn('relative w-auto shrink-0', chip.height, chip.ratio)}
           >
             {/* 라벨은 button의 aria-label이 담당 — 이미지는 장식 */}
-            <Image
-              src={active ? chip.on : chip.src}
-              alt=""
-              fill
-              className="object-contain"
-            />
+            <Image src={active ? chip.on : chip.src} alt="" fill className="object-contain" />
           </button>
         )
       })}

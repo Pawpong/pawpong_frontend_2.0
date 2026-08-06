@@ -57,7 +57,8 @@ const CarouselIndicator = ({ count, currentIndex }: CarouselIndicatorProps) => (
         key={index}
         className={cn(
           'h-2 rounded-lg transition-[width,background-color]',
-          index === currentIndex ? 'w-5 bg-secondary-500' : 'w-2 bg-white/30',
+          // 히어로 캐러셀과 동일한 노란 pill (#fffa94 활성 / #a9835a 비활성)
+          index === currentIndex ? 'w-5 bg-[#fffa94]' : 'w-2 bg-[#a9835a]',
         )}
       />
     ))}
@@ -83,6 +84,10 @@ const ImageDetailModal = ({
   const { currentIndex, handlePrev, handleNext } = useImageCarousel(images, initialIndex)
   const hasCarousel = images.length > 1
   const hasActions = showActions && Boolean(footer)
+  // 프로필/설명/투표/버튼이 전혀 없는 순수 이미지 뷰(입양 상세) — 박스를 이미지 폭에 맞춰
+  // 좌우 여백/멀어진 화살표로 불규칙해 보이던 문제를 제거 (Figma 1952-260350)
+  const isPlain =
+    !profile && !description && !hasActions && voteCount === undefined && !showVoteStatus
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -163,7 +168,13 @@ const ImageDetailModal = ({
 
             {/* 이미지 + 좌우 네비게이션 */}
             <div className="relative flex min-h-0 w-full flex-1 shrink-0 items-center justify-center tab:h-[28.40625rem] tab:flex-none pc:h-auto pc:flex-1">
-              <div className="relative size-full max-w-[37.875rem] overflow-hidden bg-neutral-700 tab:rounded-lg pc:aspect-[4/3] pc:h-full pc:w-auto">
+              <div
+                className={cn(
+                  'relative size-full max-w-[37.875rem] overflow-hidden bg-neutral-700 tab:rounded-lg pc:aspect-[4/3] pc:h-full pc:w-auto',
+                  // 순수 이미지 뷰(입양 상세)는 pc에서 폭 캡을 풀어 높이 기준 4/3 가로형으로 (Figma 1952-260350)
+                  isPlain && 'pc:max-w-[48.75rem] pc:rounded-[1.25rem]',
+                )}
+              >
                 {images[currentIndex] && (
                   <Image
                     src={images[currentIndex]}
@@ -210,7 +221,10 @@ const ImageDetailModal = ({
               </div>
             </div>
 
-            {hasCarousel && <CarouselIndicator count={images.length} currentIndex={currentIndex} />}
+            {/* 순수 이미지 뷰(입양)는 히어로처럼 1장이어도 인디케이터를 사진 밑에 노출 */}
+            {(hasCarousel || isPlain) && (
+              <CarouselIndicator count={images.length} currentIndex={currentIndex} />
+            )}
 
             {/* 하단 버튼 — showActions로 독립 제어 */}
             {hasActions && (

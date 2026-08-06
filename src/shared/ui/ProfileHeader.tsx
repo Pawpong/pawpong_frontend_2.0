@@ -71,7 +71,9 @@ const ProfileHeader = ({
             >
               {preview}
             </p>
-            <span className={cn('shrink-0 leading-[1.5] font-medium text-neutral-700', previewSize)}>
+            <span
+              className={cn('shrink-0 leading-[1.5] font-medium text-neutral-700', previewSize)}
+            >
               [더보기]
             </span>
           </div>

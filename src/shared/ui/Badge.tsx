@@ -83,12 +83,14 @@ export const PopularBadgeContent = ({
 /** 애정도 뱃지 (Figma 743-68293) — pointFilled(bg-point-500 + primary 테두리/텍스트) */
 export const AffectionBadge = ({
   children = '애정도',
+  size = 'lg',
   className,
 }: {
   children?: React.ReactNode
+  size?: BadgeProps['size']
   className?: string
 }) => (
-  <Badge variant="pointFilled" size="lg" className={className}>
+  <Badge variant="pointFilled" size={size} className={className}>
     {children}
   </Badge>
 )

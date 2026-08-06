@@ -2,9 +2,10 @@
 
 import { useRouter } from 'next/navigation'
 import type { ReactNode } from 'react'
-import { Container, Separator, ImageModal } from '@/shared/ui'
+import { Container, Separator, ImageDetailModal } from '@/shared/ui'
 import { ArrowBackIcon, MoreVertIcon } from '@/shared/assets/icons'
 import { useImageModal } from '@/shared/lib/useImageModal'
+import { useToggleAdoptionFavorite } from '@/features/adoption'
 import type { AdoptionDetailDto } from '@/shared/types'
 import { HealthInfoCard } from './HealthInfoCard'
 import { ParentInfoCard } from './ParentInfoCard'
@@ -21,11 +22,17 @@ interface AdoptionDetailContentProps {
    입양 상세 페이지 오케스트레이터
    - 모바일 서브헤더 + 히어로 + 하단 섹션 + CTA + 이미지 모달
    - 이미지 모달 상태는 히어로/하단 카드가 공유하므로 여기서 보관
+   - 관심 상태도 히어로(pc)/CTA바(모바일·탭)가 공유하므로 여기서 보관
    ═══════════════════════════════════════════════ */
 const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
   const router = useRouter()
   const { imageModalOpen, setImageModalOpen, modalImages, modalInitialIndex, openImageModal } =
     useImageModal(detail.imageUrls)
+  // listingId = petId (mapAdoptionDetail)
+  const { isFavorite, toggleFavorite } = useToggleAdoptionFavorite(
+    detail.listingId,
+    detail.isFavorited,
+  )
 
   return (
     <div className="pb-[6rem] tab:pb-[6rem]">
@@ -45,7 +52,12 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
       </div>
 
       {/* ═══ 히어로 섹션 ═══ */}
-      <AdoptionDetailHero detail={detail} onImageClick={openImageModal} />
+      <AdoptionDetailHero
+        detail={detail}
+        onImageClick={openImageModal}
+        isFavorite={isFavorite}
+        onToggleFavorite={toggleFavorite}
+      />
 
       {/* ═══ 하단 콘텐츠 ═══ 피그마 tab: 섹션별 컨테이너 px-48 py-12 */}
       {/* [refactored] 반복되던 <Container className="tab:py-[0.75rem] pc:py-[1.25rem]"> 를 Section으로 추출 */}
@@ -78,14 +90,21 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
       </Section>
 
       {/* ═══ CTA 하단 고정 바 ═══ */}
-      <AdoptionCtaBar listingId={detail.listingId} />
+      <AdoptionCtaBar
+        listingId={detail.listingId}
+        isFavorite={isFavorite}
+        onToggleFavorite={toggleFavorite}
+      />
 
-      {/* ═══ 이미지 모달 ═══ */}
-      <ImageModal
+      {/* ═══ 이미지 모달 — 공통 ImageDetailModal (Figma 1952-260350: 이미지+대표뱃지+캐러셀만,
+          프로필/소개/투표/버튼 없음) ═══ */}
+      <ImageDetailModal
         images={modalImages}
         initialIndex={modalInitialIndex}
         open={imageModalOpen}
         onOpenChange={setImageModalOpen}
+        representativeIndex={0}
+        showActions={false}
       />
     </div>
   )
