@@ -55,7 +55,7 @@ const FavoriteShareActions = ({
           aria-label="공유"
           className="flex items-center gap-0 text-[0.75rem] font-semibold text-neutral-850"
         >
-          <ShareIcon className="size-[2rem]" />
+          <ShareIcon className="size-[2rem] text-neutral-700" />
           <span className={labelClassName}>공유</span>
         </button>
       )}

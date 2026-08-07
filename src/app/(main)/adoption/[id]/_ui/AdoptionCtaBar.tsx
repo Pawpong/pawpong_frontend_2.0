@@ -32,7 +32,7 @@ const AdoptionCtaBar = ({ listingId, isFavorite, onToggleFavorite }: AdoptionCta
         <FavoriteIcon
           size="lg"
           status={isFavorite ? 'fill' : 'default'}
-          className={isFavorite ? FAVORITE_ACTIVE : 'text-[#5d5d5d]'}
+          className={isFavorite ? FAVORITE_ACTIVE : 'text-neutral-500'}
         />
       </button>
 
