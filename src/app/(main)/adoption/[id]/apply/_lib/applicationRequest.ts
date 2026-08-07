@@ -9,13 +9,15 @@ export const toCreateApplicationRequest = (
   breederId: detail.breeder.id,
   petId: detail.listingId,
   privacyConsent: data.privacyConsent,
-  selfIntroduction: data.adoptionPlan,
+  // selfIntroduction DTO 정의(성별·연령대·거주지·결혼계획·생활패턴)가 조사의 자기소개와 일치 —
+  // 조사를 채운 경우 그 값을, 아니면 기존처럼 입양 계획을 사용
+  selfIntroduction: data.selfIntroduction?.trim() || data.adoptionPlan,
   familyMembers: data.familyMembers,
   allFamilyConsent: data.allFamilyConsent,
   canProvideBasicCare: data.canProvideBasicCare,
   canAffordMedicalExpenses: data.canAffordMedicalExpenses,
   allergyTestInfo: '',
-  timeAwayFromHome: '',
-  livingSpaceDescription: '',
+  timeAwayFromHome: data.timeAwayFromHome ?? '',
+  livingSpaceDescription: data.livingSpaceDescription ?? '',
   previousPetExperience: '',
 })
