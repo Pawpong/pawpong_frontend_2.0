@@ -53,7 +53,8 @@ const ChatMessageInput = ({ onSend, disabled }: ChatMessageInputProps) => {
       const uploaded = await uploadFile.mutateAsync({ file, folder: 'chat' })
       const content = serializeChatAttachment({
         kind: messageType,
-        url: uploaded.cdnUrl,
+        // cdnUrl은 만료되는 signed URL이므로 영구 경로인 url을 본문에 저장한다.
+        url: uploaded.url,
         name: file.name,
         size: uploaded.size || file.size,
         mimeType: file.type,
