@@ -63,7 +63,13 @@ const CategoryFilter = ({ selected, onChange, className }: CategoryFilterProps) 
             className={cn('relative w-auto shrink-0', chip.height, chip.ratio)}
           >
             {/* 라벨은 button의 aria-label이 담당 — 이미지는 장식 */}
-            <Image src={active ? chip.on : chip.src} alt="" fill className="object-contain" />
+            <Image
+              src={active ? chip.on : chip.src}
+              alt=""
+              fill
+              sizes="96px"
+              className="object-contain"
+            />
           </button>
         )
       })}

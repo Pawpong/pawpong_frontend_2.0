@@ -20,7 +20,13 @@ const BreederListingCard = ({ listing, className }: BreederListingCardProps) => 
     >
       {/* Image */}
       <div className="relative size-[10.25rem] overflow-hidden rounded-[0.375rem] bg-[#d4d4d4]">
-        <Image src={listing.thumbnailUrl} alt={listing.name} fill className="object-cover" />
+        <Image
+          src={listing.thumbnailUrl}
+          alt={listing.name}
+          fill
+          sizes="(max-width: 768px) 50vw, 25vw"
+          className="object-cover"
+        />
         <AdoptionStatusBadge
           status={listing.status}
           size="md"
