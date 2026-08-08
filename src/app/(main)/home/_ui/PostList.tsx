@@ -4,11 +4,21 @@ import { toPostCardProps, type MyHomePost } from '@/shared/mocks/myHome'
 
 interface PostListProps {
   posts: MyHomePost[]
+  /** 글이 없을 때 문구 (마이홈은 '내가 쓴 글이 없습니다.') */
+  emptyText?: string
 }
 
 // 디자인(2046-160971): 모바일은 카드 stack(gap-20), 탭·PC는 #cacaca 보더 박스(rounded-8) + 구분선, 게시글 간 gap-32
 // 박스는 max-w-948(59.25rem) 중앙 정렬(frame items-center), 세로 여백(spacing-40)은 래퍼 Container의 py가 담당
-const PostList = ({ posts }: PostListProps) => {
+const PostList = ({ posts, emptyText = '게시글이 없습니다.' }: PostListProps) => {
+  if (posts.length === 0) {
+    return (
+      <p className="py-10 text-center text-sm leading-[1.5] font-medium text-neutral-700">
+        {emptyText}
+      </p>
+    )
+  }
+
   return (
     <div className="flex flex-col gap-5 tab:mx-auto tab:max-w-[59.25rem] tab:gap-8 tab:rounded-lg tab:border tab:border-neutral-300 tab:p-3">
       {posts.map((post, index) => (
