@@ -2,7 +2,8 @@
 
 import { useCallback, useMemo, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { chatQueries, getChatMessages } from '@/entities/chat'
+import { chatQueries } from '@/entities/chat'
+import { getAccessToken } from '@/shared/api'
 import type {
   ChatMessageResponseDto,
   ChatMessageType,
@@ -11,31 +12,13 @@ import type {
 } from '@/shared/types'
 import { useChatSocket } from './useChatSocket'
 
-const readAccessToken = () => {
-  if (typeof document === 'undefined') return null
-  const cookie = document.cookie
-    .split('; ')
-    .find((item) => item.startsWith('accessToken='))
-    ?.slice('accessToken='.length)
-  if (!cookie) return null
-
-  try {
-    return decodeURIComponent(cookie)
-  } catch {
-    return cookie
-  }
-}
-
-const sortMessages = (messages: ChatMessageResponseDto[]) =>
-  messages.slice().sort((a, b) => {
-    const timeDiff = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-    return timeDiff || a.messageId.localeCompare(b.messageId)
-  })
-
 const mergeMessages = (current: ChatMessageResponseDto[], incoming: ChatMessageResponseDto[]) => {
   const byId = new Map(current.map((message) => [message.messageId, message]))
   incoming.forEach((message) => byId.set(message.messageId, message))
-  return sortMessages([...byId.values()])
+  return [...byId.values()].sort((a, b) => {
+    const timeDiff = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    return timeDiff || a.messageId.localeCompare(b.messageId)
+  })
 }
 
 interface LiveMessageState {
@@ -49,11 +32,10 @@ const useChatRoom = (roomId: string, currentUserId: string) => {
   const [usePolling, setUsePolling] = useState(false)
   const [socketError, setSocketError] = useState<string | null>(null)
   const [liveState, setLiveState] = useState<LiveMessageState>({ roomId, messages: [] })
-  const token = readAccessToken()
+  const token = getAccessToken()
 
   const messagesQuery = useQuery({
     ...chatQueries.messages(roomId),
-    queryFn: async () => sortMessages(await getChatMessages(roomId, 50)),
     refetchInterval: usePolling ? 3_000 : false,
     refetchIntervalInBackground: false,
   })

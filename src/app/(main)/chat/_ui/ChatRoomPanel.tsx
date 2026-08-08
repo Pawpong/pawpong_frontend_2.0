@@ -1,8 +1,11 @@
 'use client'
 
 import * as React from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { cn } from '@/shared/lib/cn'
 import { useChatRoom } from '@/features/chat-realtime'
+import { adoptionQueries } from '@/entities/adoption'
+import { applicationQueries } from '@/entities/application'
 import type { ChatRoomResponseDto } from '@/shared/types'
 import { CHAT_CONTENT_WIDTH, CHAT_GUTTER_X } from '../_lib/constants'
 import { ChatRoomHeader } from './ChatRoomHeader'
@@ -32,13 +35,19 @@ const ChatRoomPanel = ({ room, currentUserId, onBack }: ChatRoomPanelProps) => {
   const displayName = room.counterpart.nickname
   const [showNotice, setShowNotice] = React.useState(true)
 
+  // 입양 문의 방일 때만 신청 -> 펫 상세 순으로 조회해 상단 카드를 채운다.
+  const applicationQuery = useQuery(applicationQueries.detail(room.applicationId ?? ''))
+  const petQuery = useQuery(adoptionQueries.detail(applicationQuery.data?.petId ?? ''))
+
   React.useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages.length])
 
+  // 상대가 보낸 안 읽은 메시지가 있을 때만 읽음 처리를 emit한다.
+  const hasUnread = messages.some((message) => !message.isMine && !message.isRead)
   React.useEffect(() => {
-    if (isConnected) markAsRead()
-  }, [isConnected, markAsRead, messages.length])
+    if (isConnected && hasUnread) markAsRead()
+  }, [isConnected, hasUnread, markAsRead])
 
   return (
     <div className="flex h-[calc(100dvh-4rem)] flex-col bg-point-50">
@@ -51,7 +60,7 @@ const ChatRoomPanel = ({ room, currentUserId, onBack }: ChatRoomPanelProps) => {
       />
 
       {/* Pet Info Card */}
-      {room.applicationId && <PetInfoCard />}
+      {petQuery.data && <PetInfoCard detail={petQuery.data} />}
 
       {/* 모바일 알림은 펫 카드 바로 아래에서 전체 폭으로 노출한다. */}
       {showNotice && (
@@ -85,13 +94,14 @@ const ChatRoomPanel = ({ room, currentUserId, onBack }: ChatRoomPanelProps) => {
                 </button>
               </div>
             ) : (
-              messages.map((msg) => (
+              messages.map((msg, idx) => (
                 <ChatMessageBubble
                   key={msg.messageId}
                   message={msg}
                   isMine={msg.isMine}
                   senderName={displayName}
-                  showProfile={!msg.isMine}
+                  // 상대 메시지가 연속되면 첫 말풍선에만 프로필을 노출한다.
+                  showProfile={!msg.isMine && messages[idx - 1]?.isMine !== false}
                 />
               ))
             )}

@@ -5,6 +5,7 @@ import axios, {
   InternalAxiosRequestConfig,
 } from 'axios'
 import { ApiError, normalizeApiError } from './unwrap'
+import { getAccessToken } from './token'
 
 export interface ApiRequestConfig extends AxiosRequestConfig {
   skipAuth?: boolean
@@ -41,20 +42,9 @@ function createApiClient(): AxiosInstance {
 
     if ((config as InternalAxiosRequestConfig & { skipAuth?: boolean }).skipAuth) return config
 
-    if (typeof window !== 'undefined') {
-      const cookies = document.cookie.split(';').reduce(
-        (acc, cookie) => {
-          const [key, value] = cookie.trim().split('=')
-          acc[key] = value
-          return acc
-        },
-        {} as Record<string, string>,
-      )
-
-      const accessToken = cookies['accessToken']
-      if (accessToken && !config.headers['Authorization']) {
-        config.headers['Authorization'] = `Bearer ${accessToken}`
-      }
+    const accessToken = getAccessToken()
+    if (accessToken && !config.headers['Authorization']) {
+      config.headers['Authorization'] = `Bearer ${accessToken}`
     }
     return config
   })
