@@ -4,31 +4,21 @@ import { Badge } from '@/shared/ui'
 import { CheckIcon } from '@/shared/assets/icons'
 import type { AdoptionDetailDto } from '@/shared/types'
 import { BaseInfoCard } from './BaseInfoCard'
+import { EmptyNote } from './EmptyNote'
 
 const CompletionBadge = ({ completed }: { completed: boolean }) => (
-  <Badge
-    variant="status"
-    className={cn(
-      'flex items-center justify-center px-[0.625rem] py-[0.25rem] text-[0.75rem] leading-[1.375rem] pc:text-[0.875rem]',
-      completed ? 'bg-[#5d5d5d]' : 'bg-[#a4a4a4]',
-    )}
-  >
-    {completed && <CheckIcon className="size-[1.25rem] pc:size-[1.5rem]" />}
+  <Badge variant={completed ? 'primaryOutline' : 'neutralFilled'} size="lg">
+    {completed && <CheckIcon className="size-4" />}
     <span>{completed ? '검사 완료' : '미완료'}</span>
   </Badge>
-)
-
-// 기록이 없을 때 표시하는 안내 문구
-const EmptyNote = ({ children }: { children: ReactNode }) => (
-  <p className="py-[0.5rem] text-[0.875rem] leading-[1.375rem] font-medium text-[#a4a4a4]">
-    {children}
-  </p>
 )
 
 // [refactored] 섹션 헤더(제목 + 검사완료 배지) — 2회 반복 제거
 const SectionHeader = ({ title, completed }: { title: string; completed: boolean }) => (
   <div className="flex items-center justify-between">
-    <p className="text-[0.875rem] leading-[1.375rem] font-semibold text-[#5d5d5d]">{title}</p>
+    <p className="text-[0.875rem] leading-[1.375rem] font-semibold text-neutral-700 pc:text-[1rem] pc:leading-[1.5]">
+      {title}
+    </p>
     <CompletionBadge completed={completed} />
   </div>
 )
@@ -77,7 +67,10 @@ const HealthInfoCard = ({ detail }: { detail: AdoptionDetailDto }) => (
             ))}
           </Table>
         ) : (
-          <EmptyNote>등록된 접종 정보가 없어요.</EmptyNote>
+          // 미완료 사유가 있으면 그대로 노출 (분양글 작성 시 브리더가 입력)
+          <EmptyNote>
+            {detail.health.vaccinationIncompleteReason || '등록된 접종 정보가 없어요.'}
+          </EmptyNote>
         )}
       </div>
 
@@ -87,9 +80,7 @@ const HealthInfoCard = ({ detail }: { detail: AdoptionDetailDto }) => (
         <SectionHeader title="유전병 검사" completed={detail.health.geneticTestCompleted} />
 
         {/* [refactored] Table/TableRow 사용 (접종일 컬럼 없음) */}
-        {detail.health.geneticTest.date ||
-        detail.health.geneticTest.institution ||
-        detail.health.geneticTest.results.length > 0 ? (
+        {detail.health.geneticTest.results.length > 0 ? (
           <Table>
             <TableRow>
               <span className="min-w-px flex-1 text-neutral-700">검진일</span>
@@ -112,7 +103,9 @@ const HealthInfoCard = ({ detail }: { detail: AdoptionDetailDto }) => (
             ))}
           </Table>
         ) : (
-          <EmptyNote>등록된 유전병 검사 정보가 없어요.</EmptyNote>
+          <EmptyNote>
+            {detail.health.geneticTestIncompleteReason || '등록된 유전병 검사 정보가 없어요.'}
+          </EmptyNote>
         )}
       </div>
     </div>

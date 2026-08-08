@@ -11,7 +11,7 @@ const AdoptionApplyPage = () => {
   const params = useParams<{ id: string }>()
   const petId = params.id
 
-  // 입양 신청 대상 — GET /adoption/:petId (상세 UI 뷰모델 매퍼 재사용)
+  // 신청서에는 브리더/펫 기본 정보만 필요 — 다른 분양건은 조회하지 않는다
   const { data, isLoading, isError } = useQuery(adoptionQueries.detail(petId))
 
   if (isLoading) {
@@ -25,7 +25,7 @@ const AdoptionApplyPage = () => {
   if (isError || !data) {
     return (
       <Container className="flex min-h-screen items-center justify-center py-10">
-        <p className="text-sm text-neutral-700">입양 정보를 불러오지 못했습니다.</p>
+        <p className="text-sm text-neutral-700">분양글을 불러오지 못했습니다.</p>
       </Container>
     )
   }

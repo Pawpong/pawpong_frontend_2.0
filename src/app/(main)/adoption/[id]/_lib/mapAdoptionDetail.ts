@@ -1,4 +1,5 @@
 import type {
+  AdoptionPetCard,
   AdoptionPetDetail,
   AdoptionDetailDto,
   AdoptionStatus,
@@ -8,6 +9,7 @@ import type {
 } from '@/shared/types'
 import { formatDate } from '@/shared/lib/formatDate'
 import { petTypeToCategory } from '@/shared/lib/petCategory'
+import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
 
 /** 백엔드 PetStatus('adopted') → 프론트 AdoptionStatus('completed') */
 const toAdoptionStatus = (status: AdoptionPetDetail['status']): AdoptionStatus =>
@@ -16,9 +18,12 @@ const toAdoptionStatus = (status: AdoptionPetDetail['status']): AdoptionStatus =
 /**
  * v2 입양 상세 API 응답(AdoptionPetDetail)을 상세 UI 뷰모델(AdoptionDetailDto)로 매핑한다.
  * - 검사 기록은 UI의 단일 검사 정보(GeneticTestInfo)로 축약
- * - 브리더의 다른 분양건(otherListings)은 이번 MVP 에서 빈 배열 (별도 조회 필요)
+ * - 브리더의 다른 분양건(otherListings)은 목록 API를 따로 조회해 넘긴다 (상세 응답에 없음)
  */
-export const mapAdoptionDetail = (d: AdoptionPetDetail): AdoptionDetailDto => {
+export const mapAdoptionDetail = (
+  d: AdoptionPetDetail,
+  otherPets: AdoptionPetCard[] = [],
+): AdoptionDetailDto => {
   const health: HealthInfo = {
     vaccinationCompleted: d.vaccinationStatus === 'completed',
     vaccinations: (d.vaccinationRecords ?? []).map((r) => ({
@@ -26,7 +31,10 @@ export const mapAdoptionDetail = (d: AdoptionPetDetail): AdoptionDetailDto => {
       date: r.date,
       dose: `${r.round}차`,
     })),
+    // 미완료 사유는 분양글 작성 시 브리더가 입력 — 기록이 없을 때 안내 문구 대신 노출
+    vaccinationIncompleteReason: d.vaccinationIncompleteReason,
     geneticTestCompleted: d.geneticTestStatus === 'completed',
+    geneticTestIncompleteReason: d.geneticTestIncompleteReason,
     geneticTest: {
       date: d.geneticTestRecords?.[0]?.date ?? '',
       institution: d.geneticTestRecords?.[0]?.institution ?? '',
@@ -81,6 +89,6 @@ export const mapAdoptionDetail = (d: AdoptionPetDetail): AdoptionDetailDto => {
     health,
     parents,
     breedingEnvironment,
-    otherListings: [],
+    otherListings: otherPets.map(mapAdoptionCard),
   }
 }

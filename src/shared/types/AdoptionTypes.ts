@@ -53,13 +53,6 @@ export interface AdoptedListingCard extends AdoptionListingCard {
   adoptedAt: string
 }
 
-/** 입양 상태 한국어 매핑 */
-export const ADOPTION_STATUS_LABEL: Record<AdoptionStatus, string> = {
-  available: '입양 가능',
-  reserved: '예약중',
-  completed: '분양 완료',
-}
-
 /** 성별 한국어 매핑 */
 export const GENDER_LABEL: Record<'male' | 'female', string> = {
   male: '남자',
@@ -98,8 +91,11 @@ export interface GeneticTestInfo {
 export interface HealthInfo {
   vaccinationCompleted: boolean
   vaccinations: VaccinationRecord[]
+  /** 미완료 시 브리더가 입력한 사유 */
+  vaccinationIncompleteReason?: string
   geneticTestCompleted: boolean
   geneticTest: GeneticTestInfo
+  geneticTestIncompleteReason?: string
 }
 
 /** 부모 정보 */

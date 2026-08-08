@@ -1,10 +1,9 @@
 'use client'
 
 import { useParams } from 'next/navigation'
-import { useQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { Container } from '@/shared/ui'
 import { adoptionQueries } from '@/entities/adoption'
-import { profileQueries } from '@/entities/profile'
 import { AdoptionDetailContent } from './_ui/AdoptionDetailContent'
 import { mapAdoptionDetail } from './_lib/mapAdoptionDetail'
 
@@ -13,8 +12,10 @@ const AdoptionDetailPage = () => {
   const petId = params.id
 
   const { data, isLoading, isError } = useQuery(adoptionQueries.detail(petId))
-  // 로그인 사용자 조회 (비로그인 시 undefined) — 브리더 본인 여부 판별용
-  const { data: myProfile } = useQuery(profileQueries.me())
+  // 브리더의 다른 분양건 — 상세 응답에 없어 목록 API로 별도 조회(브리더 id를 알아야 하므로 상세 이후)
+  const { data: otherPets } = useInfiniteQuery(
+    adoptionQueries.breederPets(data?.breederId ?? '', petId),
+  )
 
   if (isLoading) {
     return (
@@ -32,10 +33,7 @@ const AdoptionDetailPage = () => {
     )
   }
 
-  const detail = mapAdoptionDetail(data)
-  const isOwner = !!myProfile && myProfile.userId === detail.breeder.id
-
-  return <AdoptionDetailContent detail={detail} isOwner={isOwner} />
+  return <AdoptionDetailContent detail={mapAdoptionDetail(data, otherPets?.pages[0]?.items)} />
 }
 
 export default AdoptionDetailPage

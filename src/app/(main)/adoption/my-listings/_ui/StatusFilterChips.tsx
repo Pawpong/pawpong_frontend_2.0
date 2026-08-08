@@ -2,7 +2,7 @@
 
 import { cn } from '@/shared/lib/cn'
 import type { AdoptionStatus } from '@/shared/types'
-import { ADOPTION_STATUS_LABEL } from '@/shared/types'
+import { ADOPTION_CARD_STATUS } from '@/entities/adoption'
 
 const ADOPTION_STATUSES: AdoptionStatus[] = ['available', 'reserved', 'completed']
 
@@ -30,7 +30,7 @@ const StatusFilterChips = ({ activeStatus, onStatusChange }: StatusFilterChipsPr
               isActive ? 'bg-text-primary text-white' : 'bg-[#e1e1e1] text-text-primary',
             )}
           >
-            {ADOPTION_STATUS_LABEL[status]}
+            {ADOPTION_CARD_STATUS[status].label}
           </button>
         )
       })}

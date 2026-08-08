@@ -4,17 +4,10 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { cn } from '@/shared/lib/cn'
 
-import { Badge, FavoriteButton, FavoriteToggle, ListingStats } from '@/shared/ui'
+import { FavoriteButton, FavoriteToggle, ListingStats, PopularBadge } from '@/shared/ui'
 import type { AdoptionListingCard } from '@/shared/types'
-import { ADOPTION_STATUS_LABEL, GENDER_LABEL } from '@/shared/types'
-import { ADOPTION_STATUS_BG } from './statusBg'
-
-// Figma 세로형 카드 상태 배지 → 공통 Badge 변형: 분양중/예약중 active(다크), 분양완료 disabled(그레이)
-const STATUS_BADGE_VARIANT: Record<AdoptionListingCard['status'], 'active' | 'disabled'> = {
-  available: 'active',
-  reserved: 'active',
-  completed: 'disabled',
-}
+import { GENDER_LABEL } from '@/shared/types'
+import { AdoptionStatusBadge } from './AdoptionStatusBadge'
 
 // [refactored] 세로형 카드 제목 공통 클래스 (모바일/태블릿 — 사이즈만 각 카드에서 cn으로 덧붙임)
 const CARD_TITLE_BASE = 'line-clamp-2 leading-[1.5] font-semibold text-neutral-850'
@@ -48,12 +41,11 @@ const CardImage = ({
     {isCompleted && <div className="absolute inset-0 bg-white/70" />}
     {/* 인기(bestBadge) 좌상단 배지 — Figma 796-81671 (mo 14px/py-2 · tab 16px/py-4) */}
     {listing.isPopular && (
-      <Badge
+      <PopularBadge
         variant="outline"
+        iconSize="responsive"
         className="absolute top-[0.6875rem] left-[0.6875rem] bg-white px-2 py-0.5 text-sm leading-[1.5] font-medium text-neutral-700 tab:top-[0.875rem] tab:left-[0.9219rem] tab:py-1 tab:text-base"
-      >
-        인기
-      </Badge>
+      />
     )}
   </div>
 )
@@ -75,19 +67,6 @@ const CardStats = ({
     size={size}
     className={className}
   />
-)
-
-// [refactored] 세로형 카드 상태 배지 — variant·label 룩업 중복 제거 (모바일 size=md / 태블릿 기본)
-const StatusBadge = ({
-  status,
-  size,
-}: {
-  status: AdoptionListingCard['status']
-  size?: 'md' | 'lg'
-}) => (
-  <Badge variant={STATUS_BADGE_VARIANT[status]} size={size} className="shrink-0">
-    {ADOPTION_STATUS_LABEL[status]}
-  </Badge>
 )
 
 /* ═══════════════════════════════════════════════
@@ -119,8 +98,7 @@ const AdoptionCard = ({ listing, className, isFavorite, onToggle }: AdoptionCard
           <div className="flex items-start justify-between gap-[0.5rem]">
             {/* [refactored] 제목 공통 클래스 + 모바일 사이즈 */}
             <p className={cn(CARD_TITLE_BASE, 'min-w-0 flex-1 text-[0.875rem]')}>{listing.name}</p>
-            {/* [refactored] StatusBadge 추출 */}
-            <StatusBadge status={listing.status} size="md" />
+            <AdoptionStatusBadge status={listing.status} size="md" className="shrink-0" />
           </div>
           {/* 하단: 문의/관심/조회 */}
           <CardStats
@@ -152,8 +130,7 @@ const AdoptionCard = ({ listing, className, isFavorite, onToggle }: AdoptionCard
           </div>
           {/* 우측: 상태배지(상단, 다크) + 관심있어요(하단, 하트+텍스트) */}
           <div className="flex shrink-0 flex-col items-end justify-between">
-            {/* [refactored] StatusBadge 추출 (태블릿은 기본 사이즈) */}
-            <StatusBadge status={listing.status} />
+            <AdoptionStatusBadge status={listing.status} className="shrink-0" />
             <FavoriteButton
               size="md"
               isFavorite={isFavorite}
@@ -205,15 +182,11 @@ const AdoptionCardHorizontal = ({
             {listing.name}
           </p>
           <div className="flex items-center">
-            <Badge
-              variant="status"
-              className={cn(
-                ADOPTION_STATUS_BG[listing.status],
-                'px-[0.5rem] py-[0.125rem] text-[0.75rem] leading-normal',
-              )}
-            >
-              {ADOPTION_STATUS_LABEL[listing.status]}
-            </Badge>
+            <AdoptionStatusBadge
+              status={listing.status}
+              size="md"
+              className="px-[0.5rem] py-[0.125rem] text-[0.75rem] leading-normal"
+            />
           </div>
         </div>
 
@@ -226,12 +199,10 @@ const AdoptionCardHorizontal = ({
 
       {/* 인기 배지: left16 top13.76 h22 px8 py2 text12 */}
       {listing.isPopular && (
-        <Badge
+        <PopularBadge
           variant="outline"
           className="absolute top-[0.86rem] left-[1rem] bg-white px-[0.5rem] py-[0.125rem] text-[0.75rem] leading-normal"
-        >
-          인기🔥
-        </Badge>
+        />
       )}
     </Link>
   )

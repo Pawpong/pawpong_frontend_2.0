@@ -2,11 +2,10 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { Badge, ListingStats, PostedDate } from '@/shared/ui'
+import { ListingStats, PostedDate } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import type { AdoptionListingCard } from '@/shared/types'
-import { ADOPTION_STATUS_LABEL } from '@/shared/types'
-import { ADOPTION_STATUS_BG } from '@/entities/adoption'
+import { AdoptionStatusBadge } from '@/entities/adoption'
 
 interface BreederListingCardProps {
   listing: AdoptionListingCard
@@ -21,22 +20,12 @@ const BreederListingCard = ({ listing, className }: BreederListingCardProps) => 
     >
       {/* Image */}
       <div className="relative size-[10.25rem] overflow-hidden rounded-[0.375rem] bg-[#d4d4d4]">
-        <Image
-          src={listing.thumbnailUrl}
-          alt={listing.name}
-          fill
-          sizes="164px"
-          className="object-cover"
+        <Image src={listing.thumbnailUrl} alt={listing.name} fill className="object-cover" />
+        <AdoptionStatusBadge
+          status={listing.status}
+          size="md"
+          className="absolute top-[0.766rem] left-[0.625rem] px-[0.625rem] py-[0.25rem] text-xs leading-[1.375rem]"
         />
-        <Badge
-          variant="status"
-          className={cn(
-            ADOPTION_STATUS_BG[listing.status],
-            'absolute top-[0.766rem] left-[0.625rem] px-[0.625rem] py-[0.25rem] text-xs leading-[1.375rem]',
-          )}
-        >
-          {ADOPTION_STATUS_LABEL[listing.status]}
-        </Badge>
       </div>
 
       {/* Info */}

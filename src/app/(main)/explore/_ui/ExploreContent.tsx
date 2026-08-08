@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import {
@@ -10,20 +10,20 @@ import {
   PopularBadgeContent,
   TabBar,
 } from '@/shared/ui'
+import { CATEGORY_TO_PET_TYPE } from '@/shared/lib/petCategory'
+import { adoptionQueries } from '@/entities/adoption'
+import { mapAdoptionCard, dedupeByListingId } from '@/shared/lib/mapAdoptionCard'
 import { SearchSection } from '@/features/search'
 import { CategorySection } from '@/features/category-filter'
 import { cn } from '@/shared/lib/cn'
 import { useBreakpoint } from '@/shared/lib/useBreakpoint'
 import { useGnbHeight } from '@/shared/lib/useGnbHeight'
-import { CATEGORY_TO_PET_TYPE } from '@/shared/lib/petCategory'
 import { ANIMAL_CATEGORIES } from '@/shared/types'
 import type { AnimalCategory } from '@/shared/types'
-import { adoptionQueries } from '@/entities/adoption'
 import { BreederExploreContent } from './BreederExploreContent'
 import { ExploreAdoptionCard } from './ExploreAdoptionCard'
 import { ExploreListingSection } from './ExploreListingSection'
 import { ExploreFilterBar } from './ExploreFilterBar'
-import { mapAdoptionCard, dedupeByListingId } from '../_lib/mapAdoptionCard'
 import { EXPLORE_TABS, SEARCH_PLACEHOLDERS, EXPLORE_SECTION_CONTAINER } from '../_lib/constants'
 import type { ExploreType } from '../_lib/constants'
 
@@ -59,25 +59,24 @@ const ExploreContent = () => {
 
   // 입양 탐색 실데이터 — 카테고리 칩은 petType, 필터 칩은 sort/status로 매핑해 v2 API 조회
   // (입양 탭에서만 활성화). 필터가 바뀌면 queryKey가 바뀌어 서버에서 다시 받아온다.
-  const isAdoptionTab = selectedType === 'adoption'
   const petType = CATEGORY_TO_PET_TYPE[selectedCategory]
   const { sort, status } = FILTER_TO_QUERY[adoptionListFilter]
   const {
     data: listData,
-    isLoading: isListLoading,
-    isError: isListError,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
     ...adoptionQueries.list(sort, petType, status),
-    enabled: isAdoptionTab,
+    enabled: selectedType === 'adoption',
   })
 
   // 무한스크롤 페이지 병합 시 listingId 중복 제거 — 서버 페이지네이션이 경계에서 항목을
   // 겹쳐 주더라도 React key 중복(카드 중복/누락)이 발생하지 않도록 방어한다.
-  const listings = dedupeByListingId(
-    (listData?.pages.flatMap((page) => page.items) ?? []).map(mapAdoptionCard),
+  const listings = useMemo(
+    () =>
+      dedupeByListingId((listData?.pages.flatMap((page) => page.items) ?? []).map(mapAdoptionCard)),
+    [listData],
   )
   const totalCount = listData?.pages[0]?.pagination.totalItems
 
@@ -120,12 +119,15 @@ const ExploreContent = () => {
   const stickyBarTop = gnbH + (isTabUp ? headerH : 0)
 
   useEffect(() => {
-    const measure = () => {
-      if (headerRef.current) setHeaderH(headerRef.current.offsetHeight)
-    }
+    const el = headerRef.current
+    if (!el) return
+    // ResizeObserver로 탭바 높이 상시 추적 (window resize만으론 폰트로드·HMR·동적변경 시
+    // 높이 변화를 못 잡아 headerH가 stale → 컴팩트바가 탭바에 겹쳐 칩이 잘림)
+    const measure = () => setHeaderH(el.offsetHeight)
     measure()
-    window.addEventListener('resize', measure)
-    return () => window.removeEventListener('resize', measure)
+    const observer = new ResizeObserver(measure)
+    observer.observe(el)
+    return () => observer.disconnect()
   }, [])
 
   useEffect(() => {
@@ -173,51 +175,47 @@ const ExploreContent = () => {
 
       {selectedType === 'breeder' ? (
         <BreederExploreContent selectedCategory={selectedCategory} />
-      ) : isListLoading ? (
-        <Container className="flex items-center justify-center py-10">
-          <p className="text-sm text-neutral-700">불러오는 중...</p>
-        </Container>
-      ) : isListError ? (
-        <Container className="flex items-center justify-center py-10">
-          <p className="text-sm text-neutral-700">분양글을 불러오지 못했습니다.</p>
-        </Container>
       ) : (
-        <Container className={EXPLORE_SECTION_CONTAINER}>
-          <ExploreListingSection
-            title="전체 분양 소식"
-            items={listings}
-            totalCount={totalCount}
-            getKey={(listing) => listing.listingId}
-            renderCard={(listing) => <ExploreAdoptionCard listing={listing} />}
-            headerSlot={
-              <div className="flex shrink-0 items-center gap-2" aria-label="분양 소식 필터">
-                {/* [refactored] 칩 버튼 스타일 → 공통 FilterChip */}
-                {ADOPTION_LIST_FILTERS.map((filter) => (
-                  <FilterChip
-                    key={filter.value}
-                    selected={adoptionListFilter === filter.value}
-                    onClick={() => setAdoptionListFilter(filter.value)}
-                    size="responsive"
-                  >
-                    {filter.value === 'popular' ? (
-                      <PopularBadgeContent size="responsive" />
-                    ) : (
-                      filter.label
-                    )}
-                  </FilterChip>
-                ))}
-              </div>
-            }
-          />
-          {listings.length === 0 && (
-            <p className="py-10 text-center text-sm text-neutral-700">등록된 분양글이 없습니다.</p>
-          )}
-          <InfiniteScrollTrigger
-            onIntersect={fetchNextPage}
-            hasNextPage={hasNextPage ?? false}
-            isFetchingNextPage={isFetchingNextPage}
-          />
-        </Container>
+        <>
+          <Container className={EXPLORE_SECTION_CONTAINER}>
+            <ExploreListingSection
+              title="전체 분양 소식"
+              items={listings}
+              totalCount={totalCount}
+              getKey={(listing) => listing.listingId}
+              renderCard={(listing) => <ExploreAdoptionCard listing={listing} />}
+              headerSlot={
+                <div className="flex shrink-0 items-center gap-2" aria-label="분양 소식 필터">
+                  {/* [refactored] 칩 버튼 스타일 → 공통 FilterChip */}
+                  {ADOPTION_LIST_FILTERS.map((filter) => (
+                    <FilterChip
+                      key={filter.value}
+                      selected={adoptionListFilter === filter.value}
+                      onClick={() => setAdoptionListFilter(filter.value)}
+                      size="responsive"
+                    >
+                      {filter.value === 'popular' ? (
+                        <PopularBadgeContent size="responsive" />
+                      ) : (
+                        filter.label
+                      )}
+                    </FilterChip>
+                  ))}
+                </div>
+              }
+            />
+            {listings.length === 0 && (
+              <p className="py-10 text-center text-sm text-neutral-700">
+                등록된 분양글이 없습니다.
+              </p>
+            )}
+            <InfiniteScrollTrigger
+              onIntersect={fetchNextPage}
+              hasNextPage={hasNextPage ?? false}
+              isFetchingNextPage={isFetchingNextPage}
+            />
+          </Container>
+        </>
       )}
     </>
   )

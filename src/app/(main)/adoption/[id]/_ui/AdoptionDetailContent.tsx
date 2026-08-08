@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import type { ReactNode } from 'react'
-import { Container, Separator, ImageModal } from '@/shared/ui'
+import { Container, Separator, ImageDetailModal } from '@/shared/ui'
 import { ArrowBackIcon, MoreVertIcon } from '@/shared/assets/icons'
 import { useImageModal } from '@/shared/lib/useImageModal'
 import { useToggleAdoptionFavorite } from '@/features/adoption'
@@ -16,20 +16,19 @@ import { AdoptionCtaBar } from './AdoptionCtaBar'
 
 interface AdoptionDetailContentProps {
   detail: AdoptionDetailDto
-  /** 로그인 사용자가 이 분양글의 브리더 본인인지 */
-  isOwner: boolean
 }
 
 /* ═══════════════════════════════════════════════
    입양 상세 페이지 오케스트레이터
    - 모바일 서브헤더 + 히어로 + 하단 섹션 + CTA + 이미지 모달
    - 이미지 모달 상태는 히어로/하단 카드가 공유하므로 여기서 보관
+   - 관심 상태도 히어로(pc)/CTA바(모바일·탭)가 공유하므로 여기서 보관
    ═══════════════════════════════════════════════ */
-const AdoptionDetailContent = ({ detail, isOwner }: AdoptionDetailContentProps) => {
+const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
   const router = useRouter()
   const { imageModalOpen, setImageModalOpen, modalImages, modalInitialIndex, openImageModal } =
     useImageModal(detail.imageUrls)
-  // 관심(하트) 토글 — 히어로(pc)·하단 CTA 바(모바일·탭) 공용
+  // listingId = petId (mapAdoptionDetail)
   const { isFavorite, toggleFavorite } = useToggleAdoptionFavorite(
     detail.listingId,
     detail.isFavorited,
@@ -56,7 +55,6 @@ const AdoptionDetailContent = ({ detail, isOwner }: AdoptionDetailContentProps) 
       <AdoptionDetailHero
         detail={detail}
         onImageClick={openImageModal}
-        isOwner={isOwner}
         isFavorite={isFavorite}
         onToggleFavorite={toggleFavorite}
       />
@@ -65,7 +63,7 @@ const AdoptionDetailContent = ({ detail, isOwner }: AdoptionDetailContentProps) 
       {/* [refactored] 반복되던 <Container className="tab:py-[0.75rem] pc:py-[1.25rem]"> 를 Section으로 추출 */}
       {/* 건강 + 부모 + 사육 — pc: 좌(건강↑/사육↓) | 우(부모 전체 높이) grid / 모바일·탭: 세로 (Figma 1226-54550) */}
       <Section>
-        <div className="pc:grid pc:grid-cols-[minmax(0,55.75rem)_minmax(0,1fr)] pc:gap-[1.75rem]">
+        <div className="pc:grid pc:grid-cols-[55.75rem_minmax(0,1fr)] pc:gap-[1.75rem]">
           <HealthInfoCard detail={detail} />
           <ParentInfoCard detail={detail} onImageClick={openImageModal} />
           <BreedingEnvironmentCard
@@ -79,30 +77,34 @@ const AdoptionDetailContent = ({ detail, isOwner }: AdoptionDetailContentProps) 
       {/* 브리더의 다른 분양건 — 피그마: 컬럼 920px 중앙(외곽서 260px), 제목 위 48px, gap 39px */}
       <Section>
         <Separator className="bg-[#d4d4d4]" />
-        <div className="mt-[1rem] flex flex-col gap-[0.75rem] pc:mx-auto pc:mt-[3rem] pc:max-w-[57.5rem] pc:gap-[2.4375rem]">
-          <p className="text-[0.75rem] leading-[1.375rem] font-medium text-[#5d5d5d] pc:text-[1.25rem] pc:font-semibold pc:text-neutral-850">
+        <div className="mt-[1rem] flex flex-col gap-[0.75rem] pc:mx-auto pc:mt-[3rem] pc:max-w-[57.5rem] pc:gap-2">
+          <p className="text-[0.75rem] leading-[1.375rem] font-medium text-[#5d5d5d] pc:text-[1.25rem] pc:leading-[1.5] pc:font-semibold pc:text-neutral-850">
             브리더의 다른 분양건 {detail.otherListings.length}
           </p>
-          {detail.otherListings.map((listing) => (
-            <OtherListingCard key={listing.listingId} listing={listing} />
-          ))}
+          <div className="flex flex-col gap-[0.75rem] pc:gap-6">
+            {detail.otherListings.map((listing) => (
+              <OtherListingCard key={listing.listingId} listing={listing} />
+            ))}
+          </div>
         </div>
       </Section>
 
       {/* ═══ CTA 하단 고정 바 ═══ */}
       <AdoptionCtaBar
         listingId={detail.listingId}
-        isOwner={isOwner}
         isFavorite={isFavorite}
         onToggleFavorite={toggleFavorite}
       />
 
-      {/* ═══ 이미지 모달 ═══ */}
-      <ImageModal
+      {/* ═══ 이미지 모달 — 공통 ImageDetailModal (Figma 1952-260350: 이미지+대표뱃지+캐러셀만,
+          프로필/소개/투표/버튼 없음) ═══ */}
+      <ImageDetailModal
         images={modalImages}
         initialIndex={modalInitialIndex}
         open={imageModalOpen}
         onOpenChange={setImageModalOpen}
+        representativeIndex={0}
+        showActions={false}
       />
     </div>
   )

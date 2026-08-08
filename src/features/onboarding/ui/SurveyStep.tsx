@@ -10,6 +10,7 @@ import {
   clearSocialSignupSession,
 } from '@/features/auth'
 import { useUpdateMyProfile } from '@/features/profile'
+import { markSurveySkipped } from '@/shared/lib/surveySkip'
 import {
   surveySchema,
   type SurveyFormData,
@@ -173,6 +174,11 @@ const SurveyStep = () => {
         <div className="flex w-full flex-col gap-3">
           <button
             type="button"
+            onClick={() => {
+              // 조사 미작성 표시 후 가입 완료 진행 — 입양 신청(apply) 시 다시 작성받는다
+              markSurveySkipped()
+              handleSubmit(handleComplete)()
+            }}
             className="flex items-center gap-0 self-end rounded-lg bg-neutral-850 px-2 py-1 text-[0.875rem] font-semibold text-neutral-50"
           >
             다음에 작성하기

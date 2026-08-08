@@ -7,6 +7,10 @@ export const applicationSchema = z.object({
   canAffordMedicalExpenses: z.boolean().refine((v) => v, '치료비 감당 가능 여부를 확인해주세요'),
   familyMembers: z.string().min(1, '가족 구성원을 입력해주세요'),
   allFamilyConsent: z.boolean().refine((v) => v, '가족 동의 여부를 확인해주세요'),
+  // 조사 건너뛴 입양자용 선택 항목 (apply 변형) — 미입력 허용, isValid에 영향 없음
+  selfIntroduction: z.string().optional(),
+  timeAwayFromHome: z.string().optional(),
+  livingSpaceDescription: z.string().optional(),
 })
 
 export type ApplicationFormValues = z.infer<typeof applicationSchema>

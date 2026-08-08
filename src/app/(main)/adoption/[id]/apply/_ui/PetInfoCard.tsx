@@ -1,9 +1,10 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRightIcon } from '@/shared/assets/icons'
-import { Badge } from '@/shared/ui'
+import { PopularBadge } from '@/shared/ui'
 import type { AdoptionDetailDto } from '@/shared/types'
-import { ADOPTION_STATUS_LABEL, GENDER_LABEL } from '@/shared/types'
+import { GENDER_LABEL } from '@/shared/types'
+import { ADOPTION_CARD_STATUS } from '@/entities/adoption'
 import { getAgeText } from '../_lib/schema'
 
 interface PetInfoCardProps {
@@ -31,9 +32,7 @@ const PetInfoCard = ({ detail }: PetInfoCardProps) => {
               className="object-cover"
             />
             {detail.isPopular && (
-              <Badge variant="default" className="absolute top-[0.875rem] left-4">
-                인기
-              </Badge>
+              <PopularBadge variant="default" className="absolute top-[0.875rem] left-4" />
             )}
           </div>
 
@@ -43,7 +42,7 @@ const PetInfoCard = ({ detail }: PetInfoCardProps) => {
               {/* 상태 + 제목(제목은 pc에서만 같은 줄) */}
               <div className="flex items-center gap-4 whitespace-nowrap">
                 <span className="text-sm font-bold pc:text-base">
-                  {ADOPTION_STATUS_LABEL[detail.status]}
+                  {ADOPTION_CARD_STATUS[detail.status].label}
                 </span>
                 <span className="hidden pc:inline pc:text-base pc:font-semibold">{title}</span>
               </div>

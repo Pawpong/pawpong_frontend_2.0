@@ -1,6 +1,7 @@
 'use client'
 
 import type { CSSProperties, ReactNode } from 'react'
+import { PAGE_WIDTH_CLASS } from '@/shared/config/layout'
 import { cn } from '@/shared/lib/cn'
 import { Tabs, TabsList, TabsTrigger } from './Tabs'
 
@@ -49,10 +50,14 @@ const TabBar = ({
         className={cn('w-full border-b border-neutral-300 bg-white', barClassName)}
         style={barStyle}
       >
+        {/* 폭은 페이지 셸과 동일(PAGE_WIDTH_CLASS), 여백만 탭 바 디자인에 맞춤.
+            Container를 쓰지 않는 이유: 모바일 좌우 여백 없이 348px 목록을 가운데 두는 배치라
+            Container의 px를 전부 덮어써야 한다. */}
         <div
           className={cn(
-            'mx-auto w-full pt-3 tab:max-w-[48rem] tab:px-12 tab:pt-4 pc:px-20',
-            isTwoTabs ? 'pc:max-w-[90rem]' : 'pc:max-w-[58.75rem]',
+            PAGE_WIDTH_CLASS,
+            'pt-3 tab:px-12 tab:pt-4 pc:px-20',
+            !isTwoTabs && 'pc:max-w-[58.75rem]',
           )}
         >
           <TabsList
