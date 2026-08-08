@@ -54,19 +54,29 @@ interface ProfileCardBreederProps {
 
 type ProfileCardProps = ProfileCardBaseProps | ProfileCardBreederProps
 
+// 모바일은 가로(아바타 → 라벨), PC는 세로(라벨 → 아바타). DOM 순서는 하나로 두고
+// flex-col-reverse로 뒤집어 마크업 중복을 피한다.
 const FollowerSection = ({
-  followerCount,
+  vertical,
   className,
   textClassName,
   onClick,
 }: {
-  followerCount: number
+  vertical?: boolean
   className?: string
   textClassName?: string
   onClick?: () => void
 }) => (
-  <button type="button" onClick={onClick} className={cn('flex items-center gap-0.5', className)}>
-    {/* 팔로워 미리보기 — ProfileAvatar xsmall(24) + 회색 테두리, 살짝 겹침 */}
+  <button
+    type="button"
+    onClick={onClick}
+    className={cn(
+      'flex gap-0.5',
+      vertical ? 'flex-col-reverse items-start gap-2' : 'items-center',
+      className,
+    )}
+  >
+    {/* 친구 목록 미리보기 — ProfileAvatar xsmall(24) + 회색 테두리, 살짝 겹침 */}
     <div className="flex items-center">
       {[0, 1, 2].map((i) => (
         <ProfileAvatar
@@ -76,9 +86,7 @@ const FollowerSection = ({
         />
       ))}
     </div>
-    <span className={cn('font-medium text-neutral-850', textClassName)}>
-      팔로워 {followerCount}
-    </span>
+    <span className={cn('font-medium text-neutral-850', textClassName)}>친구 목록</span>
   </button>
 )
 
@@ -139,7 +147,7 @@ const FavoriteButton = ({ className }: { className?: string }) => (
 const EditButton = () => (
   <Link
     href="/home/edit"
-    className="flex h-10 flex-1 items-center justify-center rounded-full border border-neutral-300 p-2 text-base leading-[1.5] font-semibold text-neutral-850 tab:h-12"
+    className="flex h-8 flex-1 items-center justify-center rounded-full border border-neutral-300 p-2 text-sm leading-[1.5] font-semibold text-neutral-850 tab:h-10 tab:text-base"
   >
     프로필 편집
   </Link>
@@ -189,15 +197,16 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
     ? `${breederProfile.businessLocation.city} ${breederProfile.businessLocation.district}`
     : null
 
-  // 상단 뱃지 (전 모드 공통, 채운 #3e3e3e) — 모바일 md(14px) / 데스크탑 lg(16px)
+  // 상단 뱃지 (전 모드 공통) — point-500 채움 + primary-500 테두리/텍스트
+  // 모바일 md(10px·h-24) / PC lg(14px). PC 높이는 디자인 노드 기준 32px로 맞춘다.
   const renderBadges = (size?: 'md') => (
     <>
       {isBreederProfile && (
-        <Badge variant="active" size={size}>
+        <Badge variant="pointFilled" size={size} className={size ? undefined : 'h-8'}>
           브리더
         </Badge>
       )}
-      <Badge variant="active" size={size}>
+      <Badge variant="pointFilled" size={size} className={size ? undefined : 'h-8'}>
         {profile.bpm} BPM
       </Badge>
     </>
@@ -225,12 +234,8 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
           {/* 소개 */}
           <ProfileBio className="w-full text-sm">{profile.bio}</ProfileBio>
           {locationText && <LocationInfo location={locationText} />}
-          {/* 팔로워 */}
-          <FollowerSection
-            followerCount={profile.followerCount}
-            textClassName="text-xs"
-            onClick={() => setFollowOpen(true)}
-          />
+          {/* 친구 목록 */}
+          <FollowerSection textClassName="text-xs" onClick={() => setFollowOpen(true)} />
         </div>
         {/* 하단: 모드별 버튼 (풀폭, gap-10, h-40) */}
         <div className="flex w-full items-start gap-2.5">
@@ -239,7 +244,7 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
       </div>
 
       {/* ===== Desktop (디자인 node 1021-20324) ===== */}
-      <div className="mx-auto hidden max-w-[59.25rem] overflow-hidden rounded-lg bg-neutral-50 tab:block">
+      <div className="mx-auto hidden max-w-[59.25rem] overflow-hidden rounded-lg bg-point-50 tab:block">
         {/* 상단: 좌(뱃지·이름·소개) / 우(팔로워·아바타) — h-204 고정, 콘텐츠 가운데 정렬 */}
         <div className="flex h-[12.75rem] items-center justify-center overflow-hidden px-5 py-8">
           <div className="flex w-full max-w-[48.75rem] items-end justify-between gap-3">
@@ -247,11 +252,12 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
               <div className="flex items-start gap-3">{renderBadges()}</div>
               <ProfileName className="text-2xl">{profile.nickname}</ProfileName>
               {locationText && <LocationInfo location={locationText} />}
-              <ProfileBio className="text-base">{profile.bio}</ProfileBio>
+              {/* 디자인상 이름·소개 블록 폭 440 */}
+              <ProfileBio className="w-full max-w-[27.5rem] text-base">{profile.bio}</ProfileBio>
             </div>
             <div className="flex shrink-0 items-end gap-3">
               <FollowerSection
-                followerCount={profile.followerCount}
+                vertical
                 textClassName="text-xs"
                 onClick={() => setFollowOpen(true)}
               />
@@ -263,7 +269,7 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
         {/* 하단: 구분선 + 모드별 버튼 */}
         <div className="flex flex-col items-center gap-3 pb-8">
           <div className="h-px w-full bg-neutral-150" />
-          <div className="flex w-full max-w-[36.625rem] items-center gap-6 px-5">
+          <div className="flex w-full max-w-[43rem] items-center gap-6 px-5">
             <Actions />
           </div>
         </div>
