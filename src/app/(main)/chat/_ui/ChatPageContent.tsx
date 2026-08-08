@@ -13,11 +13,8 @@ import { ChatRoomPanel } from './ChatRoomPanel'
 const ChatPageContent = () => {
   const [activeRoomId, setActiveRoomId] = React.useState<string | null>(null)
   const isPC = useBreakpoint('pc')
-  const roomsQuery = useQuery({
-    ...chatQueries.rooms(),
-    refetchInterval: 5_000,
-    refetchIntervalInBackground: false,
-  })
+  // activeRoomId로 방을 찾기 위한 캐시 구독만 한다. 폴링은 useChatRoomFilter가 담당.
+  const roomsQuery = useQuery(chatQueries.rooms())
   const profileQuery = useQuery({
     ...profileQueries.me(),
     enabled: !!activeRoomId,
