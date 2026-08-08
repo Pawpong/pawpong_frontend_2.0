@@ -4,7 +4,6 @@ import { cn } from '@/shared/lib/cn'
 import type { ChatRoomResponseDto } from '@/shared/types'
 import { CHAT_GUTTER_X } from '../_lib/constants'
 import { useChatRoomFilter } from '../_lib/useChatRoomFilter'
-import { getUnreadCount } from '../_lib/utils'
 import { ChatFilterTabs } from './ChatFilterTabs'
 import { ChatRoomItem } from './ChatRoomItem'
 
@@ -24,7 +23,7 @@ const ChatRoomFilterableList = ({
   listClassName,
   gutterClassName = CHAT_GUTTER_X,
 }: ChatRoomFilterableListProps) => {
-  const { filter, setFilter, filteredRooms } = useChatRoomFilter()
+  const { filter, setFilter, filteredRooms, isLoading, isError, refetch } = useChatRoomFilter()
 
   return (
     <>
@@ -37,7 +36,22 @@ const ChatRoomFilterableList = ({
         <ChatFilterTabs value={filter} onChange={setFilter} className="justify-end" />
       </div>
 
-      {filteredRooms.length === 0 ? (
+      {isLoading ? (
+        <div className="flex items-center justify-center py-20">
+          <p className="text-sm font-medium text-neutral-700">채팅방을 불러오는 중입니다.</p>
+        </div>
+      ) : isError ? (
+        <div className="flex flex-col items-center justify-center gap-3 py-20">
+          <p className="text-sm font-medium text-neutral-700">채팅방을 불러오지 못했습니다.</p>
+          <button
+            type="button"
+            onClick={() => void refetch()}
+            className="rounded-lg bg-neutral-850 px-3 py-2 text-sm font-semibold text-white"
+          >
+            다시 시도
+          </button>
+        </div>
+      ) : filteredRooms.length === 0 ? (
         <div className="flex items-center justify-center py-20">
           <p className="text-sm font-medium text-neutral-700">채팅방이 없습니다</p>
         </div>
@@ -48,7 +62,7 @@ const ChatRoomFilterableList = ({
               key={room.roomId}
               room={room}
               isActive={room.roomId === activeRoomId}
-              unreadCount={getUnreadCount(room)}
+              unreadCount={room.unreadCount}
               onClick={() => onSelectRoom(room)}
             />
           ))}

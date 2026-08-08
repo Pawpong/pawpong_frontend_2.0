@@ -1,6 +1,8 @@
 import { ProfileAvatar } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
+import { FileIcon } from '@/shared/assets/icons'
 import type { ChatMessageResponseDto } from '@/shared/types'
+import { formatFileSize, parseChatAttachment } from '../_lib/attachment'
 import { RelativeTime } from './RelativeTime'
 
 interface ChatMessageBubbleProps {
@@ -15,9 +17,7 @@ const Bubble = ({ content, isMine }: { content: string; isMine: boolean }) => (
   <div
     className={cn(
       'rounded-tl-2xl rounded-tr-2xl px-4 py-3 pc:p-5',
-      isMine
-        ? 'rounded-bl-2xl bg-[#fff26a]'
-        : 'rounded-br-2xl border border-neutral-300 bg-neutral-50',
+      isMine ? 'rounded-bl-2xl bg-point-500' : 'rounded-br-2xl border border-neutral-500 bg-white',
     )}
   >
     <p className="text-sm leading-[1.5] font-semibold break-words whitespace-pre-wrap text-neutral-850 pc:text-base">
@@ -25,6 +25,63 @@ const Bubble = ({ content, isMine }: { content: string; isMine: boolean }) => (
     </p>
   </div>
 )
+
+const AttachmentBubble = ({
+  message,
+  isMine,
+}: {
+  message: ChatMessageResponseDto
+  isMine: boolean
+}) => {
+  const attachment = parseChatAttachment(message.content, message.messageType)
+  if (!attachment) return <Bubble content={message.content} isMine={isMine} />
+
+  if (message.messageType === 'image') {
+    return (
+      <a
+        href={attachment.url}
+        target="_blank"
+        rel="noreferrer"
+        className={cn(
+          'block overflow-hidden rounded-2xl border',
+          isMine ? 'border-point-500 bg-point-500' : 'border-neutral-500 bg-white',
+        )}
+        aria-label={`${attachment.name} 원본 이미지 열기`}
+      >
+        {/* 업로드 CDN 호스트가 환경별로 달라 native img로 표시한다. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={attachment.url}
+          alt={attachment.name}
+          className="max-h-80 w-auto max-w-full object-contain"
+        />
+      </a>
+    )
+  }
+
+  return (
+    <a
+      href={attachment.url}
+      target="_blank"
+      rel="noreferrer"
+      download={attachment.name}
+      className={cn(
+        'flex min-w-56 items-center gap-3 rounded-2xl border px-4 py-3 pc:p-5',
+        isMine ? 'border-point-500 bg-point-500' : 'border-neutral-500 bg-white',
+      )}
+    >
+      <FileIcon className="size-8 shrink-0 text-neutral-850" />
+      <span className="min-w-0">
+        <span className="block truncate text-sm font-semibold text-neutral-850 pc:text-base">
+          {attachment.name}
+        </span>
+        {attachment.size > 0 && (
+          <span className="block text-xs text-neutral-700">{formatFileSize(attachment.size)}</span>
+        )}
+      </span>
+    </a>
+  )
+}
 
 const ChatMessageBubble = ({
   message,
@@ -40,7 +97,7 @@ const ChatMessageBubble = ({
       <div className="flex w-full justify-end">
         <div className="flex max-w-[85%] items-end gap-3 pc:max-w-[18.8125rem]">
           {time}
-          <Bubble content={message.content} isMine />
+          <AttachmentBubble message={message} isMine />
         </div>
       </div>
     )
@@ -56,7 +113,7 @@ const ChatMessageBubble = ({
         </div>
       )}
       <div className="flex max-w-[85%] items-end gap-3 pc:max-w-[21.9375rem]">
-        <Bubble content={message.content} isMine={false} />
+        <AttachmentBubble message={message} isMine={false} />
         {time}
       </div>
     </div>

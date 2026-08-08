@@ -4,7 +4,9 @@
  */
 
 export interface UploadResponse {
+  url: string
   cdnUrl: string
+  filename: string
   fileName: string
-  fileSize: number
+  size: number
 }
