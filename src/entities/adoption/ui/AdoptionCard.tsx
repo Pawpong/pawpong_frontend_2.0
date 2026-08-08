@@ -69,7 +69,7 @@ const CardStats = ({
    - 태블릿+: large (796-81669) — rounded-8, 좌/우 2단(제목·stats / 배지·관심있어요), 제목=품종ǀ성별 나이
    ═══════════════════════════════════════════════ */
 const AdoptionCard = ({ listing, className, isFavorite, onToggle }: AdoptionCardProps) => {
-  const isCompleted = listing.status === 'completed'
+  const isCompleted = listing.status === 'adopted'
 
   return (
     <Link href={`/adoption/${listing.listingId}`} className={cn('block', className)}>

@@ -1,18 +1,18 @@
 'use client'
 
 import { cn } from '@/shared/lib/cn'
-import type { AdoptionStatus } from '@/shared/types'
+import type { PetStatus } from '@/shared/types'
 import { ADOPTION_CARD_STATUS } from '@/entities/adoption'
 
-const ADOPTION_STATUSES: AdoptionStatus[] = ['available', 'reserved', 'completed']
+const ADOPTION_STATUSES: PetStatus[] = ['available', 'reserved', 'adopted']
 
 interface StatusFilterChipsProps {
-  activeStatus: AdoptionStatus | null
-  onStatusChange: (status: AdoptionStatus | null) => void
+  activeStatus: PetStatus | null
+  onStatusChange: (status: PetStatus | null) => void
 }
 
 const StatusFilterChips = ({ activeStatus, onStatusChange }: StatusFilterChipsProps) => {
-  const handleClick = (status: AdoptionStatus) => {
+  const handleClick = (status: PetStatus) => {
     onStatusChange(activeStatus === status ? null : status)
   }
 

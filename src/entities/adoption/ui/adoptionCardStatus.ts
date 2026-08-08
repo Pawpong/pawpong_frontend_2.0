@@ -8,5 +8,5 @@ export const ADOPTION_CARD_STATUS: Record<
 > = {
   available: { label: '분양중', variant: 'primaryOutline' },
   reserved: { label: '예약중', variant: 'primaryOutline' },
-  completed: { label: '분양완료', variant: 'neutralFilled' },
+  adopted: { label: '분양완료', variant: 'neutralFilled' },
 }

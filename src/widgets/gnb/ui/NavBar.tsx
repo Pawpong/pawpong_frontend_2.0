@@ -7,7 +7,12 @@ import { cn } from '@/shared/lib/cn'
 import { useNavigationGuardContext } from '@/shared/lib/NavigationGuardContext'
 import { HEADER_NAV } from '@/shared/config/mainNav'
 
-const NavBar = ({ className }: { className?: string }) => {
+interface NavBarProps {
+  className?: string
+  chatTone?: boolean
+}
+
+const NavBar = ({ className, chatTone = false }: NavBarProps) => {
   const pathname = usePathname()
   const guardContext = useNavigationGuardContext()
 
@@ -27,7 +32,11 @@ const NavBar = ({ className }: { className?: string }) => {
           onClick={(e) => handleLinkClick(e, href)}
           className={cn(
             'flex items-center text-[1rem] whitespace-nowrap transition-colors',
-            isActive(pathname) ? 'font-semibold text-neutral-850' : 'font-medium text-neutral-500',
+            chatTone
+              ? 'font-medium text-primary-300'
+              : isActive(pathname)
+                ? 'font-semibold text-neutral-850'
+                : 'font-medium text-neutral-500',
           )}
         >
           <Icon className="size-8" />

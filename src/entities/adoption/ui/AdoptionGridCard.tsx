@@ -30,7 +30,7 @@ const AdoptionGridCard = ({ listing, isFavorite, onToggle, className }: Adoption
       <div className="relative aspect-[348/284] w-full overflow-hidden rounded-[0.5rem] bg-neutral-700">
         <Image src={listing.thumbnailUrl} alt={listing.name} fill className="object-cover" />
 
-        {status === 'completed' && <div className="absolute inset-0 bg-white/70" />}
+        {status === 'adopted' && <div className="absolute inset-0 bg-white/70" />}
 
         <div className="absolute top-2 right-3 left-3 flex items-center gap-1">
           {listing.isPopular && (
