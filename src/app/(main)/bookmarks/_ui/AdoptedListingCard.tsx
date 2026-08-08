@@ -63,7 +63,7 @@ const CardStats = ({
 
 const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
   const router = useRouter()
-  const isCompleted = listing.status === 'completed'
+  const isCompleted = listing.status === 'adopted'
   const [modalOpen, setModalOpen] = useState(false)
 
   return (

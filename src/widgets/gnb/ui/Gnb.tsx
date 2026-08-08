@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { MenuIcon } from '@/shared/assets/icons'
 import { PAGE_WIDTH_CLASS } from '@/shared/config/layout'
 import { cn } from '@/shared/lib/cn'
@@ -11,6 +12,8 @@ import { MobileMenu } from './MobileMenu'
 
 const Gnb = () => {
   const [menuOpen, setMenuOpen] = useState(false)
+  const pathname = usePathname()
+  const isChat = pathname.startsWith('/chat')
 
   return (
     <>
@@ -21,7 +24,8 @@ const Gnb = () => {
         <div
           className={cn(
             PAGE_WIDTH_CLASS,
-            'flex items-center justify-between px-4 tab:px-[3rem] pc:px-[6.25rem]',
+            'flex items-center justify-between px-4 tab:px-[3rem]',
+            isChat ? 'pc:px-20' : 'pc:px-[6.25rem]',
           )}
         >
           <LogoButton />
@@ -29,8 +33,8 @@ const Gnb = () => {
           <div className="flex items-center gap-[1.25rem]">
             {/* 데스크탑: 네비게이션(탐색/채팅/커뮤니티/마이홈) + 로그인 상태별 액션 */}
             <div className="hidden items-center gap-[1.25rem] pc:flex">
-              <NavBar />
-              <AuthActions variant="inline" />
+              <NavBar chatTone={isChat} />
+              {!isChat && <AuthActions variant="inline" />}
             </div>
             {/* 햄버거 메뉴 — 탭·모바일은 nav 대체, 데스크탑은 보조 메뉴 (전 브레이크포인트) */}
             <button

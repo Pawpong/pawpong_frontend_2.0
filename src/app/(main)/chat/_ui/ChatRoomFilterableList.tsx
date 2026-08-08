@@ -23,13 +23,7 @@ const ChatRoomFilterableList = ({
   listClassName,
   gutterClassName = CHAT_GUTTER_X,
 }: ChatRoomFilterableListProps) => {
-  const { filter, setFilter, filteredRooms, isLoading, isError } = useChatRoomFilter()
-
-  const emptyMessage = isLoading
-    ? '불러오는 중...'
-    : isError
-      ? '채팅방을 불러오지 못했습니다'
-      : '채팅방이 없습니다'
+  const { filter, setFilter, filteredRooms, isLoading, isError, refetch } = useChatRoomFilter()
 
   return (
     <>
@@ -42,9 +36,24 @@ const ChatRoomFilterableList = ({
         <ChatFilterTabs value={filter} onChange={setFilter} className="justify-end" />
       </div>
 
-      {filteredRooms.length === 0 ? (
+      {isLoading ? (
         <div className="flex items-center justify-center py-20">
-          <p className="text-sm font-medium text-neutral-700">{emptyMessage}</p>
+          <p className="text-sm font-medium text-neutral-700">채팅방을 불러오는 중입니다.</p>
+        </div>
+      ) : isError ? (
+        <div className="flex flex-col items-center justify-center gap-3 py-20">
+          <p className="text-sm font-medium text-neutral-700">채팅방을 불러오지 못했습니다.</p>
+          <button
+            type="button"
+            onClick={() => void refetch()}
+            className="rounded-lg bg-neutral-850 px-3 py-2 text-sm font-semibold text-white"
+          >
+            다시 시도
+          </button>
+        </div>
+      ) : filteredRooms.length === 0 ? (
+        <div className="flex items-center justify-center py-20">
+          <p className="text-sm font-medium text-neutral-700">채팅방이 없습니다</p>
         </div>
       ) : (
         <div className={cn('flex flex-col gap-5 py-6 pc:py-10', gutterClassName, listClassName)}>

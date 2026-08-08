@@ -26,9 +26,6 @@ export const CATEGORY_LABEL: Record<AnimalCategory, string> = {
   lizard: '도마뱀',
 }
 
-/** 입양 상태 */
-export type AdoptionStatus = 'available' | 'reserved' | 'completed'
-
 /** 입양 게시글 카드 */
 export interface AdoptionListingCard {
   listingId: string
@@ -36,7 +33,7 @@ export interface AdoptionListingCard {
   gender: 'male' | 'female'
   ageText: string
   thumbnailUrl: string
-  status: AdoptionStatus
+  status: PetStatus
   category: AnimalCategory
   inquiryCount: number
   favoriteCount: number
@@ -125,7 +122,7 @@ export interface BreederSummary {
 export interface AdoptionDetailDto {
   listingId: string
   name: string
-  status: AdoptionStatus
+  status: PetStatus
   price: string
   birthDate: string
   gender: 'male' | 'female'

@@ -1,5 +1,6 @@
 export { apiClient, API_VERSION } from './client'
 export type { ApiRequestConfig } from './client'
+export { getAccessToken } from './token'
 export {
   ApiError,
   createApiError,

@@ -3,28 +3,43 @@
 import { AffectionBadge, ProfileAvatar } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { ArrowBackIcon, MoreVertIcon } from '@/shared/assets/icons'
-import { CHAT_CONTENT_WIDTH, CHAT_GUTTER_X } from '../_lib/constants'
+import { CHAT_CONTENT_WIDTH } from '../_lib/constants'
 
 interface ChatRoomHeaderProps {
   displayName: string
+  profileImageUrl?: string
   hasApplication: boolean
   onBack: () => void
 }
 
-const ChatRoomHeader = ({ displayName, hasApplication, onBack }: ChatRoomHeaderProps) => {
+const ChatRoomHeader = ({
+  displayName,
+  profileImageUrl,
+  hasApplication,
+  onBack,
+}: ChatRoomHeaderProps) => {
   return (
-    <div
-      className={cn('bg-white py-1 shadow-[0px_7px_7px_rgba(55,55,55,0.1)] pc:py-2', CHAT_GUTTER_X)}
-    >
+    <div className="bg-white px-4 py-1 shadow-[0px_7px_7px_rgba(55,55,55,0.1)] tab:px-12 pc:px-2.5 pc:py-2">
       <div className={cn(CHAT_CONTENT_WIDTH, 'flex items-center justify-between')}>
-        <div className="flex items-center gap-5">
+        <div className="flex min-w-0 items-center gap-5 pc:gap-7">
           <div className="flex items-center gap-1">
-            <button type="button" onClick={onBack} className="shrink-0" aria-label="뒤로 가기">
-              <ArrowBackIcon className="size-8 text-neutral-700" />
+            <button
+              type="button"
+              onClick={onBack}
+              className="flex size-8 shrink-0 items-center justify-center"
+              aria-label="뒤로 가기"
+            >
+              <ArrowBackIcon className="size-6 text-neutral-700" />
             </button>
             <div className="flex items-center gap-2">
-              <ProfileAvatar size="responsive" />
-              <span className="text-body-s font-semibold text-neutral-850">{displayName}</span>
+              <ProfileAvatar
+                src={profileImageUrl}
+                alt={`${displayName} 프로필`}
+                size="responsive"
+              />
+              <span className="max-w-36 truncate text-body-s font-semibold text-neutral-850 pc:max-w-[21.625rem]">
+                {displayName}
+              </span>
             </div>
           </div>
           {hasApplication && <AffectionBadge />}

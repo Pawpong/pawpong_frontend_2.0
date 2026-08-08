@@ -1,37 +1,36 @@
 /**
  * 채팅 관련 타입 정의
- * 출처: 백엔드 chat-room-response.dto.ts / chat-message-response.dto.ts
+ * 출처: swagger.json - ChatRoomResponseDto, ChatMessageResponseDto, CreateRoomRequestDto
  */
 
-export type ChatRoomStatus = 'active' | 'closed'
-export type ChatSenderRole = 'adopter' | 'breeder'
+export type ChatParticipantRole = 'adopter' | 'breeder'
 export type ChatMessageType = 'text' | 'image' | 'file'
 
-/** 채팅방 상대방(카운터파트) 요약 */
-export interface ChatRoomCounterpart {
+/** 채팅방 상대방 정보 */
+export interface ChatRoomCounterpartResponseDto {
   userId: string
-  role: ChatSenderRole
+  role: ChatParticipantRole
   nickname: string
   profileImageUrl?: string
 }
 
-/** 채팅방 응답 DTO */
+/** 채팅방 응답 DTO (GET /api/v2/chat/rooms) */
 export interface ChatRoomResponseDto {
   roomId: string
   applicationId?: string
-  status: ChatRoomStatus
-  counterpart: ChatRoomCounterpart
+  status: 'active' | 'closed'
+  counterpart: ChatRoomCounterpartResponseDto
   lastMessage?: string
   lastMessageAt?: string
   unreadCount: number
   createdAt: string
 }
 
-/** 채팅 메시지 응답 DTO (isMine 은 서버가 요청자 기준으로 계산) */
+/** REST 채팅 메시지 응답 DTO */
 export interface ChatMessageResponseDto {
   messageId: string
   roomId: string
-  senderRole: ChatSenderRole
+  senderRole: ChatParticipantRole
   isMine: boolean
   content: string
   messageType: ChatMessageType
@@ -39,21 +38,23 @@ export interface ChatMessageResponseDto {
   createdAt: string
 }
 
-/**
- * WebSocket `new_message` 브로드캐스트 페이로드.
- * REST DTO 와 달리 isMine 이 없고 senderId 를 그대로 내려주므로
- * 클라이언트에서 현재 사용자 기준으로 isMine 을 계산해 정규화한다.
- */
-export interface ChatNewMessagePayload {
+/** Socket.IO new_message 이벤트 페이로드 */
+export interface WsChatMessage {
   messageId: string
   roomId: string
   senderId: string
-  senderRole: ChatSenderRole
+  senderRole: ChatParticipantRole
   receiverId: string
   content: string
   messageType: ChatMessageType
   isRead: boolean
-  createdAt: string
+  createdAt: string | Date
+}
+
+/** Socket.IO messages_read 이벤트 페이로드 */
+export interface WsMessagesRead {
+  roomId: string
+  readBy: string
 }
 
 /** 채팅방 생성 요청 */

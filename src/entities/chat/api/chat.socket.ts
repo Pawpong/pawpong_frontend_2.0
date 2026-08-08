@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { io, type Socket } from 'socket.io-client'
 import { useQueryClient } from '@tanstack/react-query'
-import type { ChatMessageResponseDto, ChatNewMessagePayload } from '@/shared/types'
+import type { ChatMessageResponseDto, WsChatMessage } from '@/shared/types'
 import { chatQueries } from './chat.queries'
 
 /** accessToken 쿠키 읽기 (WebSocket 핸드셰이크 인증용) */
@@ -20,7 +20,7 @@ const getSocketBase = () => (process.env.NEXT_PUBLIC_API_BASE_URL ?? '').replace
 
 /** 브로드캐스트 페이로드 → REST DTO 정규화 (isMine 은 현재 사용자 기준 계산) */
 const normalizeMessage = (
-  payload: ChatNewMessagePayload,
+  payload: WsChatMessage,
   currentUserId: string,
 ): ChatMessageResponseDto => ({
   messageId: payload.messageId,
@@ -30,7 +30,8 @@ const normalizeMessage = (
   content: payload.content,
   messageType: payload.messageType,
   isRead: payload.isRead,
-  createdAt: payload.createdAt,
+  createdAt:
+    typeof payload.createdAt === 'string' ? payload.createdAt : payload.createdAt.toISOString(),
 })
 
 /**
@@ -61,7 +62,7 @@ export const useChatRoomSocket = (roomId: string | undefined, currentUserId: str
     }
     socket.on('connect', joinAndRead)
 
-    const handleNewMessage = (payload: ChatNewMessagePayload) => {
+    const handleNewMessage = (payload: WsChatMessage) => {
       if (payload.roomId !== roomId) return
       const message = normalizeMessage(payload, currentUserId)
       queryClient.setQueryData<ChatMessageResponseDto[]>(

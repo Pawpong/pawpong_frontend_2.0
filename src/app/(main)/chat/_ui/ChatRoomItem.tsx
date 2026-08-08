@@ -4,6 +4,7 @@ import { cn } from '@/shared/lib/cn'
 import { MoreVertIcon } from '@/shared/assets/icons'
 import type { ChatRoomResponseDto } from '@/shared/types'
 import { ProfileAvatar } from '@/shared/ui'
+import { getChatMessagePreview } from '../_lib/attachment'
 import { RelativeTime } from './RelativeTime'
 
 interface ChatRoomItemProps {
@@ -14,26 +15,34 @@ interface ChatRoomItemProps {
 }
 
 const ChatRoomItem = ({ room, isActive, unreadCount = 0, onClick }: ChatRoomItemProps) => {
-  const displayName = room.counterpart.nickname
-
   return (
     <div
       className={cn(
         'flex items-start justify-between p-2 hover:bg-neutral-100 tab:p-3',
-        isActive && 'bg-neutral-100',
+        isActive && 'bg-point-100 hover:bg-point-100',
       )}
     >
-      <button type="button" onClick={onClick} className="flex min-w-0 items-center gap-4 text-left">
+      <button
+        type="button"
+        onClick={onClick}
+        className="flex min-w-0 flex-1 items-center gap-4 text-left"
+      >
         {/* community-profile: 아바타 상단 정렬 (모바일 32 / PC 40) */}
         <div className="flex min-w-0 items-start gap-2">
-          <ProfileAvatar size="responsive" />
+          <ProfileAvatar
+            src={room.counterpart.profileImageUrl}
+            alt={`${room.counterpart.nickname} 프로필`}
+            size="responsive"
+          />
           <div className="flex min-w-0 flex-col">
             <div className="flex items-center gap-2">
-              <span className="text-body-s font-semibold text-neutral-850">{displayName}</span>
+              <span className="truncate text-body-s font-semibold text-neutral-850">
+                {room.counterpart.nickname}
+              </span>
               <RelativeTime dateStr={room.lastMessageAt} />
             </div>
             <p className="max-w-[21.625rem] truncate text-sm leading-[1.5] font-semibold text-neutral-850">
-              {room.lastMessage ?? ''}
+              {getChatMessagePreview(room.lastMessage)}
             </p>
           </div>
         </div>

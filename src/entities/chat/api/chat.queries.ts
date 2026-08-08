@@ -11,10 +11,10 @@ export const chatQueries = {
       staleTime: STALE_TIME.REALTIME,
     }),
 
-  messages: (roomId: string) =>
+  messages: (roomId: string, limit = 50) =>
     createQuery({
-      queryKey: [...chatQueries.all(), 'messages', roomId],
-      queryFn: () => getChatMessages(roomId),
+      queryKey: [...chatQueries.all(), 'messages', roomId, limit],
+      queryFn: () => getChatMessages(roomId, limit),
       enabled: !!roomId,
       staleTime: STALE_TIME.REALTIME,
     }),

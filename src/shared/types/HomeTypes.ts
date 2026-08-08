@@ -69,6 +69,6 @@ export interface HomeAnimalData {
   birth: string
   price: string | null
   breed: string
-  status: 'available' | 'reserved' | 'completed'
+  status: 'available' | 'reserved' | 'adopted'
   isAd?: boolean
 }

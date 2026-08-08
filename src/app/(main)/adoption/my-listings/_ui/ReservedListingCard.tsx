@@ -14,7 +14,7 @@ interface ReservedListingCardProps {
 }
 
 const ReservedListingCard = ({ listing, className }: ReservedListingCardProps) => {
-  const isCompleted = listing.status === 'completed'
+  const isCompleted = listing.status === 'adopted'
 
   return (
     <Link

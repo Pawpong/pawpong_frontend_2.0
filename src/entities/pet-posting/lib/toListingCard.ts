@@ -16,7 +16,7 @@ export const toListingCard = (c: MyPetPostingCard): AdoptionListingCard => ({
   gender: c.gender,
   ageText: c.ageDescription,
   thumbnailUrl: c.primaryPhotoUrl || c.photoUrls?.[0] || FALLBACK_THUMBNAIL,
-  status: c.status === 'adopted' ? 'completed' : c.status,
+  status: c.status,
   category: 'all',
   inquiryCount: c.inquiryCount,
   favoriteCount: c.favoriteCount,
