@@ -16,7 +16,7 @@ import {
 import { ArrowRightIcon, CheckIcon, GenderIcon } from '@/shared/assets/icons'
 import { cn } from '@/shared/lib/cn'
 import { GENDER_LABEL } from '@/shared/types'
-import type { AdoptionDetailDto, AdoptionStatus } from '@/shared/types'
+import type { AdoptionDetailDto, PetStatus } from '@/shared/types'
 import { ADOPTION_CARD_STATUS } from '@/entities/adoption'
 import { HeroImageCarousel } from './HeroImageCarousel'
 import { FavoriteShareActions } from './FavoriteShareActions'
@@ -108,7 +108,7 @@ const AdoptionDetailHero = ({
             </div>
 
             {/* 분양가 / 태어난 날 / 성별 / 소개글 — 피그마 정보 블록 gap-8 */}
-            <div className="flex w-full flex-col pc:gap-5 gap-2">
+            <div className="flex w-full flex-col gap-2 pc:gap-5">
               <InfoItem label="분양가" value={detail.price} />
               <InfoItem label="태어난 날" value={detail.birthDate} />
               <InfoItem
@@ -218,9 +218,9 @@ const InfoItem = ({
 )
 
 /* ── 상태 변경 드롭다운 (브리더용) ── */
-const STATUS_OPTIONS: AdoptionStatus[] = ['reserved', 'available', 'completed']
+const STATUS_OPTIONS: PetStatus[] = ['reserved', 'available', 'adopted']
 
-const StatusDropdown = ({ currentStatus }: { currentStatus: AdoptionStatus }) => (
+const StatusDropdown = ({ currentStatus }: { currentStatus: PetStatus }) => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
       <button

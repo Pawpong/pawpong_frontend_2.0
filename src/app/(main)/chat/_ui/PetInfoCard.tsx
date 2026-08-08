@@ -4,7 +4,7 @@ import { PopularBadge } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { ArrowRightIcon } from '@/shared/assets/icons'
 import { GENDER_LABEL, type AdoptionPetDetail } from '@/shared/types'
-import { ADOPTION_CARD_STATUS, toAdoptionStatus } from '@/entities/adoption'
+import { ADOPTION_CARD_STATUS } from '@/entities/adoption'
 import { CHAT_CONTENT_WIDTH } from '../_lib/constants'
 
 interface PetInfoCardProps {
@@ -13,7 +13,7 @@ interface PetInfoCardProps {
 
 const PetInfoCard = ({ detail }: PetInfoCardProps) => {
   const title = `${detail.breed} ${detail.name} | ${GENDER_LABEL[detail.gender]} ${detail.ageDescription}`
-  const statusLabel = ADOPTION_CARD_STATUS[toAdoptionStatus(detail.status)].label
+  const statusLabel = ADOPTION_CARD_STATUS[detail.status].label
 
   return (
     <div className="bg-white px-4 py-1 tab:px-12 pc:px-5 pc:py-3">

@@ -9,7 +9,6 @@ import type {
 import { formatDate } from '@/shared/lib/formatDate'
 import { petTypeToCategory } from '@/shared/lib/petCategory'
 import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
-import { toAdoptionStatus } from '@/entities/adoption'
 
 /**
  * v2 입양 상세 API 응답(AdoptionPetDetail)을 상세 UI 뷰모델(AdoptionDetailDto)로 매핑한다.
@@ -61,7 +60,7 @@ export const mapAdoptionDetail = (
   return {
     listingId: d.petId,
     name: d.name,
-    status: toAdoptionStatus(d.status),
+    status: d.status,
     price: `${d.price.toLocaleString('ko-KR')}원`,
     birthDate: formatDate(d.birthDate),
     gender: d.gender,
