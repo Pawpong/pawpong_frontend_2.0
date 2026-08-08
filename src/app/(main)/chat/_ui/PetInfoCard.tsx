@@ -3,15 +3,9 @@ import Link from 'next/link'
 import { PopularBadge } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { ArrowRightIcon } from '@/shared/assets/icons'
-import { GENDER_LABEL, type AdoptionPetDetail, type PetStatus } from '@/shared/types'
+import { GENDER_LABEL, type AdoptionPetDetail } from '@/shared/types'
+import { ADOPTION_CARD_STATUS, toAdoptionStatus } from '@/entities/adoption'
 import { CHAT_CONTENT_WIDTH } from '../_lib/constants'
-
-// ADOPTION_CARD_STATUS는 AdoptionStatus(completed) 키라 PetStatus(adopted)에 그대로 못 쓴다.
-const PET_STATUS_LABEL: Record<PetStatus, string> = {
-  available: '분양중',
-  reserved: '예약중',
-  adopted: '분양완료',
-}
 
 interface PetInfoCardProps {
   detail: AdoptionPetDetail
@@ -19,7 +13,7 @@ interface PetInfoCardProps {
 
 const PetInfoCard = ({ detail }: PetInfoCardProps) => {
   const title = `${detail.breed} ${detail.name} | ${GENDER_LABEL[detail.gender]} ${detail.ageDescription}`
-  const statusLabel = PET_STATUS_LABEL[detail.status]
+  const statusLabel = ADOPTION_CARD_STATUS[toAdoptionStatus(detail.status)].label
 
   return (
     <div className="bg-white px-4 py-1 tab:px-12 pc:px-5 pc:py-3">

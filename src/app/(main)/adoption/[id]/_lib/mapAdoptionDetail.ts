@@ -2,7 +2,6 @@ import type {
   AdoptionPetCard,
   AdoptionPetDetail,
   AdoptionDetailDto,
-  AdoptionStatus,
   HealthInfo,
   ParentInfo,
   BreedingEnvironment,
@@ -10,10 +9,7 @@ import type {
 import { formatDate } from '@/shared/lib/formatDate'
 import { petTypeToCategory } from '@/shared/lib/petCategory'
 import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
-
-/** 백엔드 PetStatus('adopted') → 프론트 AdoptionStatus('completed') */
-const toAdoptionStatus = (status: AdoptionPetDetail['status']): AdoptionStatus =>
-  status === 'adopted' ? 'completed' : status
+import { toAdoptionStatus } from '@/entities/adoption'
 
 /**
  * v2 입양 상세 API 응답(AdoptionPetDetail)을 상세 UI 뷰모델(AdoptionDetailDto)로 매핑한다.
