@@ -1,20 +1,29 @@
 'use client'
 
-import { Container } from '@/shared/ui'
-import { AdoptedListingCard } from './AdoptedListingCard'
+import { useMemo } from 'react'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { adoptionQueries } from '@/entities/adoption'
+import { formatDate } from '@/shared/lib/formatDate'
+import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
+import { Container, InfiniteScrollTrigger } from '@/shared/ui'
 import type { AdoptedListingCard as AdoptedListingCardType } from '@/shared/types'
+import { AdoptedListingCard } from './AdoptedListingCard'
 
-interface AdoptionListTabProps {
-  listings: AdoptedListingCardType[]
-}
+const AdoptionListTab = () => {
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery(
+    adoptionQueries.myAdopted(),
+  )
 
-const AdoptionListTab = ({ listings }: AdoptionListTabProps) => {
-  const groupedByDate = listings.reduce<Record<string, AdoptedListingCardType[]>>((acc, item) => {
-    const date = item.adoptedAt
-    if (!acc[date]) acc[date] = []
-    acc[date].push(item)
-    return acc
-  }, {})
+  // 입양일 기준 그룹 — 서버가 최신순으로 주므로 삽입 순서를 그대로 유지한다
+  const groupedByDate = useMemo(() => {
+    const items = data?.pages.flatMap((page) => page.items) ?? []
+    return items.reduce<Record<string, AdoptedListingCardType[]>>((acc, pet) => {
+      const date = formatDate(pet.adoptedAt)
+      acc[date] ??= []
+      acc[date].push({ ...mapAdoptionCard(pet), adoptedAt: date })
+      return acc
+    }, {})
+  }, [data])
 
   return (
     // 패딩: 모바일 py20·px16(기본 20→px-4 오버라이드) / tab px48 / pc px80·py40 — 카드는 max-w로 중앙정렬
@@ -31,6 +40,12 @@ const AdoptionListTab = ({ listings }: AdoptionListTabProps) => {
             ))}
           </div>
         ))}
+
+        <InfiniteScrollTrigger
+          onIntersect={fetchNextPage}
+          hasNextPage={!!hasNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+        />
       </div>
     </Container>
   )
