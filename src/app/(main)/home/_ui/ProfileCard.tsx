@@ -146,7 +146,7 @@ const FavoriteButton = ({ className }: { className?: string }) => (
 
 const EditButton = () => (
   <Link
-    href="/home/edit"
+    href="/profile/edit"
     className="flex h-8 flex-1 items-center justify-center rounded-full border border-neutral-300 p-2 text-sm leading-[1.5] font-semibold text-neutral-850 pc:h-10 pc:text-base"
   >
     프로필 편집

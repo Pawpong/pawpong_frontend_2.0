@@ -10,6 +10,7 @@ import { useUpdateBreederProfile } from '@/features/breeder'
 import { useUpdateMyProfile } from '@/features/profile'
 import { useUploadSingleFile } from '@/features/upload'
 import { useLogout } from '@/features/auth'
+import { normalizeApiError } from '@/shared/api'
 import { WithdrawReason } from '@/shared/types'
 import {
   AlertMessage,
@@ -17,14 +18,14 @@ import {
   Button,
   Container,
   CtaModal,
+  FooterCtaBar,
   NavigationBar,
   ProfileAvatar,
   InputField,
   Input,
   TextareaField,
 } from '@/shared/ui'
-import { CheckIcon } from '@/shared/assets/icons'
-import { WithdrawReasonModal } from './WithdrawReasonModal'
+import { AlertCircleIcon, CheckIcon } from '@/shared/assets/icons'
 
 // [refactored] 매직 넘버·문자열 상수화
 const TOAST_DURATION_MS = 3000
@@ -37,33 +38,34 @@ const ConfirmModal = (
   props: Omit<ComponentProps<typeof CtaModal>, 'icon' | 'showClose' | 'direction'>,
 ) => <CtaModal icon={null} showClose={false} direction="responsive-reverse" {...props} />
 
-// [refactored] 탈퇴 모달 설명 — 줄바꿈 위치가 데스크탑/모바일·탭 다름
+// 탈퇴 모달 설명 (Figma 2145-193207) — 모바일·탭·PC 모두 같은 문구·줄바꿈
 const LEAVE_DESCRIPTION = (
   <>
-    <span className="block pc:hidden">
-      계정 삭제 시 모든 개인정보가
-      <br />
-      삭제되며 복구되지 않습니다
-    </span>
-    <span className="hidden pc:block">
-      계정 삭제시 모든 개인정보가 삭제되며
-      <br />
-      복구되지 않습니다
-    </span>
+    계정 삭제시 모든 개인정보가 삭제되며
+    <br />
+    복구되지 않습니다
   </>
 )
 
 // [refactored] 토스트 표시 + 자동 닫힘 로직 분리 (SRP)
+// 성공(default)·실패(error) 두 종류를 같은 슬롯에서 표시한다.
+type ToastState = { message: string; status: 'default' | 'error' }
+
 const useToast = (duration = TOAST_DURATION_MS) => {
-  const [visible, setVisible] = useState(false)
+  const [toast, setToast] = useState<ToastState | null>(null)
 
   useEffect(() => {
-    if (!visible) return
-    const timer = setTimeout(() => setVisible(false), duration)
+    if (!toast) return
+    const timer = setTimeout(() => setToast(null), duration)
     return () => clearTimeout(timer)
-  }, [visible, duration])
+  }, [toast, duration])
 
-  return { visible, show: () => setVisible(true), hide: () => setVisible(false) }
+  return {
+    current: toast,
+    success: (message: string) => setToast({ message, status: 'default' }),
+    error: (message: string) => setToast({ message, status: 'error' }),
+    hide: () => setToast(null),
+  }
 }
 
 /** 프로필 편집 (Figma node 2145-191107) — GNB는 MainLayout 제공 */
@@ -72,12 +74,7 @@ const ProfileEditContent = () => {
   const [name, setName] = useState('')
   const [bio, setBio] = useState('')
   const [showApply, setShowApply] = useState(false)
-  const [showReason, setShowReason] = useState(false) // 탈퇴 사유 선택 단계
-  const [showLeave, setShowLeave] = useState(false) // 탈퇴 최종 확인 단계
-  // 선택한 탈퇴 사유(확인 모달에서 실제 요청 시 사용)
-  const [withdraw, setWithdraw] = useState<{ reason: WithdrawReason; otherReason?: string } | null>(
-    null,
-  )
+  const [showLeave, setShowLeave] = useState(false) // 탈퇴 확인 모달
 
   const toast = useToast() // [refactored]
 
@@ -97,8 +94,8 @@ const ProfileEditContent = () => {
       const res = await uploadFile.mutateAsync({ file, folder: 'profile' })
       setPhotoPreview(res.cdnUrl)
       setPhotoFileName(res.fileName)
-    } catch {
-      // TODO: 업로드 실패 토스트
+    } catch (error) {
+      toast.error(normalizeApiError(error, '사진 업로드에 실패했습니다.').message)
     }
   }
 
@@ -174,31 +171,20 @@ const ProfileEditContent = () => {
         )
       }
       await Promise.all(tasks)
-      toast.show()
-    } catch {
-      // TODO: 실패 토스트/에러 처리
+      toast.success('프로필이 변경되었습니다')
+    } catch (error) {
+      toast.error(normalizeApiError(error, '프로필 적용에 실패했습니다.').message)
     }
   }
 
-  // 사유 선택 완료 → 최종 확인 모달로 전환
-  const handleReasonNext = (reason: WithdrawReason, otherReason?: string) => {
-    setWithdraw({ reason, otherReason })
-    setShowReason(false)
-    setShowLeave(true)
-  }
-
-  // 탈퇴: 사용자가 선택한 사유(+기타 상세)로 요청 — reason='other'면 otherReason 동반
+  // 탈퇴: 사유를 묻지 않고 바로 요청 — API 가 reason 을 필수로 받아 'other' 로 보낸다
   const handleLeave = async () => {
-    if (!withdraw) return
     setShowLeave(false)
     try {
-      await deleteAccount.mutateAsync({
-        reason: withdraw.reason,
-        ...(withdraw.otherReason ? { otherReason: withdraw.otherReason } : {}),
-      })
+      await deleteAccount.mutateAsync({ reason: WithdrawReason.OTHER })
       router.replace('/')
-    } catch {
-      // TODO: 실패 처리
+    } catch (error) {
+      toast.error(normalizeApiError(error, '탈퇴 처리에 실패했습니다.').message)
     }
   }
 
@@ -206,8 +192,8 @@ const ProfileEditContent = () => {
     try {
       await logout.mutateAsync()
       router.replace('/')
-    } catch {
-      // TODO: 실패 처리
+    } catch (error) {
+      toast.error(normalizeApiError(error, '로그아웃에 실패했습니다.').message)
     }
   }
 
@@ -215,14 +201,14 @@ const ProfileEditContent = () => {
     <div className="flex w-full flex-col">
       <NavigationBar title="프로필 편집" backHref="/home" />
 
-      {/* 디자인: 모바일 px-16(margin-mo) / 탭+ px-80(margin-pc), py-48 */}
-      <Container className="flex flex-col items-center gap-[2.625rem] px-4 py-12 tab:px-20">
+      {/* 디자인: 모바일 px-16(margin-mo) / 탭+ px-80(margin-pc), py-48
+          하단 CTA 바가 고정이라 그 높이(94px)만큼 아래 여백을 둔다 */}
+      <Container className="flex flex-col items-center gap-[2.625rem] px-4 pt-12 pb-[7.5rem] tab:px-20">
         <div className="flex w-full max-w-[37.5rem] flex-col items-center gap-11">
           {/* 아바타 + 사진 변경 */}
           <div className="flex w-28 flex-col items-center gap-8">
             <ProfileAvatar size="xlarge" src={photoPreview ?? myProfile?.profileImageUrl} />
             <div className="flex w-full flex-col items-center gap-3">
-              {/* TODO: 선택한 파일 업로드 연결 (onChange) */}
               <input
                 ref={fileInputRef}
                 type="file"
@@ -239,8 +225,8 @@ const ProfileEditContent = () => {
             </div>
           </div>
 
-          {/* 폼 */}
-          <div className="flex w-full flex-col">
+          {/* 폼 — 항목 사이 8px (앞 항목 카운터 밑 ~ 다음 항목 라벨 위) */}
+          <div className="flex w-full flex-col gap-2">
             <InputField label="포퐁 활동명">
               {/* 브리더 활동명(브리더명)은 이 화면에서 수정 불가 — 읽기전용 표시 */}
               <Input
@@ -278,11 +264,11 @@ const ProfileEditContent = () => {
           </div>
         </div>
 
-        {/* 탈퇴 / 로그아웃 — 로그아웃은 TODO 연결 */}
+        {/* 탈퇴 / 로그아웃 */}
         <div className="flex items-center gap-10">
           {/* 탈퇴는 입양자 전용 API(useDeleteAdopterAccount) — 브리더에선 숨김 */}
           {!isBreeder && (
-            <Button variant="text" onClick={() => setShowReason(true)}>
+            <Button variant="text" onClick={() => setShowLeave(true)}>
               탈퇴
             </Button>
           )}
@@ -292,46 +278,28 @@ const ProfileEditContent = () => {
         </div>
       </Container>
 
-      {/* 하단 CTA — 디자인(1054-36832): 전체공개 드롭다운 없어도 바 높이 94px 유지
-          모바일: 화면 맨 아래 고정 / 탭+: 일반 흐름 */}
-      <div className="fixed inset-x-0 bottom-0 z-40 tab:relative tab:inset-auto tab:z-auto">
-        {/* 적용 완료 토스트 — 버튼 바로 위 위치(레이아웃 안 밀림) + 풀 너비 */}
-        {toast.visible && ( // [refactored]
+      {/* 하단 고정 CTA — 공통 FooterCtaBar (Figma 1054-36832 / 모바일 1056-47239) */}
+      <FooterCtaBar
+        secondary={{ label: '그만두기', onClick: () => router.back() }}
+        primary={{
+          label: '프로필 적용',
+          onClick: () => setShowApply(true),
+          disabled: !isFormFilled || isSaving,
+        }}
+      >
+        {/* 적용 완료·실패 토스트 — 버튼 바로 위 위치(레이아웃 안 밀림) + 풀 너비 */}
+        {toast.current && ( // [refactored]
           <Container className="absolute inset-x-0 bottom-[5rem]">
             <AlertMessage
-              status="default"
+              status={toast.current.status}
               size="responsive"
-              icon={CheckIcon}
-              message="기본 프로필로 변경되었습니다"
+              icon={toast.current.status === 'error' ? AlertCircleIcon : CheckIcon}
+              message={toast.current.message}
               onClose={toast.hide} // [refactored]
             />
           </Container>
         )}
-
-        {/* 모바일(1056-47239): 풀 너비·py-16·gap-10, 그만두기 고정 w-117 / 적용 flex-1, 둘 다 h-48
-            탭+(1054-36832): 우측 정렬·바 높이 94px, 두 버튼 flex-1·h-32 */}
-        <Container className="flex items-center bg-white py-4 tab:h-[5.875rem] tab:justify-end tab:py-0">
-          <div className="flex w-full gap-2.5 tab:w-[22.5rem] tab:gap-5">
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={() => router.back()}
-              className="w-[7.3125rem] tab:h-8 tab:w-auto tab:max-w-[16.125rem] tab:flex-1 tab:text-sm"
-            >
-              그만두기
-            </Button>
-            <Button
-              variant="primary"
-              size="lg"
-              disabled={!isFormFilled || isSaving}
-              onClick={() => setShowApply(true)}
-              className="max-w-[18.5625rem] flex-1 tab:h-8 tab:max-w-[16.125rem] tab:text-sm"
-            >
-              프로필 적용
-            </Button>
-          </div>
-        </Container>
-      </div>
+      </FooterCtaBar>
 
       {/* 사진 변경 바텀시트 — 모바일·탭 전용 (디자인 2147-196483) */}
       <BottomSheet
@@ -353,13 +321,6 @@ const ProfileEditContent = () => {
           { label: '취소', variant: 'outline', onClick: () => setShowApply(false) },
           { label: '적용하기', variant: 'fill', onClick: handleApply },
         ]}
-      />
-
-      {/* 탈퇴 사유 선택 (확인 모달 앞 단계) — 선택 완료 시 최종 확인 모달로 전환 */}
-      <WithdrawReasonModal
-        open={showReason}
-        onOpenChange={setShowReason}
-        onNext={handleReasonNext}
       />
 
       {/* 계정 탈퇴 확인 (디자인 2145-193207 / 모바일·탭 2145-193342) */}

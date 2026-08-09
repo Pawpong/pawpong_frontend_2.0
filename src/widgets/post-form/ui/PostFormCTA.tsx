@@ -1,6 +1,6 @@
 'use client'
 
-import { Button, Container } from '@/shared/ui'
+import { FooterCtaBar } from '@/shared/ui'
 
 interface PostFormCTAProps {
   /** 미전달 시 임시저장 버튼 숨김 (수정 화면 등) */
@@ -17,6 +17,7 @@ interface PostFormCTAProps {
   leftSlot?: React.ReactNode
 }
 
+/** 글 작성/수정 하단 CTA — 공통 FooterCtaBar 에 임시저장/업로드 액션만 얹는다 */
 const PostFormCTA = ({
   onSaveDraft,
   onSubmit,
@@ -25,44 +26,18 @@ const PostFormCTA = ({
   isSaveDraftValid = true,
   isSubmitting = false,
   leftSlot,
-}: PostFormCTAProps) => {
-  return (
-    <div className="fixed right-0 bottom-0 left-0 z-10 bg-white/50 backdrop-blur-sm">
-      <Container className="tab:px-[6.25rem]">
-        <div
-          className={`flex items-center gap-[0.625rem] p-5 tab:h-[5.875rem] tab:p-0 ${leftSlot ? 'tab:justify-between' : 'tab:justify-end'}`}
-        >
-          {/* Left Slot — desktop only */}
-          {leftSlot && <div className="hidden tab:block">{leftSlot}</div>}
-
-          {/* Action Buttons */}
-          <div className="flex w-full items-center gap-[0.625rem] tab:w-auto tab:gap-3">
-            {onSaveDraft && (
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={onSaveDraft}
-                disabled={!isSaveDraftValid || isSubmitting}
-                className="w-[6.813rem] shrink-0 border-[#d4d4d4] text-text-primary tab:w-[17rem]"
-              >
-                임시저장
-              </Button>
-            )}
-            {/* 내용을 채우면 primary(노랑)로 활성화, 비어 있으면 회색 비활성 */}
-            <Button
-              variant="primary"
-              size="lg"
-              onClick={onSubmit}
-              disabled={!isValid || isSubmitting}
-              className="flex-1 tab:w-[17rem] tab:flex-none"
-            >
-              {submitLabel}
-            </Button>
-          </div>
-        </div>
-      </Container>
-    </div>
-  )
-}
+}: PostFormCTAProps) => (
+  <FooterCtaBar
+    leftSlot={leftSlot}
+    secondary={
+      onSaveDraft && {
+        label: '임시저장',
+        onClick: onSaveDraft,
+        disabled: !isSaveDraftValid || isSubmitting,
+      }
+    }
+    primary={{ label: submitLabel, onClick: onSubmit, disabled: !isValid || isSubmitting }}
+  />
+)
 
 export { PostFormCTA }
