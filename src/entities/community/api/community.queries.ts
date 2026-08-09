@@ -5,6 +5,7 @@ import {
   getCommunityPostDetail,
   getCommunityComments,
   getMyBookmarkedPosts,
+  getMyDraftPosts,
 } from './community.api'
 
 export const communityQueries = {
@@ -35,6 +36,15 @@ export const communityQueries = {
     createQuery({
       queryKey: [...communityQueries.all(), 'myPosts', pageSize],
       queryFn: () => getCommunityPosts({ authorId: 'me', pageSize }),
+      enabled,
+      staleTime: STALE_TIME.DEFAULT,
+    }),
+
+  // 임시저장(draft) 한 내 글 — 본인만 조회 가능. 인증 필요.
+  drafts: (enabled = true, pageSize = 30) =>
+    createQuery({
+      queryKey: [...communityQueries.all(), 'drafts', pageSize],
+      queryFn: () => getMyDraftPosts({ pageSize }),
       enabled,
       staleTime: STALE_TIME.DEFAULT,
     }),

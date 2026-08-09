@@ -1,4 +1,4 @@
-import type { FavoriteBreeder } from './myHome'
+import type { FavoriteBreeder } from '@/shared/types'
 
 export interface ExploreBreeder extends FavoriteBreeder {
   isPopular: boolean

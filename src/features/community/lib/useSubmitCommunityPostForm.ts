@@ -3,53 +3,68 @@
 import { useCallback, useState } from 'react'
 import { useUploadMultipleFiles } from '@/features/upload'
 import type { CommunityPostStatus, CommunityPostVisibility } from '@/shared/types'
-import { useCreateCommunityPost } from '../api/community.mutations'
+import { useCreateCommunityPost, useUpdateCommunityPost } from '../api/community.mutations'
+import { COMMUNITY_UPLOAD_FOLDER, toCommunityPhotoFileName } from './communityPhotoFileName'
 
 interface SubmitPostFormInput {
   text: string
   files: File[]
   visibility: CommunityPostVisibility
   status: CommunityPostStatus
+  /** 수정 시 그대로 두는 기존 사진 URL (지운 사진은 빠진 상태로 전달) */
+  keptImageUrls?: string[]
 }
 
-/** 게시글 이미지가 업로드되는 스토리지 폴더 */
-const COMMUNITY_UPLOAD_FOLDER = 'community'
-
 /**
- * 글 작성 폼(본문 + 이미지 + 공개범위) 을 백엔드 계약에 맞춰 제출한다.
+ * 글 작성/수정 폼(본문 + 이미지 + 공개범위) 을 백엔드 계약에 맞춰 제출한다.
  *
- * 1) 이미지 File[] 을 upload 모듈로 먼저 업로드해 fileName[] 을 확보하고
- * 2) createCommunityPost 로 게시글(발행/임시저장) 을 생성한다.
+ * 1) 새로 고른 이미지 File[] 을 upload 모듈로 먼저 업로드해 fileName[] 을 확보하고
+ * 2) postId 가 있으면 updateCommunityPost, 없으면 createCommunityPost 를 호출한다.
  *
- * 발행(published)/임시저장(draft) 은 status 로 구분하며, 성공 시 생성된 postId 를 반환한다.
+ * 발행(published)/임시저장(draft) 은 status 로 구분하며, 성공 시 postId 를 반환한다.
  */
-export const useSubmitCommunityPostForm = () => {
+export const useSubmitCommunityPostForm = (postId?: string) => {
   const uploadMutation = useUploadMultipleFiles()
   const createMutation = useCreateCommunityPost()
+  const updateMutation = useUpdateCommunityPost(postId ?? '')
   const [error, setError] = useState<string | null>(null)
 
-  const isSubmitting = uploadMutation.isPending || createMutation.isPending
+  const isSubmitting =
+    uploadMutation.isPending || createMutation.isPending || updateMutation.isPending
 
   const submit = useCallback(
-    async ({ text, files, visibility, status }: SubmitPostFormInput): Promise<string | null> => {
+    async ({
+      text,
+      files,
+      visibility,
+      status,
+      keptImageUrls = [],
+    }: SubmitPostFormInput): Promise<string | null> => {
       setError(null)
       try {
-        // 1) 첨부 이미지 업로드 → 파일명 확보 (없으면 스킵)
-        const photos =
+        // 1) 새로 고른 이미지 업로드 → 파일명 확보 (없으면 스킵)
+        const uploaded =
           files.length > 0
             ? (await uploadMutation.mutateAsync({ files, folder: COMMUNITY_UPLOAD_FOLDER })).map(
-                (uploaded) => uploaded.fileName,
+                (file) => file.fileName,
               )
             : []
+        // 남긴 기존 사진 + 새로 올린 사진 (수정에서 사진을 다 지우면 빈 배열로 전송)
+        // 하나라도 파일명을 못 뽑으면(예상 밖 URL 형태) 틀린 목록으로 사진을 날리느니
+        // photos 를 아예 빼서 서버의 기존 사진을 그대로 둔다.
+        const kept = keptImageUrls.map(toCommunityPhotoFileName)
+        const resolvedKept = kept.filter((name) => name !== null)
+        const photos =
+          resolvedKept.length === kept.length ? [...resolvedKept, ...uploaded] : undefined
 
-        // 2) 게시글 생성 (발행 or 임시저장)
+        // 2) 게시글 생성 or 수정
+        // 백엔드는 body 를 비우는 수정을 거부하므로, 본문이 비면 body 를 아예 보내지 않는다
+        // (임시저장 이어쓰기에서 본문을 지운 채 저장하는 경우 — 서버의 기존 본문 유지)
         const trimmed = text.trim()
-        const post = await createMutation.mutateAsync({
-          body: trimmed.length > 0 ? trimmed : undefined,
-          photos,
-          visibility,
-          status,
-        })
+        const body = trimmed.length > 0 ? trimmed : undefined
+        const post = postId
+          ? await updateMutation.mutateAsync({ body, photos, visibility, status })
+          : await createMutation.mutateAsync({ body, photos, visibility, status })
         return post.postId
       } catch (err) {
         const message =
@@ -60,7 +75,7 @@ export const useSubmitCommunityPostForm = () => {
         return null
       }
     },
-    [uploadMutation, createMutation],
+    [postId, uploadMutation, createMutation, updateMutation],
   )
 
   return { submit, isSubmitting, error }

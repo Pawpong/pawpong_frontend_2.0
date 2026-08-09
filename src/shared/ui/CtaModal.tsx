@@ -49,6 +49,8 @@ const DIRECTION_CLASS: Record<CtaModalDirection, string> = {
 export interface CtaModalAction extends VariantProps<typeof ctaModalButton> {
   label: string
   onClick: () => void
+  /** 요청 진행 중 등으로 비활성화 (중복 클릭 방지) */
+  disabled?: boolean
   /** 버튼 색 등 개별 오버라이드 (예: 삭제 빨강, 취소 회색) */
   className?: string
 }
@@ -152,6 +154,7 @@ const CtaModal = ({
                 key={action.label}
                 variant={map.variant}
                 onClick={action.onClick}
+                disabled={action.disabled}
                 className={cn(
                   'h-10 w-full text-base leading-normal transition-colors',
                   map.className,

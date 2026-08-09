@@ -59,6 +59,20 @@ export interface FavoriteBreederCard {
   addedAt: string
 }
 
+/**
+ * 즐겨찾는 브리더 카드의 화면 표시용 뷰 모델.
+ * FavoriteBreederCard(API) 를 BreederCard 컴포넌트가 쓰는 형태로 옮겨 담는다.
+ */
+export interface FavoriteBreeder {
+  id: string
+  nickname: string
+  imageUrl: string | null
+  badges: string[]
+  isBreeding: boolean
+  location: string
+  date: string
+}
+
 /** 즐겨찾는 브리더 목록 파라미터 */
 export interface FavoriteBreederListParams {
   page?: number
