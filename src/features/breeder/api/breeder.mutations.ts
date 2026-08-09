@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { breederQueries } from '@/entities/breeder'
 import { communityQueries } from '@/entities/community'
+import { profileQueries } from '@/entities/profile'
 import type {
   ProfileUpdateRequestDto,
   ApplicationStatusUpdateRequest,
@@ -34,10 +35,11 @@ export const useUpdateBreederProfile = () => {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (data: ProfileUpdateRequestDto) => updateBreederProfile(data),
-    onSuccess: () => {
+    onSuccess: async () => {
       void qc.invalidateQueries({ queryKey: breederQueries.all() })
       // 프로필 이미지는 커뮤니티 작성자 snapshot 으로 복제돼 있어, 변경 시 커뮤니티 목록도 갱신되도록 무효화한다.
       void qc.invalidateQueries({ queryKey: communityQueries.all() })
+      await qc.invalidateQueries({ queryKey: profileQueries.me().queryKey })
     },
   })
 }

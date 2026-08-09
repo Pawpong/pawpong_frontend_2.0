@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { adopterQueries } from '@/entities/adopter'
 import { communityQueries } from '@/entities/community'
+import { profileQueries } from '@/entities/profile'
 import {
   updateAdopterProfile,
   deleteAdopterAccount,
@@ -20,11 +21,14 @@ export const useUpdateAdopterProfile = () => {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (data: AdopterProfileUpdateRequest) => updateAdopterProfile(data),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: adopterQueries.profile().queryKey })
+    onSuccess: async () => {
       // 닉네임/프로필 이미지는 커뮤니티 게시글·댓글에 작성자 snapshot 으로 복제돼 있어,
       // 프로필 변경 시 커뮤니티 목록(내가 쓴 글/피드/상세)도 갱신되도록 무효화한다.
       void qc.invalidateQueries({ queryKey: communityQueries.all() })
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: adopterQueries.profile().queryKey }),
+        qc.invalidateQueries({ queryKey: profileQueries.me().queryKey }),
+      ])
     },
   })
 }

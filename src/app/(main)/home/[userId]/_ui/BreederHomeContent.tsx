@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { Container } from '@/shared/ui'
 import type { AdoptionListingCard } from '@/shared/types'
-import type { MyHomePost } from '@/shared/mocks/myHome'
 import { breederQueries } from '@/entities/breeder'
 import { adoptionQueries } from '@/entities/adoption'
 import { communityQueries } from '@/entities/community'
@@ -14,7 +13,6 @@ import { uniqueBy } from '@/shared/lib/uniqueBy'
 import { useCreateOrGetChatRoom } from '@/features/send-message'
 import { useToggleFollow } from '@/features/profile'
 import { mapAdoptionCard } from '@/app/(main)/explore/_lib/mapAdoptionCard'
-import { toMyHomePost } from '../../_lib/toMyHomePost'
 import { ProfileCard } from '../../_ui/ProfileCard'
 import { BreederListingCard } from '../../_ui/BreederListingCard'
 import { FavoriteAdoptionCard } from '@/features/adoption'
@@ -58,7 +56,7 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
 
   // 게시글 탭 — GET /community/posts?authorId=userId
   const { data: postsData } = useQuery(communityQueries.userPosts(userId))
-  const posts: MyHomePost[] = (postsData?.items ?? []).map(toMyHomePost)
+  const posts = postsData?.items ?? []
 
   if (!profile) return null
 

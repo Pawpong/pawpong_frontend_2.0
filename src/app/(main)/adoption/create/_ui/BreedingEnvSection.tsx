@@ -3,7 +3,7 @@
 import type { UseFormRegister } from 'react-hook-form'
 import { Textarea } from '@/shared/ui'
 import { useImageUpload } from '@/shared/lib/useImageUpload'
-import { ImageUploadArea } from '@/app/(main)/post/create/_ui/ImageUploadArea'
+import { ImageUploadArea } from '@/widgets/post-form'
 import type { AdoptionCreateFormValues } from '../_lib/schema'
 import { FormSection } from './FormSection'
 

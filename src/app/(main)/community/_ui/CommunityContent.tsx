@@ -10,23 +10,13 @@ import {
   SearchButton,
   Separator,
 } from '@/shared/ui'
-import { MOCK_COMMUNITY_POSTS } from '@/shared/mocks/community'
-import { uniqueBy } from '@/shared/lib/uniqueBy'
 import { PostCard, communityQueries, toCommunityPreviewProps } from '@/entities/community'
 
 const CommunityContent = () => {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
-    ...communityQueries.posts('latest'),
-    // ponytail: dev-api 다운 중 화면 확인용 — 에러 바운더리로 던지지 않고 목데이터로 렌더.
-    // 서버 복구되면 이 옵션과 아래 MOCK_COMMUNITY_POSTS 폴백을 지운다.
-    throwOnError: false,
-  })
-  // 무한스크롤 페이지 병합 시 postId 중복 제거 — 서버 페이지네이션 경계 겹침으로 인한
-  // React key 중복(글 중복/누락) 방어 (explore 의 dedupeByListingId 와 동일 취지)
-  const posts = uniqueBy(
-    data?.pages.flatMap((page) => page.items) ?? MOCK_COMMUNITY_POSTS,
-    (post) => post.postId,
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery(
+    communityQueries.posts('latest'),
   )
+  const posts = data?.pages.flatMap((page) => page.items) ?? []
 
   // ponytail: 서버 검색 API 미구현 → 지금은 검색바 펼치기 UI만. keyword 파라미터 생기면 query 연결.
   const [searchOpen, setSearchOpen] = useState(false)

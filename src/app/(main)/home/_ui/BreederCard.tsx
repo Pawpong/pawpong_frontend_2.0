@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { Badge, TextLabel } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { LocationOnIcon, PixelStarIcon } from '@/shared/assets/icons'
-import type { FavoriteBreeder } from '@/shared/mocks/myHome'
+import type { FavoriteBreeder } from '@/shared/types'
 
 interface BreederCardProps {
   breeder: FavoriteBreeder

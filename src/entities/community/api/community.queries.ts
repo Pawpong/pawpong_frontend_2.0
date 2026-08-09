@@ -5,6 +5,7 @@ import {
   getCommunityPostDetail,
   getCommunityComments,
   getMyBookmarkedPosts,
+  getMyDraftPosts,
 } from './community.api'
 
 export const communityQueries = {
@@ -39,12 +40,21 @@ export const communityQueries = {
       staleTime: STALE_TIME.DEFAULT,
     }),
 
-  // 남의 홈 '게시글' 탭 — 특정 유저가 쓴 커뮤니티 글(authorId=userId).
+  // 공개 프로필 게시글 탭 — 특정 사용자가 작성한 공개 글.
   userPosts: (userId: string, pageSize = 30) =>
     createQuery({
       queryKey: [...communityQueries.all(), 'userPosts', userId, pageSize],
       queryFn: () => getCommunityPosts({ authorId: userId, pageSize }),
       enabled: !!userId,
+      staleTime: STALE_TIME.DEFAULT,
+    }),
+
+  // 임시저장(draft) 한 내 글 — 본인만 조회 가능. 인증 필요.
+  drafts: (enabled = true, pageSize = 30) =>
+    createQuery({
+      queryKey: [...communityQueries.all(), 'drafts', pageSize],
+      queryFn: () => getMyDraftPosts({ pageSize }),
+      enabled,
       staleTime: STALE_TIME.DEFAULT,
     }),
 

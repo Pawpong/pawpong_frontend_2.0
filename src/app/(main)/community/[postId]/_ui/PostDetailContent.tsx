@@ -8,30 +8,26 @@ import {
   AuthorInfo,
   BOOKMARK_ACTIVE,
   Container,
-  CtaModal,
+  DeleteConfirmModal,
   InfiniteScrollTrigger,
   NavigationBar,
+  OwnerActionsMenu,
   PostActionButton,
   Separator,
 } from '@/shared/ui'
 import { FavoriteIcon, PixelMessageIcon, PixelBookmarkIcon } from '@/shared/assets/icons'
 import { cn } from '@/shared/lib/cn'
-import { uniqueBy } from '@/shared/lib/uniqueBy'
-import { MOCK_COMMUNITY_POST_DETAIL, MOCK_COMMUNITY_COMMENTS } from '@/shared/mocks/community'
 import { communityQueries } from '@/entities/community'
 import { profileQueries } from '@/entities/profile'
 import {
   useToggleCommunityPostLike,
   useCreateCommunityComment,
-  useUpdateCommunityPost,
   useDeleteCommunityPost,
   useBookmarkCommunityPost,
   useUnbookmarkCommunityPost,
 } from '@/features/community'
-import { VisibilitySelect, type VisibilityType } from '@/widgets/post-form'
 import { useAuthStatus } from '@/features/auth'
 import type { CommunityComment } from '@/shared/types'
-import { OwnerActionsMenu } from '../../_ui/OwnerActionsMenu'
 import { CommentItem } from './CommentItem'
 import { CommentComposer } from './CommentComposer'
 
@@ -55,11 +51,7 @@ interface PostDetailContentProps {
 const PostDetailContent = ({ postId }: PostDetailContentProps) => {
   const router = useRouter()
   const { isLoggedIn } = useAuthStatus()
-  // ponytail: dev-api 다운 중 화면 확인용 — throwOnError:false + 목데이터 폴백. 서버 복구되면 지운다.
-  const { data: post = MOCK_COMMUNITY_POST_DETAIL } = useQuery({
-    ...communityQueries.detail(postId),
-    throwOnError: false,
-  })
+  const { data: post } = useQuery(communityQueries.detail(postId))
   // 공개 상세라 비로그인 조회도 가능 — 로그인 상태에서만 내 프로필을 조회(비로그인 401 리다이렉트 방지)
   const { data: me } = useQuery({ ...profileQueries.me(), enabled: isLoggedIn })
   const {
@@ -67,28 +59,22 @@ const PostDetailContent = ({ postId }: PostDetailContentProps) => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useInfiniteQuery({ ...communityQueries.comments(postId), throwOnError: false })
-  const comments = uniqueBy(
-    commentsData?.pages.flatMap((page) => page.items) ?? MOCK_COMMUNITY_COMMENTS,
-    (comment) => comment.commentId,
-  )
+  } = useInfiniteQuery(communityQueries.comments(postId))
+  const comments = commentsData?.pages.flatMap((page) => page.items) ?? []
 
   const toggleLike = useToggleCommunityPostLike(postId)
   const bookmark = useBookmarkCommunityPost()
   const unbookmark = useUnbookmarkCommunityPost()
   const createComment = useCreateCommunityComment(postId)
-  const updatePost = useUpdateCommunityPost(postId)
   const deletePost = useDeleteCommunityPost()
 
   // 답글 대상 (parentCommentId 는 최상위 댓글로 고정 — 1단계 스레드)
   const [replyTarget, setReplyTarget] = useState<{ commentId: string; nickname: string } | null>(
     null,
   )
-  // 게시글 인라인 수정
-  const [isEditingPost, setIsEditingPost] = useState(false)
-  const [editBody, setEditBody] = useState('')
-  const [editVisibility, setEditVisibility] = useState<VisibilityType>('public')
   const [confirmDeletePost, setConfirmDeletePost] = useState(false)
+
+  if (!post) return null
 
   const isOwner = !!me?.userId && me.userId === post.authorId
 
@@ -108,21 +94,10 @@ const PostDetailContent = ({ postId }: PostDetailContentProps) => {
     setReplyTarget(null)
   }
 
-  const startEditPost = () => {
-    setEditBody(post.body)
-    setEditVisibility(post.visibility)
-    setIsEditingPost(true)
-  }
-
-  const handleSavePost = async () => {
-    const trimmed = editBody.trim()
-    if (!trimmed || updatePost.isPending) return
-    await updatePost.mutateAsync({ body: trimmed, visibility: editVisibility })
-    setIsEditingPost(false)
-  }
-
+  // 삭제 성공 시에만 목록으로 이동 (실패하면 모달을 유지해 재시도 가능)
   const handleDeletePost = () => {
-    void deletePost.mutateAsync(postId).then(() => router.push('/community'))
+    if (deletePost.isPending) return
+    deletePost.mutate(postId, { onSuccess: () => router.push('/community') })
   }
 
   return (
@@ -150,46 +125,14 @@ const PostDetailContent = ({ postId }: PostDetailContentProps) => {
                 profileImageUrl={post.authorProfileImageUrl}
                 createdAt={post.createdAt}
                 contentSlot={
-                  isEditingPost ? (
-                    <div className="mt-2 flex flex-col gap-3">
-                      <textarea
-                        value={editBody}
-                        onChange={(e) => setEditBody(e.target.value)}
-                        maxLength={2000}
-                        rows={4}
-                        className="w-full resize-none rounded-lg border border-[#d3d3d3] px-3 py-2 text-sm outline-none focus:border-text-primary"
-                      />
-                      <div className="flex items-center justify-between">
-                        <VisibilitySelect value={editVisibility} onChange={setEditVisibility} />
-                        <div className="flex gap-2">
-                          <button
-                            type="button"
-                            onClick={() => setIsEditingPost(false)}
-                            className="rounded-full border border-neutral-300 px-4 py-1.5 text-sm font-semibold text-text-secondary"
-                          >
-                            취소
-                          </button>
-                          <button
-                            type="button"
-                            onClick={handleSavePost}
-                            disabled={updatePost.isPending}
-                            className="rounded-full bg-fill-muted px-4 py-1.5 text-sm font-semibold text-text-primary disabled:opacity-50"
-                          >
-                            저장
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <p className="mt-1 text-sm font-bold whitespace-pre-wrap text-text-secondary">
-                      {post.body}
-                    </p>
-                  )
+                  <p className="mt-1 text-sm font-bold whitespace-pre-wrap text-text-secondary">
+                    {post.body}
+                  </p>
                 }
               />
-              {isOwner && !isEditingPost && (
+              {isOwner && (
                 <OwnerActionsMenu
-                  onEdit={startEditPost}
+                  onEdit={() => router.push(`/community/${postId}/edit`)}
                   onDelete={() => setConfirmDeletePost(true)}
                 />
               )}
@@ -207,7 +150,6 @@ const PostDetailContent = ({ postId }: PostDetailContentProps) => {
                       src={url}
                       alt={`게시글 이미지 ${index + 1}`}
                       fill
-                      sizes="(max-width: 768px) 234px, 349px"
                       className="object-cover"
                     />
                   )}
@@ -283,16 +225,13 @@ const PostDetailContent = ({ postId }: PostDetailContentProps) => {
         </div>
       </Container>
 
-      {/* 게시글 삭제 확인 */}
-      <CtaModal
+      {/* [refactored] 게시글 삭제 확인 — 공통 DeleteConfirmModal */}
+      <DeleteConfirmModal
         open={confirmDeletePost}
         onOpenChange={setConfirmDeletePost}
-        title="게시글을 삭제할까요?"
-        description="삭제한 게시글은 복구할 수 없습니다."
-        actions={[
-          { label: '취소', variant: 'outline', onClick: () => setConfirmDeletePost(false) },
-          { label: '삭제', variant: 'fill', onClick: handleDeletePost },
-        ]}
+        target="게시글"
+        onConfirm={handleDeletePost}
+        isPending={deletePost.isPending}
       />
     </div>
   )

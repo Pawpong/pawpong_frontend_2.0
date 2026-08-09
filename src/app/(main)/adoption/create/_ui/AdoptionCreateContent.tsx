@@ -13,7 +13,7 @@ import {
   SelectValue,
   Textarea,
 } from '@/shared/ui'
-import { ImageUploadArea } from '@/app/(main)/post/create/_ui/ImageUploadArea'
+import { ImageUploadArea } from '@/widgets/post-form'
 import { useAdoptionCreateForm } from '../_lib/useAdoptionCreateForm'
 import { FormFieldLabel } from './FormFieldLabel'
 import { HealthInfoSection } from './HealthInfoSection'

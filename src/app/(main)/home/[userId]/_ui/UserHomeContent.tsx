@@ -3,12 +3,10 @@
 import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { Container, Separator } from '@/shared/ui'
-import type { MyHomePost } from '@/shared/mocks/myHome'
 import { adopterQueries } from '@/entities/adopter'
 import { communityQueries } from '@/entities/community'
 import { useCreateOrGetChatRoom } from '@/features/send-message'
 import { useToggleFollow } from '@/features/profile'
-import { toMyHomePost } from '../../_lib/toMyHomePost'
 import { ProfileCard } from '../../_ui/ProfileCard'
 import { HomeTitle } from '../../_ui/HomeTitle'
 import { PostList } from '../../_ui/PostList'
@@ -24,7 +22,7 @@ const UserHomeContent = ({ userId }: UserHomeContentProps) => {
 
   // 게시글 탭 — GET /community/posts?authorId=userId
   const { data: postsData } = useQuery(communityQueries.userPosts(userId))
-  const posts: MyHomePost[] = (postsData?.items ?? []).map(toMyHomePost)
+  const posts = postsData?.items ?? []
 
   // 메시지 보내기 — 채팅방 생성/조회 후 대화로 이동
   const { mutate: startChat, isPending: isStartingChat } = useCreateOrGetChatRoom()

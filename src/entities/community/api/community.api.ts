@@ -173,6 +173,21 @@ export const getMyBookmarkedPosts = async (
   return { ...page, items: page.items.map(mapCard) }
 }
 
+/** 내가 임시저장(draft) 한 게시글 목록 — 본인에게만 노출, 최신순 */
+export const getMyDraftPosts = async (
+  params: CommunityBookmarkListParams = {},
+): Promise<PaginationResponse<CommunityPostCard>> => {
+  const query = new URLSearchParams()
+  if (params.page) query.set('page', String(params.page))
+  if (params.pageSize) query.set('pageSize', String(params.pageSize))
+
+  const response = await apiClient.get<ApiResponseFull<PaginationResponse<RawCommunityPostCard>>>(
+    `${API_VERSION}/community/posts/me/drafts?${query.toString()}`,
+  )
+  const page = unwrap(response, '임시저장 게시글 목록 조회에 실패했습니다.')
+  return { ...page, items: page.items.map(mapCard) }
+}
+
 /** 커뮤니티 게시글 댓글 목록 조회 (페이지네이션) */
 export const getCommunityComments = async (
   postId: string,

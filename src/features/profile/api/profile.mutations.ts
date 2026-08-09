@@ -10,8 +10,8 @@ export const useUpdateMyProfile = () => {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (data: UpdateMyProfileRequest) => updateMyProfile(data),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: profileQueries.me().queryKey })
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: profileQueries.me().queryKey })
     },
   })
 }

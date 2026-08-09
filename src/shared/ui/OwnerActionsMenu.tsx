@@ -1,12 +1,13 @@
 'use client'
 
+import { MoreVertIcon } from '@/shared/assets/icons'
+import { cn } from '@/shared/lib/cn'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-} from '@/shared/ui'
-import { MoreVertIcon } from '@/shared/assets/icons'
+} from './DropdownMenu'
 
 interface OwnerActionsMenuProps {
   onEdit: () => void
@@ -22,8 +23,8 @@ interface OwnerActionsMenuProps {
 const OwnerActionsMenu = ({ onEdit, onDelete, className }: OwnerActionsMenuProps) => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
-      <button type="button" aria-label="더보기" className={className}>
-        <MoreVertIcon className="size-6 text-text-primary" />
+      <button type="button" aria-label="더보기" className={cn('text-text-primary', className)}>
+        <MoreVertIcon className="size-6" />
       </button>
     </DropdownMenuTrigger>
     <DropdownMenuContent align="end">
