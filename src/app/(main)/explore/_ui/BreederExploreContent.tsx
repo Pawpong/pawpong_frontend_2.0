@@ -6,7 +6,7 @@ import { MOCK_FEATURED_BREEDERS, MOCK_EXPLORE_BREEDERS } from '@/shared/mocks/br
 import { EXPLORE_SECTION_CONTAINER } from '../_lib/constants'
 
 // 상단 카테고리/검색(픽셀 카테고리 + 큰 검색바)은 ExploreContent에서 공통 렌더
-// [refactored] 입양 탐색 탭과 동일한 ExploreListingSection 사용
+// 브리더 카드 종류만 주입하고 섹션/그리드 레이아웃은 공용 컴포넌트에 위임
 const BreederExploreContent = () => {
   return (
     <>

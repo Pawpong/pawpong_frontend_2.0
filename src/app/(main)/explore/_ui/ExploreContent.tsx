@@ -20,11 +20,16 @@ import { useBreakpoint } from '@/shared/lib/useBreakpoint'
 import { useGnbHeight } from '@/shared/lib/useGnbHeight'
 import { ANIMAL_CATEGORIES } from '@/shared/types'
 import type { AnimalCategory } from '@/shared/types'
+import { AdoptionCardGrid } from '@/features/adoption'
 import { BreederExploreContent } from './BreederExploreContent'
-import { ExploreAdoptionCard } from './ExploreAdoptionCard'
-import { ExploreListingSection } from './ExploreListingSection'
 import { ExploreFilterBar } from './ExploreFilterBar'
-import { EXPLORE_TABS, SEARCH_PLACEHOLDERS, EXPLORE_SECTION_CONTAINER } from '../_lib/constants'
+import { TitledSection } from './TitledSection'
+import {
+  EXPLORE_SECTION_CONTAINER,
+  EXPLORE_SECTION_TITLE_CLASS,
+  EXPLORE_TABS,
+  SEARCH_PLACEHOLDERS,
+} from '../_lib/constants'
 import type { ExploreType } from '../_lib/constants'
 
 type AdoptionListFilter = 'all' | 'available' | 'popular'
@@ -178,12 +183,9 @@ const ExploreContent = () => {
       ) : (
         <>
           <Container className={EXPLORE_SECTION_CONTAINER}>
-            <ExploreListingSection
-              title="전체 분양 소식"
-              items={listings}
-              totalCount={totalCount}
-              getKey={(listing) => listing.listingId}
-              renderCard={(listing) => <ExploreAdoptionCard listing={listing} />}
+            <TitledSection
+              title={`전체 분양 소식 ${totalCount}`}
+              titleClassName={EXPLORE_SECTION_TITLE_CLASS}
               headerSlot={
                 <div className="flex shrink-0 items-center gap-2" aria-label="분양 소식 필터">
                   {/* [refactored] 칩 버튼 스타일 → 공통 FilterChip */}
@@ -203,7 +205,9 @@ const ExploreContent = () => {
                   ))}
                 </div>
               }
-            />
+            >
+              <AdoptionCardGrid listings={listings} />
+            </TitledSection>
             {listings.length === 0 && (
               <p className="py-10 text-center text-sm text-neutral-700">
                 등록된 분양글이 없습니다.
