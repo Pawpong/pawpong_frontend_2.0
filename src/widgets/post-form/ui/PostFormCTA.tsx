@@ -1,12 +1,16 @@
 'use client'
 
-import { Container } from '@/shared/ui'
+import { Button, Container } from '@/shared/ui'
 
 interface PostFormCTAProps {
-  onSaveDraft: () => void
+  /** 미전달 시 임시저장 버튼 숨김 (수정 화면 등) */
+  onSaveDraft?: () => void
   onSubmit: () => void
   submitLabel?: string
+  /** 제출(발행) 가능 여부 */
   isValid: boolean
+  /** 임시저장 가능 여부 — 미전달 시 항상 가능 (발행보다 조건이 느슨한 폼용) */
+  isSaveDraftValid?: boolean
   /** 업로드/저장 진행 중 — 버튼 비활성화로 중복 제출 방지 */
   isSubmitting?: boolean
   /** 왼쪽 슬롯 (예: visibility select) */
@@ -18,6 +22,7 @@ const PostFormCTA = ({
   onSubmit,
   submitLabel = '업로드',
   isValid,
+  isSaveDraftValid = true,
   isSubmitting = false,
   leftSlot,
 }: PostFormCTAProps) => {
@@ -32,22 +37,27 @@ const PostFormCTA = ({
 
           {/* Action Buttons */}
           <div className="flex w-full items-center gap-[0.625rem] tab:w-auto tab:gap-3">
-            <button
-              type="button"
-              onClick={onSaveDraft}
-              disabled={isSubmitting}
-              className="h-12 w-[6.813rem] shrink-0 rounded-full border border-[#d4d4d4] text-base font-semibold text-text-primary disabled:opacity-50 tab:w-[17rem]"
-            >
-              임시저장
-            </button>
-            <button
-              type="button"
+            {onSaveDraft && (
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={onSaveDraft}
+                disabled={!isSaveDraftValid || isSubmitting}
+                className="w-[6.813rem] shrink-0 border-[#d4d4d4] text-text-primary tab:w-[17rem]"
+              >
+                임시저장
+              </Button>
+            )}
+            {/* 내용을 채우면 primary(노랑)로 활성화, 비어 있으면 회색 비활성 */}
+            <Button
+              variant="primary"
+              size="lg"
               onClick={onSubmit}
               disabled={!isValid || isSubmitting}
-              className="h-12 flex-1 rounded-full bg-fill-muted text-base font-semibold text-text-primary disabled:opacity-50 tab:w-[17rem] tab:flex-none"
+              className="flex-1 tab:w-[17rem] tab:flex-none"
             >
               {submitLabel}
-            </button>
+            </Button>
           </div>
         </div>
       </Container>

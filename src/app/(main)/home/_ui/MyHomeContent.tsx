@@ -1,16 +1,24 @@
 'use client'
 
 import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { BookmarkIcon } from '@/shared/assets/icons'
-import { Container, SectionHeader, NavigationBar, InputUpload } from '@/shared/ui'
+import {
+  Container,
+  DeleteConfirmModal,
+  SectionHeader,
+  NavigationBar,
+  InputUpload,
+} from '@/shared/ui'
 import { useGnbHeight } from '@/shared/lib/useGnbHeight'
-import { type MyHomePost } from '@/shared/mocks/myHome'
 import { createMockListings } from '@/shared/mocks/adoption'
 import { profileQueries } from '@/entities/profile'
 import { communityQueries } from '@/entities/community'
 import type { AdopterPublicProfile, BreederPublicProfile } from '@/shared/types'
 import { FavoriteAdoptionCard } from '@/features/adoption'
+import { useDeleteCommunityPost } from '@/features/community'
 import { ProfileCard } from './ProfileCard'
 import { HomeTabs, TabsContent } from './HomeTabs'
 import { PostList } from './PostList'
@@ -36,11 +44,24 @@ const TabPanel = ({
 )
 
 const MyHomeContent = () => {
+  const router = useRouter()
+  // 내 글 카드 ⋯ 메뉴 — 수정은 상세를 편집 모드로 열고, 삭제는 확인 후 DELETE
+  const deletePost = useDeleteCommunityPost()
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null)
+
+  // 삭제 성공 후에만 모달을 닫는다 (실패하면 모달을 유지해 재시도 가능)
+  const handleDeletePost = () => {
+    if (!deleteTargetId || deletePost.isPending) return
+    deletePost.mutate(deleteTargetId, { onSuccess: () => setDeleteTargetId(null) })
+  }
+
   // 마이홈 프로필 카드: /profile/me 로 내 프로필 조회 (role 에 따라 adopter/breeder 분기, 프로필 이미지 포함)
   const { data: myProfile } = useQuery(profileQueries.me())
 
   // 마이홈 '게시글' 탭 — 내가 작성한 커뮤니티 글을 백엔드에서 조회 (profile 로드 후 활성화)
   const { data: myPostsData } = useQuery(communityQueries.myPosts(!!myProfile))
+  // 임시저장 글 수 — 있을 때만 '게시글' 탭 상단에 이어쓰기 진입점을 띄운다
+  const { data: draftsData } = useQuery(communityQueries.drafts(!!myProfile))
 
   // sticky 헤더 스택: GNB → navbar(top=gnbH) → 탭바(top=gnbH+navH)
   const gnbH = useGnbHeight()
@@ -67,23 +88,11 @@ const MyHomeContent = () => {
   // [refactored] 작성 바 문구/링크를 역할별로 분리 — 단일 InputUpload 인스턴스로 렌더
   const writeBar = isBreeder
     ? { text: '분양글을 올려보세요', href: '/adoption/create' }
-    : { text: '게시글을 올려보세요', href: '/post/create' }
+    : { text: '게시글을 올려보세요', href: '/community/write' }
 
   const [activeTab, setActiveTab] = useState(defaultTab)
-  // 백엔드 CommunityPostCard → PostList 가 쓰는 MyHomePost 뷰 모델로 매핑
-  const posts: MyHomePost[] = (myPostsData?.items ?? []).map((post) => ({
-    id: post.postId,
-    author: {
-      userId: post.authorId,
-      nickname: post.authorNickname,
-      avatarUrl: post.authorProfileImageUrl ?? null,
-    },
-    createdAt: post.createdAt,
-    description: post.bodyExcerpt,
-    images: post.photoUrls,
-    likeCount: post.likeCount,
-    commentCount: post.commentCount,
-  }))
+  const posts = myPostsData?.items ?? []
+  const draftCount = draftsData?.items.length ?? 0
   const listings = isBreeder ? createMockListings() : []
 
   // /profile/me 응답을 ProfileCard 가 쓰는 공개 프로필 형태로 매핑 (프로필 이미지는 profileImageUrl)
@@ -179,13 +188,37 @@ const MyHomeContent = () => {
 
         {/* 디자인: 모바일(1023-23241) px-16·py-24 / 탭·PC(2046-160971) px-48·80·py-40 */}
         <TabPanel value="posts" className="px-4 py-6 tab:py-10">
-          <PostList posts={posts} emptyText="내가 쓴 글이 없습니다." />
+          {/* 임시저장이 있을 때만 노출 — 목록에서 이어서 작성 */}
+          {draftCount > 0 && (
+            <Link
+              href="/community/drafts"
+              className="mb-4 flex items-center justify-between rounded-lg border border-neutral-300 px-4 py-3 text-sm font-semibold text-neutral-850 tab:mx-auto tab:max-w-[59.25rem]"
+            >
+              <span>임시저장 {draftCount}개</span>
+              <span className="text-xs font-medium text-text-secondary">이어서 쓰기</span>
+            </Link>
+          )}
+          <PostList
+            posts={posts}
+            emptyText="내가 쓴 글이 없습니다."
+            onEdit={(postId) => router.push(`/community/${postId}/edit`)}
+            onDelete={setDeleteTargetId}
+          />
         </TabPanel>
 
         <TabsContent value="breeders" className="mt-0">
           <FavoriteBreedersContent />
         </TabsContent>
       </HomeTabs>
+
+      {/* [refactored] 게시글 삭제 확인 — 공통 DeleteConfirmModal */}
+      <DeleteConfirmModal
+        open={deleteTargetId !== null}
+        onOpenChange={(open) => !open && setDeleteTargetId(null)}
+        target="게시글"
+        onConfirm={handleDeletePost}
+        isPending={deletePost.isPending}
+      />
     </div>
   )
 }

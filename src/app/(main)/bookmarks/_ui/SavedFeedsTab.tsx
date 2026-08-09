@@ -1,11 +1,11 @@
 'use client'
 
 import { Container } from '@/shared/ui'
-import { PostCard } from '@/entities/community'
-import { toPostCardProps, type MyHomePost } from '@/shared/mocks/myHome'
+import { PostCard, toCommunityPreviewProps } from '@/entities/community'
+import type { CommunityPostCard } from '@/shared/types'
 
 interface SavedFeedsTabProps {
-  feeds: MyHomePost[]
+  feeds: CommunityPostCard[]
 }
 
 const SavedFeedsTab = ({ feeds }: SavedFeedsTabProps) => (
@@ -14,9 +14,9 @@ const SavedFeedsTab = ({ feeds }: SavedFeedsTabProps) => (
     {/* 각 피드가 개별 보더 카드 (Figma 2091-148897) — 카드 간 gap 모바일 20 / tab 28, tab max-w 59.25rem 가운데 */}
     <div className="flex flex-col gap-5 tab:mx-auto tab:max-w-[59.25rem] pc:gap-7">
       {feeds.map((post) => (
-        <div key={post.id} className="rounded-lg border border-neutral-300 bg-white">
+        <div key={post.postId} className="rounded-lg border border-neutral-300 bg-white">
           {/* 저장피드: ProfileHeader sm 헤더 + 모바일 좌우 패딩 보완(px-3) */}
-          <PostCard profileType="sm" className="px-3" {...toPostCardProps(post)} />
+          <PostCard profileType="sm" className="px-3" {...toCommunityPreviewProps(post)} />
         </div>
       ))}
     </div>

@@ -3,7 +3,7 @@
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { ShowcaseSection } from '@/shared/ui'
 import { CommunityBox, communityQueries, toCommunityPreviewProps } from '@/entities/community'
-import { MOCK_MY_HOME_POSTS, toPostCardProps as mockToPostCardProps } from '@/shared/mocks/myHome'
+import { MOCK_MY_HOME_POSTS } from '@/shared/mocks/myHome'
 
 const CARD_COUNT = 3
 
@@ -17,7 +17,9 @@ const CommunityShowcase = () => {
 
   // 데이터 없으면(로딩/실패/빈 목록) 목업으로 스켈레톤 유지
   const posts =
-    fetched.length > 0 ? fetched : MOCK_MY_HOME_POSTS.slice(0, CARD_COUNT).map(mockToPostCardProps)
+    fetched.length > 0
+      ? fetched
+      : MOCK_MY_HOME_POSTS.slice(0, CARD_COUNT).map(toCommunityPreviewProps)
 
   return (
     <ShowcaseSection title="동물 자랑하기" linkText="커뮤니티 바로가기" linkHref="/community">

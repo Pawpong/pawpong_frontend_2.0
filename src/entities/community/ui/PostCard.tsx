@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { ProfileHeader, TextLabel } from '@/shared/ui'
+import { OwnerActionsMenu, ProfileHeader, TextLabel } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { MoreVertIcon } from '@/shared/assets/icons'
 import type { CommunityPreviewProps } from '../model/communityPreview'
@@ -16,6 +16,9 @@ interface PostCardProps extends CommunityPreviewProps {
   showMore?: boolean
   /** 댓글 미리보기 (작성자·본문 1줄) — 없으면 미노출 */
   commentPreview?: { nickname: string; body: string }
+  /** 내 글일 때만 전달 — ⋯ 메뉴가 수정/삭제로 동작 (미전달 시 메뉴 미노출) */
+  onEdit?: () => void
+  onDelete?: () => void
   className?: string
 }
 
@@ -36,6 +39,8 @@ const PostCard = ({
   profileType,
   showMore,
   commentPreview,
+  onEdit,
+  onDelete,
   className,
 }: PostCardProps) => {
   const hasImages = images.length > 0
@@ -73,9 +78,18 @@ const PostCard = ({
           ) : (
             profileCluster
           )}
-          <button type="button" aria-label="더보기" className="shrink-0">
-            <MoreVertIcon className="size-6 text-neutral-850" />
-          </button>
+          {onEdit && onDelete ? (
+            <OwnerActionsMenu
+              onEdit={onEdit}
+              onDelete={onDelete}
+              className="shrink-0 text-neutral-850"
+            />
+          ) : (
+            // ponytail: 남의 글 ⋯ 는 액션 미정(신고 등) — 스펙 나오면 여기 연결
+            <button type="button" aria-label="더보기" className="shrink-0">
+              <MoreVertIcon className="size-6 text-neutral-850" />
+            </button>
+          )}
         </div>
       )}
 

@@ -4,7 +4,7 @@ import { useInfiniteQuery } from '@tanstack/react-query'
 import { Container, InfiniteScrollTrigger } from '@/shared/ui'
 import { profileQueries } from '@/entities/profile'
 import type { FavoriteBreederCard } from '@/shared/types'
-import type { FavoriteBreeder } from '@/shared/mocks/myHome'
+import type { FavoriteBreeder } from '@/shared/types'
 import { BreederCard } from './BreederCard'
 
 // 백엔드 FavoriteBreederCard → BreederCard 뷰 모델(FavoriteBreeder) 매핑

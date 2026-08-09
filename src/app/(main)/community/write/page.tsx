@@ -1,7 +1,7 @@
-import { CommunityWriteContent } from './_ui/CommunityWriteContent'
+import { CommunityPostEditor } from '../_ui/CommunityPostEditor'
 
 const CommunityWritePage = () => {
-  return <CommunityWriteContent />
+  return <CommunityPostEditor />
 }
 
 export default CommunityWritePage

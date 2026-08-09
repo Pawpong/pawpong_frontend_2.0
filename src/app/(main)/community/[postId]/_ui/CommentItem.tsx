@@ -1,10 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { AuthorInfo, CtaModal } from '@/shared/ui'
+import { AuthorInfo, DeleteConfirmModal, OwnerActionsMenu } from '@/shared/ui'
 import type { CommunityComment } from '@/shared/types'
 import { useUpdateCommunityComment, useDeleteCommunityComment } from '@/features/community'
-import { OwnerActionsMenu } from '../../_ui/OwnerActionsMenu'
 
 interface CommentItemProps {
   comment: CommunityComment
@@ -98,23 +97,16 @@ const CommentItem = ({ comment, currentUserId, onReply, isReply }: CommentItemPr
         />
       )}
 
-      <CtaModal
+      {/* [refactored] 댓글 삭제 확인 — 공통 DeleteConfirmModal */}
+      <DeleteConfirmModal
         open={confirmDelete}
         onOpenChange={setConfirmDelete}
-        title="댓글을 삭제할까요?"
-        description="삭제한 댓글은 복구할 수 없습니다."
-        actions={[
-          { label: '취소', variant: 'outline', onClick: () => setConfirmDelete(false) },
-          {
-            label: '삭제',
-            variant: 'fill',
-            onClick: () => {
-              void deleteComment
-                .mutateAsync(comment.commentId)
-                .finally(() => setConfirmDelete(false))
-            },
-          },
-        ]}
+        target="댓글"
+        // 삭제 성공 후에만 닫는다 (실패하면 모달을 유지해 재시도 가능)
+        onConfirm={() =>
+          deleteComment.mutate(comment.commentId, { onSuccess: () => setConfirmDelete(false) })
+        }
+        isPending={deleteComment.isPending}
       />
     </div>
   )
