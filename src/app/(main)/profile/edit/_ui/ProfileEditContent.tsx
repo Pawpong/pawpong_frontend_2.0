@@ -14,7 +14,6 @@ import { normalizeApiError } from '@/shared/api'
 import { WithdrawReason } from '@/shared/types'
 import {
   AlertMessage,
-  BottomSheet,
   Button,
   Container,
   CtaModal,
@@ -27,13 +26,14 @@ import {
 } from '@/shared/ui'
 import { AlertCircleIcon, CheckIcon } from '@/shared/assets/icons'
 
-// [refactored] 매직 넘버·문자열 상수화
 const TOAST_DURATION_MS = 3000
 const NAME_MAX_LENGTH = 30
-const BIO_MAX_LENGTH = 100
-const BELOW_PC_QUERY = '(max-width: 89.99rem)' // pc(1440px) 미만 = 모바일·탭
+const BIO_MAX_LENGTH = 200 // 서버 UpdateMyProfileRequestDto.bio maxLength
 
-// [refactored] 아이콘·X 없는 반응형 확인 모달 프리셋 (적용/탈퇴 공용)
+// [refactored] 표시 전용 Input 스타일 — 수정 불가(readOnly) + focus 보더 중립화
+const READONLY_INPUT_CLASS = 'cursor-default focus:border-neutral-150'
+
+// 아이콘·X 없는 반응형 확인 모달 프리셋 (적용/탈퇴 공용)
 const ConfirmModal = (
   props: Omit<ComponentProps<typeof CtaModal>, 'icon' | 'showClose' | 'direction'>,
 ) => <CtaModal icon={null} showClose={false} direction="responsive-reverse" {...props} />
@@ -47,7 +47,7 @@ const LEAVE_DESCRIPTION = (
   </>
 )
 
-// [refactored] 토스트 표시 + 자동 닫힘 로직 분리 (SRP)
+// 토스트 표시 + 자동 닫힘 로직 분리 (SRP)
 // 성공(default)·실패(error) 두 종류를 같은 슬롯에서 표시한다.
 type ToastState = { message: string; status: 'default' | 'error' }
 
@@ -76,10 +76,13 @@ const ProfileEditContent = () => {
   const [showApply, setShowApply] = useState(false)
   const [showLeave, setShowLeave] = useState(false) // 탈퇴 확인 모달
 
-  const toast = useToast() // [refactored]
+  const toast = useToast()
+  // [refactored] 서버 메시지 우선, 없으면 fallback — 4개 catch 블록의 반복 제거
+  const showError = (error: unknown, fallback: string) =>
+    toast.error(normalizeApiError(error, fallback).message)
 
-  // 사진 선택 — pc는 바로 파일 선택, 모바일·탭은 바텀시트
-  const [sheetOpen, setSheetOpen] = useState(false)
+  // 사진 선택 — OS 기본 시트(사진 보관함·촬영·파일)에 맡긴다.
+  // 갤러리만 여는 웹 표준 속성이 없어 자체 바텀시트를 두면 선택지를 두 번 묻게 된다.
   const fileInputRef = useRef<HTMLInputElement>(null)
   const uploadFile = useUploadSingleFile()
   const [photoPreview, setPhotoPreview] = useState<string | null>(null) // 업로드 직후 미리보기(cdnUrl)
@@ -95,23 +98,8 @@ const ProfileEditContent = () => {
       setPhotoPreview(res.cdnUrl)
       setPhotoFileName(res.fileName)
     } catch (error) {
-      toast.error(normalizeApiError(error, '사진 업로드에 실패했습니다.').message)
+      showError(error, '사진 업로드에 실패했습니다.') // [refactored]
     }
-  }
-
-  const openFilePicker = (capture: boolean) => {
-    setSheetOpen(false)
-    if (capture) fileInputRef.current?.setAttribute('capture', 'environment')
-    else fileInputRef.current?.removeAttribute('capture')
-    fileInputRef.current?.click()
-  }
-
-  const requestChange = () => {
-    if (window.matchMedia(BELOW_PC_QUERY).matches) {
-      setSheetOpen(true)
-      return
-    }
-    openFilePicker(false)
   }
 
   // 역할 판별: /profile/me 는 입양자·브리더 공용 (nickname·bio·profileImageUrl·role 제공)
@@ -124,13 +112,17 @@ const ProfileEditContent = () => {
     enabled: myProfile?.role === 'adopter',
   })
 
+  // 서버 원본값 — 폼 시드와 변경 감지(isDirty)의 기준. 저장 후 쿼리가 갱신되면 같이 따라간다
+  const savedName = (isBreeder ? myProfile?.nickname : adopterProfile?.nickname) ?? ''
+  const savedBio = myProfile?.bio ?? ''
+
   // 조회값으로 폼 초기화 (최초 1회) — effect 대신 렌더 중 동기화(React 권장 패턴)
   // 브리더는 adopterProfile 을 기다리지 않고 myProfile(닉네임)로 시드한다
   const [seeded, setSeeded] = useState(false)
   const seedReady = isBreeder ? !!myProfile : !!(adopterProfile && myProfile)
   if (!seeded && seedReady) {
-    setName((isBreeder ? myProfile?.nickname : adopterProfile?.nickname) ?? '')
-    setBio(myProfile?.bio ?? '')
+    setName(savedName)
+    setBio(savedBio)
     setSeeded(true)
   }
 
@@ -143,8 +135,11 @@ const ProfileEditContent = () => {
   const deleteAccount = useDeleteAdopterAccount()
   const logout = useLogout()
 
-  // 사진 제외 모든 입력 필드가 채워져야 적용 가능 (소셜 로그인은 readOnly로 항상 채워짐)
-  const isFormFilled = name.trim().length > 0 && bio.trim().length > 0
+  // 활동명만 필수. 소개는 서버 스펙상 빈 문자열이 "소개 비우기"로 허용돼 막지 않는다.
+  // 브리더 활동명은 이 화면에서 readOnly라 검사에서 제외 — 비어 있어도 저장을 막으면 손쓸 방법이 없다
+  const isFormFilled = isBreeder || name.trim().length > 0
+  // 바뀐 게 없으면 적용할 것도 없다. 저장 성공 시 쿼리 갱신으로 savedName/savedBio 가 따라와 자동으로 false
+  const isDirty = name !== savedName || bio !== savedBio || !!photoFileName
   const isSaving =
     updateAdopterProfile.isPending ||
     updateBreederProfile.isPending ||
@@ -157,12 +152,15 @@ const ProfileEditContent = () => {
   const handleApply = async () => {
     setShowApply(false)
     try {
-      const tasks: Promise<unknown>[] = [updateMyProfile.mutateAsync({ bio })]
+      const tasks: Promise<unknown>[] = []
+      if (bio !== savedBio) {
+        tasks.push(updateMyProfile.mutateAsync({ bio }))
+      }
       if (isBreeder) {
         if (photoFileName) {
           tasks.push(updateBreederProfile.mutateAsync({ profileImage: photoFileName }))
         }
-      } else {
+      } else if (name !== savedName || photoFileName) {
         tasks.push(
           updateAdopterProfile.mutateAsync({
             name,
@@ -171,9 +169,12 @@ const ProfileEditContent = () => {
         )
       }
       await Promise.all(tasks)
+      // 각 mutation 이 최신 프로필 refetch까지 기다리므로 서버 이미지로 안전하게 전환할 수 있다.
+      setPhotoFileName(null)
+      setPhotoPreview(null)
       toast.success('프로필이 변경되었습니다')
     } catch (error) {
-      toast.error(normalizeApiError(error, '프로필 적용에 실패했습니다.').message)
+      showError(error, '프로필 적용에 실패했습니다.') // [refactored]
     }
   }
 
@@ -184,7 +185,7 @@ const ProfileEditContent = () => {
       await deleteAccount.mutateAsync({ reason: WithdrawReason.OTHER })
       router.replace('/')
     } catch (error) {
-      toast.error(normalizeApiError(error, '탈퇴 처리에 실패했습니다.').message)
+      showError(error, '탈퇴 처리에 실패했습니다.') // [refactored]
     }
   }
 
@@ -193,7 +194,7 @@ const ProfileEditContent = () => {
       await logout.mutateAsync()
       router.replace('/')
     } catch (error) {
-      toast.error(normalizeApiError(error, '로그아웃에 실패했습니다.').message)
+      showError(error, '로그아웃에 실패했습니다.') // [refactored]
     }
   }
 
@@ -216,7 +217,11 @@ const ProfileEditContent = () => {
                 className="hidden"
                 onChange={handleFileChange}
               />
-              <Button variant="fill" className="w-full" onClick={requestChange}>
+              <Button
+                variant="fill"
+                className="w-full"
+                onClick={() => fileInputRef.current?.click()}
+              >
                 사진 변경
               </Button>
               <span className="text-base leading-[1.5] font-semibold text-neutral-850">
@@ -232,14 +237,14 @@ const ProfileEditContent = () => {
               <Input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                maxLength={NAME_MAX_LENGTH} // [refactored]
+                maxLength={NAME_MAX_LENGTH}
                 placeholder="입력해보세요"
                 readOnly={isBreeder}
-                className={isBreeder ? 'cursor-default focus:border-neutral-150' : undefined}
+                className={isBreeder ? READONLY_INPUT_CLASS : undefined} // [refactored]
               />
               {!isBreeder && (
                 <p className="mt-1 self-end text-[0.625rem] leading-[1.5] font-medium text-neutral-700">
-                  {name.length}/{NAME_MAX_LENGTH} {/* [refactored] */}
+                  {name.length}/{NAME_MAX_LENGTH}
                 </p>
               )}
             </InputField>
@@ -247,7 +252,7 @@ const ProfileEditContent = () => {
             <TextareaField
               label="소개"
               placeholder="입력해보세요"
-              maxLength={BIO_MAX_LENGTH} // [refactored]
+              maxLength={BIO_MAX_LENGTH}
               currentLength={bio.length}
               value={bio}
               onChange={(e) => setBio(e.target.value)}
@@ -257,8 +262,8 @@ const ProfileEditContent = () => {
             {/* 소셜 로그인 이메일은 입양자 프로필에만 있어 브리더에선 숨김 */}
             {!isBreeder && (
               <InputField label="소셜 로그인">
-                {/* 표시 전용 — readOnly(수정X) + tabIndex/-1·focus 보더 중립화(focus X) */}
-                <Input value={email} readOnly className="cursor-default focus:border-neutral-150" />
+                {/* [refactored] 표시 전용 스타일은 활동명 readOnly와 공유 */}
+                <Input value={email} readOnly className={READONLY_INPUT_CLASS} />
               </InputField>
             )}
           </div>
@@ -284,33 +289,22 @@ const ProfileEditContent = () => {
         primary={{
           label: '프로필 적용',
           onClick: () => setShowApply(true),
-          disabled: !isFormFilled || isSaving,
+          disabled: !isFormFilled || !isDirty || isSaving,
         }}
       >
         {/* 적용 완료·실패 토스트 — 버튼 바로 위 위치(레이아웃 안 밀림) + 풀 너비 */}
-        {toast.current && ( // [refactored]
+        {toast.current && (
           <Container className="absolute inset-x-0 bottom-[5rem]">
             <AlertMessage
               status={toast.current.status}
               size="responsive"
               icon={toast.current.status === 'error' ? AlertCircleIcon : CheckIcon}
               message={toast.current.message}
-              onClose={toast.hide} // [refactored]
+              onClose={toast.hide}
             />
           </Container>
         )}
       </FooterCtaBar>
-
-      {/* 사진 변경 바텀시트 — 모바일·탭 전용 (디자인 2147-196483) */}
-      <BottomSheet
-        open={sheetOpen}
-        onOpenChange={setSheetOpen}
-        title="사진변경"
-        actions={[
-          { label: '사진첩 보기', onClick: () => openFilePicker(false) },
-          { label: '촬영하기', onClick: () => openFilePicker(true) },
-        ]}
-      />
 
       {/* 프로필 적용 확인 (디자인 2145-192876 / 모바일·탭 2145-192877) */}
       <ConfirmModal
@@ -328,7 +322,7 @@ const ProfileEditContent = () => {
         open={showLeave}
         onOpenChange={setShowLeave}
         title="포퐁을 떠나실 건가요?"
-        description={LEAVE_DESCRIPTION} // [refactored]
+        description={LEAVE_DESCRIPTION}
         actions={[
           { label: '계정 탈퇴', variant: 'outline', onClick: handleLeave },
           { label: '다시 생각해볼게요', variant: 'fill', onClick: () => setShowLeave(false) },
