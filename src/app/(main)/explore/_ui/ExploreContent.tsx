@@ -7,12 +7,14 @@ import {
   Container,
   FilterChip,
   InfiniteScrollTrigger,
+  ListStateMessage,
   PopularBadgeContent,
   TabBar,
 } from '@/shared/ui'
 import { CATEGORY_TO_PET_TYPE } from '@/shared/lib/petCategory'
 import { adoptionQueries } from '@/entities/adoption'
-import { mapAdoptionCard, dedupeByListingId } from '@/shared/lib/mapAdoptionCard'
+import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
+import { dedupeBy } from '@/shared/lib/dedupeBy'
 import { SearchSection } from '@/features/search'
 import { CategorySection } from '@/features/category-filter'
 import { cn } from '@/shared/lib/cn'
@@ -71,6 +73,8 @@ const ExploreContent = () => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    isPending,
+    isError,
   } = useInfiniteQuery({
     ...adoptionQueries.list(sort, petType, status),
     enabled: selectedType === 'adoption',
@@ -80,10 +84,13 @@ const ExploreContent = () => {
   // 겹쳐 주더라도 React key 중복(카드 중복/누락)이 발생하지 않도록 방어한다.
   const listings = useMemo(
     () =>
-      dedupeByListingId((listData?.pages.flatMap((page) => page.items) ?? []).map(mapAdoptionCard)),
+      dedupeBy(
+        (listData?.pages.flatMap((page) => page.items) ?? []).map(mapAdoptionCard),
+        (listing) => listing.listingId,
+      ),
     [listData],
   )
-  const totalCount = listData?.pages[0]?.pagination.totalItems
+  const totalCount = listData?.pages[0]?.pagination.totalItems ?? 0
 
   const handleTypeChange = useCallback(
     (type: ExploreType) => {
@@ -206,13 +213,16 @@ const ExploreContent = () => {
                 </div>
               }
             >
-              <AdoptionCardGrid listings={listings} />
+              {isPending ? (
+                <ListStateMessage kind="loading">분양글을 불러오는 중입니다.</ListStateMessage>
+              ) : isError && listings.length === 0 ? (
+                <ListStateMessage kind="error">분양글을 불러오지 못했습니다.</ListStateMessage>
+              ) : listings.length === 0 ? (
+                <ListStateMessage>등록된 분양글이 없습니다.</ListStateMessage>
+              ) : (
+                <AdoptionCardGrid listings={listings} />
+              )}
             </TitledSection>
-            {listings.length === 0 && (
-              <p className="py-10 text-center text-sm text-neutral-700">
-                등록된 분양글이 없습니다.
-              </p>
-            )}
             <InfiniteScrollTrigger
               onIntersect={fetchNextPage}
               hasNextPage={hasNextPage ?? false}

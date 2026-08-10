@@ -17,6 +17,7 @@ const BookmarksContent = () => {
       <NavigationBar title="저장목록" backHref="/home" />
 
       <TabBar
+        narrow
         items={BOOKMARK_TABS.map((tab) => ({ value: tab.id, label: tab.label }))}
         value={activeTab}
         onValueChange={setActiveTab}

@@ -4,8 +4,15 @@ import { useMemo, useState } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { adoptionQueries } from '@/entities/adoption'
 import { AdoptionCardGrid } from '@/features/adoption'
-import { dedupeByListingId, mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
-import { Container, FilterChip, InfiniteScrollTrigger, SectionHeader } from '@/shared/ui'
+import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
+import { dedupeBy } from '@/shared/lib/dedupeBy'
+import {
+  Container,
+  FilterChip,
+  InfiniteScrollTrigger,
+  ListStateMessage,
+  SectionHeader,
+} from '@/shared/ui'
 import type { PetStatus } from '@/shared/types'
 
 // 서버 status 필터 (미지정 = 전체) — 클라이언트에서 거르지 않고 쿼리 파라미터로 넘긴다
@@ -18,13 +25,16 @@ const STATUS_FILTERS: Array<{ value: PetStatus | 'all'; label: string }> = [
 const FavoritesTab = () => {
   const [filter, setFilter] = useState<PetStatus | 'all'>('all')
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery(
-    adoptionQueries.myFavorites(filter === 'all' ? undefined : filter),
-  )
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending, isError } =
+    useInfiniteQuery(adoptionQueries.myFavorites(filter === 'all' ? undefined : filter))
 
   // 페이지 경계에서 서버가 항목을 겹쳐 주더라도 React key가 중복되지 않도록 방어 (탐색과 동일)
   const listings = useMemo(
-    () => dedupeByListingId((data?.pages.flatMap((page) => page.items) ?? []).map(mapAdoptionCard)),
+    () =>
+      dedupeBy(
+        (data?.pages.flatMap((page) => page.items) ?? []).map(mapAdoptionCard),
+        (listing) => listing.listingId,
+      ),
     [data],
   )
   const totalCount = data?.pages[0]?.pagination.totalItems ?? 0
@@ -55,7 +65,15 @@ const FavoritesTab = () => {
         }
       />
 
-      <AdoptionCardGrid listings={listings} />
+      {isPending ? (
+        <ListStateMessage kind="loading">관심 목록을 불러오는 중입니다.</ListStateMessage>
+      ) : isError && listings.length === 0 ? (
+        <ListStateMessage kind="error">관심 목록을 불러오지 못했습니다.</ListStateMessage>
+      ) : listings.length === 0 ? (
+        <ListStateMessage>관심 표시한 입양글이 없습니다.</ListStateMessage>
+      ) : (
+        <AdoptionCardGrid listings={listings} />
+      )}
 
       <InfiniteScrollTrigger
         onIntersect={fetchNextPage}

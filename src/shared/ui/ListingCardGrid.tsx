@@ -1,4 +1,4 @@
-import type { Key, ReactNode } from 'react'
+import { Fragment, type Key, type ReactNode } from 'react'
 
 interface ListingCardGridProps<T> {
   items: readonly T[]
@@ -10,7 +10,7 @@ interface ListingCardGridProps<T> {
 const ListingCardGrid = <T,>({ items, getKey, renderItem }: ListingCardGridProps<T>) => (
   <div className="grid grid-cols-2 gap-4 tab:mx-[2.75rem] tab:gap-5 pc:mx-[2.875rem] pc:grid-cols-4">
     {items.map((item) => (
-      <div key={getKey(item)}>{renderItem(item)}</div>
+      <Fragment key={getKey(item)}>{renderItem(item)}</Fragment>
     ))}
   </div>
 )
