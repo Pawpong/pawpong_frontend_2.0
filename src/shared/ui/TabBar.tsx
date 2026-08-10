@@ -20,6 +20,8 @@ interface TabBarProps {
   barClassName?: string
   barStyle?: CSSProperties
   ariaLabel?: string
+  /** PC에서 탭 목록을 940px로 좁힘 (마이홈 3탭 레이아웃). 기본은 페이지 폭 그대로 */
+  narrow?: boolean
 }
 
 /**
@@ -39,11 +41,8 @@ const TabBar = ({
   barClassName,
   barStyle,
   ariaLabel,
+  narrow,
 }: TabBarProps) => {
-  // 2탭은 PC 1440 풀폭(large 2탭), 3탭 이상은 940 레이아웃 — 탭 수가 런타임에 변하는
-  // 마이홈(브리더 3탭 / 입양자 2탭)을 커버하려고 개수로 판단한다.
-  const isTwoTabs = items.length === 2
-
   return (
     <Tabs value={value} onValueChange={onValueChange} className={cn('w-full', className)}>
       <div
@@ -57,7 +56,7 @@ const TabBar = ({
           className={cn(
             PAGE_WIDTH_CLASS,
             'pt-3 tab:px-12 tab:pt-4 pc:px-20',
-            !isTwoTabs && 'pc:max-w-[58.75rem]',
+            narrow && 'pc:max-w-[58.75rem]',
           )}
         >
           <TabsList

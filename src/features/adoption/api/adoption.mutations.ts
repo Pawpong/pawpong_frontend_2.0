@@ -51,6 +51,80 @@ const patchAdoptionCache = (
   return applyToPet(data)
 }
 
+/** 관심목록 캐시에서는 관심 해제한 펫을 즉시 제거하고 페이지네이션 개수도 맞춘다. */
+const removeFromFavoritePages = (data: unknown, petId: string): unknown => {
+  if (
+    typeof data !== 'object' ||
+    data === null ||
+    !('pages' in data) ||
+    !Array.isArray(data.pages)
+  ) {
+    return data
+  }
+
+  const containsPet = data.pages.some(
+    (page) =>
+      typeof page === 'object' &&
+      page !== null &&
+      'items' in page &&
+      Array.isArray(page.items) &&
+      page.items.some((item: unknown) => isFavoritablePet(item) && item.petId === petId),
+  )
+  if (!containsPet) return data
+
+  return {
+    ...data,
+    pages: data.pages.map((page) => {
+      if (
+        typeof page !== 'object' ||
+        page === null ||
+        !('items' in page) ||
+        !Array.isArray(page.items)
+      ) {
+        return page
+      }
+
+      const nextPage = {
+        ...page,
+        items: page.items.filter(
+          (item: unknown) => !(isFavoritablePet(item) && item.petId === petId),
+        ),
+      }
+
+      if (
+        !('pagination' in page) ||
+        typeof page.pagination !== 'object' ||
+        page.pagination === null ||
+        !('totalItems' in page.pagination) ||
+        typeof page.pagination.totalItems !== 'number'
+      ) {
+        return nextPage
+      }
+
+      const totalItems = Math.max(0, page.pagination.totalItems - 1)
+      const pageSize =
+        'pageSize' in page.pagination && typeof page.pagination.pageSize === 'number'
+          ? page.pagination.pageSize
+          : 0
+      const totalPages = pageSize > 0 ? Math.ceil(totalItems / pageSize) : 0
+      const currentPage =
+        'currentPage' in page.pagination && typeof page.pagination.currentPage === 'number'
+          ? page.pagination.currentPage
+          : 1
+
+      return {
+        ...nextPage,
+        pagination: {
+          ...page.pagination,
+          totalItems,
+          totalPages,
+          hasNextPage: currentPage < totalPages,
+        },
+      }
+    }),
+  }
+}
+
 interface ToggleFavoriteVariables {
   petId: string
   nextFavorited: boolean
@@ -70,6 +144,7 @@ interface ToggleFavoriteVariables {
 const useToggleFavoriteMutation = () => {
   const qc = useQueryClient()
   const scope = { queryKey: adoptionQueries.all() }
+  const favoritesScope = { queryKey: [...adoptionQueries.all(), 'myFavorites'] }
 
   return useMutation({
     mutationFn: ({ petId, nextFavorited }: ToggleFavoriteVariables) =>
@@ -93,6 +168,9 @@ const useToggleFavoriteMutation = () => {
               : pet.favoriteCount + (nextFavorited ? 1 : -1),
         })),
       )
+      if (!nextFavorited) {
+        qc.setQueriesData(favoritesScope, (data) => removeFromFavoritePages(data, petId))
+      }
       return { snapshot }
     },
     onError: (_error, _variables, context) => {
@@ -107,7 +185,13 @@ const useToggleFavoriteMutation = () => {
         })),
       )
     },
-    onSettled: () => qc.invalidateQueries({ ...scope, refetchType: 'none' }),
+    onSettled: async (_data, _error, { nextFavorited }) => {
+      await qc.invalidateQueries({ ...scope, refetchType: 'none' })
+      // 관심목록 화면에서 제거된 카드의 빈 자리를 다음 항목으로 채운다.
+      if (!nextFavorited) {
+        await qc.invalidateQueries({ ...favoritesScope, refetchType: 'active' })
+      }
+    },
   })
 }
 

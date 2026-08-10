@@ -15,7 +15,7 @@ interface SectionHeaderProps {
   className?: string
   /** 타이틀 텍스트 스타일 오버라이드 (색·크기·굵기 등) */
   titleClassName?: string
-  /** PC 우측에 렌더링할 커스텀 요소 */
+  /** 우측에 렌더링할 커스텀 요소 — subtitle 이 있으면 부제 줄, 없으면 타이틀 줄 우측 */
   rightSlot?: React.ReactNode
   /** 모바일 접기/펼치기 */
   collapsible?: boolean
@@ -51,6 +51,8 @@ const SectionHeader = ({
         {linkText && linkHref && (
           <DetailLink href={linkHref} label={linkText} size="sm" className="tab:text-[0.875rem]" />
         )}
+        {/* 부제가 없으면 우측 슬롯을 타이틀 줄(링크 자리)에 붙인다 */}
+        {!subtitle && rightSlot}
         {collapsible && (
           <button type="button" onClick={onToggle} className="tab:hidden">
             <ArrowRightIcon
@@ -62,13 +64,11 @@ const SectionHeader = ({
           </button>
         )}
       </div>
-      {(subtitle || rightSlot) && (
+      {subtitle && (
         <div className="flex items-center justify-between">
-          {subtitle && (
-            <p className="text-xs font-bold text-[#898989] tab:text-base tab:font-semibold">
-              {subtitle}
-            </p>
-          )}
+          <p className="text-xs font-bold text-[#898989] tab:text-base tab:font-semibold">
+            {subtitle}
+          </p>
           {rightSlot}
         </div>
       )}
