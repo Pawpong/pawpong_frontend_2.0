@@ -6,13 +6,7 @@ import { adoptionQueries } from '@/entities/adoption'
 import { AdoptionCardGrid } from '@/features/adoption'
 import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
-import {
-  Container,
-  FilterChip,
-  InfiniteScrollTrigger,
-  ListStateMessage,
-  SectionHeader,
-} from '@/shared/ui'
+import { Container, FilterChip, InfiniteScrollTrigger, ListState, SectionHeader } from '@/shared/ui'
 import type { PetStatus } from '@/shared/types'
 
 // 서버 status 필터 (미지정 = 전체) — 클라이언트에서 거르지 않고 쿼리 파라미터로 넘긴다
@@ -65,15 +59,16 @@ const FavoritesTab = () => {
         }
       />
 
-      {isPending ? (
-        <ListStateMessage kind="loading">관심 목록을 불러오는 중입니다.</ListStateMessage>
-      ) : isError && listings.length === 0 ? (
-        <ListStateMessage kind="error">관심 목록을 불러오지 못했습니다.</ListStateMessage>
-      ) : listings.length === 0 ? (
-        <ListStateMessage>관심 표시한 입양글이 없습니다.</ListStateMessage>
-      ) : (
+      <ListState
+        isPending={isPending}
+        isError={isError}
+        isEmpty={listings.length === 0}
+        loadingText="관심 목록을 불러오는 중입니다."
+        errorText="관심 목록을 불러오지 못했습니다."
+        emptyText="관심 표시한 입양글이 없습니다."
+      >
         <AdoptionCardGrid listings={listings} />
-      )}
+      </ListState>
 
       <InfiniteScrollTrigger
         onIntersect={fetchNextPage}

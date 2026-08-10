@@ -7,7 +7,7 @@ import {
   Container,
   FilterChip,
   InfiniteScrollTrigger,
-  ListStateMessage,
+  ListState,
   PopularBadgeContent,
   TabBar,
 } from '@/shared/ui'
@@ -213,15 +213,16 @@ const ExploreContent = () => {
                 </div>
               }
             >
-              {isPending ? (
-                <ListStateMessage kind="loading">분양글을 불러오는 중입니다.</ListStateMessage>
-              ) : isError && listings.length === 0 ? (
-                <ListStateMessage kind="error">분양글을 불러오지 못했습니다.</ListStateMessage>
-              ) : listings.length === 0 ? (
-                <ListStateMessage>등록된 분양글이 없습니다.</ListStateMessage>
-              ) : (
+              <ListState
+                isPending={isPending}
+                isError={isError}
+                isEmpty={listings.length === 0}
+                loadingText="분양글을 불러오는 중입니다."
+                errorText="분양글을 불러오지 못했습니다."
+                emptyText="등록된 분양글이 없습니다."
+              >
                 <AdoptionCardGrid listings={listings} />
-              )}
+              </ListState>
             </TitledSection>
             <InfiniteScrollTrigger
               onIntersect={fetchNextPage}
