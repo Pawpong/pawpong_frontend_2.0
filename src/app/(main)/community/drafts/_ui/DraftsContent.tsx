@@ -5,8 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { Container, DeleteConfirmModal, NavigationBar, Separator } from '@/shared/ui'
 import { communityQueries, toCommunityPreviewProps } from '@/entities/community'
-import { ConnectedPostCard } from '@/features/community'
-import { useDeleteCommunityPost } from '@/features/community'
+import { ConnectedPostCard, useDeleteCommunityPost } from '@/features/community'
 
 /** 임시저장 목록 — 카드를 누르면 수정 화면에서 이어서 작성한다 */
 const DraftsContent = () => {
