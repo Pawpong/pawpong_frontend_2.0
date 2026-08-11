@@ -76,8 +76,9 @@ interface FavoriteCacheTarget {
 const isPetStatus = (value: unknown): value is PetStatus =>
   value === 'available' || value === 'reserved' || value === 'adopted'
 
+// myFavorites 키는 [...myFavoritesAll(), status, pageSize] 구조라 status는 프리픽스 바로 뒤에 온다
 const getFavoriteStatus = (queryKey: QueryKey): PetStatus | undefined => {
-  const status = queryKey[2]
+  const status = queryKey[adoptionQueries.myFavoritesAll().length]
   return isPetStatus(status) ? status : undefined
 }
 
@@ -244,15 +245,18 @@ const useToggleFavoriteMutation = () => {
             return
           }
 
+          const options = adoptionQueries.favoritesPage(target.status, target.page, target.pageSize)
+
           try {
-            const refreshedPage = await qc.fetchQuery(
-              adoptionQueries.favoritesPage(target.status, target.page, target.pageSize),
-            )
+            const refreshedPage = await qc.fetchQuery(options)
             qc.setQueryData<FavoritePages>(target.queryKey, (data) =>
               data ? mergeFavoriteBackfill(data, refreshedPage, result.petId) : data,
             )
           } catch {
             // 낙관적 제거는 유지하고, 다음 마운트에서 서버 상태를 다시 확인한다.
+          } finally {
+            // 화면이 읽지 않는 일회성 백필 캐시는 성공 여부와 관계없이 즉시 정리한다.
+            qc.removeQueries({ queryKey: options.queryKey, exact: true })
           }
         }),
       )
