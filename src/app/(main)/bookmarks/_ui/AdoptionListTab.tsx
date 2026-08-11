@@ -6,7 +6,7 @@ import { adoptionQueries } from '@/entities/adoption'
 import { formatDate } from '@/shared/lib/formatDate'
 import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
-import { Container, InfiniteScrollTrigger, ListStateMessage } from '@/shared/ui'
+import { Container, InfiniteScrollTrigger, ListState } from '@/shared/ui'
 import type { AdoptedListingCard as AdoptedListingCardType } from '@/shared/types'
 import { AdoptedListingCard } from './AdoptedListingCard'
 
@@ -30,14 +30,15 @@ const AdoptionListTab = () => {
     // 패딩: 모바일 py20·px16(기본 20→px-4 오버라이드) / tab px48 / pc px80·py40 — 카드는 max-w로 중앙정렬
     <Container className="px-4 py-5 pc:py-10">
       <div className="flex flex-col gap-3 tab:gap-[0.625rem]">
-        {isPending ? (
-          <ListStateMessage kind="loading">입양목록을 불러오는 중입니다.</ListStateMessage>
-        ) : isError && groupedEntries.length === 0 ? (
-          <ListStateMessage kind="error">입양목록을 불러오지 못했습니다.</ListStateMessage>
-        ) : groupedEntries.length === 0 ? (
-          <ListStateMessage>입양한 내역이 없습니다.</ListStateMessage>
-        ) : (
-          groupedEntries.map(([date, items]) => (
+        <ListState
+          isPending={isPending}
+          isError={isError}
+          isEmpty={groupedEntries.length === 0}
+          loadingText="입양목록을 불러오는 중입니다."
+          errorText="입양목록을 불러오지 못했습니다."
+          emptyText="입양한 내역이 없습니다."
+        >
+          {groupedEntries.map(([date, items]) => (
             <div key={date} className="flex flex-col gap-[0.375rem] tab:gap-[0.625rem]">
               {/* 입양 날짜 — 모바일·탭 body-sm(12) / pc body-md(14), medium, #6b6b6b */}
               <p className="text-body-sm font-medium text-neutral-700 pc:text-body-md">
@@ -47,8 +48,8 @@ const AdoptionListTab = () => {
                 <AdoptedListingCard key={listing.listingId} listing={listing} />
               ))}
             </div>
-          ))
-        )}
+          ))}
+        </ListState>
 
         <InfiniteScrollTrigger
           onIntersect={fetchNextPage}

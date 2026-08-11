@@ -23,7 +23,6 @@ const HomeTabs = ({ tabs, activeTab, onTabChange, children, stickyTop }: HomeTab
   const gnbH = useGnbHeight()
   const top = Math.max((stickyTop ?? gnbH) - 1, 0)
 
-  // 마이홈만 PC 940 레이아웃(브리더 3탭). 입양자 2탭은 기존대로 풀폭
   return (
     <TabBar
       items={tabs.map((tab) => ({
@@ -37,7 +36,6 @@ const HomeTabs = ({ tabs, activeTab, onTabChange, children, stickyTop }: HomeTab
       }))}
       value={activeTab}
       onValueChange={onTabChange}
-      narrow={tabs.length > 2}
       barClassName="tab:sticky tab:z-30"
       barStyle={{ top }}
       ariaLabel="홈 콘텐츠"

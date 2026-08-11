@@ -47,11 +47,20 @@ export const adoptionQueries = {
       staleTime: STALE_TIME.DEFAULT,
     }),
 
+  myFavoritesAll: () => [...adoptionQueries.all(), 'myFavorites'] as const,
+
   myFavorites: (status?: PetStatus, pageSize = 15) =>
     createInfiniteQuery({
-      queryKey: [...adoptionQueries.all(), 'myFavorites', status, pageSize],
+      queryKey: [...adoptionQueries.myFavoritesAll(), status, pageSize],
       queryFn: (page) => getMyFavoriteAdoptions({ status, page, pageSize }),
       staleTime: STALE_TIME.DEFAULT,
+    }),
+
+  favoritesPage: (status: PetStatus | undefined, page: number, pageSize = 15) =>
+    createQuery({
+      queryKey: [...adoptionQueries.all(), 'favoritesPage', status, page, pageSize],
+      queryFn: () => getMyFavoriteAdoptions({ status, page, pageSize }),
+      staleTime: STALE_TIME.REALTIME,
     }),
 
   myAdopted: (pageSize = 15) =>

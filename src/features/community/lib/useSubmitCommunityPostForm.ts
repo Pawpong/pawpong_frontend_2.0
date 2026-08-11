@@ -58,10 +58,9 @@ export const useSubmitCommunityPostForm = (postId?: string) => {
           resolvedKept.length === kept.length ? [...resolvedKept, ...uploaded] : undefined
 
         // 2) 게시글 생성 or 수정
-        // 백엔드는 body 를 비우는 수정을 거부하므로, 본문이 비면 body 를 아예 보내지 않는다
-        // (임시저장 이어쓰기에서 본문을 지운 채 저장하는 경우 — 서버의 기존 본문 유지)
-        const trimmed = text.trim()
-        const body = trimmed.length > 0 ? trimmed : undefined
+        // 임시저장은 빈 본문 저장이 정상 값이라 그대로 보낸다(본문 지우고 사진만 남기는 경우).
+        // 발행은 서버가 빈 본문을 거부하지만 폼에서 먼저 막는다.
+        const body = text.trim()
         const post = postId
           ? await updateMutation.mutateAsync({ body, photos, visibility, status })
           : await createMutation.mutateAsync({ body, photos, visibility, status })
