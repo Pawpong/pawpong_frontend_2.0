@@ -39,6 +39,8 @@ interface RawCommunityPostCard {
   likeCount: number
   commentCount: number
   saveCount: number
+  isLiked: boolean
+  isSaved: boolean
   createdAt: string
 }
 
@@ -95,6 +97,8 @@ const mapCard = (raw: RawCommunityPostCard): CommunityPostCard => ({
   likeCount: raw.likeCount,
   commentCount: raw.commentCount,
   saveCount: raw.saveCount,
+  isLiked: raw.isLiked,
+  isSaved: raw.isSaved,
   createdAt: raw.createdAt,
 })
 
@@ -170,7 +174,8 @@ export const getMyBookmarkedPosts = async (
     `${API_VERSION}/community/posts/me/bookmarks?${query.toString()}`,
   )
   const page = unwrap(response, '저장한 게시글 목록 조회에 실패했습니다.')
-  return { ...page, items: page.items.map(mapCard) }
+  // 저장 목록 응답의 isSaved가 false로 내려와도 이 엔드포인트 결과는 전부 내가 저장한 글이다.
+  return { ...page, items: page.items.map((raw) => ({ ...mapCard(raw), isSaved: true })) }
 }
 
 /** 내가 임시저장(draft) 한 게시글 목록 — 본인에게만 노출, 최신순 */

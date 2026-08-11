@@ -62,6 +62,8 @@ const MY_HOME_POST_BASE: Omit<CommunityPostCard, 'postId'> = {
   likeCount: 10,
   commentCount: 10,
   saveCount: 2,
+  isLiked: false,
+  isSaved: false,
   createdAt: '20시간',
 }
 

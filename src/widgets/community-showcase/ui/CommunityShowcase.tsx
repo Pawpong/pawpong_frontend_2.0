@@ -2,7 +2,8 @@
 
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { ShowcaseSection } from '@/shared/ui'
-import { CommunityBox, communityQueries, toCommunityPreviewProps } from '@/entities/community'
+import { communityQueries, toCommunityPreviewProps } from '@/entities/community'
+import { ConnectedCommunityBox } from '@/features/community'
 import { MOCK_MY_HOME_POSTS } from '@/shared/mocks/myHome'
 
 const CARD_COUNT = 3
@@ -26,7 +27,7 @@ const CommunityShowcase = () => {
       {/* 한 DOM 목록을 브레이크포인트별 그리드로 재배치한다. */}
       <div className="grid grid-cols-[20.0625rem] justify-center gap-y-2 tab:grid-cols-[repeat(2,20.0625rem)] tab:justify-between pc:grid-cols-[repeat(3,25.4375rem)] pc:gap-y-0">
         {posts.map((post, index) => (
-          <CommunityBox
+          <ConnectedCommunityBox
             key={post.detailHref ?? index}
             {...post}
             className={index === 2 ? 'hidden pc:flex' : undefined}

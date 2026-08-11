@@ -4,7 +4,8 @@ import { Fragment, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { Container, DeleteConfirmModal, NavigationBar, Separator } from '@/shared/ui'
-import { PostCard, communityQueries, toCommunityPreviewProps } from '@/entities/community'
+import { communityQueries, toCommunityPreviewProps } from '@/entities/community'
+import { ConnectedPostCard } from '@/features/community'
 import { useDeleteCommunityPost } from '@/features/community'
 
 /** 임시저장 목록 — 카드를 누르면 수정 화면에서 이어서 작성한다 */
@@ -37,7 +38,7 @@ const DraftsContent = () => {
               {drafts.map((draft, index) => (
                 <Fragment key={draft.postId}>
                   {index > 0 && <Separator className="bg-border-light" />}
-                  <PostCard
+                  <ConnectedPostCard
                     {...toCommunityPreviewProps(draft)}
                     // 임시저장 글은 상세가 없으므로 수정 화면으로 바로 보낸다
                     detailHref={`/community/${draft.postId}/edit`}

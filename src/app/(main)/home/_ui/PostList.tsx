@@ -1,5 +1,6 @@
 import { Fragment } from 'react'
-import { PostCard, toCommunityPreviewProps } from '@/entities/community'
+import { toCommunityPreviewProps } from '@/entities/community'
+import { ConnectedPostCard } from '@/features/community'
 import type { CommunityPostCard } from '@/shared/types'
 
 interface PostListProps {
@@ -26,7 +27,7 @@ const PostList = ({ posts, emptyText = '게시글이 없습니다.', onEdit, onD
     <div className="flex flex-col gap-5 tab:mx-auto tab:max-w-[59.25rem] tab:gap-8 tab:rounded-lg tab:border tab:border-neutral-300 tab:p-3">
       {posts.map((post, index) => (
         <Fragment key={post.postId}>
-          <PostCard
+          <ConnectedPostCard
             {...toCommunityPreviewProps(post)}
             onEdit={onEdit && (() => onEdit(post.postId))}
             onDelete={onDelete && (() => onDelete(post.postId))}

@@ -21,10 +21,9 @@ import { communityQueries } from '@/entities/community'
 import { profileQueries } from '@/entities/profile'
 import {
   useToggleCommunityPostLike,
+  useToggleCommunityPostBookmark,
   useCreateCommunityComment,
   useDeleteCommunityPost,
-  useBookmarkCommunityPost,
-  useUnbookmarkCommunityPost,
 } from '@/features/community'
 import { useAuthStatus } from '@/features/auth'
 import type { CommunityComment } from '@/shared/types'
@@ -62,9 +61,8 @@ const PostDetailContent = ({ postId }: PostDetailContentProps) => {
   } = useInfiniteQuery(communityQueries.comments(postId))
   const comments = commentsData?.pages.flatMap((page) => page.items) ?? []
 
-  const toggleLike = useToggleCommunityPostLike(postId)
-  const bookmark = useBookmarkCommunityPost()
-  const unbookmark = useUnbookmarkCommunityPost()
+  const toggleLike = useToggleCommunityPostLike(postId, post?.isLiked ?? false)
+  const toggleBookmark = useToggleCommunityPostBookmark(postId, post?.isSaved ?? false)
   const createComment = useCreateCommunityComment(postId)
   const deletePost = useDeleteCommunityPost()
 
@@ -168,7 +166,7 @@ const PostDetailContent = ({ postId }: PostDetailContentProps) => {
                 ariaLabel="좋아요"
                 active={post.isLiked}
                 iconStatus={post.isLiked ? 'fill' : 'default'}
-                onClick={() => toggleLike.mutate(post.isLiked)}
+                onClick={toggleLike.toggleLike}
                 disabled={toggleLike.isPending}
               />
               <PostActionButton
@@ -182,8 +180,8 @@ const PostDetailContent = ({ postId }: PostDetailContentProps) => {
                 ariaLabel="북마크"
                 active={post.isSaved}
                 activeClassName={BOOKMARK_ACTIVE}
-                onClick={() => (post.isSaved ? unbookmark : bookmark).mutate(postId)}
-                disabled={bookmark.isPending || unbookmark.isPending}
+                onClick={toggleBookmark.toggleBookmark}
+                disabled={toggleBookmark.isPending}
               />
             </div>
 
