@@ -7,12 +7,14 @@ import {
   Container,
   FilterChip,
   InfiniteScrollTrigger,
+  ListState,
   PopularBadgeContent,
   TabBar,
 } from '@/shared/ui'
 import { CATEGORY_TO_PET_TYPE } from '@/shared/lib/petCategory'
 import { adoptionQueries } from '@/entities/adoption'
-import { mapAdoptionCard, dedupeByListingId } from '@/shared/lib/mapAdoptionCard'
+import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
+import { dedupeBy } from '@/shared/lib/dedupeBy'
 import { SearchSection } from '@/features/search'
 import { CategorySection } from '@/features/category-filter'
 import { cn } from '@/shared/lib/cn'
@@ -20,11 +22,16 @@ import { useBreakpoint } from '@/shared/lib/useBreakpoint'
 import { useGnbHeight } from '@/shared/lib/useGnbHeight'
 import { ANIMAL_CATEGORIES } from '@/shared/types'
 import type { AnimalCategory } from '@/shared/types'
+import { AdoptionCardGrid } from '@/features/adoption'
 import { BreederExploreContent } from './BreederExploreContent'
-import { ExploreAdoptionCard } from './ExploreAdoptionCard'
-import { ExploreListingSection } from './ExploreListingSection'
 import { ExploreFilterBar } from './ExploreFilterBar'
-import { EXPLORE_TABS, SEARCH_PLACEHOLDERS, EXPLORE_SECTION_CONTAINER } from '../_lib/constants'
+import { TitledSection } from './TitledSection'
+import {
+  EXPLORE_SECTION_CONTAINER,
+  EXPLORE_SECTION_TITLE_CLASS,
+  EXPLORE_TABS,
+  SEARCH_PLACEHOLDERS,
+} from '../_lib/constants'
 import type { ExploreType } from '../_lib/constants'
 
 type AdoptionListFilter = 'all' | 'available' | 'popular'
@@ -66,6 +73,8 @@ const ExploreContent = () => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    isPending,
+    isError,
   } = useInfiniteQuery({
     ...adoptionQueries.list(sort, petType, status),
     enabled: selectedType === 'adoption',
@@ -75,10 +84,13 @@ const ExploreContent = () => {
   // 겹쳐 주더라도 React key 중복(카드 중복/누락)이 발생하지 않도록 방어한다.
   const listings = useMemo(
     () =>
-      dedupeByListingId((listData?.pages.flatMap((page) => page.items) ?? []).map(mapAdoptionCard)),
+      dedupeBy(
+        (listData?.pages.flatMap((page) => page.items) ?? []).map(mapAdoptionCard),
+        (listing) => listing.listingId,
+      ),
     [listData],
   )
-  const totalCount = listData?.pages[0]?.pagination.totalItems
+  const totalCount = listData?.pages[0]?.pagination.totalItems ?? 0
 
   const handleTypeChange = useCallback(
     (type: ExploreType) => {
@@ -178,12 +190,9 @@ const ExploreContent = () => {
       ) : (
         <>
           <Container className={EXPLORE_SECTION_CONTAINER}>
-            <ExploreListingSection
-              title="전체 분양 소식"
-              items={listings}
-              totalCount={totalCount}
-              getKey={(listing) => listing.listingId}
-              renderCard={(listing) => <ExploreAdoptionCard listing={listing} />}
+            <TitledSection
+              title={`전체 분양 소식 ${totalCount}`}
+              titleClassName={EXPLORE_SECTION_TITLE_CLASS}
               headerSlot={
                 <div className="flex shrink-0 items-center gap-2" aria-label="분양 소식 필터">
                   {/* [refactored] 칩 버튼 스타일 → 공통 FilterChip */}
@@ -203,12 +212,18 @@ const ExploreContent = () => {
                   ))}
                 </div>
               }
-            />
-            {listings.length === 0 && (
-              <p className="py-10 text-center text-sm text-neutral-700">
-                등록된 분양글이 없습니다.
-              </p>
-            )}
+            >
+              <ListState
+                isPending={isPending}
+                isError={isError}
+                isEmpty={listings.length === 0}
+                loadingText="분양글을 불러오는 중입니다."
+                errorText="분양글을 불러오지 못했습니다."
+                emptyText="등록된 분양글이 없습니다."
+              >
+                <AdoptionCardGrid listings={listings} />
+              </ListState>
+            </TitledSection>
             <InfiniteScrollTrigger
               onIntersect={fetchNextPage}
               hasNextPage={hasNextPage ?? false}

@@ -1,41 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import { useInfiniteQuery } from '@tanstack/react-query'
 import { NavigationBar, TabBar, TabsContent } from '@/shared/ui'
-import { adoptionQueries } from '@/entities/adoption'
-import { mapAdoptionCard } from '@/app/(main)/explore/_lib/mapAdoptionCard'
-import { formatDate } from '@/shared/lib/formatDate'
-import { uniqueBy } from '@/shared/lib/uniqueBy'
-import { MOCK_MY_HOME_POSTS } from '@/shared/mocks/myHome'
-import type { AdoptedListingCard } from '@/shared/types'
 import { BOOKMARK_TABS } from './constants'
 import { FavoritesTab } from './FavoritesTab'
 import { SavedFeedsTab } from './SavedFeedsTab'
 import { AdoptionListTab } from './AdoptionListTab'
 
+// 각 탭이 자기 데이터를 직접 조회한다 — 비활성 탭은 Radix가 언마운트하므로
+// 열린 탭의 API만 호출된다(enabled 분기 불필요).
 const BookmarksContent = () => {
   const [activeTab, setActiveTab] = useState('favorites')
-
-  // 관심 목록 탭 — GET /adoption/me/favorites
-  const { data: favoritesData } = useInfiniteQuery(adoptionQueries.myFavorites())
-  const listings = uniqueBy(
-    (favoritesData?.pages.flatMap((page) => page.items) ?? []).map(mapAdoptionCard),
-    (listing) => listing.listingId,
-  )
-
-  // 입양목록 탭 — GET /adoption/me/adopted
-  const { data: adoptedData } = useInfiniteQuery(adoptionQueries.myAdopted())
-  const adoptedListings: AdoptedListingCard[] = uniqueBy(
-    (adoptedData?.pages.flatMap((page) => page.items) ?? []).map((card) => ({
-      ...mapAdoptionCard(card),
-      adoptedAt: formatDate(card.adoptedAt),
-    })),
-    (listing) => listing.listingId,
-  )
-
-  // 저장피드 탭 — '저장피드' 제품 정의 확정 전까지 목업 유지 (백엔드는 좋아요한 영상만 제공)
-  const savedFeeds = MOCK_MY_HOME_POSTS
 
   return (
     <div className="flex w-full flex-1 flex-col">
@@ -48,15 +23,15 @@ const BookmarksContent = () => {
         ariaLabel="저장목록"
       >
         <TabsContent value="favorites" className="mt-0">
-          <FavoritesTab listings={listings} />
+          <FavoritesTab />
         </TabsContent>
 
         <TabsContent value="saved-feeds" className="mt-0">
-          <SavedFeedsTab feeds={savedFeeds} />
+          <SavedFeedsTab />
         </TabsContent>
 
         <TabsContent value="adoption-list" className="mt-0">
-          <AdoptionListTab listings={adoptedListings} />
+          <AdoptionListTab />
         </TabsContent>
       </TabBar>
     </div>

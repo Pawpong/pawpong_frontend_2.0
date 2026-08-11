@@ -1,4 +1,4 @@
-import type { AdoptionListingCard, AdoptedListingCard } from '@/shared/types'
+import type { AdoptionListingCard } from '@/shared/types'
 
 export const MOCK_ADOPTION_LISTING: AdoptionListingCard = {
   listingId: '1',
@@ -48,19 +48,3 @@ export const createMockListings = (): AdoptionListingCard[] => {
 }
 
 /** 내가 입양한 목록 목데이터 */
-export const MOCK_ADOPTED_LISTINGS: AdoptedListingCard[] = [
-  {
-    ...MOCK_ADOPTION_LISTING,
-    listingId: 'adopted-1',
-    status: 'adopted',
-    adoptedAt: '2026.04.30',
-    isPopular: false,
-  },
-  {
-    ...MOCK_ADOPTION_LISTING,
-    listingId: 'adopted-2',
-    status: 'adopted',
-    adoptedAt: '2026.05.05',
-    isPopular: true,
-  },
-]
