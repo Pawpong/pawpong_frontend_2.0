@@ -4,6 +4,7 @@ import * as React from 'react'
 import * as AvatarPrimitive from '@radix-ui/react-avatar'
 import { tv, type VariantProps } from 'tailwind-variants'
 import { cn } from '@/shared/lib/cn'
+import { PawIcon } from '@/shared/assets/icons'
 
 const avatarVariants = tv({
   base: 'relative flex shrink-0 overflow-hidden rounded-full',
@@ -48,7 +49,7 @@ AvatarImage.displayName = AvatarPrimitive.Image.displayName
 export const AvatarFallback = React.forwardRef<
   React.ComponentRef<typeof AvatarPrimitive.Fallback>,
   React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback>
->(({ className, ...props }, ref) => (
+>(({ className, children, ...props }, ref) => (
   <AvatarPrimitive.Fallback
     ref={ref}
     className={cn(
@@ -56,6 +57,9 @@ export const AvatarFallback = React.forwardRef<
       className,
     )}
     {...props}
-  />
+  >
+    {/* 이니셜 등을 넘기지 않으면 기본 아바타(발바닥) */}
+    {children ?? <PawIcon className="size-1/2 text-neutral-500" />}
+  </AvatarPrimitive.Fallback>
 ))
 AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName

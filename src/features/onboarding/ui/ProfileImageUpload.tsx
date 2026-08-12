@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { PixelUserIcon } from '@/shared/assets/icons'
+import { PawIcon } from '@/shared/assets/icons'
 import { HelpMessage } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { useUploadProfileImage, loadSocialSignupSession } from '@/features/auth'
@@ -61,7 +61,7 @@ const ProfileImageUpload = ({ value, onChange, className }: ProfileImageUploadPr
           // eslint-disable-next-line @next/next/no-img-element
           <img src={shownImage} alt="프로필 미리보기" className="size-full object-cover" />
         ) : (
-          <PixelUserIcon className="size-[2.5rem] text-white tab:size-[3.5rem]" />
+          <PawIcon className="size-[2.5rem] text-white tab:size-[3.5rem]" />
         )}
       </button>
       <input

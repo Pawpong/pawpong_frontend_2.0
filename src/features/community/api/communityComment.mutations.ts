@@ -9,14 +9,13 @@ import {
   deleteCommunityComment,
 } from './community.api'
 
-/** 댓글 작성 (parentCommentId 있으면 답글) — 댓글 목록 + 상세(댓글 수) 갱신 */
+/** 댓글 작성 (parentCommentId 있으면 답글) — 목록 카드의 commentCount·commentPreview까지 갱신 */
 export const useCreateCommunityComment = (postId: string) => {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (data: CreateCommunityCommentRequest) => createCommunityComment(postId, data),
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: [...communityQueries.all(), 'comments', postId] })
-      void qc.invalidateQueries({ queryKey: communityQueries.detail(postId).queryKey })
+      void qc.invalidateQueries({ queryKey: communityQueries.all() })
     },
   })
 }
