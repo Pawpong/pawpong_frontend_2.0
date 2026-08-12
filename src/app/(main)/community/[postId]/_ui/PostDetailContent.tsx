@@ -3,13 +3,12 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import {
   AuthorInfo,
   BOOKMARK_ACTIVE,
   Container,
   DeleteConfirmModal,
-  InfiniteScrollTrigger,
   NavigationBar,
   OwnerActionsMenu,
   PostActionButton,
@@ -22,26 +21,13 @@ import { profileQueries } from '@/entities/profile'
 import {
   useToggleCommunityPostLike,
   useToggleCommunityPostBookmark,
-  useCreateCommunityComment,
   useDeleteCommunityPost,
 } from '@/features/community'
 import { useAuthStatus } from '@/features/auth'
-import type { CommunityComment } from '@/shared/types'
-import { CommentItem } from './CommentItem'
-import { CommentComposer } from './CommentComposer'
+import { CommentSection } from './CommentSection'
 
 // [refactored] 반복되던 섹션 좌우 패딩(모바일 0 / tab 50px)을 상수로 추출
 const SECTION_X = 'px-0 tab:px-[3.125rem]'
-
-// [refactored] 컴포넌트에서 분리한 순수 함수 — 로드된 댓글로 1단계 스레드(최상위 + 답글) 구성
-const buildCommentTree = (comments: CommunityComment[]) => {
-  const topLevel = comments.filter((c) => !c.parentCommentId)
-  const repliesByParent = comments.reduce<Record<string, CommunityComment[]>>((acc, c) => {
-    if (c.parentCommentId) (acc[c.parentCommentId] ??= []).push(c)
-    return acc
-  }, {})
-  return { topLevel, repliesByParent }
-}
 
 interface PostDetailContentProps {
   postId: string
@@ -53,44 +39,23 @@ const PostDetailContent = ({ postId }: PostDetailContentProps) => {
   const { data: post } = useQuery(communityQueries.detail(postId))
   // 공개 상세라 비로그인 조회도 가능 — 로그인 상태에서만 내 프로필을 조회(비로그인 401 리다이렉트 방지)
   const { data: me } = useQuery({ ...profileQueries.me(), enabled: isLoggedIn })
-  const {
-    data: commentsData,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery(communityQueries.comments(postId))
-  const comments = commentsData?.pages.flatMap((page) => page.items) ?? []
 
-  const toggleLike = useToggleCommunityPostLike(postId, post?.isLiked ?? false)
-  const toggleBookmark = useToggleCommunityPostBookmark(postId, post?.isSaved ?? false)
-  const createComment = useCreateCommunityComment(postId)
+  // [refactored] 훅 반환값을 구조분해 — 호출부에서 toggleLike.toggleLike 처럼 겹쳐 쓰지 않게
+  const { toggleLike, isPending: isLikePending } = useToggleCommunityPostLike(
+    postId,
+    post?.isLiked ?? false,
+  )
+  const { toggleBookmark, isPending: isBookmarkPending } = useToggleCommunityPostBookmark(
+    postId,
+    post?.isSaved ?? false,
+  )
   const deletePost = useDeleteCommunityPost()
 
-  // 답글 대상 (parentCommentId 는 최상위 댓글로 고정 — 1단계 스레드)
-  const [replyTarget, setReplyTarget] = useState<{ commentId: string; nickname: string } | null>(
-    null,
-  )
   const [confirmDeletePost, setConfirmDeletePost] = useState(false)
 
   if (!post) return null
 
   const isOwner = !!me?.userId && me.userId === post.authorId
-
-  // [refactored] 트리 구성 로직을 buildCommentTree로 분리
-  const { topLevel, repliesByParent } = buildCommentTree(comments)
-
-  const handleReply = (comment: CommunityComment) => {
-    // 답글의 답글도 최상위 댓글에 매달아 1단계 스레드를 유지
-    setReplyTarget({
-      commentId: comment.parentCommentId ?? comment.commentId,
-      nickname: comment.authorNickname,
-    })
-  }
-
-  const handleSubmitComment = async (body: string) => {
-    await createComment.mutateAsync({ body, parentCommentId: replyTarget?.commentId })
-    setReplyTarget(null)
-  }
 
   // 삭제 성공 시에만 목록으로 이동 (실패하면 모달을 유지해 재시도 가능)
   const handleDeletePost = () => {
@@ -166,8 +131,8 @@ const PostDetailContent = ({ postId }: PostDetailContentProps) => {
                 ariaLabel="좋아요"
                 active={post.isLiked}
                 iconStatus={post.isLiked ? 'fill' : 'default'}
-                onClick={toggleLike.toggleLike}
-                disabled={toggleLike.isPending}
+                onClick={toggleLike}
+                disabled={isLikePending}
               />
               <PostActionButton
                 icon={PixelMessageIcon}
@@ -180,44 +145,16 @@ const PostDetailContent = ({ postId }: PostDetailContentProps) => {
                 ariaLabel="북마크"
                 active={post.isSaved}
                 activeClassName={BOOKMARK_ACTIVE}
-                onClick={toggleBookmark.toggleBookmark}
-                disabled={toggleBookmark.isPending}
+                onClick={toggleBookmark}
+                disabled={isBookmarkPending}
               />
             </div>
 
             {/* Comments */}
             <Separator fullWidth className="mt-4 bg-border-light tab:mx-0 tab:w-full" />
+            {/* [refactored] 댓글 입력·스레드·무한스크롤을 CommentSection으로 분리 */}
             <div className={cn('pb-4 tab:pb-8', SECTION_X)}>
-              {/* 댓글 입력 (로그인 사용자만) */}
-              {isLoggedIn && (
-                <CommentComposer
-                  onSubmit={handleSubmitComment}
-                  isSubmitting={createComment.isPending}
-                  profileImageUrl={me?.profileImageUrl}
-                  replyingToNickname={replyTarget?.nickname}
-                  onCancelReply={() => setReplyTarget(null)}
-                />
-              )}
-
-              {topLevel.map((comment) => (
-                <div key={comment.commentId}>
-                  <CommentItem comment={comment} currentUserId={me?.userId} onReply={handleReply} />
-                  {(repliesByParent[comment.commentId] ?? []).map((reply) => (
-                    <CommentItem
-                      key={reply.commentId}
-                      comment={reply}
-                      currentUserId={me?.userId}
-                      onReply={handleReply}
-                      isReply
-                    />
-                  ))}
-                </div>
-              ))}
-              <InfiniteScrollTrigger
-                onIntersect={fetchNextPage}
-                hasNextPage={hasNextPage ?? false}
-                isFetchingNextPage={isFetchingNextPage}
-              />
+              <CommentSection postId={postId} />
             </div>
           </div>
         </div>

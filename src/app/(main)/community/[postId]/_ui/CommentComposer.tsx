@@ -6,6 +6,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui'
 interface CommentComposerProps {
   onSubmit: (body: string) => void | Promise<void>
   isSubmitting?: boolean
+  hasSubmitError: boolean
+  onClearSubmitError: () => void
   /** 작성자(나) 아바타 */
   profileImageUrl?: string
   /** 답글 대상 닉네임 — 있으면 답글 모드 배너 표시 */
@@ -20,6 +22,8 @@ interface CommentComposerProps {
 const CommentComposer = ({
   onSubmit,
   isSubmitting = false,
+  hasSubmitError,
+  onClearSubmitError,
   profileImageUrl,
   replyingToNickname,
   onCancelReply,
@@ -27,10 +31,15 @@ const CommentComposer = ({
   const [value, setValue] = useState('')
   const trimmed = value.trim()
 
+  // 실패해도 입력값은 남기고 재시도할 수 있게 — 오류 상태는 호출부 mutation을 단일 출처로 쓴다
   const handleSubmit = async () => {
     if (!trimmed || isSubmitting) return
-    await onSubmit(trimmed)
-    setValue('')
+    try {
+      await onSubmit(trimmed)
+      setValue('')
+    } catch {
+      // mutation의 isError로 안내하고, 이벤트 핸들러의 unhandled rejection만 막는다
+    }
   }
 
   return (
@@ -55,7 +64,10 @@ const CommentComposer = ({
           <input
             type="text"
             value={value}
-            onChange={(e) => setValue(e.target.value)}
+            onChange={(e) => {
+              setValue(e.target.value)
+              if (hasSubmitError) onClearSubmitError()
+            }}
             onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
             placeholder="댓글달기"
             maxLength={1000}
@@ -71,6 +83,11 @@ const CommentComposer = ({
           </button>
         </div>
       </div>
+      {hasSubmitError && (
+        <p role="alert" className="text-xs text-error-700">
+          댓글 등록에 실패했습니다. 다시 시도해주세요.
+        </p>
+      )}
     </div>
   )
 }
