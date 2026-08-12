@@ -7,16 +7,20 @@ interface CommunityPreviewAuthor {
 }
 
 interface CommunityPreviewProps {
+  postId: string
   author: CommunityPreviewAuthor
   createdAt: string
   text: string
   images?: string[]
   likeCount: number
   commentCount: number
+  isLiked: boolean
+  isSaved: boolean
   detailHref?: string
 }
 
 const toCommunityPreviewProps = (post: CommunityPostCard): CommunityPreviewProps => ({
+  postId: post.postId,
   author: {
     id: post.authorId,
     nickname: post.authorNickname,
@@ -27,6 +31,8 @@ const toCommunityPreviewProps = (post: CommunityPostCard): CommunityPreviewProps
   images: post.photoUrls,
   likeCount: post.likeCount,
   commentCount: post.commentCount,
+  isLiked: post.isLiked,
+  isSaved: post.isSaved,
   detailHref: `/community/${post.postId}`,
 })
 

@@ -11,6 +11,9 @@ import { CommunityPostProfile } from './CommunityPostProfile'
 type CommunityBoxAuthor = CommunityPreviewAuthor
 
 interface CommunityBoxProps extends CommunityPreviewProps {
+  /** 좋아요·북마크 토글 — features의 ConnectedCommunityBox에서 주입 */
+  onToggleLike?: () => void
+  onToggleSave?: () => void
   className?: string
 }
 
@@ -25,7 +28,11 @@ const CommunityBox = ({
   images = [],
   likeCount,
   commentCount,
+  isLiked,
+  isSaved,
   detailHref,
+  onToggleLike,
+  onToggleSave,
   className,
 }: CommunityBoxProps) => {
   const primaryImage = images[0]
@@ -84,7 +91,14 @@ const CommunityBox = ({
         )}
       </div>
 
-      <CommunityPostActions likeCount={likeCount} commentCount={commentCount} />
+      <CommunityPostActions
+        likeCount={likeCount}
+        commentCount={commentCount}
+        liked={isLiked}
+        saved={isSaved}
+        onToggleLike={onToggleLike}
+        onToggleSave={onToggleSave}
+      />
     </article>
   )
 }
