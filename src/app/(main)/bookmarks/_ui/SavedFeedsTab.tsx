@@ -2,7 +2,8 @@
 
 import { useMemo } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { communityQueries, PostCard, toCommunityPreviewProps } from '@/entities/community'
+import { communityQueries, toCommunityPreviewProps } from '@/entities/community'
+import { ConnectedPostCard } from '@/features/community'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
 import { Container, InfiniteScrollTrigger, ListState } from '@/shared/ui'
 
@@ -31,7 +32,11 @@ const SavedFeedsTab = () => {
           {feeds.map((post) => (
             <div key={post.postId} className="rounded-lg border border-neutral-300 bg-white">
               {/* 저장피드: ProfileHeader sm 헤더 + 모바일 좌우 패딩 보완(px-3) */}
-              <PostCard profileType="sm" className="px-3" {...toCommunityPreviewProps(post)} />
+              <ConnectedPostCard
+                profileType="sm"
+                className="px-3"
+                {...toCommunityPreviewProps(post)}
+              />
             </div>
           ))}
         </ListState>

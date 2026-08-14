@@ -31,6 +31,8 @@ export interface CommunityPostCard {
   likeCount: number
   commentCount: number
   saveCount: number
+  isLiked: boolean
+  isSaved: boolean
   createdAt: string
 }
 

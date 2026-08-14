@@ -66,9 +66,11 @@ export const communityQueries = {
       staleTime: STALE_TIME.DEFAULT,
     }),
 
+  myBookmarksAll: () => [...communityQueries.all(), 'myBookmarks'] as const,
+
   myBookmarks: (pageSize = 15) =>
     createInfiniteQuery({
-      queryKey: [...communityQueries.all(), 'myBookmarks', pageSize],
+      queryKey: [...communityQueries.myBookmarksAll(), pageSize],
       queryFn: (page) => getMyBookmarkedPosts({ page, pageSize }),
       staleTime: STALE_TIME.DEFAULT,
     }),

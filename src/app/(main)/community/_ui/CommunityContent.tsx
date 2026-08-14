@@ -10,7 +10,8 @@ import {
   SearchButton,
   Separator,
 } from '@/shared/ui'
-import { PostCard, communityQueries, toCommunityPreviewProps } from '@/entities/community'
+import { communityQueries, toCommunityPreviewProps } from '@/entities/community'
+import { ConnectedPostCard } from '@/features/community'
 
 const CommunityContent = () => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery(
@@ -53,7 +54,7 @@ const CommunityContent = () => {
             {posts.map((post, index) => (
               <Fragment key={post.postId}>
                 {index > 0 && <Separator className="bg-border-light" />}
-                <PostCard
+                <ConnectedPostCard
                   {...toCommunityPreviewProps(post)}
                   // ponytail: 목록 API에 댓글 미리보기 없음 — 상세(commentPreview) 생기면 교체. 댓글 있는 글만.
                   commentPreview={

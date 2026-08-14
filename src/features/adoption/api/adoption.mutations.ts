@@ -7,6 +7,7 @@ import {
   type QueryKey,
 } from '@tanstack/react-query'
 import { adoptionQueries } from '@/entities/adoption'
+import { patchCachedItem } from '@/shared/lib/patchCachedItem'
 import type {
   AdoptionFavoriteResponse,
   AdoptionPetCard,
@@ -35,33 +36,15 @@ const isFavoritablePet = (value: unknown): value is FavoritablePet =>
   'isFavorited' in value &&
   'favoriteCount' in value
 
-/**
- * adoption 캐시 안의 특정 펫만 갈아끼운다.
- * 캐시에 들어있는 형태는 세 가지뿐이다 — 무한 목록(InfiniteData<PaginationResponse>), 배열(popular), 단일 상세.
- */
+/** adoption 캐시 안의 특정 펫만 갈아끼운다. */
 const patchAdoptionCache = (
   data: unknown,
   petId: string,
   patch: (pet: FavoritablePet) => FavoritablePet,
-): unknown => {
-  const applyToPet = (value: unknown) =>
-    isFavoritablePet(value) && value.petId === petId ? patch(value) : value
-
-  if (Array.isArray(data)) return data.map(applyToPet)
-  if (typeof data !== 'object' || data === null) return data
-
-  if ('pages' in data && Array.isArray(data.pages)) {
-    return {
-      ...data,
-      pages: data.pages.map((page: unknown) =>
-        typeof page === 'object' && page !== null && 'items' in page && Array.isArray(page.items)
-          ? { ...page, items: page.items.map(applyToPet) }
-          : page,
-      ),
-    }
-  }
-  return applyToPet(data)
-}
+): unknown =>
+  patchCachedItem(data, (value) =>
+    isFavoritablePet(value) && value.petId === petId ? patch(value) : value,
+  )
 
 type FavoritePages = InfiniteData<PaginationResponse<AdoptionPetCard>, number>
 

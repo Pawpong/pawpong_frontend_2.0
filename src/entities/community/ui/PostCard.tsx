@@ -19,6 +19,9 @@ interface PostCardProps extends CommunityPreviewProps {
   /** 내 글일 때만 전달 — ⋯ 메뉴가 수정/삭제로 동작 (미전달 시 메뉴 미노출) */
   onEdit?: () => void
   onDelete?: () => void
+  /** 좋아요·북마크 토글 — features의 ConnectedPostCard에서 주입 */
+  onToggleLike?: () => void
+  onToggleSave?: () => void
   className?: string
 }
 
@@ -35,12 +38,16 @@ const PostCard = ({
   images = [],
   likeCount,
   commentCount,
+  isLiked,
+  isSaved,
   detailHref,
   profileType,
   showMore,
   commentPreview,
   onEdit,
   onDelete,
+  onToggleLike,
+  onToggleSave,
   className,
 }: PostCardProps) => {
   const hasImages = images.length > 0
@@ -120,7 +127,14 @@ const PostCard = ({
         {/* 액션 + 댓글 미리보기 — 아이콘↔댓글 4px gap */}
         <div className="flex flex-col gap-1">
           {/* 액션: 좋아요 · 댓글 · 북마크 (픽셀 아이콘) */}
-          <CommunityPostActions likeCount={likeCount} commentCount={commentCount} />
+          <CommunityPostActions
+            likeCount={likeCount}
+            commentCount={commentCount}
+            liked={isLiked}
+            saved={isSaved}
+            onToggleLike={onToggleLike}
+            onToggleSave={onToggleSave}
+          />
 
           {/* 댓글 미리보기 (Figma community-profile 2596-231732) — 작성자 + 본문 1줄 + [더보기] */}
           {commentPreview && (

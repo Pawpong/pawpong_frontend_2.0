@@ -25,17 +25,19 @@ const CommentItem = ({ comment, currentUserId, onReply, isReply }: CommentItemPr
   const [editValue, setEditValue] = useState(comment.body)
   const [confirmDelete, setConfirmDelete] = useState(false)
 
-  const handleSaveEdit = async () => {
+  // 삭제와 같은 방식 — 성공했을 때만 편집 모드를 닫는다 (실패하면 입력 유지, unhandled rejection 없음)
+  const handleSaveEdit = () => {
     const trimmed = editValue.trim()
     if (!trimmed || updateComment.isPending) return
-    await updateComment.mutateAsync({ body: trimmed })
-    setIsEditing(false)
+    updateComment.mutate({ body: trimmed }, { onSuccess: () => setIsEditing(false) })
   }
 
   return (
     <div className={`flex items-start gap-2 py-3 ${isReply ? 'pl-12' : ''}`}>
       <AuthorInfo
         size="md"
+        // 남는 가로를 댓글이 차지해야 ⋯ 메뉴가 오른쪽 끝으로 밀린다
+        className="flex min-w-0 flex-1 items-start gap-2"
         authorId={comment.authorId}
         nickname={comment.authorNickname}
         profileImageUrl={comment.authorProfileImageUrl}
@@ -71,9 +73,16 @@ const CommentItem = ({ comment, currentUserId, onReply, isReply }: CommentItemPr
                     취소
                   </button>
                 </div>
+                {updateComment.isError && (
+                  <p role="alert" className="text-xs text-error-700">
+                    댓글 수정에 실패했습니다. 다시 시도해주세요.
+                  </p>
+                )}
               </div>
             ) : (
-              <p className="mt-1 text-sm font-bold text-text-secondary">{comment.body}</p>
+              <p className="mt-1 text-sm font-bold break-words whitespace-pre-wrap text-text-secondary">
+                {comment.body}
+              </p>
             )}
             {!isEditing && onReply && (
               <button

@@ -1,38 +1,45 @@
 'use client'
 
-import { useState } from 'react'
 import { FavoriteIcon, PixelBookmarkIcon, PixelMessageIcon } from '@/shared/assets/icons'
 import { BOOKMARK_ACTIVE, PostActionButton } from '@/shared/ui'
 
 interface CommunityPostActionsProps {
   likeCount: number
   commentCount: number
+  liked: boolean
+  saved: boolean
+  /** 미전달 시 버튼은 표시만 되고 동작하지 않는다 (features 래퍼에서 주입) */
+  onToggleLike?: () => void
+  onToggleSave?: () => void
 }
 
-const CommunityPostActions = ({ likeCount, commentCount }: CommunityPostActionsProps) => {
-  // ponytail: API 미연결 — mutation 연결 전까지 공통 로컬 상태로 색과 카운트만 반영한다.
-  const [liked, setLiked] = useState(false)
-  const [bookmarked, setBookmarked] = useState(false)
-
+const CommunityPostActions = ({
+  likeCount,
+  commentCount,
+  liked,
+  saved,
+  onToggleLike,
+  onToggleSave,
+}: CommunityPostActionsProps) => {
   return (
     <div className="flex items-center gap-2">
       <PostActionButton
         icon={FavoriteIcon}
-        count={likeCount + (liked ? 1 : 0)}
+        count={likeCount}
         iconClassName="size-8"
         ariaLabel="좋아요"
         active={liked}
         iconStatus={liked ? 'fill' : 'default'}
-        onClick={() => setLiked((current) => !current)}
+        onClick={onToggleLike}
       />
       <PostActionButton icon={PixelMessageIcon} count={commentCount} iconClassName="size-8" />
       <PostActionButton
         icon={PixelBookmarkIcon}
         iconClassName="size-8"
         ariaLabel="북마크"
-        active={bookmarked}
+        active={saved}
         activeClassName={BOOKMARK_ACTIVE}
-        onClick={() => setBookmarked((current) => !current)}
+        onClick={onToggleSave}
       />
     </div>
   )

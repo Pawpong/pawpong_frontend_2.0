@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { PixelUserIcon } from '@/shared/assets/icons'
+import { PawIcon } from '@/shared/assets/icons'
 import { cn } from '@/shared/lib/cn'
 
 // Figma nav bar (746:72275) 픽셀 아이콘 — 32x32 정규화, fill=currentColor로 active/inactive 색 토글.
@@ -54,7 +54,7 @@ const NavCommunityIcon = ({ className }: NavIconProps) => (
 const NavMyHomeIcon = ({ className }: NavIconProps) => (
   <span className={cn('flex items-center justify-center', className)}>
     <span className="flex size-[68.75%] items-center justify-center rounded-full bg-current">
-      <PixelUserIcon className="size-1/2 text-white" />
+      <PawIcon className="size-1/2 text-white" />
     </span>
   </span>
 )
