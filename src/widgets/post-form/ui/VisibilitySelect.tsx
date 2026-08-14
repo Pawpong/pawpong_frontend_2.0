@@ -9,7 +9,7 @@ import {
 } from '@/shared/ui'
 
 const VISIBILITY_OPTIONS = [
-  { id: 'public', label: '전체공개' },
+  { id: 'public', label: '전체 공개' },
   { id: 'followers', label: '팔로워 공개' },
   { id: 'private', label: '나만보기' },
 ] as const
@@ -27,14 +27,15 @@ const VisibilitySelect = ({ value, onChange }: VisibilitySelectProps) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
+        {/* Figma 1058-47323: 풀 너비 h-45, p-12, radius 8 — Textarea와 같은 테두리 톤 */}
         <button
           type="button"
-          className="flex w-full items-center rounded-[0.375rem] border border-[#a8a8a8] px-[0.625rem] py-[0.5rem] tab:w-auto tab:border-fill-muted tab:py-[0.25rem]"
+          className="flex h-[2.8125rem] w-full items-center justify-between rounded-lg border border-neutral-300 bg-white p-3"
         >
-          <span className="flex-1 text-left text-sm font-medium text-text-primary">
+          <span className="flex-1 text-left text-sm leading-[1.5] font-medium whitespace-nowrap text-neutral-850">
             {activeLabel}
           </span>
-          <ChevronDownIcon className="size-6 text-[#C6C6C6]" />
+          <ChevronDownIcon className="size-6 text-neutral-500" />
         </button>
       </DropdownMenuTrigger>
 

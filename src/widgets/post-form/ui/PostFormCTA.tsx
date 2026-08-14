@@ -13,7 +13,7 @@ interface PostFormCTAProps {
   isSaveDraftValid?: boolean
   /** 업로드/저장 진행 중 — 버튼 비활성화로 중복 제출 방지 */
   isSubmitting?: boolean
-  /** 왼쪽 슬롯 (예: visibility select) */
+  /** 바 왼쪽 슬롯 (Figma 1054-36832 — 공개범위 드롭다운) */
   leftSlot?: React.ReactNode
 }
 
