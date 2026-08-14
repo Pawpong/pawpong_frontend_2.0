@@ -32,7 +32,7 @@ const HallOfFame = () => {
               <span className="block tab:inline pc:block">소개합니다 !</span>
             </h2>
             <DetailLink
-              href="/vote"
+              href="/hall-of-fame"
               label="명예의 동물 투표하기"
               size="sm"
               className="text-neutral-850 pc:text-sm"
