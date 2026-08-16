@@ -2,7 +2,7 @@
 
 import { useCallback } from 'react'
 import { SocialSignupCapture, type SocialSignupSession } from '@/features/auth'
-import { useOnboardingForm } from '@/features/onboarding/model/useOnboardingForm'
+import { useOnboardingForm } from '@/features/onboarding'
 
 /** 새 OAuth tempId가 들어오면 이전 사용자의 persist 폼을 먼저 비운다. */
 const SignupSessionCapture = () => {

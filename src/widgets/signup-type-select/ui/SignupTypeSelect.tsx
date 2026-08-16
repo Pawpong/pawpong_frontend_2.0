@@ -3,10 +3,13 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Container, PixelSelectCard } from '@/shared/ui'
-import { StepLayout } from '@/features/onboarding/ui/StepLayout'
-import { StepTitle } from '@/features/onboarding/ui/StepTitle'
-import { StepNavButtons } from '@/features/onboarding/ui/StepNavButtons'
-import { USER_TYPE_OPTIONS, type UserType } from '@/features/onboarding'
+import {
+  StepLayout,
+  StepNavButtons,
+  StepTitle,
+  USER_TYPE_OPTIONS,
+  type UserType,
+} from '@/features/onboarding'
 
 const SignupTypeSelect = () => {
   const router = useRouter()

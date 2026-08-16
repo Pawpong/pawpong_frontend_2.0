@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { loadSocialSignupSession } from '@/features/auth'
 import { getGuardRedirect } from '../model/onboardingGuard'
@@ -26,6 +26,9 @@ const OnboardingRouteGuard = ({ userType, children }: OnboardingRouteGuardProps)
   const status = useOnboardingForm((state) => state.status)
   const ownerTempId = useOnboardingForm((state) => state.ownerTempId)
 
+  // sessionStorage 읽기 + JSON.parse — 마운트 후 바뀌지 않으므로 렌더마다 다시 읽지 않는다
+  const sessionTempId = useMemo(() => loadSocialSignupSession()?.tempId, [])
+
   const requestedStep = pathname.split('/').pop() ?? ''
   const redirectTo =
     hasHydrated && isStepForUser(userType, requestedStep)
@@ -35,7 +38,7 @@ const OnboardingRouteGuard = ({ userType, children }: OnboardingRouteGuardProps)
           completedSteps,
           status,
           // 이 탭에서 시작한 온보딩인지 — 소셜 세션과 스토어 주인이 같아야 한다
-          hasValidSession: !!ownerTempId && ownerTempId === loadSocialSignupSession()?.tempId,
+          hasValidSession: !!ownerTempId && ownerTempId === sessionTempId,
         })
       : null
 
