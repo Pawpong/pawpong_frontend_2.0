@@ -7,8 +7,9 @@ import { AnimalSelectStep } from './AnimalSelectStep'
 import { KennelInfoStep } from './KennelInfoStep'
 import { DocumentsStep } from './DocumentsStep'
 import { CompleteStep } from './CompleteStep'
+import type { StepId } from '../model/types'
 
-const STEP_COMPONENTS: Record<string, React.ComponentType> = {
+const STEP_COMPONENTS = {
   'animal-select': AnimalSelectStep,
   profile: ProfileStep,
   info: InfoStep,
@@ -16,22 +17,15 @@ const STEP_COMPONENTS: Record<string, React.ComponentType> = {
   'kennel-info': KennelInfoStep,
   documents: DocumentsStep,
   complete: CompleteStep,
-}
+} satisfies Record<StepId, React.ComponentType>
 
 interface StepRendererProps {
-  stepId: string
+  stepId: StepId
 }
 
+// [refactored] 없는 스텝 폴백 제거 — [step]/page.tsx 가 이미 notFound() 로 걸러낸다
 const StepRenderer = ({ stepId }: StepRendererProps) => {
   const StepComponent = STEP_COMPONENTS[stepId]
-
-  if (!StepComponent) {
-    return (
-      <div className="flex flex-col items-center gap-[1rem] p-[1.25rem]">
-        <p className="text-[#5d5d5d]">알 수 없는 단계입니다.</p>
-      </div>
-    )
-  }
 
   return <StepComponent />
 }

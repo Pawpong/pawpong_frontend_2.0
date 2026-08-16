@@ -138,9 +138,26 @@ const PRIVACY_POLICY = `포퐁(이하 "회사")은 「개인정보 보호법」 
 · 공고일자: 2025년 12월 21일
 · 시행일자: 2025년 12월 23일`
 
+/* 브리더 입점 서약서 — 구 레포(app/signup/_components/oath-dialog-trigger)의
+   뉴/엘리트 두 레벨 본문을 하나로 합친 것. 중복 항목은 정리했다. */
+const BREEDER_PLEDGE = `본인은 포퐁 플랫폼 브리더 회원으로 입점함에 있어, 아래의 기준을 성실히 준수할 것을 서약합니다. 만약 이를 위반하거나 허위 사실이 적발될 경우, 플랫폼에서 즉시 퇴출될 수 있음을 이해하며 이에 동의합니다.
+
+· 본인은 관할 지자체에 동물생산업 등록을 완료하였으며, 관련 법규를 성실히 준수하고 법적으로 판매업이 아님을 확인합니다.
+· 모든 분양 과정에서 표준 입양계약서를 작성합니다.
+· 2종 이하 브리딩 원칙을 지키며, 다품종 브리딩을 하지 않습니다.
+· 모든 분양 개체는 반드시 생후 2개월(8주) 이후에만 분양합니다.
+· 국내에서 진행되는 모든 분양은 반드시 대면 분양으로 진행하며, 비대면·택배 분양은 절대 하지 않습니다.
+· 분양 개체의 사회화, 건강, 복지를 최우선으로 하며, 불필요하거나 무분별한 번식을 하지 않습니다.
+· 포퐁 플랫폼과 입양자에게 허위 사실 없이 투명하게 정보를 제공합니다.`
+
 export const POLICIES = {
   service: { title: '서비스 이용약관', content: TERMS_OF_SERVICE },
   privacy: { title: '개인정보 수집 및 이용 동의', content: PRIVACY_POLICY },
+  breederPledge: { title: '브리더 입점 서약서', content: BREEDER_PLEDGE },
 } as const
 
-export type Policy = (typeof POLICIES)[keyof typeof POLICIES]
+/** 모달에 띄울 약관 한 건 — 서버(GET /terms)의 title/body 도 이 모양으로 맞춰 쓴다 */
+export interface Policy {
+  title: string
+  content: string
+}

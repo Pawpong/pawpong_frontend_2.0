@@ -8,9 +8,11 @@ const buttonVariants = tv({
   base: 'flex items-center justify-center leading-[1.5] font-semibold text-neutral-850 transition-colors disabled:cursor-not-allowed disabled:opacity-50',
   variants: {
     variant: {
-      // primary: hover 텍스트 #6b6b6b / press 배경 #f3ec59 / disabled 배경·텍스트(opacity-100로 base opacity-50 무효화)
+      // primary: Figma BaseButton(743-70331/70327/70329) — bg/interactive/point-color 토큰을 그대로 쓴다.
+      // default point-500(#fffe72) / hover point-300(#fffeaa) / press point-600(#dbda5b), 글자색은 상태 무관 #3e3e3e.
+      // disabled 는 opacity-100 으로 base 의 opacity-50 을 무효화
       primary:
-        'rounded-full bg-[#fffa94] p-2 transition-colors hover:text-neutral-700 active:bg-[#f3ec59] disabled:bg-neutral-150 disabled:text-neutral-400 disabled:opacity-100',
+        'rounded-full bg-point-500 p-2 transition-colors hover:bg-point-300 active:bg-point-600 disabled:bg-neutral-150 disabled:text-neutral-400 disabled:opacity-100',
       outline: 'rounded-full border border-neutral-300 bg-white p-2',
       // text(txt btn): hover 배경 #f6f6f6 / press 배경 #ededed / disabled 텍스트 #c2c2c2, rounded-8
       text: 'rounded-lg px-1 text-sm hover:bg-neutral-50 active:bg-neutral-100 disabled:text-[#c2c2c2] disabled:opacity-100',

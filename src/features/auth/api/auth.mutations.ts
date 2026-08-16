@@ -7,13 +7,17 @@ import {
   checkBreederNameDuplicate,
   sendVerificationCode,
   verifyCode,
-  completeAdopterRegistration,
-  completeBreederRegistration,
+  registerAdopter,
+  registerBreeder,
   uploadBreederDocuments,
   uploadProfileImage,
   logout,
 } from './auth.api'
-import type { AdopterRegistrationDto, BreederRegistrationDto } from '@/shared/types'
+import type {
+  BreederUploadDocumentType,
+  RegisterAdopterRequest,
+  RegisterBreederRequest,
+} from '@/shared/types'
 
 export const useCheckEmailDuplicate = () =>
   useMutation({ mutationFn: (email: string) => checkEmailDuplicate(email) })
@@ -32,11 +36,11 @@ export const useVerifyCode = () =>
     mutationFn: ({ phone, code }: { phone: string; code: string }) => verifyCode(phone, code),
   })
 
-export const useCompleteAdopterRegistration = () =>
-  useMutation({ mutationFn: (data: AdopterRegistrationDto) => completeAdopterRegistration(data) })
+export const useRegisterAdopter = () =>
+  useMutation({ mutationFn: (data: RegisterAdopterRequest) => registerAdopter(data) })
 
-export const useCompleteBreederRegistration = () =>
-  useMutation({ mutationFn: (data: BreederRegistrationDto) => completeBreederRegistration(data) })
+export const useRegisterBreeder = () =>
+  useMutation({ mutationFn: (data: RegisterBreederRequest) => registerBreeder(data) })
 
 export const useUploadBreederDocuments = () =>
   useMutation({
@@ -46,7 +50,7 @@ export const useUploadBreederDocuments = () =>
       level,
     }: {
       tempId: string
-      files: { type: string; file: File }[]
+      files: { type: BreederUploadDocumentType; file: File }[]
       level: 'new' | 'elite'
     }) => uploadBreederDocuments(tempId, files, level),
   })

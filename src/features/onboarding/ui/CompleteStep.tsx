@@ -3,12 +3,15 @@
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/shared/ui'
+import { useOnboardingForm } from '../model/useOnboardingForm'
 import { StepLayout } from './StepLayout'
 import { StepTitle } from './StepTitle'
 import { StepNavButtons } from './StepNavButtons'
 
 const CompleteStep = () => {
   const router = useRouter()
+  // 가입 완료 상태는 /complete 진입 허용에 쓰이므로, 온보딩을 완전히 벗어날 때 비운다
+  const clearOnboarding = useOnboardingForm((state) => state.clear)
 
   return (
     <StepLayout className="w-full flex-1">
@@ -37,8 +40,11 @@ const CompleteStep = () => {
       </div>
 
       <StepNavButtons
-        onNext={() => router.push('/')}
-        nextLabel="다음"
+        onNext={() => {
+          clearOnboarding()
+          router.push('/')
+        }}
+        nextLabel="홈으로"
         extraButtons={
           <Button variant="text" className="text-base font-medium tab:text-sm">
             문의하기

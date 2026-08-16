@@ -14,7 +14,11 @@ interface UseExitGuardOptions {
  * - popstate/beforeunload: 브라우저 네비게이션 가드
  * - requestExit: 닫기 버튼 등 프로그래밍 방식 나가기 가드
  */
-const useExitGuard = ({ hasChanges, enabled = true, confirmAlways = false }: UseExitGuardOptions) => {
+const useExitGuard = ({
+  hasChanges,
+  enabled = true,
+  confirmAlways = false,
+}: UseExitGuardOptions) => {
   const [showGuard, setShowGuard] = useState(false)
   const sourceRef = useRef<'browser' | 'programmatic' | null>(null)
   const allowNavigationRef = useRef(false)

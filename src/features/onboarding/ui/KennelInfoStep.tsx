@@ -1,39 +1,22 @@
 'use client'
 
 import { Controller } from 'react-hook-form'
-import { useOnboarding } from '../model/OnboardingContext'
 import { useStepForm } from '../model/useStepForm'
 import { useDuplicateCheck } from '../model/useDuplicateCheck'
 import { useCheckBreederNameDuplicate } from '@/features/auth'
-import { kennelInfoSchema, type KennelInfoFormData, REGIONS } from '../model/schema'
+import { kennelInfoSchema, INTRODUCTION_MAX_LENGTH, REGIONS } from '../model/schema'
+import { BREED_KEYWORDS } from '../model/breedKeywords'
 import { StepContainer } from './StepContainer'
-import { TextareaField } from '@/shared/ui'
-import { StepSelect } from './StepInput'
+import { Dropdown, InputField, TextareaField } from '@/shared/ui'
 import { ChipSelect } from './ChipSelect'
 import { ProfileImageUpload } from './ProfileImageUpload'
 import { DuplicateCheckField } from './DuplicateCheckField'
 
 const REGION_OPTIONS = REGIONS.map((r) => ({ value: r, label: r }))
 
-const BREED_KEYWORDS = [
-  '비숑',
-  '도베르만',
-  '골든리트리버',
-  '푸들',
-  '시바이누',
-  '말티즈',
-  '포메라니안',
-  '코기',
-  '허스키',
-  '사모예드',
-  '래브라도',
-]
-
 const KennelInfoStep = () => {
-  const { goBack } = useOnboarding()
-
-  const { register, control, handleSubmit, watch, onSubmit, firstErrorMessage } =
-    useStepForm<KennelInfoFormData>('kennel-info', kennelInfoSchema, {
+  const { register, control, handleSubmit, watch, onSubmit, firstErrorMessage, goBack } =
+    useStepForm('kennel-info', kennelInfoSchema, {
       breederName: '',
       region: undefined,
       selectedBreeds: [],
@@ -42,6 +25,7 @@ const KennelInfoStep = () => {
     })
 
   const breederName = watch('breederName')
+  const introduction = watch('introduction')
 
   // 브리더명 중복 검사 (백엔드: POST /api/v2/auth/check-breeder-name)
   const breederNameCheck = useDuplicateCheck(useCheckBreederNameDuplicate(), {
@@ -49,17 +33,23 @@ const KennelInfoStep = () => {
     duplicate: '이미 사용 중인 브리더명입니다.',
     available: '사용 가능한 브리더명입니다.',
     fallback: '중복검사에 실패했습니다.',
+    unchecked: '브리더명 중복 확인을 완료해주세요.',
+  })
+
+  const handleNext = handleSubmit((data) => {
+    if (breederNameCheck.validate(data.breederName)) onSubmit(data)
   })
 
   return (
     <StepContainer
       title="브리더 정보를 입력해주세요"
-      onNext={() => handleSubmit(onSubmit)()}
+      onNext={handleNext}
       onBack={goBack}
       navError={firstErrorMessage}
+      contentClassName="tab:max-w-[40.9727rem]"
     >
-      <div className="mt-[2rem] flex w-full flex-col items-center gap-[2rem] px-5 tab:mt-[3.625rem] tab:max-w-[40.625rem] tab:gap-[3.625rem] tab:px-0">
-        {/* 업로드 후 받은 URL을 폼(profileImage)에 보관 → DocumentsStep의 social/complete에서 전송 */}
+      <div className="flex w-full flex-col items-center gap-[2rem] px-5 tab:gap-[3.625rem] tab:px-0">
+        {/* 업로드 후 받은 URL을 폼(profileImage)에 보관 → DocumentsStep의 가입 요청에서 전송 */}
         <Controller
           name="profileImage"
           control={control}
@@ -69,59 +59,57 @@ const KennelInfoStep = () => {
         />
 
         {/* 폼 영역 */}
-        <div className="flex w-full flex-col gap-[0.625rem] tab:gap-[2.09rem]">
+        <div className="flex w-full flex-col gap-4">
           {/* 브리더명 + 중복검사 — 공통 DuplicateCheckField */}
           <DuplicateCheckField
-            placeholder="브리더명(상호명)"
-            checkLabel="중복검사"
-            pendingLabel="검사 중"
+            label="별명"
+            required
+            placeholder="별명을 입력해주세요"
+            checkLabel="중복 확인"
+            pendingLabel="확인 중"
             value={breederName}
             registration={register('breederName')}
             check={breederNameCheck}
           />
 
           {/* 지역 */}
-          <Controller
-            name="region"
-            control={control}
-            render={({ field }) => (
-              <StepSelect
-                value={field.value ?? ''}
-                onValueChange={field.onChange}
-                placeholder="지역"
-                options={REGION_OPTIONS}
-              />
-            )}
-          />
-
-          {/* 품종 키워드 */}
-          <div className="flex flex-col">
+          <InputField label="주소" required>
             <Controller
-              name="selectedBreeds"
+              name="region"
               control={control}
               render={({ field }) => (
-                <ChipSelect
-                  label={
-                    <>
-                      <span className="hidden tab:inline">품종</span>
-                      <span className="tab:hidden">관심있는 키워드</span>
-                    </>
-                  }
-                  items={BREED_KEYWORDS}
-                  value={field.value}
-                  onChange={field.onChange}
+                <Dropdown
+                  value={field.value ?? ''}
+                  onValueChange={field.onChange}
+                  placeholder="주소를 선택해주세요"
+                  options={REGION_OPTIONS}
                 />
               )}
             />
-          </div>
+          </InputField>
 
-          {/* 소개 — 가입 완료 후 프로필 bio(PATCH /profile/me)로 저장 */}
+          {/* 소개 — 일반 가입(InfoStep)과 동일 규격. 브리더 가입 DTO 엔 소개가 없어 가입 후 bio 로 저장 */}
           <TextareaField
             label="소개"
-            placeholder="브리더 소개를 입력해주세요"
-            maxLength={100}
-            currentLength={watch('introduction')?.length ?? 0}
+            placeholder="입력해보세요"
+            maxLength={INTRODUCTION_MAX_LENGTH}
+            currentLength={introduction?.length ?? 0}
             {...register('introduction')}
+          />
+
+          {/* 품종 키워드 — 별명·주소와 같은 필드 묶음 (간격 spacing/16) */}
+          <Controller
+            name="selectedBreeds"
+            control={control}
+            render={({ field }) => (
+              <ChipSelect
+                label="케어하고 있는 품종 (최대 5개)"
+                items={[...BREED_KEYWORDS]}
+                value={field.value}
+                onChange={field.onChange}
+                maxSelected={5}
+              />
+            )}
           />
         </div>
       </div>

@@ -70,7 +70,8 @@ const copyToClipboard = async (text: string) => {
   }
 }
 
-const isAbortError = (error: unknown) => error instanceof DOMException && error.name === 'AbortError'
+const isAbortError = (error: unknown) =>
+  error instanceof DOMException && error.name === 'AbortError'
 
 const ShareModal = ({
   open,
