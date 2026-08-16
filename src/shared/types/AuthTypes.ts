@@ -3,43 +3,93 @@
  * 출처: auth.ts
  */
 
-import type { AdopterProfileDto } from './AdopterTypes'
-import type { BreederProfileResponseDto } from './BreederTypes'
+import type { TermsCode } from './TermsTypes'
 
-export interface AdopterRegistrationDto {
+// ─── 신규 가입 계약 (POST /auth/register/adopter · /auth/register/breeder) ───
+
+/** 동의 이력 — 마케팅 동의도 별도 필드가 아니라 이 배열에 'marketing' 을 넣어 표시한다 */
+export interface TermsAgreementItem {
+  code: TermsCode
+  version: string
+}
+
+/** 입양 상담용 사전 정보 — 온보딩 조사 양식 답변이 여기로 들어간다 */
+export interface CounselDefaultProfile {
+  selfIntroduction: string
+  dailyAbsenceHours?: string
+  livingSpaceDescription?: string
+  counselPrivacyAgreed: boolean
+}
+
+export interface RegisterAdopterRequest {
   tempId: string
   email: string
-  name: string
   nickname: string
+  /** 공개 프로필 한 줄 소개 (trim 후 최대 200자) */
+  bio?: string
+  /** 실명 (상담 시 표시) */
+  realName: string
   phone?: string
-  marketingAgreed?: boolean
-  /** 사전 업로드한 프로필 이미지 파일명 또는 URL */
   profileImage?: string
+  interestedBreedIds?: string[]
+  counselDefaultProfile?: CounselDefaultProfile
+  termsAgreements: TermsAgreementItem[]
 }
 
-export interface BreederRegistrationDto {
-  tempId: string
-  provider: string
+export interface RegisterBreederAgreements {
+  termsOfService: boolean
+  privacyPolicy: boolean
+  marketingConsent?: boolean
+}
+
+export interface RegisterBreederRequest {
   email: string
-  name: string
-  phone: string
-  petType: string
-  plan: string
+  phoneNumber: string
   breederName: string
-  introduction?: string
-  city: string
-  district: string
+  breederLocation: { city: string; district?: string }
+  animal: 'cat' | 'dog' | 'reptile'
+  /** 최대 5개 */
   breeds: string[]
-  level: string
-  marketingAgreed: boolean
-  /** 사전 업로드한 프로필 이미지 파일명 또는 URL */
+  plan: 'basic' | 'pro'
+  level: 'new' | 'elite'
+  agreements: RegisterBreederAgreements
+  tempId?: string
+  provider?: string
   profileImage?: string
+  /** 사전 업로드 응답의 파일 경로 배열 (documentTypes 와 순서 일치) */
+  documentUrls?: string[]
+  documentTypes?: BreederDocumentType[]
 }
 
-export interface AuthResponseDto {
+export type BreederUploadDocumentType = 'idCard' | 'animalProductionLicense'
+
+export type BreederDocumentType =
+  | 'id_card'
+  | 'animal_production_license'
+  | 'adoption_contract_sample'
+  | 'pedigree'
+  | 'breeder_certification'
+
+/** 브리더 인증 서류 업로드 응답 항목 — type 은 서버 표기(snake_case) 그대로 온다 */
+export interface UploadedVerificationDocument {
+  type: BreederDocumentType
+  url: string
+  filename: string
+  size: number
+  uploadedAt: string
+}
+
+export interface UploadBreederDocumentsResponse {
+  /** 이번 요청으로 올라간 서류 */
+  uploadedDocuments: UploadedVerificationDocument[]
+  /** 기존 + 이번 업로드 전체 */
+  allDocuments: UploadedVerificationDocument[]
+}
+
+/** 가입 응답 — 두 엔드포인트 모두 토큰을 최상위로 준다 */
+export interface RegisterTokens {
   accessToken: string
   refreshToken: string
-  userInfo: AdopterProfileDto | BreederProfileResponseDto
 }
 
 export interface LogoutResponseDto {

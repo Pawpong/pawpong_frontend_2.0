@@ -1,6 +1,8 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
+import { GoogleIcon, KakaoIcon, NaverIcon } from '@/shared/assets/icons'
+import { cn } from '@/shared/lib/cn'
 import { Button } from '@/shared/ui/Button'
 
 /**
@@ -17,14 +19,36 @@ import { Button } from '@/shared/ui/Button'
  *       localhost:8080 로 등록돼 있어야 로컬에서 소셜 로그인이 끝까지 완료된다.
  *       (제공사 콘솔에도 동일 콜백이 등록돼 있어야 함)
  *
- * TODO(FE/디자인): 현재는 와이어프레임 수준. 디자인 확정 시 브랜드 색/아이콘/간격 반영.
+ * 버튼 디자인은 구 레포(Pawpong/pawpong_frontend components/social-login)에서 가져왔다.
  */
 type SocialProvider = 'kakao' | 'naver' | 'google'
 
-const SOCIAL_BUTTONS: { provider: SocialProvider; label: string; className: string }[] = [
-  { provider: 'kakao', label: '카카오로 시작하기', className: 'bg-[#FEE500] text-black' },
-  { provider: 'naver', label: '네이버로 시작하기', className: 'bg-[#03C75A] text-white' },
-  { provider: 'google', label: '구글로 시작하기', className: 'border border-neutral-300 bg-white' },
+const SOCIAL_BUTTONS: {
+  provider: SocialProvider
+  label: string
+  Icon: typeof KakaoIcon
+  className: string
+}[] = [
+  {
+    provider: 'kakao',
+    label: '카카오로 시작하기',
+    Icon: KakaoIcon,
+    className: 'bg-[#FEE500] text-neutral-850 hover:bg-[#FEE500]/80',
+  },
+  {
+    provider: 'naver',
+    label: '네이버로 시작하기',
+    Icon: NaverIcon,
+    className: 'bg-[#03C75A] text-white hover:bg-[#03C75A]/80',
+  },
+  {
+    provider: 'google',
+    label: '구글로 시작하기',
+    Icon: GoogleIcon,
+    // 구글은 배경색을 임의로 못 바꾼다 — 공식 가이드라인이 흰색/#131314/#F2F2F2 세 가지만 허용.
+    // light 옵션은 #FFFFFF + 1px #747775 테두리가 한 세트라 흰 배경에서도 경계가 보인다.
+    className: 'border border-[#747775] bg-white text-neutral-850 hover:bg-neutral-50',
+  },
 ]
 
 const getApiBaseUrl = () => {
@@ -63,14 +87,17 @@ export const SocialLoginList = () => {
 
   return (
     <div className="flex w-full flex-col gap-3">
-      {SOCIAL_BUTTONS.map(({ provider, label, className }) => (
+      {SOCIAL_BUTTONS.map(({ provider, label, Icon, className }) => (
         <Button
           key={provider}
           variant="fill"
-          className={`w-full justify-center ${className}`}
+          className={cn('h-12 w-full justify-between px-4 py-3', className)}
           onClick={() => startSocialLogin(provider)}
         >
+          <Icon className="size-4" />
           {label}
+          {/* 아이콘 폭만큼의 여백 — 라벨을 버튼 정중앙에 둔다 */}
+          <span className="size-4" />
         </Button>
       ))}
     </div>

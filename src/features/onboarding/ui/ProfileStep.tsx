@@ -1,293 +1,50 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { Controller } from 'react-hook-form'
-import { CheckRoundedIcon } from '@/shared/assets/icons'
+import { useQuery } from '@tanstack/react-query'
+import { termsQueries } from '@/entities/terms'
 import { useOnboarding } from '../model/OnboardingContext'
 import { useStepForm } from '../model/useStepForm'
-import { useSendVerificationCode, useVerifyCode } from '@/features/auth'
-import { profileSchema, type ProfileFormData, EMAIL_DOMAINS } from '../model/schema'
-import { StepLayout } from './StepLayout'
-import { StepTitle } from './StepTitle'
-import { StepIndicator } from './StepIndicator'
-import {
-  Dropdown,
-  Input,
-  InputField,
-  HelpMessage,
-  PolicyModal,
-  type HelpMessageState,
-} from '@/shared/ui'
-import { POLICIES, type Policy } from '../model/policyContent'
-import { StepActionButton } from './StepInput'
-import { StepNavButtons } from './StepNavButtons'
-import { CheckboxField } from './CheckboxField'
-
-const AGREEMENTS = [
-  {
-    id: 'serviceAgreed' as const,
-    label: '(필수) 서비스 이용약관 동의',
-    policy: POLICIES.service,
-  },
-  {
-    id: 'privacyAgreed' as const,
-    label: '(필수) 개인정보 수집 및 이용 동의',
-    policy: POLICIES.privacy,
-  },
-  {
-    id: 'marketingAgreed' as const,
-    label: '(선택) 마케팅 수신 동의',
-    policy: null,
-  },
-]
+import { profileSchema } from '../model/schema'
+import { hasAllRequiredAdopterTerms } from '../model/termsAgreements'
+import { StepContainer } from './StepContainer'
+import { PhoneVerificationSection } from './PhoneVerificationSection'
+import { AgreementSection } from './AgreementSection'
 
 const ProfileStep = () => {
-  const { goBack } = useOnboarding()
-  const [openPolicy, setOpenPolicy] = useState<Policy | null>(null)
+  const { userType } = useOnboarding()
+  const { data: activeTerms, isError: isTermsError } = useQuery(termsQueries.list())
+  const termsUnavailable =
+    userType === 'general' &&
+    (isTermsError || (activeTerms !== undefined && !hasAllRequiredAdopterTerms(activeTerms)))
 
-  const { register, control, handleSubmit, watch, setValue, onSubmit, firstErrorMessage } =
-    useStepForm<ProfileFormData>('profile', profileSchema, {
+  const { register, control, handleSubmit, setValue, onSubmit, firstErrorMessage, goBack } =
+    useStepForm('profile', profileSchema, {
       email: '',
-      emailDomain: EMAIL_DOMAINS[0],
       phone: '',
       verificationCode: '',
-      serviceAgreed: false as unknown as true,
-      privacyAgreed: false as unknown as true,
+      phoneVerified: false,
+      serviceAgreed: false,
+      privacyAgreed: false,
       marketingAgreed: false,
-      isOver14: false as unknown as true,
+      isOver14: false,
     })
-
-  const serviceAgreed = watch('serviceAgreed')
-  const privacyAgreed = watch('privacyAgreed')
-  const marketingAgreed = watch('marketingAgreed')
-  const isOver14 = watch('isOver14')
-
-  const phone = watch('phone')
-  const verificationCode = watch('verificationCode')
-
-  // 휴대폰 인증 (백엔드: POST /api/v2/auth/phone/send-code · verify-code)
-  const { mutate: sendCode, isPending: isSending } = useSendVerificationCode()
-  const { mutate: verifyCode, isPending: isVerifying } = useVerifyCode()
-  const [isCodeSent, setIsCodeSent] = useState(false)
-  const [isPhoneVerified, setIsPhoneVerified] = useState(false)
-  const [secondsLeft, setSecondsLeft] = useState(0)
-  const [phoneMessage, setPhoneMessage] = useState<HelpMessageState | null>(null)
-  const [codeMessage, setCodeMessage] = useState<HelpMessageState | null>(null)
-
-  // 인증코드 유효시간 카운트다운 (백엔드 만료 3분과 동일)
-  useEffect(() => {
-    if (!isCodeSent || isPhoneVerified) return
-    const timerId = setInterval(() => {
-      setSecondsLeft((prev) => (prev <= 1 ? 0 : prev - 1))
-    }, 1000)
-    return () => clearInterval(timerId)
-  }, [isCodeSent, isPhoneVerified])
-
-  const formatTimer = (sec: number) =>
-    `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`
-
-  const handleSendCode = () => {
-    if (!phone) {
-      setPhoneMessage({ text: '휴대폰 번호를 입력해주세요.', status: 'error' })
-      return
-    }
-    setPhoneMessage(null)
-    sendCode(phone, {
-      onSuccess: () => {
-        setIsCodeSent(true)
-        setIsPhoneVerified(false)
-        setValue('verificationCode', '')
-        setSecondsLeft(180)
-        setCodeMessage(null)
-        setPhoneMessage({
-          text: '인증번호를 발송했습니다.',
-          status: 'default',
-          icon: CheckRoundedIcon,
-        })
-      },
-      onError: (error) => {
-        setPhoneMessage({
-          text: error instanceof Error ? error.message : '인증번호 발송에 실패했습니다.',
-          status: 'error',
-        })
-      },
-    })
-  }
-
-  const handleVerifyCode = () => {
-    if (!verificationCode) {
-      setCodeMessage({ text: '인증번호를 입력해주세요.', status: 'error' })
-      return
-    }
-    verifyCode(
-      { phone, code: verificationCode },
-      {
-        onSuccess: () => {
-          setIsPhoneVerified(true)
-          setSecondsLeft(0)
-          setCodeMessage({ text: '인증되었습니다.', status: 'success' })
-        },
-        onError: (error) => {
-          setCodeMessage({
-            text: error instanceof Error ? error.message : '인증번호를 다시 입력해주세요',
-            status: 'error',
-          })
-        },
-      },
-    )
-  }
-
-  const allAgreementsChecked = serviceAgreed && privacyAgreed && marketingAgreed && isOver14
-
-  const handleToggleAll = () => {
-    const nextValue = !allAgreementsChecked
-    setValue('serviceAgreed', nextValue as unknown as true)
-    setValue('privacyAgreed', nextValue as unknown as true)
-    setValue('marketingAgreed', nextValue)
-    setValue('isOver14', nextValue as unknown as true)
-  }
 
   return (
-    <StepLayout>
-      <StepTitle subtitle="문자 미수신 시 [인증번호 재전송] 버튼을 눌러주세요">
-        계정 정보를 입력해주세요
-      </StepTitle>
-
-      <div className="flex w-full max-w-[40.625rem] flex-col items-center gap-8 px-4 py-12 tab:gap-[3.625rem] tab:py-12">
-        <StepIndicator />
-
-        {/* 폼 영역 */}
-        <div className="flex w-full flex-col gap-4">
-          <InputField label="이메일" required>
-            <div className="flex items-end gap-1">
-              <Input
-                type="text"
-                placeholder="이메일을 입력해주세요"
-                {...register('email')}
-                className="flex-1"
-              />
-              <Controller
-                name="emailDomain"
-                control={control}
-                render={({ field }) => (
-                  <Dropdown
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    options={EMAIL_DOMAINS.map((d) => ({ value: d, label: d }))}
-                    className="w-[7.6875rem]"
-                  />
-                )}
-              />
-            </div>
-          </InputField>
-
-          <InputField label="휴대폰 번호" required>
-            <div className="flex items-end gap-2">
-              <Input
-                type="tel"
-                placeholder="휴대폰 번호를 입력해주세요"
-                {...register('phone')}
-                className="flex-1"
-                disabled={isPhoneVerified}
-              />
-              <StepActionButton onClick={handleSendCode} disabled={isSending || isPhoneVerified}>
-                {isSending ? '발송 중' : isCodeSent ? '재전송' : '인증번호'}
-              </StepActionButton>
-            </div>
-            {phoneMessage && (
-              <HelpMessage status={phoneMessage.status} icon={phoneMessage.icon} className="mt-1">
-                {phoneMessage.text}
-              </HelpMessage>
-            )}
-          </InputField>
-
-          <InputField label="인증번호" required>
-            <div className="flex items-end gap-2">
-              <div className="relative flex-1">
-                <Input
-                  type="text"
-                  placeholder="인증번호를 입력해주세요"
-                  {...register('verificationCode')}
-                  className="pr-[3.5rem]"
-                  disabled={!isCodeSent || isPhoneVerified}
-                />
-                {isCodeSent && !isPhoneVerified && (
-                  <span className="absolute top-1/2 right-3 -translate-y-1/2 text-[0.875rem] font-medium text-neutral-850">
-                    {formatTimer(secondsLeft)}
-                  </span>
-                )}
-              </div>
-              <StepActionButton
-                onClick={handleVerifyCode}
-                disabled={!isCodeSent || isPhoneVerified || isVerifying}
-              >
-                {isPhoneVerified ? '완료' : isVerifying ? '확인 중' : '확인'}
-              </StepActionButton>
-            </div>
-            {codeMessage && (
-              <HelpMessage status={codeMessage.status} className="mt-1">
-                {codeMessage.text}
-              </HelpMessage>
-            )}
-          </InputField>
-        </div>
-
-        {/* 약관 동의 */}
-        <div className="flex w-full flex-col gap-10">
-          <div className="flex flex-col gap-4">
-            <CheckboxField
-              label="전체 약관동의"
-              checked={!!allAgreementsChecked}
-              onCheckedChange={handleToggleAll}
-            />
-
-            {AGREEMENTS.map((agreement) => (
-              <Controller
-                key={agreement.id}
-                name={agreement.id}
-                control={control}
-                render={({ field }) => (
-                  <CheckboxField
-                    label={agreement.label}
-                    checked={!!field.value}
-                    onCheckedChange={(checked) => field.onChange(checked)}
-                    hasDetailLink={!!agreement.policy}
-                    onDetailClick={() => setOpenPolicy(agreement.policy)}
-                  />
-                )}
-              />
-            ))}
-          </div>
-
-          <Controller
-            name="isOver14"
-            control={control}
-            render={({ field }) => (
-              <CheckboxField
-                label="본인은 만 14세 이상입니다."
-                checked={!!field.value}
-                onCheckedChange={(checked) => field.onChange(checked)}
-              />
-            )}
-          />
-        </div>
-      </div>
-
-      <StepNavButtons
-        onNext={() => handleSubmit(onSubmit)()}
-        onBack={goBack}
-        error={firstErrorMessage}
-      />
-
-      {openPolicy && (
-        <PolicyModal
-          open
-          onOpenChange={(o) => !o && setOpenPolicy(null)}
-          title={openPolicy.title}
-          content={openPolicy.content}
-        />
-      )}
-    </StepLayout>
+    <StepContainer
+      title="계정 정보를 입력해주세요"
+      subtitle="문자 미수신 시 [인증번호 재전송] 버튼을 눌러주세요"
+      onNext={() => handleSubmit(onSubmit)()}
+      onBack={goBack}
+      navError={
+        firstErrorMessage ??
+        (termsUnavailable
+          ? '약관 정보를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.'
+          : undefined)
+      }
+    >
+      <PhoneVerificationSection control={control} register={register} setValue={setValue} />
+      <AgreementSection control={control} setValue={setValue} activeTerms={activeTerms} />
+    </StepContainer>
   )
 }
 

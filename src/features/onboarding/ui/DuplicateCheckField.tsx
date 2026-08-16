@@ -31,20 +31,33 @@ const DuplicateCheckField = ({
   value,
   registration,
   check,
-}: DuplicateCheckFieldProps) => (
-  <InputField label={label} required={required} className="w-full">
-    <div className="flex w-full items-end gap-2">
-      <Input type="text" placeholder={placeholder} {...registration} className="flex-1" />
-      <StepActionButton onClick={() => check.check(value)} disabled={check.isPending}>
-        {check.isPending ? pendingLabel : checkLabel}
-      </StepActionButton>
-    </div>
-    {check.message && (
-      <HelpMessage status={check.message.status} className="mt-1">
-        {check.message.text}
-      </HelpMessage>
-    )}
-  </InputField>
-)
+}: DuplicateCheckFieldProps) => {
+  const { onChange, ...inputRegistration } = registration
+
+  return (
+    <InputField label={label} required={required} className="w-full">
+      <div className="flex w-full items-end gap-2">
+        <Input
+          type="text"
+          placeholder={placeholder}
+          {...inputRegistration}
+          onChange={(event) => {
+            onChange(event)
+            check.reset()
+          }}
+          className="flex-1"
+        />
+        <StepActionButton onClick={() => check.check(value)} disabled={check.isPending}>
+          {check.isPending ? pendingLabel : checkLabel}
+        </StepActionButton>
+      </div>
+      {check.message && (
+        <HelpMessage status={check.message.status} className="mt-1">
+          {check.message.text}
+        </HelpMessage>
+      )}
+    </InputField>
+  )
+}
 
 export { DuplicateCheckField }

@@ -1,12 +1,11 @@
 'use client'
 
 import { useRef, type ChangeEvent } from 'react'
-import { AttachmentIcon } from '@/shared/assets/icons'
+import { FileIcon } from '@/shared/assets/icons'
 import { cn } from '@/shared/lib/cn'
 
 interface DocumentUploadButtonProps {
   label: string
-  variant?: 'primary' | 'secondary'
   /** 파일 선택 시 호출 (선택한 File 전달) */
   onFileSelect?: (file: File) => void
   /** 이미 선택된 파일명 — 있으면 라벨 대신 표시 */
@@ -17,12 +16,11 @@ interface DocumentUploadButtonProps {
 }
 
 /**
- * 서류 업로드 버튼
+ * 서류 업로드 버튼 (Figma 3134-343413)
  * 클릭 시 숨은 파일 input 을 열어 파일을 선택하고, 선택한 File 을 onFileSelect 로 상위 폼에 전달한다.
  */
 const DocumentUploadButton = ({
   label,
-  variant = 'primary',
   onFileSelect,
   selectedFileName,
   accept = 'image/*,application/pdf',
@@ -41,16 +39,14 @@ const DocumentUploadButton = ({
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
+        // px 20 / py 12 / gap 4 / radius 8 — 아이콘 32 + py 24 = 높이 56
         className={cn(
-          'flex w-full items-center gap-[0.75rem] rounded-[1rem] px-[1.25rem] py-[0.9375rem]',
-          variant === 'primary'
-            ? 'h-[3.5625rem] bg-[#a8a8a8] tab:h-[4.375rem]'
-            : 'h-[3.625rem] bg-[#d5d5d5] tab:h-[4.375rem]',
+          'flex w-full items-center gap-1 rounded-lg border border-neutral-300 bg-white px-5 py-3 text-left',
           className,
         )}
       >
-        <AttachmentIcon className="size-[1.5rem] shrink-0 text-white" />
-        <span className="truncate text-[1rem] leading-[1.375rem] font-semibold text-white">
+        <FileIcon className="size-8 shrink-0 text-neutral-700" />
+        <span className="truncate text-base leading-[1.5] font-semibold text-neutral-850">
           {selectedFileName ?? label}
         </span>
       </button>

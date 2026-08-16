@@ -1,9 +1,11 @@
 import { apiClient, API_VERSION, unwrap, unwrapVoid } from '@/shared/api'
 import type {
   ApiResponse,
-  AuthResponseDto,
-  AdopterRegistrationDto,
-  BreederRegistrationDto,
+  UploadBreederDocumentsResponse,
+  RegisterAdopterRequest,
+  RegisterBreederRequest,
+  RegisterTokens,
+  BreederUploadDocumentType,
 } from '@/shared/types'
 
 export const checkEmailDuplicate = (email: string) =>
@@ -40,37 +42,11 @@ export const verifyCode = async (phone: string, code: string): Promise<void> => 
   unwrapVoid(response, '인증 코드 확인에 실패했습니다.')
 }
 
-export const completeAdopterRegistration = async (
-  data: AdopterRegistrationDto,
-): Promise<AuthResponseDto> =>
-  apiClient
-    .post<ApiResponse<AuthResponseDto>>(`${API_VERSION}/auth/social/complete`, {
-      tempId: data.tempId,
-      email: data.email,
-      name: data.name,
-      role: 'adopter',
-      nickname: data.nickname,
-      phone: data.phone,
-      marketingAgreed: data.marketingAgreed ?? false,
-      profileImage: data.profileImage,
-    })
-    .then((res) => unwrap(res, '회원가입에 실패했습니다.'))
-
-export const completeBreederRegistration = async (
-  data: BreederRegistrationDto,
-): Promise<AuthResponseDto> =>
-  apiClient
-    .post<ApiResponse<AuthResponseDto>>(`${API_VERSION}/auth/social/complete`, {
-      ...data,
-      role: 'breeder',
-    })
-    .then((res) => unwrap(res, '회원가입에 실패했습니다.'))
-
 export const uploadBreederDocuments = async (
   tempId: string,
-  files: { type: string; file: File }[],
+  files: { type: BreederUploadDocumentType; file: File }[],
   level: 'new' | 'elite',
-): Promise<{ documentUrls: string[] }> => {
+): Promise<UploadBreederDocumentsResponse> => {
   const formData = new FormData()
   files.forEach(({ file }) => formData.append('files', file))
   formData.append('types', JSON.stringify(files.map(({ type }) => type)))
@@ -78,7 +54,7 @@ export const uploadBreederDocuments = async (
 
   return apiClient
     .post<
-      ApiResponse<{ documentUrls: string[] }>
+      ApiResponse<UploadBreederDocumentsResponse>
     >(`${API_VERSION}/auth/upload-breeder-documents`, formData, { params: { tempId } })
     .then((res) => unwrap(res, '서류 업로드에 실패했습니다.'))
 }
@@ -110,3 +86,18 @@ export const logout = async (): Promise<{ message: string; loggedOutAt: string }
     throw error
   }
 }
+
+/**
+ * 입양자 회원가입 (신규 계약).
+ * social/complete 와 달리 상담 사전정보(counselDefaultProfile)와 약관 동의 이력을 함께 저장한다.
+ */
+export const registerAdopter = async (data: RegisterAdopterRequest): Promise<RegisterTokens> =>
+  apiClient
+    .post<ApiResponse<RegisterTokens>>(`${API_VERSION}/auth/register/adopter`, data)
+    .then((res) => unwrap(res, '회원가입에 실패했습니다.'))
+
+/** 브리더 회원가입 (신규 계약) — 서류는 사전 업로드한 경로를 함께 싣는다 */
+export const registerBreeder = async (data: RegisterBreederRequest): Promise<RegisterTokens> =>
+  apiClient
+    .post<ApiResponse<RegisterTokens>>(`${API_VERSION}/auth/register/breeder`, data)
+    .then((res) => unwrap(res, '회원가입에 실패했습니다.'))

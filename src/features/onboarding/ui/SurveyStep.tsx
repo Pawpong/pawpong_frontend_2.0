@@ -1,28 +1,38 @@
 'use client'
 
-import { useState } from 'react'
 import { Controller, type UseFormRegister } from 'react-hook-form'
-import { useOnboarding } from '../model/OnboardingContext'
 import { useStepForm } from '../model/useStepForm'
-import {
-  useCompleteAdopterRegistration,
-  loadSocialSignupSession,
-  clearSocialSignupSession,
-} from '@/features/auth'
-import { useUpdateMyProfile } from '@/features/profile'
-import { markSurveySkipped } from '@/shared/lib/surveySkip'
-import {
-  surveySchema,
-  type SurveyFormData,
-  type ProfileFormData,
-  type InfoFormData,
-} from '../model/schema'
+import { useAdopterSignup } from '../model/useAdopterSignup'
+import { surveySchema, SURVEY_TEXT_MAX_LENGTH, type SurveyFormData } from '../model/schema'
 import { StepContainer } from './StepContainer'
 import { TextareaField, TextLabel } from '@/shared/ui'
 import { CheckboxField } from './CheckboxField'
+import { ADOPTION_SURVEY_QUESTIONS } from '@/shared/config/adoptionSurvey'
 
 // [refactored] 라벨(선택) + TextareaField 블록 판박이(자기소개·집비우는·공간소개) 통합
 type SurveyTextField = 'selfIntro' | 'awayTime' | 'livingSpace'
+
+const SURVEY_FIELDS: ReadonlyArray<{
+  name: SurveyTextField
+  label: string
+  placeholder: string
+}> = [
+  {
+    name: 'selfIntro',
+    label: ADOPTION_SURVEY_QUESTIONS.selfIntroduction.title,
+    placeholder: ADOPTION_SURVEY_QUESTIONS.selfIntroduction.placeholder,
+  },
+  {
+    name: 'awayTime',
+    label: ADOPTION_SURVEY_QUESTIONS.timeAwayFromHome.title,
+    placeholder: ADOPTION_SURVEY_QUESTIONS.timeAwayFromHome.placeholder,
+  },
+  {
+    name: 'livingSpace',
+    label: ADOPTION_SURVEY_QUESTIONS.livingSpaceDescription.title,
+    placeholder: ADOPTION_SURVEY_QUESTIONS.livingSpaceDescription.placeholder,
+  },
+]
 
 interface SurveyTextareaProps {
   name: SurveyTextField
@@ -39,7 +49,7 @@ const SurveyTextarea = ({ name, label, placeholder, register, length }: SurveyTe
     </TextLabel>
     <TextareaField
       placeholder={placeholder}
-      maxLength={100}
+      maxLength={SURVEY_TEXT_MAX_LENGTH}
       currentLength={length}
       {...register(name)}
     />
@@ -47,99 +57,33 @@ const SurveyTextarea = ({ name, label, placeholder, register, length }: SurveyTe
 )
 
 const SurveyStep = () => {
-  // 입양자 플로우의 마지막 데이터 단계 — 여기서 실제 가입(social/complete)을 호출한다.
-  const { goBack, goNext, formData, setFormData } = useOnboarding()
+  // 입양자 플로우의 마지막 데이터 단계 — 실제 가입 호출은 useAdopterSignup 이 담당한다
+  const { submit, isPending, error } = useAdopterSignup()
 
-  const { register, control, watch, handleSubmit, firstErrorMessage } = useStepForm<SurveyFormData>(
-    'survey',
-    surveySchema,
-    {
-      privacyAgreed: false as unknown as true,
+  const { register, control, watch, setValue, handleSubmit, firstErrorMessage, goBack } =
+    useStepForm('survey', surveySchema, {
+      privacyAgreed: false,
       selfIntro: '',
       awayTime: '',
       livingSpace: '',
-    },
-  )
+    })
 
-  const { mutate: completeAdopter, isPending } = useCompleteAdopterRegistration()
-  const updateMyProfile = useUpdateMyProfile()
-  const [submitError, setSubmitError] = useState<string | null>(null)
-
-  // "다음" → 입양자 가입 완료 처리 (성공 시에만 complete 단계로 이동)
-  const handleComplete = (surveyData: SurveyFormData) => {
-    if (isPending) return
-    setFormData('survey', surveyData)
-    setSubmitError(null)
-
-    const social = loadSocialSignupSession()
-    if (!social?.tempId) {
-      setSubmitError(
-        '소셜 가입 정보가 없습니다. 로그인 화면에서 소셜 로그인으로 다시 시작해주세요.',
-      )
-      return
-    }
-
-    const profile = (formData.profile ?? {}) as Partial<ProfileFormData>
-    const info = (formData.info ?? {}) as Partial<InfoFormData>
-    const email =
-      social.email ||
-      (profile.email && profile.emailDomain ? `${profile.email}@${profile.emailDomain}` : '')
-
-    completeAdopter(
-      {
-        tempId: social.tempId,
-        email,
-        // 백엔드 DTO 는 name 을 필수로 요구 — 소셜 이름이 없으면 닉네임으로 대체
-        name: social.name || info.nickname || '',
-        nickname: info.nickname ?? '',
-        phone: profile.phone,
-        marketingAgreed: profile.marketingAgreed ?? false,
-        // InfoStep 에서 업로드한 프로필 이미지(URL/파일명) — 없으면 미전송
-        profileImage: info.profileImage || undefined,
-      },
-      {
-        onSuccess: async (auth) => {
-          // 발급 토큰을 쿠키로 저장해 로그인 상태로 전환
-          try {
-            await fetch('/api/auth/set-cookie', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                accessToken: auth.accessToken,
-                refreshToken: auth.refreshToken,
-              }),
-              credentials: 'include',
-            })
-          } catch {
-            // 쿠키 저장에 실패해도 가입 자체는 완료된 상태 — 완료 화면으로 진행
-          }
-          // 가입 때 적은 자기소개를 프로필 소개(bio)로 저장 (베스트에포트 — 실패해도 가입은 완료)
-          const intro = surveyData.selfIntro?.trim()
-          if (intro) {
-            try {
-              await updateMyProfile.mutateAsync({ bio: intro })
-            } catch {
-              // bio 저장 실패는 무시 — 마이홈에서 다시 입력 가능
-            }
-          }
-          clearSocialSignupSession()
-          goNext()
-        },
-        onError: (error) => {
-          setSubmitError(error instanceof Error ? error.message : '회원가입 완료에 실패했습니다.')
-        },
-      },
-    )
+  const handleSkip = () => {
+    // 선택 답변의 교차 검증보다 스킵 의도가 우선이므로 폼 값도 먼저 비운다.
+    setValue('selfIntro', '')
+    setValue('awayTime', '')
+    setValue('livingSpace', '')
+    void handleSubmit((data) => submit(data, { skipped: true }))()
   }
 
   return (
     <StepContainer
       title="간단한 조사 양식"
-      onNext={() => handleSubmit(handleComplete)()}
+      onNext={() => handleSubmit((data) => submit(data, { skipped: false }))()}
       onBack={goBack}
       nextLabel={isPending ? '가입 중...' : '다음'}
       nextDisabled={isPending}
-      navError={firstErrorMessage ?? submitError ?? undefined}
+      navError={firstErrorMessage ?? error ?? undefined}
     >
       {/* 콘텐츠 영역 — 섹션 간 gap: 모바일 32px / tab+ 58px (Figma root gap, mt 대신 gap) */}
       <div className="flex w-full flex-col gap-8 tab:gap-[3.625rem]">
@@ -162,9 +106,9 @@ const SurveyStep = () => {
             render={({ field }) => (
               <CheckboxField
                 label="동의합니다"
-                checked={!!field.value}
-                onCheckedChange={(checked) => field.onChange(checked)}
-                className="rounded-lg bg-neutral-100 px-2"
+                checked={field.value}
+                onCheckedChange={field.onChange}
+                className="px-2"
               />
             )}
           />
@@ -174,12 +118,9 @@ const SurveyStep = () => {
         <div className="flex w-full flex-col gap-3">
           <button
             type="button"
-            onClick={() => {
-              // 조사 미작성 표시 후 가입 완료 진행 — 입양 신청(apply) 시 다시 작성받는다
-              markSurveySkipped()
-              handleSubmit(handleComplete)()
-            }}
-            className="flex items-center gap-0 self-end rounded-lg bg-neutral-850 px-2 py-1 text-[0.875rem] font-semibold text-neutral-50"
+            onClick={handleSkip}
+            disabled={isPending}
+            className="flex items-center gap-0 self-end rounded-lg bg-neutral-850 px-2 py-1 text-[0.875rem] font-semibold text-neutral-50 disabled:opacity-40"
           >
             다음에 작성하기
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="size-4">
@@ -190,13 +131,10 @@ const SurveyStep = () => {
             </svg>
           </button>
 
-          {/* 자기소개 */}
           <SurveyTextarea
-            name="selfIntro"
-            label="간단하게 자기소개 부탁드려요"
-            placeholder="성별, 연령대, 거주지, 결혼 계획, 생활 패턴 등"
+            {...SURVEY_FIELDS[0]}
             register={register}
-            length={watch('selfIntro')?.length ?? 0}
+            length={watch(SURVEY_FIELDS[0].name)?.length ?? 0}
           />
 
           {/* 공간/생활패턴 섹션 라벨 — 모바일 14 / tab+ 16 (Figma) */}
@@ -204,21 +142,14 @@ const SurveyStep = () => {
             반려동물이 지낼 공간과 생활패턴에 대해 알려주세요
           </TextLabel>
 
-          <SurveyTextarea
-            name="awayTime"
-            label="평균적으로 집을 비우는 시간은 얼마나 되나요?"
-            placeholder="출퇴근/외출 시간을 포함해 하루 중 집을 비우는 시간"
-            register={register}
-            length={watch('awayTime')?.length ?? 0}
-          />
-
-          <SurveyTextarea
-            name="livingSpace"
-            label="반려동물과 함께 지내게 될 공간을 소개해 주세요"
-            placeholder="생활할 공간과 환경(크기/구조)"
-            register={register}
-            length={watch('livingSpace')?.length ?? 0}
-          />
+          {SURVEY_FIELDS.slice(1).map((field) => (
+            <SurveyTextarea
+              key={field.name}
+              {...field}
+              register={register}
+              length={watch(field.name)?.length ?? 0}
+            />
+          ))}
         </div>
       </div>
     </StepContainer>
