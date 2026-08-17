@@ -12,10 +12,7 @@ const SavedFeedsTab = () => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending, isError } =
     useInfiniteQuery(communityQueries.myBookmarks())
 
-  const feeds = useMemo(
-    () => dedupeBy(flattenPages(data), (post) => post.postId),
-    [data],
-  )
+  const feeds = useMemo(() => dedupeBy(flattenPages(data), (post) => post.postId), [data])
 
   return (
     // 저장피드 전용 패딩 — 모바일 py48·px16 / tab 48 전방향 (tab px는 Container 기본 48)

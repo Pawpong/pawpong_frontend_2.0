@@ -55,10 +55,7 @@ const HallOfFameContent = () => {
   } = useInfiniteQuery(contestQueries.entries(ENTRY_PAGE_SIZE))
   const voteEntry = useVoteContestEntry()
 
-  const entries = useMemo(
-    () => flattenPages(entriesData),
-    [entriesData],
-  )
+  const entries = useMemo(() => flattenPages(entriesData), [entriesData])
   const winners =
     hallOfFameData?.pages[0]?.items.slice(0, PODIUM_COUNT).map((item) => item.winner) ?? []
   const currentRanking = currentContest?.ranking.slice(0, PODIUM_COUNT) ?? []
