@@ -9,6 +9,7 @@ import { dedupeBy } from '@/shared/lib/dedupeBy'
 import { Container, InfiniteScrollTrigger, ListState } from '@/shared/ui'
 import type { AdoptedListingCard as AdoptedListingCardType } from '@/shared/types'
 import { AdoptedListingCard } from './AdoptedListingCard'
+import { flattenPages } from '@/shared/lib/infiniteList'
 
 const AdoptionListTab = () => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending, isError } =
@@ -16,7 +17,7 @@ const AdoptionListTab = () => {
 
   // 입양일 기준 그룹 — 서버가 최신순으로 주므로 삽입 순서를 그대로 유지한다
   const groupedByDate = useMemo(() => {
-    const items = dedupeBy(data?.pages.flatMap((page) => page.items) ?? [], (pet) => pet.petId)
+    const items = dedupeBy(flattenPages(data), (pet) => pet.petId)
     return items.reduce<Record<string, AdoptedListingCardType[]>>((acc, pet) => {
       const date = formatDate(pet.adoptedAt)
       acc[date] ??= []

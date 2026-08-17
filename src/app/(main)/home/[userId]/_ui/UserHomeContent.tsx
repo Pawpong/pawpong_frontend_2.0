@@ -1,8 +1,10 @@
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { Container, Separator } from '@/shared/ui'
+import { flattenPages } from '@/shared/lib/infiniteList'
+import { dedupeBy } from '@/shared/lib/dedupeBy'
 import { adopterQueries } from '@/entities/adopter'
 import { communityQueries } from '@/entities/community'
 import { useCreateOrGetChatRoom } from '@/features/send-message'
@@ -20,9 +22,9 @@ const UserHomeContent = ({ userId }: UserHomeContentProps) => {
   const router = useRouter()
   const { data: profile } = useQuery(adopterQueries.publicProfile(userId))
 
-  // 게시글 탭 — GET /community/posts?authorId=userId
-  const { data: postsData } = useQuery(communityQueries.userPosts(userId))
-  const posts = postsData?.items ?? []
+  // 게시글 탭 — GET /community/posts?authorId=userId (무한 쿼리 첫 페이지만 노출)
+  const { data: postsData } = useInfiniteQuery(communityQueries.userPosts(userId))
+  const posts = dedupeBy(flattenPages(postsData), (post) => post.postId)
 
   // 메시지 보내기 — 채팅방 생성/조회 후 대화로 이동
   const { mutate: startChat, isPending: isStartingChat } = useCreateOrGetChatRoom()

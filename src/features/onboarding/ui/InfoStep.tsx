@@ -1,51 +1,28 @@
 'use client'
 
 import { Controller } from 'react-hook-form'
-import { useOnboarding } from '../model/OnboardingContext'
+import { TextareaField } from '@/shared/ui'
 import { useStepForm } from '../model/useStepForm'
 import { useDuplicateCheck } from '../model/useDuplicateCheck'
 import { useCheckNicknameDuplicate } from '@/features/auth'
-import { infoSchema, type InfoFormData } from '../model/schema'
+import { infoSchema, INTRODUCTION_MAX_LENGTH } from '../model/schema'
+import { INTEREST_KEYWORDS } from '../model/breedKeywords'
 import { StepContainer } from './StepContainer'
 import { ChipSelect } from './ChipSelect'
 import { ProfileImageUpload } from './ProfileImageUpload'
 import { DuplicateCheckField } from './DuplicateCheckField'
 
-const SAMPLE_KEYWORDS = [
-  '비숑',
-  '도베르만',
-  '골든리트리버',
-  '푸들',
-  '시바이누',
-  '말티즈',
-  '포메라니안',
-  '코기',
-  '허스키',
-  '사모예드',
-  '래브라도',
-  '치와와',
-  '닥스훈트',
-  '보더콜리',
-  '슈나우저',
-  '비글',
-  '요크셔테리어',
-  '웰시코기',
-  '진돗개',
-  '삽살개',
-  '풍산개',
-]
-
 const InfoStep = () => {
-  const { goBack } = useOnboarding()
-
-  const { register, control, handleSubmit, watch, onSubmit, firstErrorMessage } =
-    useStepForm<InfoFormData>('info', infoSchema, {
+  const { register, control, handleSubmit, watch, onSubmit, firstErrorMessage, goBack } =
+    useStepForm('info', infoSchema, {
       nickname: '',
       selectedKeywords: [],
-      profileImage: '',
+      profileImage: undefined,
+      introduction: '',
     })
 
   const nickname = watch('nickname')
+  const introduction = watch('introduction')
 
   // 닉네임 중복 검사 (백엔드: POST /api/v2/auth/check-nickname)
   const nicknameCheck = useDuplicateCheck(useCheckNicknameDuplicate(), {
@@ -53,12 +30,17 @@ const InfoStep = () => {
     duplicate: '사용 불가능한 별명입니다.',
     available: '사용 가능한 별명입니다.',
     fallback: '중복 검사에 실패했습니다.',
+    unchecked: '닉네임 중복 확인을 완료해주세요.',
+  })
+
+  const handleNext = handleSubmit((data) => {
+    if (nicknameCheck.validate(data.nickname)) onSubmit(data)
   })
 
   return (
     <StepContainer
       title="회원 정보를 입력해주세요"
-      onNext={() => handleSubmit(onSubmit)()}
+      onNext={handleNext}
       onBack={goBack}
       navError={firstErrorMessage}
     >
@@ -71,31 +53,42 @@ const InfoStep = () => {
           )}
         />
 
-        {/* 별명 + 중복 확인 (Figma 966-20830) — 공통 DuplicateCheckField */}
-        <DuplicateCheckField
-          label="별명"
-          required
-          placeholder="별명을 입력해주세요"
-          checkLabel="중복 확인"
-          pendingLabel="확인 중"
-          value={nickname}
-          registration={register('nickname')}
-          check={nicknameCheck}
-        />
+        {/* 포퐁 활동명 · 소개 (Figma 3414-752441) — 필드 사이 spacing/20 */}
+        <div className="flex w-full flex-col gap-5">
+          {/* 시안의 input-btn(gap 8, items-end) 구조 그대로 — 공통 DuplicateCheckField */}
+          <DuplicateCheckField
+            label="포퐁 활동명"
+            required
+            placeholder="별명을 입력해주세요"
+            checkLabel="중복 확인"
+            pendingLabel="확인 중"
+            value={nickname}
+            registration={register('nickname')}
+            check={nicknameCheck}
+          />
 
-        {/* 관심있는 키워드 (ChipSelect 자체가 w-full flex-col) */}
-        <Controller
-          name="selectedKeywords"
-          control={control}
-          render={({ field }) => (
-            <ChipSelect
-              label="관심있는 키워드"
-              items={SAMPLE_KEYWORDS}
-              value={field.value}
-              onChange={field.onChange}
-            />
-          )}
-        />
+          <TextareaField
+            label="소개"
+            placeholder="입력해보세요"
+            maxLength={INTRODUCTION_MAX_LENGTH}
+            currentLength={introduction?.length ?? 0}
+            {...register('introduction')}
+          />
+
+          {/* 관심있는 키워드 — 활동명·소개와 같은 필드 묶음 (ChipSelect 자체가 w-full flex-col) */}
+          <Controller
+            name="selectedKeywords"
+            control={control}
+            render={({ field }) => (
+              <ChipSelect
+                label="관심있는 키워드"
+                items={[...INTEREST_KEYWORDS]}
+                value={field.value}
+                onChange={field.onChange}
+              />
+            )}
+          />
+        </div>
       </>
     </StepContainer>
   )

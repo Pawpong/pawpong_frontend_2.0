@@ -25,7 +25,7 @@ const ContestEntryContent = () => {
 
   return (
     <div className="flex min-h-screen flex-col bg-white">
-      <PostFormHeader title="명예의 전당 콘테스트 참여하기" />
+      <PostFormHeader title="명예의 전당 콘테스트 참여하기" className="tab:px-[6.25rem]" />
 
       <Container className="flex-1 pt-[0.719rem] pb-[7.5rem] tab:px-[6.25rem] tab:pt-[5.5rem]">
         <div className="flex flex-col gap-[1.125rem] tab:flex-row tab:gap-0">

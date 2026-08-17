@@ -3,15 +3,13 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { Container } from '@/shared/ui'
+import { Container, TextareaField, TextLabel } from '@/shared/ui'
 import { communityQueries } from '@/entities/community'
 import { profileQueries } from '@/entities/profile'
 import { useSubmitCommunityPostForm } from '@/features/community'
 import {
   usePostForm,
   PostFormHeader,
-  PostFormTextArea,
-  PostFormToolbar,
   PostFormCTA,
   ImageUploadArea,
   VisibilitySelect,
@@ -50,7 +48,6 @@ const PostForm = ({ postId, post }: PostFormProps) => {
     textareaRef,
     handleAddImages,
     handleRemoveImage,
-    handleEmojiSelect,
   } = usePostForm({ initialText: post?.body ?? '', initialImages: post?.photoUrls ?? [] })
 
   const [visibility, setVisibility] = useState<VisibilityType>(post?.visibility ?? 'public')
@@ -81,29 +78,43 @@ const PostForm = ({ postId, post }: PostFormProps) => {
     <div className="flex min-h-screen flex-col bg-white">
       <PostFormHeader title={formText.title} mobileTitle={formText.mobileTitle} />
 
-      <Container className="flex-1 pt-[0.719rem] pb-[7.5rem] tab:px-[6.25rem] tab:pt-[5.5rem]">
-        <div className="flex flex-col gap-[1.125rem] tab:flex-row tab:gap-0">
-          <div className="tab:w-[26.256rem] tab:shrink-0">
-            <ImageUploadArea images={images} onAdd={handleAddImages} onRemove={handleRemoveImage} />
-          </div>
-
-          <div className="flex flex-1 flex-col tab:ml-[2.5rem]">
-            <div className="flex flex-col gap-[0.375rem] tab:gap-[1.125rem]">
-              <PostFormTextArea
-                ref={textareaRef}
-                value={text}
-                onChange={setText}
-                placeholder="귀여운 동물을 자랑해보세요"
+      {/* Figma 1056-46147(PC) / 1056-46891(tab·mo): PC는 이미지 372 + 본문 2단(gap 100), 그 아래는 세로 스택 */}
+      <Container className="flex-1 py-5 pb-[7.5rem] pc:py-12">
+        {/* PC 콘텐츠 폭 1280 고정 (1440 - 좌우 80) */}
+        <div className="mx-auto w-full pc:max-w-320">
+          <div className="flex flex-col gap-[1.1875rem] pc:flex-row pc:gap-25">
+            <div className="flex flex-col gap-1 pc:w-93 pc:shrink-0 pc:gap-2">
+              <TextLabel size="14" requirement="선택">
+                이미지
+              </TextLabel>
+              <ImageUploadArea
+                size="post"
+                hideLabel
+                images={images}
+                onAdd={handleAddImages}
+                onRemove={handleRemoveImage}
               />
-              <PostFormToolbar onEmojiSelect={handleEmojiSelect} />
             </div>
 
-            <div className="mt-[1.125rem] tab:hidden">
-              <VisibilitySelect value={visibility} onChange={setVisibility} />
-            </div>
-
-            {error && <p className="mt-[0.75rem] text-sm text-red-500">{error}</p>}
+            {/* 본문 입력 높이: tab·mo 105(Textarea 기본) / PC 180 */}
+            <TextareaField
+              ref={textareaRef}
+              label="게시글"
+              required
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder="입력해보세요"
+              wrapperClassName="pc:flex-1"
+              className="pc:h-45"
+            />
           </div>
+
+          {/* 공개 설정 — tab·mo는 본문 아래 풀 너비, PC는 하단 CTA 바 왼쪽(Figma 1054-36832) */}
+          <div className="mt-3 pc:hidden">
+            <VisibilitySelect value={visibility} onChange={setVisibility} />
+          </div>
+
+          {error && <p className="mt-3 text-sm text-error-500">{error}</p>}
         </div>
       </Container>
 
@@ -115,7 +126,13 @@ const PostForm = ({ postId, post }: PostFormProps) => {
         isValid={canPublish}
         isSaveDraftValid={canSaveDraft}
         isSubmitting={isSubmitting}
-        leftSlot={<VisibilitySelect value={visibility} onChange={setVisibility} />}
+        leftSlot={
+          // Figma 1054-36832: 바 왼쪽 드롭다운 100px.
+          // 고정폭이면 '팔로워 공개'가 잘려 최소폭으로 두고 라벨만큼 늘어나게 한다
+          <div className="hidden min-w-25 pc:block">
+            <VisibilitySelect value={visibility} onChange={setVisibility} />
+          </div>
+        }
       />
     </div>
   )

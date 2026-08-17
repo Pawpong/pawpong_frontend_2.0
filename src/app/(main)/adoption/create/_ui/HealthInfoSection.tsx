@@ -1,208 +1,147 @@
 'use client'
 
-import { type Control, Controller, useWatch } from 'react-hook-form'
-import { InfoIcon } from '@/shared/assets/icons'
-import { Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui'
-import type { AdoptionCreateFormValues } from '../_lib/schema'
+import { Controller, type FieldErrors, type UseFormRegister, useFieldArray } from 'react-hook-form'
+import { Dropdown, Input, InputField } from '@/shared/ui'
+import { HEALTH_RECORD_TEXT_MAX_LENGTH } from '../_lib/constants'
+import { createGeneticTestRow, createVaccinationRow } from '../_lib/defaultValues'
+import { DOSE_OPTIONS, GENETIC_TEST_OPTIONS, VACCINATION_OPTIONS } from '../_lib/formOptions'
+import type { AdoptionCreateFormValues, AdoptionFormControl } from '../_lib/schema'
+import { DateInput } from './MaskedInput'
 import { FormSection } from './FormSection'
-import { AddRowButton } from './AddRowButton'
+import { HealthStatusBlock } from './HealthStatusBlock'
+import { RemoveRowButton } from './AddRowButton'
 
 interface HealthInfoSectionProps {
-  control: Control<AdoptionCreateFormValues>
+  control: AdoptionFormControl
+  register: UseFormRegister<AdoptionCreateFormValues>
+  errors: FieldErrors<AdoptionCreateFormValues>
 }
 
-const HealthInfoSection = ({ control }: HealthInfoSectionProps) => {
-  const vaccinationStatus = useWatch({ control, name: 'vaccinationStatus' })
-  const geneticTestStatus = useWatch({ control, name: 'geneticTestStatus' })
-  const geneticTestResult = useWatch({ control, name: 'geneticTests.0.result' })
-
-  const isVaccinationIncomplete =
-    vaccinationStatus === 'in-progress' || vaccinationStatus === 'not-started'
-  const isGeneticTestIncomplete =
-    geneticTestStatus === 'not-tested' || geneticTestStatus === 'incomplete'
+const HealthInfoSection = ({ control, register, errors }: HealthInfoSectionProps) => {
+  const {
+    fields: vaccinationFields,
+    append: appendVaccination,
+    remove: removeVaccination,
+  } = useFieldArray({ control, name: 'vaccinations' })
+  const {
+    fields: geneticTestFields,
+    append: appendGeneticTest,
+    remove: removeGeneticTest,
+  } = useFieldArray({ control, name: 'geneticTests' })
 
   return (
-    <FormSection
-      title="건강 정보"
-      required
-      icon={<InfoIcon className="size-4 text-text-primary" />}
-      className="gap-[0.921rem] tab:gap-[2.188rem]"
-    >
-      {/* 예방 접종 현황 */}
-      <div className="flex flex-col gap-3 tab:gap-3">
-        <p className="text-sm leading-[1.375rem] font-semibold text-text-primary tab:px-0 tab:text-base">
-          예방 접종 현황
-        </p>
-        <div className="flex flex-col gap-1.5">
-          <Controller
-            name="vaccinationStatus"
-            control={control}
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="접종완료" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="completed">접종 완료</SelectItem>
-                  <SelectItem value="in-progress">접종 중</SelectItem>
-                  <SelectItem value="not-started">미접종</SelectItem>
-                </SelectContent>
-              </Select>
-            )}
-          />
-          {isVaccinationIncomplete ? (
-            <Controller
-              name="vaccinationReason"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  placeholder="미완료한 이유작성 (예: 태어난지 한달도 안됨)"
-                  value={field.value}
-                  onChange={field.onChange}
-                />
-              )}
-            />
-          ) : (
-            <>
-              <div className="flex gap-1">
-                <Controller
-                  name="vaccinations.0.name"
-                  control={control}
-                  render={({ field }) => (
+    <FormSection title="건강 정보">
+      {/* Figma 3137-387069: 제목 아래 콘텐츠 래퍼 — 예방 접종/유전병 두 블록 사이만 40 */}
+      <div className="flex flex-col gap-10">
+        <HealthStatusBlock
+          control={control}
+          register={register}
+          label="예방 접종 현황"
+          options={VACCINATION_OPTIONS}
+          statusName="vaccinationStatus"
+          statusError={errors.vaccinationStatus?.message}
+          reasonName="vaccinationReason"
+          reasonError={errors.vaccinationReason?.message}
+          onAdd={() => appendVaccination(createVaccinationRow())}
+        >
+          {vaccinationFields.map((row, index) => {
+            const rowErrors = errors.vaccinations?.[index]
+            return (
+              <div key={row.id} className="flex flex-col gap-2">
+                <div className="flex flex-col gap-4 tab:flex-row">
+                  <InputField className="tab:flex-1" error={rowErrors?.name?.message}>
                     <Input
                       placeholder="접종명"
-                      className="flex-1"
-                      value={field.value}
-                      onChange={field.onChange}
+                      maxLength={HEALTH_RECORD_TEXT_MAX_LENGTH}
+                      {...register(`vaccinations.${index}.name`)}
                     />
-                  )}
-                />
-                <Controller
-                  name="vaccinations.0.date"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      placeholder="접종일 (예: 2024-03-15)"
-                      className="flex-1"
-                      value={field.value}
-                      onChange={field.onChange}
+                  </InputField>
+                  <InputField className="tab:flex-1" error={rowErrors?.date?.message}>
+                    <DateInput
+                      placeholder="접종 날짜 (YYYY-MM-DD)"
+                      registration={register(`vaccinations.${index}.date`)}
                     />
-                  )}
-                />
-                <Controller
-                  name="vaccinations.0.dose"
-                  control={control}
-                  render={({ field }) => (
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="w-16 tab:w-[4.5rem]">
-                        <SelectValue placeholder="차수" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Array.from({ length: 10 }, (_, i) => (
-                          <SelectItem key={i + 1} value={String(i + 1)}>
-                            {i + 1}차
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
+                  </InputField>
+                  <InputField error={rowErrors?.dose?.message}>
+                    <Controller
+                      name={`vaccinations.${index}.dose`}
+                      control={control}
+                      render={({ field }) => (
+                        <Dropdown
+                          options={DOSE_OPTIONS}
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          placeholder="차수"
+                          className="tab:w-25"
+                        />
+                      )}
+                    />
+                  </InputField>
+                </div>
+                {/* [refactored] 행 삭제 버튼 공통화 */}
+                <RemoveRowButton
+                  label="접종 기록 삭제"
+                  onClick={() => removeVaccination(index)}
+                  visible={vaccinationFields.length > 1}
                 />
               </div>
-              <AddRowButton label="작성란 추가하기" />
-            </>
-          )}
-        </div>
-      </div>
+            )
+          })}
+        </HealthStatusBlock>
 
-      {/* 유전병 검사 */}
-      <div className="flex flex-col gap-3 tab:gap-3">
-        <p className="text-sm leading-[1.375rem] font-semibold text-text-primary tab:px-0 tab:text-base">
-          유전병 검사
-        </p>
-        <div className="flex flex-col gap-1.5">
-          <Controller
-            name="geneticTestStatus"
-            control={control}
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="검사완료" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="completed">검사 완료</SelectItem>
-                  <SelectItem value="incomplete">검사 미완료</SelectItem>
-                  <SelectItem value="not-tested">미검사</SelectItem>
-                </SelectContent>
-              </Select>
-            )}
-          />
-          {isGeneticTestIncomplete ? (
-            <Controller
-              name="geneticTestReason"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  placeholder="미완료한 이유작성 (예: 태어난지 한달도 안됨)"
-                  value={field.value}
-                  onChange={field.onChange}
-                />
-              )}
-            />
-          ) : (
-            <>
-              <Controller
-                name="geneticTests.0.date"
-                control={control}
-                render={({ field }) => (
+        <HealthStatusBlock
+          control={control}
+          register={register}
+          label="유전병 검사"
+          options={GENETIC_TEST_OPTIONS}
+          statusName="geneticTestStatus"
+          statusError={errors.geneticTestStatus?.message}
+          reasonName="geneticTestReason"
+          reasonError={errors.geneticTestReason?.message}
+          onAdd={() => appendGeneticTest(createGeneticTestRow())}
+        >
+          {geneticTestFields.map((row, index) => {
+            const rowErrors = errors.geneticTests?.[index]
+            return (
+              <div key={row.id} className="flex flex-col gap-4">
+                <div className="flex flex-col gap-4 tab:flex-row">
+                  <InputField className="tab:flex-1" error={rowErrors?.testName?.message}>
+                    <Input
+                      placeholder="유전병명"
+                      maxLength={HEALTH_RECORD_TEXT_MAX_LENGTH}
+                      {...register(`geneticTests.${index}.testName`)}
+                    />
+                  </InputField>
+                  <InputField className="tab:flex-1" error={rowErrors?.result?.message}>
+                    <Input
+                      placeholder="검사 결과"
+                      maxLength={HEALTH_RECORD_TEXT_MAX_LENGTH}
+                      {...register(`geneticTests.${index}.result`)}
+                    />
+                  </InputField>
+                </div>
+                <InputField error={rowErrors?.date?.message}>
+                  <DateInput
+                    placeholder="검진 날짜 (YYYY-MM-DD)"
+                    registration={register(`geneticTests.${index}.date`)}
+                  />
+                </InputField>
+                <InputField error={rowErrors?.institution?.message}>
                   <Input
-                    placeholder="검진날짜 (예: 2024-03-15)"
-                    value={field.value}
-                    onChange={field.onChange}
+                    placeholder="검사 기관"
+                    maxLength={HEALTH_RECORD_TEXT_MAX_LENGTH}
+                    {...register(`geneticTests.${index}.institution`)}
                   />
-                )}
-              />
-              <Controller
-                name="geneticTests.0.institution"
-                control={control}
-                render={({ field }) => (
-                  <Input placeholder="검사 기관" value={field.value} onChange={field.onChange} />
-                )}
-              />
-              <div className="flex gap-1.5">
-                <Controller
-                  name="geneticTests.0.result"
-                  control={control}
-                  render={({ field }) => (
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className={field.value === 'abnormal' ? 'w-24 shrink-0' : ''}>
-                        <SelectValue placeholder="검사결과" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="normal">정상</SelectItem>
-                        <SelectItem value="abnormal">비정상</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  )}
+                </InputField>
+                <RemoveRowButton
+                  label="검사 기록 삭제"
+                  onClick={() => removeGeneticTest(index)}
+                  visible={geneticTestFields.length > 1}
                 />
-                {geneticTestResult === 'abnormal' && (
-                  <Controller
-                    name="geneticTests.0.diseaseName"
-                    control={control}
-                    render={({ field }) => (
-                      <Input
-                        placeholder="병명"
-                        className="flex-1"
-                        value={field.value}
-                        onChange={field.onChange}
-                      />
-                    )}
-                  />
-                )}
               </div>
-              <AddRowButton label="작성란 추가하기" />
-            </>
-          )}
-        </div>
+            )
+          })}
+        </HealthStatusBlock>
       </div>
     </FormSection>
   )

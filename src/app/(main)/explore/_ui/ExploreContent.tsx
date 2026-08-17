@@ -33,6 +33,7 @@ import {
   SEARCH_PLACEHOLDERS,
 } from '../_lib/constants'
 import type { ExploreType } from '../_lib/constants'
+import { flattenPages, getTotalItems } from '@/shared/lib/infiniteList'
 
 type AdoptionListFilter = 'all' | 'available' | 'popular'
 
@@ -83,14 +84,10 @@ const ExploreContent = () => {
   // 무한스크롤 페이지 병합 시 listingId 중복 제거 — 서버 페이지네이션이 경계에서 항목을
   // 겹쳐 주더라도 React key 중복(카드 중복/누락)이 발생하지 않도록 방어한다.
   const listings = useMemo(
-    () =>
-      dedupeBy(
-        (listData?.pages.flatMap((page) => page.items) ?? []).map(mapAdoptionCard),
-        (listing) => listing.listingId,
-      ),
+    () => dedupeBy(flattenPages(listData).map(mapAdoptionCard), (listing) => listing.listingId),
     [listData],
   )
-  const totalCount = listData?.pages[0]?.pagination.totalItems ?? 0
+  const totalCount = getTotalItems(listData)
 
   const handleTypeChange = useCallback(
     (type: ExploreType) => {

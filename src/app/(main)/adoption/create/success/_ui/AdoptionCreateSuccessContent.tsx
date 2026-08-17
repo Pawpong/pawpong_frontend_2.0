@@ -2,13 +2,11 @@ import Link from 'next/link'
 import { Container } from '@/shared/ui'
 
 interface AdoptionCreateSuccessContentProps {
-  /** 작성된 분양글의 petId (없으면 내 분양목록으로 폴백) */
-  petId?: string
+  /** 방금 작성한 분양글 id — 작성 완료 후 쿼리로 전달된다 */
+  petId: string
 }
 
 const AdoptionCreateSuccessContent = ({ petId }: AdoptionCreateSuccessContentProps) => {
-  const detailHref = petId ? `/adoption/${petId}` : '/adoption/my-listings'
-
   return (
     <Container className="flex min-h-screen flex-col py-10">
       <div className="flex flex-1 flex-col items-center justify-center rounded-2xl bg-[#f5f5f5] px-6">
@@ -28,7 +26,7 @@ const AdoptionCreateSuccessContent = ({ petId }: AdoptionCreateSuccessContentPro
             홈으로
           </Link>
           <Link
-            href={detailHref}
+            href={`/adoption/${encodeURIComponent(petId)}`}
             className="flex h-12 w-[11.9375rem] items-center justify-center rounded-full bg-[#d4d4d4] text-base font-semibold text-text-primary"
           >
             작성한 글 보러가기

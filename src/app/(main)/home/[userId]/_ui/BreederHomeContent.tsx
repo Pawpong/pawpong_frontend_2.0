@@ -1,18 +1,18 @@
 'use client'
 
 import { useState } from 'react'
-import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { Container } from '@/shared/ui'
-import type { AdoptionListingCard } from '@/shared/types'
-import { breederQueries } from '@/entities/breeder'
+import { Container, InfiniteScrollTrigger, ListState } from '@/shared/ui'
+import { flattenPages } from '@/shared/lib/infiniteList'
+import { dedupeBy } from '@/shared/lib/dedupeBy'
+import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
 import { adoptionQueries } from '@/entities/adoption'
+import { breederQueries } from '@/entities/breeder'
 import { communityQueries } from '@/entities/community'
-import { uniqueBy } from '@/shared/lib/uniqueBy'
 import { useCreateOrGetChatRoom } from '@/features/send-message'
 import { useToggleFollow } from '@/features/profile'
-import { mapAdoptionCard } from '@/app/(main)/explore/_lib/mapAdoptionCard'
 import { ProfileCard } from '../../_ui/ProfileCard'
 import { BreederListingCard } from '../../_ui/BreederListingCard'
 import { FavoriteAdoptionCard } from '@/features/adoption'
@@ -21,6 +21,10 @@ import { HomeTitle } from '../../_ui/HomeTitle'
 import { PostList } from '../../_ui/PostList'
 import { FooterPlaceholder } from '../../_ui/FooterPlaceholder'
 import { BREEDER_HOME_TABS } from '../../_ui/constants'
+
+// 이 탭이 곧 분양글 목록 전체라 마이홈 프리뷰(6)보다 크게 받는다 (서버 상한 60)
+const HOME_LISTING_PAGE_SIZE = 16
+const HOME_POST_PAGE_SIZE = 30
 
 interface BreederHomeContentProps {
   userId: string
@@ -46,17 +50,29 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
 
   // 팔로우 토글 (브리더 공개 프로필엔 isFollowing 필드가 없어 초기값 false)
   const { isFollowing, toggleFollow, isPending: isFollowPending } = useToggleFollow(userId, false)
+  const {
+    data: listingsData,
+    isPending: isListingsPending,
+    isError: isListingsError,
+    fetchNextPage: fetchNextListings,
+    hasNextPage: hasNextListings,
+    isFetchingNextPage: isFetchingNextListings,
+  } = useInfiniteQuery(adoptionQueries.breederPets(userId, undefined, HOME_LISTING_PAGE_SIZE))
+  const {
+    data: postsData,
+    isPending: isPostsPending,
+    isError: isPostsError,
+    fetchNextPage: fetchNextPosts,
+    hasNextPage: hasNextPosts,
+    isFetchingNextPage: isFetchingNextPosts,
+  } = useInfiniteQuery(communityQueries.userPosts(userId, HOME_POST_PAGE_SIZE))
 
-  // 분양 개체 탭 — GET /adoption?breederId=userId
-  const { data: listingsData } = useInfiniteQuery(adoptionQueries.breederPets(userId))
-  const listings: AdoptionListingCard[] = uniqueBy(
-    (listingsData?.pages.flatMap((page) => page.items) ?? []).map(mapAdoptionCard),
+  // 무한스크롤 페이지 병합 시 id 중복 제거 (React key 중복 방어)
+  const listings = dedupeBy(
+    flattenPages(listingsData).map(mapAdoptionCard),
     (listing) => listing.listingId,
   )
-
-  // 게시글 탭 — GET /community/posts?authorId=userId
-  const { data: postsData } = useQuery(communityQueries.userPosts(userId))
-  const posts = postsData?.items ?? []
+  const posts = dedupeBy(flattenPages(postsData), (post) => post.postId)
 
   if (!profile) return null
 
@@ -86,25 +102,53 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
       <HomeTabs tabs={BREEDER_HOME_TABS} activeTab={activeTab} onTabChange={setActiveTab}>
         <TabsContent value="listings" className="mt-0">
           <Container className="pc:px-[10rem]">
-            {/* Mobile */}
-            <div className="grid grid-cols-2 gap-[0.625rem] py-[1.25rem] tab:hidden">
-              {listings.map((listing) => (
-                <BreederListingCard key={listing.listingId} listing={listing} />
-              ))}
-            </div>
-            {/* Desktop */}
-            <div className="hidden tab:mt-[2.959rem] tab:grid tab:grid-cols-3 tab:gap-6">
-              {listings.map((listing) => (
-                <FavoriteAdoptionCard key={listing.listingId} listing={listing} />
-              ))}
-            </div>
+            <ListState
+              isPending={isListingsPending}
+              isError={isListingsError}
+              isEmpty={listings.length === 0}
+              loadingText="분양글을 불러오는 중입니다."
+              errorText="분양글을 불러오지 못했습니다."
+              emptyText="등록된 분양글이 없습니다."
+            >
+              <>
+                <div className="grid grid-cols-2 gap-[0.625rem] py-[1.25rem] tab:hidden">
+                  {listings.map((listing) => (
+                    <BreederListingCard key={listing.listingId} listing={listing} />
+                  ))}
+                </div>
+                <div className="hidden tab:mt-[2.959rem] tab:grid tab:grid-cols-3 tab:gap-6">
+                  {listings.map((listing) => (
+                    <FavoriteAdoptionCard key={listing.listingId} listing={listing} />
+                  ))}
+                </div>
+              </>
+            </ListState>
+            <InfiniteScrollTrigger
+              onIntersect={() => void fetchNextListings()}
+              hasNextPage={hasNextListings ?? false}
+              isFetchingNextPage={isFetchingNextListings}
+            />
           </Container>
         </TabsContent>
 
         <TabsContent value="posts" className="mt-0">
           {/* 세로 여백은 PostList가 아닌 래퍼가 담당 (spacing-40) */}
           <Container className="tab:py-10 pc:px-[10rem]">
-            <PostList posts={posts} />
+            <ListState
+              isPending={isPostsPending}
+              isError={isPostsError}
+              isEmpty={posts.length === 0}
+              loadingText="게시글을 불러오는 중입니다."
+              errorText="게시글을 불러오지 못했습니다."
+              emptyText="게시글이 없습니다."
+            >
+              <PostList posts={posts} />
+            </ListState>
+            <InfiniteScrollTrigger
+              onIntersect={() => void fetchNextPosts()}
+              hasNextPage={hasNextPosts ?? false}
+              isFetchingNextPage={isFetchingNextPosts}
+            />
           </Container>
         </TabsContent>
       </HomeTabs>

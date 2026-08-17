@@ -7,13 +7,15 @@ import { Container } from '@/shared/ui'
 interface PostFormHeaderProps {
   title: string
   mobileTitle?: string
+  /** 본문 여백이 Container 기본과 다른 화면에서 헤더를 맞추기 위한 오버라이드 */
+  className?: string
 }
 
-const PostFormHeader = ({ title, mobileTitle }: PostFormHeaderProps) => {
+const PostFormHeader = ({ title, mobileTitle, className }: PostFormHeaderProps) => {
   const router = useRouter()
 
   return (
-    <Container className="tab:px-[6.25rem]">
+    <Container className={className}>
       <header className="flex h-[3rem] items-center gap-[0.625rem] tab:h-[5.5rem] tab:justify-between tab:gap-0">
         <button type="button" onClick={() => router.back()} aria-label="닫기">
           <CloseIcon className="size-5 text-text-primary" />

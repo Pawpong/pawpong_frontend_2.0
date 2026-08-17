@@ -1,11 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
 import type { FieldPath } from 'react-hook-form'
 import { CloseIcon, PawIcon } from '@/shared/assets/icons'
 import { Container, CtaModal, ExitConfirmModal } from '@/shared/ui'
 import { isSurveySkipped } from '@/shared/lib/surveySkip'
 import type { AdoptionDetailDto } from '@/shared/types'
+import { ADOPTION_SURVEY_QUESTIONS } from '@/shared/config/adoptionSurvey'
 import { useApplicationForm } from '../_lib/useApplicationForm'
 import type { ApplicationFormValues } from '../_lib/schema'
 import { PetInfoCard } from './PetInfoCard'
@@ -39,20 +40,22 @@ const CONSENT_CHECKS: { name: FieldPath<ApplicationFormValues>; label: string }[
 const SURVEY_FIELDS: { name: ApplicationTextField; title: string; placeholder: string }[] = [
   {
     name: 'selfIntroduction',
-    title: '간단하게 자기소개 부탁드려요',
-    placeholder: '성별, 연령대, 거주지, 결혼 계획, 생활 패턴 등',
+    ...ADOPTION_SURVEY_QUESTIONS.selfIntroduction,
   },
   {
     name: 'timeAwayFromHome',
-    title: '평균적으로 집을 비우는 시간은 얼마나 되나요?',
-    placeholder: '출퇴근/외출 시간을 포함해 하루 중 집을 비우는 시간',
+    ...ADOPTION_SURVEY_QUESTIONS.timeAwayFromHome,
   },
   {
     name: 'livingSpaceDescription',
-    title: '반려동물과 함께 지내게 될 공간을 소개해주세요',
-    placeholder: '생활할 공간과 환경(크기/ 구조)',
+    ...ADOPTION_SURVEY_QUESTIONS.livingSpaceDescription,
   },
 ]
+
+const subscribeToSurveySkip = (onStoreChange: () => void) => {
+  window.addEventListener('storage', onStoreChange)
+  return () => window.removeEventListener('storage', onStoreChange)
+}
 
 const ApplicationForm = ({ detail }: ApplicationFormProps) => {
   const {
@@ -75,8 +78,7 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
   } = useApplicationForm(detail)
 
   // 온보딩에서 조사 양식을 건너뛴 입양자에게만 조사 항목을 노출 (localStorage → 클라이언트에서만 읽음)
-  const [needsSurvey, setNeedsSurvey] = useState(false)
-  useEffect(() => setNeedsSurvey(isSurveySkipped()), [])
+  const needsSurvey = useSyncExternalStore(subscribeToSurveySkip, isSurveySkipped, () => false)
 
   return (
     <div>

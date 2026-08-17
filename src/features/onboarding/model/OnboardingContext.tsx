@@ -1,19 +1,27 @@
 'use client'
 
-import { createContext, useCallback, useContext, useMemo, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { type UserType, ONBOARDING_STEPS } from './types'
+import { createContext, useCallback, useContext, useEffect, useMemo } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
+import {
+  type UserType,
+  type OnboardingFormData,
+  type FormStepId,
+  type StepConfig,
+  ONBOARDING_STEPS,
+} from './types'
+import { useOnboardingForm } from './useOnboardingForm'
 
 interface OnboardingState {
   userType: UserType
   currentStepIndex: number
-  formData: Record<string, unknown>
-  steps: typeof ONBOARDING_STEPS.general
-  totalSteps: number
-  currentStepId: string
-  isFirstStep: boolean
-  isLastStep: boolean
-  setFormData: (stepId: string, data: Record<string, unknown>) => void
+  formData: Partial<OnboardingFormData>
+  steps: StepConfig[]
+  /** 스텝 검증 통과 — 값 저장 + 완료 표시 */
+  setFormData: <K extends FormStepId>(stepId: K, data: OnboardingFormData[K]) => void
+  /** 검증 없이 입력값만 보관 (이전 단계로 이동할 때) */
+  saveDraft: <K extends FormStepId>(stepId: K, data: OnboardingFormData[K]) => void
+  /** 이 스텝부터 뒤쪽 완료 표시 해제 (앞 단계를 고치면 뒤 단계 값이 낡는다) */
+  invalidateFrom: (stepId: FormStepId) => void
   goNext: () => void
   goBack: () => void
 }
@@ -22,40 +30,46 @@ const OnboardingContext = createContext<OnboardingState | null>(null)
 
 interface OnboardingProviderProps {
   userType: UserType
-  initialStepIndex?: number
   children: React.ReactNode
 }
 
-const OnboardingProvider = ({
-  userType,
-  initialStepIndex = 0,
-  children,
-}: OnboardingProviderProps) => {
+const OnboardingProvider = ({ userType, children }: OnboardingProviderProps) => {
   const router = useRouter()
+  const pathname = usePathname()
   const steps = ONBOARDING_STEPS[userType]
-  const [currentStepIndex, setCurrentStepIndex] = useState(initialStepIndex)
-  const [formData, setFormDataState] = useState<Record<string, unknown>>({})
 
-  const setFormData = useCallback((stepId: string, data: Record<string, unknown>) => {
-    setFormDataState((prev) => ({ ...prev, [stepId]: data }))
+  // 현재 스텝은 URL 에서 파생한다. state 로 복제하면 브라우저 뒤로/앞으로에서 URL 과 어긋나
+  // 진행 표시와 goNext 목적지가 틀어진다
+  const currentStepIndex = Math.max(
+    steps.findIndex((step) => step.id === pathname.split('/').pop()),
+    0,
+  )
+
+  // 입력값은 sessionStorage 에 산다(zustand persist) — 새로고침해도 유지된다
+  const formData = useOnboardingForm((state) => state.drafts)
+  const setFormData = useOnboardingForm((state) => state.completeStep)
+  const saveDraft = useOnboardingForm((state) => state.saveDraft)
+  const invalidateStoreFrom = useOnboardingForm((state) => state.invalidateFrom)
+
+  const invalidateFrom = useCallback(
+    (stepId: FormStepId) => invalidateStoreFrom(userType, stepId),
+    [invalidateStoreFrom, userType],
+  )
+
+  // 복원은 하이드레이션 이후에 (persist 의 skipHydration) — 서버 HTML 과 첫 렌더를 맞추기 위해서다.
+  // 복원값의 폼 반영은 useStepForm 이 담당한다
+  useEffect(() => {
+    void useOnboardingForm.persist.rehydrate()
   }, [])
 
   const goNext = useCallback(() => {
-    if (currentStepIndex < steps.length - 1) {
-      const nextStep = steps[currentStepIndex + 1]
-      setCurrentStepIndex((prev) => prev + 1)
-      router.push(`/signup/${userType}/${nextStep.id}`)
-    }
+    const nextStep = steps[currentStepIndex + 1]
+    if (nextStep) router.push(`/signup/${userType}/${nextStep.id}`)
   }, [currentStepIndex, steps, userType, router])
 
   const goBack = useCallback(() => {
-    if (currentStepIndex > 0) {
-      const prevStep = steps[currentStepIndex - 1]
-      setCurrentStepIndex((prev) => prev - 1)
-      router.push(`/signup/${userType}/${prevStep.id}`)
-    } else {
-      router.push('/signup')
-    }
+    const prevStep = steps[currentStepIndex - 1]
+    router.push(prevStep ? `/signup/${userType}/${prevStep.id}` : '/signup')
   }, [currentStepIndex, steps, userType, router])
 
   const value = useMemo(
@@ -64,15 +78,23 @@ const OnboardingProvider = ({
       currentStepIndex,
       formData,
       steps,
-      totalSteps: steps.length,
-      currentStepId: steps[currentStepIndex].id,
-      isFirstStep: currentStepIndex === 0,
-      isLastStep: currentStepIndex === steps.length - 1,
       setFormData,
+      saveDraft,
+      invalidateFrom,
       goNext,
       goBack,
     }),
-    [userType, currentStepIndex, formData, steps, setFormData, goNext, goBack],
+    [
+      userType,
+      currentStepIndex,
+      formData,
+      steps,
+      setFormData,
+      saveDraft,
+      invalidateFrom,
+      goNext,
+      goBack,
+    ],
   )
 
   return <OnboardingContext.Provider value={value}>{children}</OnboardingContext.Provider>

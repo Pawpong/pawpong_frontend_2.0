@@ -1,38 +1,54 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 
 interface UseImageUploadOptions {
   maxImages?: number
   onDirty?: () => void
 }
 
+/** 미리보기 URL(images)과 원본 File(files)을 1:1로 유지한다 — 제출 시 files를 업로드해 파일명을 얻는다 */
 const useImageUpload = ({ maxImages = 10, onDirty }: UseImageUploadOptions = {}) => {
   const [images, setImages] = useState<string[]>([])
-  // 미리보기 URL(images) 과 1:1 로 대응하는 실제 File 객체 — 업로드 시 서버 전송에 사용.
   const [files, setFiles] = useState<File[]>([])
+  const imagesRef = useRef<string[]>([])
+
+  useEffect(
+    () => () => {
+      imagesRef.current.forEach((imageUrl) => URL.revokeObjectURL(imageUrl))
+      imagesRef.current = []
+    },
+    [],
+  )
 
   const handleAddImages = useCallback(
     (fileList: FileList) => {
-      const added = Array.from(fileList)
-      const newImages = added.map((file) => URL.createObjectURL(file))
-      setImages((prev) => [...prev, ...newImages].slice(0, maxImages))
-      setFiles((prev) => [...prev, ...added].slice(0, maxImages))
+      const room = maxImages - files.length
+      if (room <= 0) return
+      const added = Array.from(fileList).slice(0, room)
+      setImages((prev) => {
+        const next = [...prev, ...added.map((file) => URL.createObjectURL(file))]
+        imagesRef.current = next
+        return next
+      })
+      setFiles((prev) => [...prev, ...added])
       onDirty?.()
     },
-    [maxImages, onDirty],
+    [maxImages, files.length, onDirty],
   )
 
   const handleRemoveImage = useCallback((index: number) => {
     setImages((prev) => {
       const removed = prev[index]
       if (removed) URL.revokeObjectURL(removed)
-      return prev.filter((_, i) => i !== index)
+      const next = prev.filter((_, i) => i !== index)
+      imagesRef.current = next
+      return next
     })
     setFiles((prev) => prev.filter((_, i) => i !== index))
   }, [])
 
-  return { images, files, setImages, setFiles, handleAddImages, handleRemoveImage }
+  return { images, files, handleAddImages, handleRemoveImage }
 }
 
 export { useImageUpload }

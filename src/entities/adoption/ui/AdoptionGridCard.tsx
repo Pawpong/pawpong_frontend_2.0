@@ -8,15 +8,29 @@ import type { AdoptionListingCard } from '@/shared/types'
 import { FavoriteToggle, PopularBadge } from '@/shared/ui'
 import { AdoptionStatusBadge } from './AdoptionStatusBadge'
 
+/** 이 카드가 실제로 그리는 필드만 (분양글 목록처럼 다른 응답 타입도 그대로 넘길 수 있게) */
+type AdoptionGridCardListing = Pick<
+  AdoptionListingCard,
+  'listingId' | 'name' | 'gender' | 'ageText' | 'thumbnailUrl' | 'status'
+> & { isPopular?: boolean }
+
 interface AdoptionGridCardProps {
-  listing: AdoptionListingCard
+  listing: AdoptionGridCardListing
   isFavorite?: boolean
   onToggle?: () => void
+  /** 관심 하트 노출 (기본 true). 내 분양글처럼 관심 등록이 없는 화면은 false */
+  showFavorite?: boolean
   className?: string
 }
 
 /** 탐색/홈 공용 세로형 카드 (프레젠테이셔널). 관심 연결은 호출부(features 래퍼)가 담당한다. */
-const AdoptionGridCard = ({ listing, isFavorite, onToggle, className }: AdoptionGridCardProps) => {
+const AdoptionGridCard = ({
+  listing,
+  isFavorite,
+  onToggle,
+  showFavorite = true,
+  className,
+}: AdoptionGridCardProps) => {
   const { status } = listing
 
   return (
@@ -50,12 +64,15 @@ const AdoptionGridCard = ({ listing, isFavorite, onToggle, className }: Adoption
           <AdoptionStatusBadge status={status} size="md" className="shrink-0 tab:hidden" />
         </div>
 
-        <FavoriteToggle
-          isFavorite={isFavorite}
-          onToggle={onToggle}
-          className="absolute right-2 bottom-1 tab:right-3 tab:bottom-2"
-          iconClassName={cn('size-8 tab:size-12', !isFavorite && '!text-neutral-50')}
-        />
+        {/* 하트는 클릭을 가로채므로(preventDefault) 토글이 없는 화면에선 아예 그리지 않는다 */}
+        {showFavorite && (
+          <FavoriteToggle
+            isFavorite={isFavorite}
+            onToggle={onToggle}
+            className="absolute right-2 bottom-1 tab:right-3 tab:bottom-2"
+            iconClassName={cn('size-8 tab:size-12', !isFavorite && '!text-neutral-50')}
+          />
+        )}
       </div>
 
       <div className="flex min-h-[4.3125rem] items-start justify-between gap-2 p-2 tab:p-3">
@@ -85,3 +102,4 @@ const AdoptionGridCard = ({ listing, isFavorite, onToggle, className }: Adoption
 }
 
 export { AdoptionGridCard }
+export type { AdoptionGridCardListing }

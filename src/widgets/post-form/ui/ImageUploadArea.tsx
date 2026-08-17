@@ -2,7 +2,8 @@
 
 import { useRef, useState } from 'react'
 import Image from 'next/image'
-import { ImageIcon, CloseIcon } from '@/shared/assets/icons'
+import { tv, type VariantProps } from 'tailwind-variants'
+import { CameraIcon, ImageIcon, CloseIcon } from '@/shared/assets/icons'
 import { ImageModal } from '@/shared/ui'
 import {
   Dialog,
@@ -15,7 +16,47 @@ import {
 
 const MAX_IMAGES = 10
 
-interface ImageUploadAreaProps {
+/**
+ * 업로드 타일 지오메트리.
+ * - default: 기존 화면(분양글 등장록·부모견·사육환경·명예의전당)이 쓰는 기존 규격
+ * - post: 커뮤니티 게시글 작성 (Figma 1056-46032 PC / 1056-46732 tab·mo) — mo·tab 100·radius4, PC 180·radius8
+ */
+const imageUploadVariants = tv({
+  slots: {
+    root: 'flex flex-col',
+    tiles: 'flex',
+    addButton: 'flex shrink-0 flex-col items-center',
+    addIcon: '',
+    addCounter: '',
+    preview: 'relative shrink-0 overflow-hidden',
+  },
+  variants: {
+    size: {
+      default: {
+        root: 'gap-[0.375rem] tab:gap-3',
+        tiles: 'gap-[0.375rem] tab:flex-wrap tab:gap-x-[1.438rem] tab:gap-y-3',
+        addButton:
+          'size-[3.793rem] rounded-[0.438rem] border border-[#cdcdcd] pt-[0.802rem] pr-[1.162rem] pb-[0.569rem] pl-[1.131rem] tab:h-[12.623rem] tab:w-[12.363rem] tab:justify-center tab:gap-[0.188rem] tab:rounded-[0.596rem] tab:border-fill-placeholder tab:p-0',
+        addIcon: 'size-[1.459rem] text-text-primary tab:size-[3.285rem]',
+        addCounter: 'text-[0.729rem] font-medium text-text-primary tab:text-[1.642rem]',
+        preview:
+          'size-[3.793rem] rounded-[0.438rem] border border-[#cdcdcd] bg-fill-placeholder tab:h-[12.623rem] tab:w-[12.363rem] tab:rounded-[0.596rem] tab:border-0',
+      },
+      post: {
+        root: 'gap-1 pc:gap-2',
+        tiles: 'flex-wrap gap-3',
+        addButton:
+          'size-25 justify-center gap-0.5 rounded border border-neutral-500 bg-white p-2 pc:size-45 pc:gap-2 pc:rounded-lg',
+        addIcon: 'size-8 text-neutral-700',
+        addCounter: 'text-sm leading-[1.5] font-semibold text-neutral-700 pc:text-base',
+        preview: 'size-25 rounded border border-neutral-500 pc:size-45 pc:rounded-lg',
+      },
+    },
+  },
+  defaultVariants: { size: 'default' },
+})
+
+interface ImageUploadAreaProps extends VariantProps<typeof imageUploadVariants> {
   images: string[]
   onAdd: (files: FileList) => void
   onRemove: (index: number) => void
@@ -36,7 +77,10 @@ const ImageUploadArea = ({
   onSetRepresentative,
   hideLabel = false,
   maxImages = MAX_IMAGES,
+  size,
 }: ImageUploadAreaProps) => {
+  const styles = imageUploadVariants({ size })
+  const AddIcon = size === 'post' ? CameraIcon : ImageIcon
   const inputRef = useRef<HTMLInputElement>(null)
   const [modalOpen, setModalOpen] = useState(false)
   const [modalIndex, setModalIndex] = useState(0)
@@ -79,7 +123,7 @@ const ImageUploadArea = ({
   const isRepresentative = (index: number) => hasRepresentative && representativeIndex === index
 
   return (
-    <div className="flex flex-col gap-[0.375rem] tab:gap-3">
+    <div className={styles.root()}>
       {!hideLabel && (
         <p className="text-body-s text-text-primary">
           <span className="font-bold">이미지</span>{' '}
@@ -90,15 +134,11 @@ const ImageUploadArea = ({
         </p>
       )}
 
-      <div className="flex gap-[0.375rem] tab:flex-wrap tab:gap-x-[1.438rem] tab:gap-y-3">
+      <div className={styles.tiles()}>
         {/* Upload Button */}
-        <button
-          type="button"
-          onClick={handleClick}
-          className="flex size-[3.793rem] shrink-0 flex-col items-center rounded-[0.438rem] border border-[#cdcdcd] pt-[0.802rem] pr-[1.162rem] pb-[0.569rem] pl-[1.131rem] tab:h-[12.623rem] tab:w-[12.363rem] tab:items-center tab:justify-center tab:gap-[0.188rem] tab:rounded-[0.596rem] tab:border-fill-placeholder tab:p-0"
-        >
-          <ImageIcon className="size-[1.459rem] text-text-primary tab:size-[3.285rem]" />
-          <span className="text-[0.729rem] font-medium text-text-primary tab:text-[1.642rem]">
+        <button type="button" onClick={handleClick} className={styles.addButton()}>
+          <AddIcon className={styles.addIcon()} />
+          <span className={styles.addCounter()}>
             {images.length}/{maxImages}
           </span>
         </button>
@@ -114,10 +154,7 @@ const ImageUploadArea = ({
 
         {/* Image Previews */}
         {images.map((src, index) => (
-          <div
-            key={src}
-            className="relative size-[3.793rem] shrink-0 overflow-hidden rounded-[0.438rem] border border-[#cdcdcd] bg-fill-placeholder tab:h-[12.623rem] tab:w-[12.363rem] tab:rounded-[0.596rem] tab:border-0"
-          >
+          <div key={src} className={styles.preview()}>
             <button
               type="button"
               className="size-full"
@@ -155,8 +192,8 @@ const ImageUploadArea = ({
               <CloseIcon className="size-2.5 text-white tab:size-3.5" />
             </button>
 
-            {/* 순번 — desktop only */}
-            {!hasRepresentative && (
+            {/* 순번 — desktop only. post 타일(100·180)에는 45px 배지가 과해 노출하지 않는다 */}
+            {!hasRepresentative && size !== 'post' && (
               <div className="pointer-events-none absolute top-0 left-0 hidden size-[2.822rem] items-center justify-center tab:flex">
                 <span className="text-[1.562rem] leading-[1.552rem] font-bold text-white">
                   {index + 1}

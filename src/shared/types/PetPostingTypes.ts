@@ -32,13 +32,13 @@ export interface ParentPetSnapshot {
   relation: ParentRelation
   breed: string
   name: string
-  birthDate?: string
+  birthDate: string
   photoFileName?: string
 }
 
 /** 사육 환경 */
 export interface PetBreedingEnvironment {
-  description: string
+  description?: string
   photoFileName?: string
 }
 
@@ -99,6 +99,7 @@ export interface MyPetPostingCard {
   petId: string
   name: string
   breed: string
+  petType: CommunityPetType
   gender: PetGender
   ageDescription: string
   price: number
@@ -109,6 +110,8 @@ export interface MyPetPostingCard {
   inquiryCount: number
   favoriteCount: number
   viewCount: number
+  /** 활성 채팅방 수 */
+  chatCount: number
   createdAt: string
 }
 

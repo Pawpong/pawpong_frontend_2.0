@@ -1,16 +1,33 @@
+import { PlusIcon } from '@/shared/assets/icons'
+import { Button } from '@/shared/ui'
+
 interface AddRowButtonProps {
   label: string
-  onClick?: () => void
+  onClick: () => void
+  disabled?: boolean
 }
 
-const AddRowButton = ({ label, onClick }: AddRowButtonProps) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className="mx-auto h-7 rounded-[0.375rem] bg-[#a8a8a8] px-[0.625rem] text-sm font-medium text-white tab:h-auto tab:w-[28.75rem] tab:rounded-full tab:p-[0.625rem] tab:text-sm"
-  >
+/** 작성란/부모정보 추가 버튼 (Figma FillButton 3137-387118) — h-32 radius 8, 아이콘 16 + 14/bold */
+const AddRowButton = ({ label, onClick, disabled }: AddRowButtonProps) => (
+  <Button variant="fill" size="sm" onClick={onClick} disabled={disabled} className="w-full">
+    <PlusIcon className="size-4" />
     {label}
-  </button>
+  </Button>
 )
 
-export { AddRowButton }
+interface RemoveRowButtonProps {
+  label: string
+  onClick: () => void
+  /** 행이 하나뿐이면 지울 수 없다 — 호출부의 `fields.length > 1` 판정을 여기로 모았다 */
+  visible: boolean
+}
+
+// [refactored] 접종·유전병·부모 세 곳에서 같던 행 삭제 버튼
+const RemoveRowButton = ({ label, onClick, visible }: RemoveRowButtonProps) =>
+  visible ? (
+    <Button variant="text" onClick={onClick} className="self-end">
+      {label}
+    </Button>
+  ) : null
+
+export { AddRowButton, RemoveRowButton }

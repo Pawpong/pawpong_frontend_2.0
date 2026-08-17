@@ -1,95 +1,85 @@
 'use client'
 
-import Link from 'next/link'
+import { useState } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { Container, PageHeader, Separator, InfiniteScrollTrigger } from '@/shared/ui'
-import { FavoriteAdoptionCard } from '@/features/adoption'
-import { petPostingQueries, toListingCard } from '@/entities/pet-posting'
-import { uniqueBy } from '@/shared/lib/uniqueBy'
-import { useListingsFilter } from '../_lib/useListingsFilter'
-import { StatusFilterChips } from './StatusFilterChips'
-import { ReservedListingCard } from './ReservedListingCard'
-import { BreederListingCard } from '@/app/(main)/home/_ui/BreederListingCard'
+import {
+  Container,
+  FilterChip,
+  InfiniteScrollTrigger,
+  InputUpload,
+  ListState,
+  NavigationBar,
+  TextLabel,
+} from '@/shared/ui'
+import type { PetStatus } from '@/shared/types'
+import { ADOPTION_CARD_STATUS, AdoptionGridCard } from '@/entities/adoption'
+import { petPostingQueries } from '@/entities/pet-posting'
+import { mapMyPetPostingCard } from '@/shared/lib/mapMyPetPostingCard'
+import { flattenPages, getTotalItems } from '@/shared/lib/infiniteList'
+import { dedupeBy } from '@/shared/lib/dedupeBy'
 
+// [refactored] 상태 목록·라벨 단일 소스는 ADOPTION_CARD_STATUS (카드 뱃지와 같은 곳)
+const STATUS_FILTERS = Object.keys(ADOPTION_CARD_STATUS) as PetStatus[]
+const PAGE_SIZE = 16
+
+/** 브리더 분양 페이지 (Figma 3138-493376) — 작성 유도 바 + 상태 필터 + 내 분양글 그리드 */
 const MyListingsContent = () => {
-  // 내 분양글 실데이터 — 마이홈 분양목록 탭과 동일 API(GET /api/v2/breeder-pet-posting/me).
-  // 상태 칩은 로드된 아이템에 대한 클라이언트 필터(useListingsFilter)로 유지
-  const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteQuery(petPostingQueries.myList())
-  // 무한스크롤 페이지 병합 시 listingId 중복 제거 (React key 중복 방어)
-  const allListings = uniqueBy(
-    (data?.pages.flatMap((page) => page.items) ?? []).map(toListingCard),
-    (listing) => listing.listingId,
-  )
-  const { activeStatus, setActiveStatus, filteredListings, isGroupedView, groupedByDate } =
-    useListingsFilter(allListings)
+  // 같은 칩을 다시 누르면 해제 -> 전체
+  const [status, setStatus] = useState<PetStatus | null>(null)
+
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending, isError } =
+    useInfiniteQuery(petPostingQueries.myList(status ?? undefined, PAGE_SIZE))
+
+  // 무한스크롤 페이지 병합 시 petId 중복 제거 (React key 중복 방어)
+  const postings = dedupeBy(flattenPages(data), (posting) => posting.petId)
+  // 시안의 '분양 목록 109' — 필터 적용 후 전체 개수 (첫 페이지 응답 기준)
+  const totalCount = getTotalItems(data)
 
   return (
     <div className="flex w-full flex-col pb-12">
-      <PageHeader title="분양 페이지" backHref="/home" />
+      <NavigationBar title="분양 페이지" backHref="/home" />
 
-      <Separator className="bg-border-light" />
+      <InputUpload text="분양할 동물 작성하러가기" href="/adoption/create" />
 
-      {/* CTA: 분양글 작성 */}
-      <Container>
-        <Link
-          href="/adoption/create"
-          className="block py-3 text-sm leading-[1.375rem] font-medium text-text-primary tab:py-4 tab:text-base"
-        >
-          {`분양할 아이가 있나요? 글 작성하러 가기 >`}
-        </Link>
-      </Container>
+      <Container className="flex flex-col gap-3 py-6 tab:py-10">
+        <div className="flex items-center justify-between gap-2">
+          <TextLabel size="16">분양 목록 {totalCount}</TextLabel>
 
-      <Separator className="bg-border-light" />
-
-      {/* 분양목록 헤더 + 필터 */}
-      <Container>
-        <div className="flex items-center justify-between pt-5 tab:pt-8">
-          <p className="text-sm leading-[1.5] font-bold text-text-primary tab:text-xl">분양목록</p>
-          <StatusFilterChips activeStatus={activeStatus} onStatusChange={setActiveStatus} />
-        </div>
-
-        {isLoading ? (
-          <p className="py-10 text-center text-sm text-neutral-700">불러오는 중...</p>
-        ) : isError ? (
-          <p className="py-10 text-center text-sm text-neutral-700">
-            분양글을 불러오지 못했습니다.
-          </p>
-        ) : filteredListings.length === 0 ? (
-          <p className="py-10 text-center text-sm text-neutral-700">등록된 분양글이 없습니다.</p>
-        ) : isGroupedView && groupedByDate ? (
-          /* 예약중: 날짜 그룹 + 가로형 리스트 */
-          <div className="flex flex-col gap-3 py-5 tab:gap-[3.787rem] tab:py-8">
-            {[...groupedByDate.entries()].map(([date, listings]) => (
-              <div key={date} className="flex flex-col gap-1.5">
-                <p className="text-sm leading-[1.375rem] font-medium text-text-primary">{date}</p>
-                <div className="flex flex-col gap-2">
-                  {listings.map((listing) => (
-                    <ReservedListingCard key={listing.listingId} listing={listing} />
-                  ))}
-                </div>
-              </div>
+          <div className="flex flex-wrap items-center gap-2">
+            {STATUS_FILTERS.map((value) => (
+              <FilterChip
+                key={value}
+                size="responsive"
+                selected={status === value}
+                onClick={() => setStatus(status === value ? null : value)}
+              >
+                {ADOPTION_CARD_STATUS[value].label}
+              </FilterChip>
             ))}
           </div>
-        ) : (
-          <>
-            {/* Mobile: 2열 그리드 */}
-            <div className="grid grid-cols-2 gap-[0.625rem] py-[1.25rem] tab:hidden">
-              {filteredListings.map((listing) => (
-                <BreederListingCard key={listing.listingId} listing={listing} />
-              ))}
-            </div>
+        </div>
 
-            {/* Desktop: 3열 그리드 */}
-            <div className="hidden tab:mt-6 tab:grid tab:grid-cols-3 tab:gap-6 tab:pb-8">
-              {filteredListings.map((listing) => (
-                <FavoriteAdoptionCard key={listing.listingId} listing={listing} />
-              ))}
-            </div>
-          </>
-        )}
+        <ListState
+          isPending={isPending}
+          isError={isError}
+          isEmpty={postings.length === 0}
+          loadingText="분양 목록을 불러오는 중입니다."
+          errorText="분양 목록을 불러오지 못했습니다."
+          emptyText="등록한 분양글이 없습니다."
+        >
+          <div className="grid grid-cols-2 gap-x-3 gap-y-6 tab:grid-cols-3 pc:grid-cols-4">
+            {postings.map((posting) => (
+              <AdoptionGridCard
+                key={posting.petId}
+                listing={mapMyPetPostingCard(posting)}
+                showFavorite={false}
+              />
+            ))}
+          </div>
+        </ListState>
+
         <InfiniteScrollTrigger
-          onIntersect={fetchNextPage}
+          onIntersect={() => void fetchNextPage()}
           hasNextPage={hasNextPage ?? false}
           isFetchingNextPage={isFetchingNextPage}
         />

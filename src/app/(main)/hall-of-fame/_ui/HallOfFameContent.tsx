@@ -18,6 +18,7 @@ import { ContestVoteCard, contestQueries } from '@/entities/contest'
 import { useVoteContestEntry } from '@/features/contest'
 import { useAuthStatus } from '@/features/auth'
 import { HallOfFamePodium } from '@/widgets/hall-of-fame'
+import { flattenPages } from '@/shared/lib/infiniteList'
 
 const PODIUM_COUNT = 3
 const ENTRY_PAGE_SIZE = 16
@@ -58,7 +59,7 @@ const HallOfFameContent = () => {
   // 무한스크롤 페이지 병합 시 id 중복 제거 — 서버 페이지네이션이 경계에서 항목을
   // 겹쳐 주더라도 React key 중복(카드 중복/누락)이 발생하지 않도록 방어한다.
   const entries = useMemo(
-    () => dedupeBy(entriesData?.pages.flatMap((page) => page.items) ?? [], (entry) => entry.id),
+    () => dedupeBy(flattenPages(entriesData), (entry) => entry.id),
     [entriesData],
   )
   const winners =

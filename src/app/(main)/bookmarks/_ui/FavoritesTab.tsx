@@ -2,18 +2,20 @@
 
 import { useMemo, useState } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { adoptionQueries } from '@/entities/adoption'
+import { ADOPTION_CARD_STATUS, adoptionQueries } from '@/entities/adoption'
 import { AdoptionCardGrid } from '@/features/adoption'
 import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
 import { Container, FilterChip, InfiniteScrollTrigger, ListState, SectionHeader } from '@/shared/ui'
 import type { PetStatus } from '@/shared/types'
+import { flattenPages, getTotalItems } from '@/shared/lib/infiniteList'
 
-// 서버 status 필터 (미지정 = 전체) — 클라이언트에서 거르지 않고 쿼리 파라미터로 넘긴다
+// 서버 status 필터 (미지정 = 전체) — 클라이언트에서 거르지 않고 쿼리 파라미터로 넘긴다.
+// [refactored] 상태 라벨은 카드 뱃지와 같은 ADOPTION_CARD_STATUS 에서 가져온다 (예약중은 관심 목록에 없음)
 const STATUS_FILTERS: Array<{ value: PetStatus | 'all'; label: string }> = [
   { value: 'all', label: '전체' },
-  { value: 'available', label: '분양중' },
-  { value: 'adopted', label: '분양완료' },
+  { value: 'available', label: ADOPTION_CARD_STATUS.available.label },
+  { value: 'adopted', label: ADOPTION_CARD_STATUS.adopted.label },
 ]
 
 const FavoritesTab = () => {
@@ -24,14 +26,10 @@ const FavoritesTab = () => {
 
   // 페이지 경계에서 서버가 항목을 겹쳐 주더라도 React key가 중복되지 않도록 방어 (탐색과 동일)
   const listings = useMemo(
-    () =>
-      dedupeBy(
-        (data?.pages.flatMap((page) => page.items) ?? []).map(mapAdoptionCard),
-        (listing) => listing.listingId,
-      ),
+    () => dedupeBy(flattenPages(data).map(mapAdoptionCard), (listing) => listing.listingId),
     [data],
   )
-  const totalCount = data?.pages[0]?.pagination.totalItems ?? 0
+  const totalCount = getTotalItems(data)
 
   return (
     // 섹션 패딩을 Container로 일원화 (세로 20/40/40 · 가로 16/48/80, 모바일만 기본값 20→16 오버라이드)
