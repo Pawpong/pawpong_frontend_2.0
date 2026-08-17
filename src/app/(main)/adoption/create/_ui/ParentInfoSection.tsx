@@ -5,20 +5,12 @@ import { Dropdown, Input, InputField } from '@/shared/ui'
 import { PARENT_IMAGE_MAX, PARENT_MAX_COUNT, PARENT_TEXT_MAX_LENGTH } from '../_lib/constants'
 import { RELATIONSHIP_OPTIONS } from '../_lib/formOptions'
 import type { AdoptionCreateFormValues, AdoptionFormControl } from '../_lib/schema'
+// [refactored] 손으로 다시 적던 ParentRows 를 훅이 만드는 실제 타입에서 가져온다 (정의 1곳)
+import type { ParentRows } from '../_lib/useAdoptionCreateForm'
 import { FormSection } from './FormSection'
 import { AddRowButton, RemoveRowButton } from './AddRowButton'
 import { DateInput } from './MaskedInput'
 import { ImageField } from './ImageField'
-
-/** 행 목록과 행별 사진을 함께 넘겨받는다 — 둘의 동기화는 useAdoptionCreateForm 이 책임진다 */
-interface ParentRows {
-  fields: { id: string }[]
-  append: () => void
-  remove: (index: number) => void
-  imagesOf: (rowId: string) => string[]
-  addImage: (rowId: string, files: FileList) => void
-  removeImage: (rowId: string) => void
-}
 
 interface ParentInfoSectionProps {
   control: AdoptionFormControl

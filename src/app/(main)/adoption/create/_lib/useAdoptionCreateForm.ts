@@ -155,4 +155,10 @@ const useAdoptionCreateForm = () => {
   }
 }
 
+/**
+ * 부모 행 목록 + 행별 사진 번들 — ParentInfoSection 이 그대로 소비한다.
+ * 훅이 만드는 실제 형태에서 파생시켜, 여기서 필드를 늘려도 소비처 타입이 조용히 어긋나지 않게 한다.
+ */
+export type ParentRows = ReturnType<typeof useAdoptionCreateForm>['parentRows']
+
 export { useAdoptionCreateForm }
