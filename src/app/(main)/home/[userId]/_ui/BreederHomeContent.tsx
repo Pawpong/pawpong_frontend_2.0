@@ -18,7 +18,8 @@ import { PostList } from '../../_ui/PostList'
 import { FooterPlaceholder } from '../../_ui/FooterPlaceholder'
 import { BREEDER_HOME_TABS } from '../../_ui/constants'
 
-const HOME_LISTING_PAGE_SIZE = 6
+// 이 탭이 곧 분양글 목록 전체라 마이홈 프리뷰(6)보다 크게 받는다 (서버 상한 60)
+const HOME_LISTING_PAGE_SIZE = 16
 const HOME_POST_PAGE_SIZE = 30
 
 interface BreederHomeContentProps {
