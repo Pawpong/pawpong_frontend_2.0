@@ -40,6 +40,14 @@ export const communityQueries = {
       staleTime: STALE_TIME.DEFAULT,
     }),
 
+  userPosts: (userId: string, pageSize = 30) =>
+    createQuery({
+      queryKey: [...communityQueries.all(), 'userPosts', userId, pageSize],
+      queryFn: () => getCommunityPosts({ authorId: userId, pageSize }),
+      enabled: !!userId,
+      staleTime: STALE_TIME.DEFAULT,
+    }),
+
   // 임시저장(draft) 한 내 글 — 본인만 조회 가능. 인증 필요.
   drafts: (enabled = true, pageSize = 30) =>
     createQuery({
