@@ -18,7 +18,8 @@ import { flattenPages } from '@/shared/lib/infiniteList'
 import { profileQueries } from '@/entities/profile'
 import { communityQueries } from '@/entities/community'
 import { AdoptionGridCard } from '@/entities/adoption'
-import { mapMyPetPostingCard, petPostingQueries } from '@/entities/pet-posting'
+import { petPostingQueries } from '@/entities/pet-posting'
+import { mapMyPetPostingCard } from '@/shared/lib/mapMyPetPostingCard'
 import type { AdopterPublicProfile, BreederPublicProfile } from '@/shared/types'
 import { useDeleteCommunityPost } from '@/features/community'
 import { ProfileCard } from './ProfileCard'
@@ -103,7 +104,7 @@ const MyHomeContent = () => {
   // 프로필 조회 전에는 역할을 모르므로 선택값을 비워두고, 조회 후 역할별 기본 탭을 사용한다.
   // useState(defaultTab)로 바로 시드하면 최초 adopter 기본값('posts')이 브리더에게도 고정된다.
   const [selectedTab, setSelectedTab] = useState<string | null>(null)
-  const activeTab = tabs.some((tab) => tab.id === selectedTab) ? selectedTab! : defaultTab
+  const activeTab = tabs.find((tab) => tab.id === selectedTab)?.id ?? defaultTab
   const posts = myPostsData?.items ?? []
   const draftCount = draftsData?.items.length ?? 0
   const listings = flattenPages(myListingsData)
