@@ -13,7 +13,8 @@ import {
 } from '@/shared/ui'
 import type { PetStatus } from '@/shared/types'
 import { ADOPTION_CARD_STATUS, AdoptionGridCard } from '@/entities/adoption'
-import { mapMyPetPostingCard, petPostingQueries } from '@/entities/pet-posting'
+import { petPostingQueries } from '@/entities/pet-posting'
+import { mapMyPetPostingCard } from '@/shared/lib/mapMyPetPostingCard'
 import { flattenPages, getTotalItems } from '@/shared/lib/infiniteList'
 
 // [refactored] 상태 목록·라벨 단일 소스는 ADOPTION_CARD_STATUS (카드 뱃지와 같은 곳)
