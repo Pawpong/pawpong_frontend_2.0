@@ -22,9 +22,11 @@ const getErrorMessage = (error: unknown) =>
 
 /** 파일 업로드부터 글 생성, 실패한 업로드 정리까지 하나의 제출 단위로 관리한다. */
 const useCreatePostingSubmission = () => {
-  const uploadMutation = useUploadMultipleFiles()
-  const deleteMutation = useDeleteFile()
-  const createMutation = useCreatePetPosting()
+  // mutateAsync 는 observer 에 한 번 바인딩된 안정 참조지만, useMutation 이 돌려주는
+  // 객체 자체는 렌더마다 새로 만들어진다. 함수만 뽑아야 아래 useCallback 이 실제로 memo 된다.
+  const { mutateAsync: uploadFilesAsync } = useUploadMultipleFiles()
+  const { mutateAsync: deleteFileAsync } = useDeleteFile()
+  const { mutateAsync: createPostingAsync } = useCreatePetPosting()
   const submittingRef = useRef(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -49,7 +51,7 @@ const useCreatePostingSubmission = () => {
 
       const uploadFiles = async (files: File[]) => {
         if (files.length === 0) return []
-        const uploaded = await uploadMutation.mutateAsync({
+        const uploaded = await uploadFilesAsync({
           files,
           folder: ADOPTION_UPLOAD_FOLDER,
         })
@@ -58,7 +60,8 @@ const useCreatePostingSubmission = () => {
 
       try {
         // 부모는 행마다 사진이 따로라 그룹을 펼쳐 올리고, 아래에서 같은 순서로 다시 나눈다.
-        const uploadGroups = [petFiles, ...parentFiles, breedingEnvFiles]
+        // 사육 환경은 서버가 photoFileName 1장만 받으므로 나머지는 올리지 않는다 (고아 파일 방지)
+        const uploadGroups = [petFiles, ...parentFiles, breedingEnvFiles.slice(0, 1)]
 
         // 모든 업로드가 끝날 때까지 기다려야 일부 성공 후 실패한 파일도 빠짐없이 정리할 수 있다.
         const uploadResults = await Promise.allSettled(uploadGroups.map(uploadFiles))
@@ -88,7 +91,7 @@ const useCreatePostingSubmission = () => {
         })
 
         createRequestStarted = true
-        const { petId } = await createMutation.mutateAsync(request)
+        const { petId } = await createPostingAsync(request)
         postingCreated = true
         return petId
       } catch (submitError) {
@@ -103,9 +106,7 @@ const useCreatePostingSubmission = () => {
         const canCleanup = !createRequestStarted || isDefinitiveRejection
 
         if (!postingCreated && canCleanup && uploadedFileNames.length > 0) {
-          await Promise.allSettled(
-            uploadedFileNames.map((fileName) => deleteMutation.mutateAsync(fileName)),
-          )
+          await Promise.allSettled(uploadedFileNames.map((fileName) => deleteFileAsync(fileName)))
         }
         setError(getErrorMessage(submitError))
         return null
@@ -114,7 +115,7 @@ const useCreatePostingSubmission = () => {
         setIsSubmitting(false)
       }
     },
-    [createMutation, deleteMutation, uploadMutation],
+    [createPostingAsync, deleteFileAsync, uploadFilesAsync],
   )
 
   return { submit, isSubmitting, error, clearError: () => setError(null) }

@@ -43,7 +43,8 @@ const AdoptionCreateContent = () => {
       {/* Figma 3134-385401: PC는 이미지 372 + 폼 2단(gap 100), 콘텐츠 폭 1280 고정 */}
       {/* pb-30(120px)은 fixed CTA 바(94px)를 피하는 여백 — pc에서 py로 덮으면 마지막 섹션이 가려진다 */}
       <Container className="flex-1 py-5 pb-30 pc:pt-12">
-        <div className="mx-auto w-full pc:max-w-320">
+        {/* CTA 바가 fixed 라 폼 밖에 있다. 폼 경계를 만들어 Enter 제출과 보조기기 인식을 살린다 */}
+        <form onSubmit={handleUpload} className="mx-auto w-full pc:max-w-320">
           <div className="flex flex-col gap-[1.1875rem] pc:flex-row pc:gap-25">
             <ImageField
               images={petImages.images}
@@ -76,7 +77,10 @@ const AdoptionCreateContent = () => {
               {submitError && <p className="text-sm text-error-500">{submitError}</p>}
             </div>
           </div>
-        </div>
+
+          {/* 암묵적 제출(Enter)은 폼에 submit 버튼이 있어야 동작한다. 실제 버튼은 fixed CTA 바에 있다 */}
+          <button type="submit" className="hidden" aria-hidden tabIndex={-1} />
+        </form>
       </Container>
 
       <PostFormCTA
