@@ -84,11 +84,7 @@ const ExploreContent = () => {
   // 무한스크롤 페이지 병합 시 listingId 중복 제거 — 서버 페이지네이션이 경계에서 항목을
   // 겹쳐 주더라도 React key 중복(카드 중복/누락)이 발생하지 않도록 방어한다.
   const listings = useMemo(
-    () =>
-      dedupeBy(
-        flattenPages(listData).map(mapAdoptionCard),
-        (listing) => listing.listingId,
-      ),
+    () => dedupeBy(flattenPages(listData).map(mapAdoptionCard), (listing) => listing.listingId),
     [listData],
   )
   const totalCount = getTotalItems(listData)

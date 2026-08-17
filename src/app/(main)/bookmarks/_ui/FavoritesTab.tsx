@@ -26,11 +26,7 @@ const FavoritesTab = () => {
 
   // 페이지 경계에서 서버가 항목을 겹쳐 주더라도 React key가 중복되지 않도록 방어 (탐색과 동일)
   const listings = useMemo(
-    () =>
-      dedupeBy(
-        (flattenPages(data)).map(mapAdoptionCard),
-        (listing) => listing.listingId,
-      ),
+    () => dedupeBy(flattenPages(data).map(mapAdoptionCard), (listing) => listing.listingId),
     [data],
   )
   const totalCount = getTotalItems(data)

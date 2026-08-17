@@ -24,11 +24,7 @@ import { cafe24Proup } from '@/shared/lib/fonts'
  *
  * TODO(FE): 디자인 확정 시 헤더/로고/약관 동의/배너(login-banners) 영역 추가.
  */
-const LoginPage = async ({
-  searchParams,
-}: {
-  searchParams: Promise<{ signup?: string }>
-}) => {
+const LoginPage = async ({ searchParams }: { searchParams: Promise<{ signup?: string }> }) => {
   const { signup } = await searchParams
 
   return (
