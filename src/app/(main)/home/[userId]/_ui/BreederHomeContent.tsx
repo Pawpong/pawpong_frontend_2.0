@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import Image from 'next/image'
-import { Container, ListState } from '@/shared/ui'
+import { Container, InfiniteScrollTrigger, ListState } from '@/shared/ui'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
 import { adoptionQueries } from '@/entities/adoption'
@@ -32,15 +32,21 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
     data: listingsData,
     isPending: isListingsPending,
     isError: isListingsError,
+    fetchNextPage: fetchNextListings,
+    hasNextPage: hasNextListings,
+    isFetchingNextPage: isFetchingNextListings,
   } = useInfiniteQuery(adoptionQueries.breederPets(userId, undefined, HOME_LISTING_PAGE_SIZE))
   const {
     data: postsData,
     isPending: isPostsPending,
     isError: isPostsError,
-  } = useQuery(communityQueries.userPosts(userId, HOME_POST_PAGE_SIZE))
+    fetchNextPage: fetchNextPosts,
+    hasNextPage: hasNextPosts,
+    isFetchingNextPage: isFetchingNextPosts,
+  } = useInfiniteQuery(communityQueries.userPosts(userId, HOME_POST_PAGE_SIZE))
 
   const listings = flattenPages(listingsData).map(mapAdoptionCard)
-  const posts = postsData?.items ?? []
+  const posts = flattenPages(postsData)
 
   if (!profile) return null
 
@@ -83,6 +89,11 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
                 </div>
               </>
             </ListState>
+            <InfiniteScrollTrigger
+              onIntersect={() => void fetchNextListings()}
+              hasNextPage={hasNextListings ?? false}
+              isFetchingNextPage={isFetchingNextListings}
+            />
           </Container>
         </TabsContent>
 
@@ -99,6 +110,11 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
             >
               <PostList posts={posts} />
             </ListState>
+            <InfiniteScrollTrigger
+              onIntersect={() => void fetchNextPosts()}
+              hasNextPage={hasNextPosts ?? false}
+              isFetchingNextPage={isFetchingNextPosts}
+            />
           </Container>
         </TabsContent>
       </HomeTabs>
