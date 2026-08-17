@@ -6,13 +6,14 @@ import { communityQueries, toCommunityPreviewProps } from '@/entities/community'
 import { ConnectedPostCard } from '@/features/community'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
 import { Container, InfiniteScrollTrigger, ListState } from '@/shared/ui'
+import { flattenPages } from '@/shared/lib/infiniteList'
 
 const SavedFeedsTab = () => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending, isError } =
     useInfiniteQuery(communityQueries.myBookmarks())
 
   const feeds = useMemo(
-    () => dedupeBy(data?.pages.flatMap((page) => page.items) ?? [], (post) => post.postId),
+    () => dedupeBy(flattenPages(data), (post) => post.postId),
     [data],
   )
 

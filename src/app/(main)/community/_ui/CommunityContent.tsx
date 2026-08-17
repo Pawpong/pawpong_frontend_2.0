@@ -12,12 +12,13 @@ import {
 } from '@/shared/ui'
 import { communityQueries, toCommunityPreviewProps } from '@/entities/community'
 import { ConnectedPostCard } from '@/features/community'
+import { flattenPages } from '@/shared/lib/infiniteList'
 
 const CommunityContent = () => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery(
     communityQueries.posts('latest'),
   )
-  const posts = data?.pages.flatMap((page) => page.items) ?? []
+  const posts = flattenPages(data)
 
   // ponytail: 서버 검색 API 미구현 → 지금은 검색바 펼치기 UI만. keyword 파라미터 생기면 query 연결.
   const [searchOpen, setSearchOpen] = useState(false)
