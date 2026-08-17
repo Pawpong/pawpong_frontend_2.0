@@ -17,6 +17,7 @@ import { ContestVoteCard, contestQueries } from '@/entities/contest'
 import { useVoteContestEntry } from '@/features/contest'
 import { useAuthStatus } from '@/features/auth'
 import { HallOfFamePodium } from '@/widgets/hall-of-fame'
+import { flattenPages } from '@/shared/lib/infiniteList'
 
 const PODIUM_COUNT = 3
 const ENTRY_PAGE_SIZE = 16
@@ -55,7 +56,7 @@ const HallOfFameContent = () => {
   const voteEntry = useVoteContestEntry()
 
   const entries = useMemo(
-    () => entriesData?.pages.flatMap((page) => page.items) ?? [],
+    () => flattenPages(entriesData),
     [entriesData],
   )
   const winners =

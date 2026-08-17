@@ -10,6 +10,7 @@ import { useAuthStatus } from '@/features/auth'
 import type { CommunityComment } from '@/shared/types'
 import { CommentItem } from './CommentItem'
 import { CommentComposer } from './CommentComposer'
+import { flattenPages } from '@/shared/lib/infiniteList'
 
 /** 최상위 댓글 하나와 그 답글들. root가 null이면 삭제된 댓글 자리. */
 interface CommentThread {
@@ -73,7 +74,7 @@ const CommentSection = ({ postId }: CommentSectionProps) => {
     null,
   )
 
-  const comments = commentsData?.pages.flatMap((page) => page.items) ?? []
+  const comments = flattenPages(commentsData)
   const { threads, loadedIds } = buildCommentTree(comments)
 
   const handleReply = (comment: CommunityComment) => {

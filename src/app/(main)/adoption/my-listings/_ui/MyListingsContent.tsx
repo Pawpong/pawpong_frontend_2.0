@@ -1,75 +1,86 @@
 'use client'
 
-import Link from 'next/link'
-import { Container, PageHeader, Separator } from '@/shared/ui'
-import { FavoriteAdoptionCard } from '@/features/adoption'
-import { createMockListings } from '@/shared/mocks/adoption'
-import { useListingsFilter } from '../_lib/useListingsFilter'
-import { StatusFilterChips } from './StatusFilterChips'
-import { ReservedListingCard } from './ReservedListingCard'
-import { BreederListingCard } from '@/app/(main)/home/_ui/BreederListingCard'
+import { useState } from 'react'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import {
+  Container,
+  FilterChip,
+  InfiniteScrollTrigger,
+  InputUpload,
+  ListState,
+  NavigationBar,
+  TextLabel,
+} from '@/shared/ui'
+import type { PetStatus } from '@/shared/types'
+import { ADOPTION_CARD_STATUS, AdoptionGridCard } from '@/entities/adoption'
+import { petPostingQueries } from '@/entities/pet-posting'
+import { toGridCardListing } from '../_lib/toGridCardListing'
+import { flattenPages, getTotalItems } from '@/shared/lib/infiniteList'
 
+// [refactored] 상태 목록·라벨 단일 소스는 ADOPTION_CARD_STATUS (카드 뱃지와 같은 곳)
+const STATUS_FILTERS = Object.keys(ADOPTION_CARD_STATUS) as PetStatus[]
+const PAGE_SIZE = 16
+
+/** 브리더 분양 페이지 (Figma 3138-493376) — 작성 유도 바 + 상태 필터 + 내 분양글 그리드 */
 const MyListingsContent = () => {
-  const allListings = createMockListings()
-  const { activeStatus, setActiveStatus, filteredListings, isGroupedView, groupedByDate } =
-    useListingsFilter(allListings)
+  // 같은 칩을 다시 누르면 해제 -> 전체
+  const [status, setStatus] = useState<PetStatus | null>(null)
+
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending, isError } =
+    useInfiniteQuery(petPostingQueries.myList(status ?? undefined, PAGE_SIZE))
+
+  const postings = flattenPages(data)
+  // 시안의 '분양 목록 109' — 필터 적용 후 전체 개수 (첫 페이지 응답 기준)
+  const totalCount = getTotalItems(data)
 
   return (
     <div className="flex w-full flex-col pb-12">
-      <PageHeader title="분양 페이지" backHref="/home" />
+      <NavigationBar title="분양 페이지" backHref="/home" />
 
-      <Separator className="bg-border-light" />
+      <InputUpload text="분양할 동물 작성하러가기" href="/adoption/create" />
 
-      {/* CTA: 분양글 작성 */}
-      <Container>
-        <Link
-          href="/adoption/create"
-          className="block py-3 text-sm leading-[1.375rem] font-medium text-text-primary tab:py-4 tab:text-base"
-        >
-          {`분양할 아이가 있나요? 글 작성하러 가기 >`}
-        </Link>
-      </Container>
+      <Container className="flex flex-col gap-3 py-6 tab:py-10">
+        <div className="flex items-center justify-between gap-2">
+          <TextLabel size="16">분양 목록 {totalCount}</TextLabel>
 
-      <Separator className="bg-border-light" />
-
-      {/* 분양목록 헤더 + 필터 */}
-      <Container>
-        <div className="flex items-center justify-between pt-5 tab:pt-8">
-          <p className="text-sm leading-[1.5] font-bold text-text-primary tab:text-xl">분양목록</p>
-          <StatusFilterChips activeStatus={activeStatus} onStatusChange={setActiveStatus} />
-        </div>
-
-        {isGroupedView && groupedByDate ? (
-          /* 예약중: 날짜 그룹 + 가로형 리스트 */
-          <div className="flex flex-col gap-3 py-5 tab:gap-[3.787rem] tab:py-8">
-            {[...groupedByDate.entries()].map(([date, listings]) => (
-              <div key={date} className="flex flex-col gap-1.5">
-                <p className="text-sm leading-[1.375rem] font-medium text-text-primary">{date}</p>
-                <div className="flex flex-col gap-2">
-                  {listings.map((listing) => (
-                    <ReservedListingCard key={listing.listingId} listing={listing} />
-                  ))}
-                </div>
-              </div>
+          <div className="flex flex-wrap items-center gap-2">
+            {STATUS_FILTERS.map((value) => (
+              <FilterChip
+                key={value}
+                size="responsive"
+                selected={status === value}
+                onClick={() => setStatus(status === value ? null : value)}
+              >
+                {ADOPTION_CARD_STATUS[value].label}
+              </FilterChip>
             ))}
           </div>
-        ) : (
-          <>
-            {/* Mobile: 2열 그리드 */}
-            <div className="grid grid-cols-2 gap-[0.625rem] py-[1.25rem] tab:hidden">
-              {filteredListings.map((listing) => (
-                <BreederListingCard key={listing.listingId} listing={listing} />
-              ))}
-            </div>
+        </div>
 
-            {/* Desktop: 3열 그리드 */}
-            <div className="hidden tab:mt-6 tab:grid tab:grid-cols-3 tab:gap-6 tab:pb-8">
-              {filteredListings.map((listing) => (
-                <FavoriteAdoptionCard key={listing.listingId} listing={listing} />
-              ))}
-            </div>
-          </>
-        )}
+        <ListState
+          isPending={isPending}
+          isError={isError}
+          isEmpty={postings.length === 0}
+          loadingText="분양 목록을 불러오는 중입니다."
+          errorText="분양 목록을 불러오지 못했습니다."
+          emptyText="등록한 분양글이 없습니다."
+        >
+          <div className="grid grid-cols-2 gap-x-3 gap-y-6 tab:grid-cols-3 pc:grid-cols-4">
+            {postings.map((posting) => (
+              <AdoptionGridCard
+                key={posting.petId}
+                listing={toGridCardListing(posting)}
+                showFavorite={false}
+              />
+            ))}
+          </div>
+        </ListState>
+
+        <InfiniteScrollTrigger
+          onIntersect={() => void fetchNextPage()}
+          hasNextPage={hasNextPage ?? false}
+          isFetchingNextPage={isFetchingNextPage}
+        />
       </Container>
     </div>
   )

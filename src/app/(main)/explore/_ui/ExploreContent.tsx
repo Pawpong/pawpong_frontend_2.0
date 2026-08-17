@@ -33,6 +33,7 @@ import {
   SEARCH_PLACEHOLDERS,
 } from '../_lib/constants'
 import type { ExploreType } from '../_lib/constants'
+import { flattenPages, getTotalItems } from '@/shared/lib/infiniteList'
 
 type AdoptionListFilter = 'all' | 'available' | 'popular'
 
@@ -85,12 +86,12 @@ const ExploreContent = () => {
   const listings = useMemo(
     () =>
       dedupeBy(
-        (listData?.pages.flatMap((page) => page.items) ?? []).map(mapAdoptionCard),
+        flattenPages(listData).map(mapAdoptionCard),
         (listing) => listing.listingId,
       ),
     [listData],
   )
-  const totalCount = listData?.pages[0]?.pagination.totalItems ?? 0
+  const totalCount = getTotalItems(listData)
 
   const handleTypeChange = useCallback(
     (type: ExploreType) => {
