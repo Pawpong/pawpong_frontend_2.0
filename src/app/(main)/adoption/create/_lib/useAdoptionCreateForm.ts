@@ -143,7 +143,8 @@ const useAdoptionCreateForm = () => {
     representativeIndex,
     setRepresentativeIndex,
     isSubmitting: submission.isSubmitting,
-    canSubmit: isValid && petImages.files.length > 0,
+    // 사진 미등록은 버튼을 막지 않는다 — 눌러서 사유를 보게 해야 왜 못 올리는지 알 수 있다
+    canSubmit: isValid,
     submitError: submitError ?? submission.error,
     showGuard,
     cancelExit,
