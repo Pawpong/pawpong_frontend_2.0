@@ -14,7 +14,7 @@ import {
 import type { PetStatus } from '@/shared/types'
 import { ADOPTION_CARD_STATUS, AdoptionGridCard } from '@/entities/adoption'
 import { petPostingQueries } from '@/entities/pet-posting'
-import { toGridCardListing } from '../_lib/toGridCardListing'
+import { mapMyPetPostingCard } from '@/shared/lib/mapMyPetPostingCard'
 import { flattenPages, getTotalItems } from '@/shared/lib/infiniteList'
 
 // [refactored] 상태 목록·라벨 단일 소스는 ADOPTION_CARD_STATUS (카드 뱃지와 같은 곳)
@@ -69,7 +69,7 @@ const MyListingsContent = () => {
             {postings.map((posting) => (
               <AdoptionGridCard
                 key={posting.petId}
-                listing={toGridCardListing(posting)}
+                listing={mapMyPetPostingCard(posting)}
                 showFavorite={false}
               />
             ))}

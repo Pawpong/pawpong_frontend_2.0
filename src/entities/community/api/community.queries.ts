@@ -40,6 +40,15 @@ export const communityQueries = {
       staleTime: STALE_TIME.DEFAULT,
     }),
 
+  // 특정 사용자가 쓴 글 — 브리더홈 '게시글' 탭. 글 수 제한이 없어 무한 스크롤로 받는다.
+  userPosts: (userId: string, pageSize = 30) =>
+    createInfiniteQuery({
+      queryKey: [...communityQueries.all(), 'userPosts', userId, pageSize],
+      queryFn: (page) => getCommunityPosts({ authorId: userId, page, pageSize }),
+      enabled: !!userId,
+      staleTime: STALE_TIME.DEFAULT,
+    }),
+
   // 임시저장(draft) 한 내 글 — 본인만 조회 가능. 인증 필요.
   drafts: (enabled = true, pageSize = 30) =>
     createQuery({

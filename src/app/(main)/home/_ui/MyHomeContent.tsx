@@ -3,7 +3,7 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { BookmarkIcon } from '@/shared/assets/icons'
 import {
   Container,
@@ -11,20 +11,24 @@ import {
   SectionHeader,
   NavigationBar,
   InputUpload,
+  ListState,
 } from '@/shared/ui'
 import { useGnbHeight } from '@/shared/lib/useGnbHeight'
-import { createMockListings } from '@/shared/mocks/adoption'
+import { flattenPages } from '@/shared/lib/infiniteList'
 import { profileQueries } from '@/entities/profile'
 import { communityQueries } from '@/entities/community'
+import { AdoptionGridCard } from '@/entities/adoption'
+import { petPostingQueries } from '@/entities/pet-posting'
+import { mapMyPetPostingCard } from '@/shared/lib/mapMyPetPostingCard'
 import type { AdopterPublicProfile, BreederPublicProfile } from '@/shared/types'
-import { FavoriteAdoptionCard } from '@/features/adoption'
 import { useDeleteCommunityPost } from '@/features/community'
 import { ProfileCard } from './ProfileCard'
 import { HomeTabs, TabsContent } from './HomeTabs'
 import { PostList } from './PostList'
 import { FavoriteBreedersContent } from './FavoriteBreedersContent'
-import { BreederListingCard } from './BreederListingCard'
 import { MY_HOME_TABS, BREEDER_MY_HOME_TABS } from './constants'
+
+const HOME_LISTING_PAGE_SIZE = 6
 
 // [refactored] 탭 패널 공통 래퍼 — TabsContent(mt-0) + Container(pc 좌우 여백) 반복 제거
 // 탭 콘텐츠는 Container 기본 margin(margin-mo 20 / margin-tab 48 / margin-pc 80) 사용.
@@ -57,11 +61,20 @@ const MyHomeContent = () => {
 
   // 마이홈 프로필 카드: /profile/me 로 내 프로필 조회 (role 에 따라 adopter/breeder 분기, 프로필 이미지 포함)
   const { data: myProfile } = useQuery(profileQueries.me())
+  const isBreeder = myProfile?.role === 'breeder'
 
   // 마이홈 '게시글' 탭 — 내가 작성한 커뮤니티 글을 백엔드에서 조회 (profile 로드 후 활성화)
   const { data: myPostsData } = useQuery(communityQueries.myPosts(!!myProfile))
   // 임시저장 글 수 — 있을 때만 '게시글' 탭 상단에 이어쓰기 진입점을 띄운다
   const { data: draftsData } = useQuery(communityQueries.drafts(!!myProfile))
+  const {
+    data: myListingsData,
+    isPending: isMyListingsPending,
+    isError: isMyListingsError,
+  } = useInfiniteQuery({
+    ...petPostingQueries.myList(undefined, HOME_LISTING_PAGE_SIZE),
+    enabled: isBreeder,
+  })
 
   // sticky 헤더 스택: GNB → navbar(top=gnbH) → 탭바(top=gnbH+navH)
   const gnbH = useGnbHeight()
@@ -81,8 +94,6 @@ const MyHomeContent = () => {
     return () => observer.disconnect()
   }, [])
 
-  const isBreeder = myProfile?.role === 'breeder'
-
   const tabs = isBreeder ? BREEDER_MY_HOME_TABS : MY_HOME_TABS
   const defaultTab = isBreeder ? 'listings' : 'posts'
   // [refactored] 작성 바 문구/링크를 역할별로 분리 — 단일 InputUpload 인스턴스로 렌더
@@ -90,10 +101,13 @@ const MyHomeContent = () => {
     ? { text: '분양글을 올려보세요', href: '/adoption/create' }
     : { text: '게시글을 올려보세요', href: '/community/write' }
 
-  const [activeTab, setActiveTab] = useState(defaultTab)
+  // 프로필 조회 전에는 역할을 모르므로 선택값을 비워두고, 조회 후 역할별 기본 탭을 사용한다.
+  // useState(defaultTab)로 바로 시드하면 최초 adopter 기본값('posts')이 브리더에게도 고정된다.
+  const [selectedTab, setSelectedTab] = useState<string | null>(null)
+  const activeTab = tabs.find((tab) => tab.id === selectedTab)?.id ?? defaultTab
   const posts = myPostsData?.items ?? []
   const draftCount = draftsData?.items.length ?? 0
-  const listings = isBreeder ? createMockListings() : []
+  const listings = flattenPages(myListingsData)
 
   // /profile/me 응답을 ProfileCard 가 쓰는 공개 프로필 형태로 매핑 (프로필 이미지는 profileImageUrl)
   const adopterPublicProfile: AdopterPublicProfile | null =
@@ -159,7 +173,7 @@ const MyHomeContent = () => {
       <HomeTabs
         tabs={tabs}
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={setSelectedTab}
         stickyTop={gnbH + navH}
       >
         {/* 브리더: 분양글 작성 바 / 일반: 게시글 작성 바 (공통 InputUpload, 상·하 보더 포함) */}
@@ -171,18 +185,24 @@ const MyHomeContent = () => {
             <div className="pt-5 tab:pt-8">
               <SectionHeader title="분양목록" linkText="분양페이지 가기" linkHref="/adoption" />
             </div>
-            {/* Mobile */}
-            <div className="grid grid-cols-2 gap-[0.625rem] py-[1.25rem] tab:hidden">
-              {listings.map((listing) => (
-                <BreederListingCard key={listing.listingId} listing={listing} />
-              ))}
-            </div>
-            {/* Desktop */}
-            <div className="hidden tab:mt-6 tab:grid tab:grid-cols-3 tab:gap-6">
-              {listings.map((listing) => (
-                <FavoriteAdoptionCard key={listing.listingId} listing={listing} />
-              ))}
-            </div>
+            <ListState
+              isPending={isMyListingsPending}
+              isError={isMyListingsError}
+              isEmpty={listings.length === 0}
+              loadingText="분양 목록을 불러오는 중입니다."
+              errorText="분양 목록을 불러오지 못했습니다."
+              emptyText="등록한 분양글이 없습니다."
+            >
+              <div className="grid grid-cols-2 gap-x-3 gap-y-6 py-5 tab:mt-6 tab:grid-cols-3 tab:py-0">
+                {listings.map((listing) => (
+                  <AdoptionGridCard
+                    key={listing.petId}
+                    listing={mapMyPetPostingCard(listing)}
+                    showFavorite={false}
+                  />
+                ))}
+              </div>
+            </ListState>
           </TabPanel>
         )}
 
