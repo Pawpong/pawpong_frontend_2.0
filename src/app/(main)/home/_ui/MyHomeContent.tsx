@@ -1,30 +1,18 @@
 'use client'
 
-import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { BookmarkIcon } from '@/shared/assets/icons'
-import {
-  Container,
-  CtaBanner,
-  DeleteConfirmModal,
-  FilterChip,
-  InfiniteScrollTrigger,
-  NavigationBar,
-  InputUpload,
-  ListState,
-  TextLabel,
-} from '@/shared/ui'
+import { Container, CtaBanner, DeleteConfirmModal, NavigationBar, InputUpload } from '@/shared/ui'
 import { useGnbHeight } from '@/shared/lib/useGnbHeight'
-import { flattenPages } from '@/shared/lib/infiniteList'
 import { profileQueries } from '@/entities/profile'
 import { communityQueries } from '@/entities/community'
-import { ADOPTION_CARD_STATUS, AdoptionGridCard } from '@/entities/adoption'
-import { petPostingQueries } from '@/entities/pet-posting'
-import { mapMyPetPostingCard } from '@/shared/lib/mapMyPetPostingCard'
-import type { AdopterPublicProfile, BreederPublicProfile, PetStatus } from '@/shared/types'
 import { useDeleteCommunityPost } from '@/features/community'
+// [refactored] 분양 페이지와 동일한 목록 블록 — 위젯으로 공유
+import { MyPetPostingList } from '@/widgets/my-pet-postings'
+import { toMyProfileCardProps } from '../_lib/toMyProfileCardProps'
 import { ProfileCard } from './ProfileCard'
 import { HomeTabs, TabsContent } from './HomeTabs'
 import { PostList } from './PostList'
@@ -32,26 +20,6 @@ import { FavoriteBreedersContent } from './FavoriteBreedersContent'
 import { MY_HOME_TABS, BREEDER_MY_HOME_TABS } from './constants'
 
 const HOME_LISTING_PAGE_SIZE = 16
-
-// [refactored] 상태 목록·라벨 단일 소스는 ADOPTION_CARD_STATUS (분양 페이지 필터와 같은 곳)
-const STATUS_FILTERS = Object.keys(ADOPTION_CARD_STATUS) as PetStatus[]
-
-// [refactored] 탭 패널 공통 래퍼 — TabsContent(mt-0) + Container(pc 좌우 여백) 반복 제거
-// 탭 콘텐츠는 Container 기본 margin(margin-mo 20 / margin-tab 48 / margin-pc 80) 사용.
-// py 등 추가 여백은 패널별 className으로 주입
-const TabPanel = ({
-  value,
-  children,
-  className,
-}: {
-  value: string
-  children: ReactNode
-  className?: string
-}) => (
-  <TabsContent value={value} className="mt-0">
-    <Container className={className}>{children}</Container>
-  </TabsContent>
-)
 
 const MyHomeContent = () => {
   const router = useRouter()
@@ -73,19 +41,6 @@ const MyHomeContent = () => {
   const { data: myPostsData } = useQuery(communityQueries.myPosts(!!myProfile))
   // 임시저장 글 수 — 있을 때만 '게시글' 탭 상단에 이어쓰기 진입점을 띄운다
   const { data: draftsData } = useQuery(communityQueries.drafts(!!myProfile))
-  // 같은 칩을 다시 누르면 해제 -> 전체 (분양 페이지 필터와 동일 동작)
-  const [listingStatus, setListingStatus] = useState<PetStatus | null>(null)
-  const {
-    data: myListingsData,
-    isPending: isMyListingsPending,
-    isError: isMyListingsError,
-    fetchNextPage: fetchNextListings,
-    hasNextPage: hasNextListings,
-    isFetchingNextPage: isFetchingNextListings,
-  } = useInfiniteQuery({
-    ...petPostingQueries.myList(listingStatus ?? undefined, HOME_LISTING_PAGE_SIZE),
-    enabled: isBreeder,
-  })
 
   // sticky 헤더 스택: GNB → navbar(top=gnbH) → 탭바(top=gnbH+navH)
   const gnbH = useGnbHeight()
@@ -118,43 +73,9 @@ const MyHomeContent = () => {
   const activeTab = tabs.find((tab) => tab.id === selectedTab)?.id ?? defaultTab
   const posts = myPostsData?.items ?? []
   const draftCount = draftsData?.items.length ?? 0
-  const listings = flattenPages(myListingsData)
+  const profileCardProps = myProfile ? toMyProfileCardProps(myProfile) : null
 
-  // /profile/me 응답을 ProfileCard 가 쓰는 공개 프로필 형태로 매핑 (프로필 이미지는 profileImageUrl)
-  const adopterPublicProfile: AdopterPublicProfile | null =
-    myProfile && myProfile.role === 'adopter'
-      ? {
-          userId: myProfile.userId,
-          nickname: myProfile.nickname,
-          profileImageUrl: myProfile.profileImageUrl,
-          bio: myProfile.bio,
-          bpm: myProfile.bpm,
-          followerCount: myProfile.followerCount,
-          isFollowing: false,
-        }
-      : null
-  const breederPublicProfile: BreederPublicProfile | null =
-    myProfile && myProfile.role === 'breeder'
-      ? {
-          breederId: myProfile.userId,
-          nickname: myProfile.nickname,
-          profileImageUrl: myProfile.profileImageUrl,
-          bio: myProfile.bio,
-          longDescription: myProfile.longDescription,
-          bpm: myProfile.bpm,
-          followerCount: myProfile.followerCount,
-          level: myProfile.level ?? 'new',
-          plan: myProfile.plan ?? 'basic',
-          businessLocation: {
-            city: myProfile.businessLocation?.city ?? '',
-            district: myProfile.businessLocation?.district ?? '',
-            address: myProfile.businessLocation?.address,
-          },
-          isFavorited: false,
-        }
-      : null
-
-  if (!adopterPublicProfile && !breederPublicProfile) return null
+  if (!profileCardProps) return null
 
   return (
     <div className="flex w-full flex-col">
@@ -174,11 +95,7 @@ const MyHomeContent = () => {
 
       {/* 디자인: 모바일 px-16(margin-mo)·py-20 / 탭 px-48·PC px-80·py-40 */}
       <Container className="px-4 py-5 tab:py-10">
-        {isBreeder && breederPublicProfile ? (
-          <ProfileCard profile={breederPublicProfile} mode="mine-breeder" />
-        ) : adopterPublicProfile ? (
-          <ProfileCard profile={adopterPublicProfile} />
-        ) : null}
+        <ProfileCard {...profileCardProps} />
       </Container>
 
       <HomeTabs
@@ -192,71 +109,43 @@ const MyHomeContent = () => {
 
         {/* 분양 목록 탭 (브리더만) — 시안 3170-790275: 배너 -> 라벨+필터 -> 카드 4열 */}
         {isBreeder && (
-          <TabPanel value="listings" className="flex flex-col gap-3 py-5 tab:py-10">
-            <CtaBanner text="분양 페이지 바로가기" href="/adoption" />
+          <TabsContent value="listings" className="mt-0">
+            {/* 배너는 콘텐츠 Container 밖의 독립 밴드 (시안 3170-800323) — 홈 CTA 스트립과 같은 배치.
+                위쪽은 작성 바(InputUpload)의 보더와 붙지 않게 여백을 더 준다 */}
+            <Container className="px-4 pt-10 pb-2">
+              <CtaBanner text="분양 페이지 바로가기" href="/adoption" />
+            </Container>
 
-            <div className="flex items-center justify-between gap-2">
-              <TextLabel size="16">분양 목록</TextLabel>
-
-              <div className="flex flex-wrap items-center gap-2">
-                {STATUS_FILTERS.map((value) => (
-                  <FilterChip
-                    key={value}
-                    size="responsive"
-                    selected={listingStatus === value}
-                    onClick={() => setListingStatus(listingStatus === value ? null : value)}
-                  >
-                    {ADOPTION_CARD_STATUS[value].label}
-                  </FilterChip>
-                ))}
-              </div>
-            </div>
-            <ListState
-              isPending={isMyListingsPending}
-              isError={isMyListingsError}
-              isEmpty={listings.length === 0}
-              loadingText="분양 목록을 불러오는 중입니다."
-              errorText="분양 목록을 불러오지 못했습니다."
-              emptyText="등록한 분양글이 없습니다."
-            >
-              <div className="grid grid-cols-2 gap-x-3 gap-y-6 tab:grid-cols-3 pc:grid-cols-4 pc:gap-x-[1.375rem]">
-                {listings.map((listing) => (
-                  <AdoptionGridCard
-                    key={listing.petId}
-                    listing={mapMyPetPostingCard(listing)}
-                    showFavorite={false}
-                  />
-                ))}
-              </div>
-            </ListState>
-
-            <InfiniteScrollTrigger
-              onIntersect={() => void fetchNextListings()}
-              hasNextPage={hasNextListings ?? false}
-              isFetchingNextPage={isFetchingNextListings}
-            />
-          </TabPanel>
+            <Container className="py-5 tab:py-10">
+              <MyPetPostingList
+                pageSize={HOME_LISTING_PAGE_SIZE}
+                gridClassName="pc:gap-x-[1.375rem]"
+              />
+            </Container>
+          </TabsContent>
         )}
 
         {/* 디자인: 모바일(1023-23241) px-16·py-24 / 탭·PC(2046-160971) px-48·80·py-40 */}
-        <TabPanel value="posts" className="px-4 py-6 tab:py-10">
-          {/* 임시저장이 있을 때만 노출 — 목록에서 이어서 작성 */}
-          {draftCount > 0 && (
-            <Link
-              href="/community/drafts"
-              className="mb-4 flex items-center justify-between rounded-lg border border-neutral-300 px-4 py-3 text-sm font-semibold text-neutral-850 tab:mx-auto tab:max-w-[59.25rem]"
-            >
-              <span>임시저장 {draftCount}개</span>
-              <span className="text-xs font-medium text-text-secondary">이어서 쓰기</span>
-            </Link>
-          )}
-          <PostList
-            posts={posts}
-            emptyText="내가 쓴 글이 없습니다."
-            onEdit={(postId) => router.push(`/community/${postId}/edit`)}
-            onDelete={setDeleteTargetId}
-          />
-        </TabPanel>
+        <TabsContent value="posts" className="mt-0">
+          <Container className="px-4 py-6 tab:py-10">
+            {/* 임시저장이 있을 때만 노출 — 목록에서 이어서 작성 */}
+            {draftCount > 0 && (
+              <Link
+                href="/community/drafts"
+                className="mb-4 flex items-center justify-between rounded-lg border border-neutral-300 px-4 py-3 text-sm font-semibold text-neutral-850 tab:mx-auto tab:max-w-[59.25rem]"
+              >
+                <span>임시저장 {draftCount}개</span>
+                <span className="text-xs font-medium text-text-secondary">이어서 쓰기</span>
+              </Link>
+            )}
+            <PostList
+              posts={posts}
+              emptyText="내가 쓴 글이 없습니다."
+              onEdit={(postId) => router.push(`/community/${postId}/edit`)}
+              onDelete={setDeleteTargetId}
+            />
+          </Container>
+        </TabsContent>
 
         <TabsContent value="breeders" className="mt-0">
           <FavoriteBreedersContent />
