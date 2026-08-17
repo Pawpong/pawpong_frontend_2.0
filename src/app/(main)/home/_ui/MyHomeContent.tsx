@@ -8,27 +8,33 @@ import { BookmarkIcon } from '@/shared/assets/icons'
 import {
   Container,
   DeleteConfirmModal,
-  SectionHeader,
+  FilterChip,
+  InfiniteScrollTrigger,
   NavigationBar,
   InputUpload,
   ListState,
+  TextLabel,
 } from '@/shared/ui'
 import { useGnbHeight } from '@/shared/lib/useGnbHeight'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import { profileQueries } from '@/entities/profile'
 import { communityQueries } from '@/entities/community'
-import { AdoptionGridCard } from '@/entities/adoption'
+import { ADOPTION_CARD_STATUS, AdoptionGridCard } from '@/entities/adoption'
 import { petPostingQueries } from '@/entities/pet-posting'
 import { mapMyPetPostingCard } from '@/shared/lib/mapMyPetPostingCard'
-import type { AdopterPublicProfile, BreederPublicProfile } from '@/shared/types'
+import type { AdopterPublicProfile, BreederPublicProfile, PetStatus } from '@/shared/types'
 import { useDeleteCommunityPost } from '@/features/community'
 import { ProfileCard } from './ProfileCard'
 import { HomeTabs, TabsContent } from './HomeTabs'
 import { PostList } from './PostList'
 import { FavoriteBreedersContent } from './FavoriteBreedersContent'
+import { AdoptionPageBanner } from './AdoptionPageBanner'
 import { MY_HOME_TABS, BREEDER_MY_HOME_TABS } from './constants'
 
-const HOME_LISTING_PAGE_SIZE = 6
+const HOME_LISTING_PAGE_SIZE = 16
+
+// [refactored] 상태 목록·라벨 단일 소스는 ADOPTION_CARD_STATUS (분양 페이지 필터와 같은 곳)
+const STATUS_FILTERS = Object.keys(ADOPTION_CARD_STATUS) as PetStatus[]
 
 // [refactored] 탭 패널 공통 래퍼 — TabsContent(mt-0) + Container(pc 좌우 여백) 반복 제거
 // 탭 콘텐츠는 Container 기본 margin(margin-mo 20 / margin-tab 48 / margin-pc 80) 사용.
@@ -67,12 +73,17 @@ const MyHomeContent = () => {
   const { data: myPostsData } = useQuery(communityQueries.myPosts(!!myProfile))
   // 임시저장 글 수 — 있을 때만 '게시글' 탭 상단에 이어쓰기 진입점을 띄운다
   const { data: draftsData } = useQuery(communityQueries.drafts(!!myProfile))
+  // 같은 칩을 다시 누르면 해제 -> 전체 (분양 페이지 필터와 동일 동작)
+  const [listingStatus, setListingStatus] = useState<PetStatus | null>(null)
   const {
     data: myListingsData,
     isPending: isMyListingsPending,
     isError: isMyListingsError,
+    fetchNextPage: fetchNextListings,
+    hasNextPage: hasNextListings,
+    isFetchingNextPage: isFetchingNextListings,
   } = useInfiniteQuery({
-    ...petPostingQueries.myList(undefined, HOME_LISTING_PAGE_SIZE),
+    ...petPostingQueries.myList(listingStatus ?? undefined, HOME_LISTING_PAGE_SIZE),
     enabled: isBreeder,
   })
 
@@ -98,7 +109,7 @@ const MyHomeContent = () => {
   const defaultTab = isBreeder ? 'listings' : 'posts'
   // [refactored] 작성 바 문구/링크를 역할별로 분리 — 단일 InputUpload 인스턴스로 렌더
   const writeBar = isBreeder
-    ? { text: '분양글을 올려보세요', href: '/adoption/create' }
+    ? { text: '분양할 동물 작성하러가기', href: '/adoption/create' }
     : { text: '게시글을 올려보세요', href: '/community/write' }
 
   // 프로필 조회 전에는 역할을 모르므로 선택값을 비워두고, 조회 후 역할별 기본 탭을 사용한다.
@@ -179,11 +190,26 @@ const MyHomeContent = () => {
         {/* 브리더: 분양글 작성 바 / 일반: 게시글 작성 바 (공통 InputUpload, 상·하 보더 포함) */}
         <InputUpload text={writeBar.text} href={writeBar.href} />
 
-        {/* 분양목록 탭 (브리더만) */}
+        {/* 분양 목록 탭 (브리더만) — 시안 3170-790275: 배너 -> 라벨+필터 -> 카드 4열 */}
         {isBreeder && (
-          <TabPanel value="listings" className="pc:px-[10rem]">
-            <div className="pt-5 tab:pt-8">
-              <SectionHeader title="분양목록" linkText="분양페이지 가기" linkHref="/adoption" />
+          <TabPanel value="listings" className="flex flex-col gap-3 py-5 tab:py-10">
+            <AdoptionPageBanner />
+
+            <div className="flex items-center justify-between gap-2">
+              <TextLabel size="16">분양 목록</TextLabel>
+
+              <div className="flex flex-wrap items-center gap-2">
+                {STATUS_FILTERS.map((value) => (
+                  <FilterChip
+                    key={value}
+                    size="responsive"
+                    selected={listingStatus === value}
+                    onClick={() => setListingStatus(listingStatus === value ? null : value)}
+                  >
+                    {ADOPTION_CARD_STATUS[value].label}
+                  </FilterChip>
+                ))}
+              </div>
             </div>
             <ListState
               isPending={isMyListingsPending}
@@ -193,7 +219,7 @@ const MyHomeContent = () => {
               errorText="분양 목록을 불러오지 못했습니다."
               emptyText="등록한 분양글이 없습니다."
             >
-              <div className="grid grid-cols-2 gap-x-3 gap-y-6 py-5 tab:mt-6 tab:grid-cols-3 tab:py-0">
+              <div className="grid grid-cols-2 gap-x-3 gap-y-6 tab:grid-cols-3 pc:grid-cols-4 pc:gap-x-[1.375rem]">
                 {listings.map((listing) => (
                   <AdoptionGridCard
                     key={listing.petId}
@@ -203,6 +229,12 @@ const MyHomeContent = () => {
                 ))}
               </div>
             </ListState>
+
+            <InfiniteScrollTrigger
+              onIntersect={() => void fetchNextListings()}
+              hasNextPage={hasNextListings ?? false}
+              isFetchingNextPage={isFetchingNextListings}
+            />
           </TabPanel>
         )}
 
