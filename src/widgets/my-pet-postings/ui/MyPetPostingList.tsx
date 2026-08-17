@@ -16,7 +16,7 @@ const STATUS_FILTERS = Object.keys(ADOPTION_CARD_STATUS) as PetStatus[]
 const DEFAULT_GRID = 'grid grid-cols-2 gap-x-3 gap-y-6 tab:grid-cols-3 pc:grid-cols-4'
 
 interface MyPetPostingListProps {
-  pageSize?: number
+  pageSize: number
   /** 라벨 옆에 필터 적용 후 전체 개수 표시 (분양 페이지 시안의 '분양 목록 109') */
   showTotalCount?: boolean
   /** 그리드 간격 오버라이드 — 화면마다 시안 값이 다르다 */
@@ -31,7 +31,7 @@ interface MyPetPostingListProps {
  * 바깥 여백은 호출부의 Container 가 담당한다.
  */
 const MyPetPostingList = ({
-  pageSize = 16,
+  pageSize,
   showTotalCount = false,
   gridClassName,
 }: MyPetPostingListProps) => {

@@ -31,18 +31,15 @@ interface CtaBannerProps {
   text: string
   /** 지정하면 배너 전체가 링크가 된다 (홈 CTA 스트립은 이동이 없어 미지정) */
   href?: string
-  className?: string
 }
 
 /**
  * 픽셀 발자국 CTA 스트립 (Figma 2752-266432 / 2752-266394).
  * 스트립 px-16 py-12(pc px-32) · 텍스트 12px -> pc 14px · PC 폭 1134.
  */
-const CtaBanner = ({ text, href, className }: CtaBannerProps) => {
-  const barClass = cn(
-    'relative mx-auto flex w-full items-center justify-between overflow-hidden rounded-xl bg-secondary-200 px-4 py-3 pc:max-w-[70.875rem] pc:px-8',
-    className,
-  )
+const CtaBanner = ({ text, href }: CtaBannerProps) => {
+  const barClass =
+    'relative mx-auto flex w-full items-center justify-between overflow-hidden rounded-xl bg-secondary-200 px-4 py-3 pc:max-w-[70.875rem] pc:px-8'
 
   const content = (
     <>
