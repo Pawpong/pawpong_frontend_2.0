@@ -7,6 +7,7 @@ import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { BookmarkIcon } from '@/shared/assets/icons'
 import {
   Container,
+  CtaBanner,
   DeleteConfirmModal,
   FilterChip,
   InfiniteScrollTrigger,
@@ -28,7 +29,6 @@ import { ProfileCard } from './ProfileCard'
 import { HomeTabs, TabsContent } from './HomeTabs'
 import { PostList } from './PostList'
 import { FavoriteBreedersContent } from './FavoriteBreedersContent'
-import { AdoptionPageBanner } from './AdoptionPageBanner'
 import { MY_HOME_TABS, BREEDER_MY_HOME_TABS } from './constants'
 
 const HOME_LISTING_PAGE_SIZE = 16
@@ -193,7 +193,7 @@ const MyHomeContent = () => {
         {/* 분양 목록 탭 (브리더만) — 시안 3170-790275: 배너 -> 라벨+필터 -> 카드 4열 */}
         {isBreeder && (
           <TabPanel value="listings" className="flex flex-col gap-3 py-5 tab:py-10">
-            <AdoptionPageBanner />
+            <CtaBanner text="분양 페이지 바로가기" href="/adoption" />
 
             <div className="flex items-center justify-between gap-2">
               <TextLabel size="16">분양 목록</TextLabel>
