@@ -3,14 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import {
-  Container,
-  FilterChip,
-  InfiniteScrollTrigger,
-  ListState,
-  PopularBadgeContent,
-  TabBar,
-} from '@/shared/ui'
+import { Container, InfiniteScrollTrigger, ListState, TabBar } from '@/shared/ui'
 import { CATEGORY_TO_PET_TYPE } from '@/shared/lib/petCategory'
 import { adoptionQueries } from '@/entities/adoption'
 import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
@@ -25,6 +18,8 @@ import type { AnimalCategory } from '@/shared/types'
 import { AdoptionCardGrid } from '@/features/adoption'
 import { BreederExploreContent } from './BreederExploreContent'
 import { ExploreFilterBar } from './ExploreFilterBar'
+import { ExploreListFilters } from './ExploreListFilters'
+import type { ExploreListFilter } from './ExploreListFilters'
 import { TitledSection } from './TitledSection'
 import {
   EXPLORE_SECTION_CONTAINER,
@@ -34,14 +29,6 @@ import {
 } from '../_lib/constants'
 import type { ExploreType } from '../_lib/constants'
 import { flattenPages, getTotalItems } from '@/shared/lib/infiniteList'
-
-type AdoptionListFilter = 'all' | 'available' | 'popular'
-
-const ADOPTION_LIST_FILTERS: Array<{ value: AdoptionListFilter; label: string }> = [
-  { value: 'all', label: '전체' },
-  { value: 'available', label: '분양중' },
-  { value: 'popular', label: '인기' },
-]
 
 // 필터 칩 → v2 /adoption 쿼리 파라미터 (서버 필터링 — 클라이언트 slice 금지)
 const FILTER_TO_QUERY = {
@@ -57,7 +44,7 @@ const ExploreContent = () => {
 
   const typeParam = searchParams.get('type')
   const selectedType: ExploreType = typeParam === 'breeder' ? 'breeder' : 'adoption'
-  const [adoptionListFilter, setAdoptionListFilter] = useState<AdoptionListFilter>('all')
+  const [adoptionListFilter, setAdoptionListFilter] = useState<ExploreListFilter>('all')
 
   const categoryParam = searchParams.get('category')
   const selectedCategory: AnimalCategory =
@@ -95,6 +82,9 @@ const ExploreContent = () => {
       if (type === 'breeder') {
         params.set('type', 'breeder')
       }
+      // 탭을 바꾸면 카테고리 칩(URL 파라미터)이 초기화되므로 목록 필터도 같이 되돌린다
+      // (브리더 탭 필터는 컴포넌트가 언마운트되며 저절로 초기화된다)
+      setAdoptionListFilter('all')
       const query = params.toString()
       router.replace(`${pathname}${query ? `?${query}` : ''}`, { scroll: false })
     },
@@ -183,7 +173,7 @@ const ExploreContent = () => {
       <div ref={sentinelRef} aria-hidden />
 
       {selectedType === 'breeder' ? (
-        <BreederExploreContent />
+        <BreederExploreContent category={selectedCategory} />
       ) : (
         <>
           <Container className={EXPLORE_SECTION_CONTAINER}>
@@ -191,23 +181,11 @@ const ExploreContent = () => {
               title={`전체 분양 소식 ${totalCount}`}
               titleClassName={EXPLORE_SECTION_TITLE_CLASS}
               headerSlot={
-                <div className="flex shrink-0 items-center gap-2" aria-label="분양 소식 필터">
-                  {/* [refactored] 칩 버튼 스타일 → 공통 FilterChip */}
-                  {ADOPTION_LIST_FILTERS.map((filter) => (
-                    <FilterChip
-                      key={filter.value}
-                      selected={adoptionListFilter === filter.value}
-                      onClick={() => setAdoptionListFilter(filter.value)}
-                      size="responsive"
-                    >
-                      {filter.value === 'popular' ? (
-                        <PopularBadgeContent size="responsive" />
-                      ) : (
-                        filter.label
-                      )}
-                    </FilterChip>
-                  ))}
-                </div>
+                <ExploreListFilters
+                  value={adoptionListFilter}
+                  onChange={setAdoptionListFilter}
+                  ariaLabel="분양 소식 필터"
+                />
               }
             >
               <ListState
