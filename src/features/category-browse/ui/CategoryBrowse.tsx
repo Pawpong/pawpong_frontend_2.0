@@ -3,11 +3,10 @@ import Link from 'next/link'
 import { Container, CtaBanner } from '@/shared/ui'
 
 // Figma 2752-269487 — 카테고리 버튼(동물+pill+라벨)은 통짜 SVG. default/hover 2상태.
-// ponytail: 3번째(도마뱀) 전용 아트가 없어 강아지 SVG로 임시 표기 — 리자드 SVG 나오면 src 교체.
 const CATEGORIES = [
   { label: '고양이 찾기', href: '/explore?category=cat', src: 'cat' },
   { label: '강아지 찾기', href: '/explore?category=dog', src: 'dog' },
-  { label: '도마뱀 찾기', href: '/explore?category=lizard', src: 'dog' },
+  { label: '도마뱀 찾기', href: '/explore?category=lizard', src: 'lizard' },
   { label: '브리더 탐색', href: '/explore?type=breeder', src: 'explore' },
 ]
 
