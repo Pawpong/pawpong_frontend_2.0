@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { cn } from '@/shared/lib/cn'
 import { FAVORITE_ACTIVE, FAVORITE_INACTIVE } from './FavoriteToggle'
 
@@ -23,6 +24,8 @@ interface PostActionButtonProps {
   ariaLabel?: string
   /** 있으면 버튼으로 렌더(클릭 가능), 없으면 표시전용 */
   onClick?: () => void
+  /** 있으면 링크로 렌더 (댓글 아이콘 → 게시글 상세) */
+  href?: string
   disabled?: boolean
 }
 
@@ -35,6 +38,7 @@ const PostActionButton = ({
   iconStatus,
   ariaLabel,
   onClick,
+  href,
   disabled,
 }: PostActionButtonProps) => {
   const inner = (
@@ -53,6 +57,14 @@ const PostActionButton = ({
       )}
     </>
   )
+
+  if (href) {
+    return (
+      <Link href={href} aria-label={ariaLabel} className="flex items-center gap-1">
+        {inner}
+      </Link>
+    )
+  }
 
   if (onClick) {
     return (

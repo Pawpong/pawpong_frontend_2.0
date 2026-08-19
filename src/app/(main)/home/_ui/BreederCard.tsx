@@ -1,129 +1,82 @@
 'use client'
 
-import { useState, type MouseEvent } from 'react'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Badge, TextLabel } from '@/shared/ui'
-import { cn } from '@/shared/lib/cn'
-import { LocationOnIcon, PixelStarIcon } from '@/shared/assets/icons'
-import type { FavoriteBreeder } from '@/shared/types'
+import { Badge, MediaCard } from '@/shared/ui'
+import { LocationOnIcon } from '@/shared/assets/icons'
+import { FavoriteBreederIconButton } from './FavoriteBreederIconButton'
+import type { BreederLevel, FavoriteBreeder } from '@/shared/types'
+
+// 시안 뱃지 문구는 '브리더 LV' 자리표시자 — 실제 레벨 값(new | elite)으로 채운다
+const LEVEL_LABEL: Record<BreederLevel, string> = {
+  new: '뉴 브리더',
+  elite: '엘리트 브리더',
+}
 
 interface BreederCardProps {
   breeder: FavoriteBreeder
   showPopularBadge?: boolean
 }
 
-// [refactored] md 뱃지 → 탭+에서 lg(16px)로 키우는 반응형 오버라이드 (인기·분양중 공용)
-const BADGE_TAB_LG = 'tab:h-auto tab:py-1 tab:text-base'
-
-// [refactored] 즐겨찾기 별 토글 — 모바일(이미지 위)·PC(즐겨찾기 행) 공용
-const FavoriteStar = ({
-  pressed,
-  onClick,
-  className,
-  iconClassName,
-  label,
-}: {
-  pressed: boolean
-  onClick: (e: MouseEvent) => void
-  className: string
-  iconClassName: string
-  label?: string
-}) => (
-  <button
-    type="button"
-    aria-label={label ? undefined : '즐겨찾기'}
-    aria-pressed={pressed}
-    onClick={onClick}
-    className={className}
-  >
-    <PixelStarIcon className={cn(iconClassName, pressed ? 'text-[#fffa94]' : 'text-neutral-500')} />
-    {label && <span className="text-xs leading-[1.5] font-semibold text-neutral-850">{label}</span>}
-  </button>
-)
-
 /**
- * 즐겨찾는 브리더 카드 (Figma node 1023-38692 · CardStar)
- * - 모바일(medium): 이미지 위 별(우하단) + 인기/분양중 14px
- * - PC(large): 이미지엔 별 없음, 정보 하단에 "별 + 즐겨찾기" 행 + 인기/분양중 16px
- * - 별(IconStar 814-99421): default 회색 / press 노란색(#fffa94) 토글
+ * 브리더 카드 (Figma CardStar 816-102863) — 즐겨찾기 탭·브리더 탐색 공용.
+ *
+ * 셸(이미지 + 본문 좌측 텍스트 + 우측 뱃지)은 분양 카드와 같아 MediaCard 로 공유하고,
+ * 규격만 이 시안을 따른다: medium(모바일 164) / large(PC 282).
+ * 아이콘(IconStar 2949-296222)은 픽셀 마름모다 — 미등록은 흰색 60% 외곽선, 등록은 투톤 채움.
  */
 const BreederCard = ({ breeder, showPopularBadge }: BreederCardProps) => {
-  // TODO: API 연동 후 실제 브리더 홈 경로로 변경
-  // 로컬 UI 토글 (실데이터 연결 시 API의 즐겨찾기 여부로 초기화)
-  const [favorited, setFavorited] = useState(false)
-
-  // 카드가 Link라 별 클릭 시 이동 방지 후 토글
-  const toggleFavorite = (e: MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setFavorited((prev) => !prev)
-  }
-
   return (
-    <Link href={`/home/${breeder.id}`} className="flex flex-col">
-      {/* 이미지: 인기 뱃지(좌상단) / 모바일 별(우하단) */}
-      <div className="relative aspect-[282/230] w-full overflow-hidden rounded bg-neutral-700 tab:rounded-lg">
-        {breeder.imageUrl && (
-          <Image
-            src={breeder.imageUrl}
-            alt={breeder.nickname}
-            fill
-            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-            className="object-cover"
-          />
-        )}
-        {showPopularBadge && (
-          <Badge
-            variant="default"
-            size="md"
-            className={cn('absolute top-2.5 left-2.5 tab:top-3.5 tab:left-3.5', BADGE_TAB_LG)}
-          >
-            인기
-          </Badge>
-        )}
-        {/* 모바일 전용 별 오버레이 (PC는 정보 영역의 즐겨찾기 행) */}
-        <FavoriteStar
-          pressed={favorited}
-          onClick={toggleFavorite}
-          className="absolute right-0 bottom-0 tab:hidden"
-          iconClassName="size-12"
-        />
-      </div>
-
-      {/* 정보 */}
-      <div className="flex min-h-20 flex-col gap-2 p-2 tab:min-h-[7.5625rem] tab:justify-between tab:p-3">
-        {/* 이름/위치 + 분양중 (모바일 items-start / PC items-center) */}
-        <div className="flex items-start justify-between gap-2 tab:items-center">
-          <div className="flex min-w-0 flex-col">
-            {/* 카드 이름 라벨 14px semibold #3e3e3e (p-2px) */}
-            <TextLabel size="14" className="truncate">
-              {breeder.nickname}
-            </TextLabel>
-            <div className="flex items-center">
-              <LocationOnIcon className="size-6 shrink-0 text-neutral-700" />
-              <span className="truncate text-xs leading-[1.5] font-medium text-neutral-700">
-                {breeder.location}
-              </span>
+    <MediaCard
+      href={`/home/${breeder.id}`}
+      thumbnailUrl={breeder.imageUrl ?? undefined}
+      alt={breeder.nickname}
+      // 시안: mo 164x133.84 / pc 282x230 (비율 동일), radius mo 4 / pc 8
+      thumbnailClassName="aspect-[282/230] rounded tab:rounded-lg"
+      overlay={
+        <>
+          {/* 인기 뱃지 — 좌상단, 박스 mo px-8 py-4 / pc px-12 py-8 */}
+          {showPopularBadge && (
+            <div className="absolute top-1 left-2 flex items-center tab:top-2 tab:left-3">
+              <Badge variant="primaryOutline" size="md" className="tab:h-[1.8125rem] tab:text-sm">
+                인기
+              </Badge>
             </div>
-          </div>
-          {breeder.isBreeding && (
-            <Badge variant="active" size="md" className={cn('shrink-0', BADGE_TAB_LG)}>
-              분양중
-            </Badge>
           )}
-        </div>
 
-        {/* PC 전용: 즐겨찾기 (별 + 텍스트, 우측 정렬) */}
-        <FavoriteStar
-          pressed={favorited}
-          onClick={toggleFavorite}
-          className="hidden items-center self-end tab:flex"
-          iconClassName="size-8"
-          label="즐겨찾기"
-        />
+          {/* 즐겨찾기 토글 — 프로필 카드와 같은 공용 버튼 (박스 mo 32 / pc 48, 글리프 24 / 40).
+              이미지 위라 미등록 색만 흰색 60% 로 덮는다 */}
+          <FavoriteBreederIconButton
+            breederId={breeder.id}
+            isFavorited={!!breeder.isFavorited}
+            size="card"
+            iconClassName={breeder.isFavorited ? undefined : 'text-white/60'}
+            className="absolute right-2 bottom-1 tab:right-3 tab:bottom-2"
+          />
+        </>
+      }
+      trailing={
+        breeder.level && (
+          <Badge
+            variant="primaryOutline"
+            size="md"
+            // 시안(CardStar large): 본문 행이 items-center — 뱃지만 세로 가운데로
+            className="shrink-0 self-center tab:h-[1.8125rem] tab:text-sm"
+          >
+            {LEVEL_LABEL[breeder.level]}
+          </Badge>
+        )
+      }
+    >
+      {/* 이름 mo 12 / pc 16 bold, 위치 mo 10 / pc 14 medium #6b6b6b */}
+      <p className="truncate text-xs leading-[1.5] font-semibold text-neutral-850 tab:text-base">
+        {breeder.nickname}
+      </p>
+      <div className="flex min-w-0 items-center">
+        <LocationOnIcon className="size-5 shrink-0 text-neutral-700 tab:size-6" />
+        <span className="truncate text-[0.625rem] leading-[1.5] font-medium text-neutral-700 tab:text-sm">
+          {breeder.location}
+        </span>
       </div>
-    </Link>
+    </MediaCard>
   )
 }
 

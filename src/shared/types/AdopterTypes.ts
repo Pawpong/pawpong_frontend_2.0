@@ -8,6 +8,18 @@ import type { PaginationResponse } from './ApiTypes'
 
 // ==================== 프로필 ====================
 
+/**
+ * 온보딩 조사 양식(상담 사전 정보) 답변.
+ * 서버가 답변이 하나도 없으면 프로필 응답에서 null 로 내려주므로, 이 값으로
+ * '다음에 작성하기'로 건너뛴 입양자인지 판별한다.
+ */
+export interface AdopterCounselProfile {
+  selfIntroduction?: string
+  dailyAbsenceHours?: string
+  livingSpaceDescription?: string
+  counselPrivacyAgreedAt?: string
+}
+
 export interface AdopterProfileDto {
   adopterId: string
   emailAddress: string
@@ -17,6 +29,8 @@ export interface AdopterProfileDto {
   accountStatus: string
   authProvider: AuthProvider
   marketingAgreed: boolean
+  /** 조사 양식을 건너뛴 경우 null */
+  counselDefaultProfile: AdopterCounselProfile | null
   createdAt: string
   updatedAt: string
 }

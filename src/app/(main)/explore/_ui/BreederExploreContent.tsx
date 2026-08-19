@@ -1,97 +1,104 @@
 'use client'
 
-import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
-import { Container, InfiniteScrollTrigger } from '@/shared/ui'
-import { cn } from '@/shared/lib/cn'
-import type { AnimalCategory } from '@/shared/types'
+import { useMemo, useState } from 'react'
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { Container, InfiniteScrollTrigger, ListState, ListingCardGrid } from '@/shared/ui'
 import { breederQueries } from '@/entities/breeder'
+import { dedupeBy } from '@/shared/lib/dedupeBy'
+import { flattenPages, getTotalItems } from '@/shared/lib/infiniteList'
+import { CATEGORY_TO_PET_TYPE } from '@/shared/lib/petCategory'
 import { BreederCard } from '@/app/(main)/home/_ui/BreederCard'
-import { ExploreListingSection } from './ExploreListingSection'
-import { mapBreederCard } from '../_lib/mapBreederCard'
-import { uniqueBy } from '@/shared/lib/uniqueBy'
-import { EXPLORE_SECTION_CONTAINER } from '../_lib/constants'
+import { TitledSection } from './TitledSection'
+import { ExploreListFilters } from './ExploreListFilters'
+import type { ExploreListFilter } from './ExploreListFilters'
+import { EXPLORE_SECTION_CONTAINER, EXPLORE_SECTION_TITLE_CLASS } from '../_lib/constants'
+import type { AnimalCategory, Breeder, FavoriteBreeder } from '@/shared/types'
 
-// 상단 카테고리/검색(픽셀 카테고리 + 큰 검색바)은 ExploreContent에서 공통 렌더
-// [refactored] 입양 탐색 탭과 동일한 ExploreListingSection 사용
-const BreederExploreContent = ({ selectedCategory }: { selectedCategory: AnimalCategory }) => {
-  // 백엔드 브리더 탐색 petType enum 은 dog|cat 뿐 — 도마뱀(reptile)은 400이라 전체와 동일하게 필터 생략
-  const petType =
-    selectedCategory === 'dog' || selectedCategory === 'cat' ? selectedCategory : undefined
+// 필터 칩 → /breeder/explore 파라미터 (서버 필터링 — 클라이언트 slice 금지)
+const FILTER_TO_QUERY = {
+  all: { sortBy: 'latest' },
+  available: { sortBy: 'latest', isAdoptionAvailable: true },
+  popular: { sortBy: 'favorite' },
+} as const
 
-  // queryKey 안정성: params 객체는 결정적으로 생성 (칩 토글 시 동일 키 재사용)
-  // 네트워크 에러(백엔드 다운=status undefined)·5xx 는 전역 설정상 에러 바운더리로 튄다.
-  // 이 컴포넌트는 자체 isError UI 를 가지므로 throwOnError:false 로 인라인 처리한다(분양/커뮤니티 탭과 동일).
-  const {
-    data: exploreData,
-    isLoading,
-    isError,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery({
-    ...breederQueries.explore(petType ? { petType } : {}),
-    throwOnError: false,
-  })
-  const { data: popularData } = useQuery({ ...breederQueries.popular(), throwOnError: false })
+// 탐색 카테고리 → 브리더 검색 petType. 도마뱀(reptile)은 API enum(dog|cat)에 없어 전체 조회로 둔다.
+const toBreederPetType = (category: AnimalCategory) => {
+  const petType = CATEGORY_TO_PET_TYPE[category]
+  return petType === 'dog' || petType === 'cat' ? petType : undefined
+}
 
-  const featuredBreeders = (popularData ?? []).slice(0, 4).map((b) => mapBreederCard(b, true))
-  const breeders = uniqueBy(
-    (exploreData?.pages.flatMap((page) => page.items) ?? []).map((b) => mapBreederCard(b)),
-    (breeder) => breeder.id,
+// Breeder(API) → BreederCard 뷰 모델. 카드는 즐겨찾는 브리더 탭과 같은 것을 쓴다.
+const toBreederCardModel = (breeder: Breeder): FavoriteBreeder => ({
+  id: breeder.breederId,
+  nickname: breeder.breederName,
+  imageUrl: breeder.profileImage ?? breeder.representativePhotos[0] ?? null,
+  badges: [],
+  isBreeding: breeder.isAdoptionAvailable,
+  location: breeder.location,
+  date: breeder.createdAt,
+  level: breeder.breederLevel,
+  isFavorited: breeder.isFavorited,
+})
+
+interface BreederExploreContentProps {
+  /** 상단 픽셀 카테고리 칩 선택값 — 입양 탭과 같은 필터를 공유한다 */
+  category: AnimalCategory
+}
+
+// 상단 카테고리/검색(픽셀 카테고리 + 큰 검색바)은 ExploreContent에서 공통 렌더.
+// 목록 레이아웃은 입양 탐색과 동일 — 제목+필터 칩 헤더 / 공용 그리드 / 무한스크롤.
+const BreederExploreContent = ({ category }: BreederExploreContentProps) => {
+  const [listFilter, setListFilter] = useState<ExploreListFilter>('all')
+
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending, isError } =
+    useInfiniteQuery(
+      breederQueries.explore({
+        petType: toBreederPetType(category),
+        ...FILTER_TO_QUERY[listFilter],
+      }),
+    )
+
+  // 서버 페이지 경계에서 항목이 겹쳐도 React key가 중복되지 않도록 방어 (입양 탭과 동일)
+  const breeders = useMemo(
+    () => dedupeBy(flattenPages(data).map(toBreederCardModel), (breeder) => breeder.id),
+    [data],
   )
-  const totalCount = exploreData?.pages[0]?.pagination.totalItems
-
-  if (isLoading) {
-    return (
-      <Container className="flex items-center justify-center py-10">
-        <p className="text-sm text-neutral-700">불러오는 중...</p>
-      </Container>
-    )
-  }
-
-  if (isError) {
-    return (
-      <Container className="flex items-center justify-center py-10">
-        <p className="text-sm text-neutral-700">브리더를 불러오지 못했습니다.</p>
-      </Container>
-    )
-  }
+  const totalCount = getTotalItems(data)
 
   return (
-    <>
-      {/* 인기 브리더 — 입양 탐색 인기 동물과 동일 (tab 가로 80px) */}
-      {featuredBreeders.length > 0 && (
-        <Container className={cn(EXPLORE_SECTION_CONTAINER, 'tab:px-20')}>
-          <ExploreListingSection
-            title="인기 브리더"
-            items={featuredBreeders}
-            getKey={(breeder) => breeder.id}
-            renderCard={(breeder) => <BreederCard breeder={breeder} showPopularBadge />}
-            variant="featured"
+    <Container className={EXPLORE_SECTION_CONTAINER}>
+      <TitledSection
+        title={`전체 브리더 소식 ${totalCount}`}
+        titleClassName={EXPLORE_SECTION_TITLE_CLASS}
+        headerSlot={
+          <ExploreListFilters
+            value={listFilter}
+            onChange={setListFilter}
+            ariaLabel="브리더 소식 필터"
           />
-        </Container>
-      )}
-
-      {/* 전체 브리더 소식 — 전체 입양 소식과 동일 그리드 */}
-      <Container className={EXPLORE_SECTION_CONTAINER}>
-        {breeders.length === 0 ? (
-          <p className="py-10 text-center text-sm text-neutral-700">등록된 브리더가 없습니다.</p>
-        ) : (
-          <ExploreListingSection
-            title="전체 브리더 소식"
+        }
+      >
+        <ListState
+          isPending={isPending}
+          isError={isError}
+          isEmpty={breeders.length === 0}
+          loadingText="브리더를 불러오는 중입니다."
+          errorText="브리더를 불러오지 못했습니다."
+          emptyText="등록된 브리더가 없습니다."
+        >
+          <ListingCardGrid
             items={breeders}
-            totalCount={totalCount}
             getKey={(breeder) => breeder.id}
-            renderCard={(breeder) => <BreederCard breeder={breeder} />}
+            renderItem={(breeder) => <BreederCard breeder={breeder} />}
           />
-        )}
-        <InfiniteScrollTrigger
-          onIntersect={fetchNextPage}
-          hasNextPage={hasNextPage ?? false}
-          isFetchingNextPage={isFetchingNextPage}
-        />
-      </Container>
-    </>
+        </ListState>
+      </TitledSection>
+      <InfiniteScrollTrigger
+        onIntersect={fetchNextPage}
+        hasNextPage={hasNextPage ?? false}
+        isFetchingNextPage={isFetchingNextPage}
+      />
+    </Container>
   )
 }
 

@@ -71,6 +71,10 @@ export interface FavoriteBreeder {
   isBreeding: boolean
   location: string
   date: string
+  /** 카드 우측 뱃지에 표기 (시안 CardStar 816-102863) */
+  level?: BreederLevel
+  /** 즐겨찾기 등록 여부 — 카드의 다이아몬드 채움 상태 */
+  isFavorited?: boolean
 }
 
 /** 즐겨찾는 브리더 목록 파라미터 */

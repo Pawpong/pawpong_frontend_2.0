@@ -1,7 +1,8 @@
 'use client'
 
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query'
 import { adopterQueries } from '@/entities/adopter'
+import { breederQueries } from '@/entities/breeder'
 import { communityQueries } from '@/entities/community'
 import { profileQueries } from '@/entities/profile'
 import {
@@ -39,12 +40,24 @@ export const useDeleteAdopterAccount = () =>
       deleteAdopterAccount(data),
   })
 
+/**
+ * 즐겨찾기 토글이 건드리는 캐시.
+ * isFavorited 를 들고 있는 브리더 쿼리가 공개 프로필·탐색 목록 여럿이고 staleTime 도
+ * 길어(VERY_LONG) breeder 루트째 지워야 다시 들어왔을 때 별 상태가 어긋나지 않는다.
+ */
+const invalidateFavoriteCaches = (qc: QueryClient) =>
+  Promise.all([
+    qc.invalidateQueries({ queryKey: adopterQueries.all() }),
+    qc.invalidateQueries({ queryKey: profileQueries.favoriteBreeders().queryKey }),
+    qc.invalidateQueries({ queryKey: breederQueries.all() }),
+  ])
+
 export const useAddFavorite = () => {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (breederId: string) => addFavorite(breederId),
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: adopterQueries.all() })
+      void invalidateFavoriteCaches(qc)
     },
   })
 }
@@ -54,7 +67,7 @@ export const useRemoveFavorite = () => {
   return useMutation({
     mutationFn: (breederId: string) => removeFavorite(breederId),
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: adopterQueries.all() })
+      void invalidateFavoriteCaches(qc)
     },
   })
 }

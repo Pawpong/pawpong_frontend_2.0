@@ -25,6 +25,46 @@ interface PostCardProps extends CommunityPreviewProps {
   className?: string
 }
 
+/** 이미지 가로 스크롤 — detailHref 있으면 행 전체(빈 영역 포함)가 상세 진입 링크 */
+const ImagesRow = ({
+  images,
+  detailHref,
+  className,
+}: {
+  images: string[]
+  detailHref?: string
+  className?: string
+}) => {
+  const row = (
+    <div className={cn('flex gap-3 overflow-x-auto', className)}>
+      {images.map((src, index) => (
+        <div
+          key={index}
+          className="relative h-[13.1875rem] w-[17.5625rem] shrink-0 overflow-hidden rounded-lg bg-neutral-700 tab:h-60 tab:w-80"
+        >
+          {src && (
+            <Image
+              src={src}
+              alt={`게시글 이미지 ${index + 1}`}
+              fill
+              sizes="(max-width: 768px) 281px, 320px"
+              className="object-cover"
+            />
+          )}
+        </div>
+      ))}
+    </div>
+  )
+
+  return detailHref ? (
+    <Link href={detailHref} className="block">
+      {row}
+    </Link>
+  ) : (
+    row
+  )
+}
+
 /**
  * 커뮤니티 게시글 카드 (Figma node 1054-28522 · community box -게시글)
  * - 헤더: 아바타 + [이름·작성시각] / 본문 미리보기 + 더보기(⋯)
@@ -104,24 +144,11 @@ const PostCard = ({
       <div className="flex flex-col gap-2">
         {/* 이미지 (가로 스크롤) — 저장피드(profileType)는 상단패딩 제거 */}
         {hasImages && (
-          <div className={cn('flex gap-3 overflow-x-auto pt-3 pc:pt-3', profileType && 'pt-0')}>
-            {images.map((src, index) => (
-              <div
-                key={index}
-                className="relative h-[13.1875rem] w-[17.5625rem] shrink-0 overflow-hidden rounded-lg bg-neutral-700 tab:h-60 tab:w-80"
-              >
-                {src && (
-                  <Image
-                    src={src}
-                    alt={`게시글 이미지 ${index + 1}`}
-                    fill
-                    sizes="(max-width: 768px) 281px, 320px"
-                    className="object-cover"
-                  />
-                )}
-              </div>
-            ))}
-          </div>
+          <ImagesRow
+            images={images}
+            detailHref={detailHref}
+            className={cn('pt-3 pc:pt-3', profileType && 'pt-0')}
+          />
         )}
 
         {/* 액션 + 댓글 미리보기 — 아이콘↔댓글 4px gap */}
@@ -134,6 +161,7 @@ const PostCard = ({
             saved={isSaved}
             onToggleLike={onToggleLike}
             onToggleSave={onToggleSave}
+            detailHref={detailHref}
           />
 
           {/* 댓글 미리보기 (Figma community-profile 2596-231732) — 작성자 + 본문 1줄 + [더보기] */}

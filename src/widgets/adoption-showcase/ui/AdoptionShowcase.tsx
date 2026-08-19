@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { ShowcaseSection } from '@/shared/ui'
 import { adoptionQueries } from '@/entities/adoption'
-import { mapAdoptionCard } from '@/app/(main)/explore/_lib/mapAdoptionCard'
+import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
 import { createMockListings } from '@/shared/mocks/adoption'
 import { FavoriteAdoptionShowcaseCard } from '@/features/adoption'
 

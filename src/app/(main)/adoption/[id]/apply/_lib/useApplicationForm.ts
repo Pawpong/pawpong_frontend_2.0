@@ -2,15 +2,19 @@
 
 import { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { useQuery } from '@tanstack/react-query'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useCreateApplication } from '@/features/application'
+import { adopterQueries } from '@/entities/adopter'
 import { useExitGuard } from '@/shared/lib/useExitGuard'
-import { clearSurveySkipped } from '@/shared/lib/surveySkip'
+import { useToast } from '@/shared/lib/useToast'
+import { normalizeApiError } from '@/shared/api'
 import { GENDER_LABEL } from '@/shared/types'
 import type { AdoptionDetailDto } from '@/shared/types'
 import { applicationSchema, getAgeText, type ApplicationFormValues } from './schema'
 import { toCreateApplicationRequest } from './applicationRequest'
+import { SUBMIT_ERROR_FALLBACK } from './constants'
 
 const useApplicationForm = (detail: AdoptionDetailDto) => {
   const router = useRouter()
@@ -77,18 +81,30 @@ const useApplicationForm = (detail: AdoptionDetailDto) => {
     handleCloseClick()
   }
 
+  // 신청 실패(중복 신청 409 / 분양 불가 400 / 브리더·펫 없음 404)를 알리는 토스트.
+  // 전역 MutationCache 는 5xx 를 Sentry 로 보낼 뿐이라 4xx 는 화면에서 직접 처리해야 한다.
+  const toast = useToast()
+
   const confirmConsult = () => {
     const data = pendingData.current
     if (!data) return
     createApplication(toCreateApplicationRequest(detail, data), {
       onSuccess: () => {
-        // 조사 항목까지 신청서로 제출됐으므로 건너뜀 플래그 해제
-        clearSurveySkipped()
         setShowConsultConfirm(false)
         router.push(`/adoption/${detail.listingId}`)
       },
+      onError: (error) => {
+        // 모달을 닫아 폼으로 돌려보낸다 (입력값은 유지) — 서버 문구를 그대로 노출
+        setShowConsultConfirm(false)
+        toast.error(normalizeApiError(error, SUBMIT_ERROR_FALLBACK).message)
+      },
     })
   }
+
+  // 온보딩에서 '다음에 작성하기'로 조사 양식을 건너뛴 입양자에게만 조사 항목을 노출.
+  // 서버가 답변이 하나도 없으면 counselDefaultProfile 을 null 로 내려준다 (건너뜀 판별의 유일한 근거).
+  const { data: adopterProfile } = useQuery(adopterQueries.profile())
+  const needsSurvey = adopterProfile?.counselDefaultProfile === null
 
   const petSummary = `${detail.name} . ${GENDER_LABEL[detail.gender]} . ${getAgeText(detail.birthDate)}`
 
@@ -109,6 +125,8 @@ const useApplicationForm = (detail: AdoptionDetailDto) => {
     cancelConsult,
     giveUpFromConsult,
     petSummary,
+    needsSurvey,
+    toast,
   }
 }
 

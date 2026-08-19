@@ -42,6 +42,7 @@ interface RawCommunityPostCard {
   isLiked: boolean
   isSaved: boolean
   createdAt: string
+  commentPreview?: RawCommunityComment[]
 }
 
 interface RawCommunityComment {
@@ -100,6 +101,7 @@ const mapCard = (raw: RawCommunityPostCard): CommunityPostCard => ({
   isLiked: raw.isLiked,
   isSaved: raw.isSaved,
   createdAt: raw.createdAt,
+  commentPreview: raw.commentPreview?.map(mapComment),
 })
 
 const mapComment = (raw: RawCommunityComment): CommunityComment => ({

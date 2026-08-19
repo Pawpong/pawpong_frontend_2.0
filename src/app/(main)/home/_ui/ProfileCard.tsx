@@ -3,23 +3,32 @@
 import { useState, type ComponentType, type ReactNode } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import {
   useInfiniteQuery,
   type InfiniteData,
   type UseInfiniteQueryResult,
 } from '@tanstack/react-query'
-import { Badge, ProfileAvatar, FollowButton, FollowersModal, type FollowUser } from '@/shared/ui'
+import {
+  Badge,
+  Button,
+  buttonVariants,
+  ProfileAvatar,
+  FollowersModal,
+  type FollowUser,
+} from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
-import { uniqueBy } from '@/shared/lib/uniqueBy'
 import { LocationOnIcon } from '@/shared/assets/icons'
 import { profileQueries } from '@/entities/profile'
-import { useUnfollowUser, useRemoveFollower } from '@/features/profile'
+import { useUnfollowUser, useRemoveFollower, useToggleFollow } from '@/features/profile'
+import { useCreateOrGetChatRoom } from '@/features/send-message'
 import type {
   AdopterPublicProfile,
   BreederPublicProfile,
   FollowUserCard,
   PaginationResponse,
 } from '@/shared/types'
+import { FavoriteBreederIconButton } from './FavoriteBreederIconButton'
 
 // 백엔드 FollowUserCard → 모달이 쓰는 FollowUser (맞팔 여부는 두 플래그 조합)
 const toFollowUser = (card: FollowUserCard): FollowUser => ({
@@ -33,10 +42,7 @@ const toFollowUser = (card: FollowUserCard): FollowUser => ({
 type FollowListQuery = UseInfiniteQueryResult<InfiniteData<PaginationResponse<FollowUserCard>>>
 
 const toFollowUsers = (query: FollowListQuery): FollowUser[] =>
-  uniqueBy(
-    (query.data?.pages ?? []).flatMap((page) => page.items.map(toFollowUser)),
-    (user) => user.id,
-  )
+  (query.data?.pages ?? []).flatMap((page) => page.items.map(toFollowUser))
 
 const toPaging = (query: FollowListQuery) => ({
   hasMore: query.hasNextPage,
@@ -46,20 +52,12 @@ const toPaging = (query: FollowListQuery) => ({
 
 type ProfileMode = 'mine' | 'mine-breeder' | 'other' | 'breeder'
 
-interface ProfileActionProps {
-  onMessage?: () => void
-  isMessagePending?: boolean
-  isFollowing?: boolean
-  onToggleFollow?: () => void
-  isFollowPending?: boolean
-}
-
-interface ProfileCardBaseProps extends ProfileActionProps {
+interface ProfileCardBaseProps {
   profile: AdopterPublicProfile
   mode?: 'mine' | 'other'
 }
 
-interface ProfileCardBreederProps extends ProfileActionProps {
+interface ProfileCardBreederProps {
   profile: BreederPublicProfile
   mode: 'breeder' | 'mine-breeder'
 }
@@ -120,165 +118,143 @@ const ProfileBio = ({ children, className }: { children: ReactNode; className?: 
   </p>
 )
 
-/* ── 공통 버튼 ── */
-
-// [refactored] pill 버튼 공통 베이스 (h-40, 둥근, muted 배경) — 메시지/즐겨찾기 아이콘 버튼이 공유
-const PILL_BASE = 'flex h-10 items-center justify-center rounded-full bg-fill-muted p-2.5'
-
-// [refactored] 아이콘+라벨 pill 버튼 — 메시지/즐겨찾기 공통 구조 통합
-const IconPillButton = ({
-  icon,
-  label,
-  className,
-  onClick,
-  disabled,
-}: {
-  icon: string
-  label: string
-  className?: string
-  onClick?: () => void
-  disabled?: boolean
-}) => (
-  <button
-    type="button"
-    onClick={onClick}
-    disabled={disabled}
-    className={cn(PILL_BASE, 'gap-1.5 disabled:opacity-50', className)}
-  >
-    <Image src={icon} alt={label} width={20} height={20} />
-    <span className="text-sm leading-[1.375rem] font-semibold text-text-primary">{label}</span>
-  </button>
-)
-
-// [refactored] IconPillButton 얇은 래퍼 — 기존 호출부(MineActions 등) 유지
-const MessageButton = ({
-  label = '메시지 보내기',
-  className,
-  onClick,
-  disabled,
-}: {
-  label?: string
-  className?: string
-  onClick?: () => void
-  disabled?: boolean
-}) => (
-  <IconPillButton
-    icon="/chat.svg"
-    label={label}
-    className={className}
-    onClick={onClick}
-    disabled={disabled}
-  />
-)
-
-const FavoriteButton = ({ className }: { className?: string }) => (
-  <IconPillButton icon="/star.svg" label="즐겨찾기 등록" className={className} />
-)
-
 /* ── mode별 하단 액션 (디자인: pill border 버튼) ── */
 
+// 프로필 편집·팔로우·메시지 공통 크기 — 모바일 32, PC 40
+const ACTION_SIZE = 'h-8 flex-1 text-sm pc:h-10 pc:text-base'
+
 const EditButton = () => (
-  <Link
-    href="/profile/edit"
-    className="flex h-8 flex-1 items-center justify-center rounded-full border border-neutral-300 p-2 text-sm leading-[1.5] font-semibold text-neutral-850 pc:h-10 pc:text-base"
-  >
+  <Link href="/profile/edit" className={cn(buttonVariants({ variant: 'outline' }), ACTION_SIZE)}>
     프로필 편집
   </Link>
 )
 
-const MineActions = () => <EditButton />
+interface VisitorActionsProps {
+  /** 상대 사용자 id — 팔로우·채팅방 생성 대상 */
+  profileUserId: string
+  initialFollowing: boolean
+}
 
-const BreederActions = ({
-  onMessage,
-  isMessagePending,
-  isFollowing,
-  onToggleFollow,
-  isFollowPending,
-}: ProfileActionProps) => (
-  <>
-    <FavoriteButton className="hidden pc:flex pc:w-[12.5rem]" />
-    <MessageButton
-      label="상담하기"
-      className="pc:w-[12.5rem]"
-      onClick={onMessage}
-      disabled={isMessagePending}
-    />
-    <FollowButton
-      status={isFollowing ? 'following' : 'follow'}
-      className="flex-1"
-      onClick={onToggleFollow}
-      disabled={isFollowPending}
-    />
-  </>
+const MineActions = (_: VisitorActionsProps) => <EditButton />
+
+/* ── 남의 홈에서 보이는 액션 (Figma 3349-2026986) ── */
+
+// 흰 배경 + border/secondary(#cacaca) pill
+const MessageButton = ({ onClick, disabled }: { onClick: () => void; disabled: boolean }) => (
+  <Button
+    variant="outline"
+    className={cn(ACTION_SIZE, 'gap-1.5 pc:gap-2')}
+    onClick={onClick}
+    disabled={disabled}
+  >
+    <Image src="/chat.svg" alt="" width={24} height={24} className="size-5 pc:size-6" />
+    메시지
+  </Button>
 )
 
-const OtherActions = ({
-  onMessage,
-  isMessagePending,
+// 시안의 팔로우는 point 색 BaseButton(최대 258).
+// 공통 FollowButton 은 팔로워 모달용 muted pill 이라 여기서는 쓰지 않는다
+const FollowActionButton = ({
   isFollowing,
-  onToggleFollow,
-  isFollowPending,
-}: ProfileActionProps) => (
-  <>
-    <MessageButton className="pc:w-[12.5rem]" onClick={onMessage} disabled={isMessagePending} />
-    <FollowButton
-      status={isFollowing ? 'following' : 'follow'}
-      className="flex-1"
-      onClick={onToggleFollow}
-      disabled={isFollowPending}
-    />
-  </>
+  onClick,
+  disabled,
+}: {
+  isFollowing: boolean
+  onClick: () => void
+  disabled: boolean
+}) => (
+  <Button
+    variant="primary"
+    className={cn(ACTION_SIZE, 'pc:max-w-[16.125rem]')}
+    onClick={onClick}
+    disabled={disabled}
+  >
+    {isFollowing ? '팔로잉' : '팔로우'}
+  </Button>
 )
+
+// 팔로우가 앞, 메시지가 뒤 — 입양자·브리더 홈 동일
+const VisitorActions = ({ profileUserId, initialFollowing }: VisitorActionsProps) => {
+  const router = useRouter()
+  // 메시지 — 채팅방 생성/조회 후 대화로 이동
+  const { mutate: startChat, isPending: isStartingChat } = useCreateOrGetChatRoom()
+  const handleMessage = () => {
+    startChat(
+      { breederId: profileUserId },
+      {
+        onSuccess: (room) => router.push(`/chat?roomId=${room.roomId}`),
+        onError: (error) =>
+          window.alert(error instanceof Error ? error.message : '채팅을 시작하지 못했습니다.'),
+      },
+    )
+  }
+
+  const { isFollowing, toggleFollow, isPending: isFollowPending } = useToggleFollow(
+    profileUserId,
+    initialFollowing,
+  )
+
+  return (
+    <>
+      <FollowActionButton
+        isFollowing={isFollowing}
+        onClick={toggleFollow}
+        disabled={isFollowPending}
+      />
+      <MessageButton onClick={handleMessage} disabled={isStartingChat} />
+    </>
+  )
+}
 
 const ACTION_MAP = {
   mine: MineActions,
   'mine-breeder': MineActions,
-  breeder: BreederActions,
-  other: OtherActions,
-} satisfies Record<ProfileMode, ComponentType<ProfileActionProps>>
+  breeder: VisitorActions,
+  other: VisitorActions,
+} satisfies Record<ProfileMode, ComponentType<VisitorActionsProps>>
 
 /* ── ProfileCard ── */
 
-const ProfileCard = ({
-  profile,
-  mode = 'mine',
-  onMessage,
-  isMessagePending,
-  isFollowing,
-  onToggleFollow,
-  isFollowPending,
-}: ProfileCardProps) => {
+const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
   const Actions = ACTION_MAP[mode]
   const [followOpen, setFollowOpen] = useState(false)
 
-  // [refactored] 타입 단언(as) 대신 in-내로잉으로 브리더 프로필 판별
+  // [refactored] 브리더 판별을 한 곳에서 — 이전엔 'isFavorited' in / 'breederId' in /
+  // 'businessLocation' in 으로 같은 판정을 네 번 했다 (타입 단언 없이 in-내로잉)
   const breederProfile = 'businessLocation' in profile ? profile : null
   const isBreederProfile = breederProfile !== null
-  const profileUserId = 'breederId' in profile ? profile.breederId : profile.userId
+  const profileUserId = breederProfile?.breederId ?? (profile as AdopterPublicProfile).userId
+  // 팔로우 초기값 — 브리더 공개 프로필엔 isFollowing 필드가 없어 false로 시작
+  const initialFollowing = ('isFollowing' in profile ? profile.isFollowing : false) ?? false
 
   // 친구 목록 — 모달이 열릴 때만 조회
   const followersQuery = useInfiniteQuery(profileQueries.followers(profileUserId, followOpen))
   const followingsQuery = useInfiniteQuery(profileQueries.followings(profileUserId, followOpen))
   const { mutate: unfollow } = useUnfollowUser()
   const { mutate: removeFollower } = useRemoveFollower()
+  // 남의 브리더 홈에서만 카드 우상단 즐겨찾기 아이콘을 띄운다
+  const showFavoriteAction = mode === 'breeder' && breederProfile !== null
   const locationText = breederProfile
     ? `${breederProfile.businessLocation.city} ${breederProfile.businessLocation.district}`
     : null
 
   // 상단 뱃지 (전 모드 공통) — point-500 채움 + primary-500 테두리/텍스트
   // 모바일 md(10px·h-24) / PC lg(14px). PC 높이는 디자인 노드 기준 32px로 맞춘다.
-  const renderBadges = (size?: 'md') => (
-    <>
-      {isBreederProfile && (
-        <Badge variant="pointFilled" size={size} className={size ? undefined : 'h-8'}>
-          브리더
-        </Badge>
-      )}
-      <Badge variant="pointFilled" size={size} className={size ? undefined : 'h-8'}>
-        {profile.bpm} BPM
-      </Badge>
-    </>
-  )
+  const renderBadges = (size?: 'md') => {
+    // [refactored] size 미지정(=PC lg)일 때만 높이를 32로 맞춘다는 규칙을 이름으로 드러냄
+    const badgeProps = {
+      variant: 'pointFilled',
+      size,
+      className: size ? undefined : 'h-8',
+    } as const
+
+    return (
+      <>
+        {isBreederProfile && <Badge {...badgeProps}>브리더</Badge>}
+        <Badge {...badgeProps}>{profile.bpm} BPM</Badge>
+      </>
+    )
+  }
 
   return (
     <>
@@ -307,35 +283,51 @@ const ProfileCard = ({
         </div>
         {/* 하단: 모드별 버튼 (풀폭, gap-10, h-40) */}
         <div className="flex w-full items-start gap-2.5">
-          <Actions
-            onMessage={onMessage}
-            isMessagePending={isMessagePending}
-            isFollowing={isFollowing}
-            onToggleFollow={onToggleFollow}
-            isFollowPending={isFollowPending}
-          />
+          <Actions profileUserId={profileUserId} initialFollowing={initialFollowing} />
         </div>
       </div>
 
       {/* ===== Desktop (디자인 node 1021-20324) ===== */}
       <div className="mx-auto hidden max-w-[59.25rem] overflow-hidden rounded-lg bg-point-50 pc:block">
-        {/* 상단: 좌(뱃지·이름·소개) / 우(팔로워·아바타) — h-204 고정, 콘텐츠 가운데 정렬 */}
-        <div className="flex h-[12.75rem] items-center justify-center overflow-hidden px-5 py-8">
-          <div className="flex w-full max-w-[48.75rem] items-end justify-between gap-3">
+        {/* 상단: 좌(프로필 정보) / 우(즐겨찾기 아이콘·팔로워·아바타) */}
+        <div className="flex items-center justify-center overflow-hidden px-5 py-8">
+          <div className="flex w-full max-w-[48.75rem] items-start justify-between gap-3">
             <div className="flex min-w-0 flex-1 flex-col items-start gap-3">
               <div className="flex items-start gap-3">{renderBadges()}</div>
               <ProfileName className="text-2xl">{profile.nickname}</ProfileName>
-              {locationText && <LocationInfo location={locationText} />}
-              {/* 디자인상 이름·소개 블록 폭 440 */}
+              {/* 디자인상 이름·소개 블록 폭 440. 위치는 소개 아래 (모바일 블록과 같은 순서) */}
               <ProfileBio className="w-full max-w-[27.5rem] text-base">{profile.bio}</ProfileBio>
+              {locationText && <LocationInfo location={locationText} />}
             </div>
-            <div className="flex shrink-0 items-end gap-3">
-              <FollowerSection
-                vertical
-                textClassName="text-xs"
-                onClick={() => setFollowOpen(true)}
-              />
-              <ProfileAvatar size="xlarge" src={profile.profileImageUrl} alt={profile.nickname} />
+            {/* [refactored] 두 갈래가 팔로워+아바타를 똑같이 그리고 있어 한 벌로 합쳤다.
+                실제 차이는 즐겨찾기 행 유무와 래퍼 폭뿐 */}
+            <div
+              className={cn(
+                'flex items-end gap-3',
+                showFavoriteAction ? 'min-w-0 flex-1 flex-col items-end self-stretch' : 'shrink-0',
+              )}
+            >
+              {showFavoriteAction && (
+                <div className="flex h-12 w-full items-center justify-end">
+                  <FavoriteBreederIconButton
+                    breederId={breederProfile.breederId}
+                    isFavorited={breederProfile.isFavorited}
+                  />
+                </div>
+              )}
+              <div
+                className={cn(
+                  'flex items-end gap-3',
+                  showFavoriteAction && 'w-[13.5625rem] justify-end',
+                )}
+              >
+                <FollowerSection
+                  vertical
+                  textClassName="text-xs"
+                  onClick={() => setFollowOpen(true)}
+                />
+                <ProfileAvatar size="xlarge" src={profile.profileImageUrl} alt={profile.nickname} />
+              </div>
             </div>
           </div>
         </div>
@@ -343,14 +335,13 @@ const ProfileCard = ({
         {/* 하단: 구분선 + 모드별 버튼 */}
         <div className="flex flex-col items-center gap-3 pb-8">
           <div className="h-px w-full bg-neutral-150" />
-          <div className="flex w-full max-w-[43rem] items-center gap-6 px-5">
-            <Actions
-              onMessage={onMessage}
-              isMessagePending={isMessagePending}
-              isFollowing={isFollowing}
-              onToggleFollow={onToggleFollow}
-              isFollowPending={isFollowPending}
-            />
+          <div
+            className={cn(
+              'flex w-full items-start gap-6',
+              mode === 'breeder' ? 'max-w-[48rem]' : 'max-w-[43rem] px-5',
+            )}
+          >
+            <Actions profileUserId={profileUserId} initialFollowing={initialFollowing} />
           </div>
         </div>
       </div>

@@ -10,7 +10,6 @@ import { buildAdopterRegistrationRequest } from './buildAdopterRegistrationReque
 import { useSignupCompletion } from './useSignupCompletion' // [refactored]
 import { SIGNUP_ERROR } from './signupErrors' // [refactored]
 import type { SurveyFormData } from './schema'
-import { clearSurveySkipped, markSurveySkipped } from '@/shared/lib/surveySkip'
 
 /**
  * 입양자 가입 완료 (POST /auth/register/adopter)
@@ -89,10 +88,7 @@ export const useAdopterSignup = () => {
 
     try {
       const tokens = await registerAdopter(request)
-      // 조사 미작성 표시는 가입이 실제로 끝난 뒤에만 남긴다
-      if (skipped) markSurveySkipped()
-      else clearSurveySkipped()
-
+      // 조사 작성 여부는 서버가 counselDefaultProfile 유무로 판별한다 (클라 플래그 불필요)
       await complete(tokens) // [refactored]
     } catch (err) {
       setError(err instanceof Error ? err.message : SIGNUP_ERROR.registerFailed)

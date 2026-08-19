@@ -1,73 +1,62 @@
 'use client'
 
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
-import { useRouter } from 'next/navigation'
-import { Container, Separator } from '@/shared/ui'
+import { Container, InfiniteScrollTrigger, ListState, NavigationBar } from '@/shared/ui'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
 import { adopterQueries } from '@/entities/adopter'
 import { communityQueries } from '@/entities/community'
-import { useCreateOrGetChatRoom } from '@/features/send-message'
-import { useToggleFollow } from '@/features/profile'
 import { ProfileCard } from '../../_ui/ProfileCard'
-import { HomeTitle } from '../../_ui/HomeTitle'
 import { PostList } from '../../_ui/PostList'
 import { FooterPlaceholder } from '../../_ui/FooterPlaceholder'
+
+const HOME_POST_PAGE_SIZE = 30
 
 interface UserHomeContentProps {
   userId: string
 }
 
 const UserHomeContent = ({ userId }: UserHomeContentProps) => {
-  const router = useRouter()
   const { data: profile } = useQuery(adopterQueries.publicProfile(userId))
-
-  // 게시글 탭 — GET /community/posts?authorId=userId (무한 쿼리 첫 페이지만 노출)
-  const { data: postsData } = useInfiniteQuery(communityQueries.userPosts(userId))
-  const posts = dedupeBy(flattenPages(postsData), (post) => post.postId)
-
-  // 메시지 보내기 — 채팅방 생성/조회 후 대화로 이동
-  const { mutate: startChat, isPending: isStartingChat } = useCreateOrGetChatRoom()
-  const handleMessage = () => {
-    startChat(
-      { breederId: userId },
-      {
-        onSuccess: (room) => router.push(`/chat?roomId=${room.roomId}`),
-        onError: (error) =>
-          window.alert(error instanceof Error ? error.message : '채팅을 시작하지 못했습니다.'),
-      },
-    )
-  }
-
-  // 팔로우 토글
   const {
-    isFollowing,
-    toggleFollow,
-    isPending: isFollowPending,
-  } = useToggleFollow(userId, profile?.isFollowing ?? false)
+    data: postsData,
+    isPending: isPostsPending,
+    isError: isPostsError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery(communityQueries.userPosts(userId, HOME_POST_PAGE_SIZE))
+
+  // 무한스크롤 페이지 병합 시 postId 중복 제거 (React key 중복 방어)
+  const posts = dedupeBy(flattenPages(postsData), (post) => post.postId)
 
   if (!profile) return null
 
   return (
     <div className="flex w-full flex-col">
-      <HomeTitle title={profile.nickname} />
+      <NavigationBar title={profile.nickname} />
 
-      <Container className="pc:px-[10rem]">
-        <ProfileCard
-          profile={profile}
-          mode="other"
-          onMessage={handleMessage}
-          isMessagePending={isStartingChat}
-          isFollowing={isFollowing}
-          onToggleFollow={toggleFollow}
-          isFollowPending={isFollowPending}
-        />
+      <Container className="px-4 pt-5">
+        <ProfileCard profile={profile} mode="other" />
       </Container>
 
-      <Separator className="bg-border-light tab:hidden" />
-
-      <Container className="pc:px-[10rem]">
-        <PostList posts={posts} />
+      {/* Figma 1023:22324 — 모바일 padding spacing/24 + margin/mo(16), 탭 이상은 spacing/40 */}
+      <Container className="px-4 py-6 tab:py-10">
+        <ListState
+          isPending={isPostsPending}
+          isError={isPostsError}
+          isEmpty={posts.length === 0}
+          loadingText="게시글을 불러오는 중입니다."
+          errorText="게시글을 불러오지 못했습니다."
+          emptyText="게시글이 없습니다."
+        >
+          <PostList posts={posts} />
+        </ListState>
+        <InfiniteScrollTrigger
+          onIntersect={() => void fetchNextPage()}
+          hasNextPage={hasNextPage ?? false}
+          isFetchingNextPage={isFetchingNextPage}
+        />
       </Container>
 
       <FooterPlaceholder />
