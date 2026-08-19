@@ -34,6 +34,8 @@ export interface CommunityPostCard {
   isLiked: boolean
   isSaved: boolean
   createdAt: string
+  /** 카드에 노출할 최신 댓글 (없으면 빈 배열) */
+  commentPreview?: CommunityComment[]
 }
 
 /** 커뮤니티 댓글 */
