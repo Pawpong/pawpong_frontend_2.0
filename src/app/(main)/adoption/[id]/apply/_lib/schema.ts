@@ -15,6 +15,14 @@ export const applicationSchema = z.object({
 
 export type ApplicationFormValues = z.infer<typeof applicationSchema>
 
+// [refactored] 스키마 파생 타입이라 스키마 옆이 제자리 (_ui/FormFields 에서 이동)
+// 문자열 필드 키만 추림 — 필드 추가/삭제 시 자동 반영(drift 방지)
+export type ApplicationTextField = {
+  [K in keyof ApplicationFormValues]-?: NonNullable<ApplicationFormValues[K]> extends string
+    ? K
+    : never
+}[keyof ApplicationFormValues]
+
 export const getAgeText = (birthDate: string): string => {
   const match = birthDate.match(/(\d{4})년\s*(\d{1,2})월/)
   if (!match) return birthDate
