@@ -42,22 +42,22 @@ export const useDeleteAdopterAccount = () =>
 
 /**
  * 즐겨찾기 토글이 건드리는 캐시.
- * 브리더 공개 프로필이 isFavorited 를 들고 있고 staleTime 이 길어(VERY_LONG) 함께 지워야
- * 홈으로 돌아왔을 때 별 상태가 어긋나지 않는다.
+ * isFavorited 를 들고 있는 브리더 쿼리가 공개 프로필·탐색 목록 여럿이고 staleTime 도
+ * 길어(VERY_LONG) breeder 루트째 지워야 다시 들어왔을 때 별 상태가 어긋나지 않는다.
  */
-const invalidateFavoriteCaches = (qc: QueryClient, breederId: string) =>
+const invalidateFavoriteCaches = (qc: QueryClient) =>
   Promise.all([
     qc.invalidateQueries({ queryKey: adopterQueries.all() }),
     qc.invalidateQueries({ queryKey: profileQueries.favoriteBreeders().queryKey }),
-    qc.invalidateQueries({ queryKey: breederQueries.publicProfile(breederId).queryKey }),
+    qc.invalidateQueries({ queryKey: breederQueries.all() }),
   ])
 
 export const useAddFavorite = () => {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (breederId: string) => addFavorite(breederId),
-    onSuccess: (_, breederId) => {
-      void invalidateFavoriteCaches(qc, breederId)
+    onSuccess: () => {
+      void invalidateFavoriteCaches(qc)
     },
   })
 }
@@ -66,8 +66,8 @@ export const useRemoveFavorite = () => {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (breederId: string) => removeFavorite(breederId),
-    onSuccess: (_, breederId) => {
-      void invalidateFavoriteCaches(qc, breederId)
+    onSuccess: () => {
+      void invalidateFavoriteCaches(qc)
     },
   })
 }

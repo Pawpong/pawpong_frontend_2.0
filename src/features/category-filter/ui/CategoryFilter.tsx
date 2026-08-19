@@ -46,7 +46,7 @@ const CategoryFilter = ({ selected, onChange, className }: CategoryFilterProps) 
     <div
       className={cn(
         // 모바일: 2열 grid(폭 이등분) / tab+: flex 한 줄
-        'grid grid-cols-2 items-end justify-items-center gap-x-[1.375rem] gap-y-2 tab:flex tab:gap-x-3 tab:flex-wrap tab:justify-center',
+        'grid grid-cols-2 items-end justify-items-center gap-x-[1.375rem] gap-y-2 tab:flex tab:flex-wrap tab:justify-center tab:gap-x-3',
         className,
       )}
     >
