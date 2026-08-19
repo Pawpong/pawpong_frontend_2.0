@@ -98,6 +98,7 @@ const CommunityBox = ({
         saved={isSaved}
         onToggleLike={onToggleLike}
         onToggleSave={onToggleSave}
+        detailHref={detailHref}
       />
     </article>
   )

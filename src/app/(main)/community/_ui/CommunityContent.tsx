@@ -55,18 +55,7 @@ const CommunityContent = () => {
             {posts.map((post, index) => (
               <Fragment key={post.postId}>
                 {index > 0 && <Separator className="bg-border-light" />}
-                <ConnectedPostCard
-                  {...toCommunityPreviewProps(post)}
-                  // ponytail: 목록 API에 댓글 미리보기 없음 — 상세(commentPreview) 생기면 교체. 댓글 있는 글만.
-                  commentPreview={
-                    post.commentCount > 0
-                      ? {
-                          nickname: '댓글러',
-                          body: '미리보기 댓글입니다. 한줄만 보여줍니다. 두줄이상 넘어가면 쩜쩜쩜 보여줍니다.',
-                        }
-                      : undefined
-                  }
-                />
+                <ConnectedPostCard {...toCommunityPreviewProps(post)} />
               </Fragment>
             ))}
           </div>

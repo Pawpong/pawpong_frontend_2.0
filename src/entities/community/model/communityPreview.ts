@@ -17,6 +17,7 @@ interface CommunityPreviewProps {
   isLiked: boolean
   isSaved: boolean
   detailHref?: string
+  commentPreview?: { nickname: string; body: string }
 }
 
 const toCommunityPreviewProps = (post: CommunityPostCard): CommunityPreviewProps => ({
@@ -34,6 +35,10 @@ const toCommunityPreviewProps = (post: CommunityPostCard): CommunityPreviewProps
   isLiked: post.isLiked,
   isSaved: post.isSaved,
   detailHref: `/community/${post.postId}`,
+  commentPreview: post.commentPreview?.[0] && {
+    nickname: post.commentPreview[0].authorNickname,
+    body: post.commentPreview[0].body,
+  },
 })
 
 export { toCommunityPreviewProps }
