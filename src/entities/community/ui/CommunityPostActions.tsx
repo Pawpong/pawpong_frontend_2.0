@@ -11,6 +11,8 @@ interface CommunityPostActionsProps {
   /** 미전달 시 버튼은 표시만 되고 동작하지 않는다 (features 래퍼에서 주입) */
   onToggleLike?: () => void
   onToggleSave?: () => void
+  /** 있으면 댓글 아이콘이 게시글 상세 링크가 된다 */
+  detailHref?: string
 }
 
 const CommunityPostActions = ({
@@ -20,6 +22,7 @@ const CommunityPostActions = ({
   saved,
   onToggleLike,
   onToggleSave,
+  detailHref,
 }: CommunityPostActionsProps) => {
   return (
     <div className="flex items-center gap-2">
@@ -32,7 +35,13 @@ const CommunityPostActions = ({
         iconStatus={liked ? 'fill' : 'default'}
         onClick={onToggleLike}
       />
-      <PostActionButton icon={PixelMessageIcon} count={commentCount} iconClassName="size-8" />
+      <PostActionButton
+        icon={PixelMessageIcon}
+        count={commentCount}
+        iconClassName="size-8"
+        ariaLabel="댓글 보기"
+        href={detailHref}
+      />
       <PostActionButton
         icon={PixelBookmarkIcon}
         iconClassName="size-8"
