@@ -82,6 +82,9 @@ const ExploreContent = () => {
       if (type === 'breeder') {
         params.set('type', 'breeder')
       }
+      // 탭을 바꾸면 카테고리 칩(URL 파라미터)이 초기화되므로 목록 필터도 같이 되돌린다
+      // (브리더 탭 필터는 컴포넌트가 언마운트되며 저절로 초기화된다)
+      setAdoptionListFilter('all')
       const query = params.toString()
       router.replace(`${pathname}${query ? `?${query}` : ''}`, { scroll: false })
     },
