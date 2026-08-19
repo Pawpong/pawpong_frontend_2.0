@@ -1,7 +1,7 @@
 'use client'
 
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { Container, InfiniteScrollTrigger } from '@/shared/ui'
+import { Container, InfiniteScrollTrigger, ListingCardGrid } from '@/shared/ui'
 import { profileQueries } from '@/entities/profile'
 import type { FavoriteBreederCard } from '@/shared/types'
 import type { FavoriteBreeder } from '@/shared/types'
@@ -17,6 +17,9 @@ const toBreederCardModel = (breeder: FavoriteBreederCard): FavoriteBreeder => ({
   isBreeding: breeder.recentPetStatus === 'available',
   location: breeder.breederLocation,
   date: breeder.addedAt,
+  level: breeder.level,
+  // 이 목록 자체가 즐겨찾기한 브리더라 항상 등록 상태
+  isFavorited: true,
 })
 
 const FavoriteBreedersContent = () => {
@@ -34,11 +37,12 @@ const FavoriteBreedersContent = () => {
           즐겨찾는 브리더가 없습니다.
         </p>
       ) : (
-        <div className="grid grid-cols-2 gap-x-2.5 gap-y-4 tab:grid-cols-3 tab:gap-5 pc:mx-auto pc:max-w-[74.25rem] pc:grid-cols-4">
-          {breeders.map((breeder) => (
-            <BreederCard key={breeder.id} breeder={breeder} />
-          ))}
-        </div>
+        <ListingCardGrid
+          layout="compact"
+          items={breeders}
+          getKey={(breeder) => breeder.id}
+          renderItem={(breeder) => <BreederCard breeder={breeder} />}
+        />
       )}
       <InfiniteScrollTrigger
         onIntersect={fetchNextPage}

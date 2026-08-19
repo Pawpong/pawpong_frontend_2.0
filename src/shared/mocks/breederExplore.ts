@@ -12,6 +12,7 @@ const BREEDER_BASE: Omit<ExploreBreeder, 'id'> = {
   imageUrl: null,
   badges: ['초보집사', '50 BPM'],
   isBreeding: true,
+  level: 'new',
   location: '마곡동',
   date: '2026.4.30',
   isPopular: false,

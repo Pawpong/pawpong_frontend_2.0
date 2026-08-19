@@ -23,11 +23,12 @@ import type {
 } from '@/shared/types'
 
 /** 브리더 공개 프로필 조회 (브리더홈) */
+// 인증은 선택(security: [JWT-Auth, {}])이지만 skipAuth 를 쓰면 안 된다 —
+// isFavorited 가 "로그인 입양자 기준" 값이라 토큰 없이 부르면 항상 false 로 온다.
+// 비로그인은 토큰이 없어 자동으로 익명 요청이 되므로 그대로 두면 된다.
 export const getBreederPublicProfile = (breederId: string) =>
   apiClient
-    .get<
-      ApiResponseFull<BreederPublicProfile>
-    >(`${API_VERSION}/profile/breeders/${breederId}`, { skipAuth: true } as ApiRequestConfig)
+    .get<ApiResponseFull<BreederPublicProfile>>(`${API_VERSION}/profile/breeders/${breederId}`)
     .then((res) => unwrap(res, '브리더 프로필 조회에 실패했습니다.'))
 
 /** 브리더 상세 프로필 조회 (기존) */
@@ -56,13 +57,15 @@ export const exploreBreeders = (params: SearchBreederParams = {}) =>
     .post<ApiResponseFull<PaginationResponse<Breeder>>>(`${API_VERSION}/breeder/explore`, params)
     .then(unwrap)
 
-/** 인기 브리더 목록 */
+/**
+ * 인기 브리더 목록
+ *
+ * 카드마다 isFavorited(현재 사용자의 찜 여부)가 실려 오므로 skipAuth 를 쓰지 않는다 —
+ * 토큰 없이 부르면 찜한 브리더도 전부 false 로 온다.
+ * 비로그인은 토큰이 없어 자동으로 익명 요청이 된다.
+ */
 export const getPopularBreeders = () =>
-  apiClient
-    .get<
-      ApiResponseFull<Breeder[]>
-    >(`${API_VERSION}/breeder/popular`, { skipAuth: true } as ApiRequestConfig)
-    .then(unwrap)
+  apiClient.get<ApiResponseFull<Breeder[]>>(`${API_VERSION}/breeder/popular`).then(unwrap)
 
 /** 분양 개체 목록 */
 export const getBreederPets = (breederId: string, page = 1, limit = 20) =>

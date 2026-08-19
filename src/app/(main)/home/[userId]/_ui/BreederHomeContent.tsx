@@ -2,8 +2,13 @@
 
 import { useState } from 'react'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
-import Image from 'next/image'
-import { Container, InfiniteScrollTrigger, ListState } from '@/shared/ui'
+import {
+  Container,
+  InfiniteScrollTrigger,
+  ListState,
+  ListingCardGrid,
+  NavigationBar,
+} from '@/shared/ui'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
 import { adoptionQueries } from '@/entities/adoption'
@@ -11,9 +16,9 @@ import { breederQueries } from '@/entities/breeder'
 import { communityQueries } from '@/entities/community'
 import { ProfileCard } from '../../_ui/ProfileCard'
 import { BreederListingCard } from '../../_ui/BreederListingCard'
+import { FavoriteBreederIconButton } from '../../_ui/FavoriteBreederIconButton'
 import { FavoriteAdoptionCard } from '@/features/adoption'
 import { HomeTabs, TabsContent } from '../../_ui/HomeTabs'
-import { HomeTitle } from '../../_ui/HomeTitle'
 import { PostList } from '../../_ui/PostList'
 import { FooterPlaceholder } from '../../_ui/FooterPlaceholder'
 import { BREEDER_HOME_TABS } from '../../_ui/constants'
@@ -53,12 +58,15 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
 
   return (
     <div className="flex w-full flex-col">
-      <HomeTitle
+      <NavigationBar
         title="Breeder"
-        rightAction={
-          <button type="button" aria-label="즐겨찾기" className="tab:hidden">
-            <Image src="/star.svg" alt="즐겨찾기" width={24} height={24} />
-          </button>
+        right={
+          <FavoriteBreederIconButton
+            breederId={profile.breederId}
+            isFavorited={profile.isFavorited}
+            size="nav"
+            className="pc:hidden"
+          />
         }
       />
 
@@ -83,10 +91,15 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
                     <BreederListingCard key={listing.listingId} listing={listing} />
                   ))}
                 </div>
-                <div className="hidden tab:mt-[2.959rem] tab:grid tab:grid-cols-3 tab:gap-6">
-                  {listings.map((listing) => (
-                    <FavoriteAdoptionCard key={listing.listingId} listing={listing} />
-                  ))}
+                {/* 즐겨찾기 브리더 탭과 같은 그리드(compact) — PC 4열·1188px 가운데 정렬.
+                    이전엔 3열 고정 + 폭 제한이 없어 PC 카드가 과하게 컸다 */}
+                <div className="hidden tab:mt-[2.959rem] tab:block">
+                  <ListingCardGrid
+                    layout="compact"
+                    items={listings}
+                    getKey={(listing) => listing.listingId}
+                    renderItem={(listing) => <FavoriteAdoptionCard listing={listing} />}
+                  />
                 </div>
               </>
             </ListState>
