@@ -5,6 +5,7 @@ import { ShowcaseSection } from '@/shared/ui'
 import { CommunityBox, communityQueries, toCommunityPreviewProps } from '@/entities/community'
 import { ConnectedCommunityBox } from '@/features/community'
 import { MOCK_MY_HOME_POSTS } from '@/shared/mocks/myHome'
+import { flattenPages } from '@/shared/lib/infiniteList'
 
 const CARD_COUNT = 3
 
@@ -14,7 +15,8 @@ const CommunityShowcase = () => {
     ...communityQueries.posts('latest', undefined, undefined, CARD_COUNT),
     throwOnError: false,
   })
-  const fetched = (data?.pages[0]?.items ?? []).slice(0, CARD_COUNT).map(toCommunityPreviewProps)
+  // [refactored] 손수 pages[0] 까던 것 → 기존 flattenPages 헬퍼로 통일
+  const fetched = flattenPages(data).slice(0, CARD_COUNT).map(toCommunityPreviewProps)
 
   // 데이터 없으면(로딩/실패/빈 목록) 목업으로 스켈레톤 유지
   const isMock = fetched.length === 0
