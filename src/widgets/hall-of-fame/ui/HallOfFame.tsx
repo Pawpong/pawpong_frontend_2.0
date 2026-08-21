@@ -6,6 +6,7 @@ import { contestQueries } from '@/entities/contest'
 import { MOCK_RANKING_ENTRIES } from '@/shared/mocks/hallOfFame'
 import type { ContestEntry } from '@/shared/types'
 import { Container, DetailLink, ImageDetailModal } from '@/shared/ui'
+import { flattenPages } from '@/shared/lib/infiniteList'
 import { HallOfFamePodium } from './HallOfFamePodium'
 
 const CARD_COUNT = 3
@@ -17,7 +18,10 @@ const HallOfFame = () => {
     ...contestQueries.hallOfFame(CARD_COUNT),
     throwOnError: false,
   })
-  const winners = (data?.pages[0]?.items ?? []).slice(0, CARD_COUNT).map((item) => item.winner)
+  // [refactored] 손수 pages[0] 까던 것 → 기존 flattenPages 헬퍼로 통일
+  const winners = flattenPages(data)
+    .slice(0, CARD_COUNT)
+    .map((item) => item.winner)
 
   // ponytail SSL 인증서 복구 전 홈 UI 확인용 폴백
   const cards: (ContestEntry | undefined)[] = winners.length > 0 ? winners : MOCK_RANKING_ENTRIES
