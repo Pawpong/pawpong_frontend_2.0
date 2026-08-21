@@ -1,6 +1,11 @@
 'use client'
 
-import { useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query'
+import {
+  useMutation,
+  useQueryClient,
+  type InfiniteData,
+  type QueryClient,
+} from '@tanstack/react-query'
 import { adopterQueries } from '@/entities/adopter'
 import { breederQueries } from '@/entities/breeder'
 import { communityQueries } from '@/entities/community'
@@ -14,6 +19,8 @@ import {
 } from './adopter.api'
 import type {
   AdopterProfileUpdateRequest,
+  FavoriteBreederCard,
+  PaginationResponse,
   ReviewCreateRequest,
   WithdrawReason,
 } from '@/shared/types'
@@ -62,10 +69,34 @@ export const useAddFavorite = () => {
   })
 }
 
+/**
+ * 즐겨찾는 브리더 목록 캐시에서 해당 카드를 즉시 제거한다.
+ * 목록은 등록된 브리더만 반환해(isFavorited 항상 true) 재조회 전까지 카드가 채워진 별로 남는다.
+ */
+const dropFromFavoriteList = (qc: QueryClient, breederId: string) =>
+  qc.setQueriesData<InfiniteData<PaginationResponse<FavoriteBreederCard>>>(
+    { queryKey: [...profileQueries.all(), 'favoriteBreeders'] },
+    (data) =>
+      data && {
+        ...data,
+        pages: data.pages.map((page) => ({
+          ...page,
+          items: page.items.filter((breeder) => breeder.breederId !== breederId),
+        })),
+      },
+  )
+
 export const useRemoveFavorite = () => {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (breederId: string) => removeFavorite(breederId),
+    onMutate: (breederId) => {
+      dropFromFavoriteList(qc, breederId)
+    },
+    // ponytail: 롤백 스냅샷 대신 재조회로 되돌린다 (실패는 드물고 서버가 정답)
+    onError: () => {
+      void qc.invalidateQueries({ queryKey: profileQueries.favoriteBreeders().queryKey })
+    },
     onSuccess: () => {
       void invalidateFavoriteCaches(qc)
     },
