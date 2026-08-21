@@ -19,7 +19,7 @@ import {
 import { cn } from '@/shared/lib/cn'
 import { LocationOnIcon } from '@/shared/assets/icons'
 import { profileQueries } from '@/entities/profile'
-import { useUnfollowUser, useRemoveFollower } from '@/features/profile'
+import { useFollowUser, useUnfollowUser, useRemoveFollower } from '@/features/profile'
 import type {
   AdopterPublicProfile,
   BreederPublicProfile,
@@ -139,28 +139,46 @@ const MessageButton = () => (
   </Button>
 )
 
+interface VisitorActionsProps {
+  /** 팔로우 대상 — 입양자는 userId, 브리더는 breederId (백엔드 팔로우 대상은 양쪽 모두 허용) */
+  targetId: string
+  isFollowing: boolean
+}
+
 // 시안의 팔로우는 point 색 BaseButton(최대 258).
 // 공통 FollowButton 은 팔로워 모달용 muted pill 이라 여기서는 쓰지 않는다
-const FollowActionButton = () => (
-  <Button variant="primary" className={cn(ACTION_SIZE, 'pc:max-w-[16.125rem]')}>
-    팔로우
-  </Button>
-)
+const FollowActionButton = ({ targetId, isFollowing }: VisitorActionsProps) => {
+  const follow = useFollowUser()
+  const unfollow = useUnfollowUser()
+  const isPending = follow.isPending || unfollow.isPending
+
+  return (
+    <Button
+      variant={isFollowing ? 'outline' : 'primary'}
+      disabled={isPending}
+      onClick={() => (isFollowing ? unfollow : follow).mutate(targetId)}
+      className={cn(ACTION_SIZE, 'pc:max-w-[16.125rem]')}
+    >
+      {isFollowing ? '팔로잉' : '팔로우'}
+    </Button>
+  )
+}
 
 // 팔로우가 앞, 메시지가 뒤 — 입양자·브리더 홈 동일
-const VisitorActions = () => (
+const VisitorActions = (props: VisitorActionsProps) => (
   <>
-    <FollowActionButton />
+    <FollowActionButton {...props} />
     <MessageButton />
   </>
 )
 
+// 내 홈 액션은 props 를 쓰지 않는다 (같은 자리에서 렌더되므로 시그니처만 맞춤)
 const ACTION_MAP = {
   mine: MineActions,
   'mine-breeder': MineActions,
   breeder: VisitorActions,
   other: VisitorActions,
-} satisfies Record<ProfileMode, ComponentType>
+} satisfies Record<ProfileMode, ComponentType<VisitorActionsProps>>
 
 /* ── ProfileCard ── */
 
@@ -173,6 +191,7 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
   const breederProfile = 'businessLocation' in profile ? profile : null
   const isBreederProfile = breederProfile !== null
   const profileUserId = breederProfile?.breederId ?? (profile as AdopterPublicProfile).userId
+  const isFollowing = breederProfile?.isFollowing ?? (profile as AdopterPublicProfile).isFollowing
 
   // 친구 목록 — 모달이 열릴 때만 조회
   const followersQuery = useInfiniteQuery(profileQueries.followers(profileUserId, followOpen))
@@ -230,7 +249,7 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
         </div>
         {/* 하단: 모드별 버튼 (풀폭, gap-10, h-40) */}
         <div className="flex w-full items-start gap-2.5">
-          <Actions />
+          <Actions targetId={profileUserId} isFollowing={isFollowing} />
         </div>
       </div>
 
@@ -288,7 +307,7 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
               mode === 'breeder' ? 'max-w-[48rem]' : 'max-w-[43rem] px-5',
             )}
           >
-            <Actions />
+            <Actions targetId={profileUserId} isFollowing={isFollowing} />
           </div>
         </div>
       </div>

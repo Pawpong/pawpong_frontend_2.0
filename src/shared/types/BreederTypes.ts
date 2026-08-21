@@ -165,7 +165,6 @@ export interface BreederPublicProfile {
   longDescription?: string
   bpm: number
   followerCount: number
-  /** 내가 팔로우하는 수 (브리더는 항상 0) */
   followingCount?: number
   level: BreederLevel
   plan: 'basic' | 'pro'
@@ -175,6 +174,8 @@ export interface BreederPublicProfile {
     address?: string
   }
   isFavorited: boolean
+  /** 로그인 사용자가 이 브리더를 팔로우 중인지 (비로그인/본인 조회는 false) */
+  isFollowing: boolean
 }
 
 /** 브리더 프로필 수정 요청 — Partial<BreederProfileInfoDto> 기반 */
