@@ -18,8 +18,7 @@ const toBreederCardModel = (breeder: FavoriteBreederCard): FavoriteBreeder => ({
   location: breeder.breederLocation,
   date: breeder.addedAt,
   level: breeder.level,
-  // 이 목록 자체가 즐겨찾기한 브리더라 항상 등록 상태
-  isFavorited: true,
+  isFavorited: breeder.isFavorited,
 })
 
 const FavoriteBreedersContent = () => {

@@ -57,6 +57,7 @@ export interface FavoriteBreederCard {
   bpm: number
   level: BreederLevel
   addedAt: string
+  isFavorited: boolean
 }
 
 /**
