@@ -1,13 +1,25 @@
+'use client'
+
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { adoptionQueries } from '@/entities/adoption'
 import { ShowcaseSection } from '@/shared/ui'
+import { flattenPages } from '@/shared/lib/infiniteList'
+import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
 import { createMockListings } from '@/shared/mocks/adoption'
 import { FavoriteAdoptionShowcaseCard } from '@/features/adoption'
 
 const CARD_COUNT = 4
 
-// ponytail: 분양 목록 API(AdoptionPetCard)가 카드 타입(AdoptionListingCard)과 아직 불일치 —
-// explore도 동일하게 이 카드엔 목데이터 사용. 타입 정합되면 adoptionQueries.list로 교체.
 const AdoptionShowcase = () => {
-  const listings = createMockListings().slice(0, CARD_COUNT)
+  // 홈 섹션은 비필수 — 실패해도 페이지는 렌더되어야 하므로 바운더리로 던지지 않음
+  const { data } = useInfiniteQuery({
+    ...adoptionQueries.list('latest', undefined, 'available', undefined, CARD_COUNT),
+    throwOnError: false,
+  })
+  const pets = flattenPages(data).slice(0, CARD_COUNT).map(mapAdoptionCard)
+
+  // ponytail SSL 인증서 복구 전 홈 UI 확인용 폴백 (명예의 동물과 동일)
+  const listings = pets.length > 0 ? pets : createMockListings().slice(0, CARD_COUNT)
 
   return (
     <ShowcaseSection title="분양중인 동물" linkText="탐색 바로가기" linkHref="/explore">
