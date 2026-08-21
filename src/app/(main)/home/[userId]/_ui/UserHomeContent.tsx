@@ -7,7 +7,6 @@ import { adopterQueries } from '@/entities/adopter'
 import { communityQueries } from '@/entities/community'
 import { ProfileCard } from '../../_ui/ProfileCard'
 import { PostList } from '../../_ui/PostList'
-import { FooterPlaceholder } from '../../_ui/FooterPlaceholder'
 
 const HOME_POST_PAGE_SIZE = 30
 
@@ -32,9 +31,9 @@ const UserHomeContent = ({ userId }: UserHomeContentProps) => {
 
   return (
     <div className="flex w-full flex-col">
-      <NavigationBar title={profile.nickname} />
+      <NavigationBar title={`${profile.nickname}의 홈`} />
 
-      <Container className="px-4 pt-5">
+      <Container className="px-4 py-5 tab:py-10">
         <ProfileCard profile={profile} mode="other" />
       </Container>
 
@@ -56,8 +55,6 @@ const UserHomeContent = ({ userId }: UserHomeContentProps) => {
           isFetchingNextPage={isFetchingNextPage}
         />
       </Container>
-
-      <FooterPlaceholder />
     </div>
   )
 }
