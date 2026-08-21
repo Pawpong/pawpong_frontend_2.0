@@ -32,7 +32,7 @@ const UserHomeContent = ({ userId }: UserHomeContentProps) => {
 
   return (
     <div className="flex w-full flex-col">
-      <NavigationBar title={profile.nickname} />
+      <NavigationBar title={`${profile.nickname}의 홈`} />
 
       <Container className="px-4 pt-5">
         <ProfileCard profile={profile} mode="other" />

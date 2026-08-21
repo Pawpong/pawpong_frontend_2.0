@@ -59,7 +59,7 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
   return (
     <div className="flex w-full flex-col">
       <NavigationBar
-        title="Breeder"
+        title={`${profile.nickname}의 홈`}
         right={
           <FavoriteBreederIconButton
             breederId={profile.breederId}
