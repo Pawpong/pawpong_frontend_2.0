@@ -31,7 +31,7 @@ const NavBar = ({ className, chatTone = false }: NavBarProps) => {
           href={href}
           onClick={(e) => handleLinkClick(e, href)}
           className={cn(
-            'flex items-center gap-[0.125rem] text-sm leading-[1.5] whitespace-nowrap transition-colors',
+            'flex items-center gap-0.5 text-sm leading-[1.5] whitespace-nowrap transition-colors',
             chatTone
               ? 'font-medium text-primary-300'
               : isActive(pathname)
@@ -39,7 +39,7 @@ const NavBar = ({ className, chatTone = false }: NavBarProps) => {
                 : 'font-medium text-secondary-500',
           )}
         >
-          <Icon className="size-[1.875rem]" />
+          <Icon className="size-7.5" />
           {label}
         </Link>
       ))}
