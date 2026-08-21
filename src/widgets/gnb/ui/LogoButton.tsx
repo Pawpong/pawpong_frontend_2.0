@@ -18,8 +18,15 @@ const LogoButton = () => {
 
   return (
     <Link href="/" aria-label="홈으로 이동" onClick={handleClick}>
-      {/* Figma 로고 (742:67105) — 96x32 워드마크 */}
-      <Image src="/logo.svg" alt="Pawpong" width={96} height={32} priority />
+      {/* Figma 로고 (742:67105) — mo 28px / tab+ 32px 높이, 폭은 비율 유지 */}
+      <Image
+        src="/logo.svg"
+        alt="Pawpong"
+        width={96}
+        height={32}
+        priority
+        className="h-7 w-auto tab:h-8"
+      />
     </Link>
   )
 }
