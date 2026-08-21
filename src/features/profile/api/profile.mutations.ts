@@ -1,6 +1,7 @@
 'use client'
 
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query'
+import { breederQueries } from '@/entities/breeder'
 import { profileQueries } from '@/entities/profile'
 import type { UpdateMyProfileRequest } from '@/shared/types'
 import { updateMyProfile, followUser, unfollowUser, removeFollower } from './profile.api'
@@ -15,12 +16,22 @@ export const useUpdateMyProfile = () => {
   })
 }
 
+/**
+ * 팔로우 관계가 바뀌면 프로필 루트뿐 아니라 브리더 루트도 지운다 —
+ * 브리더홈의 isFollowing/followerCount 는 breederQueries 쪽 캐시에 있다.
+ */
+const invalidateFollowCaches = (qc: QueryClient) =>
+  Promise.all([
+    qc.invalidateQueries({ queryKey: profileQueries.all() }),
+    qc.invalidateQueries({ queryKey: breederQueries.all() }),
+  ])
+
 export const useFollowUser = () => {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (userId: string) => followUser(userId),
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: profileQueries.all() })
+      void invalidateFollowCaches(qc)
     },
   })
 }
@@ -30,7 +41,7 @@ export const useUnfollowUser = () => {
   return useMutation({
     mutationFn: (userId: string) => unfollowUser(userId),
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: profileQueries.all() })
+      void invalidateFollowCaches(qc)
     },
   })
 }
