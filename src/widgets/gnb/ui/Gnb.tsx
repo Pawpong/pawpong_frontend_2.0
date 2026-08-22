@@ -17,15 +17,16 @@ const Gnb = () => {
 
   return (
     <>
+      {/* 높이·좌우 여백은 Figma 740-66523 디바이스 프레임 기준
+          (mo-375 h48/px16 · tab-768 py8/px48 · pc-1440 h64/py8/px80) */}
       <header
         data-gnb
-        className="sticky top-0 z-50 flex w-full items-center justify-center bg-white py-0 pc:py-[0.5rem]"
+        className="sticky top-0 z-50 flex h-12 w-full items-center justify-center bg-white tab:py-2 pc:h-16"
       >
         <div
           className={cn(
             PAGE_WIDTH_CLASS,
-            'flex items-center justify-between px-4 tab:px-[3rem]',
-            isChat ? 'pc:px-20' : 'pc:px-[6.25rem]',
+            'flex items-center justify-between px-4 tab:px-12 pc:px-20',
           )}
         >
           <LogoButton />
@@ -43,7 +44,8 @@ const Gnb = () => {
               className="flex size-12 items-center justify-center"
               aria-label="메뉴 열기"
             >
-              <MenuIcon className="size-6" />
+              {/* Figma icon/menu — colors/icon/interactive/main color/Primary (#ad651d) */}
+              <MenuIcon className="size-6 text-primary-500" />
             </button>
           </div>
         </div>

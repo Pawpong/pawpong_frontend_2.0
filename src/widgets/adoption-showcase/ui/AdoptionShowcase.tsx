@@ -1,8 +1,9 @@
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
-import { ShowcaseSection } from '@/shared/ui'
+import { useInfiniteQuery } from '@tanstack/react-query'
 import { adoptionQueries } from '@/entities/adoption'
+import { ShowcaseSection } from '@/shared/ui'
+import { flattenPages } from '@/shared/lib/infiniteList'
 import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
 import { createMockListings } from '@/shared/mocks/adoption'
 import { FavoriteAdoptionShowcaseCard } from '@/features/adoption'
@@ -10,16 +11,15 @@ import { FavoriteAdoptionShowcaseCard } from '@/features/adoption'
 const CARD_COUNT = 4
 
 const AdoptionShowcase = () => {
-  // 홈은 부분 실패 허용 — throwOnError만 꺼서 실패 시 목업으로 스켈레톤 유지
-  // (AdoptionPetCard → AdoptionListingCard 변환은 explore와 동일하게 mapAdoptionCard 재사용)
-  const { data } = useQuery({
-    ...adoptionQueries.popular(undefined, CARD_COUNT),
+  // 홈 섹션은 비필수 — 실패해도 페이지는 렌더되어야 하므로 바운더리로 던지지 않음
+  const { data } = useInfiniteQuery({
+    ...adoptionQueries.list('latest', undefined, 'available', undefined, CARD_COUNT),
     throwOnError: false,
   })
-  const fetched = (data ?? []).slice(0, CARD_COUNT).map(mapAdoptionCard)
+  const pets = flattenPages(data).slice(0, CARD_COUNT).map(mapAdoptionCard)
 
-  // 데이터 없으면(로딩/실패/빈 목록) 목업으로 스켈레톤 유지
-  const listings = fetched.length > 0 ? fetched : createMockListings().slice(0, CARD_COUNT)
+  // ponytail SSL 인증서 복구 전 홈 UI 확인용 폴백 (명예의 동물과 동일)
+  const listings = pets.length > 0 ? pets : createMockListings().slice(0, CARD_COUNT)
 
   return (
     <ShowcaseSection title="분양중인 동물" linkText="탐색 바로가기" linkHref="/explore">

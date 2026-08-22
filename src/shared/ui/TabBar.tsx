@@ -41,13 +41,13 @@ const TabBar = ({
 }: TabBarProps) => {
   return (
     <Tabs value={value} onValueChange={onValueChange} className={cn('w-full', className)}>
+      {/* 폭은 페이지 셸과 동일(PAGE_WIDTH_CLASS) — 하단 구분선도 1440에서 끊기도록 바 자체에 상한을 건다.
+          여백만 탭 바 디자인에 맞춤. Container를 쓰지 않는 이유: tab/pc는 Container와 같지만 모바일만 16px(Container는 20px). */}
       <div
-        className={cn('w-full border-b border-neutral-300 bg-white', barClassName)}
+        className={cn(PAGE_WIDTH_CLASS, 'border-b border-neutral-300 bg-white', barClassName)}
         style={barStyle}
       >
-        {/* 폭은 페이지 셸과 동일(PAGE_WIDTH_CLASS), 여백만 탭 바 디자인에 맞춤.
-            Container를 쓰지 않는 이유: tab/pc는 Container와 같지만 모바일만 16px(Container는 20px). */}
-        <div className={cn(PAGE_WIDTH_CLASS, 'px-4 pt-3 tab:px-12 tab:pt-4 pc:px-20')}>
+        <div className="px-4 pt-3 tab:px-12 tab:pt-4 pc:px-20">
           <TabsList variant="underline" aria-label={ariaLabel}>
             {items.map((item) => (
               <TabsTrigger

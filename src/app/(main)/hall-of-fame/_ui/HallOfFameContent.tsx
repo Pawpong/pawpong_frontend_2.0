@@ -63,7 +63,10 @@ const HallOfFameContent = () => {
     [entriesData],
   )
   const winners =
-    hallOfFameData?.pages[0]?.items.slice(0, PODIUM_COUNT).map((item) => item.winner) ?? []
+    // [refactored] 같은 파일에서 이미 쓰는 flattenPages로 통일
+    flattenPages(hallOfFameData)
+      .slice(0, PODIUM_COUNT)
+      .map((item) => item.winner)
   const currentRanking = currentContest?.ranking.slice(0, PODIUM_COUNT) ?? []
   const podiumEntries: (ContestEntry | undefined)[] = Array.from(
     { length: PODIUM_COUNT },

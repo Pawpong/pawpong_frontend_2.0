@@ -20,7 +20,7 @@ import {
 import { cn } from '@/shared/lib/cn'
 import { LocationOnIcon } from '@/shared/assets/icons'
 import { profileQueries } from '@/entities/profile'
-import { useUnfollowUser, useRemoveFollower, useToggleFollow } from '@/features/profile'
+import { useFollowUser, useUnfollowUser, useRemoveFollower } from '@/features/profile'
 import { useCreateOrGetChatRoom } from '@/features/send-message'
 import type {
   AdopterPublicProfile,
@@ -129,83 +129,71 @@ const EditButton = () => (
   </Link>
 )
 
-interface VisitorActionsProps {
-  /** 상대 사용자 id — 팔로우·채팅방 생성 대상 */
-  profileUserId: string
-  initialFollowing: boolean
-}
-
-const MineActions = (_: VisitorActionsProps) => <EditButton />
+const MineActions = () => <EditButton />
 
 /* ── 남의 홈에서 보이는 액션 (Figma 3349-2026986) ── */
 
 // 흰 배경 + border/secondary(#cacaca) pill
-const MessageButton = ({ onClick, disabled }: { onClick: () => void; disabled: boolean }) => (
-  <Button
-    variant="outline"
-    className={cn(ACTION_SIZE, 'gap-1.5 pc:gap-2')}
-    onClick={onClick}
-    disabled={disabled}
-  >
-    <Image src="/chat.svg" alt="" width={24} height={24} className="size-5 pc:size-6" />
-    메시지
-  </Button>
-)
-
-// 시안의 팔로우는 point 색 BaseButton(최대 258).
-// 공통 FollowButton 은 팔로워 모달용 muted pill 이라 여기서는 쓰지 않는다
-const FollowActionButton = ({
-  isFollowing,
-  onClick,
-  disabled,
-}: {
-  isFollowing: boolean
-  onClick: () => void
-  disabled: boolean
-}) => (
-  <Button
-    variant="primary"
-    className={cn(ACTION_SIZE, 'pc:max-w-[16.125rem]')}
-    onClick={onClick}
-    disabled={disabled}
-  >
-    {isFollowing ? '팔로잉' : '팔로우'}
-  </Button>
-)
-
-// 팔로우가 앞, 메시지가 뒤 — 입양자·브리더 홈 동일
-const VisitorActions = ({ profileUserId, initialFollowing }: VisitorActionsProps) => {
+// 누르면 채팅방 생성(또는 기존 방 조회) 후 /chat 으로 이동
+const MessageButton = ({ targetId }: { targetId: string }) => {
   const router = useRouter()
-  // 메시지 — 채팅방 생성/조회 후 대화로 이동
-  const { mutate: startChat, isPending: isStartingChat } = useCreateOrGetChatRoom()
-  const handleMessage = () => {
-    startChat(
-      { breederId: profileUserId },
-      {
-        onSuccess: (room) => router.push(`/chat?roomId=${room.roomId}`),
-        onError: (error) =>
-          window.alert(error instanceof Error ? error.message : '채팅을 시작하지 못했습니다.'),
-      },
-    )
-  }
-
-  const { isFollowing, toggleFollow, isPending: isFollowPending } = useToggleFollow(
-    profileUserId,
-    initialFollowing,
-  )
+  const { mutate: startChat, isPending } = useCreateOrGetChatRoom()
 
   return (
-    <>
-      <FollowActionButton
-        isFollowing={isFollowing}
-        onClick={toggleFollow}
-        disabled={isFollowPending}
-      />
-      <MessageButton onClick={handleMessage} disabled={isStartingChat} />
-    </>
+    <Button
+      variant="outline"
+      disabled={isPending}
+      onClick={() =>
+        startChat(
+          { breederId: targetId },
+          {
+            onSuccess: (room) => router.push(`/chat?roomId=${room.roomId}`),
+            onError: () => alert('채팅방을 열지 못했습니다. 잠시 후 다시 시도해주세요.'),
+          },
+        )
+      }
+      className={cn(ACTION_SIZE, 'gap-1.5 pc:gap-2')}
+    >
+      <Image src="/chat.svg" alt="" width={24} height={24} className="size-5 pc:size-6" />
+      메시지
+    </Button>
   )
 }
 
+interface VisitorActionsProps {
+  /** 팔로우 대상 — 입양자는 userId, 브리더는 breederId (백엔드 팔로우 대상은 양쪽 모두 허용) */
+  targetId: string
+  isFollowing: boolean
+}
+
+// 시안의 팔로우는 point 색 BaseButton(최대 258).
+// 공통 FollowButton 은 팔로워 모달용 muted pill 이라 여기서는 쓰지 않는다
+const FollowActionButton = ({ targetId, isFollowing }: VisitorActionsProps) => {
+  const follow = useFollowUser()
+  const unfollow = useUnfollowUser()
+  const isPending = follow.isPending || unfollow.isPending
+
+  return (
+    <Button
+      variant={isFollowing ? 'outline' : 'primary'}
+      disabled={isPending}
+      onClick={() => (isFollowing ? unfollow : follow).mutate(targetId)}
+      className={cn(ACTION_SIZE, 'pc:max-w-[16.125rem]')}
+    >
+      {isFollowing ? '팔로잉' : '팔로우'}
+    </Button>
+  )
+}
+
+// 팔로우가 앞, 메시지가 뒤 — 입양자·브리더 홈 동일
+const VisitorActions = (props: VisitorActionsProps) => (
+  <>
+    <FollowActionButton {...props} />
+    <MessageButton targetId={props.targetId} />
+  </>
+)
+
+// 내 홈 액션은 props 를 쓰지 않는다 (같은 자리에서 렌더되므로 시그니처만 맞춤)
 const ACTION_MAP = {
   mine: MineActions,
   'mine-breeder': MineActions,
@@ -224,8 +212,7 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
   const breederProfile = 'businessLocation' in profile ? profile : null
   const isBreederProfile = breederProfile !== null
   const profileUserId = breederProfile?.breederId ?? (profile as AdopterPublicProfile).userId
-  // 팔로우 초기값 — 브리더 공개 프로필엔 isFollowing 필드가 없어 false로 시작
-  const initialFollowing = ('isFollowing' in profile ? profile.isFollowing : false) ?? false
+  const isFollowing = breederProfile?.isFollowing ?? (profile as AdopterPublicProfile).isFollowing
 
   // 친구 목록 — 모달이 열릴 때만 조회
   const followersQuery = useInfiniteQuery(profileQueries.followers(profileUserId, followOpen))
@@ -283,7 +270,7 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
         </div>
         {/* 하단: 모드별 버튼 (풀폭, gap-10, h-40) */}
         <div className="flex w-full items-start gap-2.5">
-          <Actions profileUserId={profileUserId} initialFollowing={initialFollowing} />
+          <Actions targetId={profileUserId} isFollowing={isFollowing} />
         </div>
       </div>
 
@@ -341,7 +328,7 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
               mode === 'breeder' ? 'max-w-[48rem]' : 'max-w-[43rem] px-5',
             )}
           >
-            <Actions profileUserId={profileUserId} initialFollowing={initialFollowing} />
+            <Actions targetId={profileUserId} isFollowing={isFollowing} />
           </div>
         </div>
       </div>

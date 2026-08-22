@@ -38,7 +38,9 @@ export const toMyProfileCardProps = (profile: MyProfile): MyProfileCardProps => 
         district: profile.businessLocation?.district ?? '',
         address: profile.businessLocation?.address,
       },
+      // 내 홈은 팔로우/즐겨찾기 액션이 없어 자기 자신 기준 false 로 채운다
       isFavorited: false,
+      isFollowing: false,
     },
   }
 }

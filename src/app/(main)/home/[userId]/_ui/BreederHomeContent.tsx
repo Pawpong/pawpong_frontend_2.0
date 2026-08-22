@@ -21,7 +21,6 @@ import { FavoriteBreederIconButton } from '../../_ui/FavoriteBreederIconButton'
 import { FavoriteAdoptionCard } from '@/features/adoption'
 import { HomeTabs, TabsContent } from '../../_ui/HomeTabs'
 import { PostList } from '../../_ui/PostList'
-import { FooterPlaceholder } from '../../_ui/FooterPlaceholder'
 import { BREEDER_HOME_TABS } from '../../_ui/constants'
 
 // 이 탭이 곧 분양글 목록 전체라 마이홈 프리뷰(6)보다 크게 받는다 (서버 상한 60)
@@ -64,7 +63,7 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
   return (
     <div className="flex w-full flex-col">
       <NavigationBar
-        title="Breeder"
+        title={`${profile.nickname}의 홈`}
         right={
           <FavoriteBreederIconButton
             breederId={profile.breederId}
@@ -75,7 +74,7 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
         }
       />
 
-      <Container className="pc:px-[10rem]">
+      <Container className="px-4 py-5 tab:py-10">
         <ProfileCard profile={profile} mode="breeder" />
       </Container>
 
@@ -137,8 +136,6 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
           </Container>
         </TabsContent>
       </HomeTabs>
-
-      <FooterPlaceholder />
     </div>
   )
 }
