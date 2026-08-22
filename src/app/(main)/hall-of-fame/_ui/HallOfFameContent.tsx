@@ -109,7 +109,7 @@ const HallOfFameContent = () => {
             <HallOfFamePodium
               entries={podiumEntries}
               onEntryClick={setSelectedEntry}
-              className="pc:h-[26rem] pc:w-[65rem]"
+              className="pc:h-[26rem] pc:min-w-0 pc:shrink pc:flex-1"
             />
           </div>
         </Container>
