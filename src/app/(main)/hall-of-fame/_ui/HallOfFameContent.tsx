@@ -96,7 +96,7 @@ const HallOfFameContent = () => {
                   화살표는 마지막 줄 끝에 붙여 흐르게 둔다 (세로 가운데 띄우면 어색) */}
               <Link
                 href="/hall-of-fame/participate"
-                className="text-right text-xs leading-[1.5] font-semibold text-neutral-850 tab:text-left pc:w-[9.0625rem]"
+                className="text-right text-xs leading-[1.5] font-semibold text-[#c75a00] tab:text-left pc:w-[9.0625rem]"
               >
                 이번주 명예의 전당{' '}
                 <span className="block tab:inline pc:block">
