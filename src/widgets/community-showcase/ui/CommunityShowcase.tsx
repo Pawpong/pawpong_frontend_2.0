@@ -30,7 +30,7 @@ const CommunityShowcase = () => {
   return (
     <ShowcaseSection title="동물 자랑하기" linkText="커뮤니티 바로가기" linkHref="/community">
       {/* 한 DOM 목록을 브레이크포인트별 그리드로 재배치한다. */}
-      <div className="grid grid-cols-[20.0625rem] justify-center gap-y-2 tab:grid-cols-[repeat(2,20.0625rem)] tab:justify-between pc:grid-cols-[repeat(3,25.4375rem)] pc:gap-y-0">
+      <div className="grid grid-cols-1 gap-y-2 tab:grid-cols-2 tab:gap-x-[1.875rem] pc:grid-cols-3 pc:gap-y-0">
         {posts.map((post, index) => (
           <Card
             key={post.detailHref ?? index}
