@@ -2,7 +2,7 @@
 
 import { cn } from '@/shared/lib/cn'
 import { Separator } from '@/shared/ui'
-import type { CommunityCategory } from '@/shared/mocks/community'
+import type { CommunityCategory } from '@/shared/mocks'
 
 interface CategorySidebarProps {
   categories: CommunityCategory[]

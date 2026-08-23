@@ -1,5 +1,5 @@
 import { cn } from '@/shared/lib/cn'
-import { PAGE_WIDTH_CLASS } from '@/shared/config/layout'
+import { PAGE_WIDTH_CLASS } from '@/shared/config'
 
 interface ContainerProps {
   children: React.ReactNode

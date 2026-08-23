@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { FavoriteIcon } from '@/shared/assets/icons'
+import { FavoriteIcon } from '@/shared/assets'
 import { FAVORITE_ACTIVE } from '@/shared/ui'
 
 interface AdoptionCtaBarProps {

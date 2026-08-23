@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { CheckRoundedIcon } from '@/shared/assets/icons'
+import { CheckRoundedIcon } from '@/shared/assets'
 import { useSendVerificationCode, useVerifyCode } from '@/features/auth'
 import type { HelpMessageState } from '@/shared/ui'
 

@@ -17,7 +17,7 @@ import {
   type FollowUser,
 } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
-import { LocationOnIcon } from '@/shared/assets/icons'
+import { LocationOnIcon } from '@/shared/assets'
 import { profileQueries } from '@/entities/profile'
 import { useFollowUser, useUnfollowUser, useRemoveFollower } from '@/features/profile'
 import type {

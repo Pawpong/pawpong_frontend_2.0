@@ -2,7 +2,7 @@
 
 import * as SelectPrimitive from '@radix-ui/react-select'
 import { tv } from 'tailwind-variants'
-import { ChevronDownIcon } from '@/shared/assets/icons'
+import { ChevronDownIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 
 // 드롭다운 (Figma 1229-43132) — 기존 Select(폼 셀렉트)와 다른 디자인이라 별도 컴포넌트

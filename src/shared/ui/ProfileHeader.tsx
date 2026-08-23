@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { ProfileAvatar } from './ProfileAvatar'
-import { MoreVertIcon } from '@/shared/assets/icons'
+import { MoreVertIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 
 // Figma chat-profile (1867-182359) — 아바타 + 이름·시각 + 미리보기 1줄 + (옵션)빨간 배지 + 더보기

@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { MoreVertIcon } from '@/shared/assets/icons'
+import { MoreVertIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import type { CommunityPreviewAuthor, CommunityPreviewProps } from '../model/communityPreview'
 import { CommunityPostActions } from './CommunityPostActions'

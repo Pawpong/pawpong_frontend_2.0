@@ -1,4 +1,4 @@
-import { VoteIcon } from '@/shared/assets/icons'
+import { VoteIcon } from '@/shared/assets'
 import type { ContestEntry, HomeUserType } from '@/shared/types'
 
 interface EntryHeaderProps {

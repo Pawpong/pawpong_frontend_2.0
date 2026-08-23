@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { ArrowRightIcon } from '@/shared/assets/icons'
+import { ArrowRightIcon } from '@/shared/assets'
 import type { ContestEntry } from '@/shared/types'
 
 interface EntryImageProps {

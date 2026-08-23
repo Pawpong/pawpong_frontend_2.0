@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react'
 import Image from 'next/image'
 import { tv, type VariantProps } from 'tailwind-variants'
-import { CameraIcon, ImageIcon, CloseIcon } from '@/shared/assets/icons'
+import { CameraIcon, ImageIcon, CloseIcon } from '@/shared/assets'
 import { ImageModal } from '@/shared/ui'
 import {
   Dialog,

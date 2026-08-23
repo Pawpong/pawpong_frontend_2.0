@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { RankBadgeIcon } from '@/shared/assets/icons'
+import { RankBadgeIcon } from '@/shared/assets'
 import { Avatar, AvatarFallback } from '@/shared/ui'
 import type { ContestEntry } from '@/shared/types'
 

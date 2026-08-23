@@ -1,5 +1,5 @@
 import type { FieldPath } from 'react-hook-form'
-import { ADOPTION_SURVEY_QUESTIONS } from '@/shared/config/adoptionSurvey'
+import { ADOPTION_SURVEY_QUESTIONS } from '@/shared/config'
 import type { ApplicationFormValues, ApplicationTextField } from './schema'
 
 // [refactored] 신청서 문구를 한곳에 모음 — 텍스트 필드가 상수 배열(조사)과 JSX 인라인(입양계획·가족구성원)으로

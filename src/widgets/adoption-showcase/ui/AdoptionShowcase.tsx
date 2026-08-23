@@ -5,7 +5,7 @@ import { adoptionQueries } from '@/entities/adoption'
 import { ShowcaseSection } from '@/shared/ui'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
-import { createMockListings } from '@/shared/mocks/adoption'
+import { createMockListings } from '@/shared/mocks'
 import { FavoriteAdoptionShowcaseCard } from '@/features/adoption'
 
 const CARD_COUNT = 4

@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowRightIcon } from '@/shared/assets/icons'
+import { ArrowRightIcon } from '@/shared/assets'
 import { PopularBadge } from '@/shared/ui'
 import type { AdoptionDetailDto } from '@/shared/types'
 import { GENDER_LABEL } from '@/shared/types'

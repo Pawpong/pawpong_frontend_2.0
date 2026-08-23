@@ -4,7 +4,7 @@ import * as React from 'react'
 import * as AvatarPrimitive from '@radix-ui/react-avatar'
 import { tv, type VariantProps } from 'tailwind-variants'
 import { cn } from '@/shared/lib/cn'
-import { PawIcon } from '@/shared/assets/icons'
+import { PawIcon } from '@/shared/assets'
 
 const avatarVariants = tv({
   base: 'relative flex shrink-0 overflow-hidden rounded-full',

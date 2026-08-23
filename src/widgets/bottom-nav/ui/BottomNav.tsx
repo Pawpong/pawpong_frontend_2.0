@@ -3,8 +3,8 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/shared/lib/cn'
-import { MAIN_NAV } from '@/shared/config/mainNav'
-import { PAGE_WIDTH_CLASS } from '@/shared/config/layout'
+import { MAIN_NAV } from '@/shared/config'
+import { PAGE_WIDTH_CLASS } from '@/shared/config'
 
 /** 모바일·탭 하단 고정 네비게이션 (pc는 상단 GNB 사용). 아이콘·목적지는 shared/config/mainNav 공유 */
 const BottomNav = () => {

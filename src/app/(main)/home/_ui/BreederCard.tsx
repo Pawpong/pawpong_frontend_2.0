@@ -1,7 +1,7 @@
 'use client'
 
 import { Badge, MediaCard } from '@/shared/ui'
-import { LocationOnIcon } from '@/shared/assets/icons'
+import { LocationOnIcon } from '@/shared/assets'
 import { FavoriteBreederIconButton } from './FavoriteBreederIconButton'
 import type { BreederLevel, FavoriteBreeder } from '@/shared/types'
 

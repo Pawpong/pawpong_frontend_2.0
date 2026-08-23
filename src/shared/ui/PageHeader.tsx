@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowBackIcon } from '@/shared/assets/icons'
+import { ArrowBackIcon } from '@/shared/assets'
 import { Container } from './Container'
 
 interface PageHeaderProps {

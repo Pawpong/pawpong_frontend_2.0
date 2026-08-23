@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/ui'
-import { CameraIcon, FileIcon, LocationPinIcon, PlusIcon } from '@/shared/assets/icons'
+import { CameraIcon, FileIcon, LocationPinIcon, PlusIcon } from '@/shared/assets'
 
 const ATTACH_ITEMS = [
   { icon: CameraIcon, label: '이미지', type: 'image' },

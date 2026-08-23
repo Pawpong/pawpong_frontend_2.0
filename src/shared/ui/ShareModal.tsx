@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import Image from 'next/image'
-import { CloseIcon } from '@/shared/assets/icons'
+import { CloseIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { getKakao, shareToKakao } from '@/shared/lib/kakao'
 import { Dialog, DialogOverlay, DialogPortal } from './Dialog'

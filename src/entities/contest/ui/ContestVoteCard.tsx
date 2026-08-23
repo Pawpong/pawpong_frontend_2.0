@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowRightIcon } from '@/shared/assets/icons'
+import { ArrowRightIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import type { ContestEntry } from '@/shared/types'
 import { ProfileAvatar } from '@/shared/ui'

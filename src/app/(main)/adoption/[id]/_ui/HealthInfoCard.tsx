@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { cn } from '@/shared/lib/cn'
 import { Badge } from '@/shared/ui'
-import { CheckIcon } from '@/shared/assets/icons'
+import { CheckIcon } from '@/shared/assets'
 import type { AdoptionDetailDto } from '@/shared/types'
 import { BaseInfoCard } from './BaseInfoCard'
 import { EmptyNote } from './EmptyNote'
