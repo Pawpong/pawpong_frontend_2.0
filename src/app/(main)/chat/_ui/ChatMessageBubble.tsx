@@ -1,6 +1,6 @@
 import { ProfileAvatar } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
-import { FileIcon } from '@/shared/assets/icons'
+import { FileIcon } from '@/shared/assets'
 import type { ChatMessageResponseDto } from '@/shared/types'
 import { formatFileSize, parseChatAttachment } from '../_lib/attachment'
 import { RelativeTime } from './RelativeTime'

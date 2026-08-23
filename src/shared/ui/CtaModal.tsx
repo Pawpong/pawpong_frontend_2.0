@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { tv, type VariantProps } from 'tailwind-variants'
-import { CloseIcon, InfoIcon } from '@/shared/assets/icons'
+import { CloseIcon, InfoIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { Dialog, DialogOverlay, DialogPortal } from './Dialog'
 import { Button } from './Button'

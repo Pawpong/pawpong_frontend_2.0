@@ -3,7 +3,7 @@
 import type { ComponentType, ReactNode } from 'react'
 import { tv } from 'tailwind-variants'
 import { cn } from '@/shared/lib/cn'
-import { CloseIcon } from '@/shared/assets/icons'
+import { CloseIcon } from '@/shared/assets'
 
 const alertMessage = tv({
   slots: {

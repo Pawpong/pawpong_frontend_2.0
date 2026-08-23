@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { tv, type VariantProps } from 'tailwind-variants'
-import { ArrowRightIcon } from '@/shared/assets/icons'
+import { ArrowRightIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 
 const detailLinkVariants = tv({

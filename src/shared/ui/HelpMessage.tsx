@@ -1,7 +1,7 @@
 import type { ComponentType, ReactNode } from 'react'
 import { tv, type VariantProps } from 'tailwind-variants'
 import { cn } from '@/shared/lib/cn'
-import { AlertCircleIcon, CheckRoundedIcon } from '@/shared/assets/icons'
+import { AlertCircleIcon, CheckRoundedIcon } from '@/shared/assets'
 
 const helpMessage = tv({
   slots: {

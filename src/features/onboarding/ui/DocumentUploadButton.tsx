@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, type ChangeEvent } from 'react'
-import { FileIcon } from '@/shared/assets/icons'
+import { FileIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 
 interface DocumentUploadButtonProps {

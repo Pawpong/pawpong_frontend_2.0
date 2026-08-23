@@ -1,4 +1,4 @@
-import { PlusIcon } from '@/shared/assets/icons'
+import { PlusIcon } from '@/shared/assets'
 import { Button } from '@/shared/ui'
 
 interface AddRowButtonProps {

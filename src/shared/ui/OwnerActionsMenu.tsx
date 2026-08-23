@@ -1,6 +1,6 @@
 'use client'
 
-import { MoreVertIcon } from '@/shared/assets/icons'
+import { MoreVertIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import {
   DropdownMenu,

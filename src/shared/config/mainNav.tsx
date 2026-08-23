@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { PawIcon } from '@/shared/assets/icons'
+import { PawIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 
 // Figma nav bar (746:72275) 픽셀 아이콘 — 32x32 정규화, fill=currentColor로 active/inactive 색 토글.

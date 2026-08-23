@@ -1,7 +1,7 @@
 'use client'
 
 import type { MouseEvent } from 'react'
-import { PixelStarFillIcon, PixelStarOutlineIcon } from '@/shared/assets/icons'
+import { PixelStarFillIcon, PixelStarOutlineIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { useAddFavorite, useRemoveFavorite } from '@/features/adopter'
 

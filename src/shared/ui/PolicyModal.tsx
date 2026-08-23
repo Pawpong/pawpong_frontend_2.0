@@ -1,7 +1,7 @@
 'use client'
 
 import * as DialogPrimitive from '@radix-ui/react-dialog'
-import { CloseIcon } from '@/shared/assets/icons'
+import { CloseIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { Dialog, DialogOverlay, DialogPortal } from './Dialog'
 

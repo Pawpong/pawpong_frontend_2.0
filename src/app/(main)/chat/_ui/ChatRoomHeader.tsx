@@ -2,7 +2,7 @@
 
 import { AffectionBadge, ProfileAvatar } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
-import { ArrowBackIcon, MoreVertIcon } from '@/shared/assets/icons'
+import { ArrowBackIcon, MoreVertIcon } from '@/shared/assets'
 import { CHAT_CONTENT_WIDTH } from '../_lib/constants'
 
 interface ChatRoomHeaderProps {

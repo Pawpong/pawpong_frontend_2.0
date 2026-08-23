@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import data from '@emoji-mart/data'
-import { EmojiIcon, LocationIcon } from '@/shared/assets/icons'
+import { EmojiIcon, LocationIcon } from '@/shared/assets'
 
 const Picker = dynamic(() => import('@emoji-mart/react'), {
   ssr: false,

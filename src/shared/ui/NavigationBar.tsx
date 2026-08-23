@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { cn } from '@/shared/lib/cn'
-import { ArrowBackIcon, CloseIcon } from '@/shared/assets/icons'
+import { ArrowBackIcon, CloseIcon } from '@/shared/assets'
 import { Container } from './Container'
 import { TextLabel } from './TextLabel'
 

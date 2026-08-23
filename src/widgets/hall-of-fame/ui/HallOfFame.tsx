@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { contestQueries } from '@/entities/contest'
-import { MOCK_RANKING_ENTRIES } from '@/shared/mocks/hallOfFame'
+import { MOCK_RANKING_ENTRIES } from '@/shared/mocks'
 import type { ContestEntry } from '@/shared/types'
 import { Container, DetailLink, ImageDetailModal } from '@/shared/ui'
 import { flattenPages } from '@/shared/lib/infiniteList'

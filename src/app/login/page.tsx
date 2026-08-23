@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
 import { SocialLoginList } from '@/features/auth'
 import { AlertMessage } from '@/shared/ui'
-import { CheckRoundedIcon } from '@/shared/assets/icons'
+import { CheckRoundedIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { cafe24Proup } from '@/shared/lib/fonts'
 

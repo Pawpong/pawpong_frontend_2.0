@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { CloseIcon } from '@/shared/assets/icons'
+import { CloseIcon } from '@/shared/assets'
 import { Container } from '@/shared/ui'
 
 interface PostFormHeaderProps {

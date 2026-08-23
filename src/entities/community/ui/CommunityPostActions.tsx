@@ -1,6 +1,6 @@
 'use client'
 
-import { FavoriteIcon, PixelBookmarkIcon, PixelMessageIcon } from '@/shared/assets/icons'
+import { FavoriteIcon, PixelBookmarkIcon, PixelMessageIcon } from '@/shared/assets'
 import { BOOKMARK_ACTIVE, PostActionButton } from '@/shared/ui'
 
 interface CommunityPostActionsProps {

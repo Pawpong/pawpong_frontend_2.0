@@ -4,7 +4,7 @@ import { useInfiniteQuery } from '@tanstack/react-query'
 import { ShowcaseSection } from '@/shared/ui'
 import { CommunityBox, communityQueries, toCommunityPreviewProps } from '@/entities/community'
 import { ConnectedCommunityBox } from '@/features/community'
-import { MOCK_MY_HOME_POSTS } from '@/shared/mocks/myHome'
+import { MOCK_MY_HOME_POSTS } from '@/shared/mocks'
 import { flattenPages } from '@/shared/lib/infiniteList'
 
 const CARD_COUNT = 3

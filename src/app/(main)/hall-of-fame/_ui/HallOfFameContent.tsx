@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
-import { ArrowBackIcon, ArrowRightIcon } from '@/shared/assets/icons'
+import { ArrowBackIcon, ArrowRightIcon } from '@/shared/assets'
 import type { ContestEntry } from '@/shared/types'
 import {
   Container,

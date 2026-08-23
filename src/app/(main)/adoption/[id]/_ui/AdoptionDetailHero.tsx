@@ -13,7 +13,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from '@/shared/ui'
-import { ArrowRightIcon, CheckIcon, GenderIcon } from '@/shared/assets/icons'
+import { ArrowRightIcon, CheckIcon, GenderIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { GENDER_LABEL } from '@/shared/types'
 import type { AdoptionDetailDto, PetStatus } from '@/shared/types'

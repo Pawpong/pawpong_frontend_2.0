@@ -1,5 +1,5 @@
 import { AlertMessage } from '@/shared/ui'
-import { CheckRoundedIcon } from '@/shared/assets/icons'
+import { CheckRoundedIcon } from '@/shared/assets'
 
 interface ChatNoticeBannerProps {
   onClose?: () => void

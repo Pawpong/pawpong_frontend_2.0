@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { FavoriteButton, ShareModal } from '@/shared/ui'
-import { ShareIcon } from '@/shared/assets/icons'
+import { ShareIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 
 interface FavoriteShareActionsProps {

@@ -1,7 +1,7 @@
 'use client'
 
 import { cn } from '@/shared/lib/cn'
-import { MoreVertIcon } from '@/shared/assets/icons'
+import { MoreVertIcon } from '@/shared/assets'
 import type { ChatRoomResponseDto } from '@/shared/types'
 import { ProfileAvatar } from '@/shared/ui'
 import { getChatMessagePreview } from '../_lib/attachment'

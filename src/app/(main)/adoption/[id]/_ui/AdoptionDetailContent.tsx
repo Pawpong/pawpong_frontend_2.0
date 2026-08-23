@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import type { ReactNode } from 'react'
 import { Container, Separator, ImageDetailModal } from '@/shared/ui'
-import { ArrowBackIcon, MoreVertIcon } from '@/shared/assets/icons'
+import { ArrowBackIcon, MoreVertIcon } from '@/shared/assets'
 import { useImageModal } from '@/shared/lib/useImageModal'
 import { useToggleAdoptionFavorite } from '@/features/adoption'
 import type { AdoptionDetailDto } from '@/shared/types'

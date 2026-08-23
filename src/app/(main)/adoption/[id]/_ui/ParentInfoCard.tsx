@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { Badge } from '@/shared/ui'
-import { GenderIcon } from '@/shared/assets/icons'
+import { GenderIcon } from '@/shared/assets'
 import type { AdoptionDetailDto } from '@/shared/types'
 import { BaseInfoCard } from './BaseInfoCard'
 import { EmptyNote } from './EmptyNote'
