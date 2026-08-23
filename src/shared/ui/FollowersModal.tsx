@@ -11,7 +11,7 @@ import { TextLabel } from './TextLabel'
 import { NavigationBar } from './NavigationBar'
 import { InfiniteScrollTrigger } from './InfiniteScrollTrigger'
 import { CtaModal } from './CtaModal'
-import { CloseIcon } from '@/shared/assets/icons'
+import { CloseIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 
 interface FollowUser {

@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
-import { ArrowBackIcon, ArrowRightIcon } from '@/shared/assets/icons'
+import { ArrowBackIcon, ArrowRightIcon } from '@/shared/assets'
 import type { ContestEntry } from '@/shared/types'
 import {
   Container,
@@ -81,6 +81,10 @@ const HallOfFameContent = () => {
     voteEntry.mutate(entryId)
   }
 
+  // 서버가 같은 상태(콘테스트 없음)를 /current는 200+null, /entries는 400으로 다르게 응답한다.
+  // 후보 목록 실패를 그대로 에러로 보여주면 "불러오지 못했습니다"라는 거짓 문구가 뜬다
+  const hasNoContest = currentContest === null
+
   const votedEntryId =
     currentContest?.myVotedEntryId ?? entries.find((entry) => entry.hasVoted)?.id ?? null
   const hasContestVote = votedEntryId !== null
@@ -102,7 +106,7 @@ const HallOfFameContent = () => {
                   화살표는 마지막 줄 끝에 붙여 흐르게 둔다 (세로 가운데 띄우면 어색) */}
               <Link
                 href="/hall-of-fame/participate"
-                className="text-right text-xs leading-[1.5] font-semibold text-neutral-850 tab:text-left pc:w-[9.0625rem]"
+                className="text-right text-xs leading-[1.5] font-semibold text-[#c75a00] tab:text-left pc:w-[9.0625rem]"
               >
                 이번주 명예의 전당{' '}
                 <span className="block tab:inline pc:block">
@@ -115,7 +119,7 @@ const HallOfFameContent = () => {
             <HallOfFamePodium
               entries={podiumEntries}
               onEntryClick={setSelectedEntry}
-              className="pc:h-[26rem] pc:w-[65rem]"
+              className="pc:h-[26rem] pc:min-w-0 pc:shrink pc:flex-1"
             />
           </div>
         </Container>
@@ -129,11 +133,13 @@ const HallOfFameContent = () => {
 
           <ListState
             isPending={areEntriesPending}
-            isError={areEntriesError}
+            isError={areEntriesError && !hasNoContest}
             isEmpty={entries.length === 0}
             loadingText="투표 후보를 불러오는 중입니다."
             errorText="투표 후보를 불러오지 못했습니다."
-            emptyText="아직 등록된 투표 후보가 없습니다."
+            emptyText={
+              hasNoContest ? '진행 중인 콘테스트가 없습니다.' : '아직 등록된 투표 후보가 없습니다.'
+            }
           >
             <>
               <div className="grid grid-cols-2 gap-4 tab:grid-cols-3 tab:gap-5 pc:grid-cols-4">

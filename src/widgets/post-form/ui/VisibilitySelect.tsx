@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronDownIcon } from '@/shared/assets/icons'
+import { ChevronDownIcon } from '@/shared/assets'
 import {
   DropdownMenu,
   DropdownMenuTrigger,

@@ -1,5 +1,5 @@
 import { cn } from '@/shared/lib/cn'
-import { PawIcon } from '@/shared/assets/icons' // [refactored] 빈 아바타 폴백 아이콘 유저글리프 → paw
+import { PawIcon } from '@/shared/assets' // [refactored] 빈 아바타 폴백 아이콘 유저글리프 → paw
 import { Avatar, AvatarFallback, AvatarImage } from './Avatar'
 
 interface ProfileAvatarProps {

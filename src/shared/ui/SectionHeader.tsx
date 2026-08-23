@@ -1,4 +1,4 @@
-import { ArrowRightIcon } from '@/shared/assets/icons'
+import { ArrowRightIcon } from '@/shared/assets'
 import { DetailLink } from './DetailLink'
 import { textLabelVariants } from './TextLabel'
 import { cn } from '@/shared/lib/cn'

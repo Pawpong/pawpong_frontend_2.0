@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { type MouseEvent } from 'react'
 import { cn } from '@/shared/lib/cn'
 import { useNavigationGuardContext } from '@/shared/lib/NavigationGuardContext'
-import { HEADER_NAV } from '@/shared/config/mainNav'
+import { HEADER_NAV } from '@/shared/config'
 import { NotificationBell } from './NotificationBell'
 
 interface NavBarProps {

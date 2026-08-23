@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { GoogleIcon, KakaoIcon, NaverIcon } from '@/shared/assets/icons'
+import { GoogleIcon, KakaoIcon, NaverIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { Button } from '@/shared/ui/Button'
 

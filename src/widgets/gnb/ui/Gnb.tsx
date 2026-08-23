@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { usePathname } from 'next/navigation'
-import { MenuIcon } from '@/shared/assets/icons'
-import { PAGE_WIDTH_CLASS } from '@/shared/config/layout'
+import { MenuIcon } from '@/shared/assets'
+import { PAGE_WIDTH_CLASS } from '@/shared/config'
 import { cn } from '@/shared/lib/cn'
 import { LogoButton } from './LogoButton'
 import { NavBar } from './NavBar'

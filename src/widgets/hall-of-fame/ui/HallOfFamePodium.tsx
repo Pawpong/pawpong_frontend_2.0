@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import type { ContestEntry } from '@/shared/types'
-import { ArrowRightIcon } from '@/shared/assets/icons'
+import { ArrowRightIcon } from '@/shared/assets'
 import { ProfileAvatar } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import 'swiper/css'
@@ -219,7 +219,7 @@ const HallOfFamePodium = ({ entries, onEntryClick, className }: HallOfFamePodium
   return (
     <div
       className={cn(
-        'relative flex h-[13.8125rem] w-full shrink-0 items-center overflow-hidden rounded-xl bg-secondary-200 px-4 py-8 tab:h-[16.8rem] tab:items-start tab:justify-center tab:p-8 pc:h-[26.425rem] pc:w-[66.0625rem]',
+        'relative flex h-[13.8125rem] w-full shrink-0 items-center overflow-hidden rounded-xl bg-secondary-200 px-4 py-8 tab:h-[16.8rem] tab:items-start tab:justify-center tab:p-8 pc:h-[26.425rem] pc:min-w-0 pc:shrink pc:flex-1',
         className,
       )}
     >

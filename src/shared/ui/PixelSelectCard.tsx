@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { tv } from 'tailwind-variants'
-import { PawPrintIcon } from '@/shared/assets/icons'
+import { PawPrintIcon } from '@/shared/assets'
 import { cafe24Proup } from '@/shared/lib/fonts'
 import { cn } from '@/shared/lib/cn'
 

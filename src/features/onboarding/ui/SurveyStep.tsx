@@ -7,7 +7,7 @@ import { surveySchema, SURVEY_TEXT_MAX_LENGTH, type SurveyFormData } from '../mo
 import { StepContainer } from './StepContainer'
 import { TextareaField, TextLabel } from '@/shared/ui'
 import { CheckboxField } from './CheckboxField'
-import { ADOPTION_SURVEY_QUESTIONS } from '@/shared/config/adoptionSurvey'
+import { ADOPTION_SURVEY_QUESTIONS } from '@/shared/config'
 
 // [refactored] 라벨(선택) + TextareaField 블록 판박이(자기소개·집비우는·공간소개) 통합
 type SurveyTextField = 'selfIntro' | 'awayTime' | 'livingSpace'

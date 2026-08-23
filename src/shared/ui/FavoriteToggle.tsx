@@ -2,7 +2,7 @@
 
 import { type MouseEvent, type SVGProps } from 'react'
 import { cn } from '@/shared/lib/cn'
-import { FavoriteIcon } from '@/shared/assets/icons'
+import { FavoriteIcon } from '@/shared/assets'
 
 // Figma icon/heart press 상태 — 관심 #ff8181 / 기본 #a6a6a6.
 // 모든 하트(FavoriteToggle·FavoriteButton·PostActionButton)가 참조하는 단일 색 정의.

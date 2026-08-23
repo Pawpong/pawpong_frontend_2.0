@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { CloseIcon } from '@/shared/assets/icons'
+import { CloseIcon } from '@/shared/assets'
 import { LogoButton } from './LogoButton'
 import { AuthActions } from './AuthActions'
 import { MOBILE_MENU_ITEMS } from './NavItems'

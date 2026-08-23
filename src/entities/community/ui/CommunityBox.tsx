@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { MoreVertIcon } from '@/shared/assets/icons'
+import { MoreVertIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import type { CommunityPreviewAuthor, CommunityPreviewProps } from '../model/communityPreview'
 import { CommunityPostActions } from './CommunityPostActions'
@@ -58,7 +58,8 @@ const CommunityBox = ({
   return (
     <article
       className={cn(
-        'flex h-[20.5625rem] w-[20.0625rem] flex-col items-start overflow-hidden rounded-lg border border-neutral-300 bg-white p-3 pc:h-[23.5rem] pc:w-[25.4375rem]',
+        // 카드 폭이 그리드를 채우므로 높이도 고정값이 아닌 비율로 — 디자인 기준(tab 321x329 / pc 407x376)
+        'flex aspect-[321/329] w-full flex-col items-start overflow-hidden rounded-lg border border-neutral-300 bg-white p-3 pc:aspect-[407/376]',
         // Figma hover/press (923-18992): 배경 #f6f6f6 + drop shadow
         'transition-[background-color,box-shadow] hover:bg-neutral-50 hover:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)] active:bg-neutral-50 active:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]',
         className,

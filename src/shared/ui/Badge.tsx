@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { tv, type VariantProps } from 'tailwind-variants'
-import { FireIcon } from '@/shared/assets/icons'
+import { FireIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 
 const badgeVariants = tv({

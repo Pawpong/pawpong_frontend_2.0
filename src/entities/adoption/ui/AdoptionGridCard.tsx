@@ -1,6 +1,6 @@
 'use client'
 
-import { GenderIcon } from '@/shared/assets/icons'
+import { GenderIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import type { AdoptionListingCard } from '@/shared/types'
 import { FavoriteToggle, MediaCard, PopularBadge } from '@/shared/ui'

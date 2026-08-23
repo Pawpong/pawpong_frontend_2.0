@@ -46,6 +46,8 @@ const ExploreContent = () => {
   const selectedType: ExploreType = typeParam === 'breeder' ? 'breeder' : 'adoption'
   const [adoptionListFilter, setAdoptionListFilter] = useState<ExploreListFilter>('all')
 
+  const keyword = searchParams.get('keyword') ?? undefined
+
   const categoryParam = searchParams.get('category')
   const selectedCategory: AnimalCategory =
     categoryParam && ANIMAL_CATEGORIES.includes(categoryParam as AnimalCategory)
@@ -64,7 +66,7 @@ const ExploreContent = () => {
     isPending,
     isError,
   } = useInfiniteQuery({
-    ...adoptionQueries.list(sort, petType, status),
+    ...adoptionQueries.list(sort, petType, status, keyword),
     enabled: selectedType === 'adoption',
   })
 
@@ -98,6 +100,21 @@ const ExploreContent = () => {
         params.delete('category')
       } else {
         params.set('category', category)
+      }
+      const query = params.toString()
+      router.replace(`${pathname}${query ? `?${query}` : ''}`, { scroll: false })
+    },
+    [searchParams, router, pathname],
+  )
+
+  // 검색어는 카테고리·필터와 함께 URL에 실어 서버 조회 조건으로 합류시킨다
+  const handleSearch = useCallback(
+    (nextKeyword: string) => {
+      const params = new URLSearchParams(searchParams.toString())
+      if (nextKeyword) {
+        params.set('keyword', nextKeyword)
+      } else {
+        params.delete('keyword')
       }
       const query = params.toString()
       router.replace(`${pathname}${query ? `?${query}` : ''}`, { scroll: false })
@@ -167,7 +184,11 @@ const ExploreContent = () => {
       <div>
         <CategorySection selected={selectedCategory} onChange={handleCategoryChange} />
         {/* 검색바: 홈과 동일 — SearchSection 자체 패딩 20px(py-3 tab:py-5) / 80px(pc:px-20) */}
-        <SearchSection placeholder={SEARCH_PLACEHOLDERS[selectedType]} />
+        <SearchSection
+          placeholder={SEARCH_PLACEHOLDERS[selectedType]}
+          defaultValue={keyword}
+          onSubmit={handleSearch}
+        />
       </div>
       {/* 스크롤 트리거 sentinel (상단 영역 끝) */}
       <div ref={sentinelRef} aria-hidden />

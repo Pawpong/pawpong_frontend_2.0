@@ -1,6 +1,6 @@
 'use client'
 
-import { AlertCircleIcon, PawIcon } from '@/shared/assets/icons'
+import { AlertCircleIcon, PawIcon } from '@/shared/assets'
 import { AlertMessage, Container, CtaModal, ExitConfirmModal, NavigationBar } from '@/shared/ui'
 import type { AdoptionDetailDto } from '@/shared/types'
 import { useApplicationForm } from '../_lib/useApplicationForm'

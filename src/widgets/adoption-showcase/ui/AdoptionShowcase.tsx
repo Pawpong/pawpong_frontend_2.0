@@ -5,7 +5,7 @@ import { adoptionQueries } from '@/entities/adoption'
 import { ShowcaseSection } from '@/shared/ui'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
-import { createMockListings } from '@/shared/mocks/adoption'
+import { createMockListings } from '@/shared/mocks'
 import { FavoriteAdoptionShowcaseCard } from '@/features/adoption'
 
 const CARD_COUNT = 4
@@ -23,8 +23,10 @@ const AdoptionShowcase = () => {
 
   return (
     <ShowcaseSection title="분양중인 동물" linkText="탐색 바로가기" linkHref="/explore">
-      {/* 모바일 2열 / 태블릿·PC 4열 (탭 164px, PC 282px 카드) */}
-      <div className="grid grid-cols-[repeat(2,10.25rem)] justify-between gap-x-0 gap-y-5 tab:grid-cols-[repeat(4,10.25rem)] tab:gap-y-0 pc:grid-cols-4 pc:gap-[3.125rem]">
+      {/* 모바일 2열 / 태블릿·PC 4열. 전 구간 고정폭이 아니라 비율 컬럼 —
+          고정 164px + justify-between이면 기준폭(375/768)을 벗어나는 순간
+          남는 폭이 전부 카드 사이 간격으로 벌어졌다 */}
+      <div className="grid grid-cols-2 gap-x-[0.9375rem] gap-y-5 tab:grid-cols-4 tab:gap-x-5 tab:gap-y-0 pc:gap-x-[3.125rem]">
         {listings.map((listing) => (
           <FavoriteAdoptionShowcaseCard key={listing.listingId} listing={listing} />
         ))}

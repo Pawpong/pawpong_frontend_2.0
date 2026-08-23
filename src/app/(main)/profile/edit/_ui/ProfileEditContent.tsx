@@ -25,7 +25,7 @@ import {
   Input,
   TextareaField,
 } from '@/shared/ui'
-import { AlertCircleIcon, CheckIcon } from '@/shared/assets/icons'
+import { AlertCircleIcon, CheckIcon } from '@/shared/assets'
 
 const NAME_MAX_LENGTH = 30
 const BIO_MAX_LENGTH = 200 // 서버 UpdateMyProfileRequestDto.bio maxLength

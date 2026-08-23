@@ -3,7 +3,7 @@
 import * as React from 'react'
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox'
 import { tv, type VariantProps } from 'tailwind-variants'
-import { PixelCheckIcon } from '@/shared/assets/icons'
+import { PixelCheckIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 
 // [refactored] Figma 758-74944 — 미체크: 회색(#a6a6a6) 아웃라인 / 체크: 노랑(#fffa94) 배경 + 진한(#3e3e3e) 체크

@@ -14,7 +14,7 @@ import {
   PostActionButton,
   Separator,
 } from '@/shared/ui'
-import { FavoriteIcon, PixelMessageIcon, PixelBookmarkIcon } from '@/shared/assets/icons'
+import { FavoriteIcon, PixelMessageIcon, PixelBookmarkIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { communityQueries } from '@/entities/community'
 import { profileQueries } from '@/entities/profile'

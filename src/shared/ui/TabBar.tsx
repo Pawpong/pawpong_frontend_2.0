@@ -1,7 +1,7 @@
 'use client'
 
 import type { CSSProperties, ReactNode } from 'react'
-import { PAGE_WIDTH_CLASS } from '@/shared/config/layout'
+import { PAGE_WIDTH_CLASS } from '@/shared/config'
 import { cn } from '@/shared/lib/cn'
 import { Tabs, TabsList, TabsTrigger } from './Tabs'
 

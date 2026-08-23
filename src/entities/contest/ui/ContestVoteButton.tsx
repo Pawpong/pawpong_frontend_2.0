@@ -1,7 +1,7 @@
 'use client'
 
 import { tv } from 'tailwind-variants'
-import { VoteIcon } from '@/shared/assets/icons'
+import { VoteIcon } from '@/shared/assets'
 
 const contestVoteButtonVariants = tv({
   base: 'flex h-8 items-center justify-center rounded-full px-2 text-sm leading-[1.5] font-semibold text-neutral-850 transition-colors disabled:cursor-not-allowed',

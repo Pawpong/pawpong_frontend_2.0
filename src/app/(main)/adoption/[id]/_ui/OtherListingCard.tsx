@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { Badge } from '@/shared/ui'
-import { GenderIcon } from '@/shared/assets/icons'
+import { GenderIcon } from '@/shared/assets'
 import { FavoriteShareActions } from './FavoriteShareActions'
 import { AdoptionCardHorizontal, AdoptionStatusBadge } from '@/entities/adoption'
 import { useToggleAdoptionFavorite } from '@/features/adoption'
