@@ -83,6 +83,8 @@ export interface CommunityPostListParams {
   petType?: CommunityPetType
   category?: string
   authorId?: string
+  /** 제목·본문 키워드 검색 (대소문자 무시). 다른 필터와 AND 결합된다 */
+  search?: string
   sort?: CommunitySortType
   page?: number
   pageSize?: number

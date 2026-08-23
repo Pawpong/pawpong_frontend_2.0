@@ -6,6 +6,7 @@ import {
   Container,
   InfiniteScrollTrigger,
   InputUpload,
+  ListState,
   NavigationBar,
   SearchButton,
   Separator,
@@ -15,14 +16,16 @@ import { ConnectedPostCard } from '@/features/community'
 import { flattenPages } from '@/shared/lib/infiniteList'
 
 const CommunityContent = () => {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery(
-    communityQueries.posts('latest'),
-  )
-  const posts = flattenPages(data)
-
-  // ponytail: 서버 검색 API 미구현 → 지금은 검색바 펼치기 UI만. keyword 파라미터 생기면 query 연결.
+  // 입력 중인 값과 실제 조회 조건을 분리한다 — 타이핑마다 재조회하지 않도록
   const [searchOpen, setSearchOpen] = useState(false)
   const [query, setQuery] = useState('')
+  const [appliedSearch, setAppliedSearch] = useState('')
+
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending, isError } =
+    useInfiniteQuery(
+      communityQueries.posts('latest', undefined, undefined, appliedSearch || undefined),
+    )
+  const posts = flattenPages(data)
 
   return (
     <div className="flex w-full flex-col">
@@ -40,8 +43,13 @@ const CommunityContent = () => {
           value={query}
           onChange={setQuery}
           onClick={() => setSearchOpen(true)}
-          // 비어 있을 때 포커스 잃으면 트리거로 복귀
-          onBlur={() => query.trim() === '' && setSearchOpen(false)}
+          onSubmit={() => setAppliedSearch(query.trim())}
+          // 비어 있을 때 포커스 잃으면 트리거로 복귀 (적용된 검색어도 함께 해제)
+          onBlur={() => {
+            if (query.trim() !== '') return
+            setSearchOpen(false)
+            setAppliedSearch('')
+          }}
           // 모바일은 풀폭, tab+는 최대 300px
           className="max-w-none tab:max-w-[18.75rem]"
         />
@@ -51,14 +59,25 @@ const CommunityContent = () => {
           pc는 Figma(2063-215749) 기준 948px 고정 폭 가운데 정렬 */}
       <Container className="px-4 pb-10 tab:pb-16">
         <div className="mx-auto w-full pc:max-w-[59.25rem]">
-          <div className="flex min-w-0 flex-col gap-5 tab:gap-8 tab:rounded-lg tab:border tab:border-neutral-300 tab:p-3">
-            {posts.map((post, index) => (
-              <Fragment key={post.postId}>
-                {index > 0 && <Separator className="bg-border-light" />}
-                <ConnectedPostCard {...toCommunityPreviewProps(post)} />
-              </Fragment>
-            ))}
-          </div>
+          <ListState
+            isPending={isPending}
+            isError={isError}
+            isEmpty={posts.length === 0}
+            loadingText="게시글을 불러오는 중입니다."
+            errorText="게시글을 불러오지 못했습니다."
+            emptyText={
+              appliedSearch ? `'${appliedSearch}' 검색 결과가 없습니다.` : '게시글이 없습니다.'
+            }
+          >
+            <div className="flex min-w-0 flex-col gap-5 tab:gap-8 tab:rounded-lg tab:border tab:border-neutral-300 tab:p-3">
+              {posts.map((post, index) => (
+                <Fragment key={post.postId}>
+                  {index > 0 && <Separator className="bg-border-light" />}
+                  <ConnectedPostCard {...toCommunityPreviewProps(post)} />
+                </Fragment>
+              ))}
+            </div>
+          </ListState>
 
           <InfiniteScrollTrigger
             onIntersect={fetchNextPage}

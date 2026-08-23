@@ -15,11 +15,12 @@ export const communityQueries = {
     sort: CommunitySortType = 'latest',
     petType?: CommunityPetType,
     category?: string,
+    search?: string,
     pageSize = 15,
   ) =>
     createInfiniteQuery({
-      queryKey: [...communityQueries.all(), 'posts', sort, petType, category, pageSize],
-      queryFn: (page) => getCommunityPosts({ sort, petType, category, page, pageSize }),
+      queryKey: [...communityQueries.all(), 'posts', sort, petType, category, search, pageSize],
+      queryFn: (page) => getCommunityPosts({ sort, petType, category, search, page, pageSize }),
       staleTime: STALE_TIME.DEFAULT,
     }),
 
