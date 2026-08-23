@@ -1,24 +1,26 @@
 'use client'
 
-import { Fragment, useState } from 'react'
+import { useState } from 'react'
+import Link from 'next/link'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import {
-  Container,
-  InfiniteScrollTrigger,
-  InputUpload,
-  NavigationBar,
-  SearchButton,
-  Separator,
-} from '@/shared/ui'
+import { Container, InfiniteScrollTrigger, NavigationBar, SearchButton } from '@/shared/ui'
+import { PlusIcon } from '@/shared/assets/icons'
 import { communityQueries, toCommunityPreviewProps } from '@/entities/community'
-import { ConnectedPostCard } from '@/features/community'
 import { flattenPages } from '@/shared/lib/infiniteList'
+import { CommunityFeedCard } from './CommunityFeedCard'
+import { MOCK_COMMUNITY_FEED } from './mockFeed'
 
 const CommunityContent = () => {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery(
+  const { data, isPending, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery(
     communityQueries.posts('latest'),
   )
-  const posts = flattenPages(data)
+  const fetchedPosts = flattenPages(data)
+  // 개발 환경에서 백엔드가 없어 API가 실패/빈 목록으로 끝나면 목업 피드로 폴백한다.
+  // 로딩이 끝났는데도 게시글이 하나도 없을 때만 켜지므로, 실제 운영 빌드에서는 절대 노출되지 않는다.
+  const posts =
+    process.env.NODE_ENV !== 'production' && !isPending && fetchedPosts.length === 0
+      ? MOCK_COMMUNITY_FEED
+      : fetchedPosts
 
   // ponytail: 서버 검색 API 미구현 → 지금은 검색바 펼치기 UI만. keyword 파라미터 생기면 query 연결.
   const [searchOpen, setSearchOpen] = useState(false)
@@ -28,9 +30,6 @@ const CommunityContent = () => {
     <div className="flex w-full flex-col">
       {/* 상단바 — 공통 NavigationBar (Figma 2063-213675 navigation bar) */}
       <NavigationBar title="포퐁커뮤니티" backHref="/" />
-
-      {/* 작성 유도 바 — 공통 InputUpload (Figma 2063-213676, 상·하 보더 + px mo16/tab48/pc80) */}
-      <InputUpload text="게시글을 올려보세요" href="/community/write" />
 
       {/* 검색 (Figma 1657-251460 — 버튼 클릭 시 focus 입력 pill로 전환)
           padding: mo 8·16 / tab 12·48 (px-4=모바일 16, tab48은 Container 기본값) */}
@@ -47,27 +46,13 @@ const CommunityContent = () => {
         />
       </Container>
 
-      {/* Main: Feed — 모바일은 카드 나열(gap 20), tab+는 border 박스 하나에 구분선 (Figma 1054-34769)
-          pc는 Figma(2063-215749) 기준 948px 고정 폭 가운데 정렬 */}
+      {/* Main: Feed — 인스타그램 홈처럼 카드 하나하나를 스크롤하며 보는 단일 컬럼 피드.
+          pc는 이미지가 도드라지도록 게시판형 폭(948px) 대신 좁은 피드 폭(415px)으로 가운데 정렬 */}
       <Container className="px-4 pb-10 tab:pb-16">
-        <div className="mx-auto w-full pc:max-w-[59.25rem]">
-          <div className="flex min-w-0 flex-col gap-5 tab:gap-8 tab:rounded-lg tab:border tab:border-neutral-300 tab:p-3">
-            {posts.map((post, index) => (
-              <Fragment key={post.postId}>
-                {index > 0 && <Separator className="bg-border-light" />}
-                <ConnectedPostCard
-                  {...toCommunityPreviewProps(post)}
-                  // ponytail: 목록 API에 댓글 미리보기 없음 — 상세(commentPreview) 생기면 교체. 댓글 있는 글만.
-                  commentPreview={
-                    post.commentCount > 0
-                      ? {
-                          nickname: '댓글러',
-                          body: '미리보기 댓글입니다. 한줄만 보여줍니다. 두줄이상 넘어가면 쩜쩜쩜 보여줍니다.',
-                        }
-                      : undefined
-                  }
-                />
-              </Fragment>
+        <div className="mx-auto w-full pc:max-w-[415px]">
+          <div className="flex flex-col gap-6 tab:gap-8 pc:gap-10">
+            {posts.map((post) => (
+              <CommunityFeedCard key={post.postId} {...toCommunityPreviewProps(post)} />
             ))}
           </div>
 
@@ -78,6 +63,15 @@ const CommunityContent = () => {
           />
         </div>
       </Container>
+
+      {/* 글쓰기 진입점 — 상단 InputUpload 바 대신, 우하단 고정 FAB로 변경 (Figma "글작성" BaseButton) */}
+      <Link
+        href="/community/write"
+        className="fixed right-6 bottom-6 z-40 flex h-12 items-center gap-1 rounded-full bg-point-500 px-4 shadow-[0_7px_7px_rgba(55,55,55,0.1)]"
+      >
+        <PlusIcon className="size-6 text-neutral-850" />
+        <span className="text-base leading-[1.5] font-semibold text-neutral-850">글작성</span>
+      </Link>
     </div>
   )
 }

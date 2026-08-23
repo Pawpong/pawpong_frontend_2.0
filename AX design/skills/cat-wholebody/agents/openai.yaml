@@ -1,0 +1,4 @@
+interface:
+  display_name: "cat-wholebody"
+  short_description: "원형을 잠그고 픽셀 동물 SVG를 제작·검증합니다"
+  default_prompt: "Use $cat-wholebody to create a Pawpong pixel animal SVG from the attached reference while preserving the canonical geometry."

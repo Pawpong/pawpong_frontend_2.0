@@ -8,6 +8,7 @@ import { profileQueries } from '@/entities/profile'
 import { useCreateCommunityComment } from '@/features/community'
 import { useAuthStatus } from '@/features/auth'
 import type { CommunityComment } from '@/shared/types'
+import { MOCK_ME } from '../../_ui/mockFeed'
 import { CommentItem } from './CommentItem'
 import { CommentComposer } from './CommentComposer'
 import { flattenPages } from '@/shared/lib/infiniteList'
@@ -58,7 +59,12 @@ interface CommentSectionProps {
 const CommentSection = ({ postId }: CommentSectionProps) => {
   const { isLoggedIn } = useAuthStatus()
   // 상세와 같은 queryKey라 네트워크 요청은 1건으로 합쳐진다 (prop drilling 대신 직접 조회)
-  const { data: me } = useQuery({ ...profileQueries.me(), enabled: isLoggedIn })
+  const { data: fetchedMe } = useQuery({ ...profileQueries.me(), enabled: isLoggedIn })
+  // mock-* 글(백엔드 없는 로컬 미리보기)에 한해, 로그인 여부와 무관하게 가짜 프로필로
+  // 댓글 작성 인터랙션을 미리 볼 수 있게 한다. 실제 게시글은 기존처럼 로그인이 있어야 댓글창이 뜬다.
+  const isMockPost = postId.startsWith('mock-')
+  const me = fetchedMe ?? (isMockPost ? MOCK_ME : undefined)
+  const showComposer = isLoggedIn || isMockPost
   const {
     data: commentsData,
     fetchNextPage,
@@ -90,7 +96,19 @@ const CommentSection = ({ postId }: CommentSectionProps) => {
     const parentCommentId =
       replyTarget && loadedIds.has(replyTarget.commentId) ? replyTarget.commentId : undefined
 
-    await createComment.mutateAsync({ body, parentCommentId })
+    await createComment.mutateAsync({
+      body,
+      parentCommentId,
+      // 있으면(로그인 상태) 응답을 기다리지 않고 입력창 바로 아래에 낙관적으로 먼저 그린다
+      optimisticAuthor: me
+        ? {
+            authorId: me.userId,
+            authorModel: me.role === 'breeder' ? 'Breeder' : 'Adopter',
+            authorNickname: me.nickname,
+            authorProfileImageUrl: me.profileImageUrl,
+          }
+        : undefined,
+    })
     setReplyTarget(null)
   }
 
@@ -108,8 +126,8 @@ const CommentSection = ({ postId }: CommentSectionProps) => {
 
   return (
     <>
-      {/* 댓글 입력 (로그인 사용자만) */}
-      {isLoggedIn && (
+      {/* 댓글 입력 — 로그인 사용자, 또는 mock 글 미리보기 */}
+      {showComposer && (
         <CommentComposer
           onSubmit={handleSubmitComment}
           isSubmitting={createComment.isPending}
