@@ -12,7 +12,7 @@ const CARD_COUNT = 3
 const CommunityShowcase = () => {
   // 홈은 부분 실패 허용 — throwOnError만 꺼서 실패 시 목업 유지 (커뮤니티 페이지는 기본 정책)
   const { data } = useInfiniteQuery({
-    ...communityQueries.posts('latest', undefined, undefined, CARD_COUNT),
+    ...communityQueries.posts('latest', undefined, undefined, undefined, CARD_COUNT),
     throwOnError: false,
   })
   // [refactored] 손수 pages[0] 까던 것 → 기존 flattenPages 헬퍼로 통일

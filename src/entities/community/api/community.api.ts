@@ -144,6 +144,7 @@ export const getCommunityPosts = async (
   if (params.petType) query.set('petType', params.petType)
   if (params.category) query.set('category', params.category)
   if (params.authorId) query.set('authorId', params.authorId)
+  if (params.search) query.set('search', params.search)
   if (params.sort) query.set('sort', params.sort)
   if (params.page) query.set('page', String(params.page))
   if (params.pageSize) query.set('pageSize', String(params.pageSize))
