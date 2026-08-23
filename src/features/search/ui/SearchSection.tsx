@@ -11,6 +11,10 @@ interface SearchSectionProps {
   withPadding?: boolean
   /** 검색바 아래 "인기 검색어" 라벨 (홈 전용, Figma 2752-261253) — 없으면 미노출 */
   popularKeywords?: string[]
+  /** 초기 검색어 — 탐색 페이지처럼 URL에 이미 검색어가 있는 경우 */
+  defaultValue?: string
+  /** 제출 시 동작. 미지정이면 SearchBar 기본값(탐색 페이지 이동) */
+  onSubmit?: (keyword: string) => void
 }
 
 const SearchSection = ({
@@ -18,6 +22,8 @@ const SearchSection = ({
   className,
   withPadding = true,
   popularKeywords,
+  defaultValue,
+  onSubmit,
 }: SearchSectionProps) => {
   return (
     <section
@@ -28,7 +34,7 @@ const SearchSection = ({
       )}
     >
       <div className="flex w-full max-w-[21.4375rem] flex-col gap-3 tab:max-w-[30.125rem] pc:max-w-[52.875rem]">
-        <SearchBar placeholder={placeholder} />
+        <SearchBar placeholder={placeholder} defaultValue={defaultValue} onSubmit={onSubmit} />
         {popularKeywords && popularKeywords.length > 0 && (
           <div className="flex min-w-0 items-center gap-3 overflow-hidden">
             <span className="shrink-0 text-xs leading-[1.5] font-medium text-neutral-700 tab:text-sm">
