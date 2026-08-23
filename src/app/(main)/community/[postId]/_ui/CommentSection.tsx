@@ -60,8 +60,10 @@ const CommentSection = ({ postId }: CommentSectionProps) => {
   const { isLoggedIn } = useAuthStatus()
   // 상세와 같은 queryKey라 네트워크 요청은 1건으로 합쳐진다 (prop drilling 대신 직접 조회)
   const { data: fetchedMe } = useQuery({ ...profileQueries.me(), enabled: isLoggedIn })
-  // mock-* 글(백엔드 없는 로컬 미리보기)에 한해, 로그인 여부와 무관하게 가짜 프로필로
-  // 댓글 작성 인터랙션을 미리 볼 수 있게 한다. 실제 게시글은 기존처럼 로그인이 있어야 댓글창이 뜬다.
+  // 최은진: 목업 피드(mockFeed) 도입에 맞춰 추가 — mock-* 글(백엔드 없는 로컬 미리보기)에
+  // 한해, 로그인 여부와 무관하게 가짜 프로필(MOCK_ME)로 댓글 작성 인터랙션을 미리 볼 수
+  // 있게 한다. 실제 게시글은 기존처럼 로그인이 있어야 댓글창이 뜬다.
+  // (기존에는 `const { data: me } = ...` 하나였던 걸 fetchedMe로 이름을 바꾸고 이 분기를 추가)
   const isMockPost = postId.startsWith('mock-')
   const me = fetchedMe ?? (isMockPost ? MOCK_ME : undefined)
   const showComposer = isLoggedIn || isMockPost
@@ -96,6 +98,8 @@ const CommentSection = ({ postId }: CommentSectionProps) => {
     const parentCommentId =
       replyTarget && loadedIds.has(replyTarget.commentId) ? replyTarget.commentId : undefined
 
+    // 최은진: 기존에는 { body, parentCommentId }만 넘겼는데, 낙관적 업데이트를 위해
+    // optimisticAuthor를 새로 실어 보낸다 (실제 API 요청 바디에는 안 실림 — mutation 쪽에서 분리).
     await createComment.mutateAsync({
       body,
       parentCommentId,
@@ -126,7 +130,7 @@ const CommentSection = ({ postId }: CommentSectionProps) => {
 
   return (
     <>
-      {/* 댓글 입력 — 로그인 사용자, 또는 mock 글 미리보기 */}
+      {/* 최은진: 기존 {isLoggedIn && ...} 조건을 showComposer로 교체 — mock 글 미리보기도 통과하게 */}
       {showComposer && (
         <CommentComposer
           onSubmit={handleSubmitComment}

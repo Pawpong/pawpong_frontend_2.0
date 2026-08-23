@@ -1,123 +1,46 @@
 'use client'
 
-import {
-  AuthorInfo,
-  BOOKMARK_ACTIVE,
-  DeleteConfirmModal,
-  OwnerActionsMenu,
-  PostActionButton,
-  Separator,
-} from '@/shared/ui'
-import { FavoriteIcon, PixelMessageIcon, PixelBookmarkIcon } from '@/shared/assets/icons'
-import { cn } from '@/shared/lib/cn'
-import { usePostDetail } from '../../../[postId]/_ui/usePostDetail'
-import { CommentSection } from '../../../[postId]/_ui/CommentSection'
-import { PostImageCarousel } from '../../../_ui/PostImageCarousel'
+import * as DialogPrimitive from '@radix-ui/react-dialog'
+import { CloseIcon } from '@/shared/assets/icons'
+import { useBreakpoint } from '@/shared/lib/useBreakpoint'
+import { PostDetailPanel } from '../../../_ui/PostDetailPanel'
 
 interface PostDetailModalBodyProps {
   postId: string
 }
 
 /**
- * 인스타그램 웹 데스크톱 상세 모달 레이아웃 — 사진을 왼쪽에 꽉 채우고, 오른쪽에
- * 헤더·본문·댓글·액션을 배치한다. tab 미만(모바일)에서는 사진이 위, 나머지가 아래로 쌓인다.
- * 풀페이지 상세(PostDetailContent)와 데이터·액션 로직은 usePostDetail로 공유하고 배치만 다르다.
+ * 최은진: Figma "feed-detail" 컴포넌트(node 3753:246802, device=pc·device=tab-mo)를
+ * 그대로 반영하도록 전면 재작성 — 실제 마크업은 PostDetailPanel(공용)이 그리고, 이
+ * 파일은 pc/tab 브레이크포인트에 맞는 layout과 "닫기(X)" 트레일링 아이콘만 결정한다.
+ * https://www.figma.com/design/7VXGIjqr1eZBEmsp3OPNie/2026-pawpong?node-id=3753-246802
+ *
+ * 최은진: 기존엔 stacked→side-by-side 전환 기준이 tab(768~)이라 tab 폭에서도 이미
+ * 사이드바이사이드로 보였다. Figma device=pc 베리언트는 pc(1440~)에서만 쓰고,
+ * tab(768~1439)은 device=tab-mo(스택형)를 그대로 모달로 띄운다.
+ *
+ * 최은진: 닫기(X)가 기존엔 이미지 위에 떠 있는 절대위치 버튼(PostDetailModal)이었는데,
+ * Figma 헤더 안에 X가 포함돼 있어 PostDetailPanel의 header trailing 슬롯으로 옮겼다.
+ * DialogPrimitive.Close는 같은 Dialog.Root 트리 안이면 어디서 렌더해도 동작한다.
  */
 const PostDetailModalBody = ({ postId }: PostDetailModalBodyProps) => {
-  const {
-    router,
-    post,
-    isOwner,
-    toggleLike,
-    isLikePending,
-    toggleBookmark,
-    isBookmarkPending,
-    confirmDeletePost,
-    setConfirmDeletePost,
-    handleDeletePost,
-    isDeletePending,
-  } = usePostDetail(postId)
+  const isPc = useBreakpoint('pc')
 
-  if (!post) return null
-
-  const hasImages = post.photoUrls.length > 0
+  const closeButton = (
+    <DialogPrimitive.Close
+      aria-label="닫기"
+      className="shrink-0 rounded-full p-1 text-text-primary hover:bg-fill-muted focus:outline-none"
+    >
+      <CloseIcon className="size-6" />
+    </DialogPrimitive.Close>
+  )
 
   return (
-    <div className="flex h-full min-h-0 w-full flex-col tab:flex-row">
-      {hasImages && (
-        <PostImageCarousel
-          images={post.photoUrls}
-          alt={post.authorNickname}
-          className="aspect-square w-full shrink-0 tab:aspect-auto tab:h-full tab:w-[60%]"
-        />
-      )}
-
-      <div className={cn('flex min-h-0 flex-1 flex-col', hasImages && 'tab:w-[40%]')}>
-        {/* 헤더 */}
-        <div className="flex items-center justify-between gap-2 border-b border-border-light p-4">
-          <AuthorInfo
-            size="md"
-            authorId={post.authorId}
-            nickname={post.authorNickname}
-            profileImageUrl={post.authorProfileImageUrl}
-            createdAt={post.createdAt}
-          />
-          {isOwner && (
-            <OwnerActionsMenu
-              onEdit={() => router.push(`/community/${postId}/edit`)}
-              onDelete={() => setConfirmDeletePost(true)}
-            />
-          )}
-        </div>
-
-        {/* 본문 + 댓글 (이 영역만 스크롤) */}
-        <div className="min-h-0 flex-1 overflow-y-auto">
-          <p className="p-4 text-sm leading-[1.6] font-semibold whitespace-pre-wrap text-neutral-850">
-            {post.body}
-          </p>
-          <Separator className="bg-border-light" />
-          <div className="p-4">
-            <CommentSection postId={postId} />
-          </div>
-        </div>
-
-        {/* 액션 — 하단 고정 */}
-        <div className="flex items-center gap-2 border-t border-border-light p-4">
-          <PostActionButton
-            icon={FavoriteIcon}
-            count={post.likeCount}
-            iconClassName="size-8"
-            ariaLabel="좋아요"
-            active={post.isLiked}
-            iconStatus={post.isLiked ? 'fill' : 'default'}
-            onClick={toggleLike}
-            disabled={isLikePending}
-          />
-          <PostActionButton
-            icon={PixelMessageIcon}
-            count={post.commentCount}
-            iconClassName="size-8"
-          />
-          <PostActionButton
-            icon={PixelBookmarkIcon}
-            iconClassName="size-8"
-            ariaLabel="북마크"
-            active={post.isSaved}
-            activeClassName={BOOKMARK_ACTIVE}
-            onClick={toggleBookmark}
-            disabled={isBookmarkPending}
-          />
-        </div>
-      </div>
-
-      <DeleteConfirmModal
-        open={confirmDeletePost}
-        onOpenChange={setConfirmDeletePost}
-        target="게시글"
-        onConfirm={handleDeletePost}
-        isPending={isDeletePending}
-      />
-    </div>
+    <PostDetailPanel
+      postId={postId}
+      layout={isPc ? 'side-by-side' : 'stacked'}
+      trailingAction={closeButton}
+    />
   )
 }
 

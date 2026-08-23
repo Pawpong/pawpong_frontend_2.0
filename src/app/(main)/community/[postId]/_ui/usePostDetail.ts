@@ -14,6 +14,7 @@ import { useAuthStatus } from '@/features/auth'
 import { getMockPostDetail } from '../../_ui/mockFeed'
 
 /**
+ * 최은진: 신규 파일 — PostDetailContent에서 데이터 조회/액션 로직을 분리해서 만든 훅.
  * 게시글 상세에 필요한 데이터·액션 전부 — 풀페이지(PostDetailContent)와
  * 모달(PostDetailModalBody)이 같은 로직을 각자 다른 레이아웃으로 그린다.
  */

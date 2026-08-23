@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import {
   AuthorInfo,
   BOOKMARK_ACTIVE,
@@ -11,10 +12,12 @@ import {
   PostActionButton,
   Separator,
 } from '@/shared/ui'
-import { FavoriteIcon, PixelMessageIcon, PixelBookmarkIcon } from '@/shared/assets/icons'
+import { CloseIcon, FavoriteIcon, PixelMessageIcon, PixelBookmarkIcon } from '@/shared/assets/icons'
 import { cn } from '@/shared/lib/cn'
+import { useBreakpoint } from '@/shared/lib/useBreakpoint'
 import { usePostDetail } from './usePostDetail'
 import { CommentSection } from './CommentSection'
+import { PostDetailPanel } from '../../_ui/PostDetailPanel'
 
 // [refactored] 반복되던 섹션 좌우 패딩(모바일 0 / tab 50px)을 상수로 추출
 const SECTION_X = 'px-0 tab:px-[3.125rem]'
@@ -24,6 +27,8 @@ interface PostDetailContentProps {
 }
 
 const PostDetailContent = ({ postId }: PostDetailContentProps) => {
+  // 최은진: 이 컴포넌트 안에 직접 있던 데이터 조회(useQuery)·좋아요/북마크/삭제 로직을
+  // usePostDetail 훅으로 전부 뽑아냈다 — 모달(PostDetailModalBody)도 같은 로직을 쓰기 위함.
   const {
     router,
     post,
@@ -37,8 +42,43 @@ const PostDetailContent = ({ postId }: PostDetailContentProps) => {
     handleDeletePost,
     isDeletePending,
   } = usePostDetail(postId)
+  // 최은진: mo(~767) 전용 레이아웃 분기 — PostDetailModal이 mo에서는 모달 대신 이 페이지로
+  // window.location.replace 해오므로, mo에서 이 컴포넌트가 곧 "피드 상세" 화면이 된다.
+  // tab·pc(직접 URL 접근 시의 기존 카드형 레이아웃)는 아래 이 분기 밖에서 그대로 둔다.
+  const isTabUp = useBreakpoint('tab')
 
   if (!post) return null
+
+  // 최은진: Figma "feed-detail" 컴포넌트(node 3753:246802)의 device=tab-mo 베리언트를
+  // tab 모달과 완전히 동일하게 반영 — PostDetailPanel(공용, PostDetailModalBody가 tab에서
+  // 쓰는 것과 같은 컴포넌트)을 그대로 재사용하고, 모달이 아니라 실제 페이지이므로 트레일링
+  // 아이콘만 닫기(X) 대신 뒤로가기로 바꿨다. h-dvh로 뷰포트 전체를 채워 헤더/이미지/캡션/
+  // 액션바는 고정되고 댓글 영역만 스크롤되는, 모달과 동일한 인터랙션을 페이지에서도 유지한다.
+  if (!isTabUp) {
+    // 최은진: 뒤로가기 화살표 → tab 모달과 동일한 닫기(X) 아이콘으로 교체. 클릭 시 동작(피드로
+    // 복귀)은 그대로고, 아이콘만 tab 모달의 트레일링 아이콘과 시각적으로 통일했다.
+    const backButton = (
+      <Link
+        href="/community"
+        aria-label="닫기"
+        className="shrink-0 rounded-full p-1 text-text-primary hover:bg-fill-muted"
+      >
+        <CloseIcon className="size-6" />
+      </Link>
+    )
+
+    // 최은진: h-dvh를 바로 쓰면 상위 (main)/layout.tsx의 sticky Gnb 헤더(mo에서 size-12=3rem
+    // 고정 높이, data-gnb) 만큼 문서 전체 높이가 뷰포트를 초과해서 페이지 자체가 스크롤돼버린다
+    // (댓글 영역만 스크롤되는 모달과 다른 인터랙션이 됨) — Gnb 높이를 뺀 나머지만 채운다.
+    return (
+      <PostDetailPanel
+        postId={postId}
+        layout="stacked"
+        trailingAction={backButton}
+        className="h-[calc(100dvh-3rem)]"
+      />
+    )
+  }
 
   return (
     <div className="flex w-full flex-col">
@@ -64,8 +104,10 @@ const PostDetailContent = ({ postId }: PostDetailContentProps) => {
                 nickname={post.authorNickname}
                 profileImageUrl={post.authorProfileImageUrl}
                 createdAt={post.createdAt}
+                // 최은진: 게시글 본문 스타일 font-bold/text-text-secondary → font-semibold/text-neutral-850로
+                // 교체 — 댓글(CommentItem) 본문과 동일한 톤으로 통일
                 contentSlot={
-                  <p className="mt-1 text-sm font-bold whitespace-pre-wrap text-text-secondary">
+                  <p className="mt-1 text-sm font-semibold whitespace-pre-wrap text-neutral-850">
                     {post.body}
                   </p>
                 }

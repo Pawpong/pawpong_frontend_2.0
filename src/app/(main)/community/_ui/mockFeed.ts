@@ -1,7 +1,7 @@
 import type { CommunityPostCard, CommunityPostDetail } from '@/shared/types'
 
 /**
- * 백엔드 없이 로컬에서 피드 스크롤 UI를 확인하기 위한 목업 데이터.
+ * 최은진: 신규 파일 — 백엔드 없이 로컬에서 피드 스크롤 UI를 확인하기 위한 목업 데이터.
  * CommunityContent에서 API 호출이 실패하거나(백엔드 미기동) 빈 목록일 때만,
  * 개발 환경(NODE_ENV !== 'production')에서 폴백으로 사용된다.
  */

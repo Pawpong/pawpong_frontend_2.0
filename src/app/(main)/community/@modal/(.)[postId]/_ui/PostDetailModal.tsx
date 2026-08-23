@@ -1,7 +1,9 @@
 'use client'
 
+import { useEffect } from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { useRouter } from 'next/navigation'
+import { useBreakpoint } from '@/shared/lib/useBreakpoint'
 import { PostDetailModalBody } from './PostDetailModalBody'
 
 interface PostDetailModalProps {
@@ -9,39 +11,52 @@ interface PostDetailModalProps {
 }
 
 /**
+ * 최은진: 신규 파일 — 인터셉트 라우트(page.tsx)에서 렌더되는 모달 셸.
  * 인스타그램 웹의 댓글 아이콘 클릭 로직: 피드는 그대로 뒤에 남겨두고 상세를 큰 모달로 띄운다.
  * 닫으면(X 버튼·바깥 클릭·ESC 모두 onOpenChange로 들어온다) 오던 자리로 돌아간다.
  *
  * 공용 Dialog(shared/ui)를 안 쓰고 radix primitive를 직접 쓰는 이유: 공용 Dialog는 z-50 고정인데
  * 사이트 상단 헤더(<header>)도 sticky z-50이라 겹치면 배경이 어두워지지 않는 스태킹 충돌이 있었다.
  * 이 파일은 community 페이지 전용이라 여기서만 z를 더 높여 해결한다 (공용 컴포넌트는 건드리지 않음).
+ *
+ * 최은진: 반응형 정책(참고: 바탕화면 pawpong/FeedDetailModal) 반영 — pc(1440~)·tab(768~1439)은
+ * 이 모달로 보여주고, mo(~767)는 모달이 아니라 실제 상세 페이지로 이동시킨다. useBreakpoint('tab')
+ * 이 false(=mo)로 확정되는 순간 실제 라우트([postId]/page.tsx)로 보내고, 그 판정이 끝나기 전과
+ * mo로 확정된 뒤에는 모달을 그리지 않아 깜빡임 없이 페이지만 보이게 한다.
+ *
+ * 최은진: 처음엔 router.replace를 썼는데, 인터셉트 라우트는 소프트 네비게이션으로
+ * "이미 그 경로에 와 있는" 상태이기 때문에 같은 경로로 다시 router.replace를 호출해도
+ * Next.js가 인터셉트 렌더를 그대로 유지해버려(=클릭해도 아무 반응이 없는 것처럼 보임) mo에서
+ * 피드 상세로 안 넘어가는 버그가 있었다. window.location.replace로 하드 네비게이션을 강제해서
+ * 확실히 실제 페이지가 뜨도록 고쳤다.
+ *
+ * 최은진: 닫기(X) 버튼을 Figma 컴포넌트(node 3753:246802)대로 PostDetailModalBody의 헤더
+ * 안으로 옮겨서, 여기 있던 이미지 위 절대위치 X 버튼은 제거했다(중복 방지).
  */
 const PostDetailModal = ({ postId }: PostDetailModalProps) => {
   const router = useRouter()
+  const isTabUp = useBreakpoint('tab')
+
+  useEffect(() => {
+    if (!isTabUp) window.location.replace(`/community/${postId}`)
+  }, [isTabUp, postId])
+
+  if (!isTabUp) return null
 
   return (
     <DialogPrimitive.Root open onOpenChange={(open) => !open && router.back()}>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="fixed inset-0 z-[60] bg-black/50 data-[state=closed]:opacity-0 data-[state=open]:opacity-100" />
-        {/* 인스타그램 웹 상세 모달 크기감: 데스크톱에서 뷰포트를 거의 채우는 큰 카드 */}
-        <DialogPrimitive.Content className="fixed top-1/2 left-1/2 z-[60] flex h-[94vh] max-h-[60rem] w-[calc(100%-1.5rem)] max-w-[80rem] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl bg-white shadow-lg data-[state=closed]:opacity-0 data-[state=open]:opacity-100">
+        {/* 최은진: Figma "feed-detail" 컴포넌트(node 3753:246802)의 device=tab-mo 베리언트가
+            420×1100(가로:세로 ≈ 1:2.62)로, 기존에 쓰던 1:1.2 비율(다른 참고 프로젝트 기준)과
+            전혀 다른 세로로 긴 카드 형태다 — 이 새 Figma 스펙에 맞춰 tab 모달 크기를 폭
+            26.25rem(420px)·높이 68.75rem(1100px) 고정으로 교체했다(뷰포트 폭 비례 확장이던
+            calc(27rem+22vw) 계산식은 폐기). max-h-[85vh]는 1100px가 실제 화면보다 클 때 잘라주는
+            안전판 — 댓글 영역(PostDetailPanel의 overflow-y-auto)이 남는 공간을 스크롤로 흡수한다.
+            pc(1440~)는 device=pc(1120×680, 60/40 분할)와 동일 비율이라 기존 확대 크기를 그대로 둔다. */}
+        <DialogPrimitive.Content className="fixed top-1/2 left-1/2 z-[60] flex h-[68.75rem] max-h-[85vh] w-[26.25rem] max-w-[calc(100%-1.5rem)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl bg-white shadow-lg data-[state=closed]:opacity-0 data-[state=open]:opacity-100 pc:h-[94vh] pc:max-h-[60rem] pc:w-[calc(100%-1.5rem)] pc:max-w-[80rem]">
           <DialogPrimitive.Title className="sr-only">게시글 상세</DialogPrimitive.Title>
           <PostDetailModalBody postId={postId} />
-          <DialogPrimitive.Close
-            aria-label="닫기"
-            className="absolute top-3 right-3 z-[61] rounded-full bg-black/40 p-1.5 text-white opacity-90 hover:opacity-100 focus:outline-none"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              className="size-4"
-              aria-hidden
-            >
-              <path d="M18 6 6 18M6 6l12 12" />
-            </svg>
-          </DialogPrimitive.Close>
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>

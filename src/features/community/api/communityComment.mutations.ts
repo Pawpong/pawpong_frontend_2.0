@@ -15,6 +15,9 @@ import {
   deleteCommunityComment,
 } from './community.api'
 
+// 최은진: 아래 4개(OptimisticCommentAuthor / CreateCommentVariables / CommentsCache /
+// appendComment)는 낙관적 댓글 작성을 위해 새로 추가한 타입·헬퍼. 이전에는
+// mutationFn이 CreateCommunityCommentRequest를 그대로 받아 API만 호출하고 끝이었다.
 interface OptimisticCommentAuthor {
   authorId: string
   authorModel: CommunityAuthorModel
@@ -63,6 +66,10 @@ const appendComment = (data: CommentsCache | undefined, comment: CommunityCommen
 }
 
 /**
+ * 최은진: 기존엔 `useMutation({ mutationFn: (data) => createCommunityComment(postId, data),
+ * onSuccess: invalidate })` 딱 두 줄짜리 단순 mutation이었다. 여기에 낙관적 업데이트
+ * (onMutate/onError)와 mock 글 처리를 새로 얹었다.
+ *
  * 댓글 작성 (parentCommentId 있으면 답글) — 목록 카드의 commentCount·commentPreview까지 갱신.
  *
  * optimisticAuthor를 넘기면 요청이 끝나길 기다리지 않고 입력창 바로 아래에 댓글을 먼저 그린다

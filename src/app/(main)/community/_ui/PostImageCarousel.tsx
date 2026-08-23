@@ -4,6 +4,11 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { cn } from '@/shared/lib/cn'
 
+/**
+ * 최은진: 신규 파일 — 피드 카드와 상세 모달(극장 모드)이 이미지 캐러셀을 공유하도록
+ * 분리한 컴포넌트. 배경/버튼/인디케이터/이미지 채움 방식을 전부 className prop으로
+ * 받아서, 두 화면이 서로 다른 스타일을 각자 넘겨 쓴다(기본값은 모달 기준).
+ */
 interface PostImageCarouselProps {
   images: string[]
   alt: string

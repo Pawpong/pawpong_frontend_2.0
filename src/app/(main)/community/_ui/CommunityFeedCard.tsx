@@ -22,6 +22,8 @@ const BOOKMARK_ACTIVE = 'text-[#a9835a]'
 const ICON_DEFAULT = 'text-neutral-500'
 
 /**
+ * 최은진: 신규 파일 — CommunityContent의 게시판형 카드(ConnectedPostCard)를
+ * 인스타그램형 단일 컬럼 피드 카드로 교체하면서 만든 컴포넌트.
  * 커뮤니티 홈(/community) 전용 피드 카드 — Figma "CommunityFeedCard" 컴포넌트
  * (node 3606:622637, img/txt 베리언트) 그대로 구현. 노드를 직접 읽어 검증한 값:
  * - 카드 자체는 보더 없음(strokes: []) — 대신 이미지에 8px 라운드가 별도로 있다.
@@ -53,7 +55,9 @@ const CommunityFeedCard = ({
   const hasImages = images.length > 0
 
   return (
-    <article className="flex flex-col overflow-hidden rounded-2xl bg-white">
+    // 최은진: mo에서는 카드 모서리를 각지게(rounded-none) 해서 화면 끝까지 꽉 차 보이게 하고,
+    // tab부터 다시 rounded-2xl로 둥글린다 — Container 쪽 mo 좌우 여백 제거와 짝을 이루는 변경.
+    <article className="flex flex-col overflow-hidden rounded-none bg-white tab:rounded-2xl">
       {/* 헤더 — 아바타·닉네임·작성시각 (Figma "header" / community-profile) */}
       <div className="flex items-center justify-between gap-2 p-3">
         <Link href={href} className="flex min-w-0 flex-1 items-center gap-2">
