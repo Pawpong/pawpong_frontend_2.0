@@ -8,7 +8,8 @@ import { cn } from '@/shared/lib/cn'
 import { getKakao, shareToKakao } from '@/shared/lib/kakao'
 import { Dialog, DialogOverlay, DialogPortal } from './Dialog'
 
-/* 공유하기 모달 (Figma 1949-253368) — 인스타/카카오톡/페이스북/URL 복사 */
+/* 공유하기 모달 (Figma 1949-253368) — 카카오톡/페이스북/네이버 블로그/URL 복사.
+   인스타그램은 웹 공유 인텐트를 제공하지 않아 URL 복사로만 폴백돼서 제외했다 */
 
 interface ShareModalProps {
   open: boolean
@@ -24,20 +25,14 @@ interface ShareModalProps {
   className?: string
 }
 
-type ShareKey = 'instagram' | 'kakao' | 'facebook' | 'copy'
+type ShareKey = 'kakao' | 'facebook' | 'naver' | 'copy'
 
 interface ShareFeedback {
-  tone: 'success' | 'info' | 'error'
+  tone: 'success' | 'error'
   message: string
 }
 
 const OPTIONS: { key: ShareKey; label: string; icon: string; circle: string }[] = [
-  {
-    key: 'instagram',
-    label: '인스타그램',
-    icon: '/images/share/instagram.svg',
-    circle: 'border border-neutral-150 bg-white',
-  },
   { key: 'kakao', label: '카카오톡', icon: '/images/share/kakaotalk.svg', circle: 'bg-[#ffe812]' },
   {
     key: 'facebook',
@@ -45,8 +40,21 @@ const OPTIONS: { key: ShareKey; label: string; icon: string; circle: string }[] 
     icon: '/images/share/facebook.png',
     circle: 'bg-[#0866ff]',
   },
+  {
+    key: 'naver',
+    label: '블로그',
+    icon: '/images/share/naver.svg',
+    circle: 'bg-[#03c75a]',
+  },
   { key: 'copy', label: 'URL 복사', icon: '/images/share/link.svg', circle: 'bg-neutral-100' },
 ]
+
+/** 외부 공유 페이지를 팝업으로 연다. 차단되면 호출부에서 에러 피드백으로 이어진다. */
+const openSharePopup = (shareUrl: string) => {
+  const popup = window.open(shareUrl, '_blank', 'popup,width=720,height=640')
+  if (!popup) throw new Error('팝업이 차단되었습니다.')
+  popup.opener = null
+}
 
 /** Async Clipboard를 우선 사용하고, HTTP·구형 브라우저에서는 동기 복사로 폴백한다. */
 const copyToClipboard = async (text: string) => {
@@ -69,9 +77,6 @@ const copyToClipboard = async (text: string) => {
     textarea.remove()
   }
 }
-
-const isAbortError = (error: unknown) =>
-  error instanceof DOMException && error.name === 'AbortError'
 
 const ShareModal = ({
   open,
@@ -119,28 +124,17 @@ const ShareModal = ({
           break
         }
         case 'facebook': {
-          const popup = window.open(
+          openSharePopup(
             `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
-            '_blank',
-            'popup,width=720,height=640',
           )
-          if (!popup) throw new Error('팝업이 차단되었습니다.')
-          popup.opener = null
           setFeedback({ tone: 'success', message: '페이스북 공유 창을 열었습니다.' })
           break
         }
-        case 'instagram': {
-          const shareData = { title: shareTitle, text: description, url: shareUrl }
-          if (navigator.share && (!navigator.canShare || navigator.canShare(shareData))) {
-            await navigator.share(shareData)
-            setFeedback({ tone: 'success', message: '공유를 완료했습니다.' })
-          } else {
-            await copyToClipboard(shareUrl)
-            setFeedback({
-              tone: 'info',
-              message: '이 브라우저에서는 인스타그램 직접 공유를 지원하지 않아 URL을 복사했습니다.',
-            })
-          }
+        case 'naver': {
+          openSharePopup(
+            `https://share.naver.com/web/shareView?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(shareTitle)}`,
+          )
+          setFeedback({ tone: 'success', message: '네이버 공유 창을 열었습니다.' })
           break
         }
         // [refactored] SDK 페이로드 조립은 shared/lib/kakao로 이동. await 없이 동기 호출해야 팝업이 안 막힌다.
@@ -150,10 +144,6 @@ const ShareModal = ({
         }
       }
     } catch (error) {
-      if (isAbortError(error)) {
-        setFeedback({ tone: 'info', message: '공유를 취소했습니다.' })
-        return
-      }
       setFeedback({
         tone: 'error',
         message:
