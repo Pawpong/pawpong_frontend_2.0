@@ -16,6 +16,10 @@ const VISIBILITY_OPTIONS = [
 
 type VisibilityType = (typeof VISIBILITY_OPTIONS)[number]['id']
 
+// '나만보기'는 선택지에서 뺀다. 다만 서버 계약(CommunityPostVisibility)에는 남아 있어
+// 기존 private 글을 열었을 때 라벨은 그대로 보여줘야 하므로 목록에서만 제외한다.
+const SELECTABLE_OPTIONS = VISIBILITY_OPTIONS.filter((option) => option.id !== 'private')
+
 interface VisibilitySelectProps {
   value: VisibilityType
   onChange: (value: VisibilityType) => void
@@ -43,7 +47,7 @@ const VisibilitySelect = ({ value, onChange }: VisibilitySelectProps) => {
         align="start"
         className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-[8rem] rounded-md p-0"
       >
-        {VISIBILITY_OPTIONS.map((option) => (
+        {SELECTABLE_OPTIONS.map((option) => (
           <DropdownMenuItem
             key={option.id}
             onClick={() => onChange(option.id)}
