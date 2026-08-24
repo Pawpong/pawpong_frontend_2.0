@@ -41,3 +41,4 @@ const PostFormCTA = ({
 )
 
 export { PostFormCTA }
+export type { PostFormCTAProps }
