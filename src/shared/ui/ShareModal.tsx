@@ -91,13 +91,19 @@ const ShareModal = ({
   const [kakaoReady, setKakaoReady] = useState(false)
   const [feedback, setFeedback] = useState<ShareFeedback | null>(null)
 
-  // 모달이 열린 동안 SDK를 미리 로드/init만 해둔다. 실제 공유는 클릭 시 동기로 호출.
-  useEffect(() => {
-    if (!open) {
+  // 닫을 때 상태 리셋은 이벤트에서 한다. effect 안에서 동기로 setState 하면
+  // 렌더가 한 번 더 도는 데다(react-hooks/set-state-in-effect) 닫히는 순간 필요도 없다.
+  const handleOpenChange = (next: boolean) => {
+    if (!next) {
       setKakaoReady(false)
       setFeedback(null)
-      return
     }
+    onOpenChange(next)
+  }
+
+  // 모달이 열린 동안 SDK를 미리 로드/init만 해둔다. 실제 공유는 클릭 시 동기로 호출.
+  useEffect(() => {
+    if (!open) return
 
     let cancelled = false
     void getKakao()
@@ -155,7 +161,7 @@ const ShareModal = ({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogPortal>
         <DialogOverlay />
         <DialogPrimitive.Content
