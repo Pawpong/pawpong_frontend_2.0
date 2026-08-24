@@ -207,3 +207,27 @@
     --swiper-pagination-bottom: 2.5rem;
   }
 }
+
+/* 피드 이미지 더블탭 좋아요 — 하트가 커졌다 사라진다 */
+@keyframes heart-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  35% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.1);
+  }
+}
+
+.animate-heart-pop {
+  animation: heart-pop 0.7s ease-out forwards;
+}
