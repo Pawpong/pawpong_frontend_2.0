@@ -1,18 +1,25 @@
 'use client'
 
-import { Fragment, useState } from 'react'
+import { useState } from 'react'
+import Link from 'next/link'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import {
   Container,
   InfiniteScrollTrigger,
-  InputUpload,
   ListState,
+  LoginPromptModal,
   NavigationBar,
   SearchButton,
-  Separator,
 } from '@/shared/ui'
-import { communityQueries, toCommunityPreviewProps } from '@/entities/community'
-import { ConnectedPostCard } from '@/features/community'
+import { PlusIcon } from '@/shared/assets'
+import {
+  COMMUNITY_LOGIN_PROMPT,
+  CommunityFeedCardSkeleton,
+  communityQueries,
+  toCommunityPreviewProps,
+} from '@/entities/community'
+import { ConnectedFeedCard } from '@/features/community'
+import { useLoginGuard } from '@/features/auth'
 import { flattenPages } from '@/shared/lib/infiniteList'
 
 const CommunityContent = () => {
@@ -20,6 +27,8 @@ const CommunityContent = () => {
   const [searchOpen, setSearchOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [appliedSearch, setAppliedSearch] = useState('')
+  // 좋아요·북마크는 비로그인 요청이 401로 떨어지므로 먼저 로그인으로 유도한다
+  const { guard, isPromptOpen, setPromptOpen } = useLoginGuard()
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending, isError } =
     useInfiniteQuery(
@@ -31,9 +40,6 @@ const CommunityContent = () => {
     <div className="flex w-full flex-col">
       {/* 상단바 — 공통 NavigationBar (Figma 2063-213675 navigation bar) */}
       <NavigationBar title="포퐁커뮤니티" backHref="/" />
-
-      {/* 작성 유도 바 — 공통 InputUpload (Figma 2063-213676, 상·하 보더 + px mo16/tab48/pc80) */}
-      <InputUpload text="게시글을 올려보세요" href="/community/write" />
 
       {/* 검색 (Figma 1657-251460 — 버튼 클릭 시 focus 입력 pill로 전환)
           padding: mo 8·16 / tab 12·48 (px-4=모바일 16, tab48은 Container 기본값) */}
@@ -55,26 +61,37 @@ const CommunityContent = () => {
         />
       </Container>
 
-      {/* Main: Feed — 모바일은 카드 나열(gap 20), tab+는 border 박스 하나에 구분선 (Figma 1054-34769)
-          pc는 Figma(2063-215749) 기준 948px 고정 폭 가운데 정렬 */}
-      <Container className="px-4 pb-10 tab:pb-16">
-        <div className="mx-auto w-full pc:max-w-[59.25rem]">
+      {/* Main: Feed — 인스타그램 홈처럼 카드 하나하나를 스크롤하는 단일 컬럼 피드.
+          pc는 이미지가 도드라지도록 게시판형 폭(948px) 대신 좁은 피드 폭(415px)으로 가운데 정렬.
+          모바일은 좌우 여백을 없애 카드가 화면 끝까지 닿게 한다 (tab/pc는 Container 기본 여백 유지) */}
+      <Container className="px-0 pb-10 tab:pb-16">
+        <div className="mx-auto w-full pc:max-w-[25.9375rem]">
+          {/* 로딩은 ListState 문구 대신 카드 골격으로 — 피드는 화면 대부분이 이미지라 덜 흔들린다 */}
+          {isPending && (
+            <div className="flex min-w-0 flex-col gap-6 tab:gap-8 pc:gap-10">
+              {[0, 1, 2].map((i) => (
+                <CommunityFeedCardSkeleton key={i} />
+              ))}
+            </div>
+          )}
+
           <ListState
-            isPending={isPending}
+            isPending={false}
             isError={isError}
-            isEmpty={posts.length === 0}
+            isEmpty={!isPending && posts.length === 0}
             loadingText="게시글을 불러오는 중입니다."
             errorText="게시글을 불러오지 못했습니다."
             emptyText={
               appliedSearch ? `'${appliedSearch}' 검색 결과가 없습니다.` : '게시글이 없습니다.'
             }
           >
-            <div className="flex min-w-0 flex-col gap-5 tab:gap-8 tab:rounded-lg tab:border tab:border-neutral-300 tab:p-3">
-              {posts.map((post, index) => (
-                <Fragment key={post.postId}>
-                  {index > 0 && <Separator className="bg-border-light" />}
-                  <ConnectedPostCard {...toCommunityPreviewProps(post)} />
-                </Fragment>
+            <div className="flex min-w-0 flex-col gap-6 tab:gap-8 pc:gap-10">
+              {posts.map((post) => (
+                <ConnectedFeedCard
+                  key={post.postId}
+                  guard={guard}
+                  {...toCommunityPreviewProps(post)}
+                />
               ))}
             </div>
           </ListState>
@@ -86,6 +103,21 @@ const CommunityContent = () => {
           />
         </div>
       </Container>
+
+      {/* 글작성 — 상단 작성 유도 바를 대신하는 우하단 고정 FAB (Figma "글작성" BaseButton) */}
+      <Link
+        href="/community/write"
+        className="fixed right-6 bottom-6 z-40 flex h-12 items-center gap-1 rounded-full bg-point-500 px-4 shadow-[0_7px_7px_rgba(55,55,55,0.1)]"
+      >
+        <PlusIcon className="size-6 text-neutral-850" />
+        <span className="text-base leading-[1.5] font-semibold text-neutral-850">글작성</span>
+      </Link>
+
+      <LoginPromptModal
+        open={isPromptOpen}
+        onOpenChange={setPromptOpen}
+        description={COMMUNITY_LOGIN_PROMPT.reaction} // [refactored]
+      />
     </div>
   )
 }
