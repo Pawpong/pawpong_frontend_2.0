@@ -34,7 +34,9 @@ const FooterCtaBar = ({ leftSlot, secondary, primary, children }: FooterCtaBarPr
       {/* 좌측 슬롯 자리는 비어 있어도 유지해 버튼 그룹이 우측에 붙게 한다 */}
       <div className="hidden tab:block">{leftSlot}</div>
 
-      <div className="flex w-full gap-2.5 tab:w-[22.5rem] tab:gap-5">
+      {/* 그룹 폭 360은 [보조+주] 2개 기준(170+20+170). 주 버튼만 있을 땐 남는 190만큼
+          왼쪽으로 뜨므로 오른쪽으로 붙인다 (2개일 땐 딱 맞아 영향 없음) */}
+      <div className="flex w-full gap-2.5 tab:w-[22.5rem] tab:justify-end tab:gap-5">
         {secondary && (
           <Button
             variant="outline"
