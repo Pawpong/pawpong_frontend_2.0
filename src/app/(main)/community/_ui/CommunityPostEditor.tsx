@@ -116,7 +116,7 @@ const CommunityPostEditor = ({ postId }: CommunityPostEditorProps) => {
 
   useEffect(() => {
     // 판정이 끝났는데 내 글이 아니면 수정 화면을 노출하지 않고 상세로 되돌린다
-    if (postId && post && meFetched && !isOwner) router.replace(`/community/${postId}`)
+    if (postId && post && meFetched && !isOwner) router.replace(`/community/post/${postId}`)
   }, [postId, post, meFetched, isOwner, router])
 
   if (!postId) return <PostForm />

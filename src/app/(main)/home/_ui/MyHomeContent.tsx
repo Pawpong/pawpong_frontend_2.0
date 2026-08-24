@@ -141,7 +141,7 @@ const MyHomeContent = () => {
             <PostList
               posts={posts}
               emptyText="내가 쓴 글이 없습니다."
-              onEdit={(postId) => router.push(`/community/${postId}/edit`)}
+              onEdit={(postId) => router.push(`/community/post/${postId}/edit`)}
               onDelete={setDeleteTargetId}
             />
           </Container>

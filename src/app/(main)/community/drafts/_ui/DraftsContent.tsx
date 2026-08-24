@@ -40,8 +40,8 @@ const DraftsContent = () => {
                   <ConnectedPostCard
                     {...toCommunityPreviewProps(draft)}
                     // 임시저장 글은 상세가 없으므로 수정 화면으로 바로 보낸다
-                    detailHref={`/community/${draft.postId}/edit`}
-                    onEdit={() => router.push(`/community/${draft.postId}/edit`)}
+                    detailHref={`/community/post/${draft.postId}/edit`}
+                    onEdit={() => router.push(`/community/post/${draft.postId}/edit`)}
                     onDelete={() => setDeleteTargetId(draft.postId)}
                   />
                 </Fragment>
