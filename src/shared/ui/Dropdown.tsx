@@ -13,7 +13,7 @@ const dropdownVariants = tv({
       // 미선택(placeholder)은 Input 과 같은 톤으로, 선택되면 본문 색
       'flex h-[2.8125rem] w-full items-center justify-between rounded-lg border border-neutral-150 bg-white p-3 text-sm leading-[1.5] font-medium text-neutral-850 outline-none data-[placeholder]:text-neutral-500 data-[state=open]:border-info-500 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1 [&[data-state=open]>svg]:rotate-180',
     content:
-      'relative z-50 max-h-96 w-[var(--radix-select-trigger-width)] overflow-hidden overflow-y-auto rounded-lg border border-neutral-150 bg-white shadow-[0_7px_7px_0_rgba(55,55,55,0.1)] data-[side=bottom]:translate-y-2',
+      'relative z-dropdown max-h-96 w-[var(--radix-select-trigger-width)] overflow-hidden overflow-y-auto rounded-lg border border-neutral-150 bg-white shadow-[0_7px_7px_0_rgba(55,55,55,0.1)] data-[side=bottom]:translate-y-2',
     item: 'flex h-[3.0625rem] w-full cursor-default items-center bg-white p-3 text-sm leading-[1.5] font-medium text-neutral-700 outline-none select-none focus:bg-neutral-50 data-[state=checked]:bg-neutral-100 data-[state=checked]:font-semibold data-[state=checked]:text-neutral-850',
   },
 })

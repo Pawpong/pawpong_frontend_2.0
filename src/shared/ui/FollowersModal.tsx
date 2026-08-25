@@ -109,7 +109,7 @@ const FollowersModal = ({
             // 설명 텍스트가 없는 모달 — Radix의 aria-describedby 누락 경고를 명시적으로 끔
             aria-describedby={undefined}
             onOpenAutoFocus={(e) => e.preventDefault()}
-            className="fixed inset-0 z-50 flex h-full w-full flex-col overflow-hidden bg-white pc:inset-auto pc:top-1/2 pc:left-1/2 pc:h-[min(40.875rem,90vh)] pc:w-[min(46.0625rem,calc(100vw-2rem))] pc:-translate-x-1/2 pc:-translate-y-1/2 pc:rounded-[1.25rem] pc:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]"
+            className="fixed inset-0 z-modal flex h-full w-full flex-col overflow-hidden bg-white pc:inset-auto pc:top-1/2 pc:left-1/2 pc:h-[min(40.875rem,90vh)] pc:w-[min(46.0625rem,calc(100vw-2rem))] pc:-translate-x-1/2 pc:-translate-y-1/2 pc:rounded-[1.25rem] pc:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]"
           >
             <DialogPrimitive.Title className="sr-only">팔로워·팔로잉 목록</DialogPrimitive.Title>
 

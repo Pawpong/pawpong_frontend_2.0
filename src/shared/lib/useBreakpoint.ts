@@ -2,13 +2,13 @@
 
 import { useCallback, useSyncExternalStore } from 'react'
 
-const BREAKPOINTS = {
+export const BREAKPOINTS = {
   mo: 375,
   tab: 768,
   pc: 1440,
 } as const
 
-type Breakpoint = keyof typeof BREAKPOINTS
+export type Breakpoint = keyof typeof BREAKPOINTS
 
 /**
  * 현재 뷰포트가 지정한 브레이크포인트 이상인지 반환

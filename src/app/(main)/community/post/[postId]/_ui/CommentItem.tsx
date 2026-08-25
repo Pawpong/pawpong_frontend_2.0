@@ -1,9 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { AuthorInfo, DeleteConfirmModal, OwnerActionsMenu } from '@/shared/ui'
+import { AuthorInfo, Button, DeleteConfirmModal, OwnerActionsMenu } from '@/shared/ui'
 import type { CommunityComment } from '@/shared/types'
-import { useUpdateCommunityComment, useDeleteCommunityComment } from '@/features/community'
+import { useDeleteCommunityComment, useUpdateCommunityComment } from '@/features/community'
 
 interface CommentItemProps {
   comment: CommunityComment
@@ -18,14 +18,13 @@ interface CommentItemProps {
 const CommentItem = ({ comment, currentUserId, onReply, isReply }: CommentItemProps) => {
   const isOwner = !!currentUserId && currentUserId === comment.authorId
 
-  const updateComment = useUpdateCommunityComment(comment.commentId)
-  const deleteComment = useDeleteCommunityComment()
+  const updateComment = useUpdateCommunityComment(comment.commentId, comment.postId)
+  const deleteComment = useDeleteCommunityComment(comment.postId)
 
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState(comment.body)
   const [confirmDelete, setConfirmDelete] = useState(false)
 
-  // 삭제와 같은 방식 — 성공했을 때만 편집 모드를 닫는다 (실패하면 입력 유지, unhandled rejection 없음)
   const handleSaveEdit = () => {
     const trimmed = editValue.trim()
     if (!trimmed || updateComment.isPending) return
@@ -48,30 +47,34 @@ const CommentItem = ({ comment, currentUserId, onReply, isReply }: CommentItemPr
               <div className="mt-1 flex flex-col gap-2">
                 <textarea
                   value={editValue}
-                  onChange={(e) => setEditValue(e.target.value)}
+                  onChange={(event) => setEditValue(event.target.value)}
                   maxLength={1000}
                   rows={2}
-                  className="w-full resize-none rounded-lg border border-[#d3d3d3] px-3 py-2 text-sm outline-none focus:border-text-primary"
+                  className="w-full resize-none rounded-lg border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-text-primary"
                 />
                 <div className="flex gap-2">
-                  <button
-                    type="button"
+                  <Button
+                    variant="primary"
+                    size="sm"
                     onClick={handleSaveEdit}
-                    disabled={updateComment.isPending}
-                    className="rounded-full bg-fill-muted px-3 py-1 text-sm font-semibold text-text-primary disabled:opacity-50"
+                    disabled={!editValue.trim() || updateComment.isPending}
+                    className="px-3"
                   >
-                    저장
-                  </button>
-                  <button
-                    type="button"
+                    {updateComment.isPending ? '저장 중' : '저장'}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => {
                       setIsEditing(false)
                       setEditValue(comment.body)
+                      updateComment.reset()
                     }}
-                    className="rounded-full border border-neutral-300 px-3 py-1 text-sm font-semibold text-text-secondary"
+                    disabled={updateComment.isPending}
+                    className="px-3 text-text-secondary"
                   >
                     취소
-                  </button>
+                  </Button>
                 </div>
                 {updateComment.isError && (
                   <p role="alert" className="text-xs text-error-700">
@@ -97,26 +100,31 @@ const CommentItem = ({ comment, currentUserId, onReply, isReply }: CommentItemPr
         }
       />
 
-      {/* 본인 댓글: 수정/삭제 메뉴 */}
+      {/* 본인 댓글에서만 ⋮ → 수정/삭제 메뉴 노출 */}
       {isOwner && !isEditing && (
         <OwnerActionsMenu
           className="shrink-0 pt-1"
-          onEdit={() => setIsEditing(true)}
+          onEdit={() => {
+            setEditValue(comment.body)
+            updateComment.reset()
+            setIsEditing(true)
+          }}
           onDelete={() => setConfirmDelete(true)}
         />
       )}
 
-      {/* [refactored] 댓글 삭제 확인 — 공통 DeleteConfirmModal */}
-      <DeleteConfirmModal
-        open={confirmDelete}
-        onOpenChange={setConfirmDelete}
-        target="댓글"
-        // 삭제 성공 후에만 닫는다 (실패하면 모달을 유지해 재시도 가능)
-        onConfirm={() =>
-          deleteComment.mutate(comment.commentId, { onSuccess: () => setConfirmDelete(false) })
-        }
-        isPending={deleteComment.isPending}
-      />
+      {isOwner && (
+        <DeleteConfirmModal
+          open={confirmDelete}
+          onOpenChange={setConfirmDelete}
+          target="댓글"
+          // 삭제 성공 후에만 닫고, 갱신된 댓글 목록과 댓글 수는 mutation 훅이 다시 조회한다.
+          onConfirm={() =>
+            deleteComment.mutate(comment.commentId, { onSuccess: () => setConfirmDelete(false) })
+          }
+          isPending={deleteComment.isPending}
+        />
+      )}
     </div>
   )
 }

@@ -27,7 +27,7 @@ interface FooterCtaBarProps {
  * - 버튼: 모바일 h-48 풀 너비(보조 117 고정), tab+ h-40 · 170 · gap 20 (그룹 360)
  */
 const FooterCtaBar = ({ leftSlot, secondary, primary, children }: FooterCtaBarProps) => (
-  <div className="fixed inset-x-0 bottom-0 z-40 bg-white">
+  <div className="fixed inset-x-0 bottom-0 z-sticky bg-white">
     {children}
 
     <Container className="flex items-center bg-white py-4 tab:h-[5.875rem] tab:justify-between tab:py-0">

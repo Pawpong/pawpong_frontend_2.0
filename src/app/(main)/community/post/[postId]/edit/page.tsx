@@ -1,4 +1,4 @@
-import { CommunityPostEditor } from '../../_ui/CommunityPostEditor'
+import { CommunityPostEditor } from '../../../_ui/CommunityPostEditor'
 
 interface CommunityPostEditPageProps {
   params: Promise<{ postId: string }>

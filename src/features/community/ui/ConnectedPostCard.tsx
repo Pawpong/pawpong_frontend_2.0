@@ -1,7 +1,7 @@
 'use client'
 
 import type { ComponentProps } from 'react'
-import { CommunityBox, PostCard } from '@/entities/community'
+import { CommunityBox, CommunityFeedCard, PostCard } from '@/entities/community'
 import {
   useToggleCommunityPostBookmark,
   useToggleCommunityPostLike,
@@ -35,4 +35,25 @@ const ConnectedCommunityBox = (
   return <CommunityBox {...props} {...reactions} />
 }
 
-export { ConnectedCommunityBox, ConnectedPostCard }
+interface ConnectedFeedCardProps
+  extends Omit<ComponentProps<typeof CommunityFeedCard>, InjectedActions> {
+  /**
+   * 로그인이 필요한 동작을 감싸는 가드 (features/auth의 useLoginGuard).
+   * 같은 레이어의 auth 슬라이스를 직접 참조하지 않도록 앱 레이어에서 주입받는다.
+   */
+  guard?: (action: () => void) => () => void
+}
+
+const ConnectedFeedCard = ({ guard, ...props }: ConnectedFeedCardProps) => {
+  const reactions = useCardReactions(props.postId, props.isLiked, props.isSaved)
+
+  return (
+    <CommunityFeedCard
+      {...props}
+      onToggleLike={guard ? guard(reactions.onToggleLike) : reactions.onToggleLike}
+      onToggleSave={guard ? guard(reactions.onToggleSave) : reactions.onToggleSave}
+    />
+  )
+}
+
+export { ConnectedCommunityBox, ConnectedFeedCard, ConnectedPostCard }

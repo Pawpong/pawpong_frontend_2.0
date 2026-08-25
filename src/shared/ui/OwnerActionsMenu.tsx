@@ -10,14 +10,16 @@ import {
 } from './DropdownMenu'
 
 interface OwnerActionsMenuProps {
-  onEdit: () => void
+  /** 수정 기능을 제공하는 화면에서만 수정 항목을 노출한다. */
+  onEdit?: () => void
   onDelete: () => void
   /** 트리거 아이콘 크기 (기본 size-6) */
   className?: string
 }
 
 /**
- * 본인 소유 게시글/댓글의 ⋮ 더보기 메뉴 (수정/삭제).
+ * 본인 소유 게시글/댓글의 ⋮ 더보기 메뉴.
+ * onEdit을 생략하면 삭제 항목만 노출한다.
  * 소유자 판정은 호출부에서 하고, 이 컴포넌트는 렌더된 시점에 항상 표시한다.
  */
 const OwnerActionsMenu = ({ onEdit, onDelete, className }: OwnerActionsMenuProps) => (
@@ -28,7 +30,7 @@ const OwnerActionsMenu = ({ onEdit, onDelete, className }: OwnerActionsMenuProps
       </button>
     </DropdownMenuTrigger>
     <DropdownMenuContent align="end">
-      <DropdownMenuItem onSelect={onEdit}>수정</DropdownMenuItem>
+      {onEdit && <DropdownMenuItem onSelect={onEdit}>수정</DropdownMenuItem>}
       <DropdownMenuItem onSelect={onDelete} className="text-red-500 focus:text-red-500">
         삭제
       </DropdownMenuItem>

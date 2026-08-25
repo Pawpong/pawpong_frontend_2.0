@@ -32,7 +32,7 @@ const ImageModal = ({
       <DialogPortal>
         <DialogOverlay className="bg-black/50" />
         <DialogPrimitive.Content
-          className="fixed top-1/2 left-1/2 z-50 w-[57.25rem] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[1rem] border border-[#c6c6c6] bg-black"
+          className="fixed top-1/2 left-1/2 z-modal w-[57.25rem] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-[1rem] border border-[#c6c6c6] bg-black"
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
           <DialogPrimitive.Title className="sr-only">이미지 상세 보기</DialogPrimitive.Title>
