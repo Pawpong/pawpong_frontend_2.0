@@ -167,7 +167,7 @@ const ShareModal = ({
         <DialogPrimitive.Content
           aria-describedby="share-modal-description"
           className={cn(
-            'fixed top-1/2 left-1/2 z-50 w-[22.5rem] max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 rounded-[0.75rem] bg-white data-[state=closed]:opacity-0 data-[state=open]:opacity-100',
+            'fixed top-1/2 left-1/2 z-modal w-[22.5rem] max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 rounded-[0.75rem] bg-white data-[state=closed]:opacity-0 data-[state=open]:opacity-100',
             className,
           )}
         >

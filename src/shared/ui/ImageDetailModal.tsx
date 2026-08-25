@@ -96,7 +96,7 @@ const ImageDetailModal = ({
         <DialogPrimitive.Content
           onOpenAutoFocus={(event) => event.preventDefault()}
           className={cn(
-            'fixed top-1/2 left-1/2 z-50 flex h-[min(45.625rem,100dvh)] w-[min(23.4375rem,100vw)] -translate-x-1/2 -translate-y-1/2 flex-col items-center overflow-hidden bg-neutral-0 py-5 shadow-[0_7px_7px_rgba(55,55,55,0.1)]',
+            'fixed top-1/2 left-1/2 z-modal flex h-[min(45.625rem,100dvh)] w-[min(23.4375rem,100vw)] -translate-x-1/2 -translate-y-1/2 flex-col items-center overflow-hidden bg-neutral-0 py-5 shadow-[0_7px_7px_rgba(55,55,55,0.1)]',
             'tab:h-auto tab:max-h-[calc(100dvh-2rem)] tab:w-[48rem]',
             'pc:h-[40.875rem] pc:w-[64.125rem] pc:rounded-[1.25rem] pc:py-0',
             className,

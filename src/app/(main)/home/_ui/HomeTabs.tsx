@@ -36,7 +36,7 @@ const HomeTabs = ({ tabs, activeTab, onTabChange, children, stickyTop }: HomeTab
       }))}
       value={activeTab}
       onValueChange={onTabChange}
-      barClassName="tab:sticky tab:z-30"
+      barClassName="tab:sticky tab:z-sticky"
       barStyle={{ top }}
       ariaLabel="홈 콘텐츠"
     >

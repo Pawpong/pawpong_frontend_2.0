@@ -46,7 +46,7 @@ const BottomSheet = ({
       <DialogPrimitive.Content
         aria-describedby={undefined}
         className={cn(
-          'fixed inset-x-0 bottom-0 z-50 flex flex-col rounded-t-[1.25rem] bg-white shadow-[0_-0.4375rem_0.4375rem_0_rgba(55,55,55,0.1)] transition-transform duration-200 data-[state=closed]:translate-y-full data-[state=open]:translate-y-0',
+          'fixed inset-x-0 bottom-0 z-modal flex flex-col rounded-t-[1.25rem] bg-white shadow-[0_-0.4375rem_0.4375rem_0_rgba(55,55,55,0.1)] transition-transform duration-200 data-[state=closed]:translate-y-full data-[state=open]:translate-y-0',
           className,
         )}
       >

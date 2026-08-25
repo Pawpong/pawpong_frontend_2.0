@@ -54,7 +54,7 @@ export const DropdownMenuSubContent = React.forwardRef<
   <DropdownMenuPrimitive.SubContent
     ref={ref}
     className={cn(
-      'z-50 min-w-[8rem] overflow-hidden rounded-md border border-zinc-200 bg-white p-1 text-zinc-950 shadow-lg dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50',
+      'z-dropdown min-w-[8rem] overflow-hidden rounded-md border border-zinc-200 bg-white p-1 text-zinc-950 shadow-lg dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50',
       className,
     )}
     {...props}
@@ -72,7 +72,8 @@ export const DropdownMenuContent = React.forwardRef<
       sideOffset={sideOffset}
       className={cn(
         // 디자인시스템 드롭다운 (node 1159:48679): 흰 배경 · #e4e4e4 border · rounded-8 · 그림자
-        'z-50 min-w-[8rem] overflow-hidden rounded-lg border border-neutral-150 bg-white p-0 shadow-[0px_7px_7px_rgba(55,55,55,0.1)]',
+        // 상세 모달 안에서 열려도 포털 메뉴가 모달 뒤로 숨지 않도록 dropdown 레이어에 둔다.
+        'z-dropdown min-w-[8rem] overflow-hidden rounded-lg border border-neutral-150 bg-white p-0 shadow-[0px_7px_7px_rgba(55,55,55,0.1)]',
         className,
       )}
       {...props}
