@@ -25,12 +25,14 @@ const usePostDetail = (postId: string) => {
   // 그 값으로 화면을 먼저 채워 빈 모달이 보이지 않게 한다 (정렬·검색어별 캐시를 모두 훑는다)
   const placeholder = useMemo(() => {
     const caches = queryClient.getQueriesData<InfiniteData<PaginationResponse<CommunityPostCard>>>({
-      queryKey: [...communityQueries.all(), 'posts'],
+      queryKey: communityQueries.postsAll(),
     })
 
     for (const [, data] of caches) {
-      const card = data?.pages.flatMap((page) => page.items).find((item) => item.postId === postId)
-      if (card) return toPlaceholderPostDetail(card)
+      for (const page of data?.pages ?? []) {
+        const card = page.items.find((item) => item.postId === postId)
+        if (card) return toPlaceholderPostDetail(card)
+      }
     }
     return undefined
   }, [queryClient, postId])

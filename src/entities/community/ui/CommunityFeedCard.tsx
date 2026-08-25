@@ -1,9 +1,10 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import Link from 'next/link'
-import { FAVORITE_ACTIVE, ImageCarousel, OwnerActionsMenu, ProfileAvatar } from '@/shared/ui'
-import { FavoriteIcon, MoreVertIcon } from '@/shared/assets'
+import { useRouter } from 'next/navigation'
+import { ImageCarousel, OwnerActionsMenu, ProfileAvatar } from '@/shared/ui'
+import { MoreVertIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { formatRelativeTime } from '@/shared/lib/formatRelativeTime'
 import type { CommunityPreviewProps } from '../model/communityPreview'
@@ -11,7 +12,7 @@ import { CommunityPostActions } from './CommunityPostActions'
 import { COMMUNITY_CAROUSEL_STYLE } from '../model/communityUi'
 
 interface CommunityFeedCardProps extends CommunityPreviewProps {
-  /** 내 글일 때만 전달 — 더보기가 수정/삭제로 동작 */
+  /** 내 글일 때만 전달 — 더보기가 삭제(및 필요한 화면에서는 수정)로 동작 */
   onEdit?: () => void
   onDelete?: () => void
   /** 좋아요·북마크 토글 — features의 ConnectedFeedCard에서 주입 */
@@ -44,20 +45,27 @@ const CommunityFeedCard = ({
 }: CommunityFeedCardProps) => {
   const href = detailHref ?? `/community/post/${postId}`
   const hasImages = images.length > 0
-  const [showHeartPop, setShowHeartPop] = useState(false)
-  const lastTapRef = useRef(0)
+  const router = useRouter()
+  // 사진 한 번 탭으로 상세 진입. Link로 감싸면 캐러셀 스와이프와 화살표·점 조작이 막히므로,
+  // 포인터 이동 거리로 드래그(스와이프)를 걸러내고 캐러셀 컨트롤 클릭은 무시한다.
+  const pointerStart = useRef<{ x: number; y: number } | null>(null)
 
-  // 인스타그램식 더블탭 좋아요 — 이미 눌러둔 글은 해제하지 않고 애니메이션만 다시 보여준다.
-  // 캐러셀 스와이프와 겹치지 않도록 짧은 두 번의 탭(300ms)만 인식한다.
-  const handleImageTap = () => {
-    const now = Date.now()
-    const isDoubleTap = now - lastTapRef.current < 300
-    lastTapRef.current = isDoubleTap ? 0 : now
-    if (!isDoubleTap) return
+  const handleImagePointerDown = (event: React.PointerEvent) => {
+    pointerStart.current = { x: event.clientX, y: event.clientY }
+  }
 
-    setShowHeartPop(false)
-    requestAnimationFrame(() => setShowHeartPop(true))
-    if (!isLiked) onToggleLike?.()
+  const handleImagePointerUp = (event: React.PointerEvent<HTMLElement>) => {
+    const start = pointerStart.current
+    pointerStart.current = null
+    if (!start) return
+
+    // 스와이프는 진입으로 치지 않는다 (10px 이상 움직이면 드래그로 본다)
+    const moved = Math.hypot(event.clientX - start.x, event.clientY - start.y)
+    if (moved > 10) return
+    // 화살표·점 인디케이터 클릭은 캐러셀 조작이라 통과시킨다
+    if ((event.target as HTMLElement).closest('button')) return
+
+    router.push(href)
   }
 
   return (
@@ -88,7 +96,7 @@ const CommunityFeedCard = ({
             </span>
           </div>
         </Link>
-        {onEdit && onDelete ? (
+        {onDelete ? (
           <OwnerActionsMenu
             onEdit={onEdit}
             onDelete={onDelete}
@@ -105,8 +113,9 @@ const CommunityFeedCard = ({
       {/* 미디어 — 카드 폭을 채우는 1:1 캐러셀 (여러 장이면 우상단에 장수 배지) */}
       {hasImages ? (
         <div
-          className="relative aspect-square w-full overflow-hidden rounded-lg"
-          onPointerUp={handleImageTap}
+          className="relative aspect-square w-full cursor-pointer overflow-hidden rounded-lg"
+          onPointerDown={handleImagePointerDown}
+          onPointerUp={handleImagePointerUp}
         >
           <ImageCarousel
             images={images}
@@ -116,18 +125,6 @@ const CommunityFeedCard = ({
             imageClassName="object-cover"
             {...COMMUNITY_CAROUSEL_STYLE} // [refactored] 상세와 공유하는 상수로
           />
-          {showHeartPop && (
-            <FavoriteIcon
-              status="fill"
-              aria-hidden
-              onAnimationEnd={() => setShowHeartPop(false)}
-              // [refactored] 하드코딩 #ff8181 → shared/ui의 FAVORITE_ACTIVE
-              className={cn(
-                'animate-heart-pop pointer-events-none absolute top-1/2 left-1/2 size-24 -translate-x-1/2 -translate-y-1/2 drop-shadow-lg',
-                FAVORITE_ACTIVE,
-              )}
-            />
-          )}
           {images.length > 1 && (
             <span className="pointer-events-none absolute top-2.5 right-3 flex h-6 w-10 items-center justify-center rounded-full bg-neutral-850/90 text-[0.625rem] font-semibold text-white">
               {images.length}장
