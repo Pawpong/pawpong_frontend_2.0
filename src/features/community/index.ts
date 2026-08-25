@@ -15,3 +15,4 @@ export {
 } from './api/communityReaction.mutations'
 export { ConnectedCommunityBox, ConnectedFeedCard, ConnectedPostCard } from './ui/ConnectedPostCard'
 export { useSubmitCommunityPostForm } from './lib/useSubmitCommunityPostForm'
+export { useDeletePostConfirm } from './lib/useDeletePostConfirm'

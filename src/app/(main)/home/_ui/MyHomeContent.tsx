@@ -9,7 +9,7 @@ import { Container, CtaBanner, DeleteConfirmModal, NavigationBar, InputUpload } 
 import { useGnbHeight } from '@/shared/lib/useGnbHeight'
 import { profileQueries } from '@/entities/profile'
 import { communityQueries } from '@/entities/community'
-import { useDeleteCommunityPost } from '@/features/community'
+import { useDeletePostConfirm } from '@/features/community'
 // [refactored] 분양 페이지와 동일한 목록 블록 — 위젯으로 공유
 import { MyPetPostingList } from '@/widgets/my-pet-postings'
 import { toMyProfileCardProps } from '../_lib/toMyProfileCardProps'
@@ -23,15 +23,9 @@ const HOME_LISTING_PAGE_SIZE = 16
 
 const MyHomeContent = () => {
   const router = useRouter()
-  // 내 글 카드 ⋯ 메뉴 — 수정은 상세를 편집 모드로 열고, 삭제는 확인 후 DELETE
-  const deletePost = useDeleteCommunityPost()
-  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null)
-
-  // 삭제 성공 후에만 모달을 닫는다 (실패하면 모달을 유지해 재시도 가능)
-  const handleDeletePost = () => {
-    if (!deleteTargetId || deletePost.isPending) return
-    deletePost.mutate(deleteTargetId, { onSuccess: () => setDeleteTargetId(null) })
-  }
+  // 내 글 카드 ⋯ 메뉴 — 수정 화면 이동 또는 삭제 확인 후 DELETE
+  // [refactored] 삭제 확인 state·mutation·핸들러를 useDeletePostConfirm으로 (커뮤니티 피드와 공유)
+  const { requestDelete, modalProps: deleteModalProps } = useDeletePostConfirm()
 
   // 마이홈 프로필 카드: /profile/me 로 내 프로필 조회 (role 에 따라 adopter/breeder 분기, 프로필 이미지 포함)
   const { data: myProfile } = useQuery(profileQueries.me())
@@ -80,7 +74,7 @@ const MyHomeContent = () => {
   return (
     <div className="flex w-full flex-col">
       {/* 스크롤 시 GNB 아래 고정(sticky) — tab+만 */}
-      <div ref={navRef} className="bg-white tab:sticky tab:z-40" style={{ top: gnbH }}>
+      <div ref={navRef} className="bg-white tab:sticky tab:z-sticky" style={{ top: gnbH }}>
         <NavigationBar
           title="마이홈"
           // 디자인(node 2046-160996): 마이홈 모바일 navbar는 좌우 margin-tab(48px) — 공통 기본(16)을 덮어씀
@@ -142,7 +136,7 @@ const MyHomeContent = () => {
               posts={posts}
               emptyText="내가 쓴 글이 없습니다."
               onEdit={(postId) => router.push(`/community/post/${postId}/edit`)}
-              onDelete={setDeleteTargetId}
+              onDelete={requestDelete}
             />
           </Container>
         </TabsContent>
@@ -153,13 +147,7 @@ const MyHomeContent = () => {
       </HomeTabs>
 
       {/* [refactored] 게시글 삭제 확인 — 공통 DeleteConfirmModal */}
-      <DeleteConfirmModal
-        open={deleteTargetId !== null}
-        onOpenChange={(open) => !open && setDeleteTargetId(null)}
-        target="게시글"
-        onConfirm={handleDeletePost}
-        isPending={deletePost.isPending}
-      />
+      <DeleteConfirmModal target="게시글" {...deleteModalProps} />
     </div>
   )
 }

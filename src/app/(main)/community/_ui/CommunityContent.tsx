@@ -2,9 +2,11 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import {
   Container,
+  DeleteConfirmModal,
   InfiniteScrollTrigger,
   ListState,
   LoginPromptModal,
@@ -18,17 +20,21 @@ import {
   communityQueries,
   toCommunityPreviewProps,
 } from '@/entities/community'
-import { ConnectedFeedCard } from '@/features/community'
-import { useLoginGuard } from '@/features/auth'
+import { ConnectedFeedCard, useDeletePostConfirm } from '@/features/community'
+import { useLoginGuard, useMe } from '@/features/auth'
 import { flattenPages } from '@/shared/lib/infiniteList'
 
 const CommunityContent = () => {
+  const router = useRouter()
   // 입력 중인 값과 실제 조회 조건을 분리한다 — 타이핑마다 재조회하지 않도록
   const [searchOpen, setSearchOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [appliedSearch, setAppliedSearch] = useState('')
   // 좋아요·북마크는 비로그인 요청이 401로 떨어지므로 먼저 로그인으로 유도한다
   const { guard, isPromptOpen, setPromptOpen } = useLoginGuard()
+  const { me } = useMe()
+  // [refactored] 삭제 확인 state·mutation·핸들러를 useDeletePostConfirm으로 (마이홈과 공유)
+  const { requestDelete, modalProps: deleteModalProps } = useDeletePostConfirm()
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending, isError } =
     useInfiniteQuery(
@@ -86,13 +92,24 @@ const CommunityContent = () => {
             }
           >
             <div className="flex min-w-0 flex-col gap-6 tab:gap-8 pc:gap-10">
-              {posts.map((post) => (
-                <ConnectedFeedCard
-                  key={post.postId}
-                  guard={guard}
-                  {...toCommunityPreviewProps(post)}
-                />
-              ))}
+              {posts.map((post) => {
+                // [refactored] 같은 소유자 판정을 onEdit·onDelete에서 두 번 하던 것을 이름으로
+                const isMyPost = me?.userId === post.authorId
+
+                return (
+                  <ConnectedFeedCard
+                    key={post.postId}
+                    guard={guard}
+                    {...toCommunityPreviewProps(post)}
+                    onEdit={
+                      isMyPost
+                        ? () => router.push(`/community/post/${post.postId}/edit`)
+                        : undefined
+                    }
+                    onDelete={isMyPost ? () => requestDelete(post.postId) : undefined}
+                  />
+                )
+              })}
             </div>
           </ListState>
 
@@ -107,7 +124,7 @@ const CommunityContent = () => {
       {/* 글작성 — 상단 작성 유도 바를 대신하는 우하단 고정 FAB (Figma "글작성" BaseButton) */}
       <Link
         href="/community/write"
-        className="fixed right-6 bottom-6 z-40 flex h-12 items-center gap-1 rounded-full bg-point-500 px-4 shadow-[0_7px_7px_rgba(55,55,55,0.1)]"
+        className="fixed right-6 bottom-6 z-sticky flex h-12 items-center gap-1 rounded-full bg-point-500 px-4 shadow-[0_7px_7px_rgba(55,55,55,0.1)]"
       >
         <PlusIcon className="size-6 text-neutral-850" />
         <span className="text-base leading-[1.5] font-semibold text-neutral-850">글작성</span>
@@ -118,6 +135,8 @@ const CommunityContent = () => {
         onOpenChange={setPromptOpen}
         description={COMMUNITY_LOGIN_PROMPT.reaction} // [refactored]
       />
+
+      <DeleteConfirmModal target="게시글" {...deleteModalProps} />
     </div>
   )
 }
