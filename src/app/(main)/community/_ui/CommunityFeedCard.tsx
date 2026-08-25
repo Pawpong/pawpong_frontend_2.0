@@ -55,11 +55,13 @@ const CommunityFeedCard = ({
   const hasImages = images.length > 0
 
   return (
-    // 최은진: mo에서는 카드 모서리를 각지게(rounded-none) 해서 화면 끝까지 꽉 차 보이게 하고,
-    // tab부터 다시 rounded-2xl로 둥글린다 — Container 쪽 mo 좌우 여백 제거와 짝을 이루는 변경.
-    <article className="flex flex-col overflow-hidden rounded-none bg-white tab:rounded-2xl">
+    // 최은진: mo에서도 rounded-2xl로 통일 — Figma node 3557:417738의 mo 프레임을 다시
+    // 확인해보니 카드가 화면 끝까지 닿아도(좌우 여백 없음) 모서리는 그대로 16px 둥글다.
+    <article className="flex flex-col overflow-hidden rounded-2xl bg-white">
       {/* 헤더 — 아바타·닉네임·작성시각 (Figma "header" / community-profile) */}
-      <div className="flex items-center justify-between gap-2 p-3">
+      {/* 최은진: p-3(12px 균등) → px-4 py-3(16px/12px) — get_design_context로 다시
+          확인한 실제 카드는 좌우 16px, 상하 12px로 비대칭이었다. */}
+      <div className="flex items-center justify-between gap-2 px-4 py-3">
         <Link href={href} className="flex min-w-0 flex-1 items-center gap-2">
           <CommunityAvatar src={author.profileImageUrl} alt={author.nickname} />
           <div className="flex min-w-0 flex-col">
@@ -75,7 +77,8 @@ const CommunityFeedCard = ({
           </div>
         </Link>
         {/* ponytail: 남의 글 ⋯ 는 액션 미정(신고 등) — 스펙 나오면 여기 연결 */}
-        <button type="button" aria-label="더보기" className="shrink-0 p-1">
+        {/* 최은진: p-1 제거 — Figma는 24px 아이콘 주위에 별도 버튼 패딩이 없다. */}
+        <button type="button" aria-label="더보기" className="shrink-0">
           <MoreVertIcon className="size-6 text-neutral-850" />
         </button>
       </div>
@@ -101,15 +104,18 @@ const CommunityFeedCard = ({
           )}
         </div>
       ) : (
-        <Link href={href} className="block px-3 py-5">
-          <p className="line-clamp-6 text-base leading-[1.5] font-semibold whitespace-pre-line text-neutral-850">
+        // 최은진: px-3→px-4(16px), text-base(16px)→text-sm(14px) — get_design_context로
+        // 다시 확인한 텍스트 전용(type=txt) 카드 본문은 14px이었다.
+        <Link href={href} className="block px-4 py-5">
+          <p className="line-clamp-6 text-sm leading-[1.5] font-semibold whitespace-pre-line text-neutral-850">
             {text}
           </p>
         </Link>
       )}
 
-      {/* 액션 (Figma "community-icon" — px-12 py-8, gap-8) */}
-      <div className="flex items-center gap-2 px-3 py-2">
+      {/* 액션 (Figma "community-icon" — px-16 py-8, gap-8) */}
+      {/* 최은진: px-3(12px)→px-4(16px) — get_design_context 재확인. */}
+      <div className="flex items-center gap-2 px-4 py-2">
         <button
           type="button"
           aria-label="좋아요"
@@ -144,13 +150,16 @@ const CommunityFeedCard = ({
       </div>
 
       {/* 캡션 (Figma "community-profile" — 라벨(닉네임) + 본문, 한 줄 말줄임) */}
+      {/* 최은진: px-3 pb-3 → px-4 py-3 — get_design_context로 다시 확인한
+          community-profile은 좌우 16px·상하 12px(위쪽도 패딩 있음). 본문 텍스트도
+          text-xs(12px)가 아니라 text-sm(14px)이었다. */}
       {hasImages && (
-        <Link href={href} className="block px-3 pb-3">
+        <Link href={href} className="block px-4 py-3">
           <p className="flex items-center gap-3 overflow-hidden">
             <span className="shrink-0 text-sm leading-[1.5] font-semibold text-neutral-850">
               {author.nickname}
             </span>
-            <span className="min-w-0 flex-1 truncate text-xs leading-[1.5] font-semibold text-neutral-850">
+            <span className="min-w-0 flex-1 truncate text-sm leading-[1.5] font-semibold text-neutral-850">
               {text}
             </span>
           </p>

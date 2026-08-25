@@ -83,17 +83,23 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
   // 최은진: Figma 캡션은 truncate가 아니라 자연스러운 여러 줄 줄바꿈이다 — get_design_context가
   // 돌려준 코드 힌트(text-ellipsis whitespace-nowrap)만 믿고 한 줄 truncate로 잘못 옮겼던 걸,
   // 실제 Figma 스크린샷(pc·tab-mo 둘 다 캡션이 3줄까지 그대로 보임)을 다시 확인하고 고쳤다.
+  // 최은진: gap-2(8px)→gap-2.5(10px) — node 3841:296874(pc)의 caption 행 gap이 10px이었다.
+  // 더보기 메뉴는 pc(side-by-side)에서만 이 캡션 행에 있고, tab/mo(stacked)에서는
+  // 액션바 쪽으로 옮겨갔다(get_design_context node 3841:297611의 Frame1707484705 참고) —
+  // isSideBySide로 분기.
+  const moreMenu = isOwner && (
+    <PostDetailMoreMenu
+      onEdit={() => router.push(`/community/${postId}/edit`)}
+      onDelete={() => setConfirmDeletePost(true)}
+    />
+  )
+
   const caption = (
-    <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border-light px-4 py-3">
+    <div className="flex shrink-0 items-center justify-between gap-2.5 border-b border-border-light px-4 py-3">
       <p className="min-w-0 flex-1 text-sm font-semibold whitespace-pre-wrap text-neutral-850">
         {post.body}
       </p>
-      {isOwner && (
-        <PostDetailMoreMenu
-          onEdit={() => router.push(`/community/${postId}/edit`)}
-          onDelete={() => setConfirmDeletePost(true)}
-        />
-      )}
+      {isSideBySide && moreMenu}
     </div>
   )
 
@@ -104,36 +110,43 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
   )
 
   // 최은진: shared/ui의 PostActionButton 대신 CommunityFeedCard.tsx와 동일한 인라인 버튼으로.
+  // 최은진: p-4(16px 균등)→px-3 py-2(12px/8px), border-t 제거 — get_design_context로 다시 확인한
+  // "community-icon" 행(pc: node 3841:296874, tab/mo: node 3841:297611)은 border 없이
+  // px-12 py-8이었다. tab/mo에서는 이 행에 더보기(⋯) 메뉴가 justify-between으로 오른쪽 끝에 온다
+  // (pc는 캡션 쪽에 있으므로 여기선 안 그림).
   const actionBar = (
-    <div className="flex shrink-0 items-center gap-2 border-t border-border-light p-4">
-      <button
-        type="button"
-        aria-label="좋아요"
-        onClick={toggleLike}
-        disabled={isLikePending}
-        className={cn(
-          'flex items-center gap-1 disabled:opacity-50',
-          post.isLiked ? LIKE_ACTIVE : ICON_DEFAULT,
-        )}
-      >
-        <FavoriteIcon status={post.isLiked ? 'fill' : 'default'} className="size-8" />
-        <span className="text-sm font-semibold text-neutral-850">{post.likeCount}</span>
-      </button>
+    <div className="flex shrink-0 items-center justify-between gap-2 px-3 py-2">
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          aria-label="좋아요"
+          onClick={toggleLike}
+          disabled={isLikePending}
+          className={cn(
+            'flex items-center gap-1 disabled:opacity-50',
+            post.isLiked ? LIKE_ACTIVE : ICON_DEFAULT,
+          )}
+        >
+          <FavoriteIcon status={post.isLiked ? 'fill' : 'default'} className="size-8" />
+          <span className="text-sm font-semibold text-neutral-850">{post.likeCount}</span>
+        </button>
 
-      <div className={cn('flex items-center gap-1', ICON_DEFAULT)}>
-        <PixelMessageIcon className="size-8" />
-        <span className="text-sm font-semibold text-neutral-850">{post.commentCount}</span>
+        <div className={cn('flex items-center gap-1', ICON_DEFAULT)}>
+          <PixelMessageIcon className="size-8" />
+          <span className="text-sm font-semibold text-neutral-850">{post.commentCount}</span>
+        </div>
+
+        <button
+          type="button"
+          aria-label="북마크"
+          onClick={toggleBookmark}
+          disabled={isBookmarkPending}
+          className={cn('disabled:opacity-50', post.isSaved ? BOOKMARK_ACTIVE : ICON_DEFAULT)}
+        >
+          <PixelBookmarkIcon className="size-8" />
+        </button>
       </div>
-
-      <button
-        type="button"
-        aria-label="북마크"
-        onClick={toggleBookmark}
-        disabled={isBookmarkPending}
-        className={cn('disabled:opacity-50', post.isSaved ? BOOKMARK_ACTIVE : ICON_DEFAULT)}
-      >
-        <PixelBookmarkIcon className="size-8" />
-      </button>
+      {!isSideBySide && moreMenu}
     </div>
   )
 
@@ -176,20 +189,22 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
     )
   }
 
-  // 최은진: tab/mo(stacked)는 최상단 헤더·최하단 액션바만 고정하고, 이미지~댓글까지는
-  // 하나의 스크롤 영역으로 묶는다(기존엔 댓글 영역만 따로 스크롤됐음) — pc(side-by-side)는
-  // 위 분기에서 그대로 두고 건드리지 않았다.
+  // 최은진: tab/mo(stacked)는 최상단 헤더만 고정하고, 이미지~댓글까지는 하나의 스크롤
+  // 영역으로 묶는다(기존엔 댓글 영역만 따로 스크롤됐음). 액션바는 기존엔 pc처럼 맨 아래
+  // 고정이었는데, get_design_context로 node 3841:297611(tab)·3841:300027(mo)을 다시 보니
+  // 이미지 바로 다음(캡션보다 위)에 스크롤 콘텐츠의 일부로 들어가 있었다 — 순서를
+  // 이미지→액션바→캡션→댓글로 맞췄다.
   return (
     <div className={cn('flex h-full min-h-0 w-full flex-col', className)}>
       {header}
       <div className="min-h-0 flex-1 overflow-y-auto">
         {imageCarousel}
+        {actionBar}
         {caption}
         <div className="p-4">
           <CommentSection postId={postId} />
         </div>
       </div>
-      {actionBar}
       {deleteConfirm}
     </div>
   )

@@ -53,8 +53,11 @@ const PostDetailModal = ({ postId }: PostDetailModalProps) => {
             26.25rem(420px)·높이 68.75rem(1100px) 고정으로 교체했다(뷰포트 폭 비례 확장이던
             calc(27rem+22vw) 계산식은 폐기). max-h-[85vh]는 1100px가 실제 화면보다 클 때 잘라주는
             안전판 — 댓글 영역(PostDetailPanel의 overflow-y-auto)이 남는 공간을 스크롤로 흡수한다.
-            pc(1440~)는 device=pc(1120×680, 60/40 분할)와 동일 비율이라 기존 확대 크기를 그대로 둔다. */}
-        <DialogPrimitive.Content className="fixed top-1/2 left-1/2 z-[60] flex h-[68.75rem] max-h-[85vh] w-[26.25rem] max-w-[calc(100%-1.5rem)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl bg-white shadow-lg data-[state=closed]:opacity-0 data-[state=open]:opacity-100 pc:h-[94vh] pc:max-h-[60rem] pc:w-[calc(100%-1.5rem)] pc:max-w-[80rem]">
+            최은진: pc는 예전엔 "device=pc(1120×680)와 비율이 같다"고 보고 뷰포트에 맞춰 크게
+            키운 크기(94vh/80rem)를 그대로 뒀었는데, 최신 Figma 섹션(node 3349:2149847 →
+            3841:296874, device=pc)을 다시 열어보니 실제로는 비율만 같은 게 아니라 1120×680
+            고정 크기 그 자체였다 — 폭 70rem(1120px)·높이 42.5rem(680px) 고정으로 정정. */}
+        <DialogPrimitive.Content className="fixed top-1/2 left-1/2 z-[60] flex h-[68.75rem] max-h-[85vh] w-[26.25rem] max-w-[calc(100%-1.5rem)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl bg-white shadow-lg data-[state=closed]:opacity-0 data-[state=open]:opacity-100 pc:h-[42.5rem] pc:max-h-[calc(100vh-1.5rem)] pc:w-[70rem] pc:max-w-[calc(100%-1.5rem)]">
           <DialogPrimitive.Title className="sr-only">게시글 상세</DialogPrimitive.Title>
           <PostDetailModalBody postId={postId} />
         </DialogPrimitive.Content>

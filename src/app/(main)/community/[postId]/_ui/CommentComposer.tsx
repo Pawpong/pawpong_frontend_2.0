@@ -70,7 +70,10 @@ const CommentComposer = ({
             같은 원칙으로 shared/ui 변경에서 커뮤니티 상세를 분리했다. */}
         <CommunityAvatar src={profileImageUrl} alt="내 프로필" className="shrink-0" />
         {/* 최은진: 테두리 색은 포커스 여부를 그대로 따른다 (회색 → 파랑, focus-within:border-info-500 추가) */}
-        <div className="flex h-14 flex-1 items-center justify-between gap-2 rounded-lg border border-neutral-500 p-3 transition-colors focus-within:border-info-500">
+        {/* 최은진: h-14(56px)→h-10(40px) — get_design_context로 다시 확인한 comment-input의
+            "input" 박스(node 3841:296874 하위 2612:269261)가 40px 고정 높이였다(아바타와
+            같은 높이). */}
+        <div className="flex h-10 flex-1 items-center justify-between gap-2 rounded-lg border border-neutral-500 p-3 transition-colors focus-within:border-info-500">
           <input
             ref={inputRef}
             type="text"
