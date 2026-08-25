@@ -16,7 +16,7 @@ interface PostCardProps extends CommunityPreviewProps {
   showMore?: boolean
   /** 댓글 미리보기 (작성자·본문 1줄) — 없으면 미노출 */
   commentPreview?: { nickname: string; body: string }
-  /** 내 글일 때만 전달 — ⋯ 메뉴가 수정/삭제로 동작 (미전달 시 메뉴 미노출) */
+  /** 내 글일 때만 전달 — ⋯ 메뉴가 삭제(및 필요한 화면에서는 수정)로 동작 */
   onEdit?: () => void
   onDelete?: () => void
   /** 좋아요·북마크 토글 — features의 ConnectedPostCard에서 주입 */
@@ -119,7 +119,7 @@ const PostCard = ({
           ) : (
             profileCluster
           )}
-          {onEdit && onDelete ? (
+          {onDelete ? (
             <OwnerActionsMenu
               onEdit={onEdit}
               onDelete={onDelete}
