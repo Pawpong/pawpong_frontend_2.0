@@ -34,7 +34,7 @@ const toCommunityPreviewProps = (post: CommunityPostCard): CommunityPreviewProps
   commentCount: post.commentCount,
   isLiked: post.isLiked,
   isSaved: post.isSaved,
-  detailHref: `/community/${post.postId}`,
+  detailHref: `/community/post/${post.postId}`,
   commentPreview: post.commentPreview?.[0] && {
     nickname: post.commentPreview[0].authorNickname,
     body: post.commentPreview[0].body,

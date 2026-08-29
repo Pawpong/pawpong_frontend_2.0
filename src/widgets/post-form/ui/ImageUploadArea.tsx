@@ -220,7 +220,7 @@ const ImageUploadArea = ({
         <Dialog open={actionDialogOpen} onOpenChange={setActionDialogOpen}>
           <DialogPortal>
             <DialogOverlay />
-            <DialogContent className="fixed top-1/2 left-1/2 z-50 w-[16rem] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl bg-white">
+            <DialogContent className="fixed top-1/2 left-1/2 z-modal w-[16rem] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl bg-white">
               <DialogTitle className="sr-only">이미지 옵션</DialogTitle>
               <div className="flex flex-col">
                 {!isRepresentative(actionIndex) && (

@@ -27,14 +27,16 @@ interface FooterCtaBarProps {
  * - 버튼: 모바일 h-48 풀 너비(보조 117 고정), tab+ h-40 · 170 · gap 20 (그룹 360)
  */
 const FooterCtaBar = ({ leftSlot, secondary, primary, children }: FooterCtaBarProps) => (
-  <div className="fixed inset-x-0 bottom-0 z-40 bg-white">
+  <div className="fixed inset-x-0 bottom-0 z-sticky bg-white">
     {children}
 
     <Container className="flex items-center bg-white py-4 tab:h-[5.875rem] tab:justify-between tab:py-0">
       {/* 좌측 슬롯 자리는 비어 있어도 유지해 버튼 그룹이 우측에 붙게 한다 */}
       <div className="hidden tab:block">{leftSlot}</div>
 
-      <div className="flex w-full gap-2.5 tab:w-[22.5rem] tab:gap-5">
+      {/* 그룹 폭 360은 [보조+주] 2개 기준(170+20+170). 주 버튼만 있을 땐 남는 190만큼
+          왼쪽으로 뜨므로 오른쪽으로 붙인다 (2개일 땐 딱 맞아 영향 없음) */}
+      <div className="flex w-full gap-2.5 tab:w-[22.5rem] tab:justify-end tab:gap-5">
         {secondary && (
           <Button
             variant="outline"

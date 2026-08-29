@@ -21,7 +21,7 @@ const Gnb = () => {
           (mo-375 h48/px16 · tab-768 py8/px48 · pc-1440 h64/py8/px80) */}
       <header
         data-gnb
-        className="sticky top-0 z-50 flex h-12 w-full items-center justify-center bg-white tab:py-2 pc:h-16"
+        className="sticky top-0 z-header flex h-12 w-full items-center justify-center bg-white tab:py-2 pc:h-16"
       >
         <div
           className={cn(

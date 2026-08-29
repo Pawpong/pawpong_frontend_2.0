@@ -3,6 +3,24 @@
 /* 다크모드 미사용: dark: variant를 클래스 기반으로 고정해 OS 다크모드(prefers-color-scheme) 자동 적용 차단 */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* 레이어 — 숫자 직접 사용 대신 역할 기반으로 쌓임 순서를 고정한다.
+   z-index는 Tailwind v4의 @theme 네임스페이스가 아니라서 유틸리티로 직접 정의한다. */
+@utility z-sticky {
+  z-index: 40;
+}
+@utility z-header {
+  z-index: 50;
+}
+@utility z-modal {
+  z-index: 60;
+}
+@utility z-dropdown {
+  z-index: 70;
+}
+@utility z-confirm {
+  z-index: 80;
+}
+
 @theme {
   --breakpoint-mo: 375px;
   --breakpoint-tab: 768px;

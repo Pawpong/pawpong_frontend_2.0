@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback } from 'react'
 
 interface UsePostFormOptions {
   maxImages?: number
@@ -19,7 +19,6 @@ const usePostForm = ({
   const [newImages, setNewImages] = useState<string[]>([])
   const [files, setFiles] = useState<File[]>([])
   const [text, setText] = useState(initialText)
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const images = [...uploadedImages, ...newImages]
 
@@ -52,39 +51,21 @@ const usePostForm = ({
     [uploadedImages.length],
   )
 
-  const handleEmojiSelect = useCallback(
-    (emoji: string) => {
-      const textarea = textareaRef.current
-      if (textarea) {
-        const start = textarea.selectionStart
-        const end = textarea.selectionEnd
-        const newText = text.slice(0, start) + emoji + text.slice(end)
-        setText(newText)
-        requestAnimationFrame(() => {
-          const pos = start + emoji.length
-          textarea.selectionStart = pos
-          textarea.selectionEnd = pos
-          textarea.focus()
-        })
-      } else {
-        setText((prev) => prev + emoji)
-      }
-    },
-    [text],
-  )
-
   return {
     images,
+    /** ImageUploadArea 에도 같은 상한을 넘겨야 해서 함께 돌려준다 */
+    maxImages,
     /** 지우지 않고 남긴 기존 사진 URL — 수정 제출 시 파일명으로 변환해 함께 보낸다 */
     uploadedImages,
     files,
     text,
     setText,
-    textareaRef,
     handleAddImages,
     handleRemoveImage,
-    handleEmojiSelect,
   }
 }
 
+type PostFormState = ReturnType<typeof usePostForm>
+
 export { usePostForm }
+export type { PostFormState }

@@ -160,7 +160,7 @@ const ExploreContent = () => {
     <>
       {/* ══════ 탭 바(+모바일·탭 필터바) — tab+ 상단 고정(sticky), GNB 아래에 스택 ══════
           (모바일은 탭 바 비고정, GNB만 sticky) */}
-      <div ref={headerRef} className="bg-white tab:sticky tab:z-40" style={{ top: gnbH }}>
+      <div ref={headerRef} className="bg-white tab:sticky tab:z-sticky" style={{ top: gnbH }}>
         <TabBar
           items={EXPLORE_TABS.map((tab) => ({ value: tab.type, label: tab.label }))}
           value={selectedType}
@@ -171,7 +171,7 @@ const ExploreContent = () => {
 
       {/* 스크롤 시 GNB(+tab: 탭바) 아래 고정 컴팩트 칩바 (fixed → 레이아웃 점프 없음, 구분선 없음) */}
       <div
-        className={cn('fixed right-0 left-0 z-30 hidden bg-white', isStuck && 'block')}
+        className={cn('fixed right-0 left-0 z-sticky hidden bg-white', isStuck && 'block')}
         style={{ top: stickyBarTop }}
       >
         <Container>

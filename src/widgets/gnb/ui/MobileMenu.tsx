@@ -12,7 +12,7 @@ interface MobileMenuProps {
 
 const MobileMenu = ({ onClose }: MobileMenuProps) => {
   return (
-    <div className="fixed inset-0 z-[60] flex flex-col bg-white">
+    <div className="fixed inset-0 z-modal flex flex-col bg-white">
       {/* 헤더 */}
       <div className="flex items-center justify-between px-5">
         <LogoButton />

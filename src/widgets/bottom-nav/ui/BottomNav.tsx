@@ -10,7 +10,7 @@ import { PAGE_WIDTH_CLASS } from '@/shared/config'
 const BottomNav = () => {
   const pathname = usePathname()
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-neutral-100 bg-white pc:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-sticky border-t border-neutral-100 bg-white pc:hidden">
       <div
         className={cn(PAGE_WIDTH_CLASS, 'flex items-center justify-between px-4 py-3 tab:px-12')}
       >

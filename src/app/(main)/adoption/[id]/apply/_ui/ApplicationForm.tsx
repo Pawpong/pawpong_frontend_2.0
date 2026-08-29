@@ -55,7 +55,7 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
     <div>
       {/* ═══ 상단 고정 영역 — GNB(sticky top-0) 아래에 서브헤더 + 동물 정보 카드를 함께 sticky ═══ */}
       {/* top 값 = GNB 높이(모바일 48px / 탭+ ≈56px) 기준 오프셋 */}
-      <div className="sticky top-12 z-40 tab:top-14">
+      <div className="sticky top-12 z-sticky tab:top-14">
         {/* [refactored] 인라인 서브헤더 JSX → 공통 NavigationBar (Figma 976:25817 close 변형) */}
         <NavigationBar title={APPLY_TITLE} icon="close" onBack={handleCloseClick} />
         <PetInfoCard detail={detail} />

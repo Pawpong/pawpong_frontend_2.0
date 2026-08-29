@@ -1,9 +1,7 @@
 'use client'
 
-import { useState } from 'react'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
-import { useQuery } from '@tanstack/react-query'
+import Link from 'next/link'
 import {
   AuthorInfo,
   BOOKMARK_ACTIVE,
@@ -14,17 +12,12 @@ import {
   PostActionButton,
   Separator,
 } from '@/shared/ui'
-import { FavoriteIcon, PixelMessageIcon, PixelBookmarkIcon } from '@/shared/assets'
+import { CloseIcon, FavoriteIcon, PixelMessageIcon, PixelBookmarkIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
-import { communityQueries } from '@/entities/community'
-import { profileQueries } from '@/entities/profile'
-import {
-  useToggleCommunityPostLike,
-  useToggleCommunityPostBookmark,
-  useDeleteCommunityPost,
-} from '@/features/community'
-import { useAuthStatus } from '@/features/auth'
+import { useBreakpoint } from '@/shared/lib/useBreakpoint'
 import { CommentSection } from './CommentSection'
+import { usePostDetail } from './usePostDetail'
+import { PostDetailPanel } from '../../../_ui/PostDetailPanel'
 
 // [refactored] 반복되던 섹션 좌우 패딩(모바일 0 / tab 50px)을 상수로 추출
 const SECTION_X = 'px-0 tab:px-[3.125rem]'
@@ -34,33 +27,46 @@ interface PostDetailContentProps {
 }
 
 const PostDetailContent = ({ postId }: PostDetailContentProps) => {
-  const router = useRouter()
-  const { isLoggedIn } = useAuthStatus()
-  const { data: post } = useQuery(communityQueries.detail(postId))
-  // 공개 상세라 비로그인 조회도 가능 — 로그인 상태에서만 내 프로필을 조회(비로그인 401 리다이렉트 방지)
-  const { data: me } = useQuery({ ...profileQueries.me(), enabled: isLoggedIn })
-
-  // [refactored] 훅 반환값을 구조분해 — 호출부에서 toggleLike.toggleLike 처럼 겹쳐 쓰지 않게
-  const { toggleLike, isPending: isLikePending } = useToggleCommunityPostLike(
-    postId,
-    post?.isLiked ?? false,
-  )
-  const { toggleBookmark, isPending: isBookmarkPending } = useToggleCommunityPostBookmark(
-    postId,
-    post?.isSaved ?? false,
-  )
-  const deletePost = useDeleteCommunityPost()
-
-  const [confirmDeletePost, setConfirmDeletePost] = useState(false)
+  // 조회·좋아요·북마크·삭제는 모달(PostDetailPanel)과 공유하는 usePostDetail이 담당한다
+  const {
+    router,
+    post,
+    isOwner,
+    toggleLike,
+    isLikePending,
+    toggleBookmark,
+    isBookmarkPending,
+    confirmDeletePost,
+    setConfirmDeletePost,
+    handleDeletePost,
+    isDeletePending,
+  } = usePostDetail(postId)
+  // mo(~767)는 모달 대신 이 페이지로 오므로, 여기서 곧바로 피드 상세 레이아웃을 그린다
+  const isTabUp = useBreakpoint('tab')
 
   if (!post) return null
 
-  const isOwner = !!me?.userId && me.userId === post.authorId
+  if (!isTabUp) {
+    const backButton = (
+      <Link
+        href="/community"
+        aria-label="닫기"
+        className="shrink-0 rounded-full p-1 text-neutral-850 hover:bg-fill-muted"
+      >
+        <CloseIcon className="size-6" />
+      </Link>
+    )
 
-  // 삭제 성공 시에만 목록으로 이동 (실패하면 모달을 유지해 재시도 가능)
-  const handleDeletePost = () => {
-    if (deletePost.isPending) return
-    deletePost.mutate(postId, { onSuccess: () => router.push('/community') })
+    // 상위 레이아웃의 sticky Gnb(mo 3rem)를 뺀 나머지를 채워야 페이지 자체가 스크롤되지 않고
+    // 모달과 동일하게 본문 영역만 스크롤된다
+    return (
+      <PostDetailPanel
+        postId={postId}
+        layout="stacked"
+        trailingAction={backButton}
+        className="h-[calc(100dvh-3rem)]"
+      />
+    )
   }
 
   return (
@@ -95,7 +101,7 @@ const PostDetailContent = ({ postId }: PostDetailContentProps) => {
               />
               {isOwner && (
                 <OwnerActionsMenu
-                  onEdit={() => router.push(`/community/${postId}/edit`)}
+                  onEdit={() => router.push(`/community/post/${postId}/edit`)}
                   onDelete={() => setConfirmDeletePost(true)}
                 />
               )}
@@ -166,7 +172,7 @@ const PostDetailContent = ({ postId }: PostDetailContentProps) => {
         onOpenChange={setConfirmDeletePost}
         target="게시글"
         onConfirm={handleDeletePost}
-        isPending={deletePost.isPending}
+        isPending={isDeletePending}
       />
     </div>
   )

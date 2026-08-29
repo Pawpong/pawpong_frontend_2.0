@@ -7,6 +7,8 @@ import { TextLabel } from './TextLabel'
 
 interface NavigationBarProps {
   title: string
+  /** 지정 시 mo 에서만 이 문구를 쓴다 (tab+ 는 title) */
+  mobileTitle?: string
   /** 뒤로가기 링크 (없으면 화살표 미표시) */
   backHref?: string
   /** 링크 대신 동작이 필요할 때 (모달 닫기 등). backHref보다 우선 */
@@ -21,6 +23,7 @@ interface NavigationBarProps {
 /** 서브 페이지 상단바 (가운데 정렬 타이틀 + 옵션 뒤로가기/오른쪽 액션) — Figma node 976:25817 · 2046:160967 */
 const NavigationBar = ({
   title,
+  mobileTitle,
   backHref,
   onBack,
   icon = 'arrow',
@@ -50,7 +53,14 @@ const NavigationBar = ({
         )}
         {/* Figma: medium(mo) 14 / large(tab+) 16 — 라벨 높이가 바 높이(33/44)를 결정한다 */}
         <TextLabel className="min-w-0 flex-1 truncate text-center text-sm tab:text-base">
-          {title}
+          {mobileTitle ? (
+            <>
+              <span className="tab:hidden">{mobileTitle}</span>
+              <span className="hidden tab:inline">{title}</span>
+            </>
+          ) : (
+            title
+          )}
         </TextLabel>
         {/* 오른쪽 액션이 없으면 뒤로가기 아이콘 폭만큼 자리를 채워 타이틀을 실제 가운데로 */}
         {right ? (
