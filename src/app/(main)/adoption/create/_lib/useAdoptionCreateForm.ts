@@ -1,9 +1,11 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useQuery } from '@tanstack/react-query'
+import { petPostingQueries } from '@/entities/pet-posting'
 import { useImageUpload } from '@/shared/lib/useImageUpload'
 import { useExitGuard } from '@/shared/lib/useExitGuard'
 import {
@@ -14,6 +16,8 @@ import {
 import { BREEDING_ENV_IMAGE_MAX, PET_IMAGE_MAX } from './constants'
 import { createAdoptionDefaultValues, createParentRow } from './defaultValues'
 import { useCreatePostingSubmission } from './useCreatePostingSubmission'
+import { useSaveDraftSubmission } from './useSaveDraftSubmission'
+import { fromPetPostingDraft } from './fromPetPostingDraft'
 import { useParentImages } from './useParentImages'
 
 type ParentRow = AdoptionCreateParsedValues['parents'][number]
@@ -24,6 +28,8 @@ const isParentRowTouched = (parent: ParentRow) =>
 
 const useAdoptionCreateForm = () => {
   const router = useRouter()
+  // 임시저장 이어쓰기 — ?draftId= 로 들어오면 서버에 저장된 값으로 폼을 채운다
+  const draftId = useSearchParams().get('draftId')
   const [representativeIndex, setRepresentativeIndex] = useState(0)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
@@ -58,6 +64,58 @@ const useAdoptionCreateForm = () => {
   )
 
   const submission = useCreatePostingSubmission()
+  const draftSubmission = useSaveDraftSubmission()
+
+  const { data: draft } = useQuery({
+    ...petPostingQueries.draft(draftId ?? ''),
+    enabled: Boolean(draftId),
+  })
+
+  // 복원은 최초 1회만 — 이후 사용자가 고친 값을 다시 덮어쓰면 안 된다
+  const restoredRef = useRef(false)
+  useEffect(() => {
+    if (!draft || restoredRef.current) return
+    restoredRef.current = true
+
+    form.reset(fromPetPostingDraft(draft.form))
+    setRepresentativeIndex(draft.form.representativePhotoIndex ?? 0)
+
+    petImages.seedExisting(
+      (draft.form.photos ?? []).map((fileName, index) => ({
+        fileName,
+        url: draft.photoUrls.pet[index] ?? '',
+      })),
+    )
+
+    const envFileName = draft.form.breedingEnvironment?.photoFileName
+    if (envFileName && draft.photoUrls.breedingEnvironment) {
+      breedingEnvImages.seedExisting([
+        { fileName: envFileName, url: draft.photoUrls.breedingEnvironment },
+      ])
+    }
+  }, [draft, form, petImages, breedingEnvImages])
+
+  /**
+   * 부모 사진 복원은 한 박자 늦다.
+   * 사진 키가 행 id 기준인데 그 id 는 form.reset 이후 useFieldArray 가 새로 만들기 때문에,
+   * 행이 실제로 생긴 뒤에 짝지어야 한다.
+   */
+  const parentRestoredRef = useRef(false)
+  useEffect(() => {
+    if (!draft || parentRestoredRef.current) return
+    const snapshots = draft.form.parentPetSnapshots ?? []
+    if (snapshots.length === 0 || parentRowIds.length < snapshots.length) return
+    parentRestoredRef.current = true
+
+    parentImages.seedExisting(
+      snapshots.flatMap((snapshot, index) => {
+        const url = draft.photoUrls.parents[index]
+        const rowId = parentRowIds[index]
+        if (!snapshot.photoFileName || !url || !rowId) return []
+        return [{ rowId, url, fileName: snapshot.photoFileName }]
+      }),
+    )
+  }, [draft, parentRowIds, parentImages])
 
   const handleRemoveImage = useCallback(
     (index: number) => {
@@ -111,9 +169,12 @@ const useAdoptionCreateForm = () => {
     }
 
     const petId = await submission.submit({
+      draftId,
       values,
+      petEntries: petImages.entries,
       petFiles: petImages.files,
       parentFiles: parentImages.filesInOrder(parentRowIds),
+      parentExistingFileNames: parentImages.existingFileNamesInOrder(parentRowIds),
       breedingEnvFiles: breedingEnvImages.files,
       representativeIndex,
     })
@@ -123,9 +184,30 @@ const useAdoptionCreateForm = () => {
     }
   })
 
-  const handleSaveDraft = () => {
-    // TODO: 서버에 분양글 임시저장 엔드포인트가 없다. 계약 확정 후 연결
+  /**
+   * 임시저장 — 검증 없이 지금까지 입력한 값을 그대로 보낸다.
+   * 성공하면 이탈 가드를 풀고 임시저장 목록으로 보내, 저장됐다는 걸 눈으로 확인하게 한다.
+   */
+  const handleSaveDraft = async () => {
+    setSubmitError(null)
+
+    const savedDraftId = await draftSubmission.save({
+      draftId,
+      values: form.getValues(),
+      petEntries: petImages.entries,
+      petFiles: petImages.files,
+      parentFiles: parentImages.filesInOrder(parentRowIds),
+      parentExistingFileNames: parentImages.existingFileNamesInOrder(parentRowIds),
+      breedingEnvFiles: breedingEnvImages.files,
+      representativeIndex,
+    })
+
+    if (!savedDraftId) return
+
     cancelExit()
+    // 저장된 내용은 서버가 갖고 있으므로 폼을 비워 이탈 가드가 다시 뜨지 않게 한다
+    form.reset(form.getValues(), { keepValues: true, keepDirty: false })
+    router.push('/adoption/drafts')
   }
 
   return {
@@ -143,9 +225,10 @@ const useAdoptionCreateForm = () => {
     representativeIndex,
     setRepresentativeIndex,
     isSubmitting: submission.isSubmitting,
+    isSavingDraft: draftSubmission.isSaving,
     // 사진 미등록은 버튼을 막지 않는다 — 눌러서 사유를 보게 해야 왜 못 올리는지 알 수 있다
     canSubmit: isValid,
-    submitError: submitError ?? submission.error,
+    submitError: submitError ?? submission.error ?? draftSubmission.error,
     showGuard,
     cancelExit,
     handleCloseClick,

@@ -2,11 +2,17 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-interface ParentImage {
-  /** 미리보기 blob URL */
-  url: string
-  file: File
-}
+/**
+ * 부모 행의 사진 1장.
+ *
+ * - `new`: 방금 고른 파일. 제출 시 업로드해 파일키를 얻는다.
+ * - `existing`: 임시저장에서 복원한, 이미 올라간 사진. 키를 그대로 재사용한다.
+ */
+type ParentImage =
+  | { kind: 'new'; url: string; file: File }
+  | { kind: 'existing'; url: string; fileName: string }
+
+const isBlobUrl = (url: string) => url.startsWith('blob:')
 
 /**
  * 부모 행마다 사진 1장 (서버 ParentPetSnapshotRequestDto.photoFileName 이 부모별이라 행 단위로 들고 있는다).
@@ -24,7 +30,9 @@ const useParentImages = () => {
   }, [byRowId])
   useEffect(
     () => () => {
-      Object.values(latestRef.current).forEach((image) => URL.revokeObjectURL(image.url))
+      Object.values(latestRef.current).forEach((image) => {
+        if (isBlobUrl(image.url)) URL.revokeObjectURL(image.url)
+      })
     },
     [],
   )
@@ -35,8 +43,8 @@ const useParentImages = () => {
     if (!file) return
     setByRowId((prev) => {
       const previous = prev[rowId]
-      if (previous) URL.revokeObjectURL(previous.url)
-      return { ...prev, [rowId]: { url: URL.createObjectURL(file), file } }
+      if (previous && isBlobUrl(previous.url)) URL.revokeObjectURL(previous.url)
+      return { ...prev, [rowId]: { kind: 'new', url: URL.createObjectURL(file), file } }
     })
   }, [])
 
@@ -44,7 +52,7 @@ const useParentImages = () => {
     setByRowId((prev) => {
       const target = prev[rowId]
       if (!target) return prev
-      URL.revokeObjectURL(target.url)
+      if (isBlobUrl(target.url)) URL.revokeObjectURL(target.url)
       const next = { ...prev }
       delete next[rowId]
       return next
@@ -60,19 +68,49 @@ const useParentImages = () => {
     [byRowId],
   )
 
-  /** 행 순서대로 업로드할 파일 — 사진 없는 행은 빈 배열이라 인덱스가 부모 순서와 그대로 맞는다 */
+  /**
+   * 행 순서대로 업로드할 파일 — 사진 없는 행과 이미 올라간 행은 빈 배열이라
+   * 인덱스가 부모 순서와 그대로 맞는다.
+   */
   const filesInOrder = useCallback(
     (rowIds: string[]) =>
       rowIds.map((rowId) => {
         const image = byRowId[rowId]
-        return image ? [image.file] : []
+        return image?.kind === 'new' ? [image.file] : []
       }),
     [byRowId],
   )
 
+  /** 행 순서대로 이미 올라간 파일키 — 없으면 undefined (재업로드하지 않고 재사용) */
+  const existingFileNamesInOrder = useCallback(
+    (rowIds: string[]) =>
+      rowIds.map((rowId) => {
+        const image = byRowId[rowId]
+        return image?.kind === 'existing' ? image.fileName : undefined
+      }),
+    [byRowId],
+  )
+
+  /** 임시저장 복원 — 행 id 와 (URL, 파일키) 를 짝지어 채운다 */
+  const seedExisting = useCallback(
+    (photos: { rowId: string; url: string; fileName: string }[]) => {
+      setByRowId((prev) => {
+        // 사용자가 이미 뭔가 고른 뒤라면 덮어쓰지 않는다 (복원은 최초 1회)
+        if (Object.keys(prev).length > 0) return prev
+        return Object.fromEntries(
+          photos.map((photo) => [
+            photo.rowId,
+            { kind: 'existing' as const, url: photo.url, fileName: photo.fileName },
+          ]),
+        )
+      })
+    },
+    [],
+  )
+
   const hasFiles = Object.keys(byRowId).length > 0
 
-  return { add, remove, imagesOf, filesInOrder, hasFiles }
+  return { add, remove, imagesOf, filesInOrder, existingFileNamesInOrder, seedExisting, hasFiles }
 }
 
 export { useParentImages }

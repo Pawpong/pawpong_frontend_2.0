@@ -4,16 +4,24 @@ import { useCallback, useRef, useState } from 'react'
 import { useCreatePetPosting } from '@/features/pet-posting'
 import { useDeleteFile, useUploadMultipleFiles } from '@/features/upload'
 import { isApiError } from '@/shared/api'
+import { composeImageKeys } from '@/shared/lib/composeImageKeys'
+import type { ImageEntry } from '@/shared/lib/useImageUpload'
 import type { AdoptionCreateParsedValues } from './schema'
 import { ADOPTION_UPLOAD_FOLDER } from './constants'
 import { toCreatePetPostingRequest } from './toCreatePetPostingRequest'
 
 interface CreatePostingSubmissionInput {
+  /** 임시저장에서 이어 쓴 경우 그 초안 ID */
+  draftId?: string | null
   values: AdoptionCreateParsedValues
   representativeIndex: number
+  /** 분양 개체 사진 — 이미 올라간 것과 새로 고른 것이 표시 순서대로 섞여 있다 */
+  petEntries: ImageEntry[]
   petFiles: File[]
-  /** 부모 행 순서대로 각 행의 사진 (사진 없는 행은 빈 배열) */
+  /** 부모 행 순서대로 각 행의 사진 (사진 없는 행·이미 올라간 행은 빈 배열) */
   parentFiles: File[][]
+  /** 부모 행 순서대로 이미 올라간 파일키 (없으면 undefined) */
+  parentExistingFileNames: (string | undefined)[]
   breedingEnvFiles: File[]
 }
 
@@ -33,10 +41,13 @@ const useCreatePostingSubmission = () => {
 
   const submit = useCallback(
     async ({
+      draftId,
       values,
       representativeIndex,
+      petEntries,
       petFiles,
       parentFiles,
+      parentExistingFileNames,
       breedingEnvFiles,
     }: CreatePostingSubmissionInput): Promise<string | null> => {
       if (submittingRef.current) return null
@@ -80,15 +91,19 @@ const useCreatePostingSubmission = () => {
         )
         const [pet = [], ...rest] = uploadedGroups
         // 부모는 행당 최대 1장이라 각 그룹의 첫 파일명만 쓴다
-        const parents = rest.slice(0, parentFiles.length).map((names) => names[0])
+        // 이미 올라간 부모 사진은 키를 그대로 쓰고, 새로 고른 행만 업로드 결과로 채운다
+        const parents = rest
+          .slice(0, parentFiles.length)
+          .map((names, index) => parentExistingFileNames[index] ?? names[0])
         const breedingEnv = rest[parentFiles.length]?.[0]
 
         const request = toCreatePetPostingRequest(values, {
-          pet,
+          // 이미 올라간 사진은 재업로드하지 않고 키를 그대로 쓴다 (고아 파일 방지)
+          pet: composeImageKeys(petEntries, pet),
           representativeIndex,
           parents,
           breedingEnv,
-        })
+        }, draftId)
 
         createRequestStarted = true
         const { petId } = await createPostingAsync(request)

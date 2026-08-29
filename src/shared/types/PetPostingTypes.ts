@@ -61,6 +61,8 @@ export interface CreatePetPostingRequest {
   geneticTestIncompleteReason?: string
   parentPetSnapshots?: ParentPetSnapshot[]
   breedingEnvironment?: PetBreedingEnvironment
+  /** 임시저장에서 이어 쓴 경우 그 초안 ID — 발행되면 서버가 초안을 정리한다 */
+  draftId?: string
 }
 
 /** 분양글 작성/수정 응답 */
@@ -120,4 +122,56 @@ export interface MyPetPostingListParams {
   status?: PetStatus
   page?: number
   pageSize?: number
+}
+
+// ==================== 분양글 임시저장 ====================
+
+/**
+ * 분양글 임시저장 요청.
+ *
+ * 작성 도중 아무 때나 저장할 수 있어야 하므로 모든 필드가 선택이다.
+ * (서버도 필수 필드를 두지 않는다 — 발행 시점에만 검증한다)
+ */
+export type SavePetPostingDraftRequest = Partial<CreatePetPostingRequest>
+
+/** 임시저장 응답 */
+export interface PetPostingDraftSaveResponse {
+  draftId: string
+}
+
+/** 임시저장 목록 카드 */
+export interface PetPostingDraftCard {
+  draftId: string
+  name: string
+  breed: string
+  primaryPhotoUrl: string
+  updatedAt: string
+}
+
+/**
+ * 임시저장 사진의 표시용 URL.
+ *
+ * form 에는 파일키만 있고 클라이언트는 키를 URL 로 바꿀 수 없다.
+ * 재저장·발행 시에는 form 의 키를 그대로 돌려보내야 하므로 둘을 나란히 받는다.
+ */
+export interface PetPostingDraftPhotoUrls {
+  /** form.photos 와 같은 순서 */
+  pet: string[]
+  /** form.parentPetSnapshots 와 같은 순서. 사진 없는 행은 null */
+  parents: (string | null)[]
+  breedingEnvironment: string | null
+}
+
+/** 임시저장 단건 (작성 폼 복원용) */
+export interface PetPostingDraftDetail {
+  draftId: string
+  form: SavePetPostingDraftRequest
+  photoUrls: PetPostingDraftPhotoUrls
+  updatedAt: string
+}
+
+/** 임시저장 삭제 응답 */
+export interface PetPostingDraftDeleteResponse {
+  draftId: string
+  deleted: boolean
 }
