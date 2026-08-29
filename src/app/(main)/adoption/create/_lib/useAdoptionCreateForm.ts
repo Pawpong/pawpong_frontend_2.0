@@ -78,10 +78,17 @@ const useAdoptionCreateForm = () => {
     restoredRef.current = true
 
     form.reset(fromPetPostingDraft(draft.form))
-    setRepresentativeIndex(draft.form.representativePhotoIndex ?? 0)
+
+    const restoredPhotos = draft.form.photos ?? []
+    // 초안은 검증 없이 저장되므로 대표 인덱스가 사진 개수를 벗어나 있을 수 있다.
+    // 그대로 두면 서버에 범위 밖 인덱스가 나가므로 사진 범위로 고정한다
+    const savedIndex = draft.form.representativePhotoIndex ?? 0
+    setRepresentativeIndex(
+      savedIndex >= 0 && savedIndex < restoredPhotos.length ? savedIndex : 0,
+    )
 
     petImages.seedExisting(
-      (draft.form.photos ?? []).map((fileName, index) => ({
+      restoredPhotos.map((fileName, index) => ({
         fileName,
         url: draft.photoUrls.pet[index] ?? '',
       })),
@@ -129,8 +136,9 @@ const useAdoptionCreateForm = () => {
     [petImages],
   )
 
+  // 복원된 사진도 '내용이 있다'로 봐야 이탈 가드가 정상 동작한다
   const hasImages =
-    petImages.files.length > 0 || parentImages.hasFiles || breedingEnvImages.files.length > 0
+    petImages.entries.length > 0 || parentImages.hasFiles || breedingEnvImages.entries.length > 0
 
   const { showGuard, requestExit, confirmExit, cancelExit } = useExitGuard({
     hasChanges: () => isDirty || hasImages,
@@ -150,8 +158,9 @@ const useAdoptionCreateForm = () => {
     setSubmitError(null)
     submission.clearError()
 
-    // 사진은 폼 밖(useImageUpload) 상태라 zod가 못 본다. 서버 계약(1~10장)을 여기서 확인한다
-    if (petImages.files.length === 0) {
+    // 사진은 폼 밖(useImageUpload) 상태라 zod가 못 본다. 서버 계약(1~10장)을 여기서 확인한다.
+    // files 는 '새로 올릴 파일'만이라 임시저장에서 복원한 사진이 빠진다 — 화면에 걸린 전부(entries)를 센다
+    if (petImages.entries.length === 0) {
       setSubmitError('분양 개체 사진을 1장 이상 등록해주세요.')
       return
     }
@@ -175,6 +184,7 @@ const useAdoptionCreateForm = () => {
       petFiles: petImages.files,
       parentFiles: parentImages.filesInOrder(parentRowIds),
       parentExistingFileNames: parentImages.existingFileNamesInOrder(parentRowIds),
+      breedingEnvEntries: breedingEnvImages.entries,
       breedingEnvFiles: breedingEnvImages.files,
       representativeIndex,
     })
@@ -198,6 +208,7 @@ const useAdoptionCreateForm = () => {
       petFiles: petImages.files,
       parentFiles: parentImages.filesInOrder(parentRowIds),
       parentExistingFileNames: parentImages.existingFileNamesInOrder(parentRowIds),
+      breedingEnvEntries: breedingEnvImages.entries,
       breedingEnvFiles: breedingEnvImages.files,
       representativeIndex,
     })

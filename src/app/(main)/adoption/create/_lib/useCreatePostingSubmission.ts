@@ -22,6 +22,8 @@ interface CreatePostingSubmissionInput {
   parentFiles: File[][]
   /** 부모 행 순서대로 이미 올라간 파일키 (없으면 undefined) */
   parentExistingFileNames: (string | undefined)[]
+  /** 사육 환경 사진 — 이미 올라간 것과 새로 고른 것이 표시 순서대로 섞여 있다 */
+  breedingEnvEntries: ImageEntry[]
   breedingEnvFiles: File[]
 }
 
@@ -48,6 +50,7 @@ const useCreatePostingSubmission = () => {
       petFiles,
       parentFiles,
       parentExistingFileNames,
+      breedingEnvEntries,
       breedingEnvFiles,
     }: CreatePostingSubmissionInput): Promise<string | null> => {
       if (submittingRef.current) return null
@@ -95,7 +98,12 @@ const useCreatePostingSubmission = () => {
         const parents = rest
           .slice(0, parentFiles.length)
           .map((names, index) => parentExistingFileNames[index] ?? names[0])
-        const breedingEnv = rest[parentFiles.length]?.[0]
+        // 서버는 사육 환경 사진을 1장만 받는다. 이미 올라간 사진이면 키를 그대로 쓰고,
+        // 새로 고른 사진이면 업로드 결과를 쓴다 — 안 그러면 복원한 사진이 발행 때 사라진다
+        const breedingEnv = composeImageKeys(
+          breedingEnvEntries.slice(0, 1),
+          rest[parentFiles.length] ?? [],
+        )[0]
 
         const request = toCreatePetPostingRequest(values, {
           // 이미 올라간 사진은 재업로드하지 않고 키를 그대로 쓴다 (고아 파일 방지)
