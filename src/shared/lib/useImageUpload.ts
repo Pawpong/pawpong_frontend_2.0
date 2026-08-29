@@ -29,6 +29,8 @@ const isBlobUrl = (url: string) => url.startsWith('blob:')
 const useImageUpload = ({ maxImages = 10, onDirty }: UseImageUploadOptions = {}) => {
   const [entries, setEntries] = useState<ImageEntry[]>([])
   const entriesRef = useRef<ImageEntry[]>([])
+  // 복원 시점에 몇 장이 있었는지 — 이탈 가드가 '저장 후 지운 사진'을 변경으로 보게 한다
+  const [seededCount, setSeededCount] = useState(0)
 
   // 언마운트 시 blob URL 만 회수한다 (서버 URL 은 해제 대상이 아니다)
   useEffect(
@@ -79,9 +81,11 @@ const useImageUpload = ({ maxImages = 10, onDirty }: UseImageUploadOptions = {})
       setEntries((prev) => {
         // 사용자가 이미 뭔가 고른 뒤라면 덮어쓰지 않는다 (복원은 최초 1회)
         if (prev.length > 0) return prev
-        return commit(
-          photos.slice(0, maxImages).map((photo) => ({ kind: 'existing' as const, ...photo })),
-        )
+        const seeded = photos
+          .slice(0, maxImages)
+          .map((photo) => ({ kind: 'existing' as const, ...photo }))
+        setSeededCount(seeded.length)
+        return commit(seeded)
       })
     },
     [maxImages, commit],
@@ -95,6 +99,15 @@ const useImageUpload = ({ maxImages = 10, onDirty }: UseImageUploadOptions = {})
     handleAddImages,
     handleRemoveImage,
     seedExisting,
+    /**
+     * 저장하지 않은 변경이 있는가 (이탈 가드용).
+     *
+     * 복원된 사진이 그대로 있는 것은 이미 저장된 상태라 변경이 아니다.
+     * 새로 고른 사진이 있거나, 복원됐던 사진을 지운 경우만 변경으로 본다.
+     */
+    hasUnsavedChanges:
+      entries.some((entry) => entry.kind === 'new') ||
+      entries.filter((entry) => entry.kind === 'existing').length < seededCount,
   }
 }
 

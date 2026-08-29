@@ -136,12 +136,19 @@ const useAdoptionCreateForm = () => {
     [petImages],
   )
 
-  // 복원된 사진도 '내용이 있다'로 봐야 이탈 가드가 정상 동작한다
-  const hasImages =
-    petImages.entries.length > 0 || parentImages.hasFiles || breedingEnvImages.entries.length > 0
+  /**
+   * 저장하지 않은 사진 변경이 있는가.
+   *
+   * 임시저장에서 복원한 사진이 '그대로 있는 것'은 이미 저장된 상태라 변경이 아니다.
+   * 그걸 변경으로 보면 이어쓰기로 들어오자마자 나갈 때 헛경고가 뜬다.
+   */
+  const hasUnsavedImageChanges =
+    petImages.hasUnsavedChanges ||
+    parentImages.hasUnsavedChanges ||
+    breedingEnvImages.hasUnsavedChanges
 
   const { showGuard, requestExit, confirmExit, cancelExit } = useExitGuard({
-    hasChanges: () => isDirty || hasImages,
+    hasChanges: () => isDirty || hasUnsavedImageChanges,
   })
 
   const handleCloseClick = () => {

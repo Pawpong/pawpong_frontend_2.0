@@ -22,6 +22,8 @@ const isBlobUrl = (url: string) => url.startsWith('blob:')
  */
 const useParentImages = () => {
   const [byRowId, setByRowId] = useState<Record<string, ParentImage>>({})
+  // 복원 시점 장수 — 이탈 가드가 '저장 후 지운 사진'을 변경으로 보게 한다
+  const [seededCount, setSeededCount] = useState(0)
 
   // 언마운트 시 남은 blob URL 정리 — 최신 값을 ref 로 따라간다
   const latestRef = useRef(byRowId)
@@ -97,6 +99,7 @@ const useParentImages = () => {
       setByRowId((prev) => {
         // 사용자가 이미 뭔가 고른 뒤라면 덮어쓰지 않는다 (복원은 최초 1회)
         if (Object.keys(prev).length > 0) return prev
+        setSeededCount(photos.length)
         return Object.fromEntries(
           photos.map((photo) => [
             photo.rowId,
@@ -108,9 +111,25 @@ const useParentImages = () => {
     [],
   )
 
-  const hasFiles = Object.keys(byRowId).length > 0
+  const images = Object.values(byRowId)
 
-  return { add, remove, imagesOf, filesInOrder, existingFileNamesInOrder, seedExisting, hasFiles }
+  /**
+   * 저장하지 않은 변경이 있는가 (이탈 가드용).
+   * 복원된 사진이 그대로 있는 것은 변경이 아니다 — 새로 고르거나 지운 경우만 본다.
+   */
+  const hasUnsavedChanges =
+    images.some((image) => image.kind === 'new') ||
+    images.filter((image) => image.kind === 'existing').length < seededCount
+
+  return {
+    add,
+    remove,
+    imagesOf,
+    filesInOrder,
+    existingFileNamesInOrder,
+    seedExisting,
+    hasUnsavedChanges,
+  }
 }
 
 export { useParentImages }
