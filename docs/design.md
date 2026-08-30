@@ -215,6 +215,7 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 
 - React Query 목록은 재진입 시 데이터 최신성이 필요한 화면에서 `refetchOnMount: 'always'`를 명시한다.
 - 상세·작성·프로필 화면도 뒤로가기 캐시 복원 시 서버 상태를 다시 확인해야 하므로 `refetchOnMount: 'always'`와 로컬 재시도를 함께 둔다.
+- 공용 `createQuery`·`createInfiniteQuery`는 동적 데이터에 이 재진입 규칙을 기본 적용한다. 품종·지역·필터처럼 `STALE_TIME.STATIC`으로 선언한 참조 데이터만 같은 세션에서 재호출하지 않는다.
 - 뒤로가기로 복원되는 화면은 stale 화면을 그대로 믿지 않고, mutation 후 관련 query key를 invalidate한다.
 - 무한 목록은 페이지를 평탄화한 뒤 ID 기준 dedupe를 적용한다.
 - 내부 이동 URL은 `/`로 시작하는 값만 허용한다.
