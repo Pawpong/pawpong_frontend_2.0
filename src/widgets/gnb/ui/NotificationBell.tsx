@@ -4,9 +4,8 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
 import { cn } from '@/shared/lib/cn'
-import { formatRelativeTime } from '@/shared/lib/formatRelativeTime'
 import { useAuthStatus } from '@/features/auth'
-import { notificationQueries } from '@/entities/notification'
+import { NotificationListItem, notificationQueries } from '@/entities/notification'
 import { uniqueBy } from '@/shared/lib/uniqueBy'
 import { useMarkAsRead, useMarkAllAsRead } from '@/features/notification'
 import type { NotificationResponseDto } from '@/shared/types'
@@ -27,38 +26,6 @@ const BellIcon = ({ className }: { className?: string }) => (
       strokeLinecap="round"
     />
   </svg>
-)
-
-const NotificationItem = ({
-  item,
-  onSelect,
-}: {
-  item: NotificationResponseDto
-  onSelect: (item: NotificationResponseDto) => void
-}) => (
-  <button
-    type="button"
-    onClick={() => onSelect(item)}
-    className={cn(
-      'flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-neutral-50',
-      !item.isRead && 'bg-[#fafaf0]',
-    )}
-  >
-    {/* 안읽음 표시 점 */}
-    <span
-      className={cn(
-        'mt-1.5 size-2 shrink-0 rounded-full',
-        item.isRead ? 'bg-transparent' : 'bg-error-500',
-      )}
-    />
-    <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-      <p className="truncate text-sm font-semibold text-neutral-850">{item.title}</p>
-      <p className="line-clamp-2 text-sm leading-[1.4] font-medium text-neutral-700">{item.body}</p>
-      <span className="text-xs font-medium text-neutral-500">
-        {formatRelativeTime(item.createdAt)}
-      </span>
-    </div>
-  </button>
 )
 
 const NotificationBell = () => {
@@ -109,7 +76,7 @@ const NotificationBell = () => {
   const handleSelect = (item: NotificationResponseDto) => {
     if (!item.isRead) markAsRead(item.notificationId)
     setOpen(false)
-    if (item.targetUrl) router.push(item.targetUrl)
+    if (item.targetUrl?.startsWith('/')) router.push(item.targetUrl)
   }
 
   return (
@@ -163,7 +130,12 @@ const NotificationBell = () => {
             ) : (
               <div className="flex flex-col divide-y divide-[#f2f2f2]">
                 {notifications.map((item) => (
-                  <NotificationItem key={item.notificationId} item={item} onSelect={handleSelect} />
+                  <NotificationListItem
+                    key={item.notificationId}
+                    item={item}
+                    onSelect={handleSelect}
+                    compact
+                  />
                 ))}
                 {hasNextPage && (
                   <button
