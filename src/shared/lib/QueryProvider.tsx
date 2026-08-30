@@ -15,8 +15,10 @@ const shouldRetryRequest = (error: unknown, failureCount: number) => {
 }
 
 const shouldThrowToBoundary = (error: unknown) => {
+  // API 장애는 사용자가 다시 시도할 수 있는 런타임 상태다. 페이지 전체 React 트리를
+  // 걷어내는 error boundary는 렌더링/프로그래밍 오류에만 사용한다.
   if (!isApiError(error)) return true
-  return error.status === undefined || error.status >= 500
+  return false
 }
 
 const shouldCaptureError = (error: unknown) => {

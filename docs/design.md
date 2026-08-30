@@ -141,10 +141,12 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 
 ### 상태·피드백
 
+- `AsyncState`: 상세·폼·프로필처럼 목록이 아닌 화면의 loading/error/empty 상태와 재시도 액션을 같은 높이·타이포로 제공한다.
 - `ListState`: pending → error → empty → content 우선순위를 공통 처리하고, 오류 상태의 `errorAction`으로 같은 자리에서 재시도를 제공한다.
 - `AlertMessage`, `ErrorBoundaryUI`: 인라인 안내와 복구 가능한 화면 오류에 사용한다.
 - 로딩은 레이아웃을 유지하고, 오류에는 재시도 또는 안전한 이전 경로를 제공한다.
 - 빈 상태는 “데이터가 없음”과 “기능이 비활성”을 구분해 문구와 CTA를 결정한다.
+- API 오류는 전역 React error boundary로 화면 전체를 교체하지 않는다. 해당 화면의 `AsyncState`/`ListState`에서 복구하고, 전역 boundary는 렌더링·프로그래밍 오류에만 사용한다.
 
 ### 오버레이·확인
 
@@ -170,6 +172,7 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 ## 9. 데이터·탐색 상태
 
 - React Query 목록은 재진입 시 데이터 최신성이 필요한 화면에서 `refetchOnMount: 'always'`를 명시한다.
+- 상세·작성·프로필 화면도 뒤로가기 캐시 복원 시 서버 상태를 다시 확인해야 하므로 `refetchOnMount: 'always'`와 로컬 재시도를 함께 둔다.
 - 뒤로가기로 복원되는 화면은 stale 화면을 그대로 믿지 않고, mutation 후 관련 query key를 invalidate한다.
 - 무한 목록은 페이지를 평탄화한 뒤 ID 기준 dedupe를 적용한다.
 - 내부 이동 URL은 `/`로 시작하는 값만 허용한다.
@@ -190,6 +193,7 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 - focus-visible ring은 배경과 3:1 이상 구분되도록 `primary-500`을 기본으로 한다.
 - hover로만 노출되는 핵심 액션은 금지한다. 키보드 focus와 터치에서도 접근 가능해야 한다.
 - pending 동안 중복 submit을 막고 레이블로 진행 상태를 알린다.
+- 작성·수정 폼은 텍스트·공개 범위·기존/신규 이미지 중 하나라도 바뀌면 X 버튼, 브라우저 뒤로가기, 새로고침 모두 이탈 확인 대상이다.
 - 삭제·투표·즐겨찾기처럼 서버 상태를 바꾸는 액션은 성공 후 관련 숫자와 상태를 함께 갱신한다.
 
 ## 12. 검증 매트릭스
@@ -217,6 +221,7 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 | 알림                  | `NotificationListItem`, `OwnerActionsMenu`, `DeleteConfirmModal` | 그룹 목록·읽지 않음·삭제 확인·전체 보기 정렬 완료      |
 | 채팅                  | 채팅 공용 폭·Socket.IO                                           | 딥링크·뒤로가기·Kafka 정상/장애/복구 로컬 E2E 완료     |
 | 분양 임시저장         | `ListState`, `OwnerActionsMenu`, `DeleteConfirmModal`            | 재진입 강제 조회·오류 재시도·대표 사진 dirty 보호 완료 |
+| API 재진입 상태       | `AsyncState`, `ListState`, `useExitGuard`                         | 상세·신청·프로필·홈·알림·커뮤니티 로컬 복구 통일       |
 
 ## 14. 문서 갱신 규칙
 

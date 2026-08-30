@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import {
+  AsyncState,
   AuthorInfo,
   BOOKMARK_ACTIVE,
   Container,
@@ -10,6 +11,7 @@ import {
   NavigationBar,
   OwnerActionsMenu,
   PostActionButton,
+  Button,
   Separator,
 } from '@/shared/ui'
 import { CloseIcon, FavoriteIcon, PixelMessageIcon, PixelBookmarkIcon } from '@/shared/assets'
@@ -31,6 +33,9 @@ const PostDetailContent = ({ postId }: PostDetailContentProps) => {
   const {
     router,
     post,
+    isPending,
+    isError,
+    refetch,
     isOwner,
     toggleLike,
     isLikePending,
@@ -43,8 +48,6 @@ const PostDetailContent = ({ postId }: PostDetailContentProps) => {
   } = usePostDetail(postId)
   // mo(~767)는 모달 대신 이 페이지로 오므로, 여기서 곧바로 피드 상세 레이아웃을 그린다
   const isTabUp = useBreakpoint('tab')
-
-  if (!post) return null
 
   if (!isTabUp) {
     const backButton = (
@@ -65,6 +68,29 @@ const PostDetailContent = ({ postId }: PostDetailContentProps) => {
         layout="stacked"
         trailingAction={backButton}
         className="h-[calc(100dvh-3rem)]"
+      />
+    )
+  }
+
+  if (!post) {
+    return (
+      <AsyncState
+        status={isError ? 'error' : isPending ? 'loading' : 'empty'}
+        message={
+          isError
+            ? '게시글을 불러오지 못했습니다.'
+            : isPending
+              ? '게시글을 불러오는 중입니다.'
+              : '삭제되었거나 볼 수 없는 게시글입니다.'
+        }
+        action={
+          isError ? (
+            <Button variant="fill" size="sm" onClick={() => void refetch()}>
+              다시 시도
+            </Button>
+          ) : undefined
+        }
+        className="min-h-[calc(100dvh-3.5rem)]"
       />
     )
   }

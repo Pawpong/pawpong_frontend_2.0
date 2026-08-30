@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 
 interface UsePostFormOptions {
   maxImages?: number
@@ -13,14 +13,34 @@ const usePostForm = ({
   initialText = '',
   initialImages = [],
 }: UsePostFormOptions = {}) => {
+  // 수정 기준값은 이 폼 인스턴스가 처음 열린 시점으로 고정한다.
+  const [initialTextValue] = useState(initialText)
+  const [initialImageValues] = useState(initialImages)
   // 이미 서버에 올라가 있는 사진(URL). 수정 화면에서 지우면 이 목록에서만 빠진다.
   const [uploadedImages, setUploadedImages] = useState<string[]>(initialImages)
   // 이번에 고른 사진의 미리보기 URL — files 와 1:1 로 대응한다.
   const [newImages, setNewImages] = useState<string[]>([])
   const [files, setFiles] = useState<File[]>([])
   const [text, setText] = useState(initialText)
+  const newImagesRef = useRef(newImages)
+
+  useEffect(() => {
+    newImagesRef.current = newImages
+  }, [newImages])
+
+  useEffect(
+    () => () => {
+      newImagesRef.current.forEach((image) => URL.revokeObjectURL(image))
+    },
+    [],
+  )
 
   const images = [...uploadedImages, ...newImages]
+  const hasChanges =
+    text !== initialTextValue ||
+    files.length > 0 ||
+    uploadedImages.length !== initialImageValues.length ||
+    uploadedImages.some((image, index) => image !== initialImageValues[index])
 
   const handleAddImages = useCallback(
     (fileList: FileList) => {
@@ -59,6 +79,7 @@ const usePostForm = ({
     uploadedImages,
     files,
     text,
+    hasChanges,
     setText,
     handleAddImages,
     handleRemoveImage,

@@ -3,6 +3,8 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import {
+  AsyncState,
+  Button,
   DeleteConfirmModal,
   ImageCarousel,
   LoginPromptModal,
@@ -44,6 +46,7 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
     post,
     isPending,
     isError,
+    refetch,
     isOwner,
     toggleLike,
     isLikePending,
@@ -64,13 +67,24 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
     return (
       <div className={cn('flex h-full min-h-0 w-full flex-col', className)}>
         <div className="flex shrink-0 items-center justify-end px-4 py-2">{trailingAction}</div>
-        <p className="flex flex-1 items-center justify-center px-4 text-center text-sm font-medium text-neutral-500">
-          {isError
-            ? '게시글을 불러오지 못했습니다.'
-            : isPending
-              ? '게시글을 불러오는 중입니다.'
-              : '삭제되었거나 볼 수 없는 게시글입니다.'}
-        </p>
+        <AsyncState
+          status={isError ? 'error' : isPending ? 'loading' : 'empty'}
+          message={
+            isError
+              ? '게시글을 불러오지 못했습니다.'
+              : isPending
+                ? '게시글을 불러오는 중입니다.'
+                : '삭제되었거나 볼 수 없는 게시글입니다.'
+          }
+          action={
+            isError ? (
+              <Button variant="fill" size="sm" onClick={() => void refetch()}>
+                다시 시도
+              </Button>
+            ) : undefined
+          }
+          className="min-h-0 flex-1"
+        />
       </div>
     )
   }

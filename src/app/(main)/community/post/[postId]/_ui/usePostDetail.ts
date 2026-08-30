@@ -37,11 +37,13 @@ const usePostDetail = (postId: string) => {
     return undefined
   }, [queryClient, postId])
 
-  const {
-    data: post,
-    isPending,
-    isError,
-  } = useQuery({ ...communityQueries.detail(postId), placeholderData: placeholder })
+  const postQuery = useQuery({
+    ...communityQueries.detail(postId),
+    placeholderData: placeholder,
+    refetchOnMount: 'always',
+    throwOnError: false,
+  })
+  const { data: post, isPending, isError } = postQuery
 
   const { toggleLike, isPending: isLikePending } = useToggleCommunityPostLike(
     postId,
@@ -68,6 +70,7 @@ const usePostDetail = (postId: string) => {
     post,
     isPending,
     isError,
+    refetch: postQuery.refetch,
     isOwner,
     toggleLike,
     isLikePending,

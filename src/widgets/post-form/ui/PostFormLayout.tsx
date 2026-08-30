@@ -20,6 +20,8 @@ interface PostFormLayoutProps {
   /** 본문 아래 추가 영역 (공개 설정 등) */
   belowContent?: ReactNode
   error?: string | null
+  /** 작성 이탈 가드를 적용한 닫기 동작. 미전달 시 브라우저 뒤로가기. */
+  onBack?: () => void
   /** 하단 CTA — PostFormCTA 로 그대로 전달 */
   cta: PostFormCTAProps
 }
@@ -38,6 +40,7 @@ const PostFormLayout = ({
   maxLength,
   belowContent,
   error,
+  onBack,
   cta,
 }: PostFormLayoutProps) => {
   const router = useRouter()
@@ -49,7 +52,7 @@ const PostFormLayout = ({
         title={title}
         mobileTitle={mobileTitle}
         icon="close"
-        onBack={() => router.back()}
+        onBack={onBack ?? (() => router.back())}
       />
 
       <Container className="flex-1 py-5 pb-30 pc:py-12">

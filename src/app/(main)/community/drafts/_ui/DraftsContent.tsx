@@ -3,14 +3,25 @@
 import { Fragment, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { Container, DeleteConfirmModal, NavigationBar, Separator } from '@/shared/ui'
+import {
+  Button,
+  Container,
+  DeleteConfirmModal,
+  ListState,
+  NavigationBar,
+  Separator,
+} from '@/shared/ui'
 import { communityQueries, toCommunityPreviewProps } from '@/entities/community'
 import { ConnectedPostCard, useDeleteCommunityPost } from '@/features/community'
 
 /** 임시저장 목록 — 카드를 누르면 수정 화면에서 이어서 작성한다 */
 const DraftsContent = () => {
   const router = useRouter()
-  const { data } = useQuery(communityQueries.drafts())
+  const { data, isPending, isError, refetch } = useQuery({
+    ...communityQueries.drafts(),
+    refetchOnMount: 'always',
+    throwOnError: false,
+  })
   const drafts = data?.items ?? []
 
   const deletePost = useDeleteCommunityPost()
@@ -28,11 +39,19 @@ const DraftsContent = () => {
 
       <Container className="px-4 pb-10 tab:pb-16">
         <div className="mx-auto w-full pc:max-w-[59.25rem]">
-          {drafts.length === 0 ? (
-            <p className="py-10 text-center text-sm leading-[1.5] font-medium text-neutral-700">
-              임시저장한 글이 없습니다.
-            </p>
-          ) : (
+          <ListState
+            isPending={isPending}
+            isError={isError}
+            isEmpty={drafts.length === 0}
+            loadingText="임시저장한 글을 불러오는 중입니다."
+            errorText="임시저장한 글을 불러오지 못했습니다."
+            emptyText="임시저장한 글이 없습니다."
+            errorAction={
+              <Button variant="fill" size="sm" onClick={() => void refetch()} className="px-4">
+                다시 시도
+              </Button>
+            }
+          >
             <div className="flex min-w-0 flex-col gap-5 tab:gap-8 tab:rounded-lg tab:border tab:border-neutral-300 tab:p-3">
               {drafts.map((draft, index) => (
                 <Fragment key={draft.postId}>
@@ -47,7 +66,7 @@ const DraftsContent = () => {
                 </Fragment>
               ))}
             </div>
-          )}
+          </ListState>
         </div>
       </Container>
 

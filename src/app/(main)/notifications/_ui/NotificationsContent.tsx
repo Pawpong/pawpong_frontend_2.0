@@ -20,8 +20,13 @@ import {
 
 const NotificationsContent = () => {
   const router = useRouter()
-  const { data: unreadCount = 0 } = useQuery(notificationQueries.unreadCount())
-  const { data, isPending, isError, hasNextPage, fetchNextPage, isFetchingNextPage } =
+  const unreadCountQuery = useQuery({
+    ...notificationQueries.unreadCount(),
+    refetchOnMount: 'always',
+    throwOnError: false,
+  })
+  const unreadCount = unreadCountQuery.data ?? 0
+  const { data, isPending, isError, hasNextPage, fetchNextPage, isFetchingNextPage, refetch } =
     useInfiniteQuery({
       ...notificationQueries.list(),
       refetchOnMount: 'always',
@@ -61,11 +66,25 @@ const NotificationsContent = () => {
                 <PawIcon className="size-5" />
               </span>
               <p className="truncate text-sm font-medium text-neutral-700 tab:text-base">
-                읽지 않은 알림{' '}
-                <strong className="font-semibold text-primary-600">{unreadCount}</strong>개
+                {unreadCountQuery.isError ? (
+                  '읽지 않은 알림 수를 확인하지 못했어요.'
+                ) : (
+                  <>
+                    읽지 않은 알림{' '}
+                    <strong className="font-semibold text-primary-600">{unreadCount}</strong>개
+                  </>
+                )}
               </p>
             </div>
-            {unreadCount > 0 && (
+            {unreadCountQuery.isError ? (
+              <Button
+                variant="text"
+                onClick={() => void unreadCountQuery.refetch()}
+                className="h-8 shrink-0 px-3 text-xs text-primary-600 hover:bg-white tab:text-sm"
+              >
+                다시 시도
+              </Button>
+            ) : unreadCount > 0 ? (
               <Button
                 variant="text"
                 onClick={() => markAllAsRead()}
@@ -74,7 +93,7 @@ const NotificationsContent = () => {
               >
                 모두 읽기
               </Button>
-            )}
+            ) : null}
           </div>
 
           <ListState
@@ -84,6 +103,11 @@ const NotificationsContent = () => {
             loadingText="알림을 불러오는 중입니다."
             errorText="알림을 불러오지 못했습니다."
             emptyText="아직 도착한 알림이 없습니다."
+            errorAction={
+              <Button variant="fill" size="sm" onClick={() => void refetch()}>
+                다시 시도
+              </Button>
+            }
           >
             <div className="overflow-hidden rounded-xl border border-neutral-150 bg-white shadow-[0_7px_7px_rgba(55,55,55,0.06)]">
               <div className="flex flex-col divide-y divide-neutral-150">

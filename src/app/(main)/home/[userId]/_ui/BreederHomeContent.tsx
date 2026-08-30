@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import {
+  AsyncState,
+  Button,
   Container,
   InfiniteScrollTrigger,
   ListState,
@@ -33,7 +35,12 @@ interface BreederHomeContentProps {
 
 const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
   const [activeTab, setActiveTab] = useState('listings')
-  const { data: profile } = useQuery(breederQueries.publicProfile(userId))
+  const profileQuery = useQuery({
+    ...breederQueries.publicProfile(userId),
+    refetchOnMount: 'always',
+    throwOnError: false,
+  })
+  const profile = profileQuery.data
   const {
     data: listingsData,
     isPending: isListingsPending,
@@ -41,7 +48,12 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
     fetchNextPage: fetchNextListings,
     hasNextPage: hasNextListings,
     isFetchingNextPage: isFetchingNextListings,
-  } = useInfiniteQuery(adoptionQueries.breederPets(userId, undefined, HOME_LISTING_PAGE_SIZE))
+    refetch: refetchListings,
+  } = useInfiniteQuery({
+    ...adoptionQueries.breederPets(userId, undefined, HOME_LISTING_PAGE_SIZE),
+    refetchOnMount: 'always',
+    throwOnError: false,
+  })
   const {
     data: postsData,
     isPending: isPostsPending,
@@ -49,7 +61,12 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
     fetchNextPage: fetchNextPosts,
     hasNextPage: hasNextPosts,
     isFetchingNextPage: isFetchingNextPosts,
-  } = useInfiniteQuery(communityQueries.userPosts(userId, HOME_POST_PAGE_SIZE))
+    refetch: refetchPosts,
+  } = useInfiniteQuery({
+    ...communityQueries.userPosts(userId, HOME_POST_PAGE_SIZE),
+    refetchOnMount: 'always',
+    throwOnError: false,
+  })
 
   // 무한스크롤 페이지 병합 시 id 중복 제거 (React key 중복 방어)
   const listings = dedupeBy(
@@ -58,7 +75,24 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
   )
   const posts = dedupeBy(flattenPages(postsData), (post) => post.postId)
 
-  if (!profile) return null
+  if (!profile) {
+    return (
+      <AsyncState
+        status={profileQuery.isError ? 'error' : 'loading'}
+        message={
+          profileQuery.isError ? '프로필을 불러오지 못했습니다.' : '프로필을 불러오는 중입니다.'
+        }
+        action={
+          profileQuery.isError ? (
+            <Button variant="fill" size="sm" onClick={() => void profileQuery.refetch()}>
+              다시 시도
+            </Button>
+          ) : undefined
+        }
+        className="min-h-[calc(100dvh-3.5rem)]"
+      />
+    )
+  }
 
   return (
     <div className="flex w-full flex-col">
@@ -88,6 +122,11 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
               loadingText="분양글을 불러오는 중입니다."
               errorText="분양글을 불러오지 못했습니다."
               emptyText="등록된 분양글이 없습니다."
+              errorAction={
+                <Button variant="fill" size="sm" onClick={() => void refetchListings()}>
+                  다시 시도
+                </Button>
+              }
             >
               <>
                 <div className="grid grid-cols-2 gap-[0.625rem] py-[1.25rem] tab:hidden">
@@ -125,6 +164,11 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
               loadingText="게시글을 불러오는 중입니다."
               errorText="게시글을 불러오지 못했습니다."
               emptyText="게시글이 없습니다."
+              errorAction={
+                <Button variant="fill" size="sm" onClick={() => void refetchPosts()}>
+                  다시 시도
+                </Button>
+              }
             >
               <PostList posts={posts} />
             </ListState>

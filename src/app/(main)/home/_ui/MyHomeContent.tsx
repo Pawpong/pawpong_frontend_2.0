@@ -5,7 +5,15 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { ArrowRightIcon, BookmarkIcon } from '@/shared/assets'
-import { Container, CtaBanner, DeleteConfirmModal, NavigationBar, InputUpload } from '@/shared/ui'
+import {
+  Button,
+  Container,
+  CtaBanner,
+  DeleteConfirmModal,
+  InputUpload,
+  ListState,
+  NavigationBar,
+} from '@/shared/ui'
 import { useGnbHeight } from '@/shared/lib/useGnbHeight'
 import { profileQueries } from '@/entities/profile'
 import { communityQueries } from '@/entities/community'
@@ -28,13 +36,27 @@ const MyHomeContent = () => {
   const { requestDelete, modalProps: deleteModalProps } = useDeletePostConfirm()
 
   // 마이홈 프로필 카드: /profile/me 로 내 프로필 조회 (role 에 따라 adopter/breeder 분기, 프로필 이미지 포함)
-  const { data: myProfile } = useQuery(profileQueries.me())
+  const profileQuery = useQuery({
+    ...profileQueries.me(),
+    refetchOnMount: 'always',
+    throwOnError: false,
+  })
+  const myProfile = profileQuery.data
   const isBreeder = myProfile?.role === 'breeder'
 
   // 마이홈 '게시글' 탭 — 내가 작성한 커뮤니티 글을 백엔드에서 조회 (profile 로드 후 활성화)
-  const { data: myPostsData } = useQuery(communityQueries.myPosts(!!myProfile))
+  const postsQuery = useQuery({
+    ...communityQueries.myPosts(!!myProfile),
+    refetchOnMount: 'always',
+    throwOnError: false,
+  })
+  const myPostsData = postsQuery.data
   // 임시저장 글 수 — 있을 때만 '게시글' 탭 상단에 이어쓰기 진입점을 띄운다
-  const { data: draftsData } = useQuery(communityQueries.drafts(!!myProfile))
+  const { data: draftsData } = useQuery({
+    ...communityQueries.drafts(!!myProfile),
+    refetchOnMount: 'always',
+    throwOnError: false,
+  })
 
   // sticky 헤더 스택: GNB → navbar(top=gnbH) → 탭바(top=gnbH+navH)
   const gnbH = useGnbHeight()
@@ -64,7 +86,32 @@ const MyHomeContent = () => {
   const draftCount = draftsData?.items.length ?? 0
   const profileCardProps = myProfile ? toMyProfileCardProps(myProfile) : null
 
-  if (!profileCardProps) return null
+  if (!profileCardProps) {
+    return (
+      <div className="flex w-full flex-col">
+        <NavigationBar title="마이홈" />
+        <Container className="flex min-h-60 items-center justify-center px-4 py-10">
+          {profileQuery.isPending ? (
+            <p role="status" className="text-sm font-medium text-neutral-700">
+              프로필을 불러오는 중입니다.
+            </p>
+          ) : (
+            <div role="alert" className="flex flex-col items-center gap-3 text-center">
+              <p className="text-sm font-medium text-neutral-700">프로필을 불러오지 못했습니다.</p>
+              <Button
+                variant="fill"
+                size="sm"
+                onClick={() => void profileQuery.refetch()}
+                className="px-4"
+              >
+                다시 시도
+              </Button>
+            </div>
+          )}
+        </Container>
+      </div>
+    )
+  }
 
   return (
     <div className="flex w-full flex-col">
@@ -139,12 +186,30 @@ const MyHomeContent = () => {
           />
 
           <Container className="px-4 pt-2 pb-6 tab:pb-10">
-            <PostList
-              posts={posts}
+            <ListState
+              isPending={postsQuery.isPending}
+              isError={postsQuery.isError}
+              isEmpty={posts.length === 0}
+              loadingText="내가 쓴 글을 불러오는 중입니다."
+              errorText="내가 쓴 글을 불러오지 못했습니다."
               emptyText="내가 쓴 글이 없습니다."
-              onEdit={(postId) => router.push(`/community/post/${postId}/edit`)}
-              onDelete={requestDelete}
-            />
+              errorAction={
+                <Button
+                  variant="fill"
+                  size="sm"
+                  onClick={() => void postsQuery.refetch()}
+                  className="px-4"
+                >
+                  다시 시도
+                </Button>
+              }
+            >
+              <PostList
+                posts={posts}
+                onEdit={(postId) => router.push(`/community/post/${postId}/edit`)}
+                onDelete={requestDelete}
+              />
+            </ListState>
           </Container>
         </TabsContent>
 

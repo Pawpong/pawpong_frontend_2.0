@@ -103,7 +103,12 @@ const useApplicationForm = (detail: AdoptionDetailDto) => {
 
   // 온보딩에서 '다음에 작성하기'로 조사 양식을 건너뛴 입양자에게만 조사 항목을 노출.
   // 서버가 답변이 하나도 없으면 counselDefaultProfile 을 null 로 내려준다 (건너뜀 판별의 유일한 근거).
-  const { data: adopterProfile } = useQuery(adopterQueries.profile())
+  const adopterProfileQuery = useQuery({
+    ...adopterQueries.profile(),
+    refetchOnMount: 'always',
+    throwOnError: false,
+  })
+  const adopterProfile = adopterProfileQuery.data
   const needsSurvey = adopterProfile?.counselDefaultProfile === null
 
   const petSummary = `${detail.name} . ${GENDER_LABEL[detail.gender]} . ${detail.birthDate}`
@@ -126,6 +131,9 @@ const useApplicationForm = (detail: AdoptionDetailDto) => {
     giveUpFromConsult,
     petSummary,
     needsSurvey,
+    isProfilePending: adopterProfileQuery.isPending,
+    isProfileError: adopterProfileQuery.isError,
+    retryProfile: adopterProfileQuery.refetch,
     toast,
   }
 }
