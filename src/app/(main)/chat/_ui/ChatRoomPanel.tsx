@@ -36,8 +36,14 @@ const ChatRoomPanel = ({ room, currentUserId, onBack }: ChatRoomPanelProps) => {
   const [showNotice, setShowNotice] = React.useState(true)
 
   // 입양 문의 방일 때만 신청 -> 펫 상세 순으로 조회해 상단 카드를 채운다.
-  const applicationQuery = useQuery(applicationQueries.detail(room.applicationId ?? ''))
-  const petQuery = useQuery(adoptionQueries.detail(applicationQuery.data?.petId ?? ''))
+  const applicationQuery = useQuery({
+    ...applicationQueries.detail(room.applicationId ?? ''),
+    throwOnError: false,
+  })
+  const petQuery = useQuery({
+    ...adoptionQueries.detail(applicationQuery.data?.petId ?? ''),
+    throwOnError: false,
+  })
 
   React.useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })

@@ -14,6 +14,7 @@ const useChatRoomFilter = () => {
     ...chatQueries.rooms(),
     refetchInterval: 30_000,
     refetchIntervalInBackground: false,
+    throwOnError: false,
   })
   const filteredRooms = React.useMemo(
     () => filterRooms(roomsQuery.data ?? [], filter),

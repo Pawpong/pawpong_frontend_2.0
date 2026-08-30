@@ -22,17 +22,27 @@ const sortMessages = (messages: ChatMessageResponseDto[]) =>
   })
 
 /** 내 채팅방 목록 조회 */
-export const getChatRooms = () =>
+export const getChatRooms = (signal?: AbortSignal) =>
   apiClient
-    .get<ChatListPayload<ChatRoomResponseDto>>(`${API_VERSION}/chat/rooms`)
+    .get<ChatListPayload<ChatRoomResponseDto>>(`${API_VERSION}/chat/rooms`, {
+      signal,
+      timeout: 8_000,
+    })
     .then((response) => unwrapChatListResponse(response, '채팅방 목록을 불러오지 못했습니다.'))
 
 /** 채팅 메시지 내역 조회 (커서 기반 페이지네이션) */
-export const getChatMessages = (roomId: string, limit?: number, before?: string) =>
+export const getChatMessages = (
+  roomId: string,
+  limit?: number,
+  before?: string,
+  signal?: AbortSignal,
+) =>
   apiClient
-    .get<
-      ChatListPayload<ChatMessageResponseDto>
-    >(`${API_VERSION}/chat/rooms/${roomId}/messages`, { params: { limit, before } })
+    .get<ChatListPayload<ChatMessageResponseDto>>(`${API_VERSION}/chat/rooms/${roomId}/messages`, {
+      params: { limit, before },
+      signal,
+      timeout: 8_000,
+    })
     .then((response) =>
       sortMessages(unwrapChatListResponse(response, '메시지를 불러오지 못했습니다.')),
     )
