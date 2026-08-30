@@ -6,14 +6,12 @@ import { type MouseEvent } from 'react'
 import { cn } from '@/shared/lib/cn'
 import { useNavigationGuardContext } from '@/shared/lib/NavigationGuardContext'
 import { HEADER_NAV } from '@/shared/config'
-import { NotificationBell } from './NotificationBell'
 
 interface NavBarProps {
   className?: string
-  chatTone?: boolean
 }
 
-const NavBar = ({ className, chatTone = false }: NavBarProps) => {
+const NavBar = ({ className }: NavBarProps) => {
   const pathname = usePathname()
   const guardContext = useNavigationGuardContext()
 
@@ -24,7 +22,7 @@ const NavBar = ({ className, chatTone = false }: NavBarProps) => {
   }
 
   return (
-    <nav className={cn('flex items-center gap-4', className)}>
+    <nav className={cn('items-center gap-7', className)} aria-label="주요 메뉴">
       {/* 아이콘·목적지는 BottomNav와 shared/config/mainNav 공유 (Figma NavBar 1596-97648) */}
       {HEADER_NAV.map(({ href, label, Icon, isActive }) => (
         <Link
@@ -32,20 +30,15 @@ const NavBar = ({ className, chatTone = false }: NavBarProps) => {
           href={href}
           onClick={(e) => handleLinkClick(e, href)}
           className={cn(
-            'flex items-center gap-0.5 text-sm leading-[1.5] whitespace-nowrap transition-colors',
-            chatTone
-              ? 'font-medium text-primary-300'
-              : isActive(pathname)
-                ? 'font-semibold text-neutral-850'
-                : 'font-medium text-secondary-500',
+            'flex items-center text-sm leading-[1.5] font-medium whitespace-nowrap text-primary-500 transition-colors hover:text-primary-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500',
+            isActive(pathname) && 'font-semibold text-primary-700',
           )}
+          aria-current={isActive(pathname) ? 'page' : undefined}
         >
           <Icon className="size-7.5" />
           {label}
         </Link>
       ))}
-      {/* 알림 — 링크 대신 유튜브식 드롭다운 (test 통합 브랜치 기능 유지) */}
-      <NotificationBell />
     </nav>
   )
 }
