@@ -31,7 +31,7 @@ export interface AdoptionListingCard {
   listingId: string
   name: string
   gender: 'male' | 'female'
-  /** 표시용 생년월일 (YYYY.MM.DD) — 나이 대신 태어난 날을 보여준다 */
+  /** 표시용 생년월일 (YYYY년 MM월 DD일생) — 나이 대신 태어난 날을 보여준다 */
   birthDateText: string
   thumbnailUrl: string
   status: PetStatus
@@ -205,7 +205,6 @@ export interface AdoptionPetCard {
   petType: CommunityPetType
   gender: PetGender
   birthDate: string
-  ageDescription: string
   price: number
   status: PetStatus
   primaryPhotoUrl: string
