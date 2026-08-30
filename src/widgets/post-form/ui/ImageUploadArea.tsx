@@ -46,10 +46,11 @@ const imageUploadVariants = tv({
         root: 'gap-1 pc:gap-2',
         tiles: 'flex-wrap gap-3',
         addButton:
-          'size-25 justify-center gap-0.5 rounded border border-neutral-500 bg-white p-2 pc:size-45 pc:gap-2 pc:rounded-lg',
+          'size-25 justify-center gap-0.5 rounded border border-neutral-500 bg-white p-2 min-[1440px]:size-45 min-[1440px]:gap-2 min-[1440px]:rounded-lg',
         addIcon: 'size-8 text-neutral-700',
         addCounter: 'text-sm leading-[1.5] font-semibold text-neutral-700 pc:text-base',
-        preview: 'size-25 rounded border border-neutral-500 pc:size-45 pc:rounded-lg',
+        preview:
+          'size-25 rounded border border-neutral-500 min-[1440px]:size-45 min-[1440px]:rounded-lg',
       },
     },
   },

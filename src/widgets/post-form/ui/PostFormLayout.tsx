@@ -28,7 +28,7 @@ interface PostFormLayoutProps {
  * 작성 폼 공통 셸 — 상단바 + 이미지·본문 2단 + 하단 CTA.
  *
  * 게시글 작성/수정과 콘테스트 참여가 같은 레이아웃을 쓰고 제목·본문 문구·제출 로직만 다르다.
- * Figma 1056-46147(PC) / 1056-46891(tab·mo): PC는 이미지 372 + 본문 2단(gap 100).
+ * Figma 1056-46147(PC) / 1056-46891(tab·mo): 1440 화면에서 이미지 372 + 본문 2단(gap 100).
  */
 const PostFormLayout = ({
   title,
@@ -53,10 +53,9 @@ const PostFormLayout = ({
       />
 
       <Container className="flex-1 py-5 pb-30 pc:py-12">
-        {/* PC 콘텐츠 폭 1280 고정 (1440 - 좌우 80) */}
-        <div className="mx-auto w-full pc:max-w-320">
-          <div className="flex flex-col gap-[1.1875rem] pc:flex-row pc:gap-25">
-            <div className="flex flex-col gap-1 pc:w-93 pc:shrink-0 pc:gap-2">
+        <div className="mx-auto w-full min-[1440px]:max-w-320">
+          <div className="flex flex-col gap-[1.1875rem] min-[1440px]:flex-row min-[1440px]:gap-25">
+            <div className="flex flex-col gap-1 min-[1440px]:w-93 min-[1440px]:shrink-0 min-[1440px]:gap-2">
               <TextLabel size="14" requirement="선택">
                 이미지
               </TextLabel>
@@ -79,8 +78,8 @@ const PostFormLayout = ({
               placeholder={placeholder}
               maxLength={maxLength}
               currentLength={maxLength === undefined ? undefined : form.text.length}
-              wrapperClassName="pc:flex-1"
-              className="pc:h-45"
+              wrapperClassName="min-[1440px]:flex-1"
+              className="min-[1440px]:h-45"
             />
           </div>
 
