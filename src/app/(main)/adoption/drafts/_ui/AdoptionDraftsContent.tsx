@@ -4,14 +4,25 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { Container, DeleteConfirmModal, NavigationBar } from '@/shared/ui'
+import {
+  Button,
+  Container,
+  DeleteConfirmModal,
+  ListState,
+  NavigationBar,
+  OwnerActionsMenu,
+} from '@/shared/ui'
 import { petPostingQueries } from '@/entities/pet-posting'
 import { useDeletePetPostingDraft } from '@/features/pet-posting'
 
 /** 임시저장 카드를 누르면 작성 화면에서 이어서 쓴다 */
 const AdoptionDraftsContent = () => {
   const router = useRouter()
-  const { data } = useQuery(petPostingQueries.drafts())
+  const { data, isPending, isError, refetch } = useQuery({
+    ...petPostingQueries.drafts(),
+    refetchOnMount: 'always',
+    throwOnError: false,
+  })
   const drafts = data ?? []
 
   const deleteDraft = useDeletePetPostingDraft()
@@ -29,11 +40,19 @@ const AdoptionDraftsContent = () => {
 
       <Container className="px-4 pb-10 tab:pb-16">
         <div className="mx-auto w-full pc:max-w-[59.25rem]">
-          {drafts.length === 0 ? (
-            <p className="py-10 text-center text-sm leading-[1.5] font-medium text-neutral-700">
-              임시저장한 분양글이 없습니다.
-            </p>
-          ) : (
+          <ListState
+            isPending={isPending}
+            isError={isError}
+            isEmpty={drafts.length === 0}
+            loadingText="임시저장한 분양글을 불러오는 중입니다."
+            errorText="임시저장한 분양글을 불러오지 못했습니다."
+            emptyText="임시저장한 분양글이 없습니다."
+            errorAction={
+              <Button variant="fill" size="sm" onClick={() => void refetch()} className="px-4">
+                다시 시도
+              </Button>
+            }
+          >
             <ul className="flex flex-col gap-3">
               {drafts.map((draft) => (
                 <li key={draft.draftId}>
@@ -65,18 +84,16 @@ const AdoptionDraftsContent = () => {
                       </span>
                     </button>
 
-                    <button
-                      type="button"
-                      onClick={() => setDeleteTargetId(draft.draftId)}
-                      className="shrink-0 px-2 text-xs font-semibold text-neutral-700"
-                    >
-                      삭제
-                    </button>
+                    <OwnerActionsMenu
+                      onDelete={() => setDeleteTargetId(draft.draftId)}
+                      ariaLabel={`${draft.name || '제목 없는 임시저장 분양글'} 더보기`}
+                      className="shrink-0 rounded-full p-1 text-neutral-700 hover:bg-neutral-50"
+                    />
                   </div>
                 </li>
               ))}
             </ul>
-          )}
+          </ListState>
         </div>
       </Container>
 

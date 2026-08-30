@@ -29,6 +29,7 @@ export default defineConfig([
      */
     files: [
       './src/app/(main)/adoption/create/layout.tsx',
+      './src/app/(main)/adoption/drafts/page.tsx',
       './src/app/(main)/adoption/my-listings/page.tsx',
     ],
     rules: {

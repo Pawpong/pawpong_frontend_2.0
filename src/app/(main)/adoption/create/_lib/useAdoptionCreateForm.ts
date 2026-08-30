@@ -31,6 +31,7 @@ const useAdoptionCreateForm = () => {
   // 임시저장 이어쓰기 — ?draftId= 로 들어오면 서버에 저장된 값으로 폼을 채운다
   const draftId = useSearchParams().get('draftId')
   const [representativeIndex, setRepresentativeIndex] = useState(0)
+  const [savedRepresentativeIndex, setSavedRepresentativeIndex] = useState(0)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
   // resolver가 price를 number로 바꾸므로 입력 타입과 출력 타입을 분리해 선언한다
@@ -66,10 +67,13 @@ const useAdoptionCreateForm = () => {
   const submission = useCreatePostingSubmission()
   const draftSubmission = useSaveDraftSubmission()
 
-  const { data: draft } = useQuery({
+  const draftQuery = useQuery({
     ...petPostingQueries.draft(draftId ?? ''),
     enabled: Boolean(draftId),
+    refetchOnMount: 'always',
+    throwOnError: false,
   })
+  const draft = draftQuery.data
 
   // 복원은 최초 1회만 — 이후 사용자가 고친 값을 다시 덮어쓰면 안 된다
   const restoredRef = useRef(false)
@@ -86,7 +90,10 @@ const useAdoptionCreateForm = () => {
     const restoredRepresentativeIndex =
       savedIndex >= 0 && savedIndex < restoredPhotos.length ? savedIndex : 0
     // 서버 응답을 폼에 동기화하는 effect 안에서 연쇄 렌더를 만들지 않도록 다음 microtask에 반영한다.
-    queueMicrotask(() => setRepresentativeIndex(restoredRepresentativeIndex))
+    queueMicrotask(() => {
+      setRepresentativeIndex(restoredRepresentativeIndex)
+      setSavedRepresentativeIndex(restoredRepresentativeIndex)
+    })
 
     petImages.seedExisting(
       restoredPhotos.map((fileName, index) => ({
@@ -148,19 +155,22 @@ const useAdoptionCreateForm = () => {
     petImages.hasUnsavedChanges ||
     parentImages.hasUnsavedChanges ||
     breedingEnvImages.hasUnsavedChanges
+  const hasUnsavedRepresentativeChange = representativeIndex !== savedRepresentativeIndex
 
   const { showGuard, requestExit, confirmExit, cancelExit } = useExitGuard({
-    hasChanges: () => isDirty || hasUnsavedImageChanges,
+    hasChanges: () => isDirty || hasUnsavedImageChanges || hasUnsavedRepresentativeChange,
   })
+
+  const exitHref = draftId ? '/adoption/drafts' : '/adoption/my-listings'
 
   const handleCloseClick = () => {
     if (requestExit()) {
-      router.push('/adoption/my-listings')
+      router.push(exitHref)
     }
   }
 
   const handleExitConfirm = () => {
-    confirmExit(() => router.push('/adoption/my-listings'))
+    confirmExit(() => router.push(exitHref))
   }
 
   const handleUpload = form.handleSubmit(async (values) => {
@@ -225,6 +235,7 @@ const useAdoptionCreateForm = () => {
     if (!savedDraftId) return
 
     cancelExit()
+    setSavedRepresentativeIndex(representativeIndex)
     // 저장된 내용은 서버가 갖고 있으므로 폼을 비워 이탈 가드가 다시 뜨지 않게 한다
     form.reset(form.getValues(), { keepValues: true, keepDirty: false })
     router.push('/adoption/drafts')
@@ -249,6 +260,9 @@ const useAdoptionCreateForm = () => {
     // 사진 미등록은 버튼을 막지 않는다 — 눌러서 사유를 보게 해야 왜 못 올리는지 알 수 있다
     canSubmit: isValid,
     submitError: submitError ?? submission.error ?? draftSubmission.error,
+    isLoadingDraft: Boolean(draftId) && draftQuery.isPending,
+    isDraftLoadError: Boolean(draftId) && draftQuery.isError && !draft,
+    retryDraft: draftQuery.refetch,
     showGuard,
     cancelExit,
     handleCloseClick,
