@@ -98,14 +98,14 @@ const MyHomeContent = () => {
         onTabChange={setSelectedTab}
         stickyTop={gnbH + navH}
       >
-        {/* 브리더: 분양글 작성 바 / 일반: 게시글 작성 바 (공통 InputUpload, 상·하 보더 포함) */}
-        <InputUpload text={writeBar.text} href={writeBar.href} />
+        {/* 브리더: 분양글 작성 바 / 일반: 게시글 작성 바 (공통 InputUpload) */}
+        <InputUpload text={writeBar.text} href={writeBar.href} className="px-4" />
 
         {/* 분양 목록 탭 (브리더만) — 시안 3170-790275: 배너 -> 라벨+필터 -> 카드 4열 */}
         {isBreeder && (
           <TabsContent value="listings" className="mt-0">
             {/* 배너는 콘텐츠 Container 밖의 독립 밴드 (시안 3170-800323) — 홈 CTA 스트립과 같은 배치.
-                위쪽은 작성 바(InputUpload)의 보더와 붙지 않게 여백을 더 준다 */}
+                위쪽은 작성 바(InputUpload)와 붙지 않게 여백을 더 준다 */}
             <Container className="px-4 pt-10 pb-2">
               <CtaBanner text="분양 페이지 바로가기" href="/adoption" />
             </Container>
