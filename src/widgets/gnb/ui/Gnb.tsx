@@ -33,7 +33,7 @@ const Gnb = () => {
             <button
               type="button"
               onClick={() => setMenuOpen(true)}
-              className="flex size-6 items-center justify-center text-primary-500 transition-colors hover:text-primary-700 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-500"
+              className="-m-2 flex size-10 shrink-0 items-center justify-center rounded-lg text-primary-500 transition-colors hover:bg-primary-50 hover:text-primary-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
               aria-label="메뉴 열기"
             >
               {/* Figma icon/menu — colors/icon/interactive/main color/Primary (#ad651d) */}

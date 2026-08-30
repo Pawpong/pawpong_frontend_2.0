@@ -66,7 +66,7 @@ export const SearchBar = ({
       <button
         type="submit"
         aria-label="검색"
-        className="flex size-8 shrink-0 items-center justify-center rounded text-neutral-700 transition-colors hover:bg-primary-50 hover:text-primary-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+        className="-m-1 flex size-10 shrink-0 items-center justify-center rounded-lg text-neutral-700 transition-colors hover:bg-primary-50 hover:text-primary-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
       >
         <SearchIcon className="size-8" />
       </button>

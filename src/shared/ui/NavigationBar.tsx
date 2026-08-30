@@ -42,12 +42,21 @@ const NavigationBar = ({
     <Container className={cn('flex items-center bg-white px-4 py-1 tab:py-2', className)}>
       <div className="flex min-w-0 flex-1 items-center">
         {onBack && (
-          <button type="button" onClick={onBack} aria-label={backLabel} className="shrink-0">
+          <button
+            type="button"
+            onClick={onBack}
+            aria-label={backLabel}
+            className="-m-2 flex size-10 shrink-0 items-center justify-center rounded-lg transition-colors hover:bg-primary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+          >
             {backIcon}
           </button>
         )}
         {!onBack && backHref && (
-          <Link href={backHref} aria-label={backLabel} className="shrink-0">
+          <Link
+            href={backHref}
+            aria-label={backLabel}
+            className="-m-2 flex size-10 shrink-0 items-center justify-center rounded-lg transition-colors hover:bg-primary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+          >
             {backIcon}
           </Link>
         )}
