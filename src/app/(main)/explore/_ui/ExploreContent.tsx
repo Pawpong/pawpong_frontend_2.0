@@ -194,7 +194,7 @@ const ExploreContent = () => {
       <div ref={sentinelRef} aria-hidden />
 
       {selectedType === 'breeder' ? (
-        <BreederExploreContent category={selectedCategory} />
+        <BreederExploreContent category={selectedCategory} keyword={keyword} />
       ) : (
         <>
           <Container className={EXPLORE_SECTION_CONTAINER}>

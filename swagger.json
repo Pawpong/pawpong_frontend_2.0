@@ -53445,6 +53445,11 @@
               "cat"
             ]
           },
+          "keyword": {
+            "type": "string",
+            "description": "검색어 (브리더명, 품종, 지역 부분 일치)",
+            "example": "말티즈"
+          },
           "dogSize": {
             "type": "array",
             "description": "강아지 크기 필터 (dog 타입일 때만)",
