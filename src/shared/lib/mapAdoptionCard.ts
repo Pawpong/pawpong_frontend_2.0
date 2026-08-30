@@ -10,7 +10,7 @@ export const mapAdoptionCard = (c: AdoptionPetCard): AdoptionListingCard => ({
   listingId: c.petId,
   name: c.name,
   gender: c.gender,
-  ageText: c.ageDescription,
+  birthDateText: formatDate(c.birthDate),
   thumbnailUrl: c.primaryPhotoUrl || c.photoUrls?.[0] || FALLBACK_THUMBNAIL,
   status: c.status,
   category: petTypeToCategory(c.petType),

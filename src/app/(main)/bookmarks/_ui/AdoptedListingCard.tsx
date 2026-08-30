@@ -107,7 +107,7 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2">
               <p className="truncate text-xl leading-[1.5] font-bold text-neutral-850">
-                {`${listing.name} | ${GENDER_LABEL[listing.gender]} ${listing.ageText}`}
+                {`${listing.name} | ${GENDER_LABEL[listing.gender]} ${listing.birthDateText}`}
               </p>
               <AdoptionStatusBadge status={listing.status} className="shrink-0" />
             </div>
