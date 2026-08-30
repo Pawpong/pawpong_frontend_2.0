@@ -5,8 +5,8 @@ const listingCardGrid = tv({
   base: 'grid grid-cols-2',
   variants: {
     layout: {
-      /** 탐색·저장목록 — tab 2열 유지, PC 는 좌우 margin */
-      explore: 'gap-4 tab:mx-[2.75rem] tab:gap-5 pc:mx-[2.875rem] pc:grid-cols-4',
+      /** 탐색·저장목록 — tab 2열 유지, PC 4열. 좌우 여백은 Container가 담당한다 */
+      explore: 'gap-4 tab:gap-5 pc:grid-cols-4',
       /** 즐겨찾기 브리더·브리더 홈 분양목록 (Figma 1023-38692) — tab 3열, PC 1188px 가운데 정렬 */
       compact:
         'gap-x-2.5 gap-y-4 tab:grid-cols-3 tab:gap-5 pc:mx-auto pc:max-w-[74.25rem] pc:grid-cols-4',
