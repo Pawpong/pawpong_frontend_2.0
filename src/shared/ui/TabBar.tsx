@@ -44,7 +44,7 @@ const TabBar = ({
       {/* 폭은 페이지 셸과 동일(PAGE_WIDTH_CLASS) — 하단 구분선도 1440에서 끊기도록 바 자체에 상한을 건다.
           여백만 탭 바 디자인에 맞춤. Container를 쓰지 않는 이유: tab/pc는 Container와 같지만 모바일만 16px(Container는 20px). */}
       <div className={cn(PAGE_WIDTH_CLASS, 'bg-white', barClassName)} style={barStyle}>
-        <div className="mx-auto w-full border-b border-neutral-300 px-4 pt-3 tab:max-w-192 tab:px-12 tab:pt-4 pc:max-w-[58.75rem] pc:px-20">
+        <div className="mx-auto w-full max-w-176 border-b border-neutral-300 px-4 pt-3 tab:max-w-192 tab:px-12 tab:pt-4 pc:max-w-[58.75rem] pc:px-20">
           <TabsList variant="underline" aria-label={ariaLabel}>
             {items.map((item) => (
               <TabsTrigger

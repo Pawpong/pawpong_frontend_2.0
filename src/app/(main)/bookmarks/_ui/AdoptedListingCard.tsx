@@ -30,7 +30,7 @@ const CardImage = ({
       src={listing.thumbnailUrl}
       alt={listing.name}
       fill
-      sizes="(max-width: 1440px) 110px, 280px"
+      sizes="(max-width: 1439px) 110px, 280px"
       className="object-cover"
     />
     {isCompleted && <div className="absolute inset-0 bg-white/70" />}

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { MenuIcon } from '@/shared/assets'
-import { PAGE_WIDTH_CLASS } from '@/shared/config'
+import { RESPONSIVE_SHELL_CLASS } from '@/shared/config'
 import { cn } from '@/shared/lib/cn'
 import { LogoButton } from './LogoButton'
 import { NavBar } from './NavBar'
@@ -21,7 +21,7 @@ const Gnb = () => {
       >
         <div
           className={cn(
-            PAGE_WIDTH_CLASS,
+            RESPONSIVE_SHELL_CLASS,
             'flex items-center justify-between px-4 tab:px-12 pc:px-20',
           )}
         >

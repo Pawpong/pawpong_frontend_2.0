@@ -24,7 +24,7 @@ const PODIUM_COUNT = 3
 const ENTRY_PAGE_SIZE = 16
 
 const HallOfFameHeader = () => (
-  <header className="relative mx-auto flex h-11 w-full items-center px-5 tab:px-12 pc:max-w-[80rem] pc:px-0">
+  <header className="relative mx-auto flex h-11 w-full max-w-[44rem] items-center px-5 tab:max-w-[86rem] tab:px-12 pc:max-w-[80rem] pc:px-0">
     <Link href="/home" aria-label="뒤로 가기">
       <ArrowBackIcon className="size-5 text-neutral-850" />
     </Link>

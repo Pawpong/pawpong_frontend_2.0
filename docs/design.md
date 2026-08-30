@@ -53,9 +53,11 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 
 ### 페이지 셸과 거터
 
-- 전체 셸 상한: `PAGE_WIDTH_CLASS = mx-auto w-full max-w-[90rem]` (1440px)
+- 전체 배경/밴드 셸 상한: `PAGE_WIDTH_CLASS = mx-auto w-full max-w-[90rem]` (1440px)
+- 콘텐츠 셸: `RESPONSIVE_SHELL_CLASS = 704px → 1376px → 1440px`. 각 구간의 기본 거터를 뺀 실제 폭이 672px → 최대 1280px → 1280px으로 이어진다.
 - 기본 `Container`: mobile 20px / tablet 48px / PC 80px
 - 홈 쇼케이스·탭·내비게이션처럼 Figma가 16px을 명시한 mobile 영역은 `px-4`로 덮는다.
+- 공용 `Container`는 Mobile에서 바깥 704px, Tablet에서 바깥 1376px을 상한으로 둔다. 16px 여백 화면은 Mobile 실내용 672px, 기본 20px 여백 화면은 664px이 되며, Tablet은 48px 여백을 빼 최대 1280px이다. PC의 80px 여백·1280px 실내용 폭으로 넘어갈 때도 역축소하지 않는다.
 - PC 1440 프레임의 주 콘텐츠 폭은 좌우 80px을 뺀 1280px을 기본으로 한다.
 - 넓은 화면에서 콘텐츠 폭은 늘리지 않고 1440px 셸을 가운데 정렬한다.
 
@@ -67,7 +69,9 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 - 작성 폼처럼 Figma가 Tablet 프레임 상한을 명시한 화면은 768~1439px에서 실내용 폭 672px을 유지하고, 1440px부터 PC 1280px 분할 레이아웃으로 전환한다.
 - 고정 variant가 있는 카드는 기준 폭 사이에서 무한히 늘리지 않는다. 홈 분양 카드는 164px에서 282px, 커뮤니티 카드는 321px에서 407px까지만 허용한다.
 - 커뮤니티 메인 피드의 `CommunityFeedCard`는 Figma `3606:622637` 기준 343px 상한·16px radius를 전 구간에서 유지한다. Tablet 여백을 채우기 위해 1:1 미디어를 확대하지 않는다.
-- 프로필은 Mobile/Tablet에서 실내용 672px, PC에서 Figma `1021:20324`의 948px을 상한으로 한다. 공용 탭 셸은 Tablet 768px, PC에서 Figma `976:32388`의 940px을 상한으로 하며 바깥 sticky 표면만 페이지 폭을 채운다.
+- 프로필·단일 컬럼 피드는 Mobile/Tablet에서 실내용 672px, PC에서 Figma `1021:20324`의 948px을 상한으로 한다. 공용 탭 셸은 Mobile 바깥 704px/실내용 672px, Tablet 바깥 768px/실내용 672px, PC에서 Figma `976:32388`의 바깥 940px/실내용 780px을 상한으로 하며 sticky 표면만 페이지 폭을 채운다.
+- 채팅 목록·대화·입력도 같은 Mobile 704px 상한을 공유한다. PC 사이드바 내부는 독립 폭이므로 해당 상한을 적용하지 않는다.
+- GNB와 서브 내비게이션도 `RESPONSIVE_SHELL_CLASS`를 사용한다. 배경은 viewport 너비를 유지하고 로고·제목·액션만 경계에서 같은 실내용 폭으로 이어진다.
 - 767↔768에서 카드 크기가 역전되지 않도록 Mobile 그리드는 Figma 375 폭을 상한으로 가운데 정렬하고, Tablet부터 PC 상한까지 필요한 경우 `clamp()`로 보간한다.
 - 이미지 비율은 각 엔티티 카드가 소유하고, 그리드는 열 수와 gap만 소유한다.
 - 텍스트 줄 수가 달라져도 같은 그리드 행의 카드 외곽 크기가 갑자기 변하지 않게 line-clamp와 최소 높이를 사용한다.

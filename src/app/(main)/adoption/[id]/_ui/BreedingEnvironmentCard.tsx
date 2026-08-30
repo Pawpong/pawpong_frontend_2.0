@@ -33,7 +33,7 @@ const EnvImageButton = ({
       src={src}
       alt={`사육 환경 ${index + 1}`}
       fill
-      sizes="(max-width: 1440px) 191px, 320px"
+      sizes="(max-width: 1439px) 191px, 320px"
       className="object-cover"
     />
   </button>

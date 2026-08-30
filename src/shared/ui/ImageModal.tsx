@@ -63,7 +63,7 @@ const ImageModal = ({
                   src={images[currentIndex]}
                   alt={`이미지 ${currentIndex + 1}`}
                   fill
-                  sizes="(max-width: 768px) 100vw, 368px"
+                  sizes="(max-width: 767px) 100vw, 368px"
                   className="object-cover"
                 />
                 {representativeIndex !== undefined && representativeIndex === currentIndex && (

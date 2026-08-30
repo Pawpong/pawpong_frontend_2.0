@@ -41,7 +41,7 @@ const HeroImageCarousel = ({
                 src={url}
                 alt={alt}
                 fill
-                sizes="(max-width: 1440px) 100vw, 500px"
+                sizes="(max-width: 1439px) 100vw, 500px"
                 preload={index === 0}
                 draggable={false}
                 className="object-cover"

@@ -4,6 +4,7 @@ import { useRef, useState } from 'react'
 import Image from 'next/image'
 import { tv, type VariantProps } from 'tailwind-variants'
 import { CameraIcon, ImageIcon, CloseIcon } from '@/shared/assets'
+import { BREAKPOINTS } from '@/shared/lib/useBreakpoint'
 import { ImageModal } from '@/shared/ui'
 import {
   Dialog,
@@ -103,11 +104,12 @@ const ImageUploadArea = ({
     }
   }
 
-  const isDesktop = () => window.matchMedia('(min-width: 768px)').matches
+  const isTabletUp = () =>
+    window.matchMedia(`(min-width: ${BREAKPOINTS.tab}px)`).matches
 
   const handleImageClick = (index: number) => {
     if (hasRepresentative) {
-      if (isDesktop()) {
+      if (isTabletUp()) {
         setDesktopModalIndex(index)
         setDesktopModalOpen(true)
       } else {
@@ -165,7 +167,7 @@ const ImageUploadArea = ({
                 src={src}
                 alt={`업로드 이미지 ${index + 1}`}
                 fill
-                sizes="(max-width: 768px) 61px, 198px"
+                sizes="(max-width: 767px) 61px, 198px"
                 className="object-cover"
               />
             </button>

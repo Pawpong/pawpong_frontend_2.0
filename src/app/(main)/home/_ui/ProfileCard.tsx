@@ -248,7 +248,7 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
   return (
     <>
       {/* ===== Mobile (디자인 node 1023-22324) — 세로 gap-16 ===== */}
-      <div className="mx-auto flex w-full flex-col gap-4 tab:max-w-168 pc:hidden">
+      <div className="mx-auto flex w-full max-w-168 flex-col gap-4 pc:hidden">
         {/* 프로필 정보 (세로 gap-12) */}
         <div className="flex flex-col items-start gap-3">
           {/* 상단: 좌(뱃지·이름) / 우(아바타 large 52) */}

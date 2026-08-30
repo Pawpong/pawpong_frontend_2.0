@@ -39,7 +39,7 @@ interface CtaBannerProps {
  */
 const CtaBanner = ({ text, href }: CtaBannerProps) => {
   const barClass =
-    'relative mx-auto flex h-[2.3125rem] w-full items-center justify-between overflow-hidden rounded-xl bg-secondary-200 px-4 pc:h-[2.8125rem] pc:max-w-[70.875rem] pc:px-8'
+    'relative mx-auto flex h-[2.3125rem] w-full max-w-[70.875rem] items-center justify-between overflow-hidden rounded-xl bg-secondary-200 px-4 pc:h-[2.8125rem] pc:px-8'
 
   const content = (
     <>

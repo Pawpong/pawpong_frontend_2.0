@@ -18,6 +18,7 @@ import {
   COMMUNITY_LOGIN_PROMPT,
   CommunityFeedCardSkeleton,
   communityQueries,
+  getFirstPhotoPostId,
   toCommunityPreviewProps,
 } from '@/entities/community'
 import { ConnectedFeedCard, useDeletePostConfirm } from '@/features/community'
@@ -41,6 +42,7 @@ const CommunityContent = () => {
       communityQueries.posts('latest', undefined, undefined, appliedSearch || undefined),
     )
   const posts = flattenPages(data)
+  const firstPhotoPostId = getFirstPhotoPostId(posts)
 
   return (
     <div className="flex w-full flex-col">
@@ -92,14 +94,14 @@ const CommunityContent = () => {
             }
           >
             <div className="flex min-w-0 flex-col gap-6 tab:gap-8 pc:gap-10">
-              {posts.map((post, index) => {
+              {posts.map((post) => {
                 // [refactored] 같은 소유자 판정을 onEdit·onDelete에서 두 번 하던 것을 이름으로
                 const isMyPost = me?.userId === post.authorId
 
                 return (
                   <ConnectedFeedCard
                     key={post.postId}
-                    preload={index === 0}
+                    preload={post.postId === firstPhotoPostId}
                     guard={guard}
                     {...toCommunityPreviewProps(post)}
                     onEdit={

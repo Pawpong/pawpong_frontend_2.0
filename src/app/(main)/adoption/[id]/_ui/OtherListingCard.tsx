@@ -56,7 +56,7 @@ const DesktopOtherListingCard = ({
           src={listing.thumbnailUrl}
           alt={listing.name}
           fill
-          sizes="(max-width: 768px) 50vw, 25vw"
+          sizes="(max-width: 767px) 50vw, 25vw"
           className="object-cover"
         />
         {listing.isPopular && (

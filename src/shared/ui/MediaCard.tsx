@@ -37,7 +37,7 @@ const MediaCard = ({
   children,
   trailing,
   thumbnailClassName,
-  sizes = '(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw',
+  sizes = '(max-width: 767px) 50vw, (max-width: 1200px) 33vw, 25vw',
   preload = false,
   className,
 }: MediaCardProps) => (

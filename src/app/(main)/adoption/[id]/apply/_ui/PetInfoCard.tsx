@@ -27,7 +27,7 @@ const PetInfoCard = ({ detail }: PetInfoCardProps) => {
               src={detail.imageUrls[0]}
               alt={detail.name}
               fill
-              sizes="(max-width: 1440px) 87px, 133px"
+              sizes="(max-width: 1439px) 87px, 133px"
               className="object-cover"
             />
             {detail.isPopular && (
