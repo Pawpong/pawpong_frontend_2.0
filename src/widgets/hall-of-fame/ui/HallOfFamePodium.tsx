@@ -121,6 +121,7 @@ const PixelFrame = ({
           alt={entry.description || `${entry.userDisplayName}의 명예의 전당 사진`}
           fill
           sizes="(min-width: 1440px) 211px, 122px"
+          loading="eager"
           className="object-cover"
         />
       )}

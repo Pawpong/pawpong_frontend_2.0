@@ -27,7 +27,7 @@ interface CommunityFeedCardProps extends CommunityPreviewProps {
 /**
  * 인스타그램식 단일 컬럼 피드 카드 (Figma CommunityFeedCard, node 3606:622637)
  * - 이미지가 있으면 1:1 캐러셀, 없으면 본문을 큼직하게
- * - 모바일은 화면 끝까지 닿도록 모서리를 각지게, tab부터 둥글린다
+ * - Figma 고정 카드 문법(343px·radius 16)을 모든 화면 크기에서 유지한다
  */
 const CommunityFeedCard = ({
   postId,
@@ -73,12 +73,7 @@ const CommunityFeedCard = ({
   }
 
   return (
-    <article
-      className={cn(
-        'flex flex-col overflow-hidden rounded-none bg-white tab:rounded-2xl',
-        className,
-      )}
-    >
+    <article className={cn('flex flex-col overflow-hidden rounded-2xl bg-white', className)}>
       {/* 헤더 — 아바타·닉네임·작성시각 */}
       <div className="flex items-center justify-between gap-2 p-3">
         <Link href={href} prefetch={false} className="flex min-w-0 flex-1 items-center gap-2">
