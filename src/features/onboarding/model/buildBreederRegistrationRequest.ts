@@ -1,4 +1,4 @@
-import type { SocialSignupSession } from '@/features/auth'
+import type { SocialSignupSession } from '@/shared/lib/socialSignupSession'
 import type { RegisterBreederRequest, UploadBreederDocumentsResponse } from '@/shared/types'
 import type { AnimalSelectFormData, KennelInfoFormData, ProfileFormData } from './schema'
 

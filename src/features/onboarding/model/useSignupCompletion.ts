@@ -1,12 +1,12 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { saveAuthTokens } from '@/shared/lib/saveAuthTokens'
 import {
   clearSocialSignupSession,
   loadSocialSignupSession,
-  saveAuthTokens,
   type SocialSignupSession,
-} from '@/features/auth'
+} from '@/shared/lib/socialSignupSession'
 import type { RegisterTokens } from '@/shared/types'
 import { useOnboarding } from './OnboardingContext'
 import { useOnboardingForm } from './useOnboardingForm'

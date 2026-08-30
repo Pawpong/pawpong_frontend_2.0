@@ -1,21 +1,10 @@
 import { apiClient, API_VERSION, unwrap } from '@/shared/api'
 import type {
   ApiResponseFull,
-  MyProfile,
-  UpdateMyProfileRequest,
   FollowResponse,
   UnfollowResponse,
   RemoveFollowerResponse,
 } from '@/shared/types'
-
-/** 내 프로필 수정 */
-export const updateMyProfile = async (data: UpdateMyProfileRequest): Promise<MyProfile> => {
-  const response = await apiClient.patch<ApiResponseFull<MyProfile>>(
-    `${API_VERSION}/profile/me`,
-    data,
-  )
-  return unwrap(response, '프로필 수정에 실패했습니다.')
-}
 
 /** 사용자 팔로우 */
 export const followUser = async (userId: string): Promise<FollowResponse> => {

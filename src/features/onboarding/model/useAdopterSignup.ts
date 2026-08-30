@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { termsQueries } from '@/entities/terms'
-import { useRegisterAdopter } from '@/features/auth'
+import { termsQueries } from '@/entities/term'
+import { useRegisterAdopter } from '../api/onboarding.mutations'
 import { useOnboarding } from './OnboardingContext'
 import { buildTermsAgreements, REQUIRED_ADOPTER_TERM_CODES } from './termsAgreements'
 import { buildAdopterRegistrationRequest } from './buildAdopterRegistrationRequest'

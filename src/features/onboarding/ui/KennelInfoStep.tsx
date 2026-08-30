@@ -3,7 +3,7 @@
 import { Controller } from 'react-hook-form'
 import { useStepForm } from '../model/useStepForm'
 import { useDuplicateCheck } from '../model/useDuplicateCheck'
-import { useCheckBreederNameDuplicate } from '@/features/auth'
+import { useCheckBreederNameDuplicate } from '../api/onboarding.mutations'
 import { kennelInfoSchema, INTRODUCTION_MAX_LENGTH, REGIONS } from '../model/schema'
 import { BREED_KEYWORDS } from '../model/breedKeywords'
 import { StepContainer } from './StepContainer'

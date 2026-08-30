@@ -1,6 +1,6 @@
 import { createQuery, STALE_TIME } from '@/shared/api'
 import type { TermsCode } from '@/shared/types'
-import { getActiveTermsList, getTermsByCode } from './terms.api'
+import { getActiveTermsList, getTermsByCode } from './term.api'
 
 export const termsQueries = {
   all: () => ['terms'] as const,

@@ -6,7 +6,17 @@ import type {
   FavoriteBreederCard,
   FavoriteBreederListParams,
   FollowUserCard,
+  UpdateMyProfileRequest,
 } from '@/shared/types'
+
+/** 내 프로필 수정 — profile 관련 기능과 가입 완료 후 보강에서 공유하는 entity API. */
+export const updateMyProfile = async (data: UpdateMyProfileRequest): Promise<MyProfile> => {
+  const response = await apiClient.patch<ApiResponseFull<MyProfile>>(
+    `${API_VERSION}/profile/me`,
+    data,
+  )
+  return unwrap(response, '프로필 수정에 실패했습니다.')
+}
 
 /** 내 프로필 조회 (마이홈) */
 export const getMyProfile = async (): Promise<MyProfile> => {

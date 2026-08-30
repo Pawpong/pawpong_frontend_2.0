@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import { loadSocialSignupSession } from '@/features/auth'
+import { loadSocialSignupSession } from '@/shared/lib/socialSignupSession'
 import { getGuardRedirect } from '../model/onboardingGuard'
 import { useOnboardingForm } from '../model/useOnboardingForm'
 import { isStepForUser, type UserType } from '../model/types'

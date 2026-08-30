@@ -1,7 +1,8 @@
 'use client'
 
 import { useCallback, useState } from 'react'
-import { useUploadMultipleFiles } from '@/features/upload'
+import { useMutation } from '@tanstack/react-query'
+import { uploadMultipleFiles } from '@/shared/api'
 import type { CommunityPostStatus, CommunityPostVisibility } from '@/shared/types'
 import { useCreateCommunityPost, useUpdateCommunityPost } from '../api/community.mutations'
 import { COMMUNITY_UPLOAD_FOLDER, toCommunityPhotoFileName } from './communityPhotoFileName'
@@ -24,7 +25,10 @@ interface SubmitPostFormInput {
  * 발행(published)/임시저장(draft) 은 status 로 구분하며, 성공 시 postId 를 반환한다.
  */
 export const useSubmitCommunityPostForm = (postId?: string) => {
-  const uploadMutation = useUploadMultipleFiles()
+  const uploadMutation = useMutation({
+    mutationFn: ({ files, folder }: { files: File[]; folder?: string }) =>
+      uploadMultipleFiles(files, folder),
+  })
   const createMutation = useCreateCommunityPost()
   const updateMutation = useUpdateCommunityPost(postId ?? '')
   const [error, setError] = useState<string | null>(null)
