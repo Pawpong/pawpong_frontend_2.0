@@ -4,7 +4,7 @@ import { useLayoutEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { BookmarkIcon } from '@/shared/assets'
+import { ArrowRightIcon, BookmarkIcon } from '@/shared/assets'
 import { Container, CtaBanner, DeleteConfirmModal, NavigationBar, InputUpload } from '@/shared/ui'
 import { useGnbHeight } from '@/shared/lib/useGnbHeight'
 import { profileQueries } from '@/entities/profile'
@@ -56,11 +56,6 @@ const MyHomeContent = () => {
 
   const tabs = isBreeder ? BREEDER_MY_HOME_TABS : MY_HOME_TABS
   const defaultTab = isBreeder ? 'listings' : 'posts'
-  // [refactored] 작성 바 문구/링크를 역할별로 분리 — 단일 InputUpload 인스턴스로 렌더
-  const writeBar = isBreeder
-    ? { text: '분양할 동물 작성하러가기', href: '/adoption/create' }
-    : { text: '게시글을 올려보세요', href: '/community/write' }
-
   // 프로필 조회 전에는 역할을 모르므로 선택값을 비워두고, 조회 후 역할별 기본 탭을 사용한다.
   // useState(defaultTab)로 바로 시드하면 최초 adopter 기본값('posts')이 브리더에게도 고정된다.
   const [selectedTab, setSelectedTab] = useState<string | null>(null)
@@ -98,15 +93,13 @@ const MyHomeContent = () => {
         onTabChange={setSelectedTab}
         stickyTop={gnbH + navH}
       >
-        {/* 브리더: 분양글 작성 바 / 일반: 게시글 작성 바 (공통 InputUpload) */}
-        <InputUpload text={writeBar.text} href={writeBar.href} className="px-4" />
-
         {/* 분양 목록 탭 (브리더만) — 시안 3170-790275: 배너 -> 라벨+필터 -> 카드 4열 */}
         {isBreeder && (
           <TabsContent value="listings" className="mt-0">
-            {/* 배너는 콘텐츠 Container 밖의 독립 밴드 (시안 3170-800323) — 홈 CTA 스트립과 같은 배치.
-                위쪽은 작성 바(InputUpload)와 붙지 않게 여백을 더 준다 */}
-            <Container className="px-4 pt-10 pb-2">
+            <InputUpload text="분양글 작성하기" href="/adoption/create" className="px-4" />
+
+            {/* 배너는 콘텐츠 Container 밖의 독립 밴드 (시안 3170-800323) — 홈 CTA 스트립과 같은 배치 */}
+            <Container className="px-4 pt-4 pb-2">
               <CtaBanner text="분양 페이지 바로가기" href="/adoption" />
             </Container>
 
@@ -121,17 +114,31 @@ const MyHomeContent = () => {
 
         {/* 디자인: 모바일(1023-23241) px-16·py-24 / 탭·PC(2046-160971) px-48·80·py-40 */}
         <TabsContent value="posts" className="mt-0">
-          <Container className="px-4 py-6 tab:py-10">
-            {/* 임시저장이 있을 때만 노출 — 목록에서 이어서 작성 */}
-            {draftCount > 0 && (
-              <Link
-                href="/community/drafts"
-                className="mb-4 flex items-center justify-between rounded-lg border border-neutral-300 px-4 py-3 text-sm font-semibold text-neutral-850 tab:mx-auto tab:max-w-[59.25rem]"
-              >
-                <span>임시저장 {draftCount}개</span>
-                <span className="text-xs font-medium text-text-secondary">이어서 쓰기</span>
-              </Link>
-            )}
+          {/* 임시저장(보조)과 글 작성(주 액션)을 한 줄에 둬 진입점이 위아래로 쌓이지 않게 한다.
+              개수 칩만 포인트 컬러로 남겨 두 액션이 같은 갈래임을 드러낸다 */}
+          <InputUpload
+            text="글 작성하기"
+            href="/community/write"
+            className="px-4"
+            left={
+              draftCount > 0 && (
+                <Link
+                  href="/community/drafts"
+                  className="group inline-flex min-w-0 items-center gap-1.5 text-neutral-700 transition-colors hover:text-neutral-850"
+                >
+                  <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-point-500 px-1.5 text-[0.6875rem] leading-none font-semibold text-neutral-850">
+                    {draftCount}
+                  </span>
+                  <span className="truncate text-xs leading-[1.5] font-medium">
+                    임시저장 이어서 쓰기
+                  </span>
+                  <ArrowRightIcon className="size-3.5 shrink-0 transition-transform group-hover:translate-x-0.5" />
+                </Link>
+              )
+            }
+          />
+
+          <Container className="px-4 pt-2 pb-6 tab:pb-10">
             <PostList
               posts={posts}
               emptyText="내가 쓴 글이 없습니다."

@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ImageCarousel, OwnerActionsMenu, ProfileAvatar } from '@/shared/ui'
@@ -18,6 +19,8 @@ interface CommunityFeedCardProps extends CommunityPreviewProps {
   /** 좋아요·북마크 토글 — features의 ConnectedFeedCard에서 주입 */
   onToggleLike?: () => void
   onToggleSave?: () => void
+  /** 이미지 표현 — 커뮤니티 피드는 1:1 캐러셀, 마이홈처럼 카드가 넓은 곳은 가로 스크롤 썸네일 */
+  mediaLayout?: 'carousel' | 'row'
   className?: string
 }
 
@@ -41,6 +44,7 @@ const CommunityFeedCard = ({
   onDelete,
   onToggleLike,
   onToggleSave,
+  mediaLayout = 'carousel',
   className,
 }: CommunityFeedCardProps) => {
   const href = detailHref ?? `/community/post/${postId}`
@@ -110,8 +114,31 @@ const CommunityFeedCard = ({
         )}
       </div>
 
-      {/* 미디어 — 카드 폭을 채우는 1:1 캐러셀 (여러 장이면 우상단에 장수 배지) */}
-      {hasImages ? (
+      {/* 미디어 — 기본은 카드 폭을 채우는 1:1 캐러셀 (여러 장이면 우상단에 장수 배지),
+          row 는 사진을 원래 비율 그대로 가로로 늘어놓고 넘치면 스크롤한다 */}
+      {hasImages && mediaLayout === 'row' && (
+        <Link href={href} prefetch={false} className="block px-3 pt-1">
+          <div className="flex gap-3 overflow-x-auto">
+            {images.map((src, index) => (
+              <div
+                key={index}
+                className="relative h-[13.1875rem] w-[17.5625rem] shrink-0 overflow-hidden rounded-lg bg-neutral-700 tab:h-60 tab:w-80"
+              >
+                {src && (
+                  <Image
+                    src={src}
+                    alt={`게시글 이미지 ${index + 1}`}
+                    fill
+                    className="object-cover"
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        </Link>
+      )}
+
+      {hasImages && mediaLayout === 'carousel' && (
         <div
           className="relative aspect-square w-full cursor-pointer overflow-hidden rounded-lg"
           onPointerDown={handleImagePointerDown}
@@ -131,7 +158,10 @@ const CommunityFeedCard = ({
             </span>
           )}
         </div>
-      ) : (
+      )}
+
+      {/* 사진이 없으면 본문을 큼직하게 (있으면 아래 캡션에서 보여준다) */}
+      {!hasImages && (
         <Link href={href} prefetch={false} className="block px-3 py-5">
           <p className="line-clamp-6 text-base leading-[1.5] font-semibold whitespace-pre-line text-neutral-850">
             {text}
