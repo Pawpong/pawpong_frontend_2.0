@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { FilterChip, SearchIcon } from '@/shared/ui'
+import { FilterChip, SearchButton } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { ANIMAL_CATEGORIES, CATEGORY_LABEL } from '@/shared/types'
 import type { AnimalCategory } from '@/shared/types'
@@ -10,12 +10,13 @@ import type { AnimalCategory } from '@/shared/types'
 interface ExploreFilterBarProps {
   selected: AnimalCategory
   onChange: (category: AnimalCategory) => void
+  /** 현재 적용된 검색어 — 검색바를 펼칠 때 초기값으로 채운다 */
+  keyword?: string
+  onSearch: (keyword: string) => void
   className?: string
 }
 
-// [refactored] 반복되던 pill 베이스 / 검색 라벨 스타일 상수화
 const PILL_BASE = 'flex h-8 items-center rounded-full border bg-white'
-const SEARCH_TEXT = 'text-[0.875rem] font-semibold text-neutral-700'
 
 /* ═══════════════════════════════════════════════
    탭/모바일 카테고리 + 검색 한 줄 (Figma 1652-75035 / 1652-81824)
@@ -24,85 +25,64 @@ const SEARCH_TEXT = 'text-[0.875rem] font-semibold text-neutral-700'
    - 필터 클릭 → 다시 칩(뱃지) 형태로 복귀
    (모바일·태블릿 동일 로직)
    ═══════════════════════════════════════════════ */
-const ExploreFilterBar = ({ selected, onChange, className }: ExploreFilterBarProps) => {
+const ExploreFilterBar = ({
+  selected,
+  onChange,
+  keyword = '',
+  onSearch,
+  className,
+}: ExploreFilterBarProps) => {
   const [searchExpanded, setSearchExpanded] = useState(false)
-
-  // [refactored] 검색 라벨 + 아이콘 (full/small 검색 공통)
-  const searchContent = (
-    <>
-      <span className={SEARCH_TEXT}>검색</span>
-      <SearchIcon className="size-5 shrink-0 text-neutral-700" />
-    </>
-  )
+  const [query, setQuery] = useState(keyword)
 
   return (
     <div className={cn('flex items-center justify-between gap-3 py-3', className)}>
       {searchExpanded ? (
-        <>
-          {/* 필터 버튼 — 클릭 시 칩(뱃지) 형태로 복귀 */}
-          <button
-            type="button"
-            onClick={() => setSearchExpanded(false)}
-            className={cn(
-              PILL_BASE,
-              'shrink-0 gap-1 border-neutral-300 px-2 text-[0.875rem] font-semibold whitespace-nowrap text-neutral-850',
-            )}
-          >
-            <Image
-              src="/images/category/filter.svg"
-              alt=""
-              width={20}
-              height={20}
-              className="size-5"
-            />
-            필터
-          </button>
-
-          {/* 전체폭 검색바 (input) — 포커스 시 border #256EF4(1px) */}
-          <div
-            className={cn(
-              PILL_BASE,
-              'min-w-0 flex-1 justify-between gap-2 border-neutral-500 px-2 focus-within:border-info-500',
-            )}
-          >
-            <input
-              autoFocus
-              type="text"
-              placeholder="검색"
-              className="min-w-0 flex-1 bg-transparent text-[0.875rem] font-semibold text-neutral-850 outline-none placeholder:text-neutral-700"
-            />
-            <SearchIcon className="size-5 shrink-0 text-neutral-700" />
-          </div>
-        </>
+        /* 필터 버튼 — 클릭 시 칩(뱃지) 형태로 복귀 */
+        <button
+          type="button"
+          onClick={() => setSearchExpanded(false)}
+          className={cn(
+            PILL_BASE,
+            'shrink-0 gap-1 border-neutral-300 px-2 text-[0.875rem] font-semibold whitespace-nowrap text-neutral-850',
+          )}
+        >
+          <Image
+            src="/images/category/filter.svg"
+            alt=""
+            width={20}
+            height={20}
+            className="size-5"
+          />
+          필터
+        </button>
       ) : (
-        <>
-          {/* 카테고리 칩 — 공통 Badge(primary 채움/아웃라인, Figma 1652-81786) */}
-          <div className="flex flex-wrap items-center gap-2">
-            {/* [refactored] 칩 버튼 스타일 → 공통 FilterChip */}
-            {ANIMAL_CATEGORIES.map((category) => (
-              <FilterChip
-                key={category}
-                selected={selected === category}
-                onClick={() => onChange(category)}
-              >
-                {CATEGORY_LABEL[category]}
-              </FilterChip>
-            ))}
-          </div>
-
-          {/* 작은 "검색" 버튼 — 클릭 시 검색바 펼침 */}
-          <button
-            type="button"
-            onClick={() => setSearchExpanded(true)}
-            className={cn(
-              PILL_BASE,
-              'max-w-[18.75rem] shrink-0 justify-center gap-0 border-neutral-500 p-2 whitespace-nowrap',
-            )}
-          >
-            {searchContent}
-          </button>
-        </>
+        /* 카테고리 칩 — 공통 Badge(primary 채움/아웃라인, Figma 1652-81786) */
+        <div className="flex flex-wrap items-center gap-2">
+          {ANIMAL_CATEGORIES.map((category) => (
+            <FilterChip
+              key={category}
+              selected={selected === category}
+              onClick={() => onChange(category)}
+            >
+              {CATEGORY_LABEL[category]}
+            </FilterChip>
+          ))}
+        </div>
       )}
+
+      <SearchButton
+        active={searchExpanded}
+        value={query}
+        onChange={setQuery}
+        // 펼칠 때마다 현재 적용된 검색어로 되맞춘다 (상단 큰 검색바로 검색해도 어긋나지 않도록)
+        onClick={() => {
+          setQuery(keyword)
+          setSearchExpanded(true)
+        }}
+        onSubmit={() => onSearch(query.trim())}
+        className={cn(searchExpanded ? 'max-w-none min-w-0 flex-1' : 'shrink-0')}
+      />
     </div>
   )
 }
