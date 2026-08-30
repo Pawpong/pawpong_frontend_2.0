@@ -67,7 +67,7 @@ const LoginSuccessContent = () => {
     <div className="flex min-h-screen items-center justify-center">
       {error ? (
         <div className="text-center">
-          <p className="text-red-500">{error}</p>
+          <p className="text-error-500">{error}</p>
           <p className="mt-2 text-sm text-neutral-700">로그인 페이지로 이동합니다...</p>
         </div>
       ) : (

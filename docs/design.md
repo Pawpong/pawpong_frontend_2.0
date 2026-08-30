@@ -91,6 +91,9 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 | Error           | `error-500/600`              | 파괴적 액션·오류 메시지                   |
 | Info            | `info-500`                   | 정보 상태에만 사용, 브랜드 액션 대체 금지 |
 
+- 공용 컴포넌트에서는 Tailwind 기본 `zinc`, `slate`, `gray`, `red` 팔레트와 `dark:` 변형을 쓰지 않는다. Pawpong semantic token으로 의미를 표현한다.
+- Figma 자산·소셜 브랜드·픽셀 메달처럼 고유색 자체가 의미인 경우에만 hex를 허용하고 코드 주석에 출처를 남긴다.
+
 ### 타이포그래피
 
 - 본문: Pretendard, line-height 150%.
@@ -130,6 +133,7 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 - `FavoriteButton`, `FavoriteToggle`, `FollowButton`, `PostActionButton`: 도메인 액션의 아이콘·레이블·pending 상태를 소유한다.
 - `FilterChip`, `Badge`, `PixelTab`, `PixelSelectCard`: 선택·분류·상태 표시에 사용한다.
 - `Checkbox`, `Switch`, `Select`, `Dropdown`, `DropdownMenu`: 폼 선택과 메뉴를 담당한다.
+- `Switch`, `Select`, `Checkbox`, `DropdownMenu`는 `neutral` 표면, `primary-500` focus ring, `point-500` 선택 상태, `error-*` 파괴 상태를 공유한다.
 - `OwnerActionsMenu`: 수정·삭제 같은 소유자 액션을 한 메뉴로 모은다.
 
 ### 입력·검색

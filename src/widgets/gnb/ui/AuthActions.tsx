@@ -37,8 +37,8 @@ const AuthActions = ({ variant = 'inline', onNavigate, className }: AuthActionsP
   const pill = cn(SIZE[variant], 'rounded-full text-center transition-colors')
   const outline = cn(
     pill,
-    'border border-[#a8a8a8] font-medium text-[#666]',
-    variant === 'inline' && 'hover:bg-[#f5f5f5]',
+    'border border-neutral-500 font-medium text-neutral-700',
+    variant === 'inline' && 'hover:bg-neutral-50',
   )
 
   return (
@@ -63,8 +63,8 @@ const AuthActions = ({ variant = 'inline', onNavigate, className }: AuthActionsP
             onClick={onNavigate}
             className={cn(
               pill,
-              'bg-[#fffa94] font-semibold text-neutral-850',
-              variant === 'inline' && 'hover:bg-[#fff066]',
+              'bg-point-500 font-semibold text-neutral-850',
+              variant === 'inline' && 'hover:bg-point-300',
             )}
           >
             회원가입

@@ -88,7 +88,7 @@ const NotificationBell = () => {
         aria-label="알림"
         aria-expanded={open}
         className={cn(
-          'flex items-center text-[1rem] font-medium text-[#666] transition-colors',
+          'flex items-center text-[1rem] font-medium text-neutral-700 transition-colors',
           open && 'font-semibold text-primary-500',
         )}
       >
@@ -129,7 +129,7 @@ const NotificationBell = () => {
             ) : notifications.length === 0 ? (
               <p className="px-4 py-10 text-center text-sm text-neutral-700">알림이 없습니다.</p>
             ) : (
-              <div className="flex flex-col divide-y divide-[#f2f2f2]">
+              <div className="flex flex-col divide-y divide-neutral-100">
                 {notifications.map((item) => (
                   <NotificationListItem
                     key={item.notificationId}

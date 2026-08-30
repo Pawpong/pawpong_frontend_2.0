@@ -45,7 +45,7 @@ const OwnerActionsMenu = ({
     </DropdownMenuTrigger>
     <DropdownMenuContent align="end">
       {onEdit && <DropdownMenuItem onSelect={onEdit}>수정</DropdownMenuItem>}
-      <DropdownMenuItem onSelect={onDelete} className="text-red-500 focus:text-red-500">
+      <DropdownMenuItem onSelect={onDelete} className="text-error-500 focus:text-error-600">
         삭제
       </DropdownMenuItem>
     </DropdownMenuContent>

@@ -237,7 +237,7 @@ const ImageUploadArea = ({
                 <DialogClose asChild>
                   <button
                     type="button"
-                    className="w-full border-t border-[#e7e7e7] py-3.5 text-center text-sm font-medium text-red-500"
+                    className="w-full border-t border-neutral-150 py-3.5 text-center text-sm font-medium text-error-500"
                     onClick={() => onRemove(actionIndex)}
                   >
                     이미지 삭제
