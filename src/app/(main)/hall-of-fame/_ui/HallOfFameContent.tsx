@@ -41,9 +41,22 @@ const HallOfFameContent = () => {
   const [selectedEntry, setSelectedEntry] = useState<ContestEntry | null>(null)
   const [showLoginPrompt, setShowLoginPrompt] = useState(false)
 
-  const { data: currentContest } = useQuery(contestQueries.current())
-  const { data: hallOfFameData } = useInfiniteQuery({
+  const {
+    data: currentContest,
+    isPending: isCurrentPending,
+    isError: isCurrentError,
+  } = useQuery({
+    ...contestQueries.current(),
+    refetchOnMount: 'always',
+    throwOnError: false,
+  })
+  const {
+    data: hallOfFameData,
+    isPending: isHallOfFamePending,
+    isError: isHallOfFameError,
+  } = useInfiniteQuery({
     ...contestQueries.hallOfFame(PODIUM_COUNT),
+    refetchOnMount: 'always',
     throwOnError: false,
   })
   const {
@@ -53,7 +66,11 @@ const HallOfFameContent = () => {
     isFetchingNextPage,
     isPending: areEntriesPending,
     isError: areEntriesError,
-  } = useInfiniteQuery(contestQueries.entries(ENTRY_PAGE_SIZE))
+  } = useInfiniteQuery({
+    ...contestQueries.entries(ENTRY_PAGE_SIZE),
+    refetchOnMount: 'always',
+    throwOnError: false,
+  })
   const voteEntry = useVoteContestEntry()
 
   // 무한스크롤 페이지 병합 시 id 중복 제거 — 서버 페이지네이션이 경계에서 항목을
@@ -81,9 +98,9 @@ const HallOfFameContent = () => {
     voteEntry.mutate(entryId)
   }
 
-  // 서버가 같은 상태(콘테스트 없음)를 /current는 200+null, /entries는 400으로 다르게 응답한다.
-  // 후보 목록 실패를 그대로 에러로 보여주면 "불러오지 못했습니다"라는 거짓 문구가 뜬다
+  // 진행 중인 콘테스트가 없으면 서버가 current=null, entries=[]로 응답한다.
   const hasNoContest = currentContest === null
+  const hasPodiumEntry = podiumEntries.some(Boolean)
 
   const votedEntryId =
     currentContest?.myVotedEntryId ?? entries.find((entry) => entry.hasVoted)?.id ?? null
@@ -98,29 +115,44 @@ const HallOfFameContent = () => {
           <div className="flex w-full flex-col items-start gap-2.5 tab:gap-4 pc:flex-row pc:gap-9">
             <div className="flex w-full shrink-0 items-center justify-between gap-2 tab:h-[3.75rem] pc:h-[6.875rem] pc:w-[12.75rem] pc:flex-col pc:items-start">
               <h2 className="font-cafe24 text-sm leading-[1.5] font-normal text-neutral-850 tab:text-base pc:w-[12.75rem] pc:text-xl">
-                <span className="block tab:inline pc:block">이번주 명예의 동물들을 </span>
+                <span className="block tab:inline pc:block">
+                  {hasNoContest ? '역대 명예의 동물들을 ' : '이번주 명예의 동물들을 '}
+                </span>
                 <span className="block tab:inline pc:block">소개합니다 !</span>
               </h2>
 
               {/* 모바일은 한 줄에 안 들어가서 제목과 같은 지점에서 두 줄로 끊고,
                   화살표는 마지막 줄 끝에 붙여 흐르게 둔다 (세로 가운데 띄우면 어색) */}
-              <Link
-                href="/hall-of-fame/participate"
-                className="text-right text-xs leading-[1.5] font-semibold text-[#c75a00] tab:text-left pc:w-[9.0625rem]"
-              >
-                이번주 명예의 전당{' '}
-                <span className="block tab:inline pc:block">
-                  주인공이 되어보세요!
-                  <ArrowRightIcon className="inline size-4 align-middle" />
-                </span>
-              </Link>
+              {currentContest && (
+                <Link
+                  href="/hall-of-fame/participate"
+                  className="text-right text-xs leading-[1.5] font-semibold text-[#c75a00] tab:text-left pc:w-[9.0625rem]"
+                >
+                  이번주 명예의 전당{' '}
+                  <span className="block tab:inline pc:block">
+                    주인공이 되어보세요!
+                    <ArrowRightIcon className="inline size-4 align-middle" />
+                  </span>
+                </Link>
+              )}
             </div>
 
-            <HallOfFamePodium
-              entries={podiumEntries}
-              onEntryClick={setSelectedEntry}
-              className="pc:h-[26rem] pc:min-w-0 pc:shrink pc:flex-1"
-            />
+            <div className="w-full min-w-0 pc:flex-1">
+              <ListState
+                isPending={isCurrentPending || isHallOfFamePending}
+                isError={isCurrentError && isHallOfFameError}
+                isEmpty={!hasPodiumEntry}
+                loadingText="명예의 동물을 불러오는 중입니다."
+                errorText="명예의 동물을 불러오지 못했습니다."
+                emptyText="아직 선정된 명예의 동물이 없습니다."
+              >
+                <HallOfFamePodium
+                  entries={podiumEntries}
+                  onEntryClick={setSelectedEntry}
+                  className="pc:h-[26rem]"
+                />
+              </ListState>
+            </div>
           </div>
         </Container>
       </section>
