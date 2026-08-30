@@ -2,8 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import type { ReactNode } from 'react'
-import { Container, Separator, ImageDetailModal } from '@/shared/ui'
-import { ArrowBackIcon, MoreVertIcon } from '@/shared/assets'
+import { Container, Separator, ImageDetailModal, NavigationBar } from '@/shared/ui'
 import { useImageModal } from '@/shared/lib/useImageModal'
 import { useToggleAdoptionFavorite } from '@/features/adoption'
 import type { AdoptionDetailDto } from '@/shared/types'
@@ -36,20 +35,8 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
 
   return (
     <div className="pb-[6rem] tab:pb-[6rem]">
-      {/* ── 네비게이션 바 ── 피그마 976:25819: 뒤로가기 + 가운데 정렬 제목 + 더보기(케밥) px-16 py-4 */}
-      <div className="flex items-center px-[1rem] py-[0.25rem] pc:hidden">
-        <button type="button" onClick={() => router.back()}>
-          <ArrowBackIcon className="size-[1.5rem] text-neutral-850" />
-        </button>
-        <div className="flex min-w-px flex-1 items-center justify-center p-[0.125rem]">
-          <p className="text-[0.875rem] leading-[1.5] font-semibold whitespace-nowrap text-neutral-850">
-            {detail.name}
-          </p>
-        </div>
-        <button type="button">
-          <MoreVertIcon className="size-[1.5rem] text-neutral-850" />
-        </button>
-      </div>
+      {/* Figma 976:25819 — 공용 40px 뒤로가기와 가운데 제목. 동작 없는 케밥은 노출하지 않는다. */}
+      <NavigationBar title={detail.name} onBack={() => router.back()} className="pc:hidden" />
 
       {/* ═══ 히어로 섹션 ═══ */}
       <AdoptionDetailHero

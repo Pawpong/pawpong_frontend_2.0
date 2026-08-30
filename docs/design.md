@@ -202,6 +202,7 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 
 - `Breadcrumb`, `Separator`, `CtaBanner`, `ProfileAvatar`, `ProfileHeader`: 정보 계층과 브랜드 표면을 구성한다.
 - `Pixel*` 컴포넌트는 Figma에서 픽셀 아트가 명시된 영역에만 사용한다.
+- 서브 화면은 자체 헤더 마크업을 만들지 않고 `NavigationBar`/`PageHeader`를 사용한다. 동작이 정해지지 않은 케밥·북마크 아이콘은 노출하지 않으며, 보이는 액션은 실제 메뉴나 경로에 연결한다.
 
 ## 8. 목록 행과 삭제 패턴
 

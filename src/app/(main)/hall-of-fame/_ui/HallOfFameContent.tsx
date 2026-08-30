@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
-import { ArrowBackIcon, ArrowRightIcon } from '@/shared/assets'
+import { ArrowRightIcon } from '@/shared/assets'
 import type { ContestEntry } from '@/shared/types'
 import {
   Container,
@@ -12,6 +12,7 @@ import {
   ImageDetailModal,
   InfiniteScrollTrigger,
   ListState,
+  NavigationBar,
 } from '@/shared/ui'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
 import { ContestVoteCard, contestQueries } from '@/entities/contest'
@@ -22,17 +23,6 @@ import { flattenPages } from '@/shared/lib/infiniteList'
 
 const PODIUM_COUNT = 3
 const ENTRY_PAGE_SIZE = 16
-
-const HallOfFameHeader = () => (
-  <header className="relative mx-auto flex h-11 w-full max-w-[44rem] items-center px-5 tab:max-w-[86rem] tab:px-12 pc:max-w-[80rem] pc:px-0">
-    <Link href="/home" aria-label="뒤로 가기">
-      <ArrowBackIcon className="size-5 text-neutral-850" />
-    </Link>
-    <h1 className="absolute left-1/2 -translate-x-1/2 text-sm leading-[1.5] font-semibold text-neutral-850">
-      명예의 전당
-    </h1>
-  </header>
-)
 
 const HallOfFameContent = () => {
   const router = useRouter()
@@ -117,7 +107,7 @@ const HallOfFameContent = () => {
 
   return (
     <div className="flex w-full flex-col bg-base-white pb-12">
-      <HallOfFameHeader />
+      <NavigationBar title="명예의 전당" backHref="/" />
 
       <section className="w-full">
         <Container className="px-4 py-4 tab:px-12 tab:py-10 pc:max-w-[80rem] pc:px-0">
@@ -149,7 +139,7 @@ const HallOfFameContent = () => {
             <div className="w-full min-w-0 pc:flex-1">
               <ListState
                 isPending={isCurrentPending || isHallOfFamePending}
-                isError={isCurrentError && isHallOfFameError}
+                isError={!hasPodiumEntry && (isCurrentError || isHallOfFameError)}
                 isEmpty={!hasPodiumEntry}
                 loadingText="명예의 동물을 불러오는 중입니다."
                 errorText="명예의 동물을 불러오지 못했습니다."

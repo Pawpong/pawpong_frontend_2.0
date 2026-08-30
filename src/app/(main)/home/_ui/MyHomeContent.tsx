@@ -122,9 +122,13 @@ const MyHomeContent = () => {
           // 디자인(node 2046-160996): 마이홈 모바일 navbar는 좌우 margin-tab(48px) — 공통 기본(16)을 덮어씀
           className="px-12"
           right={
-            <button type="button" aria-label="북마크">
+            <Link
+              href="/bookmarks"
+              aria-label="저장목록"
+              className="-m-2 flex size-10 items-center justify-center rounded-lg transition-colors hover:bg-primary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+            >
               <BookmarkIcon className="size-6 text-neutral-850" />
-            </button>
+            </Link>
           }
         />
       </div>
