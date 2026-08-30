@@ -14,7 +14,7 @@ const PopularKeywords = () => {
   if (keywords.length === 0) return null
 
   return (
-    <div className="flex min-w-0 items-center gap-3 overflow-hidden">
+    <div className="flex min-w-0 items-center gap-5 overflow-hidden pc:justify-center">
       <span className="shrink-0 text-xs leading-[1.5] font-medium text-neutral-700 tab:text-sm">
         인기 검색어
       </span>
@@ -24,7 +24,7 @@ const PopularKeywords = () => {
             key={keywordId}
             type="button"
             onClick={() => router.push(`/explore?keyword=${encodeURIComponent(keyword)}`)}
-            className="flex h-6 items-center rounded-full border border-primary-500 px-2 text-[0.625rem] leading-[1.5] font-medium whitespace-nowrap text-primary-500 tab:h-auto tab:py-0.5 tab:text-sm"
+            className="flex h-6 items-center rounded-full border border-primary-500 px-2 text-[0.625rem] leading-[1.5] font-semibold whitespace-nowrap text-primary-500 transition-colors hover:bg-primary-50 tab:h-[1.8125rem] tab:py-1 tab:text-sm"
           >
             {keyword}
           </button>

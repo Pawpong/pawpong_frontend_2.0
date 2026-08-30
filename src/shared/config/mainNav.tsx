@@ -62,6 +62,7 @@ const NavMyHomeIcon = ({ className }: NavIconProps) => (
 export interface MainNavItem {
   href: string
   label: string
+  bottomLabel?: string
   Icon: (props: NavIconProps) => ReactNode
   isActive: (pathname: string) => boolean
 }
@@ -74,7 +75,13 @@ export const MAIN_NAV: MainNavItem[] = [
     Icon: NavSearchIcon,
     isActive: (p) => p.startsWith('/explore'),
   },
-  { href: '/chat', label: '채팅', Icon: NavChatIcon, isActive: (p) => p.startsWith('/chat') },
+  {
+    href: '/chat',
+    label: '채팅',
+    bottomLabel: '채팅방',
+    Icon: NavChatIcon,
+    isActive: (p) => p.startsWith('/chat'),
+  },
   {
     href: '/community',
     label: '커뮤니티',

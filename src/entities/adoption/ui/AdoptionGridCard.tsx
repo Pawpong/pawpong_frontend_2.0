@@ -37,23 +37,23 @@ const AdoptionGridCard = ({
       thumbnailUrl={listing.thumbnailUrl}
       alt={listing.name}
       className={cn(
-        'transition-[transform,box-shadow,background-color,border-radius] duration-200 ease-out tab:hover:-translate-y-2 tab:hover:overflow-hidden tab:hover:rounded-[1.25rem] tab:hover:bg-white tab:hover:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)] tab:focus-visible:-translate-y-2 tab:focus-visible:rounded-[1.25rem] tab:focus-visible:bg-white tab:focus-visible:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]',
+        'transition-[transform,box-shadow,background-color,border-radius] duration-200 ease-out pc:hover:-translate-y-2 pc:hover:overflow-hidden pc:hover:rounded-[1.25rem] pc:hover:bg-white pc:hover:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)] pc:focus-visible:-translate-y-2 pc:focus-visible:rounded-[1.25rem] pc:focus-visible:bg-white pc:focus-visible:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]',
         className,
       )}
       overlay={
         <>
           {status === 'adopted' && <div className="absolute inset-0 bg-white/70" />}
 
-          <div className="absolute top-2 right-3 left-3 flex items-center gap-1">
+          <div className="absolute top-1 right-2 left-2 flex items-center gap-1 pc:top-2 pc:right-3 pc:left-3">
             {listing.isPopular && (
               <PopularBadge
                 variant="primaryOutline"
                 size="md"
                 iconSize="responsive"
-                className="bg-white tab:h-[1.8125rem] tab:py-1 tab:text-sm"
+                className="bg-white pc:h-[1.8125rem] pc:py-1 pc:text-sm"
               />
             )}
-            <AdoptionStatusBadge status={status} size="md" className="shrink-0 tab:hidden" />
+            <AdoptionStatusBadge status={status} size="md" className="shrink-0 pc:hidden" />
           </div>
 
           {/* 하트는 클릭을 가로채므로(preventDefault) 토글이 없는 화면에선 아예 그리지 않는다 */}
@@ -61,8 +61,8 @@ const AdoptionGridCard = ({
             <FavoriteToggle
               isFavorite={isFavorite}
               onToggle={onToggle}
-              className="absolute right-2 bottom-1 tab:right-3 tab:bottom-2"
-              iconClassName={cn('size-8 tab:size-12', !isFavorite && '!text-neutral-50')}
+              className="absolute right-2 bottom-1 pc:right-3 pc:bottom-2"
+              iconClassName={cn('size-8 pc:size-12', !isFavorite && '!text-white/60')}
             />
           )}
         </>
@@ -71,20 +71,17 @@ const AdoptionGridCard = ({
         <AdoptionStatusBadge
           status={status}
           size="md"
-          className="hidden shrink-0 tab:flex tab:h-[1.8125rem] tab:py-1 tab:text-sm"
+          className="hidden shrink-0 pc:flex pc:h-[1.8125rem] pc:py-1 pc:text-sm"
         />
       }
     >
       <div className="flex min-w-0 items-center">
-        <p className="truncate text-sm leading-[1.5] font-semibold text-neutral-850 tab:text-base">
+        <p className="truncate text-sm leading-[1.5] font-semibold text-neutral-850 pc:text-base">
           {listing.name}
         </p>
-        <GenderIcon
-          gender={listing.gender}
-          className="size-5 shrink-0 text-neutral-850 tab:size-6"
-        />
+        <GenderIcon gender={listing.gender} className="size-7 shrink-0 text-neutral-850" />
       </div>
-      <p className="truncate text-xs leading-[1.5] font-medium text-neutral-850 tab:text-sm">
+      <p className="truncate text-xs leading-[1.5] font-medium text-neutral-850 pc:text-sm">
         {listing.birthDateText}
       </p>
     </MediaCard>

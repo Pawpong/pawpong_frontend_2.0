@@ -27,7 +27,7 @@ const CommunityShowcase = () => {
         errorText="커뮤니티 게시글을 불러오지 못했습니다."
         emptyText="아직 등록된 커뮤니티 게시글이 없습니다."
       >
-        <div className="grid grid-cols-1 gap-y-2 tab:grid-cols-2 tab:gap-x-[1.875rem] pc:grid-cols-3 pc:gap-y-0">
+        <div className="mx-auto grid w-full max-w-[20.0625rem] grid-cols-1 gap-y-5 tab:max-w-[52.75rem] tab:grid-cols-2 tab:gap-x-[1.875rem] tab:gap-y-0 pc:max-w-none pc:grid-cols-3 pc:gap-x-[1.84375rem]">
           {fetched.map((post, index) => (
             <ConnectedCommunityBox
               key={post.detailHref ?? index}

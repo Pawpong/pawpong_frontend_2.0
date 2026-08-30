@@ -186,42 +186,24 @@
   height: 0;
 }
 
-/* 배너 캐러셀 페이지네이션 (Figma 2752:261987) */
-.banner-swiper {
-  --swiper-pagination-color: #eac499;
-  --swiper-pagination-bullet-inactive-color: #d3e2fd;
-  --swiper-pagination-bullet-inactive-opacity: 1;
-  --swiper-pagination-bullet-width: 0.5rem;
-  --swiper-pagination-bullet-height: 0.5rem;
-  --swiper-pagination-bullet-horizontal-gap: 0.125rem;
-  --swiper-pagination-bottom: 1rem;
-}
-
-.banner-swiper .swiper-pagination-bullet-active {
-  width: 1.25rem;
-  border-radius: 0.5rem;
-}
-
-@media (width < 48rem) {
-  .banner-swiper .swiper-pagination {
-    display: none;
-  }
-}
-
-/* 중앙 배너 외 이전/다음 슬라이드는 태블릿 이상에서 흐리게 표시 */
+/* 중앙 배너 외 이전/다음 슬라이드는 Figma처럼 85.9% 축소 + 30% 명도로 노출한다.
+   slide 간 논리 gap은 0이며 축소로 생기는 여백이 tab 42.7px / pc 80px이 된다. */
 @media (width >= 48rem) {
+  .banner-swiper .swiper-wrapper {
+    align-items: center;
+  }
+
   .banner-swiper .swiper-slide {
     opacity: 0.3;
-    transition: opacity 200ms ease;
+    /* Swiper의 .swiper-backface-hidden transform보다 우선해 Figma 축소 비율을 유지한다. */
+    transform: scale(var(--inactive-banner-scale, 0.8589065)) translateZ(0) !important;
+    transition:
+      opacity 200ms ease,
+      transform 200ms ease;
   }
 
   .banner-swiper .swiper-slide-active {
-    opacity: 1;
-  }
-}
-
-@media (width >= 90rem) {
-  .banner-swiper {
-    --swiper-pagination-bottom: 2.5rem;
+    opacity: 1 !important;
+    transform: scale(1) translateZ(0) !important;
   }
 }
