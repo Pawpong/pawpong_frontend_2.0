@@ -114,7 +114,7 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
 
       <HomeTabs tabs={BREEDER_HOME_TABS} activeTab={activeTab} onTabChange={setActiveTab}>
         <TabsContent value="listings" className="mt-0">
-          <Container className="pc:px-[10rem]">
+          <Container>
             <ListState
               isPending={isListingsPending}
               isError={isListingsError}
@@ -129,7 +129,7 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
               }
             >
               <>
-                <div className="grid grid-cols-2 gap-[0.625rem] py-[1.25rem] tab:hidden">
+                <div className="mx-auto grid w-full max-w-[21.4375rem] grid-cols-[repeat(2,minmax(0,10.25rem))] justify-between gap-y-4 py-[1.25rem] tab:hidden">
                   {listings.map((listing) => (
                     <BreederListingCard key={listing.listingId} listing={listing} />
                   ))}

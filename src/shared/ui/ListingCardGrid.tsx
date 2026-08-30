@@ -5,11 +5,20 @@ const listingCardGrid = tv({
   base: 'grid grid-cols-2',
   variants: {
     layout: {
-      /** 탐색·저장목록 — tab 2열 유지, PC 4열. 좌우 여백은 Container가 담당한다 */
-      explore: 'gap-4 tab:gap-5 pc:grid-cols-4',
-      /** 즐겨찾기 브리더·브리더 홈 분양목록 (Figma 1023-38692) — tab 3열, PC 1188px 가운데 정렬 */
+      /**
+       * 탐색·저장목록 (Figma 797:93446)
+       * - mo~tab: 2열을 유지하되 카드가 282px보다 커지지 않는다.
+       * - PC: 1280px 안에 282px 카드 4개를 양끝 정렬해 Figma의 50.67px 간격을 만든다.
+       */
+      explore:
+        'mx-auto w-full max-w-[36.25rem] gap-4 tab:max-w-[36.5rem] tab:gap-5 pc:max-w-none pc:grid-cols-[repeat(4,17.625rem)] pc:justify-between',
+      /**
+       * 즐겨찾기 브리더·브리더 홈 분양목록 (Figma 1023:38692)
+       * - mo: 164px 카드 2개 / tab: 최대 282px 카드 3개 / PC: 282px 카드 4개.
+       * - 각 구간 상한을 두어 1439px 카드가 1440px 카드보다 커지는 역전을 막는다.
+       */
       compact:
-        'gap-x-2.5 gap-y-4 tab:grid-cols-3 tab:gap-5 pc:mx-auto pc:max-w-[74.25rem] pc:grid-cols-4',
+        'mx-auto w-full max-w-[21.4375rem] grid-cols-[repeat(2,minmax(0,10.25rem))] justify-between gap-y-4 tab:max-w-[55.375rem] tab:grid-cols-[repeat(3,minmax(0,17.625rem))] tab:justify-center tab:gap-5 pc:max-w-[74.25rem] pc:grid-cols-[repeat(4,minmax(0,17.625rem))]',
     },
   },
   defaultVariants: { layout: 'explore' },

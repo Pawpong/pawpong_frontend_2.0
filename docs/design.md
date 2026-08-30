@@ -68,7 +68,8 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 - Tablet: 정보 밀도를 높이되 PC 전용 좌우 분할을 미리 켜지 않는다.
 - PC: 1440px부터 GNB·좌우 분할·4열 카드·hover affordance를 활성화한다.
 - 작성 폼처럼 Figma가 Tablet 프레임 상한을 명시한 화면은 768~1439px에서 실내용 폭 672px을 유지하고, 1440px부터 PC 1280px 분할 레이아웃으로 전환한다.
-- 고정 variant가 있는 카드는 기준 폭 사이에서 무한히 늘리지 않는다. 홈 분양 카드는 164px에서 282px, 커뮤니티 카드는 321px에서 407px까지만 허용한다.
+- 고정 variant가 있는 카드는 기준 폭 사이에서 무한히 늘리지 않는다. 분양·브리더 카드는 164px에서 282px, 커뮤니티 카드는 321px에서 407px까지만 허용한다.
+- `ListingCardGrid`의 탐색형은 Mobile~Tablet에서 최대 282px 2열, PC에서 282px 4열로 전환한다. 브리더 compact형은 Mobile 164px 2열, Tablet 최대 282px 3열, PC 282px 4열로 제한해 1439→1440px에서 카드 폭이 역전되지 않게 한다.
 - 커뮤니티 메인 피드의 `CommunityFeedCard`는 Figma `3606:622637` 기준 343px 상한·16px radius를 전 구간에서 유지한다. Tablet 여백을 채우기 위해 1:1 미디어를 확대하지 않는다.
 - 프로필·단일 컬럼 피드는 Mobile/Tablet에서 실내용 672px, PC에서 Figma `1021:20324`의 948px을 상한으로 한다. 공용 탭 셸은 Mobile 바깥 704px/실내용 672px, Tablet 바깥 768px/실내용 672px, PC에서 Figma `976:32388`의 바깥 940px/실내용 780px을 상한으로 하며 sticky 표면만 페이지 폭을 채운다.
 - 채팅 목록·대화·입력도 같은 Mobile 704px 상한을 공유한다. PC 사이드바 내부는 독립 폭이므로 해당 상한을 적용하지 않는다.
@@ -83,18 +84,18 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 
 ### 색상 역할
 
-| 역할            | 토큰                         | 용도                                      |
-| --------------- | ---------------------------- | ----------------------------------------- |
-| Brand primary   | `primary-500` (`#ad651d`)    | 활성 내비게이션, 링크 강조, focus ring    |
-| Brand secondary | `secondary-500` (`#f6c65d`)  | 보조 브랜드 장식                          |
-| Point CTA       | `point-500` (`#fffe72`)      | 주 CTA 버튼 배경                          |
-| Warm surface    | `primary-50`, `point-50`     | 선택·읽지 않음·부드러운 hover 배경        |
-| Primary text    | `neutral-850`                | 제목·주요 본문                            |
-| Secondary text  | `neutral-700`                | 설명·메타 정보                            |
-| Muted text      | `neutral-500`                | 날짜·보조 정보                            |
-| Border          | `neutral-150`, `neutral-300` | 카드·섹션·입력 경계                       |
-| Error           | `error-500/600`              | 파괴적 액션·오류 메시지                   |
-| Info            | `info-500`                   | 정보 상태에만 사용, 브랜드 액션 대체 금지 |
+| 역할            | 토큰                         | 용도                                   |
+| --------------- | ---------------------------- | -------------------------------------- |
+| Brand primary   | `primary-500` (`#ad651d`)    | 활성 내비게이션, 링크 강조, focus ring |
+| Brand secondary | `secondary-500` (`#f6c65d`)  | 보조 브랜드 장식                       |
+| Point CTA       | `point-500` (`#fffe72`)      | 주 CTA 버튼 배경                       |
+| Warm surface    | `primary-50`, `point-50`     | 선택·읽지 않음·부드러운 hover 배경     |
+| Primary text    | `neutral-850`                | 제목·주요 본문                         |
+| Secondary text  | `neutral-700`                | 설명·메타 정보                         |
+| Muted text      | `neutral-500`                | 날짜·보조 정보                         |
+| Border          | `neutral-150`, `neutral-300` | 카드·섹션·입력 경계                    |
+| Error           | `error-500/600`              | 파괴적 액션·오류 메시지                |
+| Info            | `info-500`                   | 정보 상태와 Figma 폼 focus/open 경계선 |
 
 - 공용 컴포넌트에서는 Tailwind 기본 `zinc`, `slate`, `gray`, `red` 팔레트와 `dark:` 변형을 쓰지 않는다. Pawpong semantic token으로 의미를 표현한다.
 - Figma 자산·소셜 브랜드·픽셀 메달처럼 고유색 자체가 의미인 경우에만 hex를 허용하고 코드 주석에 출처를 남긴다.
@@ -145,7 +146,7 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 
 ### 입력·검색
 
-- `Input`, `InputField`, `InputUpload`: 입력, 레이블, 도움말, 오류 상태를 결합한다.
+- `Input`, `InputField`, `InputUpload`: 입력, 레이블, 도움말, 오류 상태를 결합한다. Figma의 폼 focus/open 경계선은 `info-500`을 쓰되 CTA·내비게이션·focus-visible ring의 브랜드 강조는 `primary-500`을 쓴다.
 - `Textarea`, `TextareaField`: 장문 입력과 글자 수/오류 상태를 담당한다.
 - `SearchBar`, `SearchButton`, `SearchIcon`: 높이 40px, radius 8, neutral border의 검색 submit을 공통화한다. 홈 검색 폭은 Mobile 343px / Tablet 482px / PC 846px이다.
 - `Label`, `TextLabel`, `HelpMessage`: 필드 레이블·필수/선택·도움말에 사용한다.
