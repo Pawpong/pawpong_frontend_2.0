@@ -37,7 +37,7 @@ const AdoptionGridCard = ({
       thumbnailUrl={listing.thumbnailUrl}
       alt={listing.name}
       className={cn(
-        'transition-shadow tab:hover:overflow-hidden tab:hover:rounded-[1.25rem] tab:hover:bg-white tab:hover:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]',
+        'transition-[transform,box-shadow,background-color,border-radius] duration-200 ease-out tab:hover:-translate-y-2 tab:hover:overflow-hidden tab:hover:rounded-[1.25rem] tab:hover:bg-white tab:hover:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)] tab:focus-visible:-translate-y-2 tab:focus-visible:rounded-[1.25rem] tab:focus-visible:bg-white tab:focus-visible:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]',
         className,
       )}
       overlay={
