@@ -7,6 +7,7 @@ import type {
   BreedingEnvironment,
 } from '@/shared/types'
 import { formatBirthDate } from '@/shared/lib/formatBirthDate'
+import { formatDate } from '@/shared/lib/formatDate'
 import { petTypeToCategory } from '@/shared/lib/petCategory'
 import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
 
@@ -23,7 +24,7 @@ export const mapAdoptionDetail = (
     vaccinationCompleted: d.vaccinationStatus === 'completed',
     vaccinations: (d.vaccinationRecords ?? []).map((r) => ({
       name: r.name,
-      date: r.date,
+      date: formatDate(r.date),
       dose: `${r.round}차`,
     })),
     // 미완료 사유는 분양글 작성 시 브리더가 입력 — 기록이 없을 때 안내 문구 대신 노출
@@ -31,7 +32,7 @@ export const mapAdoptionDetail = (
     geneticTestCompleted: d.geneticTestStatus === 'completed',
     geneticTestIncompleteReason: d.geneticTestIncompleteReason,
     geneticTest: {
-      date: d.geneticTestRecords?.[0]?.date ?? '',
+      date: formatDate(d.geneticTestRecords?.[0]?.date ?? ''),
       institution: d.geneticTestRecords?.[0]?.institution ?? '',
       results: (d.geneticTestRecords ?? []).map((r) => ({
         disease: r.testName,
