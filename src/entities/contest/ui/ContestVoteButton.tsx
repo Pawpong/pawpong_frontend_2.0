@@ -35,8 +35,7 @@ const ContestVoteButton = ({
   className,
 }: ContestVoteButtonProps) => {
   const state = isVoted ? 'voted' : hasContestVote ? 'completed' : 'idle'
-  const isCancelUnavailable = state === 'voted' && !onCancelVote
-  const disabled = isPending || isDisabled || state === 'completed' || isCancelUnavailable
+  const disabled = isPending || isDisabled || state === 'completed'
   const label =
     state === 'voted' ? '투표 취소' : state === 'completed' ? '투표했습니다' : '투표하기'
 
@@ -47,7 +46,6 @@ const ContestVoteButton = ({
       onClick={state === 'voted' ? onCancelVote : onVote}
       disabled={disabled}
       aria-label={isPending ? `${label} 처리 중` : label}
-      title={isCancelUnavailable ? '투표 취소 기능은 준비 중입니다.' : undefined}
     >
       <span>{isPending ? '처리 중...' : label}</span>
       {state !== 'voted' && <VoteIcon className="size-5 shrink-0" />}

@@ -15,7 +15,7 @@ import {
 } from '@/shared/ui'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
 import { ContestVoteCard, contestQueries } from '@/entities/contest'
-import { useVoteContestEntry } from '@/features/contest'
+import { useCancelContestVote, useVoteContestEntry } from '@/features/contest'
 import { useAuthStatus } from '@/features/auth'
 import { HallOfFamePodium } from '@/widgets/hall-of-fame'
 import { flattenPages } from '@/shared/lib/infiniteList'
@@ -72,6 +72,7 @@ const HallOfFameContent = () => {
     throwOnError: false,
   })
   const voteEntry = useVoteContestEntry()
+  const cancelVote = useCancelContestVote()
 
   // 무한스크롤 페이지 병합 시 id 중복 제거 — 서버 페이지네이션이 경계에서 항목을
   // 겹쳐 주더라도 React key 중복(카드 중복/누락)이 발생하지 않도록 방어한다.
@@ -96,6 +97,14 @@ const HallOfFameContent = () => {
       return
     }
     voteEntry.mutate(entryId)
+  }
+
+  const handleCancelVote = (entryId: string) => {
+    if (!isLoggedIn) {
+      setShowLoginPrompt(true)
+      return
+    }
+    cancelVote.mutate(entryId)
   }
 
   // 진행 중인 콘테스트가 없으면 서버가 current=null, entries=[]로 응답한다.
@@ -188,16 +197,20 @@ const HallOfFameContent = () => {
                       responsive
                       showProfile={false}
                       hasContestVote={hasContestVote}
-                      isVoting={voteEntry.isPending && voteEntry.variables === entry.id}
-                      isVoteDisabled={voteEntry.isPending}
+                      isVoting={
+                        (voteEntry.isPending && voteEntry.variables === entry.id) ||
+                        (cancelVote.isPending && cancelVote.variables === entry.id)
+                      }
+                      isVoteDisabled={voteEntry.isPending || cancelVote.isPending}
                       onVote={() => handleVote(entry.id)}
+                      onCancelVote={() => handleCancelVote(entry.id)}
                       onImageClick={() => setSelectedEntry(cardEntry)}
                     />
                   )
                 })}
               </div>
 
-              {voteEntry.isError && (
+              {(voteEntry.isError || cancelVote.isError) && (
                 <p role="alert" className="mt-4 text-center text-sm text-error-600">
                   투표를 처리하지 못했습니다. 잠시 후 다시 시도해주세요.
                 </p>
