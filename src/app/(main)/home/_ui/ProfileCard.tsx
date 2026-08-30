@@ -185,20 +185,22 @@ const FollowActionButton = ({ targetId, isFollowing }: VisitorActionsProps) => {
   )
 }
 
-// 팔로우가 앞, 메시지가 뒤 — 입양자·브리더 홈 동일
-const VisitorActions = (props: VisitorActionsProps) => (
+// 채팅방 계약은 입양자↔브리더 전용이라 브리더 홈에서만 메시지 액션을 노출한다.
+const BreederVisitorActions = (props: VisitorActionsProps) => (
   <>
     <FollowActionButton {...props} />
     <MessageButton targetId={props.targetId} />
   </>
 )
 
+const AdopterVisitorActions = (props: VisitorActionsProps) => <FollowActionButton {...props} />
+
 // 내 홈 액션은 props 를 쓰지 않는다 (같은 자리에서 렌더되므로 시그니처만 맞춤)
 const ACTION_MAP = {
   mine: MineActions,
   'mine-breeder': MineActions,
-  breeder: VisitorActions,
-  other: VisitorActions,
+  breeder: BreederVisitorActions,
+  other: AdopterVisitorActions,
 } satisfies Record<ProfileMode, ComponentType<VisitorActionsProps>>
 
 /* ── ProfileCard ── */

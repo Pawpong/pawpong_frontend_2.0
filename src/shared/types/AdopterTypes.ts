@@ -110,13 +110,10 @@ export interface FavoriteItemDto {
 export type FavoritesListResponseDto = PaginationResponse<FavoriteItemDto>
 
 export interface FavoriteAddResponseDto {
-  favoriteId: string
-  breederId: string
   message: string
 }
 
 export interface FavoriteRemoveResponseDto {
-  breederId: string
   message: string
 }
 

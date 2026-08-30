@@ -83,9 +83,10 @@ const useAdoptionCreateForm = () => {
     // 초안은 검증 없이 저장되므로 대표 인덱스가 사진 개수를 벗어나 있을 수 있다.
     // 그대로 두면 서버에 범위 밖 인덱스가 나가므로 사진 범위로 고정한다
     const savedIndex = draft.form.representativePhotoIndex ?? 0
-    setRepresentativeIndex(
-      savedIndex >= 0 && savedIndex < restoredPhotos.length ? savedIndex : 0,
-    )
+    const restoredRepresentativeIndex =
+      savedIndex >= 0 && savedIndex < restoredPhotos.length ? savedIndex : 0
+    // 서버 응답을 폼에 동기화하는 effect 안에서 연쇄 렌더를 만들지 않도록 다음 microtask에 반영한다.
+    queueMicrotask(() => setRepresentativeIndex(restoredRepresentativeIndex))
 
     petImages.seedExisting(
       restoredPhotos.map((fileName, index) => ({
@@ -124,16 +125,17 @@ const useAdoptionCreateForm = () => {
     )
   }, [draft, parentRowIds, parentImages])
 
+  const removePetImage = petImages.handleRemoveImage
   const handleRemoveImage = useCallback(
     (index: number) => {
-      petImages.handleRemoveImage(index)
+      removePetImage(index)
       setRepresentativeIndex((prev) => {
         if (index === prev) return 0
         if (index < prev) return prev - 1
         return prev
       })
     },
-    [petImages],
+    [removePetImage, setRepresentativeIndex],
   )
 
   /**

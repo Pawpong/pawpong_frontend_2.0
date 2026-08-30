@@ -3,9 +3,8 @@
 import { useState } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { contestQueries } from '@/entities/contest'
-import { MOCK_RANKING_ENTRIES } from '@/shared/mocks'
 import type { ContestEntry } from '@/shared/types'
-import { Container, DetailLink, ImageDetailModal } from '@/shared/ui'
+import { Container, DetailLink, ImageDetailModal, ListState } from '@/shared/ui'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import { HallOfFamePodium } from './HallOfFamePodium'
 
@@ -14,7 +13,7 @@ const CARD_COUNT = 3
 const HallOfFame = () => {
   const [selected, setSelected] = useState<ContestEntry | null>(null)
 
-  const { data } = useInfiniteQuery({
+  const { data, isPending, isError } = useInfiniteQuery({
     ...contestQueries.hallOfFame(CARD_COUNT),
     throwOnError: false,
   })
@@ -22,9 +21,6 @@ const HallOfFame = () => {
   const winners = flattenPages(data)
     .slice(0, CARD_COUNT)
     .map((item) => item.winner)
-
-  // ponytail SSL 인증서 복구 전 홈 UI 확인용 폴백
-  const cards: (ContestEntry | undefined)[] = winners.length > 0 ? winners : MOCK_RANKING_ENTRIES
 
   return (
     <section className="w-full bg-white">
@@ -43,7 +39,18 @@ const HallOfFame = () => {
             />
           </div>
 
-          <HallOfFamePodium entries={cards} onEntryClick={setSelected} />
+          <div className="w-full min-w-0 pc:flex-1">
+            <ListState
+              isPending={isPending}
+              isError={isError}
+              isEmpty={winners.length === 0}
+              loadingText="명예의 동물을 불러오는 중입니다."
+              errorText="명예의 동물을 불러오지 못했습니다."
+              emptyText="아직 선정된 명예의 동물이 없습니다."
+            >
+              <HallOfFamePodium entries={winners} onEntryClick={setSelected} />
+            </ListState>
+          </div>
         </div>
       </Container>
 
