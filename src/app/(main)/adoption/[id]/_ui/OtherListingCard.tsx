@@ -82,7 +82,7 @@ const DesktopOtherListingCard = ({
               <AdoptionStatusBadge status={listing.status} className="shrink-0" />
             </div>
             <p className="truncate text-[0.875rem] leading-[1.5] font-medium text-neutral-850">
-              {listing.ageText}
+              {listing.birthDateText}
             </p>
           </div>
           {listing.description && (

@@ -103,7 +103,7 @@ export interface MyPetPostingCard {
   breed: string
   petType: CommunityPetType
   gender: PetGender
-  ageDescription: string
+  birthDate: string
   price: number
   status: PetStatus
   primaryPhotoUrl: string

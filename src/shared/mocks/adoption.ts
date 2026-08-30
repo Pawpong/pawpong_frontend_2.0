@@ -4,7 +4,7 @@ export const MOCK_ADOPTION_LISTING: AdoptionListingCard = {
   listingId: '1',
   name: '레오파드 개코도마뱀 (만다린)',
   gender: 'female',
-  ageText: '6개월',
+  birthDateText: '2025.06.20',
   thumbnailUrl: '/images/mock-pet.jpg',
   status: 'available',
   category: 'lizard',

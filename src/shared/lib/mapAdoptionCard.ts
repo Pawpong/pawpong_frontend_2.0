@@ -1,5 +1,6 @@
 import type { AdoptionListingCard, AdoptionPetCard } from '@/shared/types'
 import { formatDate } from '@/shared/lib/formatDate'
+import { formatBirthDate } from '@/shared/lib/formatBirthDate'
 import { petTypeToCategory } from '@/shared/lib/petCategory'
 
 // AdoptionCard 는 <Image src> 를 무조건 렌더 — 사진 없는 분양글의 빈 URL 크래시 방어
@@ -10,7 +11,7 @@ export const mapAdoptionCard = (c: AdoptionPetCard): AdoptionListingCard => ({
   listingId: c.petId,
   name: c.name,
   gender: c.gender,
-  ageText: c.ageDescription,
+  birthDateText: formatBirthDate(c.birthDate),
   thumbnailUrl: c.primaryPhotoUrl || c.photoUrls?.[0] || FALLBACK_THUMBNAIL,
   status: c.status,
   category: petTypeToCategory(c.petType),

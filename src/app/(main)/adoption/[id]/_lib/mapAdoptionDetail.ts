@@ -6,7 +6,7 @@ import type {
   ParentInfo,
   BreedingEnvironment,
 } from '@/shared/types'
-import { formatDate } from '@/shared/lib/formatDate'
+import { formatBirthDate } from '@/shared/lib/formatBirthDate'
 import { petTypeToCategory } from '@/shared/lib/petCategory'
 import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
 
@@ -44,7 +44,7 @@ export const mapAdoptionDetail = (
     role: p.relation === 'father' ? '아빠' : '엄마',
     name: p.name,
     imageUrl: p.photoUrl,
-    birthDate: formatDate(p.birthDate),
+    birthDate: formatBirthDate(p.birthDate),
   }))
 
   const breedingEnvironment: BreedingEnvironment = {
@@ -62,7 +62,7 @@ export const mapAdoptionDetail = (
     name: d.name,
     status: d.status,
     price: `${d.price.toLocaleString('ko-KR')}원`,
-    birthDate: formatDate(d.birthDate),
+    birthDate: formatBirthDate(d.birthDate),
     gender: d.gender,
     description: d.description,
     tags: d.tags ?? [],

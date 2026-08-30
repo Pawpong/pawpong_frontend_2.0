@@ -212,6 +212,8 @@ export interface Breeder {
 
 export interface SearchBreederParams {
   petType?: 'dog' | 'cat'
+  /** 검색어 — 브리더명/품종/지역 부분 일치 */
+  keyword?: string
   dogSize?: string[]
   catFurLength?: string[]
   breeds?: string[]
