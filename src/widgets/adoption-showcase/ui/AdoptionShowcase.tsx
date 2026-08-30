@@ -29,8 +29,12 @@ const AdoptionShowcase = () => {
       >
         {/* Figma: mo 164×2 / tab 164×4에서 시작해 pc 282×4까지 자연스럽게 보간. */}
         <div className="mx-auto grid w-full max-w-[21.4375rem] grid-cols-2 gap-x-[0.9375rem] gap-y-5 tab:max-w-[80rem] tab:grid-cols-4 tab:gap-x-[clamp(0.333rem,calc(7.456vw-3.246rem),3.167rem)] tab:gap-y-0">
-          {pets.map((listing) => (
-            <FavoriteAdoptionShowcaseCard key={listing.listingId} listing={listing} />
+          {pets.map((listing, index) => (
+            <FavoriteAdoptionShowcaseCard
+              key={listing.listingId}
+              listing={listing}
+              preload={index === 0}
+            />
           ))}
         </div>
       </ListState>

@@ -11,7 +11,9 @@ const AdoptionCardGrid = ({ listings }: AdoptionCardGridProps) => (
   <ListingCardGrid
     items={listings}
     getKey={(listing) => listing.listingId}
-    renderItem={(listing) => <FavoriteAdoptionGridCard listing={listing} />}
+    renderItem={(listing, index) => (
+      <FavoriteAdoptionGridCard listing={listing} preload={index < 4} />
+    )}
   />
 )
 

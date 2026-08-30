@@ -92,13 +92,14 @@ const CommunityContent = () => {
             }
           >
             <div className="flex min-w-0 flex-col gap-6 tab:gap-8 pc:gap-10">
-              {posts.map((post) => {
+              {posts.map((post, index) => {
                 // [refactored] 같은 소유자 판정을 onEdit·onDelete에서 두 번 하던 것을 이름으로
                 const isMyPost = me?.userId === post.authorId
 
                 return (
                   <ConnectedFeedCard
                     key={post.postId}
+                    preload={index === 0}
                     guard={guard}
                     {...toCommunityPreviewProps(post)}
                     onEdit={

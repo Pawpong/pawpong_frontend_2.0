@@ -18,16 +18,19 @@ interface AdoptionCardProps {
   // 제어형 관심 상태 — mutation 연결은 features 레이어 래퍼(FavoriteAdoptionCard)에서 주입
   isFavorite?: boolean
   onToggle?: () => void
+  preload?: boolean
 }
 
 // [refactored] 세로형 카드 이미지(이미지 + 분양완료 오버레이) — 모바일/태블릿 공통, rounded만 className으로 차이
 const CardImage = ({
   listing,
   isCompleted,
+  preload = false,
   className,
 }: {
   listing: AdoptionListingCard
   isCompleted: boolean
+  preload?: boolean
   className?: string
 }) => (
   <div className={cn('relative aspect-[348/284] w-full overflow-hidden bg-neutral-700', className)}>
@@ -36,6 +39,7 @@ const CardImage = ({
       alt={listing.name}
       fill
       sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+      preload={preload}
       className="object-cover"
     />
     {isCompleted && <div className="absolute inset-0 bg-white/70" />}
@@ -74,7 +78,7 @@ const CardStats = ({
    - 모바일: medium (1023-40492) — rounded-4, 상/하 2행(제목·배지 / stats·하트), 제목=품종명, stats 12px
    - 태블릿+: large (796-81669) — rounded-8, 좌/우 2단(제목·stats / 배지·관심있어요), 제목=품종ǀ성별 나이
    ═══════════════════════════════════════════════ */
-const AdoptionCard = ({ listing, className, isFavorite, onToggle }: AdoptionCardProps) => {
+const AdoptionCard = ({ listing, className, isFavorite, onToggle, preload }: AdoptionCardProps) => {
   const isCompleted = listing.status === 'adopted'
 
   return (
@@ -83,7 +87,12 @@ const AdoptionCard = ({ listing, className, isFavorite, onToggle }: AdoptionCard
       <div className="flex flex-col tab:hidden">
         {/* 이미지 + 우하단 하트 48px 오버레이 (medium은 하트가 정보영역이 아닌 이미지 위) */}
         <div className="relative">
-          <CardImage listing={listing} isCompleted={isCompleted} className="rounded-[0.25rem]" />
+          <CardImage
+            listing={listing}
+            isCompleted={isCompleted}
+            preload={preload}
+            className="rounded-[0.25rem]"
+          />
           <FavoriteToggle
             isFavorite={isFavorite}
             onToggle={onToggle}
@@ -113,7 +122,12 @@ const AdoptionCard = ({ listing, className, isFavorite, onToggle }: AdoptionCard
       {/* hover: bg white + rounded-20 + drop shadow (Figma 1867-254861) */}
       <div className="hidden h-full flex-col transition-shadow tab:flex tab:hover:overflow-hidden tab:hover:rounded-[1.25rem] tab:hover:bg-white tab:hover:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]">
         {/* [refactored] 이미지 공통 컴포넌트 — rounded-8 */}
-        <CardImage listing={listing} isCompleted={isCompleted} className="rounded-[0.5rem]" />
+        <CardImage
+          listing={listing}
+          isCompleted={isCompleted}
+          preload={preload}
+          className="rounded-[0.5rem]"
+        />
 
         {/* 정보: flex-1, p-12, 좌(제목/stats) · 우(상태배지/관심있어요) */}
         <div className="flex min-h-[7.5rem] flex-1 justify-between gap-[0.5rem] p-[0.75rem]">
@@ -154,6 +168,7 @@ const AdoptionCardHorizontal = ({
   className,
   isFavorite,
   onToggle,
+  preload,
 }: AdoptionCardProps) => {
   return (
     <Link
@@ -170,6 +185,7 @@ const AdoptionCardHorizontal = ({
           alt={listing.name}
           fill
           sizes="100px"
+          preload={preload}
           className="object-cover"
         />
       </div>

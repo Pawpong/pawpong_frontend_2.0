@@ -160,6 +160,7 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
     <ImageCarousel
       images={post.photoUrls}
       alt={post.authorNickname}
+      preloadFirstImage
       className={isSideBySide ? 'h-full w-[60%] shrink-0' : 'aspect-square w-full shrink-0'}
       {...COMMUNITY_CAROUSEL_STYLE} // [refactored] 피드 카드와 공유하는 상수로
     />

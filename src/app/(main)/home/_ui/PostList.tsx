@@ -30,6 +30,7 @@ const PostList = ({ posts, emptyText = '게시글이 없습니다.', onEdit, onD
         <Fragment key={post.postId}>
           <ConnectedFeedCard
             {...toCommunityPreviewProps(post)}
+            preload={index === 0}
             // 마이홈 카드는 Container 폭을 다 쓰므로 정사각 캐러셀 대신 가로 스크롤로 늘어놓는다
             mediaLayout="row"
             onEdit={onEdit && (() => onEdit(post.postId))}

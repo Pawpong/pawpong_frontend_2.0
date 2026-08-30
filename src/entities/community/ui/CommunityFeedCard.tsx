@@ -21,6 +21,8 @@ interface CommunityFeedCardProps extends CommunityPreviewProps {
   onToggleSave?: () => void
   /** 이미지 표현 — 커뮤니티 피드는 1:1 캐러셀, 마이홈처럼 카드가 넓은 곳은 가로 스크롤 썸네일 */
   mediaLayout?: 'carousel' | 'row'
+  /** 목록의 첫 카드처럼 LCP 후보인 첫 이미지만 선로딩 */
+  preload?: boolean
   className?: string
 }
 
@@ -45,6 +47,7 @@ const CommunityFeedCard = ({
   onToggleLike,
   onToggleSave,
   mediaLayout = 'carousel',
+  preload = false,
   className,
 }: CommunityFeedCardProps) => {
   const href = detailHref ?? `/community/post/${postId}`
@@ -125,6 +128,7 @@ const CommunityFeedCard = ({
                     alt={`게시글 이미지 ${index + 1}`}
                     fill
                     sizes="(max-width: 767px) 281px, 320px"
+                    preload={preload && index === 0}
                     className="object-cover"
                   />
                 )}
@@ -146,6 +150,7 @@ const CommunityFeedCard = ({
             className="absolute inset-0"
             bgClassName="bg-neutral-700"
             imageClassName="object-cover"
+            preloadFirstImage={preload}
             {...COMMUNITY_CAROUSEL_STYLE} // [refactored] 상세와 공유하는 상수로
           />
           {images.length > 1 && (

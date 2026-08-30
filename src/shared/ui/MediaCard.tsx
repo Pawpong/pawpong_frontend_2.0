@@ -17,6 +17,8 @@ interface MediaCardProps {
   thumbnailClassName?: string
   /** fill 이미지 반응형 크기 힌트 — 기본값은 그리드 카드(모바일 2열/PC 4열) 기준 */
   sizes?: string
+  /** 첫 화면 LCP 후보 카드에서만 이미지 선로딩 */
+  preload?: boolean
   className?: string
 }
 
@@ -36,6 +38,7 @@ const MediaCard = ({
   trailing,
   thumbnailClassName,
   sizes = '(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw',
+  preload = false,
   className,
 }: MediaCardProps) => (
   <Link href={href} className={cn('flex h-full w-full flex-col', className)}>
@@ -46,7 +49,14 @@ const MediaCard = ({
       )}
     >
       {thumbnailUrl && (
-        <Image src={thumbnailUrl} alt={alt} fill sizes={sizes} className="object-cover" />
+        <Image
+          src={thumbnailUrl}
+          alt={alt}
+          fill
+          sizes={sizes}
+          preload={preload}
+          className="object-cover"
+        />
       )}
       {overlay}
     </div>

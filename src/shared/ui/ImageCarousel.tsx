@@ -18,6 +18,8 @@ interface ImageCarouselProps {
   inactiveDotClassName?: string
   /** 이미지 채움 방식 — 잘리지 않게 두려면 object-contain */
   imageClassName?: string
+  /** 첫 이미지를 LCP 후보로 선로딩한다. 화면의 첫 카드/상세 히어로에서만 사용한다. */
+  preloadFirstImage?: boolean
   sizes?: string
 }
 
@@ -45,6 +47,7 @@ const ImageCarousel = ({
   activeDotClassName = 'size-1.5 rounded-full bg-white',
   inactiveDotClassName = 'size-1.5 rounded-full bg-white/40',
   imageClassName = 'object-contain',
+  preloadFirstImage = false,
   sizes = '(min-width: 768px) 60vw, 100vw',
 }: ImageCarouselProps) => {
   const trackRef = useRef<HTMLDivElement>(null)
@@ -88,7 +91,7 @@ const ImageCarousel = ({
               fill
               sizes={sizes}
               className={imageClassName}
-              priority={imageIndex === 0}
+              preload={preloadFirstImage && imageIndex === 0}
             />
           </div>
         ))}

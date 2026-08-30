@@ -18,14 +18,14 @@ const listingCardGrid = tv({
 interface ListingCardGridProps<T> extends VariantProps<typeof listingCardGrid> {
   items: readonly T[]
   getKey: (item: T) => Key
-  renderItem: (item: T) => ReactNode
+  renderItem: (item: T, index: number) => ReactNode
 }
 
 /** 카드 목록 공용 그리드. 화면군마다 시안 규격이 달라 layout 으로 나눈다. */
 const ListingCardGrid = <T,>({ items, getKey, renderItem, layout }: ListingCardGridProps<T>) => (
   <div className={listingCardGrid({ layout })}>
-    {items.map((item) => (
-      <Fragment key={getKey(item)}>{renderItem(item)}</Fragment>
+    {items.map((item, index) => (
+      <Fragment key={getKey(item)}>{renderItem(item, index)}</Fragment>
     ))}
   </div>
 )

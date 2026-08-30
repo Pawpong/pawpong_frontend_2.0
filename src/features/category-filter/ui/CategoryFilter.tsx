@@ -69,6 +69,7 @@ const CategoryFilter = ({ selected, onChange, className }: CategoryFilterProps) 
               alt=""
               fill
               sizes="96px"
+              loading="eager"
               className="object-contain"
             />
           </button>

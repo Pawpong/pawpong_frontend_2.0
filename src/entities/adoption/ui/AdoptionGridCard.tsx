@@ -18,6 +18,7 @@ interface AdoptionGridCardProps {
   onToggle?: () => void
   /** 관심 하트 노출 (기본 true). 내 분양글처럼 관심 등록이 없는 화면은 false */
   showFavorite?: boolean
+  preload?: boolean
   className?: string
 }
 
@@ -27,6 +28,7 @@ const AdoptionGridCard = ({
   isFavorite,
   onToggle,
   showFavorite = true,
+  preload = false,
   className,
 }: AdoptionGridCardProps) => {
   const { status } = listing
@@ -36,6 +38,7 @@ const AdoptionGridCard = ({
       href={`/adoption/${listing.listingId}`}
       thumbnailUrl={listing.thumbnailUrl}
       alt={listing.name}
+      preload={preload}
       className={cn(
         'transition-[transform,box-shadow,background-color,border-radius] duration-200 ease-out pc:hover:-translate-y-2 pc:hover:overflow-hidden pc:hover:rounded-[1.25rem] pc:hover:bg-white pc:hover:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)] pc:focus-visible:-translate-y-2 pc:focus-visible:rounded-[1.25rem] pc:focus-visible:bg-white pc:focus-visible:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]',
         className,
