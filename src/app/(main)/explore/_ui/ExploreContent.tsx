@@ -175,7 +175,12 @@ const ExploreContent = () => {
         style={{ top: stickyBarTop }}
       >
         <Container>
-          <ExploreFilterBar selected={selectedCategory} onChange={handleCategoryChange} />
+          <ExploreFilterBar
+            selected={selectedCategory}
+            onChange={handleCategoryChange}
+            keyword={keyword}
+            onSearch={handleSearch}
+          />
         </Container>
       </div>
 
