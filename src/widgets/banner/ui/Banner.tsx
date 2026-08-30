@@ -122,7 +122,7 @@ const Banner = () => {
             type="button"
             aria-label={label}
             className={cn(
-              'absolute top-[6.19rem] z-10 flex size-5 -translate-y-1/2 items-center justify-center text-info-500 tab:top-1/2 tab:size-[2.2275rem] pc:size-[3rem] [&.swiper-button-disabled]:cursor-default [&.swiper-button-disabled]:text-neutral-500',
+              'absolute top-[6.19rem] z-10 flex size-5 -translate-y-1/2 items-center justify-center text-primary-500 transition-[color,transform] hover:text-primary-700 focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 tab:top-1/2 tab:size-[2.2275rem] pc:size-[3rem] [&.swiper-button-disabled]:cursor-default [&.swiper-button-disabled]:text-neutral-400 [&.swiper-button-disabled]:hover:text-neutral-400',
               position,
               className,
             )}

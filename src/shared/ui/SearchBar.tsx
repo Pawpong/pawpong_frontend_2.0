@@ -24,8 +24,7 @@ const DEFAULT_PLACEHOLDER = {
 
 const INPUT_NAME = 'keyword'
 
-// Figma: tab h48 / PC h56 / rounded8 / border #a6a6a6(포커스 #256EF4 — 모바일·탭 1px / PC 2px) / p12,
-// 입력 텍스트 #3E3E3E, placeholder Pretendard medium 16px #a6a6a6, 우측 32px 검색 아이콘
+// 홈 전반의 웜 뉴트럴 + 브라운 포인트 톤을 공유한다.
 export const SearchBar = ({
   placeholder = DEFAULT_PLACEHOLDER,
   defaultValue,
@@ -53,7 +52,7 @@ export const SearchBar = ({
       role="search"
       onSubmit={handleSubmit}
       className={cn(
-        'flex h-12 w-full items-center justify-between gap-3 rounded-lg border border-neutral-500 bg-white p-3 focus-within:border-info-500 pc:h-14 pc:focus-within:border-2',
+        'group flex h-12 w-full items-center justify-between gap-3 rounded-full border border-primary-200 bg-primary-50/40 px-4 shadow-[0_3px_12px_rgba(73,45,20,0.06)] transition-[border-color,background-color,box-shadow] focus-within:border-primary-500 focus-within:bg-white focus-within:shadow-[0_5px_18px_rgba(173,101,29,0.12)] pc:h-14 pc:px-5',
         className,
       )}
     >
@@ -62,10 +61,14 @@ export const SearchBar = ({
         name={INPUT_NAME}
         defaultValue={defaultValue}
         placeholder={isTablet ? placeholder.desktop : placeholder.mobile}
-        className="min-w-0 flex-1 bg-transparent text-base leading-[1.5] font-medium text-neutral-850 outline-none placeholder:text-neutral-500"
+        className="min-w-0 flex-1 bg-transparent text-sm leading-[1.5] font-medium text-neutral-850 outline-none placeholder:font-normal placeholder:text-neutral-500 tab:text-base"
       />
-      <button type="submit" aria-label="검색" className="shrink-0">
-        <SearchIcon className="size-8 text-neutral-700" />
+      <button
+        type="submit"
+        aria-label="검색"
+        className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-500 text-white transition-colors hover:bg-primary-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 pc:size-9"
+      >
+        <SearchIcon className="size-5 pc:size-6" />
       </button>
     </form>
   )

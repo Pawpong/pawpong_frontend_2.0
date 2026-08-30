@@ -29,12 +29,12 @@ const SearchSection = ({
   return (
     <section
       className={cn(
-        'flex flex-col items-center py-3 tab:py-5',
+        'flex flex-col items-center py-5 tab:py-7 pc:py-8',
         withPadding && 'px-4 tab:px-12 pc:px-20',
         className,
       )}
     >
-      <div className="flex w-full max-w-[21.4375rem] flex-col gap-3 tab:max-w-[30.125rem] pc:max-w-[52.875rem]">
+      <div className="flex w-full max-w-[36rem] flex-col gap-3 pc:max-w-[42rem]">
         <SearchBar placeholder={placeholder} defaultValue={defaultValue} onSubmit={onSubmit} />
         {showPopularKeywords && <PopularKeywords />}
       </div>
