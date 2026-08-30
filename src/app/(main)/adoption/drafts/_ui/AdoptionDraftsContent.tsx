@@ -49,6 +49,7 @@ const AdoptionDraftsContent = () => {
                             src={draft.primaryPhotoUrl}
                             alt={draft.name || '임시저장 분양글'}
                             fill
+                            sizes="64px"
                             className="object-cover"
                           />
                         )}

@@ -119,6 +119,7 @@ const PostDetailContent = ({ postId }: PostDetailContentProps) => {
                       src={url}
                       alt={`게시글 이미지 ${index + 1}`}
                       fill
+                      sizes="(max-width: 767px) 234px, 349px"
                       className="object-cover"
                     />
                   )}

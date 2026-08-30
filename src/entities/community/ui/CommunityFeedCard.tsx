@@ -129,6 +129,7 @@ const CommunityFeedCard = ({
                     src={src}
                     alt={`게시글 이미지 ${index + 1}`}
                     fill
+                    sizes="(max-width: 767px) 281px, 320px"
                     className="object-cover"
                   />
                 )}
