@@ -1,6 +1,6 @@
 import { Fragment } from 'react'
 import { toCommunityPreviewProps } from '@/entities/community'
-import { ConnectedPostCard } from '@/features/community'
+import { ConnectedFeedCard } from '@/features/community'
 import type { CommunityPostCard } from '@/shared/types'
 
 interface PostListProps {
@@ -12,8 +12,9 @@ interface PostListProps {
   onDelete?: (postId: string) => void
 }
 
-// 디자인(2046-160971): 모바일은 카드 stack(gap-20), 탭·PC는 #cacaca 보더 박스(rounded-8) + 구분선, 게시글 간 gap-32
-// 박스는 max-w-948(59.25rem) 중앙 정렬(frame items-center), 세로 여백(spacing-40)은 래퍼 Container의 py가 담당
+// 커뮤니티 피드(/community)와 같은 단일 컬럼 카드 — 다만 폭은 좁히지 않고 래퍼 Container를 그대로 채운다.
+// 내 글 목록은 어디까지가 한 글인지 바로 보여야 해서 카드 사이에 구분선을 남긴다
+// (gap을 커뮤니티의 절반으로 두어 구분선 포함 간격이 24/32/40으로 같아진다)
 const PostList = ({ posts, emptyText = '게시글이 없습니다.', onEdit, onDelete }: PostListProps) => {
   if (posts.length === 0) {
     return (
@@ -24,17 +25,17 @@ const PostList = ({ posts, emptyText = '게시글이 없습니다.', onEdit, onD
   }
 
   return (
-    <div className="flex flex-col gap-5 tab:mx-auto tab:max-w-[59.25rem] tab:gap-8 tab:rounded-lg tab:border tab:border-neutral-300 tab:p-3">
+    <div className="flex w-full min-w-0 flex-col gap-3 tab:gap-4 pc:gap-5">
       {posts.map((post, index) => (
         <Fragment key={post.postId}>
-          <ConnectedPostCard
+          <ConnectedFeedCard
             {...toCommunityPreviewProps(post)}
+            // 마이홈 카드는 Container 폭을 다 쓰므로 정사각 캐러셀 대신 가로 스크롤로 늘어놓는다
+            mediaLayout="row"
             onEdit={onEdit && (() => onEdit(post.postId))}
             onDelete={onDelete && (() => onDelete(post.postId))}
           />
-          {index < posts.length - 1 && (
-            <div className="hidden h-px w-full bg-neutral-300 tab:block" />
-          )}
+          {index < posts.length - 1 && <div className="h-px w-full bg-neutral-300" />}
         </Fragment>
       ))}
     </div>
