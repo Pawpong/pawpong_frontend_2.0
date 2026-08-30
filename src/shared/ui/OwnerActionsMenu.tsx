@@ -15,6 +15,8 @@ interface OwnerActionsMenuProps {
   onDelete: () => void
   /** 트리거 아이콘 크기 (기본 size-6) */
   className?: string
+  /** 트리거의 구체적인 접근성 이름 */
+  ariaLabel?: string
 }
 
 /**
@@ -22,10 +24,22 @@ interface OwnerActionsMenuProps {
  * onEdit을 생략하면 삭제 항목만 노출한다.
  * 소유자 판정은 호출부에서 하고, 이 컴포넌트는 렌더된 시점에 항상 표시한다.
  */
-const OwnerActionsMenu = ({ onEdit, onDelete, className }: OwnerActionsMenuProps) => (
+const OwnerActionsMenu = ({
+  onEdit,
+  onDelete,
+  className,
+  ariaLabel = '더보기',
+}: OwnerActionsMenuProps) => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
-      <button type="button" aria-label="더보기" className={cn('text-text-primary', className)}>
+      <button
+        type="button"
+        aria-label={ariaLabel}
+        className={cn(
+          'text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500',
+          className,
+        )}
+      >
         <MoreVertIcon className="size-6" />
       </button>
     </DropdownMenuTrigger>

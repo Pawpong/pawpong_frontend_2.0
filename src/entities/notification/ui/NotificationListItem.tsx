@@ -3,11 +3,12 @@
 import { cn } from '@/shared/lib/cn'
 import { formatRelativeTime } from '@/shared/lib/formatRelativeTime'
 import type { NotificationResponseDto } from '@/shared/types'
+import { OwnerActionsMenu } from '@/shared/ui/OwnerActionsMenu'
 
 interface NotificationListItemProps {
   item: NotificationResponseDto
   onSelect: (item: NotificationResponseDto) => void
-  onDelete?: (notificationId: string) => void
+  onDelete?: (item: NotificationResponseDto) => void
   compact?: boolean
 }
 
@@ -20,9 +21,9 @@ const NotificationListItem = ({
   return (
     <article
       className={cn(
-        'group relative flex w-full items-start gap-3 transition-colors hover:bg-primary-50/40',
-        compact ? 'px-4 py-3' : 'rounded-xl border border-neutral-150 px-4 py-4 tab:px-5',
-        !item.isRead && 'bg-point-50',
+        'group relative flex w-full items-start gap-3 transition-colors hover:bg-primary-50/50',
+        compact ? 'px-4 py-3' : 'px-4 py-4 tab:px-5 tab:py-5',
+        !item.isRead && 'bg-point-50/80',
       )}
     >
       <button
@@ -32,7 +33,7 @@ const NotificationListItem = ({
       >
         <span
           className={cn(
-            'mt-1.5 size-2 shrink-0 rounded-full',
+            'mt-1.5 size-2.5 shrink-0 rounded-full ring-2 ring-transparent',
             item.isRead ? 'bg-transparent' : 'bg-primary-500',
           )}
         />
@@ -50,14 +51,11 @@ const NotificationListItem = ({
       </button>
 
       {onDelete && (
-        <button
-          type="button"
-          onClick={() => onDelete(item.notificationId)}
-          aria-label={`${item.title} 알림 삭제`}
-          className="shrink-0 rounded-full px-2 py-1 text-xs font-medium text-neutral-500 transition-colors hover:bg-white hover:text-error-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
-        >
-          삭제
-        </button>
+        <OwnerActionsMenu
+          onDelete={() => onDelete(item)}
+          ariaLabel={`${item.title} 알림 더보기`}
+          className="shrink-0 rounded-full p-1 text-neutral-500 transition-colors hover:bg-white hover:text-neutral-850"
+        />
       )}
     </article>
   )

@@ -9,6 +9,7 @@ import { NotificationListItem, notificationQueries } from '@/entities/notificati
 import { uniqueBy } from '@/shared/lib/uniqueBy'
 import { useMarkAsRead, useMarkAllAsRead } from '@/features/notification'
 import type { NotificationResponseDto } from '@/shared/types'
+import { Button } from '@/shared/ui'
 
 // 전용 벨 아이콘이 없어 인라인 SVG 사용 (nav 아이콘 톤과 동일한 currentColor)
 const BellIcon = ({ className }: { className?: string }) => (
@@ -102,19 +103,19 @@ const NotificationBell = () => {
         <div className="flex h-[3rem] items-center justify-center px-[0.625rem]">알림</div>
       </button>
 
-      {/* 유튜브식 드롭다운 패널 */}
+      {/* 전체 알림 화면과 같은 grouped-list 톤의 드롭다운 패널 */}
       {open && (
-        <div className="absolute top-full right-0 z-50 mt-1 w-[22.5rem] overflow-hidden rounded-xl border border-neutral-150 bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
-          <div className="flex items-center justify-between border-b border-neutral-100 px-4 py-3">
+        <div className="absolute top-full right-0 z-dropdown mt-1 w-[22.5rem] overflow-hidden rounded-xl border border-neutral-150 bg-white shadow-[0_8px_24px_rgba(73,45,20,0.14)]">
+          <div className="flex items-center justify-between border-b border-neutral-150 bg-primary-50/60 px-4 py-3">
             <span className="text-base font-semibold text-neutral-850">알림</span>
             {unreadCount > 0 && (
-              <button
-                type="button"
+              <Button
+                variant="text"
                 onClick={() => markAllAsRead()}
-                className="text-xs font-medium text-neutral-700 transition-colors hover:text-neutral-850"
+                className="h-7 px-2 text-xs text-primary-600 hover:bg-white"
               >
-                모두 읽음
-              </button>
+                모두 읽기
+              </Button>
             )}
           </div>
 
@@ -149,6 +150,19 @@ const NotificationBell = () => {
                 )}
               </div>
             )}
+          </div>
+
+          <div className="border-t border-neutral-150 p-2">
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false)
+                router.push('/notifications')
+              }}
+              className="flex h-9 w-full items-center justify-center rounded-lg text-sm font-semibold text-primary-600 transition-colors hover:bg-primary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+            >
+              알림 전체 보기
+            </button>
           </div>
         </div>
       )}
