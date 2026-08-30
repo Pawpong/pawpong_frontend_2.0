@@ -22,14 +22,3 @@ export type ApplicationTextField = {
     ? K
     : never
 }[keyof ApplicationFormValues]
-
-export const getAgeText = (birthDate: string): string => {
-  const match = birthDate.match(/(\d{4})년\s*(\d{1,2})월/)
-  if (!match) return birthDate
-  const birthYear = parseInt(match[1], 10)
-  const birthMonth = parseInt(match[2], 10)
-  const now = new Date()
-  const monthsDiff = (now.getFullYear() - birthYear) * 12 + (now.getMonth() + 1 - birthMonth)
-  if (monthsDiff < 12) return `${monthsDiff}개월`
-  return `${Math.floor(monthsDiff / 12)}살`
-}

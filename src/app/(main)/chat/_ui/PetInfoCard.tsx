@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { PopularBadge } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
+import { formatBirthDate } from '@/shared/lib/formatBirthDate'
 import { ArrowRightIcon } from '@/shared/assets'
 import { GENDER_LABEL, type AdoptionPetDetail } from '@/shared/types'
 import { ADOPTION_CARD_STATUS } from '@/entities/adoption'
@@ -12,7 +13,7 @@ interface PetInfoCardProps {
 }
 
 const PetInfoCard = ({ detail }: PetInfoCardProps) => {
-  const title = `${detail.breed} ${detail.name} | ${GENDER_LABEL[detail.gender]} ${detail.ageDescription}`
+  const title = `${detail.breed} ${detail.name} | ${GENDER_LABEL[detail.gender]} ${formatBirthDate(detail.birthDate)}`
   const statusLabel = ADOPTION_CARD_STATUS[detail.status].label
 
   return (

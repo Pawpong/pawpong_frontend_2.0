@@ -9,7 +9,7 @@ import { AdoptionStatusBadge } from './AdoptionStatusBadge'
 /** 이 카드가 실제로 그리는 필드만 (분양글 목록처럼 다른 응답 타입도 그대로 넘길 수 있게) */
 type AdoptionGridCardListing = Pick<
   AdoptionListingCard,
-  'listingId' | 'name' | 'gender' | 'ageText' | 'thumbnailUrl' | 'status'
+  'listingId' | 'name' | 'gender' | 'birthDateText' | 'thumbnailUrl' | 'status'
 > & { isPopular?: boolean }
 
 interface AdoptionGridCardProps {
@@ -85,7 +85,7 @@ const AdoptionGridCard = ({
         />
       </div>
       <p className="truncate text-xs leading-[1.5] font-medium text-neutral-850 tab:text-sm">
-        {listing.ageText}
+        {listing.birthDateText}
       </p>
     </MediaCard>
   )

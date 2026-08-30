@@ -115,7 +115,7 @@ const AdoptionCard = ({ listing, className, isFavorite, onToggle }: AdoptionCard
           <div className="flex min-w-0 flex-1 flex-col justify-between">
             {/* [refactored] 제목 공통 클래스 + 태블릿 사이즈 */}
             <p className={cn(CARD_TITLE_BASE, 'text-[1rem]')}>
-              {`${listing.name} | ${GENDER_LABEL[listing.gender]} ${listing.ageText}`}
+              {`${listing.name} | ${GENDER_LABEL[listing.gender]} ${listing.birthDateText}`}
             </p>
             <CardStats
               listing={listing}

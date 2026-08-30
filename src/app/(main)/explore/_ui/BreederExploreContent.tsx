@@ -43,17 +43,20 @@ const toBreederCardModel = (breeder: Breeder): FavoriteBreeder => ({
 interface BreederExploreContentProps {
   /** 상단 픽셀 카테고리 칩 선택값 — 입양 탭과 같은 필터를 공유한다 */
   category: AnimalCategory
+  /** 상단 검색바 검색어 — 입양 탭과 같은 URL 파라미터를 공유한다 */
+  keyword?: string
 }
 
 // 상단 카테고리/검색(픽셀 카테고리 + 큰 검색바)은 ExploreContent에서 공통 렌더.
 // 목록 레이아웃은 입양 탐색과 동일 — 제목+필터 칩 헤더 / 공용 그리드 / 무한스크롤.
-const BreederExploreContent = ({ category }: BreederExploreContentProps) => {
+const BreederExploreContent = ({ category, keyword }: BreederExploreContentProps) => {
   const [listFilter, setListFilter] = useState<ExploreListFilter>('all')
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending, isError } =
     useInfiniteQuery(
       breederQueries.explore({
         petType: toBreederPetType(category),
+        keyword,
         ...FILTER_TO_QUERY[listFilter],
       }),
     )
