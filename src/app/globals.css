@@ -24,9 +24,9 @@
 @theme {
   --breakpoint-mo: 375px;
   --breakpoint-tab: 768px;
-  /* 셸 상한(max-w-[90rem], 1440)과 같은 값이면 스크롤바 폭 때문에 1440 모니터에서 pc:가 끝내 안 켜진다.
-     디자인 기준은 1440 그대로 두고 진입점만 노트북 폭으로 내린다 */
-  --breakpoint-pc: 1280px;
+  /* Figma 2026 Pawpong의 반응형 구간: Mo 375~767 / Tab 768~1439 / PC 1440~.
+     JS 런타임 판별(useBreakpoint)과 동일한 값으로 유지한다. */
+  --breakpoint-pc: 1440px;
 
   /* typography — Body 스케일 (line-height 150% 포함). weight는 font-* 유틸로: font-normal/medium/semibold */
   --text-body-sm: 0.75rem; /* 12 */

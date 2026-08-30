@@ -53,9 +53,9 @@ const PostFormLayout = ({
       />
 
       <Container className="flex-1 py-5 pb-30 pc:py-12">
-        <div className="mx-auto w-full min-[1440px]:max-w-320">
-          <div className="flex flex-col gap-[1.1875rem] min-[1440px]:flex-row min-[1440px]:gap-25">
-            <div className="flex flex-col gap-1 min-[1440px]:w-93 min-[1440px]:shrink-0 min-[1440px]:gap-2">
+        <div className="mx-auto w-full pc:max-w-320">
+          <div className="flex flex-col gap-[1.1875rem] pc:flex-row pc:gap-25">
+            <div className="flex flex-col gap-1 pc:w-93 pc:shrink-0 pc:gap-2">
               <TextLabel size="14" requirement="선택">
                 이미지
               </TextLabel>
@@ -78,8 +78,8 @@ const PostFormLayout = ({
               placeholder={placeholder}
               maxLength={maxLength}
               currentLength={maxLength === undefined ? undefined : form.text.length}
-              wrapperClassName="min-[1440px]:flex-1"
-              className="min-[1440px]:h-45"
+              wrapperClassName="pc:flex-1"
+              className="pc:h-45"
             />
           </div>
 
