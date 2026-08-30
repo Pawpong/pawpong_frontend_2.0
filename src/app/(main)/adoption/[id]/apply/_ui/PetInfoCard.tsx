@@ -5,7 +5,6 @@ import { PopularBadge } from '@/shared/ui'
 import type { AdoptionDetailDto } from '@/shared/types'
 import { GENDER_LABEL } from '@/shared/types'
 import { ADOPTION_CARD_STATUS } from '@/entities/adoption'
-import { getAgeText } from '../_lib/schema'
 
 interface PetInfoCardProps {
   detail: AdoptionDetailDto
@@ -15,7 +14,7 @@ interface PetInfoCardProps {
    골격은 브리더의 다른 분양건 카드(OtherListingCard)와 동일:
    이미지(좌, 가운데정렬) + 우측 정보 컬럼(flex-col justify-between self-stretch) + 하단 행 */
 const PetInfoCard = ({ detail }: PetInfoCardProps) => {
-  const title = `${detail.name} | ${GENDER_LABEL[detail.gender]} ${getAgeText(detail.birthDate)}`
+  const title = `${detail.name} | ${GENDER_LABEL[detail.gender]} ${detail.birthDate}`
 
   return (
     <div>

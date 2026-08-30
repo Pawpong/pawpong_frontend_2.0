@@ -12,7 +12,7 @@ import { useToast } from '@/shared/lib/useToast'
 import { normalizeApiError } from '@/shared/api'
 import { GENDER_LABEL } from '@/shared/types'
 import type { AdoptionDetailDto } from '@/shared/types'
-import { applicationSchema, getAgeText, type ApplicationFormValues } from './schema'
+import { applicationSchema, type ApplicationFormValues } from './schema'
 import { toCreateApplicationRequest } from './applicationRequest'
 import { SUBMIT_ERROR_FALLBACK } from './constants'
 
@@ -106,7 +106,7 @@ const useApplicationForm = (detail: AdoptionDetailDto) => {
   const { data: adopterProfile } = useQuery(adopterQueries.profile())
   const needsSurvey = adopterProfile?.counselDefaultProfile === null
 
-  const petSummary = `${detail.name} . ${GENDER_LABEL[detail.gender]} . ${getAgeText(detail.birthDate)}`
+  const petSummary = `${detail.name} . ${GENDER_LABEL[detail.gender]} . ${detail.birthDate}`
 
   return {
     register,
