@@ -147,7 +147,7 @@ const MyHomeContent = () => {
 
             {/* 배너는 콘텐츠 Container 밖의 독립 밴드 (시안 3170-800323) — 홈 CTA 스트립과 같은 배치 */}
             <Container className="px-4 pt-4 pb-2">
-              <CtaBanner text="분양 페이지 바로가기" href="/adoption" />
+              <CtaBanner text="분양 페이지 바로가기" href="/explore" />
             </Container>
 
             <Container className="py-5 tab:py-10">

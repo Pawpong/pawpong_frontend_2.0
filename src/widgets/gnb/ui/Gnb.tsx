@@ -43,7 +43,7 @@ const Gnb = () => {
         </div>
       </header>
 
-      {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} />}
+      <MobileMenu open={menuOpen} onOpenChange={setMenuOpen} />
     </>
   )
 }
