@@ -8,6 +8,7 @@ import type { FavoriteBreeder } from '@/shared/types'
 interface BreederCardProps {
   breeder: FavoriteBreeder
   showPopularBadge?: boolean
+  preload?: boolean
 }
 
 /**
@@ -17,12 +18,13 @@ interface BreederCardProps {
  * 규격만 이 시안을 따른다: medium(모바일 164) / large(PC 282).
  * 아이콘(IconStar 2949-296222)은 픽셀 마름모다 — 미등록은 흰색 60% 외곽선, 등록은 투톤 채움.
  */
-const BreederCard = ({ breeder, showPopularBadge }: BreederCardProps) => {
+const BreederCard = ({ breeder, showPopularBadge, preload = false }: BreederCardProps) => {
   return (
     <MediaCard
       href={`/home/${breeder.id}`}
       thumbnailUrl={breeder.imageUrl ?? undefined}
       alt={breeder.nickname}
+      preload={preload}
       // 시안: mo 164x133.84 / pc 282x230 (비율 동일), radius mo 4 / pc 8
       thumbnailClassName="aspect-[282/230] rounded tab:rounded-lg"
       overlay={

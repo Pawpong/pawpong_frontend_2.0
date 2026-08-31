@@ -91,7 +91,9 @@ const BreederExploreContent = ({ category, keyword }: BreederExploreContentProps
           <ListingCardGrid
             items={breeders}
             getKey={(breeder) => breeder.id}
-            renderItem={(breeder) => <BreederCard breeder={breeder} />}
+            renderItem={(breeder, index) => (
+              <BreederCard breeder={breeder} preload={index < 4 && Boolean(breeder.imageUrl)} />
+            )}
           />
         </ListState>
       </TitledSection>

@@ -68,7 +68,8 @@ const MediaCard = ({
             alt={alt}
             fill
             sizes={sizes}
-            preload={preload}
+            loading={preload ? 'eager' : 'lazy'}
+            fetchPriority={preload ? 'high' : 'auto'}
             onError={() => setFailedImageUrl(thumbnailUrl)}
             className="object-cover transition-transform duration-200 ease-out pc:group-hover/media:scale-[1.02] motion-reduce:transform-none"
           />
