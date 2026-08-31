@@ -120,6 +120,6 @@ export const breederQueries = {
     createQuery({
       queryKey: [...breederQueries.all(), 'verification'],
       queryFn: getBreederVerification,
-      staleTime: STALE_TIME.VERY_LONG,
+      staleTime: STALE_TIME.REALTIME,
     }),
 }

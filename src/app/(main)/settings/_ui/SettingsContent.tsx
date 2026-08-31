@@ -33,11 +33,18 @@ const COMMON_LINKS: SettingsLink[] = [
   },
 ]
 
-const BREEDER_LINK: SettingsLink = {
-  href: '/adoption/my-listings',
-  label: '분양글 관리',
-  description: '작성한 분양글과 진행 상태를 관리해요.',
-}
+const BREEDER_LINKS: SettingsLink[] = [
+  {
+    href: '/grade-policy/apply',
+    label: '브리더 등급 관리',
+    description: '현재 등급과 심사 상태를 확인하고 Elite 등급을 신청해요.',
+  },
+  {
+    href: '/adoption/my-listings',
+    label: '분양글 관리',
+    description: '작성한 분양글과 진행 상태를 관리해요.',
+  },
+]
 
 const SettingsLinkRow = ({ href, label, description }: SettingsLink) => (
   <Link
@@ -56,7 +63,7 @@ const SettingsLinkRow = ({ href, label, description }: SettingsLink) => (
 
 const SettingsContent = ({ userRole }: SettingsContentProps) => {
   const { logoutAndRedirect, isPending } = useLogoutAndRedirect()
-  const links = userRole === 'breeder' ? [...COMMON_LINKS, BREEDER_LINK] : COMMON_LINKS
+  const links = userRole === 'breeder' ? [...COMMON_LINKS, ...BREEDER_LINKS] : COMMON_LINKS
 
   return (
     <div className="flex w-full flex-1 flex-col bg-primary-50/20 pb-16">

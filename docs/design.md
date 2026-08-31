@@ -153,6 +153,7 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 - `Textarea`, `TextareaField`: 장문 입력과 글자 수/오류 상태를 담당한다.
 - `SearchBar`, `SearchButton`, `SearchIcon`: 높이 40px, radius 8, neutral border의 검색 submit을 공통화한다. 홈 검색 폭은 Mobile 343px / Tablet 482px / PC 846px이다.
 - `Label`, `TextLabel`, `HelpMessage`: 필드 레이블·필수/선택·도움말에 사용한다.
+- `DocumentFilePicker`: 온보딩과 등급 심사에서 같은 서류 선택 표면·파일명·오류 상태를 제공한다. PDF·JPG·PNG·WEBP만 허용하고 파일당 최대 20MB이며, 서버도 MIME·확장자·크기와 업로드 소유권을 다시 검증한다.
 
 ### 홈 반응형 기준
 
@@ -199,11 +200,13 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 
 ### 계정·도움말 화면
 
-- `/settings`는 인증된 사용자의 계정 허브다. 프로필·알림·저장목록을 공통으로 제공하고, 브리더에게만 분양글 관리를 추가한다.
+- `/settings`는 인증된 사용자의 계정 허브다. 프로필·알림·저장목록을 공통으로 제공하고, 브리더에게만 등급 관리와 분양글 관리를 추가한다.
 - `/faq`는 공개 화면이며 입양자/브리더 탭마다 `GET /home/faqs?userType=...`의 실제 데이터를 표시한다.
 - FAQ 항목은 별도 JavaScript accordion을 복제하지 않고 native `details/summary`를 사용한다. 질문 행 전체가 터치·키보드 대상이며 열림 상태는 화살표 회전과 답변 표면으로 함께 표시한다.
 - 계정 메뉴와 도움말 목록은 `rounded-xl + neutral-150 border + white surface`를 공통 카드 계약으로 사용하고, 작은 텍스트 링크를 흩뿌리지 않는다.
 - `/grade-policy`는 공개 화면이다. `new`/`elite` 값은 백엔드 enum과 동일하게 유지하고, 등급이 서류 확인 범위이며 건강·입양 결과 보증이 아니라는 한계를 반드시 함께 고지한다.
+- `/grade-policy/apply`는 브리더 전용 화면이다. 기본 심사 대기·반려, New 승인·Elite 신청 가능, Elite 심사 중·반려, Elite 승인 상태를 서버 검증 결과로 분기하며 사용자가 상태를 임의로 건너뛸 수 없다.
+- Elite 신청은 기존 New 승인 서류를 재업로드하지 않고 `adoptionContractSample`과 전문성 증빙(`breederCertification` 또는 `recentPedigreeDocument`)만 추가한다. 업로드 성공 후 반환된 파일 키만 변경 심사 요청에 넘기며, 중복 제출은 pending 상태와 서버 상태 양쪽에서 차단한다.
 
 ### 장식·구조
 
@@ -230,6 +233,7 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 - 내부 이동 URL은 `/`로 시작하는 값만 허용한다.
 - API 실패를 빈 상태로 가장하지 않는다. 오류와 빈 상태를 별도로 렌더링한다.
 - optimistic update를 쓰면 실패 시 반드시 rollback하고 서버 값으로 재검증한다.
+- 쿠키 기반 역할 UI는 `useAuthStatus().isReady`가 true가 된 뒤에만 역할별 내용을 렌더링한다. 서버 스냅샷과 첫 클라이언트 렌더를 동일하게 유지하고, `pageshow`·`popstate`·`visibilitychange`에서 쿠키를 다시 읽어 BFCache 뒤로가기에서도 오래된 역할 UI를 남기지 않는다.
 
 ## 10. 이미지
 
@@ -297,6 +301,7 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 | 채팅                  | 채팅 공용 폭·Socket.IO·`ChatRoomActionsMenu`                     | 딥링크·뒤로가기·방 나가기·Kafka 정상/장애/복구 로컬 E2E 완료     |
 | 분양 임시저장         | `ListState`, `OwnerActionsMenu`, `DeleteConfirmModal`            | 재진입 강제 조회·오류 재시도·대표 사진 dirty 보호 완료           |
 | API 재진입 상태       | `AsyncState`, `ListState`, `useExitGuard`                        | 상세·신청·프로필·홈·알림·커뮤니티 로컬 복구 통일                 |
+| 브리더 등급 정책·심사 | Figma 메뉴 `3555:416834` 외, `DocumentFilePicker`, `AsyncState`  | 공개 정책·역할 CTA·Elite 서류 업로드·신청 상태·재진입 연결 완료  |
 
 ## 15. 문서 갱신 규칙
 

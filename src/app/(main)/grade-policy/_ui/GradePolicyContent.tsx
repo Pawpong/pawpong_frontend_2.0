@@ -1,5 +1,6 @@
 import { CheckRoundedIcon, PawIcon, PixelStarFillIcon } from '@/shared/assets'
 import { Badge, Container, NavigationBar } from '@/shared/ui'
+import { GradePolicyCta } from './GradePolicyCta'
 
 const LEVELS = [
   {
@@ -111,6 +112,8 @@ const GradePolicyContent = () => (
             ))}
           </ol>
         </section>
+
+        <GradePolicyCta />
 
         <p className="px-1 text-xs leading-[1.6] font-medium text-neutral-500 tab:text-sm">
           시행일 2026.08.31 · 정책이 바뀌면 적용 전에 공지사항을 통해 안내합니다.

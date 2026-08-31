@@ -37,6 +37,7 @@ export interface BreederPriceRangeDto {
 export interface BreederDocumentDto {
   type: string
   url: string
+  fileName?: string
   originalFileName?: string
   uploadedAt?: string
 }
@@ -310,13 +311,22 @@ export interface ReviewReplyDeleteResponseDto {
 /** 브리더 인증 상태 조회 응답 (GET /breeder-management/verification) */
 export interface VerificationStatusResponse {
   status: 'pending' | 'reviewing' | 'approved' | 'rejected'
-  plan?: 'basic' | 'premium' | 'enterprise'
-  level?: 'new' | 'intermediate' | 'advanced' | 'expert'
+  plan?: 'basic' | 'pro'
+  level?: BreederLevel
   submittedAt?: string
   reviewedAt?: string
   documents?: BreederDocumentDto[]
   rejectionReason?: string
   submittedByEmail?: boolean
+  isLevelChangeRequested: boolean
+  levelChangeRequest?: {
+    previousLevel: BreederLevel
+    requestedLevel: BreederLevel
+    requestedAt: string
+    documents: BreederDocumentDto[]
+  }
+  levelChangeRejectionReason?: string
+  levelChangeReviewedAt?: string
 }
 
 /** 브리더 인증 신청 요청 (POST /breeder-management/verification) */
@@ -356,6 +366,12 @@ export interface SubmitDocumentsRequest {
   level: BreederLevel
   documents: Array<{ type: string; fileName: string; originalFileName?: string }>
   submittedByEmail?: boolean
+}
+
+/** Elite 등급 변경 신청 (POST /breeder-management/verification/level-change) */
+export interface LevelChangeRequest {
+  requestedLevel: 'elite'
+  documents: Array<{ type: string; fileName: string; originalFileName?: string }>
 }
 
 // ==================== 입양 신청 폼 (간소화) ====================

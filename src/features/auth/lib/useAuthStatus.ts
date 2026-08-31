@@ -13,11 +13,12 @@ import { useSyncExternalStore } from 'react'
  * - 서버 렌더/하이드레이션 동안에는 getServerSnapshot('') 사용 → 비로그인으로 일관 → hydration mismatch 없음
  * - 하이드레이션 후 클라이언트 스냅샷(실제 쿠키)으로 전환되어 자동 재렌더
  * - 로그인 성공 후 /login/success → /explore 진입 시 GNB 가 새로 마운트되며 쿠키를 다시 읽음
- * - 탭 재포커스 시에도 보조적으로 재평가(focus 이벤트 구독)
+ * - 탭 재포커스·뒤로가기·BFCache 복원 시에도 실제 쿠키를 다시 평가
  *
  * TODO(FE): 추후 전역 auth 스토어(zustand 등) 도입 시 이 훅을 스토어 셀렉터로 대체.
  */
 type AuthStatus = {
+  isReady: boolean
   isLoggedIn: boolean
   userRole: string | null
 }
@@ -29,21 +30,39 @@ const readCookie = (name: string): string => {
   return found ? decodeURIComponent(found.slice(prefix.length)) : ''
 }
 
-// 쿠키 변경을 직접 감지하는 표준 이벤트는 없으므로 focus 로 보조 갱신한다.
+// 쿠키 변경을 직접 감지하는 표준 이벤트는 없으므로 브라우저 재진입 이벤트에서 다시 읽는다.
 const subscribe = (onChange: () => void) => {
   window.addEventListener('focus', onChange)
-  return () => window.removeEventListener('focus', onChange)
+  window.addEventListener('pageshow', onChange)
+  window.addEventListener('popstate', onChange)
+  document.addEventListener('visibilitychange', onChange)
+
+  return () => {
+    window.removeEventListener('focus', onChange)
+    window.removeEventListener('pageshow', onChange)
+    window.removeEventListener('popstate', onChange)
+    document.removeEventListener('visibilitychange', onChange)
+  }
 }
 
 const getAccessTokenSnapshot = () => readCookie('accessToken')
 const getUserRoleSnapshot = () => readCookie('userRole')
 const getServerSnapshot = () => ''
+const subscribeHydration = () => () => undefined
+const getClientReadySnapshot = () => true
+const getServerReadySnapshot = () => false
 
 export const useAuthStatus = (): AuthStatus => {
+  const isReady = useSyncExternalStore(
+    subscribeHydration,
+    getClientReadySnapshot,
+    getServerReadySnapshot,
+  )
   const accessToken = useSyncExternalStore(subscribe, getAccessTokenSnapshot, getServerSnapshot)
   const userRole = useSyncExternalStore(subscribe, getUserRoleSnapshot, getServerSnapshot)
 
   return {
+    isReady,
     isLoggedIn: Boolean(accessToken),
     userRole: userRole || null,
   }

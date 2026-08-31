@@ -32,6 +32,7 @@ export default defineConfig([
       './src/app/(main)/adoption/drafts/page.tsx',
       './src/app/(main)/adoption/my-listings/page.tsx',
       './src/app/(main)/settings/page.tsx',
+      './src/app/(main)/grade-policy/apply/page.tsx',
     ],
     rules: {
       'fsd/no-public-api-sidestep': 'off',

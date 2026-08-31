@@ -1,8 +1,4 @@
-'use client'
-
-import { useRef, type ChangeEvent } from 'react'
-import { FileIcon } from '@/shared/assets'
-import { cn } from '@/shared/lib/cn'
+import { DocumentFilePicker } from '@/shared/ui'
 
 interface DocumentUploadButtonProps {
   label: string
@@ -23,42 +19,16 @@ const DocumentUploadButton = ({
   label,
   onFileSelect,
   selectedFileName,
-  accept = 'image/*,application/pdf',
+  accept,
   className,
-}: DocumentUploadButtonProps) => {
-  const inputRef = useRef<HTMLInputElement>(null)
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    e.target.value = '' // 같은 파일 재선택 시에도 onChange 발생
-    if (file) onFileSelect?.(file)
-  }
-
-  return (
-    <>
-      <button
-        type="button"
-        onClick={() => inputRef.current?.click()}
-        // px 20 / py 12 / gap 4 / radius 8 — 아이콘 32 + py 24 = 높이 56
-        className={cn(
-          'flex w-full items-center gap-1 rounded-lg border border-neutral-300 bg-white px-5 py-3 text-left',
-          className,
-        )}
-      >
-        <FileIcon className="size-8 shrink-0 text-neutral-700" />
-        <span className="truncate text-base leading-[1.5] font-semibold text-neutral-850">
-          {selectedFileName ?? label}
-        </span>
-      </button>
-      <input
-        ref={inputRef}
-        type="file"
-        accept={accept}
-        className="hidden"
-        onChange={handleChange}
-      />
-    </>
-  )
-}
+}: DocumentUploadButtonProps) => (
+  <DocumentFilePicker
+    label={label}
+    selectedFileName={selectedFileName}
+    accept={accept}
+    onFileSelect={(file) => onFileSelect?.(file)}
+    className={className}
+  />
+)
 
 export { DocumentUploadButton }

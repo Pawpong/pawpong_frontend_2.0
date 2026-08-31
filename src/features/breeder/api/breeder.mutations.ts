@@ -12,6 +12,7 @@ import type {
   ReviewReplyRequest,
   VerificationSubmitRequest,
   SubmitDocumentsRequest,
+  LevelChangeRequest,
   SimpleApplicationFormUpdateRequest,
   BreederAccountDeleteRequest,
 } from '@/shared/types'
@@ -27,6 +28,7 @@ import {
   submitVerification,
   submitVerificationDocuments,
   uploadVerificationDocuments,
+  requestBreederLevelChange,
   updateSimpleApplicationForm,
   deleteBreederAccount,
 } from './breeder.api'
@@ -158,6 +160,16 @@ export const useUploadVerificationDocuments = () => {
       files: { type: string; file: File }[]
       level: 'new' | 'elite'
     }) => uploadVerificationDocuments(files, level),
+  })
+}
+
+export const useRequestBreederLevelChange = () => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (data: LevelChangeRequest) => requestBreederLevelChange(data),
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: breederQueries.verification().queryKey })
+    },
   })
 }
 

@@ -15,6 +15,7 @@ import type {
   VerificationSubmitRequest,
   VerificationSubmitResponse,
   SubmitDocumentsRequest,
+  LevelChangeRequest,
   UploadDocumentsResponseDto,
   SimpleApplicationFormUpdateRequest,
   SimpleApplicationFormUpdateResponse,
@@ -107,6 +108,14 @@ export const submitVerificationDocuments = (data: SubmitDocumentsRequest) =>
     .post<
       ApiResponseFull<VerificationSubmitResponse>
     >(`${API_VERSION}/breeder-management/verification/submit`, data)
+    .then(unwrap)
+
+/** 승인된 New 브리더의 Elite 등급 변경 신청 */
+export const requestBreederLevelChange = (data: LevelChangeRequest) =>
+  apiClient
+    .post<
+      ApiResponseFull<VerificationSubmitResponse>
+    >(`${API_VERSION}/breeder-management/verification/level-change`, data)
     .then(unwrap)
 
 /** 브리더 인증 서류 업로드 (multipart) */
