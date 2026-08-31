@@ -249,6 +249,7 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 - 상세·작성·프로필 화면도 뒤로가기 캐시 복원 시 서버 상태를 다시 확인해야 하므로 `refetchOnMount: 'always'`와 로컬 재시도를 함께 둔다.
 - 공용 `createQuery`·`createInfiniteQuery`는 동적 데이터에 이 재진입 규칙을 기본 적용한다. 품종·지역·필터처럼 `STALE_TIME.STATIC`으로 선언한 참조 데이터만 같은 세션에서 재호출하지 않는다.
 - 뒤로가기로 복원되는 화면은 stale 화면을 그대로 믿지 않고, mutation 후 관련 query key를 invalidate한다.
+- 문서 BFCache 복원은 `pageshow`, Next 클라이언트 히스토리 복원은 `popstate`에서 감지한다. 새 route segment가 구독을 마친 뒤 `resetQueries({ type: 'active' }, { cancelRefetch: true })`를 한 번 호출해 중단 요청 정리와 재요청을 원자적으로 처리한다. `cancelQueries`와 `resetQueries`를 따로 호출해 복원 화면을 pending에 남기지 않는다.
 - 무한 목록은 페이지를 평탄화한 뒤 ID 기준 dedupe를 적용한다.
 - 탐색 카테고리는 `all | dog | cat | lizard`를 사용하고 API의 `petType`에는 각각 `undefined | dog | cat | reptile`로 매핑한다. 입양·브리더·커뮤니티에서 같은 매핑을 공유하며, 지원 데이터가 없다는 이유로 `lizard`를 전체 조회로 폴백하지 않는다.
 - 내부 이동 URL은 `/`로 시작하는 값만 허용한다.
@@ -317,11 +318,11 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 | 홈 프로필·탭          | `1021:20324`, `976:32388`                                        | Figma 기준 일치, 전역 breakpoint 재검증 필요                      |
 | 커뮤니티 작성         | `1056:46147`                                                     | PC 진입점을 표준 `pc:`로 통일                                     |
 | 커뮤니티 신고         | `DropdownMenu`, `Dialog`, `LoginPromptModal`                     | 비소유자 메뉴·사유 검증·표준 신고 API 연결 완료                   |
-| 명예의 전당           | 홈/콘테스트 컴포넌트                                             | API 상태·투표 취소 연결 완료, 데이터 이미지 점검 필요             |
+| 명예의 전당           | `3349:1763500`, 콘테스트 컴포넌트, `ContestEntryImage`           | API 상태·투표 취소·레거시 이미지 브랜드 폴백 연결 완료            |
 | 알림                  | `NotificationListItem`, `OwnerActionsMenu`, `DeleteConfirmModal` | 그룹 목록·읽지 않음·삭제 확인·전체 보기 정렬 완료                 |
 | 채팅                  | 채팅 공용 폭·Socket.IO·`ChatRoomActionsMenu`·`ChatAttachMenu`    | 딥링크·뒤로가기·방 나가기·위치 공유·Kafka 정상/장애/복구 E2E 완료 |
 | 분양 임시저장         | `ListState`, `OwnerActionsMenu`, `DeleteConfirmModal`            | 재진입 강제 조회·오류 재시도·대표 사진 dirty 보호 완료            |
-| API 재진입 상태       | `AsyncState`, `ListState`, `useExitGuard`                        | 상세·신청·프로필·홈·알림·커뮤니티 로컬 복구 통일                  |
+| API 재진입 상태       | `AsyncState`, `ListState`, `QueryProvider`, `useExitGuard`       | 문서 BFCache·Next popstate 활성 API 재요청 E2E 완료               |
 | 브리더 인증 정책      | Figma 메뉴 `3555:416834`, `docs/archive/grade-policy.md`         | New/Elite 라우트·활성 UI·프론트 API 계약 제거, 인증 상태만 유지   |
 | 입양자 신청·후기      | 홈 `3349:1763114`, 탭 `976:32388`, 계정 패널                     | 신청 목록·상세·후기 작성·목록·상세·역할별 진입점 실제 API 연결    |
 | 입양 관심 정책        | 입양 상세 컴포넌트 세트, `FavoriteShareActions`                  | 전 breakpoint 단일 액션·소유자 숨김·서버 self-boost 403 차단 완료 |

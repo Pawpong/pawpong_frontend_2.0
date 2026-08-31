@@ -60,19 +60,38 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
   )
 
   useEffect(() => {
-    const recoverActiveQueries = () => {
-      window.requestAnimationFrame(() => {
-        // 중단된 retryer까지 초기화해야 back/forward 복원 뒤 동일 Promise를
-        // 다시 붙잡지 않는다. resetQueries는 현재 화면의 active query만 재요청한다.
-        void queryClient
-          .cancelQueries({ type: 'active' })
-          .then(() => queryClient.resetQueries({ type: 'active' }))
-      })
+    let scheduledFrame: number | null = null
+
+    const recoverActiveQueries = (framesUntilRecovery = 1) => {
+      if (scheduledFrame !== null) window.cancelAnimationFrame(scheduledFrame)
+
+      const schedule = (remainingFrames: number) => {
+        scheduledFrame = window.requestAnimationFrame(() => {
+          if (remainingFrames > 1) {
+            schedule(remainingFrames - 1)
+            return
+          }
+
+          scheduledFrame = null
+          // resetQueries가 진행 중 요청 취소와 active query 재요청을 원자적으로 처리한다.
+          // 먼저 cancelQueries를 호출하면 라우트 구독 교체 시점에 reset 대상이 사라져
+          // 복원 화면이 pending 상태로 남을 수 있다.
+          void queryClient.resetQueries({ type: 'active' }, { cancelRefetch: true })
+        })
+      }
+
+      schedule(framesUntilRecovery)
     }
 
     const handlePageShow = (event: PageTransitionEvent) => {
       if (!event.persisted) return
       recoverActiveQueries()
+    }
+
+    const handlePopState = () => {
+      // Next.js 클라이언트 히스토리 탐색은 pageshow 없이 popstate만 발생한다.
+      // 새 route segment가 active query를 구독한 뒤 재시작하도록 두 프레임을 기다린다.
+      recoverActiveQueries(2)
     }
 
     const navigation = performance.getEntriesByType('navigation')[0] as
@@ -84,7 +103,12 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
     if (navigation?.type === 'back_forward') recoverActiveQueries()
 
     window.addEventListener('pageshow', handlePageShow)
-    return () => window.removeEventListener('pageshow', handlePageShow)
+    window.addEventListener('popstate', handlePopState)
+    return () => {
+      window.removeEventListener('pageshow', handlePageShow)
+      window.removeEventListener('popstate', handlePopState)
+      if (scheduledFrame !== null) window.cancelAnimationFrame(scheduledFrame)
+    }
   }, [queryClient])
 
   return (
