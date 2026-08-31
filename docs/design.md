@@ -144,6 +144,7 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 - `Switch`, `Select`, `Checkbox`, `DropdownMenu`는 `neutral` 표면, `primary-500` focus ring, `point-500` 선택 상태, `error-*` 파괴 상태를 공유한다.
 - `OwnerActionsMenu`: 수정·삭제 같은 소유자 액션을 한 메뉴로 모은다.
 - `ReportPostAction`: 남의 커뮤니티 글 `⋮` 메뉴, 로그인 안내, 신고 사유·상세 입력, 접수 결과를 하나의 기능 흐름으로 소유한다. 엔티티 카드는 `moreAction` 슬롯만 제공한다.
+- `ChatRoomActionsMenu`: 목록·대화 헤더의 동일한 `⋮` 진입점에서 채팅방 나가기 확인과 pending/error 상태를 소유한다.
 
 ### 입력·검색
 
@@ -191,6 +192,7 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 - `ExitConfirmModal`, `LoginPromptModal`: 작성 이탈과 인증 필요 흐름을 담당한다.
 - 신고는 임의 기본 사유를 전송하지 않는다. 사용자가 백엔드 enum에 대응하는 사유를 명시적으로 선택해야 하며, 선택 전에는 클라이언트 검증으로 요청을 차단한다.
 - 비로그인 신고는 401 요청을 먼저 보내지 않고 `LoginPromptModal`에서 현재 경로를 returnUrl로 보존한다.
+- 채팅방 나가기는 목록과 대화 헤더에서 같은 확인 문구를 사용한다. 성공하면 닫힌 방을 목록·메시지 캐시에서 즉시 제거하고, 보고 있던 방이면 `/chat`으로 replace해 닫힌 딥링크가 뒤로가기 기록에 남지 않게 한다.
 - 닫기 아이콘, focus trap, ESC, overlay click 동작은 각 페이지가 재구현하지 않는다.
 - 전체 메뉴는 Radix `Dialog`를 사용한다. viewport 전체에 neutral/warm surface를 깔고 내부 콘텐츠는 `RESPONSIVE_SHELL_CLASS`와 16/48/80px 거터를 그대로 따른다.
 
@@ -290,7 +292,7 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 | 커뮤니티 신고         | `DropdownMenu`, `Dialog`, `LoginPromptModal`                     | 비소유자 메뉴·사유 검증·표준 신고 API 연결 완료                  |
 | 명예의 전당           | 홈/콘테스트 컴포넌트                                             | API 상태·투표 취소 연결 완료, 데이터 이미지 점검 필요            |
 | 알림                  | `NotificationListItem`, `OwnerActionsMenu`, `DeleteConfirmModal` | 그룹 목록·읽지 않음·삭제 확인·전체 보기 정렬 완료                |
-| 채팅                  | 채팅 공용 폭·Socket.IO                                           | 딥링크·뒤로가기·Kafka 정상/장애/복구 로컬 E2E 완료               |
+| 채팅                  | 채팅 공용 폭·Socket.IO·`ChatRoomActionsMenu`                     | 딥링크·뒤로가기·방 나가기·Kafka 정상/장애/복구 로컬 E2E 완료     |
 | 분양 임시저장         | `ListState`, `OwnerActionsMenu`, `DeleteConfirmModal`            | 재진입 강제 조회·오류 재시도·대표 사진 dirty 보호 완료           |
 | API 재진입 상태       | `AsyncState`, `ListState`, `useExitGuard`                        | 상세·신청·프로필·홈·알림·커뮤니티 로컬 복구 통일                 |
 

@@ -39,6 +39,10 @@ const ChatPageContent = () => {
       .then(() => queryClient.invalidateQueries({ queryKey: chatQueries.rooms().queryKey }))
   }
 
+  const handleRoomClosed = (roomId: string) => {
+    if (roomId === activeRoomId) router.replace('/chat', { scroll: false })
+  }
+
   // No room selected: full-width room list page
   if (!activeRoomId) {
     return <ChatRoomList activeRoomId={null} onSelectRoom={handleSelectRoom} />
@@ -101,6 +105,7 @@ const ChatPageContent = () => {
         room={activeRoom}
         currentUserId={profileQuery.data.userId}
         onBack={handleBack}
+        onRoomClosed={() => handleRoomClosed(activeRoom.roomId)}
       />
     )
   }
@@ -108,12 +113,17 @@ const ChatPageContent = () => {
   // PC + room selected: sidebar + chat panel
   return (
     <div className="mx-auto flex h-[calc(100dvh-4rem)] w-full max-w-[90rem]">
-      <ChatSidebar activeRoomId={activeRoomId} onSelectRoom={handleSelectRoom} />
+      <ChatSidebar
+        activeRoomId={activeRoomId}
+        onSelectRoom={handleSelectRoom}
+        onRoomClosed={handleRoomClosed}
+      />
       <div className="flex-1">
         <ChatRoomPanel
           room={activeRoom}
           currentUserId={profileQuery.data.userId}
           onBack={handleBack}
+          onRoomClosed={() => handleRoomClosed(activeRoom.roomId)}
         />
       </div>
     </div>

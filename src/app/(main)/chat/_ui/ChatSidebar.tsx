@@ -6,9 +6,10 @@ import { ChatRoomFilterableList } from './ChatRoomFilterableList'
 interface ChatSidebarProps {
   activeRoomId: string
   onSelectRoom: (room: ChatRoomResponseDto) => void
+  onRoomClosed: (roomId: string) => void
 }
 
-const ChatSidebar = ({ activeRoomId, onSelectRoom }: ChatSidebarProps) => {
+const ChatSidebar = ({ activeRoomId, onSelectRoom, onRoomClosed }: ChatSidebarProps) => {
   return (
     <aside className="flex h-full w-[26.6875rem] shrink-0 flex-col border-r border-neutral-300 bg-white">
       {/* navigation bar spacer */}
@@ -18,6 +19,7 @@ const ChatSidebar = ({ activeRoomId, onSelectRoom }: ChatSidebarProps) => {
       <ChatRoomFilterableList
         activeRoomId={activeRoomId}
         onSelectRoom={onSelectRoom}
+        onRoomClosed={onRoomClosed}
         listClassName="flex-1 overflow-y-auto"
         gutterClassName="px-4"
       />
