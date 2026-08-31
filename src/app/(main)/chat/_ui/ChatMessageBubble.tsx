@@ -1,8 +1,8 @@
 import { ProfileAvatar } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
-import { FileIcon } from '@/shared/assets'
+import { FileIcon, LocationPinIcon } from '@/shared/assets'
 import type { ChatMessageResponseDto } from '@/shared/types'
-import { formatFileSize, parseChatAttachment } from '../_lib/attachment'
+import { formatFileSize, getLocationMapUrl, parseChatAttachment } from '../_lib/attachment'
 import { RelativeTime } from './RelativeTime'
 
 interface ChatMessageBubbleProps {
@@ -36,7 +36,34 @@ const AttachmentBubble = ({
   const attachment = parseChatAttachment(message.content, message.messageType)
   if (!attachment) return <Bubble content={message.content} isMine={isMine} />
 
-  if (message.messageType === 'image') {
+  if (attachment.kind === 'location') {
+    return (
+      <a
+        href={getLocationMapUrl(attachment)}
+        target="_blank"
+        rel="noreferrer"
+        className={cn(
+          'flex min-w-56 items-center gap-3 rounded-2xl border px-4 py-3 transition-colors pc:p-5',
+          isMine
+            ? 'border-point-500 bg-point-500 hover:bg-point-300'
+            : 'border-neutral-300 bg-white hover:bg-primary-50',
+        )}
+        aria-label="공유한 위치를 지도에서 열기"
+      >
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-white/80">
+          <LocationPinIcon className="size-7 text-primary-500" />
+        </span>
+        <span className="min-w-0">
+          <span className="block text-sm font-semibold text-neutral-850 pc:text-base">
+            공유한 위치
+          </span>
+          <span className="block text-xs font-medium text-neutral-700">지도에서 확인하기</span>
+        </span>
+      </a>
+    )
+  }
+
+  if (attachment.kind === 'image') {
     return (
       <a
         href={attachment.url}

@@ -4,7 +4,7 @@
  */
 
 export type ChatParticipantRole = 'adopter' | 'breeder'
-export type ChatMessageType = 'text' | 'image' | 'file'
+export type ChatMessageType = 'text' | 'image' | 'file' | 'location'
 
 /** 채팅방 상대방 정보 */
 export interface ChatRoomCounterpartResponseDto {
