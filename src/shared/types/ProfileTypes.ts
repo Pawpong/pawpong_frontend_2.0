@@ -19,8 +19,8 @@ export interface MyProfile {
   bio: string
   bpm: number
   followerCount: number
-  /** 내가 팔로우하는 수 (브리더는 항상 0) */
-  followingCount?: number
+  /** 내가 팔로우하는 수 — 브리더도 팔로우 주체가 될 수 있어 0 이 아닐 수 있다 */
+  followingCount: number
   /** Adopter only */
   favoriteBreederCount?: number
   /** Breeder only */

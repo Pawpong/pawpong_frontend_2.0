@@ -339,7 +339,7 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
         open={followOpen}
         onOpenChange={setFollowOpen}
         followerCount={profile.followerCount}
-        followingCount={profile.followingCount ?? 0}
+        followingCount={profile.followingCount}
         followers={toFollowUsers(followersQuery)}
         following={toFollowUsers(followingsQuery)}
         onRemoveFollower={removeFollower}

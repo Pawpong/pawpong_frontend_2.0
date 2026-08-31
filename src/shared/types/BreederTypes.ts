@@ -156,7 +156,8 @@ export interface BreederPublicProfile {
   longDescription?: string
   bpm: number
   followerCount: number
-  followingCount?: number
+  /** 이 브리더가 팔로우 중인 수 (즐겨찾기와 별개) */
+  followingCount: number
   level: BreederLevel
   plan: 'basic' | 'pro'
   businessLocation: {
