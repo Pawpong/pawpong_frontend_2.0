@@ -333,7 +333,7 @@ export interface VerificationStatusResponse {
 export interface VerificationSubmitRequest {
   businessNumber: string
   businessName: string
-  plan: 'basic' | 'premium' | 'enterprise'
+  plan: 'basic' | 'pro'
   documents: string[]
   businessAddress: string
   experienceYears: string
