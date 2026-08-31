@@ -16,6 +16,19 @@ interface ContestEntryImageProps {
   fallbackIconClassName?: string
 }
 
+const LEGACY_PLACEHOLDER_HOSTS = new Set(['picsum.photos'])
+
+/** 개발 시드에 남은 외부 플레이스홀더는 불안정하므로 이미지 요청 자체를 생략한다. */
+const isContestImageSourceSupported = (src?: string | null) => {
+  if (!src) return false
+
+  try {
+    return !LEGACY_PLACEHOLDER_HOSTS.has(new URL(src, 'https://pawpong.local').hostname)
+  } catch {
+    return false
+  }
+}
+
 /**
  * 콘테스트 이미지 공통 렌더러.
  *
@@ -33,7 +46,7 @@ const ContestEntryImage = ({
   fallbackIconClassName,
 }: ContestEntryImageProps) => {
   const [failedSource, setFailedSource] = useState<string>()
-  const showImage = Boolean(src) && failedSource !== src
+  const showImage = isContestImageSourceSupported(src) && failedSource !== src
 
   if (showImage) {
     return (
@@ -65,4 +78,5 @@ const ContestEntryImage = ({
 }
 
 export { ContestEntryImage }
+export { isContestImageSourceSupported }
 export type { ContestEntryImageProps }

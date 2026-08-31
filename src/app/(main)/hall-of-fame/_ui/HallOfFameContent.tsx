@@ -15,7 +15,7 @@ import {
   NavigationBar,
 } from '@/shared/ui'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
-import { ContestVoteCard, contestQueries } from '@/entities/contest'
+import { ContestVoteCard, contestQueries, isContestImageSourceSupported } from '@/entities/contest'
 import { useCancelContestVote, useVoteContestEntry } from '@/features/contest'
 import { useAuthStatus } from '@/features/auth'
 import { HallOfFamePodium } from '@/widgets/hall-of-fame'
@@ -97,6 +97,10 @@ const HallOfFameContent = () => {
     cancelVote.mutate(entryId)
   }
 
+  const handleImageClick = (entry: ContestEntry) => {
+    if (isContestImageSourceSupported(entry.photoUrl)) setSelectedEntry(entry)
+  }
+
   // 진행 중인 콘테스트가 없으면 서버가 current=null, entries=[]로 응답한다.
   const hasNoContest = currentContest === null
   const hasPodiumEntry = podiumEntries.some(Boolean)
@@ -147,7 +151,7 @@ const HallOfFameContent = () => {
               >
                 <HallOfFamePodium
                   entries={podiumEntries}
-                  onEntryClick={setSelectedEntry}
+                  onEntryClick={handleImageClick}
                   className="pc:h-[26rem]"
                 />
               </ListState>
@@ -194,7 +198,7 @@ const HallOfFameContent = () => {
                       isVoteDisabled={voteEntry.isPending || cancelVote.isPending}
                       onVote={() => handleVote(entry.id)}
                       onCancelVote={() => handleCancelVote(entry.id)}
-                      onImageClick={() => setSelectedEntry(cardEntry)}
+                      onImageClick={() => handleImageClick(cardEntry)}
                     />
                   )
                 })}

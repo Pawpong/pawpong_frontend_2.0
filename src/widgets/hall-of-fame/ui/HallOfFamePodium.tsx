@@ -6,7 +6,7 @@ import type { ContestEntry } from '@/shared/types'
 import { ArrowRightIcon } from '@/shared/assets'
 import { ProfileAvatar } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
-import { ContestEntryImage } from '@/entities/contest'
+import { ContestEntryImage, isContestImageSourceSupported } from '@/entities/contest'
 import 'swiper/css'
 
 interface HallOfFamePodiumProps {
@@ -134,7 +134,7 @@ const PixelFrame = ({
         <CrownIcon rank={rank} />
       </div>
 
-      {entry && onClick ? (
+      {entry && onClick && isContestImageSourceSupported(entry.photoUrl) ? (
         <button
           type="button"
           onClick={onClick}

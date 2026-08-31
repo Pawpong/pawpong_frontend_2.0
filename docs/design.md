@@ -219,7 +219,7 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 - FAQ 항목은 별도 JavaScript accordion을 복제하지 않고 native `details/summary`를 사용한다. 질문 행 전체가 터치·키보드 대상이며 열림 상태는 화살표 회전과 답변 표면으로 함께 표시한다.
 - FAQ 문구는 현재 구현된 서비스 진입점과 API 상태만 안내한다. 검증을 건강·결과 보증으로 표현하거나 미구현 고객센터·결제·배송 정책을 약속하지 않는다.
 - 파충류 FAQ는 종별 사육 조건 차이를 전제로 하며 획일적인 온습도·UVB·급여 수치를 제시하지 않는다. 위생과 건강 안내는 공신력 있는 수의학·공중보건 자료를 근거로 하고 전문 수의사 상담의 경계를 명시한다.
-- 명예의 전당 참여작은 Figma 홈의 `point-100` 시상대 표면을 유지한다. 과거 데이터의 외부 이미지가 만료되거나 로딩에 실패하면 브라우저의 깨진 이미지 아이콘을 노출하지 않고 `point-100 + primary-300 PawIcon` 폴백으로 교체한다.
+- 명예의 전당 참여작은 Figma 홈의 `point-100` 시상대 표면을 유지한다. 과거 데이터의 외부 이미지가 만료되거나 로딩에 실패하면 브라우저의 깨진 이미지 아이콘을 노출하지 않고 `point-100 + primary-300 PawIcon` 폴백으로 교체한다. 개발 시드의 `picsum.photos`처럼 알려진 플레이스홀더 호스트는 Next 이미지 프록시 요청 자체를 생략하고 상세 모달 진입도 막아, 화면 폴백 뒤에 503·timeout 로그가 남지 않게 한다.
 - 계정 메뉴와 도움말 목록은 `rounded-xl + neutral-150 border + white surface`를 공통 카드 계약으로 사용하고, 작은 텍스트 링크를 흩뿌리지 않는다.
 - 2026-08-31 확정 정책에는 New/Elite 브리더 등급제가 없다. 카드·프로필·검색·가입·설정에서 등급을 노출하거나 입력받지 않는다.
 - `/grade-policy`와 `/grade-policy/apply`는 `notFound()` 처리하고 메뉴에서 연결하지 않는다. 과거 UI는 활성 빌드에서 제거하며 복구 지점과 정책 결정은 `docs/archive/grade-policy.md`에 기록한다.
@@ -318,7 +318,7 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 | 홈 프로필·탭          | `1021:20324`, `976:32388`                                        | Figma 기준 일치, 전역 breakpoint 재검증 필요                      |
 | 커뮤니티 작성         | `1056:46147`                                                     | PC 진입점을 표준 `pc:`로 통일                                     |
 | 커뮤니티 신고         | `DropdownMenu`, `Dialog`, `LoginPromptModal`                     | 비소유자 메뉴·사유 검증·표준 신고 API 연결 완료                   |
-| 명예의 전당           | `3349:1763500`, 콘테스트 컴포넌트, `ContestEntryImage`           | API 상태·투표 취소·레거시 이미지 브랜드 폴백 연결 완료            |
+| 명예의 전당           | `3349:1763500`, 콘테스트 컴포넌트, `ContestEntryImage`           | API 상태·투표 취소·레거시 이미지 무요청 브랜드 폴백 연결 완료     |
 | 알림                  | `NotificationListItem`, `OwnerActionsMenu`, `DeleteConfirmModal` | 그룹 목록·읽지 않음·삭제 확인·전체 보기 정렬 완료                 |
 | 채팅                  | 채팅 공용 폭·Socket.IO·`ChatRoomActionsMenu`·`ChatAttachMenu`    | 딥링크·뒤로가기·방 나가기·위치 공유·Kafka 정상/장애/복구 E2E 완료 |
 | 분양 임시저장         | `ListState`, `OwnerActionsMenu`, `DeleteConfirmModal`            | 재진입 강제 조회·오류 재시도·대표 사진 dirty 보호 완료            |
