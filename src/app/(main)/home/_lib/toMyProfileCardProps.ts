@@ -33,7 +33,6 @@ export const toMyProfileCardProps = (profile: MyProfile): MyProfileCardProps => 
       bpm: profile.bpm,
       followerCount: profile.followerCount,
       followingCount: profile.followingCount,
-      level: profile.level ?? 'new',
       plan: profile.plan ?? 'basic',
       businessLocation: {
         city: profile.businessLocation?.city ?? '',

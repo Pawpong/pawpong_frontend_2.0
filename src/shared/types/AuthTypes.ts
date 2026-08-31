@@ -51,7 +51,6 @@ export interface RegisterBreederRequest {
   /** 최대 5개 */
   breeds: string[]
   plan: 'basic' | 'pro'
-  level: 'new' | 'elite'
   agreements: RegisterBreederAgreements
   tempId?: string
   provider?: string

@@ -207,7 +207,7 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 
 ### 계정·도움말 화면
 
-- `/settings`는 인증된 사용자의 계정 허브다. 프로필·알림·저장목록을 공통으로 제공하고, 브리더에게만 등급 관리와 분양글 관리를 추가한다.
+- `/settings`는 인증된 사용자의 계정 허브다. 프로필·알림·저장목록을 공통으로 제공하고, 브리더에게만 분양글 관리를 추가한다.
 - 입양자 설정과 전체 메뉴에는 `/activity`의 `신청·후기 내역` 진입점을 제공한다. 브리더에게는 노출하지 않으며 서버 역할 가드로 직접 접근도 차단한다.
 - `/activity`는 신청 내역과 내 후기를 공용 `TabBar`로 나눈다. 목록은 화면마다 분리된 카드가 아니라 `rounded-xl + neutral-150 border + white surface` 패널 안의 구분 행으로 표시해 설정·알림과 같은 계정 화면 계층을 유지한다.
 - 신청 목록·상세의 `reviewId`가 서버 상태의 기준이다. 프론트가 후기 전체 목록을 다시 훑어 작성 여부를 추측하지 않으며, 후기 작성 후 신청·후기 캐시를 함께 무효화한다.
@@ -216,9 +216,10 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 - `/faq`는 공개 화면이며 입양자/브리더 탭마다 `GET /home/faqs?userType=...`의 실제 데이터를 표시한다.
 - FAQ 항목은 별도 JavaScript accordion을 복제하지 않고 native `details/summary`를 사용한다. 질문 행 전체가 터치·키보드 대상이며 열림 상태는 화살표 회전과 답변 표면으로 함께 표시한다.
 - 계정 메뉴와 도움말 목록은 `rounded-xl + neutral-150 border + white surface`를 공통 카드 계약으로 사용하고, 작은 텍스트 링크를 흩뿌리지 않는다.
-- `/grade-policy`는 공개 화면이다. `new`/`elite` 값은 백엔드 enum과 동일하게 유지하고, 등급이 서류 확인 범위이며 건강·입양 결과 보증이 아니라는 한계를 반드시 함께 고지한다.
-- `/grade-policy/apply`는 브리더 전용 화면이다. 기본 심사 대기·반려, New 승인·Elite 신청 가능, Elite 심사 중·반려, Elite 승인 상태를 서버 검증 결과로 분기하며 사용자가 상태를 임의로 건너뛸 수 없다.
-- Elite 신청은 기존 New 승인 서류를 재업로드하지 않고 `adoptionContractSample`과 전문성 증빙(`breederCertification` 또는 `recentPedigreeDocument`)만 추가한다. 업로드 성공 후 반환된 파일 키만 변경 심사 요청에 넘기며, 중복 제출은 pending 상태와 서버 상태 양쪽에서 차단한다.
+- 2026-08-31 확정 정책에는 New/Elite 브리더 등급제가 없다. 카드·프로필·검색·가입·설정에서 등급을 노출하거나 입력받지 않는다.
+- `/grade-policy`와 `/grade-policy/apply`의 UI 소스는 향후 확정된 성장 정책에 재사용할 수 있는 아카이브로만 보존하고, 라우트는 `notFound()` 처리하며 메뉴에서 연결하지 않는다.
+- 브리더 검증 상태(`pending | reviewing | approved | rejected`)와 구독 플랜(`basic | pro`)은 등급과 별개의 실제 계약으로 유지한다.
+- Figma 디자인 시스템에는 `progress bar-EXP`가 있으나 EXP 산정·구간·혜택 정책은 아직 근거가 없다. BPM/EXP를 New/Elite 대체 정책으로 추정 구현하지 않는다.
 
 ### 장식·구조
 

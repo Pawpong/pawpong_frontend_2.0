@@ -158,7 +158,6 @@ export interface BreederPublicProfile {
   followerCount: number
   /** 이 브리더가 팔로우 중인 수 (즐겨찾기와 별개) */
   followingCount: number
-  level: BreederLevel
   plan: 'basic' | 'pro'
   businessLocation: {
     city: string
@@ -192,7 +191,6 @@ export interface BreederProfileUpdateResponseDto {
 export interface Breeder {
   breederId: string
   breederName: string
-  breederLevel: BreederLevel
   petType: string
   location: string
   mainBreed: string
@@ -222,7 +220,6 @@ export interface SearchBreederParams {
   province?: string[]
   city?: string[]
   isAdoptionAvailable?: boolean
-  breederLevel?: string[]
   sortBy?: 'latest' | 'favorite' | 'review' | 'price_asc' | 'price_desc'
   page?: number
   limit?: number

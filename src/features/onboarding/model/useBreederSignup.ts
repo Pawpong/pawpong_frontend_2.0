@@ -7,10 +7,7 @@ import { useOnboarding } from './OnboardingContext'
 import { useSignupCompletion } from './useSignupCompletion' // [refactored]
 import { SIGNUP_ERROR } from './signupErrors' // [refactored]
 import type { DocumentsFormData } from './schema'
-import {
-  buildBreederRegistrationRequest,
-  DEFAULT_BREEDER_LEVEL,
-} from './buildBreederRegistrationRequest'
+import { buildBreederRegistrationRequest } from './buildBreederRegistrationRequest'
 import { getBreederDocumentsSignature, getSelectedBreederDocuments } from './breederDocuments'
 
 /**
@@ -91,7 +88,6 @@ export const useBreederSignup = () => {
         uploaded = await uploadDocuments({
           tempId: social.tempId,
           files: documents,
-          level: DEFAULT_BREEDER_LEVEL,
         })
         uploadedRef.current = { signature, result: uploaded }
       }

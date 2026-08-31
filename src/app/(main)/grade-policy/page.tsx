@@ -1,11 +1,15 @@
+import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-import { GradePolicyContent } from './_ui/GradePolicyContent'
 
 export const metadata: Metadata = {
-  title: '브리더 등급 정책 | Pawpong',
-  description: '뉴 브리더와 엘리트 브리더의 확인 범위와 심사 원칙을 안내합니다.',
+  title: 'Pawpong',
+  robots: { index: false, follow: false },
 }
 
-const GradePolicyPage = () => <GradePolicyContent />
+/**
+ * 2026-08-31 현행 정책에서 New/Elite 등급제가 폐지되어 공개 라우팅을 중단했다.
+ * `_ui` 구현은 향후 EXP 정책이 확정될 때 디자인 자산으로 검토할 수 있도록 보존한다.
+ */
+const GradePolicyPage = () => notFound()
 
 export default GradePolicyPage

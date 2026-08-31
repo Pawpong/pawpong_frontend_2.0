@@ -3,13 +3,7 @@
 import { Badge, MediaCard } from '@/shared/ui'
 import { LocationOnIcon } from '@/shared/assets'
 import { FavoriteBreederIconButton } from './FavoriteBreederIconButton'
-import type { BreederLevel, FavoriteBreeder } from '@/shared/types'
-
-// 시안 뱃지 문구는 '브리더 LV' 자리표시자 — 실제 레벨 값(new | elite)으로 채운다
-const LEVEL_LABEL: Record<BreederLevel, string> = {
-  new: '뉴 브리더',
-  elite: '엘리트 브리더',
-}
+import type { FavoriteBreeder } from '@/shared/types'
 
 interface BreederCardProps {
   breeder: FavoriteBreeder
@@ -52,18 +46,6 @@ const BreederCard = ({ breeder, showPopularBadge }: BreederCardProps) => {
             className="absolute right-2 bottom-1 tab:right-3 tab:bottom-2"
           />
         </>
-      }
-      trailing={
-        breeder.level && (
-          <Badge
-            variant="primaryOutline"
-            size="md"
-            // 시안(CardStar large): 본문 행이 items-center — 뱃지만 세로 가운데로
-            className="shrink-0 self-center tab:h-[1.8125rem] tab:text-sm"
-          >
-            {LEVEL_LABEL[breeder.level]}
-          </Badge>
-        )
       }
     >
       {/* 이름 mo 12 / pc 16 bold, 위치 mo 10 / pc 14 medium #6b6b6b */}

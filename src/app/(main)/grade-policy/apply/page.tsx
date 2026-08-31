@@ -1,16 +1,12 @@
+import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-import { requireRole } from '@/features/auth/server'
-import { GradeLevelApplicationContent } from './_ui/GradeLevelApplicationContent'
 
 export const metadata: Metadata = {
-  title: '브리더 등급 관리 | Pawpong',
-  description: '현재 브리더 등급과 심사 상태를 확인하고 Elite 등급 변경을 신청합니다.',
+  title: 'Pawpong',
+  robots: { index: false, follow: false },
 }
 
-const GradeLevelApplicationPage = async () => {
-  await requireRole('breeder', '/grade-policy/apply')
-
-  return <GradeLevelApplicationContent />
-}
+/** 폐기된 등급 신청 화면은 소스만 아카이브하고 서비스 진입은 차단한다. */
+const GradeLevelApplicationPage = () => notFound()
 
 export default GradeLevelApplicationPage

@@ -45,13 +45,10 @@ export const verifyCode = async (phone: string, code: string): Promise<void> => 
 export const uploadBreederDocuments = async (
   tempId: string,
   files: { type: BreederUploadDocumentType; file: File }[],
-  level: 'new' | 'elite',
 ): Promise<UploadBreederDocumentsResponse> => {
   const formData = new FormData()
   files.forEach(({ file }) => formData.append('files', file))
   formData.append('types', JSON.stringify(files.map(({ type }) => type)))
-  formData.append('level', level)
-
   return apiClient
     .post<
       ApiResponse<UploadBreederDocumentsResponse>

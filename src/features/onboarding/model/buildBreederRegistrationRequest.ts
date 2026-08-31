@@ -9,7 +9,6 @@ const PET_TYPE_MAP = {
 } as const satisfies Record<AnimalSelectFormData['selected'], RegisterBreederRequest['animal']>
 
 export const DEFAULT_BREEDER_PLAN = 'basic' as const
-export const DEFAULT_BREEDER_LEVEL = 'new' as const
 
 interface BuildBreederRegistrationRequestParams {
   social: SocialSignupSession
@@ -36,7 +35,6 @@ export const buildBreederRegistrationRequest = ({
   animal: PET_TYPE_MAP[animal.selected],
   breeds: kennel.selectedBreeds,
   plan: DEFAULT_BREEDER_PLAN,
-  level: DEFAULT_BREEDER_LEVEL,
   agreements: {
     termsOfService: profile.serviceAgreed,
     privacyPolicy: profile.privacyAgreed,

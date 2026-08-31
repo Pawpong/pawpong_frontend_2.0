@@ -1,5 +1,3 @@
-import type { BreederLevel } from './BreederTypes'
-
 /** 브리더 플랜 */
 export type BreederPlan = 'basic' | 'pro'
 
@@ -23,8 +21,6 @@ export interface MyProfile {
   followingCount: number
   /** Adopter only */
   favoriteBreederCount?: number
-  /** Breeder only */
-  level?: BreederLevel
   /** Breeder only */
   plan?: BreederPlan
   /** Breeder only */
@@ -55,7 +51,6 @@ export interface FavoriteBreederCard {
   breederLocation: string
   recentPetStatus?: 'available' | 'reserved' | 'adopted'
   bpm: number
-  level: BreederLevel
   addedAt: string
   isFavorited: boolean
 }
@@ -72,8 +67,6 @@ export interface FavoriteBreeder {
   isBreeding: boolean
   location: string
   date: string
-  /** 카드 우측 뱃지에 표기 (시안 CardStar 816-102863) */
-  level?: BreederLevel
   /** 즐겨찾기 등록 여부 — 카드의 다이아몬드 채움 상태 */
   isFavorited?: boolean
 }

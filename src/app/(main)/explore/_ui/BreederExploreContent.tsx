@@ -36,7 +36,6 @@ const toBreederCardModel = (breeder: Breeder): FavoriteBreeder => ({
   isBreeding: breeder.isAdoptionAvailable,
   location: breeder.location,
   date: breeder.createdAt,
-  level: breeder.breederLevel,
   isFavorited: breeder.isFavorited,
 })
 

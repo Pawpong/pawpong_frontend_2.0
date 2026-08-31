@@ -46,12 +46,10 @@ export const useUploadBreederDocuments = () =>
     mutationFn: ({
       tempId,
       files,
-      level,
     }: {
       tempId: string
       files: { type: BreederUploadDocumentType; file: File }[]
-      level: 'new' | 'elite'
-    }) => uploadBreederDocuments(tempId, files, level),
+    }) => uploadBreederDocuments(tempId, files),
   })
 
 export const useUploadProfileImage = () =>

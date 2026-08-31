@@ -35,11 +35,6 @@ const COMMON_LINKS: SettingsLink[] = [
 
 const BREEDER_LINKS: SettingsLink[] = [
   {
-    href: '/grade-policy/apply',
-    label: '브리더 등급 관리',
-    description: '현재 등급과 심사 상태를 확인하고 Elite 등급을 신청해요.',
-  },
-  {
     href: '/adoption/my-listings',
     label: '분양글 관리',
     description: '작성한 분양글과 진행 상태를 관리해요.',

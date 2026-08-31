@@ -9,7 +9,6 @@ export const MOBILE_PUBLIC_MENU_ITEMS: NavItem[] = [
   { name: '탐색', href: '/explore' },
   { name: '커뮤니티', href: '/community' },
   { name: '명예의 전당', href: '/hall-of-fame' },
-  { name: '브리더 등급 정책', href: '/grade-policy' },
   { name: '자주 묻는 질문', href: '/faq' },
 ]
 
