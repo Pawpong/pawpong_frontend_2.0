@@ -3,6 +3,7 @@ import type { ApiRequestConfig } from '@/shared/api'
 import type {
   AdopterProfileDto,
   AdopterPublicProfile,
+  MyReviewDetailDto,
   MyReviewItemDto,
   PaginationResponse,
   ApiResponseFull,
@@ -34,4 +35,19 @@ export const getMyReviews = (page = 1, limit = 10) =>
       data: PaginationResponse<MyReviewItemDto>
       message?: string
     }>(`${API_VERSION}/adopter/reviews`, { params: { page, limit } })
+    .then(unwrap)
+
+/**
+ * 내 후기 상세 조회
+ *
+ * 본인이 작성한 후기만 조회된다(다른 사용자의 reviewId 로는 조회 실패).
+ * 목록 응답에는 없는 isVisible(공개 여부)이 함께 내려온다.
+ */
+export const getMyReviewDetail = (reviewId: string) =>
+  apiClient
+    .get<{
+      success: boolean
+      data: MyReviewDetailDto
+      message?: string
+    }>(`${API_VERSION}/adopter/reviews/${reviewId}`)
     .then(unwrap)
