@@ -221,7 +221,7 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 - 파충류 FAQ는 종별 사육 조건 차이를 전제로 하며 획일적인 온습도·UVB·급여 수치를 제시하지 않는다. 위생과 건강 안내는 공신력 있는 수의학·공중보건 자료를 근거로 하고 전문 수의사 상담의 경계를 명시한다.
 - 계정 메뉴와 도움말 목록은 `rounded-xl + neutral-150 border + white surface`를 공통 카드 계약으로 사용하고, 작은 텍스트 링크를 흩뿌리지 않는다.
 - 2026-08-31 확정 정책에는 New/Elite 브리더 등급제가 없다. 카드·프로필·검색·가입·설정에서 등급을 노출하거나 입력받지 않는다.
-- `/grade-policy`와 `/grade-policy/apply`의 UI 소스는 향후 확정된 성장 정책에 재사용할 수 있는 아카이브로만 보존하고, 라우트는 `notFound()` 처리하며 메뉴에서 연결하지 않는다.
+- `/grade-policy`와 `/grade-policy/apply`는 `notFound()` 처리하고 메뉴에서 연결하지 않는다. 과거 UI는 활성 빌드에서 제거하며 복구 지점과 정책 결정은 `docs/archive/grade-policy.md`에 기록한다.
 - 브리더 검증 상태(`pending | reviewing | approved | rejected`)와 구독 플랜(`basic | pro`)은 등급과 별개의 실제 계약으로 유지한다.
 - Figma 디자인 시스템에는 `progress bar-EXP`가 있으나 EXP 산정·구간·혜택 정책은 아직 근거가 없다. BPM/EXP를 New/Elite 대체 정책으로 추정 구현하지 않는다.
 - 공개 푸터의 사업자 정보는 pawpong.kr과 개인정보처리방침에 공개된 현재 값을 기준으로 한다. 확정되지 않은 전화번호·통신판매업 번호·고객센터 운영 시간을 임의로 추가하지 않는다.
@@ -320,7 +320,7 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 | 채팅                  | 채팅 공용 폭·Socket.IO·`ChatRoomActionsMenu`·`ChatAttachMenu`    | 딥링크·뒤로가기·방 나가기·위치 공유·Kafka 정상/장애/복구 E2E 완료 |
 | 분양 임시저장         | `ListState`, `OwnerActionsMenu`, `DeleteConfirmModal`            | 재진입 강제 조회·오류 재시도·대표 사진 dirty 보호 완료            |
 | API 재진입 상태       | `AsyncState`, `ListState`, `useExitGuard`                        | 상세·신청·프로필·홈·알림·커뮤니티 로컬 복구 통일                  |
-| 브리더 등급 정책·심사 | Figma 메뉴 `3555:416834` 외, `DocumentFilePicker`, `AsyncState`  | 공개 정책·역할 CTA·Elite 서류 업로드·신청 상태·재진입 연결 완료   |
+| 브리더 인증 정책      | Figma 메뉴 `3555:416834`, `docs/archive/grade-policy.md`         | New/Elite 라우트·활성 UI·프론트 API 계약 제거, 인증 상태만 유지   |
 | 입양자 신청·후기      | 홈 `3349:1763114`, 탭 `976:32388`, 계정 패널                     | 신청 목록·상세·후기 작성·목록·상세·역할별 진입점 실제 API 연결    |
 | 입양 관심 정책        | 입양 상세 컴포넌트 세트, `FavoriteShareActions`                  | 전 breakpoint 단일 액션·소유자 숨김·서버 self-boost 403 차단 완료 |
 

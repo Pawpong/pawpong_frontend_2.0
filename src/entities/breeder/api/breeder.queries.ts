@@ -23,7 +23,6 @@ import {
   getReceivedApplications,
   getReceivedApplicationDetail,
   getMyReceivedReviews,
-  getBreederVerification,
 } from './breeder.api'
 
 export const breederQueries = {
@@ -114,12 +113,5 @@ export const breederQueries = {
     createInfiniteQuery<BreederMyReviewItem>({
       queryKey: [...breederQueries.all(), 'my-reviews', params, limit],
       queryFn: (page) => getMyReceivedReviews({ ...params, page, limit }),
-    }),
-
-  verification: () =>
-    createQuery({
-      queryKey: [...breederQueries.all(), 'verification'],
-      queryFn: getBreederVerification,
-      staleTime: STALE_TIME.REALTIME,
     }),
 }

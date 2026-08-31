@@ -14,8 +14,6 @@ export type BreederVerificationStatus =
   | 'rejected'
   | 'not_submitted'
 
-export type BreederLevel = 'new' | 'elite'
-
 export type PetGender = 'male' | 'female'
 
 export type PetStatus = 'available' | 'reserved' | 'adopted'
@@ -64,7 +62,6 @@ export interface BreederStatsDto {
 export interface BreederVerificationDto {
   status: BreederVerificationStatus
   plan?: string
-  level?: BreederLevel
   submittedAt?: string
   reviewedAt?: string
   rejectionReason?: string
@@ -273,7 +270,6 @@ export interface BreederMyReviewItem {
   reviewId: string
   breederNickname: string
   breederProfileImage: string
-  breederLevel: string
   breedingPetType: string
   content: string
   reviewType: string
@@ -302,74 +298,6 @@ export interface ReviewReplyResponseDto {
 export interface ReviewReplyDeleteResponseDto {
   reviewId: string
   message: string
-}
-
-// ==================== 인증 ====================
-
-/** 브리더 인증 상태 조회 응답 (GET /breeder-management/verification) */
-export interface VerificationStatusResponse {
-  status: 'pending' | 'reviewing' | 'approved' | 'rejected'
-  plan?: 'basic' | 'pro'
-  level?: BreederLevel
-  submittedAt?: string
-  reviewedAt?: string
-  documents?: BreederDocumentDto[]
-  rejectionReason?: string
-  submittedByEmail?: boolean
-  isLevelChangeRequested: boolean
-  levelChangeRequest?: {
-    previousLevel: BreederLevel
-    requestedLevel: BreederLevel
-    requestedAt: string
-    documents: BreederDocumentDto[]
-  }
-  levelChangeRejectionReason?: string
-  levelChangeReviewedAt?: string
-}
-
-/** 브리더 인증 신청 요청 (POST /breeder-management/verification) */
-export interface VerificationSubmitRequest {
-  businessNumber: string
-  businessName: string
-  plan: 'basic' | 'pro'
-  documents: string[]
-  businessAddress: string
-  experienceYears: string
-  specialBreeds: string
-  facilityDescription: string
-  veterinaryPartnership?: string
-  submittedByEmail?: boolean
-  additionalMessage?: string
-}
-
-export interface VerificationSubmitResponse {
-  message: string
-}
-
-// ==================== 인증 서류 ====================
-
-export interface UploadedDocumentDto extends BreederDocumentDto {
-  fileName: string
-  size: number
-}
-
-export interface UploadDocumentsResponseDto {
-  count: number
-  level: BreederLevel
-  documents: UploadedDocumentDto[]
-}
-
-/** 인증 서류 제출 (간소화) 요청 (POST /breeder-management/verification/submit) */
-export interface SubmitDocumentsRequest {
-  level: BreederLevel
-  documents: Array<{ type: string; fileName: string; originalFileName?: string }>
-  submittedByEmail?: boolean
-}
-
-/** Elite 등급 변경 신청 (POST /breeder-management/verification/level-change) */
-export interface LevelChangeRequest {
-  requestedLevel: 'elite'
-  documents: Array<{ type: string; fileName: string; originalFileName?: string }>
 }
 
 // ==================== 입양 신청 폼 (간소화) ====================

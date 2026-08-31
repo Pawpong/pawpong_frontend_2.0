@@ -10,9 +10,6 @@ import type {
   ParentPetAddRequest,
   ParentPetUpdateRequest,
   ReviewReplyRequest,
-  VerificationSubmitRequest,
-  SubmitDocumentsRequest,
-  LevelChangeRequest,
   SimpleApplicationFormUpdateRequest,
   BreederAccountDeleteRequest,
 } from '@/shared/types'
@@ -25,10 +22,6 @@ import {
   createReviewReply,
   updateReviewReply,
   deleteReviewReply,
-  submitVerification,
-  submitVerificationDocuments,
-  uploadVerificationDocuments,
-  requestBreederLevelChange,
   updateSimpleApplicationForm,
   deleteBreederAccount,
 } from './breeder.api'
@@ -125,50 +118,6 @@ export const useDeleteReviewReply = () => {
     mutationFn: (reviewId: string) => deleteReviewReply(reviewId),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: breederQueries.all() })
-    },
-  })
-}
-
-// ==================== 인증 ====================
-
-export const useSubmitVerification = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (data: VerificationSubmitRequest) => submitVerification(data),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: breederQueries.verification().queryKey })
-    },
-  })
-}
-
-export const useSubmitVerificationDocuments = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (data: SubmitDocumentsRequest) => submitVerificationDocuments(data),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: breederQueries.verification().queryKey })
-    },
-  })
-}
-
-export const useUploadVerificationDocuments = () => {
-  return useMutation({
-    mutationFn: ({
-      files,
-      level,
-    }: {
-      files: { type: string; file: File }[]
-      level: 'new' | 'elite'
-    }) => uploadVerificationDocuments(files, level),
-  })
-}
-
-export const useRequestBreederLevelChange = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (data: LevelChangeRequest) => requestBreederLevelChange(data),
-    onSuccess: async () => {
-      await qc.invalidateQueries({ queryKey: breederQueries.verification().queryKey })
     },
   })
 }

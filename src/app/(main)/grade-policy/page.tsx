@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 /**
  * 2026-08-31 현행 정책에서 New/Elite 등급제가 폐지되어 공개 라우팅을 중단했다.
- * `_ui` 구현은 향후 EXP 정책이 확정될 때 디자인 자산으로 검토할 수 있도록 보존한다.
+ * 과거 화면의 정책 결정과 복구 지점은 `docs/archive/grade-policy.md`에 기록한다.
  */
 const GradePolicyPage = () => notFound()
 

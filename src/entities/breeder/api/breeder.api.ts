@@ -16,7 +16,6 @@ import type {
   BreederApplicationFormDto,
   BreederMyReviewItem,
   MyReviewsParams,
-  VerificationStatusResponse,
 } from '@/shared/types'
 
 /** 브리더 공개 프로필 조회 (브리더홈) */
@@ -133,12 +132,4 @@ export const getMyReceivedReviews = (params: MyReviewsParams = {}) =>
     .get<
       ApiResponseFull<PaginationResponse<BreederMyReviewItem>>
     >(`${API_VERSION}/breeder-management/my-reviews`, { params })
-    .then(unwrap)
-
-/** 브리더 인증 상태 조회 */
-export const getBreederVerification = () =>
-  apiClient
-    .get<
-      ApiResponseFull<VerificationStatusResponse>
-    >(`${API_VERSION}/breeder-management/verification`)
     .then(unwrap)

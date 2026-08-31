@@ -115,7 +115,6 @@ export interface ApplicationListItemDto {
   reviewId: string | null
   breederId: string
   breederName: string
-  breederLevel: BreederLevel
   profileImage?: string | null
   animalType: 'cat' | 'dog'
   petId?: string
@@ -187,8 +186,3 @@ export interface ApplicationStatusUpdateRequest {
 export interface ApplicationStatusUpdateResponseDto {
   message: string
 }
-
-// ==================== BreederLevel (application 내 참조용) ====================
-// breeder.types.ts에서 import 사용 시 순환 참조 방지를 위해 여기서도 re-export
-import type { BreederLevel } from './BreederTypes'
-export type { BreederLevel }

@@ -12,11 +12,6 @@ import type {
   ReviewReplyRequest,
   ReviewReplyResponseDto,
   ReviewReplyDeleteResponseDto,
-  VerificationSubmitRequest,
-  VerificationSubmitResponse,
-  SubmitDocumentsRequest,
-  LevelChangeRequest,
-  UploadDocumentsResponseDto,
   SimpleApplicationFormUpdateRequest,
   SimpleApplicationFormUpdateResponse,
   BreederAccountDeleteRequest,
@@ -91,49 +86,6 @@ export const deleteReviewReply = (reviewId: string) =>
       ApiResponseFull<ReviewReplyDeleteResponseDto>
     >(`${API_VERSION}/breeder-management/reviews/${reviewId}/reply`)
     .then(unwrap)
-
-// ==================== 인증 (verification) ====================
-
-/** 브리더 인증 신청 */
-export const submitVerification = (data: VerificationSubmitRequest) =>
-  apiClient
-    .post<
-      ApiResponseFull<VerificationSubmitResponse>
-    >(`${API_VERSION}/breeder-management/verification`, data)
-    .then(unwrap)
-
-/** 브리더 인증 서류 제출 (간소화) */
-export const submitVerificationDocuments = (data: SubmitDocumentsRequest) =>
-  apiClient
-    .post<
-      ApiResponseFull<VerificationSubmitResponse>
-    >(`${API_VERSION}/breeder-management/verification/submit`, data)
-    .then(unwrap)
-
-/** 승인된 New 브리더의 Elite 등급 변경 신청 */
-export const requestBreederLevelChange = (data: LevelChangeRequest) =>
-  apiClient
-    .post<
-      ApiResponseFull<VerificationSubmitResponse>
-    >(`${API_VERSION}/breeder-management/verification/level-change`, data)
-    .then(unwrap)
-
-/** 브리더 인증 서류 업로드 (multipart) */
-export const uploadVerificationDocuments = (
-  files: { type: string; file: File }[],
-  level: 'new' | 'elite',
-) => {
-  const formData = new FormData()
-  files.forEach(({ file }) => formData.append('files', file))
-  formData.append('types', JSON.stringify(files.map(({ type }) => type)))
-  formData.append('level', level)
-
-  return apiClient
-    .post<
-      ApiResponseFull<UploadDocumentsResponseDto>
-    >(`${API_VERSION}/breeder-management/verification/upload`, formData)
-    .then(unwrap)
-}
 
 // ==================== 입양 신청 폼 (간소화) ====================
 

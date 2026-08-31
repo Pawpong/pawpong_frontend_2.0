@@ -91,7 +91,6 @@ export interface FavoriteItemDto {
   breederName: string
   profileImage?: string
   representativePhotos?: string[]
-  breederLevel?: string
   petType?: string
   location: string
   specialization?: string[]
@@ -130,7 +129,6 @@ export interface MyReviewItemDto {
   breederId: string | null
   breederNickname: string
   breederProfileImage: string | null
-  breederLevel: string
   breedingPetType: string
   content: string
   reviewType: string
