@@ -46,8 +46,9 @@ const CommunityContent = () => {
 
   return (
     <div className="flex w-full flex-col">
-      {/* 상단바 — 공통 NavigationBar (Figma 2063-213675 navigation bar) */}
-      <NavigationBar title="포퐁커뮤니티" backHref="/" />
+      {/* 상단바 — 공통 NavigationBar (Figma 2063-213675 navigation bar)
+          PC 시안에는 이 서브 상단바가 없다(GNB 의 '커뮤니티' 탭이 그 역할을 한다). */}
+      <NavigationBar title="포퐁커뮤니티" backHref="/" className="pc:hidden" />
 
       {/* 검색 (Figma 1657-251460 — 버튼 클릭 시 focus 입력 pill로 전환)
           padding: mo 8·16 / tab 12·48 (px-4=모바일 16, tab48은 Container 기본값) */}
@@ -69,11 +70,12 @@ const CommunityContent = () => {
         />
       </Container>
 
-      {/* Main: Feed — Figma CommunityFeedCard(3606:622637)의 343px 카드 폭을 전 구간에서
-          유지한다. 넓은 중간 화면에서 1:1 미디어가 과도하게 커지지 않게 하고, 20px 거터와
-          중립 표면으로 카드의 16px 모서리가 명확히 보이게 한다. */}
-      <Container className="bg-neutral-100 px-4 pt-5 pb-10 tab:pt-8 tab:pb-16">
-        <div className="mx-auto w-full max-w-[21.4375rem]">
+      {/* Main: Feed — Figma "1440 · 커뮤니티 홈" 기준. 흰 표면 위 단일 컬럼이고
+          카드 폭 상한은 mo/tab 343px, PC 415px 다.
+          중립 회색 표면을 페이지 셸 폭(PC 1440) 전체에 깔면 343px 컬럼 좌우로 470px 씩
+          빈 띠가 생겨 데스크탑에 모바일 화면을 끼워 넣은 것처럼 보인다 — 시안대로 흰 배경을 쓴다. */}
+      <Container className="px-4 pt-5 pb-10 tab:pt-8 tab:pb-16">
+        <div className="mx-auto w-full max-w-[21.4375rem] pc:max-w-[25.9375rem]">
           {/* 로딩은 ListState 문구 대신 카드 골격으로 — 피드는 화면 대부분이 이미지라 덜 흔들린다 */}
           {isPending && (
             <div className="flex min-w-0 flex-col gap-6 tab:gap-8 pc:gap-10">
