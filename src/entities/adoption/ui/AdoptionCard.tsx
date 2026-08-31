@@ -119,8 +119,8 @@ const AdoptionCard = ({ listing, className, isFavorite, onToggle, preload }: Ado
 
       {/* ══════ 태블릿+ 카드 (Figma 796-81669, large) ══════ */}
       {/* 카드 배경 없음 — 이미지만 rounded-8, 정보는 2단(제목/stats · 상태배지/관심있어요) */}
-      {/* hover: bg white + rounded-20 + drop shadow (Figma 1867-254861) */}
-      <div className="hidden h-full flex-col transition-shadow tab:flex tab:hover:overflow-hidden tab:hover:rounded-[1.25rem] tab:hover:bg-white tab:hover:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]">
+      {/* hover: bg neutral-50 + rounded-20 + drop shadow (Figma 1867-254861) */}
+      <div className="hidden h-full flex-col transition-[background-color,border-radius,box-shadow] duration-200 ease-out tab:flex pc:hover:overflow-hidden pc:hover:rounded-[1.25rem] pc:hover:bg-neutral-50 pc:hover:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]">
         {/* [refactored] 이미지 공통 컴포넌트 — rounded-8 */}
         <CardImage
           listing={listing}
