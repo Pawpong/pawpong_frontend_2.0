@@ -249,6 +249,7 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 - 공용 `createQuery`·`createInfiniteQuery`는 동적 데이터에 이 재진입 규칙을 기본 적용한다. 품종·지역·필터처럼 `STALE_TIME.STATIC`으로 선언한 참조 데이터만 같은 세션에서 재호출하지 않는다.
 - 뒤로가기로 복원되는 화면은 stale 화면을 그대로 믿지 않고, mutation 후 관련 query key를 invalidate한다.
 - 무한 목록은 페이지를 평탄화한 뒤 ID 기준 dedupe를 적용한다.
+- 탐색 카테고리는 `all | dog | cat | lizard`를 사용하고 API의 `petType`에는 각각 `undefined | dog | cat | reptile`로 매핑한다. 입양·브리더·커뮤니티에서 같은 매핑을 공유하며, 지원 데이터가 없다는 이유로 `lizard`를 전체 조회로 폴백하지 않는다.
 - 내부 이동 URL은 `/`로 시작하는 값만 허용한다.
 - API 실패를 빈 상태로 가장하지 않는다. 오류와 빈 상태를 별도로 렌더링한다.
 - optimistic update를 쓰면 실패 시 반드시 rollback하고 서버 값으로 재검증한다.

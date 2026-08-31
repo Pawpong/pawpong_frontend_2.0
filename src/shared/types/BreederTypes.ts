@@ -18,6 +18,8 @@ export type PetGender = 'male' | 'female'
 
 export type PetStatus = 'available' | 'reserved' | 'adopted'
 
+export type BreederPetType = 'dog' | 'cat' | 'reptile'
+
 // ==================== 공통 서브타입 ====================
 
 export interface BreederLocationDto {
@@ -188,7 +190,7 @@ export interface BreederProfileUpdateResponseDto {
 export interface Breeder {
   breederId: string
   breederName: string
-  petType: string
+  petType: BreederPetType
   location: string
   mainBreed: string
   specializationTypes?: string[]
@@ -208,7 +210,7 @@ export interface Breeder {
 }
 
 export interface SearchBreederParams {
-  petType?: 'dog' | 'cat'
+  petType?: BreederPetType
   /** 검색어 — 브리더명/품종/지역 부분 일치 */
   keyword?: string
   dogSize?: string[]

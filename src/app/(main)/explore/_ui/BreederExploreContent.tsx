@@ -21,12 +21,6 @@ const FILTER_TO_QUERY = {
   popular: { sortBy: 'favorite' },
 } as const
 
-// 탐색 카테고리 → 브리더 검색 petType. 도마뱀(reptile)은 API enum(dog|cat)에 없어 전체 조회로 둔다.
-const toBreederPetType = (category: AnimalCategory) => {
-  const petType = CATEGORY_TO_PET_TYPE[category]
-  return petType === 'dog' || petType === 'cat' ? petType : undefined
-}
-
 // Breeder(API) → BreederCard 뷰 모델. 카드는 즐겨찾는 브리더 탭과 같은 것을 쓴다.
 const toBreederCardModel = (breeder: Breeder): FavoriteBreeder => ({
   id: breeder.breederId,
@@ -54,7 +48,7 @@ const BreederExploreContent = ({ category, keyword }: BreederExploreContentProps
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending, isError } =
     useInfiniteQuery(
       breederQueries.explore({
-        petType: toBreederPetType(category),
+        petType: CATEGORY_TO_PET_TYPE[category],
         keyword,
         ...FILTER_TO_QUERY[listFilter],
       }),
