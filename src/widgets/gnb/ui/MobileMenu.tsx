@@ -6,7 +6,7 @@ import { ArrowRightIcon, CloseIcon } from '@/shared/assets'
 import { RESPONSIVE_SHELL_CLASS } from '@/shared/config'
 import { useAuthStatus } from '@/features/auth'
 import { cn } from '@/shared/lib/cn'
-import { Dialog, DialogPortal } from '@/shared/ui'
+import { Dialog, DialogOverlay, DialogPortal } from '@/shared/ui'
 import { LogoButton } from './LogoButton'
 import { AuthActions } from './AuthActions'
 import { MOBILE_ACCOUNT_MENU_ITEMS, MOBILE_PUBLIC_MENU_ITEMS } from './NavItems'
@@ -51,6 +51,12 @@ const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogPortal>
+        {/*
+          전체화면 시트라 Content 배경(primary-50/20)만으로는 뒤 페이지가 그대로 비친다.
+          (검색바·배너가 로그인/회원가입 버튼 위로 겹쳐 보이던 원인)
+          불투명 base 를 Overlay 로 깔아 디자인 색(primary-50 20%)은 유지하면서 비침만 막는다.
+        */}
+        <DialogOverlay className="bg-base-white" />
         <DialogPrimitive.Content
           aria-describedby={undefined}
           className="fixed inset-0 z-modal flex min-w-0 flex-col overflow-y-auto bg-primary-50/20 data-[state=closed]:opacity-0 data-[state=open]:opacity-100"
