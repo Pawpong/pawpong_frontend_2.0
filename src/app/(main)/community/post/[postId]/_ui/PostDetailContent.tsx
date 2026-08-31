@@ -146,6 +146,8 @@ const PostDetailContent = ({ postId }: PostDetailContentProps) => {
                       alt={`게시글 이미지 ${index + 1}`}
                       fill
                       sizes="(max-width: 767px) 234px, 349px"
+                      loading={index === 0 ? 'eager' : 'lazy'}
+                      fetchPriority={index === 0 ? 'high' : 'auto'}
                       className="object-cover"
                     />
                   )}
