@@ -36,7 +36,7 @@ const OwnerActionsMenu = ({
         type="button"
         aria-label={ariaLabel}
         className={cn(
-          'text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500',
+          '-m-2 flex size-10 shrink-0 items-center justify-center text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500',
           className,
         )}
       >

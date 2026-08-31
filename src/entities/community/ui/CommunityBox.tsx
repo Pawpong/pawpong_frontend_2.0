@@ -1,8 +1,9 @@
 'use client'
 
+import type { ReactNode } from 'react'
+
 import Image from 'next/image'
 import Link from 'next/link'
-import { MoreVertIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import type { CommunityPreviewAuthor, CommunityPreviewProps } from '../model/communityPreview'
 import { CommunityPostActions } from './CommunityPostActions'
@@ -14,6 +15,8 @@ interface CommunityBoxProps extends CommunityPreviewProps {
   /** 좋아요·북마크 토글 — features의 ConnectedCommunityBox에서 주입 */
   onToggleLike?: () => void
   onToggleSave?: () => void
+  /** 기능 레이어에서 주입하는 게시글 추가 액션 */
+  moreAction?: ReactNode
   className?: string
 }
 
@@ -33,6 +36,7 @@ const CommunityBox = ({
   detailHref,
   onToggleLike,
   onToggleSave,
+  moreAction,
   className,
 }: CommunityBoxProps) => {
   const primaryImage = images[0]
@@ -73,13 +77,7 @@ const CommunityBox = ({
         ) : (
           profile
         )}
-        <button
-          type="button"
-          aria-label="게시글 더보기"
-          className="size-6 shrink-0 text-neutral-850"
-        >
-          <MoreVertIcon className="size-6" />
-        </button>
+        {moreAction}
       </header>
 
       <div className="min-h-0 w-full flex-1">

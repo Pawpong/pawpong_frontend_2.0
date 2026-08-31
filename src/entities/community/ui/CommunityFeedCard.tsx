@@ -1,11 +1,10 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, type ReactNode } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ImageCarousel, OwnerActionsMenu, ProfileAvatar } from '@/shared/ui'
-import { MoreVertIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { formatRelativeTime } from '@/shared/lib/formatRelativeTime'
 import type { CommunityPreviewProps } from '../model/communityPreview'
@@ -19,6 +18,8 @@ interface CommunityFeedCardProps extends CommunityPreviewProps {
   /** 좋아요·북마크 토글 — features의 ConnectedFeedCard에서 주입 */
   onToggleLike?: () => void
   onToggleSave?: () => void
+  /** 남의 글에 표시할 기능 레이어 액션(예: 신고 메뉴) */
+  moreAction?: ReactNode
   /** 이미지 표현 — 커뮤니티 피드는 1:1 캐러셀, 마이홈처럼 카드가 넓은 곳은 가로 스크롤 썸네일 */
   mediaLayout?: 'carousel' | 'row'
   /** 목록의 첫 카드처럼 LCP 후보인 첫 이미지만 선로딩 */
@@ -46,6 +47,7 @@ const CommunityFeedCard = ({
   onDelete,
   onToggleLike,
   onToggleSave,
+  moreAction,
   mediaLayout = 'carousel',
   preload = false,
   className,
@@ -105,10 +107,7 @@ const CommunityFeedCard = ({
             className="shrink-0 text-neutral-850"
           />
         ) : (
-          // ponytail: 남의 글 더보기는 액션 미정(신고 등) — 스펙 나오면 여기 연결
-          <button type="button" aria-label="더보기" className="shrink-0 p-1">
-            <MoreVertIcon className="size-6 text-neutral-850" />
-          </button>
+          moreAction
         )}
       </div>
 

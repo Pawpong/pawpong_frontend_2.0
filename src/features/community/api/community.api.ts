@@ -9,6 +9,8 @@ import type {
   CommunityPostDeleteResponse,
   CommunityBookmarkResponse,
   CommunityUnsaveResponse,
+  CommunityPostReportRequest,
+  CommunityPostReportResponse,
 } from '@/shared/types'
 
 /** 게시글 좋아요 */
@@ -95,4 +97,16 @@ export const unbookmarkCommunityPost = async (postId: string): Promise<Community
     `${API_VERSION}/community/posts/${postId}/bookmark`,
   )
   return unwrap(response, '북마크 취소에 실패했습니다.')
+}
+
+/** 남의 게시글 신고 — 동일 사용자의 중복 신고는 reported=false로 반환된다. */
+export const reportCommunityPost = async (
+  postId: string,
+  data: CommunityPostReportRequest,
+): Promise<CommunityPostReportResponse> => {
+  const response = await apiClient.post<ApiResponseFull<CommunityPostReportResponse>>(
+    `${API_VERSION}/community/posts/${postId}/report`,
+    data,
+  )
+  return unwrap(response, '게시글 신고에 실패했습니다.')
 }

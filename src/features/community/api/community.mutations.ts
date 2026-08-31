@@ -1,8 +1,17 @@
 'use client'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import type { CreateCommunityPostRequest, UpdateCommunityPostRequest } from '@/shared/types'
-import { createCommunityPost, updateCommunityPost, deleteCommunityPost } from './community.api'
+import type {
+  CommunityPostReportRequest,
+  CreateCommunityPostRequest,
+  UpdateCommunityPostRequest,
+} from '@/shared/types'
+import {
+  createCommunityPost,
+  updateCommunityPost,
+  deleteCommunityPost,
+  reportCommunityPost,
+} from './community.api'
 import {
   invalidateCommunityPostData,
   invalidateCommunityPostLists,
@@ -32,3 +41,8 @@ export const useDeleteCommunityPost = () => {
     onSuccess: (_data, postId) => invalidateDeletedCommunityPost(qc, postId),
   })
 }
+
+export const useReportCommunityPost = (postId: string) =>
+  useMutation({
+    mutationFn: (data: CommunityPostReportRequest) => reportCommunityPost(postId, data),
+  })
