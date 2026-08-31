@@ -1,12 +1,12 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import type { ContestEntry } from '@/shared/types'
 import { ArrowRightIcon } from '@/shared/assets'
 import { ProfileAvatar } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
+import { ContestEntryImage } from '@/entities/contest'
 import 'swiper/css'
 
 interface HallOfFamePodiumProps {
@@ -116,13 +116,13 @@ const PixelFrame = ({
   const photo = (
     <>
       {entry && (
-        <Image
+        <ContestEntryImage
           src={entry.photoUrl}
           alt={entry.description || `${entry.userDisplayName}의 명예의 전당 사진`}
-          fill
           sizes="(min-width: 1440px) 211px, 122px"
           loading="eager"
-          className="object-cover"
+          fetchPriority={rank === 1 ? 'high' : 'auto'}
+          fallbackIconClassName="size-12 pc:size-16"
         />
       )}
     </>
