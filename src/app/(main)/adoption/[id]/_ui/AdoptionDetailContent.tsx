@@ -61,6 +61,7 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
         onImageClick={openImageModal}
         isFavorite={isFavorite}
         onToggleFavorite={toggleFavorite}
+        showFavoriteAction={!isMyListing}
       />
 
       {/* ═══ 하단 콘텐츠 ═══ 피그마 tab: 섹션별 컨테이너 px-48 py-12 */}

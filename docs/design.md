@@ -143,6 +143,7 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 
 - `Button`: primary, outline, text, fill, ghost. 새 CTA는 이 variant를 우선 확장한다.
 - `FavoriteButton`, `FavoriteToggle`, `FollowButton`, `PostActionButton`: 도메인 액션의 아이콘·레이블·pending 상태를 소유한다.
+- 입양 관심 액션은 일반 방문자에게 Mobile CTA / Tablet 히어로 / PC 히어로 중 정확히 한 곳만 노출한다. 소유자 본인의 분양글에는 노출하지 않으며, 서버도 동일 소유자 등록을 403으로 차단해 인기 정렬 지표를 보호한다.
 - `FilterChip`, `Badge`, `PixelTab`, `PixelSelectCard`: 선택·분류·상태 표시에 사용한다.
 - `Checkbox`, `Switch`, `Select`, `Dropdown`, `DropdownMenu`: 폼 선택과 메뉴를 담당한다.
 - `Switch`, `Select`, `Checkbox`, `DropdownMenu`는 `neutral` 표면, `primary-500` focus ring, `point-500` 선택 상태, `error-*` 파괴 상태를 공유한다.
@@ -314,6 +315,7 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 | API 재진입 상태       | `AsyncState`, `ListState`, `useExitGuard`                        | 상세·신청·프로필·홈·알림·커뮤니티 로컬 복구 통일                  |
 | 브리더 등급 정책·심사 | Figma 메뉴 `3555:416834` 외, `DocumentFilePicker`, `AsyncState`  | 공개 정책·역할 CTA·Elite 서류 업로드·신청 상태·재진입 연결 완료   |
 | 입양자 신청·후기      | 홈 `3349:1763114`, 탭 `976:32388`, 계정 패널                     | 신청 목록·상세·후기 작성·목록·상세·역할별 진입점 실제 API 연결    |
+| 입양 관심 정책        | 입양 상세 컴포넌트 세트, `FavoriteShareActions`                  | 전 breakpoint 단일 액션·소유자 숨김·서버 self-boost 403 차단 완료 |
 
 ## 15. 문서 갱신 규칙
 

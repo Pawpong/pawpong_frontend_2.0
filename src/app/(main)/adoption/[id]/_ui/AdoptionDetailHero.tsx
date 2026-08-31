@@ -26,6 +26,7 @@ interface AdoptionDetailHeroProps {
   onImageClick: (images: string[], index?: number) => void
   isFavorite: boolean
   onToggleFavorite: () => void
+  showFavoriteAction: boolean
 }
 
 // [refactored] JSX 안에 있던 브레드크럼 라벨을 모듈 상수로 분리
@@ -43,6 +44,7 @@ const AdoptionDetailHero = ({
   onImageClick,
   isFavorite,
   onToggleFavorite,
+  showFavoriteAction,
 }: AdoptionDetailHeroProps) => {
   // [refactored] 모바일·pc 두 블록이 똑같이 넘기던 props를 한 곳에서 만든다
   const statsProps = {
@@ -139,6 +141,8 @@ const AdoptionDetailHero = ({
               labelClassName="hidden text-neutral-700 tab:inline"
               isFavorite={isFavorite}
               onToggle={onToggleFavorite}
+              showFavorite={showFavoriteAction}
+              favoriteClassName="hidden tab:flex"
             />
           </div>
 
@@ -149,6 +153,7 @@ const AdoptionDetailHero = ({
               {...shareProps}
               isFavorite={isFavorite}
               onToggle={onToggleFavorite}
+              showFavorite={showFavoriteAction}
             />
           </div>
         </div>
