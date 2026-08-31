@@ -46,6 +46,14 @@ const BREEDER_LINKS: SettingsLink[] = [
   },
 ]
 
+const ADOPTER_LINKS: SettingsLink[] = [
+  {
+    href: '/activity',
+    label: '신청·후기 내역',
+    description: '보낸 입양 신청의 진행 상태와 작성한 후기를 확인해요.',
+  },
+]
+
 const SettingsLinkRow = ({ href, label, description }: SettingsLink) => (
   <Link
     href={href}
@@ -63,7 +71,10 @@ const SettingsLinkRow = ({ href, label, description }: SettingsLink) => (
 
 const SettingsContent = ({ userRole }: SettingsContentProps) => {
   const { logoutAndRedirect, isPending } = useLogoutAndRedirect()
-  const links = userRole === 'breeder' ? [...COMMON_LINKS, ...BREEDER_LINKS] : COMMON_LINKS
+  const links =
+    userRole === 'breeder'
+      ? [...COMMON_LINKS, ...BREEDER_LINKS]
+      : [...COMMON_LINKS, ...ADOPTER_LINKS]
 
   return (
     <div className="flex w-full flex-1 flex-col bg-primary-50/20 pb-16">

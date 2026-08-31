@@ -9,7 +9,11 @@ import { cn } from '@/shared/lib/cn'
 import { Dialog, DialogOverlay, DialogPortal } from '@/shared/ui'
 import { LogoButton } from './LogoButton'
 import { AuthActions } from './AuthActions'
-import { MOBILE_ACCOUNT_MENU_ITEMS, MOBILE_PUBLIC_MENU_ITEMS } from './NavItems'
+import {
+  MOBILE_ACCOUNT_MENU_ITEMS,
+  MOBILE_ADOPTER_ACCOUNT_MENU_ITEMS,
+  MOBILE_PUBLIC_MENU_ITEMS,
+} from './NavItems'
 import type { NavItem } from './NavItems'
 
 interface MobileMenuProps {
@@ -45,8 +49,12 @@ const MenuGroup = ({ label, items, onNavigate }: MenuGroupProps) => (
 )
 
 const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
-  const { isLoggedIn } = useAuthStatus()
+  const { isLoggedIn, userRole } = useAuthStatus()
   const close = () => onOpenChange(false)
+  const accountItems =
+    userRole === 'adopter'
+      ? [...MOBILE_ADOPTER_ACCOUNT_MENU_ITEMS, ...MOBILE_ACCOUNT_MENU_ITEMS]
+      : MOBILE_ACCOUNT_MENU_ITEMS
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -88,9 +96,7 @@ const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
           >
             <AuthActions variant="block" onNavigate={close} />
             <MenuGroup label="서비스" items={MOBILE_PUBLIC_MENU_ITEMS} onNavigate={close} />
-            {isLoggedIn && (
-              <MenuGroup label="내 메뉴" items={MOBILE_ACCOUNT_MENU_ITEMS} onNavigate={close} />
-            )}
+            {isLoggedIn && <MenuGroup label="내 메뉴" items={accountItems} onNavigate={close} />}
           </div>
         </DialogPrimitive.Content>
       </DialogPortal>

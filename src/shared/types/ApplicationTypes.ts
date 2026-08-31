@@ -30,13 +30,14 @@ export interface StandardResponses {
   preferredPetDescription?: string
   desiredAdoptionTiming?: string
   additionalNotes?: string
+  adoptionPlan?: string
 }
 
 export interface CustomQuestionResponse {
   questionId: string
   questionLabel: string
   questionType: string
-  answer: string
+  answer: string | string[]
 }
 
 // ==================== 신청 폼 ====================
@@ -111,15 +112,20 @@ export interface ApplicationCreateRequest extends Omit<
 
 export interface ApplicationListItemDto {
   applicationId: string
+  reviewId: string | null
   breederId: string
   breederName: string
   breederLevel: BreederLevel
-  profileImage?: string
+  profileImage?: string | null
   animalType: 'cat' | 'dog'
   petId?: string
+  petName?: string
   petBreed?: string
   status: ApplicationStatus
   applicationDate: string
+  appliedAt: string
+  processedAt?: string
+  customResponses?: CustomQuestionResponse[]
   adopterId?: AdopterIdField
   adopterName?: string
   adopterNickname?: string
@@ -146,10 +152,11 @@ export interface ReceivedApplicationItemDto {
 
 interface ApplicationDetailBase {
   applicationId: string
+  reviewId: string | null
   petId?: string
   petName?: string
   status: ApplicationStatus
-  standardResponses: StandardResponses
+  standardResponses?: StandardResponses
   customResponses: CustomQuestionResponse[]
   appliedAt: string
   processedAt?: string

@@ -18,3 +18,7 @@ export const MOBILE_ACCOUNT_MENU_ITEMS: NavItem[] = [
   { name: '저장목록', href: '/bookmarks' },
   { name: '설정', href: '/settings' },
 ]
+
+export const MOBILE_ADOPTER_ACCOUNT_MENU_ITEMS: NavItem[] = [
+  { name: '신청·후기 내역', href: '/activity' },
+]

@@ -134,7 +134,7 @@ export interface MyReviewItemDto {
   breedingPetType: string
   content: string
   reviewType: string
-  writtenAt: Date
+  writtenAt: string
 }
 
 export interface MyReviewDetailDto extends MyReviewItemDto {
@@ -153,12 +153,8 @@ export interface ReviewCreateRequest {
 /** 후기 작성 응답 (adopter.ts) */
 export interface ReviewCreateResponseDto {
   reviewId: string
-  breederId: string
-  breederName: string
-  adopterId: string
-  adopterName: string
   applicationId: string
+  breederId: string
   reviewType: string
-  content: string
-  createdAt: string
+  writtenAt: string
 }
