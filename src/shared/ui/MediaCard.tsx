@@ -1,6 +1,10 @@
+'use client'
+
 import type { ReactNode } from 'react'
+import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { PawIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 
 interface MediaCardProps {
@@ -40,32 +44,64 @@ const MediaCard = ({
   sizes = '(max-width: 767px) 50vw, (max-width: 1200px) 33vw, 25vw',
   preload = false,
   className,
-}: MediaCardProps) => (
-  <Link href={href} className={cn('flex h-full w-full flex-col', className)}>
-    <div
+}: MediaCardProps) => {
+  const [failedImageUrl, setFailedImageUrl] = useState<string>()
+  const showImage = Boolean(thumbnailUrl) && failedImageUrl !== thumbnailUrl
+
+  return (
+    <article
       className={cn(
-        'relative aspect-[348/284] w-full overflow-hidden rounded bg-neutral-700 pc:rounded-lg',
-        thumbnailClassName,
+        'group/media relative flex h-full w-full flex-col overflow-hidden rounded-lg bg-white transition-[box-shadow] duration-200 ease-out',
+        'focus-within:ring-2 focus-within:ring-primary-500 focus-within:ring-offset-2 pc:hover:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]',
+        className,
       )}
     >
-      {thumbnailUrl && (
-        <Image
-          src={thumbnailUrl}
-          alt={alt}
-          fill
-          sizes={sizes}
-          preload={preload}
-          className="object-cover"
-        />
-      )}
-      {overlay}
-    </div>
+      <div
+        className={cn(
+          'relative aspect-[348/284] w-full overflow-hidden rounded bg-point-50 pc:rounded-lg',
+          thumbnailClassName,
+        )}
+      >
+        {showImage ? (
+          <Image
+            src={thumbnailUrl!}
+            alt={alt}
+            fill
+            sizes={sizes}
+            preload={preload}
+            onError={() => setFailedImageUrl(thumbnailUrl)}
+            className="object-cover transition-transform duration-200 ease-out pc:group-hover/media:scale-[1.02] motion-reduce:transform-none"
+          />
+        ) : (
+          <div
+            className="absolute inset-0 flex items-center justify-center bg-point-50 text-primary-300"
+            role="img"
+            aria-label={`${alt} 이미지 없음`}
+          >
+            <PawIcon className="size-12 opacity-70 pc:size-14" />
+          </div>
+        )}
 
-    <div className="flex min-h-[3.875rem] items-start justify-between gap-2 p-2 pc:p-3">
-      <div className="flex min-w-0 flex-1 flex-col">{children}</div>
-      {trailing}
-    </div>
-  </Link>
-)
+        <Link
+          href={href}
+          aria-label={`${alt} 상세 보기`}
+          className="absolute inset-0 z-[1] focus-visible:outline-none"
+        />
+
+        <div className="pointer-events-none absolute inset-0 z-[2] [&_a]:pointer-events-auto [&_button]:pointer-events-auto">
+          {overlay}
+        </div>
+      </div>
+
+      <Link
+        href={href}
+        className="flex min-h-[3.875rem] items-start justify-between gap-2 p-2 focus-visible:outline-none pc:p-3"
+      >
+        <div className="flex min-w-0 flex-1 flex-col">{children}</div>
+        {trailing}
+      </Link>
+    </article>
+  )
+}
 
 export { MediaCard }

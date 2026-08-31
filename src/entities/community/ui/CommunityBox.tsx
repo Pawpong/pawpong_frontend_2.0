@@ -64,8 +64,8 @@ const CommunityBox = ({
       className={cn(
         // 디자인 기준: mo·tab 321×326 / pc 407×376.
         'flex h-[20.375rem] w-full flex-col items-start overflow-hidden rounded-lg border border-neutral-300 bg-white p-3 pc:h-[23.5rem]',
-        // Figma hover/press (923-18992): 배경 #f6f6f6 + drop shadow
-        'transition-[background-color,box-shadow] hover:bg-neutral-50 hover:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)] active:bg-neutral-50 active:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]',
+        // 이미지 색을 회색으로 탁하게 만들지 않고 Figma의 얕은 elevation만 사용한다.
+        'transition-shadow focus-within:ring-2 focus-within:ring-primary-500 focus-within:ring-offset-2 pc:hover:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]',
         className,
       )}
     >

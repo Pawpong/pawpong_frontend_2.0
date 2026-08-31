@@ -11,7 +11,11 @@ const MyListingsContent = () => (
   <div className="flex w-full flex-col pb-12">
     <NavigationBar title="분양 페이지" backHref="/home" />
 
-    <InputUpload text="분양글 작성하기" href="/adoption/create" />
+    <InputUpload
+      text="분양글 작성하기"
+      href="/adoption/create"
+      description="새로운 분양 정보를 등록해보세요"
+    />
 
     <Container className="py-6 tab:py-10">
       <MyPetPostingList pageSize={PAGE_SIZE} showTotalCount />
