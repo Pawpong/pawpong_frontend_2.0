@@ -46,9 +46,8 @@ const CommunityContent = () => {
 
   return (
     <div className="flex w-full flex-col">
-      {/* 상단바 — 공통 NavigationBar (Figma 2063-213675 navigation bar)
-          PC 시안에는 이 서브 상단바가 없다(GNB 의 '커뮤니티' 탭이 그 역할을 한다). */}
-      <NavigationBar title="포퐁커뮤니티" backHref="/" className="pc:hidden" />
+      {/* 커뮤니티의 화면 정체성과 뒤로가기 기준은 전 구간에서 유지한다. */}
+      <NavigationBar title="포퐁커뮤니티" backHref="/" />
 
       {/* 검색 (Figma 1657-251460 — 버튼 클릭 시 focus 입력 pill로 전환)
           padding: mo 8·16 / tab 12·48 (px-4=모바일 16, tab48은 Container 기본값) */}

@@ -75,8 +75,8 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 - `ListingCardGrid`의 탐색형은 Mobile~Tablet에서 최대 282px 2열, PC에서 282px 4열로 전환한다. 브리더 compact형은 Mobile 164px 2열, Tablet 최대 282px 3열, PC 282px 4열로 제한해 1439→1440px에서 카드 폭이 역전되지 않게 한다.
 - 커뮤니티 메인 피드의 `CommunityFeedCard`는 Figma `3606:622637` 기준 16px radius를 유지하고, 폭 상한은 Mobile/Tablet 343px · PC 415px로 둔다. Tablet 여백을 채우기 위해 1:1 미디어를 확대하지 않는다.
 - 커뮤니티 메인 피드의 표면은 Figma PC `1440 · 커뮤니티 홈`대로 흰 배경이다. 중립 회색 표면을 페이지 셸 폭 전체에 깔지 않는다 — 컬럼이 343~415px이라 PC에서 좌우에 빈 회색 띠만 남는다.
-- 커뮤니티 메인의 `NavigationBar`(포퐁커뮤니티)는 PC 시안에 없다. `pc:hidden`으로 두고 GNB의 `커뮤니티` 탭이 그 역할을 한다.
-- 프로필·단일 컬럼 피드는 Mobile/Tablet에서 실내용 672px, PC에서 Figma `1021:20324`의 948px을 상한으로 한다. 공용 탭 셸은 Mobile 바깥 704px/실내용 672px, Tablet 바깥 768px/실내용 672px, PC에서 Figma `976:32388`의 바깥 940px/실내용 780px을 상한으로 하며 sticky 표면만 페이지 폭을 채운다.
+- 커뮤니티 메인의 `NavigationBar`(포퐁커뮤니티)는 화면 정체성과 뒤로가기 기준이므로 Mobile·Tablet·PC 전 구간에 유지한다.
+- 프로필·단일 컬럼 피드는 Mobile/Tablet에서 실내용 672px, PC에서 Figma `1021:20324`의 948px을 상한으로 한다. 공용 탭은 콘텐츠 카드 상한을 공유하지 않고 `PAGE_WIDTH_CLASS` 전체를 채운다. Figma `976:32388`의 높이·타이포·indicator 비율만 유지하며, 하단선과 탭 배치는 모든 소비 화면에서 같은 전폭 계약을 쓴다.
 - 채팅 목록·대화·입력도 같은 Mobile 704px 상한을 공유한다. PC 사이드바 내부는 독립 폭이므로 해당 상한을 적용하지 않는다.
 - GNB와 서브 내비게이션도 `RESPONSIVE_SHELL_CLASS`를 사용한다. 배경은 viewport 너비를 유지하고 로고·제목·액션만 경계에서 같은 실내용 폭으로 이어진다.
 - 767↔768에서 카드 크기가 역전되지 않도록 Mobile 그리드는 Figma 375 폭을 상한으로 가운데 정렬하고, Tablet부터 PC 상한까지 필요한 경우 `clamp()`로 보간한다.
@@ -132,7 +132,7 @@ Figma의 명시 구간을 CSS와 JS에서 동일하게 사용한다.
 | `SectionHeader`   | 섹션 제목·설명·상세 링크를 정렬한다.                                                                                                                                        |
 | `ShowcaseSection` | 홈 섹션의 거터·수직 간격·헤더를 함께 제공한다.                                                                                                                              |
 | `BottomNav`       | Mobile·Tablet의 56px 주요 내비게이션. 최상위 화면에서만 표시하고 자체 하단 CTA 화면에서는 숨긴다. 서버 스트리밍 중에도 홈 계열 fallback을 즉시 표시해 본문과 겹치지 않는다. |
-| `TabBar`, `Tabs`  | Figma `976:32388`의 탭 높이·indicator·페이지 폭을 제공한다.                                                                                                                 |
+| `TabBar`, `Tabs`  | `PAGE_WIDTH_CLASS` 전폭에서 Figma `976:32388`의 탭 높이·indicator를 제공한다. 콘텐츠 카드용 max-width를 탭에 적용하지 않는다.                                               |
 | `ListingCardGrid` | 탐색/홈 카드 열과 gap을 제공한다. 카드 외형을 소유하지 않는다.                                                                                                              |
 | `FooterCtaBar`    | 작성·신청 화면의 고정/하단 CTA 정렬을 제공한다.                                                                                                                             |
 | `MobileMenu`      | 전 구간 전체 메뉴를 modal dialog로 제공한다. 서비스 링크는 항상, 계정 링크는 로그인 상태에서만 노출하며 ESC·focus trap·이동 후 닫힘을 보장한다.                             |
