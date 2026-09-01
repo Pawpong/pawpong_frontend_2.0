@@ -16,6 +16,7 @@ export {
   createInfiniteQueryWithHasMore,
   STALE_TIME,
 } from './queryFactory'
+export { getTransientErrorRefetchInterval, transientQueryRecoveryOptions } from './queryRecovery'
 export {
   deleteFile,
   uploadAvailablePetPhoto,

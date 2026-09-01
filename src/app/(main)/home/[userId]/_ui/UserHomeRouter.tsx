@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 import { profileQueries } from '@/entities/profile'
 import { adopterQueries } from '@/entities/adopter'
 import { useAuthStatus } from '@/features/auth'
-import { isApiError } from '@/shared/api'
+import { isApiError, transientQueryRecoveryOptions } from '@/shared/api'
 import { AsyncState, Button } from '@/shared/ui'
 import { UserHomeContent } from './UserHomeContent'
 import { BreederHomeContent } from './BreederHomeContent'
@@ -20,6 +20,7 @@ const UserHomeRouter = ({ userId }: UserHomeRouterProps) => {
   const { isLoggedIn } = useAuthStatus()
   const myProfileQuery = useQuery({
     ...profileQueries.me(),
+    ...transientQueryRecoveryOptions,
     enabled: isLoggedIn,
     refetchOnMount: 'always',
     throwOnError: false,
@@ -33,6 +34,7 @@ const UserHomeRouter = ({ userId }: UserHomeRouterProps) => {
 
   const adopterProfileQuery = useQuery({
     ...adopterQueries.publicProfile(userId),
+    ...transientQueryRecoveryOptions,
     // 내 홈이면 곧바로 /home 으로 보내므로 조회할 필요가 없다 (브리더 ID 로 조회하면 400)
     enabled: !!userId && !isMine,
     refetchOnMount: 'always',

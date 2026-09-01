@@ -14,6 +14,7 @@ import {
 import { flattenPages } from '@/shared/lib/infiniteList'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
 import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
+import { transientQueryRecoveryOptions } from '@/shared/api'
 import { adoptionQueries } from '@/entities/adoption'
 import { breederQueries } from '@/entities/breeder'
 import { communityQueries } from '@/entities/community'
@@ -37,6 +38,7 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
   const [activeTab, setActiveTab] = useState('listings')
   const profileQuery = useQuery({
     ...breederQueries.publicProfile(userId),
+    ...transientQueryRecoveryOptions,
     refetchOnMount: 'always',
     throwOnError: false,
   })

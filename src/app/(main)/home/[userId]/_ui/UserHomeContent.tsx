@@ -11,6 +11,7 @@ import {
 } from '@/shared/ui'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
+import { transientQueryRecoveryOptions } from '@/shared/api'
 import { adopterQueries } from '@/entities/adopter'
 import { communityQueries } from '@/entities/community'
 import { ProfileCard } from '../../_ui/ProfileCard'
@@ -25,6 +26,7 @@ interface UserHomeContentProps {
 const UserHomeContent = ({ userId }: UserHomeContentProps) => {
   const profileQuery = useQuery({
     ...adopterQueries.publicProfile(userId),
+    ...transientQueryRecoveryOptions,
     refetchOnMount: false,
     throwOnError: false,
   })

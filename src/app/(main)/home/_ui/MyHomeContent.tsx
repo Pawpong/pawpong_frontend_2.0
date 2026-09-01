@@ -15,6 +15,7 @@ import {
   NavigationBar,
 } from '@/shared/ui'
 import { useGnbHeight } from '@/shared/lib/useGnbHeight'
+import { transientQueryRecoveryOptions } from '@/shared/api'
 import { profileQueries } from '@/entities/profile'
 import { communityQueries } from '@/entities/community'
 import { useDeletePostConfirm } from '@/features/community'
@@ -38,6 +39,7 @@ const MyHomeContent = () => {
   // 마이홈 프로필 카드: /profile/me 로 내 프로필 조회 (role 에 따라 adopter/breeder 분기, 프로필 이미지 포함)
   const profileQuery = useQuery({
     ...profileQueries.me(),
+    ...transientQueryRecoveryOptions,
     refetchOnMount: 'always',
     throwOnError: false,
   })
