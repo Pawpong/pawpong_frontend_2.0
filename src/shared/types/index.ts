@@ -1,4 +1,6 @@
 // 기반 (의존성 없음)
+// 백엔드 OpenAPI 생성 타입 — 손으로 베낀 DTO 대신 여기서 끌어다 쓴다 (pnpm api:update)
+export * from './api'
 export * from './ApiTypes'
 export * from './UploadTypes'
 export * from './FilterTypes'

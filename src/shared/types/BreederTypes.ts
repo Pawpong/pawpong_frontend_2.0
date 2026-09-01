@@ -1,7 +1,10 @@
 /**
  * 브리더 관련 타입 정의
  * 출처: breeder.ts, breeder-management.ts (중복 통합)
+ *
+ * 백엔드 응답 그대로인 타입은 손으로 베끼지 말고 ApiSchemas(생성 타입)에서 파생시킨다.
  */
+import type { ApiSchemas } from './api'
 
 // ==================== 공통 리터럴 타입 ====================
 
@@ -28,11 +31,8 @@ export interface BreederLocationDto {
   detailAddress?: string
 }
 
-export interface BreederPriceRangeDto {
-  minPrice: number
-  maxPrice: number
-  display?: string
-}
+/** 백엔드 계약 그대로 사용 — 과거 minPrice/maxPrice 로 잘못 베껴 써서 항상 undefined 였다 */
+export type BreederPriceRangeDto = ApiSchemas['BreederPriceRangeDto']
 
 export interface BreederDocumentDto {
   type: string
@@ -61,14 +61,11 @@ export interface BreederStatsDto {
   profileViewCount: number
 }
 
-export interface BreederVerificationDto {
-  status: BreederVerificationStatus
-  plan?: string
-  submittedAt?: string
-  reviewedAt?: string
-  rejectionReason?: string
-  documents?: BreederDocumentDto[]
-}
+/**
+ * 백엔드 계약 그대로 사용 — 실제 응답은 verificationStatus 한 필드뿐인데
+ * status/plan/submittedAt/... 로 베껴 놓아 붙이는 순간 전부 undefined 가 되는 상태였다.
+ */
+export type BreederVerificationDto = ApiSchemas['BreederVerificationDto']
 
 // ==================== 반려동물 ====================
 
