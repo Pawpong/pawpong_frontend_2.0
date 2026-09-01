@@ -20,7 +20,7 @@ const FullPageMessage = ({
 }: FullPageMessageProps) => (
   <main
     className={cn(
-      'flex min-h-dvh w-full items-center justify-center bg-primary-50/20 px-4 py-12 tab:px-12 pc:px-20',
+      'flex min-h-dvh w-full items-center justify-center bg-white px-4 py-12 tab:px-12 pc:px-20',
       className,
     )}
   >

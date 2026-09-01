@@ -67,7 +67,7 @@ const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
         <DialogOverlay className="bg-base-white" />
         <DialogPrimitive.Content
           aria-describedby={undefined}
-          className="fixed inset-0 z-modal flex min-w-0 flex-col overflow-y-auto bg-primary-50/20 data-[state=closed]:opacity-0 data-[state=open]:opacity-100"
+          className="fixed inset-0 z-modal flex min-w-0 flex-col overflow-y-auto bg-white data-[state=closed]:opacity-0 data-[state=open]:opacity-100"
         >
           <DialogPrimitive.Title className="sr-only">전체 메뉴</DialogPrimitive.Title>
 

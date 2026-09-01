@@ -21,7 +21,7 @@ const ActivityContent = ({ initialTab }: { initialTab: ActivityTab }) => {
   }
 
   return (
-    <div className="flex w-full flex-1 flex-col bg-primary-50/20 pb-16">
+    <div className="flex w-full flex-1 flex-col bg-white pb-16">
       <NavigationBar title="신청·후기 내역" mobileTitle="신청·후기" backHref="/home" />
 
       <TabBar

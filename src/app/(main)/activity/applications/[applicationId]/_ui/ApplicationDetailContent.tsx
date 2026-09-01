@@ -96,7 +96,7 @@ const ApplicationDetailContent = ({ applicationId }: { applicationId: string }) 
   const reviewType = data ? getReviewTypeForStatus(data.status) : null
 
   return (
-    <div className="flex w-full flex-1 flex-col bg-primary-50/20 pb-16">
+    <div className="flex w-full flex-1 flex-col bg-white pb-16">
       <NavigationBar title="신청 상세" backHref="/activity?tab=applications" />
 
       <Container className="px-4 py-5 tab:py-8 pc:py-10">

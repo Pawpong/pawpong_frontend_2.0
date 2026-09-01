@@ -38,7 +38,7 @@ const FaqContent = () => {
   const faqs = query.data ?? []
 
   return (
-    <div className="flex w-full flex-1 flex-col bg-primary-50/20 pb-16">
+    <div className="flex w-full flex-1 flex-col bg-white pb-16">
       <NavigationBar title="자주 묻는 질문" backHref="/" />
       <TabBar
         items={FAQ_TABS}
