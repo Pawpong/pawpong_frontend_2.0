@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { NavigationBar, TabBar, TabsContent } from '@/shared/ui'
+import { TabBar, TabsContent } from '@/shared/ui'
 import { BOOKMARK_TABS } from './constants'
 import { FavoritesTab } from './FavoritesTab'
 import { SavedFeedsTab } from './SavedFeedsTab'
@@ -14,8 +14,6 @@ const BookmarksContent = () => {
 
   return (
     <div className="flex w-full flex-1 flex-col">
-      <NavigationBar title="저장목록" backHref="/home" />
-
       <TabBar
         items={BOOKMARK_TABS.map((tab) => ({ value: tab.id, label: tab.label }))}
         value={activeTab}

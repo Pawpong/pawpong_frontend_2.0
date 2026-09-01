@@ -11,7 +11,6 @@ import { BannerSlide } from './BannerSlide'
 import 'swiper/css'
 
 const AUTOPLAY_DELAY_MS = 4000
-const INACTIVE_SLIDE_SCALE = 974 / 1134
 const CAROUSEL_COPY_COUNT = 3
 
 // 셀렉터를 상수로 단일화 — navigation prop과 className에서 공유 (drift 방지)
@@ -89,13 +88,12 @@ const Banner = () => {
           setActiveIndex(normalizeIndex(swiper.realIndex))
         }}
         onRealIndexChange={(swiper) => setActiveIndex(normalizeIndex(swiper.realIndex))}
-        className="banner-swiper h-[11.9792rem] w-full py-0 tab:h-[16.2333rem] tab:py-[0.5833rem] pc:h-[30.4375rem] pc:py-[1.09375rem]"
+        className="banner-swiper mx-auto h-[11.9792rem] w-[23.4375rem] max-w-full py-0 tab:h-[16.2333rem] tab:w-[37.8rem] tab:py-[0.5833rem] pc:h-[30.4375rem] pc:w-[70.875rem] pc:py-[1.09375rem]"
       >
         {carouselBanners.map(({ banner, copyIndex }) => (
           <SwiperSlide
             key={`${copyIndex}-${banner.bannerId}`}
             className="!h-auto !w-[23.4375rem] tab:!w-[37.8rem] pc:!w-[70.875rem]"
-            style={{ '--inactive-banner-scale': INACTIVE_SLIDE_SCALE } as React.CSSProperties}
           >
             <BannerSlide banner={banner} />
           </SwiperSlide>

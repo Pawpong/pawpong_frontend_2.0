@@ -7,11 +7,11 @@ const listingCardGrid = tv({
     layout: {
       /**
        * 탐색·저장목록 (Figma 797:93446)
-       * - mo~tab: 2열을 유지하되 카드가 282px보다 커지지 않는다.
+       * - mo: 2열 / tab: 3열이 Container 폭을 그대로 채운다. 폭 상한을 두면 양옆이 비어 보인다.
        * - PC: 1280px 안에 282px 카드 4개를 양끝 정렬해 Figma의 50.67px 간격을 만든다.
        */
       explore:
-        'mx-auto w-full max-w-[36.25rem] gap-4 tab:max-w-[36.5rem] tab:gap-5 pc:max-w-none pc:grid-cols-[repeat(4,17.625rem)] pc:justify-between',
+        'w-full gap-4 tab:grid-cols-3 tab:gap-5 pc:grid-cols-[repeat(4,17.625rem)] pc:justify-between',
       /**
        * 즐겨찾기 브리더·브리더 홈 분양목록 (Figma 1023:38692)
        * - mo: 164px 카드 2개 / tab: 최대 282px 카드 3개 / PC: 282px 카드 4개.

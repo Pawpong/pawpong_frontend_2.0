@@ -149,12 +149,7 @@ const MyHomeContent = () => {
         {/* 분양 목록 탭 (브리더만) — 시안 3170-790275: 배너 -> 라벨+필터 -> 카드 4열 */}
         {isBreeder && (
           <TabsContent value="listings" className="mt-0">
-            <InputUpload
-              text="분양글 작성하기"
-              href="/adoption/create"
-              description="새로운 분양 정보를 등록해보세요"
-              className="max-w-176 px-4 tab:max-w-192 pc:max-w-[58.75rem]"
-            />
+            <InputUpload text="분양글 작성하기" href="/adoption/create" className="px-4" />
 
             {/* 배너는 콘텐츠 Container 밖의 독립 밴드 (시안 3170-800323) — 홈 CTA 스트립과 같은 배치 */}
             <Container className="px-4 pt-4 pb-2">
@@ -177,8 +172,9 @@ const MyHomeContent = () => {
           <InputUpload
             text="글 작성하기"
             href="/community/write"
-            description="반려동물의 오늘을 기록해보세요"
-            className="max-w-176 px-4 tab:max-w-192 pc:max-w-[58.75rem]"
+            // 게시글 목록(PostList)과 같은 폭. Container 의 max-w·px 는 구간별 클래스라
+            // 접두사 없는 값만 주면 tab·pc 에서 원래 값이 살아남는다 — 구간마다 덮어 쓴다
+            className="mx-auto px-4 tab:max-w-168 tab:px-0 pc:max-w-[59.25rem] pc:px-0"
             left={
               draftCount > 0 && (
                 <Link

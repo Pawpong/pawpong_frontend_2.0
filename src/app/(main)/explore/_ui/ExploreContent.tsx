@@ -193,6 +193,7 @@ const ExploreContent = () => {
           placeholder={SEARCH_PLACEHOLDERS[selectedType]}
           defaultValue={keyword}
           onSubmit={handleSearch}
+          showPopularKeywords
         />
       </div>
       {/* 스크롤 트리거 sentinel (상단 영역 끝) */}

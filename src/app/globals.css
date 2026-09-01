@@ -186,24 +186,9 @@
   height: 0;
 }
 
-/* 중앙 배너 외 이전/다음 슬라이드는 Figma처럼 85.9% 축소 + 30% 명도로 노출한다.
-   slide 간 논리 gap은 0이며 축소로 생기는 여백이 tab 42.7px / pc 80px이 된다. */
+/* 배너는 한 번에 한 장만 보인다 — 스와이퍼 폭을 슬라이드 폭에 맞춰 앞뒤 슬라이드는 밖으로 잘린다. */
 @media (width >= 48rem) {
   .banner-swiper .swiper-wrapper {
     align-items: center;
-  }
-
-  .banner-swiper .swiper-slide {
-    opacity: 0.3;
-    /* Swiper의 .swiper-backface-hidden transform보다 우선해 Figma 축소 비율을 유지한다. */
-    transform: scale(var(--inactive-banner-scale, 0.8589065)) translateZ(0) !important;
-    transition:
-      opacity 200ms ease,
-      transform 200ms ease;
-  }
-
-  .banner-swiper .swiper-slide-active {
-    opacity: 1 !important;
-    transform: scale(1) translateZ(0) !important;
   }
 }
