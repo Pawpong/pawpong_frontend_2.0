@@ -1,6 +1,7 @@
 'use client'
 
-import { AffectionBadge, ProfileAvatar } from '@/shared/ui'
+// 애정도 뱃지 보류로 AffectionBadge import 제거 (복구 시 함께 되살린다)
+import { ProfileAvatar } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { ArrowBackIcon } from '@/shared/assets'
 import { CHAT_CONTENT_WIDTH } from '../_lib/constants'
@@ -10,7 +11,8 @@ interface ChatRoomHeaderProps {
   roomId: string
   displayName: string
   profileImageUrl?: string
-  hasApplication: boolean
+  /** 애정도 뱃지 노출 조건 — 뱃지 보류로 현재 미사용
+  hasApplication: boolean */
   onBack: () => void
   onRoomClosed: () => void
 }
@@ -19,7 +21,6 @@ const ChatRoomHeader = ({
   roomId,
   displayName,
   profileImageUrl,
-  hasApplication,
   onBack,
   onRoomClosed,
 }: ChatRoomHeaderProps) => {
@@ -47,7 +48,8 @@ const ChatRoomHeader = ({
               </span>
             </div>
           </div>
-          {hasApplication && <AffectionBadge />}
+          {/* 애정도 뱃지 — 정책 미확정으로 노출 보류 (docs/design.md — BPM/EXP 는 추정 구현하지 않는다)
+          {hasApplication && <AffectionBadge />} */}
         </div>
         <ChatRoomActionsMenu
           roomId={roomId}

@@ -240,7 +240,8 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
     return (
       <>
         {isBreederProfile && <Badge {...badgeProps}>브리더</Badge>}
-        <Badge {...badgeProps}>{profile.bpm} BPM</Badge>
+        {/* BPM 뱃지 — 정책 미확정으로 노출 보류 (docs/design.md — BPM/EXP 는 추정 구현하지 않는다)
+        <Badge {...badgeProps}>{profile.bpm} BPM</Badge> */}
       </>
     )
   }

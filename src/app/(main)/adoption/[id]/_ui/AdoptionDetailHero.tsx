@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { Fragment, type ReactNode } from 'react'
 import {
-  AffectionBadge,
+  // AffectionBadge — 애정도 뱃지 보류 (복구 시 함께 되살린다)
   Container,
   PopularBadge,
   ProfileAvatar,
@@ -188,8 +188,9 @@ const BreederProfileRow = ({
           {breeder.nickname}
         </p>
       </div>
-      {/* 뱃지는 size prop이 반응형이 아니라 md 기준 + pc에서 lg 치수로 덮는다 */}
-      <AffectionBadge size="md" className="pc:h-[1.8125rem] pc:py-1 pc:text-sm" />
+      {/* 애정도 뱃지 — 정책 미확정으로 노출 보류 (docs/design.md — BPM/EXP 는 추정 구현하지 않는다)
+          (뱃지는 size prop이 반응형이 아니라 md 기준 + pc에서 lg 치수로 덮는다)
+      <AffectionBadge size="md" className="pc:h-[1.8125rem] pc:py-1 pc:text-sm" /> */}
     </div>
     <Link
       href={`/home/${breeder.id}`}

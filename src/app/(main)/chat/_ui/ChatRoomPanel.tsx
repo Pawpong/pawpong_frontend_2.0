@@ -63,7 +63,8 @@ const ChatRoomPanel = ({ room, currentUserId, onBack, onRoomClosed }: ChatRoomPa
         roomId={room.roomId}
         displayName={displayName}
         profileImageUrl={room.counterpart.profileImageUrl}
-        hasApplication={!!room.applicationId}
+        // 애정도 뱃지 보류로 미전달
+        // hasApplication={!!room.applicationId}
         onBack={onBack}
         onRoomClosed={onRoomClosed}
       />
