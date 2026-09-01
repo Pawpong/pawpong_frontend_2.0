@@ -1,8 +1,0 @@
-# 백엔드 OpenAPI 에서 생성/동기화되는 산출물 — 손으로 고치지 않으므로 포맷 검사 대상이 아니다
-src/shared/types/api.generated.ts
-swagger.json
-
-# 빌드 산출물
-.next
-out
-build
