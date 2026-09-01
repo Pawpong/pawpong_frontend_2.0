@@ -15,6 +15,8 @@ interface SectionHeaderProps {
   className?: string
   /** 타이틀 텍스트 스타일 오버라이드 (색·크기·굵기 등) */
   titleClassName?: string
+  /** 상세 링크의 반응형 타이포·색 오버라이드 */
+  linkClassName?: string
   /** 우측에 렌더링할 커스텀 요소 — subtitle 이 있으면 부제 줄, 없으면 타이틀 줄 우측 */
   rightSlot?: React.ReactNode
   /** 모바일 접기/펼치기 */
@@ -30,6 +32,7 @@ const SectionHeader = ({
   linkHref,
   className,
   titleClassName,
+  linkClassName,
   rightSlot,
   collapsible,
   collapsed,
@@ -49,7 +52,12 @@ const SectionHeader = ({
           {title}
         </p>
         {linkText && linkHref && (
-          <DetailLink href={linkHref} label={linkText} size="sm" className="tab:text-[0.875rem]" />
+          <DetailLink
+            href={linkHref}
+            label={linkText}
+            size="sm"
+            className={cn('tab:text-[0.875rem]', linkClassName)}
+          />
         )}
         {/* 부제가 없으면 우측 슬롯을 타이틀 줄(링크 자리)에 붙인다 */}
         {!subtitle && rightSlot}

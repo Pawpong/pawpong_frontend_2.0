@@ -10,6 +10,8 @@ interface ShowcaseSectionProps {
   children: ReactNode
   className?: string
   contentClassName?: string
+  titleClassName?: string
+  linkClassName?: string
 }
 
 /** 홈의 카드형 쇼케이스 섹션 공통 셸. */
@@ -20,6 +22,8 @@ const ShowcaseSection = ({
   children,
   className,
   contentClassName,
+  titleClassName,
+  linkClassName,
 }: ShowcaseSectionProps) => (
   <Container className={cn('px-4 py-4 pc:px-20 pc:py-10', className)}>
     <section className={cn('flex flex-col gap-3', contentClassName)}>
@@ -28,7 +32,11 @@ const ShowcaseSection = ({
         linkText={linkText}
         linkHref={linkHref}
         className="h-[1.875rem] justify-center pc:h-auto"
-        titleClassName="p-0 font-cafe24 text-sm leading-[1.5] font-normal whitespace-nowrap text-neutral-850 tab:text-sm pc:text-xl"
+        titleClassName={cn(
+          'p-0 font-cafe24 text-xs leading-[1.5] font-normal whitespace-nowrap text-neutral-850 tab:text-sm pc:text-xl',
+          titleClassName,
+        )}
+        linkClassName={cn('tab:text-xs pc:text-sm', linkClassName)}
       />
       {children}
     </section>
