@@ -2,34 +2,33 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { ArrowRightIcon } from '@/shared/assets'
 import type { ContestEntry } from '@/shared/types'
+// [refactored] 손으로 조립하던 로그인 안내를 공통 모달로 교체
 import {
   Container,
-  CtaModal,
   ImageDetailModal,
   InfiniteScrollTrigger,
   ListState,
+  LoginPromptModal,
   NavigationBar,
 } from '@/shared/ui'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
 import { ContestVoteCard, contestQueries, isContestImageSourceSupported } from '@/entities/contest'
 import { useCancelContestVote, useVoteContestEntry } from '@/features/contest'
-import { useAuthStatus } from '@/features/auth'
+import { useLoginGuard } from '@/features/auth'
 import { HallOfFamePodium } from '@/widgets/hall-of-fame'
 import { flattenPages } from '@/shared/lib/infiniteList'
+import { ContestEntryPanel } from './ContestEntryPanel'
 
 const PODIUM_COUNT = 3
 const ENTRY_PAGE_SIZE = 16
 
 const HallOfFameContent = () => {
-  const router = useRouter()
-  const pathname = usePathname()
-  const { isLoggedIn } = useAuthStatus()
+  // [refactored] 비로그인 분기 + 안내 모달 상태를 공통 훅으로 (커뮤니티 피드와 같은 방식)
+  const { guard, isPromptOpen, setPromptOpen } = useLoginGuard()
   const [selectedEntry, setSelectedEntry] = useState<ContestEntry | null>(null)
-  const [showLoginPrompt, setShowLoginPrompt] = useState(false)
 
   const {
     data: currentContest,
@@ -80,22 +79,8 @@ const HallOfFameContent = () => {
     { length: PODIUM_COUNT },
     (_, index) => currentRanking[index] ?? winners[index],
   )
-  // 비로그인은 투표 요청이 401로 떨어지므로 먼저 로그인으로 유도한다
-  const handleVote = (entryId: string) => {
-    if (!isLoggedIn) {
-      setShowLoginPrompt(true)
-      return
-    }
-    voteEntry.mutate(entryId)
-  }
-
-  const handleCancelVote = (entryId: string) => {
-    if (!isLoggedIn) {
-      setShowLoginPrompt(true)
-      return
-    }
-    cancelVote.mutate(entryId)
-  }
+  // [refactored] 같은 모양의 비로그인 분기 두 벌을 guard 로 통일 (비로그인은 401이라 요청 자체를 막는다)
+  const isVoteMutating = voteEntry.isPending || cancelVote.isPending
 
   const handleImageClick = (entry: ContestEntry) => {
     if (isContestImageSourceSupported(entry.photoUrl)) setSelectedEntry(entry)
@@ -161,23 +146,26 @@ const HallOfFameContent = () => {
       </section>
 
       <section className="w-full">
-        <Container className="px-5 pt-6 pb-12 tab:px-12 tab:pt-10 pc:max-w-[74.625rem] pc:px-0">
-          <h2 className="mb-3 text-sm leading-[1.5] font-semibold text-neutral-850 tab:text-base pc:text-xl pc:leading-[1.4]">
+        <Container className="px-5 pt-6 pb-12 tab:px-12 tab:pt-10 pc:max-w-[80rem] pc:px-0">
+          <h2 className="mb-3 text-sm leading-[1.5] font-semibold text-neutral-850 pc:text-base pc:leading-[1.4]">
             이번주 명예의 동물 투표하기
           </h2>
 
           <ListState
             isPending={areEntriesPending}
             isError={areEntriesError && !hasNoContest}
-            isEmpty={entries.length === 0}
+            // [refactored] 빈 상태는 ContestEntryPanel 이 문구까지 맡는다 —
+            // 후보가 없어도 참여 진입점은 남아야 해서 ListState 로 덮지 않는다
+            isEmpty={false}
             loadingText="투표 후보를 불러오는 중입니다."
             errorText="투표 후보를 불러오지 못했습니다."
-            emptyText={
-              hasNoContest ? '진행 중인 콘테스트가 없습니다.' : '아직 등록된 투표 후보가 없습니다.'
-            }
+            emptyText={null}
           >
             <>
-              <div className="grid grid-cols-2 gap-4 tab:grid-cols-3 tab:gap-5 pc:grid-cols-4">
+              {/* 참여 진입점 — 후보 유무와 무관하게 투표 섹션 맨 위에 둔다 */}
+              <ContestEntryPanel hasNoContest={hasNoContest} hasEntries={entries.length > 0} />
+
+              <div className="mt-5 grid grid-cols-2 gap-4 tab:grid-cols-3 tab:gap-5 pc:grid-cols-4">
                 {entries.map((entry) => {
                   const isVoted = entry.id === votedEntryId
                   const cardEntry =
@@ -195,9 +183,9 @@ const HallOfFameContent = () => {
                         (voteEntry.isPending && voteEntry.variables === entry.id) ||
                         (cancelVote.isPending && cancelVote.variables === entry.id)
                       }
-                      isVoteDisabled={voteEntry.isPending || cancelVote.isPending}
-                      onVote={() => handleVote(entry.id)}
-                      onCancelVote={() => handleCancelVote(entry.id)}
+                      isVoteDisabled={isVoteMutating}
+                      onVote={guard(() => voteEntry.mutate(entry.id))}
+                      onCancelVote={guard(() => cancelVote.mutate(entry.id))}
                       onImageClick={() => handleImageClick(cardEntry)}
                     />
                   )
@@ -220,20 +208,11 @@ const HallOfFameContent = () => {
         </Container>
       </section>
 
-      <CtaModal
-        open={showLoginPrompt}
-        onOpenChange={setShowLoginPrompt}
-        title="로그인이 필요해요"
+      {/* [refactored] 제목·액션·returnUrl 이 그대로 겹쳐 있던 CtaModal 을 공통 모달로 */}
+      <LoginPromptModal
+        open={isPromptOpen}
+        onOpenChange={setPromptOpen}
         description="로그인하고 이번주 명예의 동물에게 투표해보세요."
-        actions={[
-          {
-            label: '로그인하러 가기',
-            variant: 'fill',
-            // returnUrl은 /login → 백엔드 OAuth → /login/success 까지 그대로 전달돼 이 페이지로 되돌아온다
-            onClick: () => router.push(`/login?returnUrl=${encodeURIComponent(pathname)}`),
-          },
-          { label: '닫기', variant: 'ghost', onClick: () => setShowLoginPrompt(false) },
-        ]}
       />
 
       {selectedEntry && (
