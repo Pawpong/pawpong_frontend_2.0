@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { normalizeReturnUrl } from '@/shared/lib/normalizeReturnUrl'
 
 /**
  * 소셜 로그인 성공 랜딩 (기존 회원)
@@ -26,7 +27,7 @@ const LoginSuccessContent = () => {
     const run = async () => {
       const accessToken = searchParams.get('accessToken')
       const refreshToken = searchParams.get('refreshToken')
-      const returnUrl = searchParams.get('returnUrl') || '/'
+      const returnUrl = normalizeReturnUrl(searchParams.get('returnUrl'))
 
       if (!accessToken || !refreshToken) {
         router.replace('/login')
