@@ -2,18 +2,13 @@
 
 import Link from 'next/link'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
-import { ArrowRightIcon, CloseIcon } from '@/shared/assets'
+import { CloseIcon, PawIcon } from '@/shared/assets'
 import { RESPONSIVE_SHELL_CLASS } from '@/shared/config'
 import { useAuthStatus } from '@/features/auth'
 import { cn } from '@/shared/lib/cn'
 import { Dialog, DialogOverlay, DialogPortal } from '@/shared/ui'
 import { LogoButton } from './LogoButton'
-import { AuthActions } from './AuthActions'
-import {
-  MOBILE_ACCOUNT_MENU_ITEMS,
-  MOBILE_ADOPTER_ACCOUNT_MENU_ITEMS,
-  MOBILE_PUBLIC_MENU_ITEMS,
-} from './NavItems'
+import { MOBILE_MENU_ITEMS } from './NavItems'
 import type { NavItem } from './NavItems'
 
 interface MobileMenuProps {
@@ -21,49 +16,17 @@ interface MobileMenuProps {
   onOpenChange: (open: boolean) => void
 }
 
-interface MenuGroupProps {
-  label: string
-  items: NavItem[]
-  onNavigate: () => void
-}
-
-const MenuGroup = ({ label, items, onNavigate }: MenuGroupProps) => (
-  <section className="overflow-hidden rounded-xl border border-neutral-150 bg-white shadow-[0_7px_7px_rgba(55,55,55,0.06)]">
-    <h2 className="px-4 pt-4 pb-2 font-cafe24 text-sm text-primary-600 tab:px-5 tab:text-base">
-      {label}
-    </h2>
-    <nav className="divide-y divide-neutral-150" aria-label={label}>
-      {items.map((item) => (
-        <Link
-          key={item.href}
-          href={item.href}
-          onClick={onNavigate}
-          className="group flex min-h-14 items-center justify-between gap-4 px-4 py-3 text-base font-semibold text-neutral-850 transition-colors hover:bg-primary-50/60 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-500 tab:min-h-16 tab:px-5"
-        >
-          {item.name}
-          <ArrowRightIcon className="size-5 shrink-0 text-neutral-500 transition-transform group-hover:translate-x-0.5 group-hover:text-primary-500" />
-        </Link>
-      ))}
-    </nav>
-  </section>
-)
-
 const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
-  const { isLoggedIn, userRole } = useAuthStatus()
+  const { isLoggedIn } = useAuthStatus()
   const close = () => onOpenChange(false)
-  const accountItems =
-    userRole === 'adopter'
-      ? [...MOBILE_ADOPTER_ACCOUNT_MENU_ITEMS, ...MOBILE_ACCOUNT_MENU_ITEMS]
-      : MOBILE_ACCOUNT_MENU_ITEMS
+  // 인증이 필요한 화면도 목록에서 감추지 않고, 비로그인이면 돌아올 주소를 실어 로그인으로 보낸다
+  const hrefFor = ({ href, requiresAuth }: NavItem) =>
+    requiresAuth && !isLoggedIn ? `/login?returnUrl=${encodeURIComponent(href)}` : href
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogPortal>
-        {/*
-          전체화면 시트라 Content 배경(primary-50/20)만으로는 뒤 페이지가 그대로 비친다.
-          (검색바·배너가 로그인/회원가입 버튼 위로 겹쳐 보이던 원인)
-          불투명 base 를 Overlay 로 깔아 디자인 색(primary-50 20%)은 유지하면서 비침만 막는다.
-        */}
+        {/* 전체화면 시트라 Content 배경만으로는 뒤 페이지가 비친다 — 불투명 base 를 Overlay 로 깐다 */}
         <DialogOverlay className="bg-base-white" />
         <DialogPrimitive.Content
           aria-describedby={undefined}
@@ -88,15 +51,30 @@ const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
             </div>
           </header>
 
+          {/* Figma 3555:416834 — 카드 없이 항목만 32px 간격으로 세운다 (본문 px16 / py40) */}
           <div
             className={cn(
               RESPONSIVE_SHELL_CLASS,
-              'flex flex-1 flex-col gap-5 px-4 py-6 tab:gap-6 tab:px-12 tab:py-10 pc:px-20',
+              'flex flex-1 flex-col gap-8 px-4 py-10 tab:px-12 pc:px-20',
             )}
           >
-            <AuthActions variant="block" onNavigate={close} />
-            <MenuGroup label="서비스" items={MOBILE_PUBLIC_MENU_ITEMS} onNavigate={close} />
-            {isLoggedIn && <MenuGroup label="내 메뉴" items={accountItems} onNavigate={close} />}
+            <h2 className="flex items-center gap-1 text-base leading-[1.5] font-bold text-primary-500">
+              <PawIcon className="size-8 shrink-0" aria-hidden />
+              설정
+            </h2>
+
+            <nav className="flex flex-col gap-8" aria-label="설정">
+              {MOBILE_MENU_ITEMS.map((item) => (
+                <Link
+                  key={item.href}
+                  href={hrefFor(item)}
+                  onClick={close}
+                  className="text-base leading-[1.5] font-semibold text-neutral-700 transition-colors hover:text-primary-500 focus-visible:rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-500"
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </nav>
           </div>
         </DialogPrimitive.Content>
       </DialogPortal>

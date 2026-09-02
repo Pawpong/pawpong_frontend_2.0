@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { MenuIcon } from '@/shared/assets'
 import { RESPONSIVE_SHELL_CLASS } from '@/shared/config'
 import { cn } from '@/shared/lib/cn'
+import { AuthActions } from './AuthActions'
 import { LogoButton } from './LogoButton'
 import { NavBar } from './NavBar'
 import { MobileMenu } from './MobileMenu'
@@ -26,8 +27,11 @@ const Gnb = () => {
           )}
         >
           <LogoButton />
-          {/* Figma 3349:1763537 — PC nav와 메뉴 아이콘 사이 40px */}
-          <div className="flex items-center gap-10">
+          {/* Figma 3349:1763537 — nav·로그인·메뉴 아이콘 사이 20px.
+              비로그인은 nav 대신 로그인/회원가입 (Figma GNB '로그인' 상태) */}
+          <div className="flex items-center gap-5">
+            {/* [refactored] 노출 조건은 AuthActions 가 판단한다. PC 는 NavBar 안 마이홈 자리에서 렌더 */}
+            <AuthActions className="pc:hidden" />
             <NavBar className="hidden pc:flex" />
             {/* 햄버거 메뉴 — 탭·모바일은 nav 대체, 데스크탑은 보조 메뉴 (전 브레이크포인트) */}
             <button

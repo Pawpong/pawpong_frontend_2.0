@@ -149,7 +149,7 @@ Use the breakpoints Figma specifies, identically in CSS and JS.
 | `TabBar`, `Tabs`  | Provide the tab height and indicator from Figma `976:32388` at the full `PAGE_WIDTH_CLASS` width. Do not apply a content-card max-width to tabs.                                                                                      |
 | `ListingCardGrid` | Provides column count and gap for explore/home cards. It does not own card appearance.                                                                                                                                                |
 | `FooterCtaBar`    | Provides the fixed bottom CTA alignment for composer and application screens.                                                                                                                                                         |
-| `MobileMenu`      | Provides the full menu as a modal dialog at every breakpoint. Service links are always shown, account links only when signed in, and ESC, focus trap, and close-after-navigation are guaranteed.                                      |
+| `MobileMenu`      | Provides the full menu as a modal dialog at every breakpoint. Every destination is listed regardless of sign-in state or role — items needing auth link to `/login?returnUrl=…` instead of disappearing — and ESC, focus trap, and close-after-navigation are guaranteed. |
 | `SiteFooter`      | Provides the service menu, currently published business information, and policy links on public browsing screens. Not rendered in focused flows such as account, composer, or chat.                                                   |
 | `FullPageMessage` | Provides the brand surface, typography, and action alignment for states that replace a whole page, such as 404 and global errors.                                                                                                     |
 
@@ -221,16 +221,19 @@ Use the breakpoints Figma specifies, identically in CSS and JS.
 - Chat location sharing tells the user their current coordinates will be revealed before sending. Only a single coordinate and its accuracy are stored on the message — no route or address is collected — and permission denial, unavailable location, and timeout are recovered inside the modal.
 - Location messages use the `location` type with range-validated latitude and longitude. The bubble keeps the existing point/white surface, external maps open in a new tab, and raw coordinates are never reverse-geocoded into an approximate address.
 - Close icons, focus trap, ESC, and overlay-click behavior are not reimplemented per page.
-- The full menu uses the Radix `Dialog`. It lays a neutral/warm surface across the entire viewport while its inner content follows `RESPONSIVE_SHELL_CLASS` and the 16/48/80px gutters exactly.
+- The full menu uses the Radix `Dialog` on a white full-viewport surface, while its inner content follows `RESPONSIVE_SHELL_CLASS` and the 16/48/80px gutters exactly.
+- Full-menu items are a single flat list under a paw + `설정` heading (Figma `3555:416834`): 16px semibold `neutral-700` rows spaced 20px apart, with no cards, borders, dividers, or trailing arrows.
+- The menu lists only destinations that exist. `서비스 소개` and `공지사항` appear in the Figma sheet but have no route, so they are not linked — a menu entry is a promise that the screen exists.
 
 ### Account and Help Screens
 
 - `/login` follows the 48/64px header, 343/500px button widths, and 12/16px spacing of the three social login Figma frames. The leftover email/password copy and separate sign-up link in Figma are not part of the current contract and are not shown.
+- Signed-out users get a single point-500 `로그인` action, never a separate `회원가입` button — sign-up starts from the same social OAuth entry. On PC it takes the `마이홈` slot in the header nav; below PC it sits in the header next to the menu button.
 - Authentication offers only Google, Kakao, and Naver OAuth. Existing users proceed to a successful sign-in and new users continue into sign-up onboarding from the same button; the page does not make the user choose between them up front.
 - Auth buttons may use social brand colors as an exception, while keeping a shared 40px height, 8px radius, centered icon/label pairing, and `primary-500` focus-visible ring.
 - `/login?returnUrl=...` accepts only internal paths beginning with `/` as a return target. A signed-in user re-entering is `replace`d, and browser-back for a signed-out user restores the previous public screen, so nobody gets trapped on the login page.
 - `/settings` is the account hub for authenticated users. Profile, notifications, and saved items are shared, with listing management added for breeders only.
-- Adopter settings and the full menu expose the `신청·후기 내역` (applications & reviews) entry point at `/activity`. It is not shown to breeders, and a server-side role guard also blocks direct access.
+- The `신청·후기 내역` (applications & reviews) entry point at `/activity` is listed for everyone; the server-side role guard is what actually blocks breeders. Menus do not pre-hide destinations.
 - `/activity` splits applications and my reviews with the shared `TabBar`. Lists are rendered as separated rows inside a `rounded-xl + neutral-150 border + white surface` panel rather than per-screen cards, keeping the same account-screen hierarchy as settings and notifications.
 - The `reviewId` on the application list and detail is the source of truth for server state. The frontend does not re-scan the whole review list to guess whether a review exists, and it invalidates both the application and review caches after a review is written.
 - One review per application. `consultation_completed` allows only a consultation review and `adoption_approved` only an adoption review; in any other state the composer is not shown.

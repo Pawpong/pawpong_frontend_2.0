@@ -1,12 +1,20 @@
 import type { ReactNode } from 'react'
-import { PawIcon } from '@/shared/assets'
+import Image from 'next/image'
 import { cn } from '@/shared/lib/cn'
+import { ProfileAvatar } from '@/shared/ui'
 
-// Figma nav bar (746:72275) 픽셀 아이콘 — 32x32 정규화, fill=currentColor로 active/inactive 색 토글.
+// Figma nav icon 세트 (1019:38520) — status=Default / hover-press 두 변형.
+// Default 는 단색이라 currentColor 로 그린다 (하단 내비 회색 / PC 헤더 브라운).
+// hover-press 는 노란 채움 + 브라운 외곽의 투톤이라 currentColor 로 표현할 수 없어
+// Figma 에서 뽑은 SVG 를 그대로 쓴다 (public/images/nav/*).
 // 헤더(데스크탑)와 BottomNav(모바일/탭)가 공유한다.
 
 interface NavIconProps {
   className?: string
+  /** 마이홈 전용 — 로그인 사용자의 프로필 사진. 없으면 기본 paw 아바타(Figma profile=X) */
+  src?: string
+  /** 마이홈 전용 — 활성 시 아바타에 primary 링 (Figma 4161:849060) */
+  active?: boolean
 }
 
 const NavHomeIcon = ({ className }: NavIconProps) => (
@@ -50,14 +58,32 @@ const NavCommunityIcon = ({ className }: NavIconProps) => (
   </svg>
 )
 
-// 마이홈: 원(bg-current) + 유저 글리프(흰색). Figma avator(원 22 / 글리프 11)를 비율로 스케일.
-const NavMyHomeIcon = ({ className }: NavIconProps) => (
-  <span className={cn('flex items-center justify-center', className)}>
-    <span className="flex size-[68.75%] items-center justify-center rounded-full bg-current">
-      <PawIcon className="size-1/2 text-white" />
-    </span>
+/**
+ * 마이홈 — 프로필 사진이 있으면 사진, 없으면 기본 paw 아바타.
+ * Figma 는 아이콘 박스 30 안에 2px 여백을 두고 아바타 25.97 을 놓는다 (4042:775065).
+ * 활성 상태에서는 아바타에 2px primary 링을 두른다 (4161:849060 / 4161:849526).
+ */
+const NavMyHomeIcon = ({ className, src, active }: NavIconProps) => (
+  <span className={cn('flex items-center justify-center p-0.5', className)}>
+    <ProfileAvatar
+      src={src}
+      size="xsmall"
+      className={cn('size-full', active && 'border-2 border-primary-500')}
+    />
   </span>
 )
+
+/** Default(단색 글리프) ↔ hover-press(투톤 SVG) 를 상태에 따라 바꿔 그린다 */
+const withActiveIcon = (Glyph: (props: NavIconProps) => ReactNode, activeSrc: string) => {
+  const NavIcon = ({ className, active }: NavIconProps) =>
+    active ? (
+      <Image src={activeSrc} alt="" width={30} height={30} className={className} />
+    ) : (
+      <Glyph className={className} />
+    )
+  NavIcon.displayName = 'NavIcon'
+  return NavIcon
+}
 
 export interface MainNavItem {
   href: string
@@ -68,24 +94,29 @@ export interface MainNavItem {
 }
 
 export const MAIN_NAV: MainNavItem[] = [
-  { href: '/', label: '홈', Icon: NavHomeIcon, isActive: (p) => p === '/' },
+  {
+    href: '/',
+    label: '홈',
+    Icon: withActiveIcon(NavHomeIcon, '/images/nav/nav-home-active.svg'),
+    isActive: (p) => p === '/',
+  },
   {
     href: '/explore',
     label: '탐색',
-    Icon: NavSearchIcon,
+    Icon: withActiveIcon(NavSearchIcon, '/images/nav/nav-search-active.svg'),
     isActive: (p) => p.startsWith('/explore'),
   },
   {
     href: '/chat',
     label: '채팅',
     bottomLabel: '채팅방',
-    Icon: NavChatIcon,
+    Icon: withActiveIcon(NavChatIcon, '/images/nav/nav-chat-active.svg'),
     isActive: (p) => p.startsWith('/chat'),
   },
   {
     href: '/community',
     label: '커뮤니티',
-    Icon: NavCommunityIcon,
+    Icon: withActiveIcon(NavCommunityIcon, '/images/nav/nav-community-active.svg'),
     isActive: (p) => p.startsWith('/community'),
   },
   { href: '/home', label: '마이홈', Icon: NavMyHomeIcon, isActive: (p) => p.startsWith('/home') },
