@@ -15,7 +15,7 @@ import { transientQueryRecoveryOptions } from '@/shared/api'
 import { adopterQueries } from '@/entities/adopter'
 import { communityQueries } from '@/entities/community'
 import { ProfileCard } from '../../_ui/ProfileCard'
-import { PostList } from '../../_ui/PostList'
+import { PostList } from '@/features/community'
 
 const HOME_POST_PAGE_SIZE = 30
 

@@ -23,8 +23,8 @@ import { BreederListingCard } from '../../_ui/BreederListingCard'
 import { FavoriteBreederIconButton } from '../../_ui/FavoriteBreederIconButton'
 import { FavoriteAdoptionCard } from '@/features/adoption'
 import { HomeTabs, TabsContent } from '../../_ui/HomeTabs'
-import { PostList } from '../../_ui/PostList'
 import { BREEDER_HOME_TABS } from '../../_ui/constants'
+import { PostList } from '@/features/community'
 
 // 이 탭이 곧 분양글 목록 전체라 마이홈 프리뷰(6)보다 크게 받는다 (서버 상한 60)
 const HOME_LISTING_PAGE_SIZE = 16
