@@ -57,7 +57,7 @@ const FaqHero = ({ onInquiryClick }: { onInquiryClick: () => void }) => (
       <p
         className={cn(
           cafe24Proup.className,
-          'max-w-[55rem] text-center text-base leading-[1.5] text-neutral-850 tab:text-lg pc:text-xl',
+          'max-w-[55rem] text-center text-2xl leading-[1.5] text-neutral-850',
         )}
       >
         서비스에 대해서 궁금한 점을 친절하게 알려드립니다.
@@ -85,7 +85,7 @@ const FaqAudienceTabs = ({
       자주 묻는 질문
     </p>
     <Tabs value={value} onValueChange={(next) => onChange(next as FaqAudience)}>
-      <TabsList aria-label="FAQ 이용자 유형" className="gap-4">
+      <TabsList aria-label="FAQ 이용자 유형" className="gap-2">
         {FAQ_TABS.map((tab) => (
           <TabsTrigger
             key={tab.value}
