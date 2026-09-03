@@ -31,15 +31,29 @@ interface CtaBannerProps {
   text: string
   /** 지정하면 배너 전체가 링크가 된다 (홈 CTA 스트립은 이동이 없어 미지정) */
   href?: string
+  /** 지정하면 배너 전체가 버튼이 된다 (href 와 동시에 쓰지 않는다) */
+  onClick?: () => void
+  /**
+   * secondary(기본, 홈 브리더 CTA) / point(문의하기 안내 배너, Figma 2752-266394 기본 override).
+   * 같은 컴포넌트를 가리키는 다른 색 override라 tone 으로 분기한다.
+   */
+  tone?: 'secondary' | 'point'
 }
+
+const TONE_CLASS = {
+  secondary: 'bg-secondary-200',
+  point: 'border border-primary-200 bg-point-100',
+} as const
 
 /**
  * 픽셀 발자국 CTA 스트립 (Figma 2752-266432 / 2752-266394).
  * 스트립 px-16 py-12(pc px-32) · 텍스트 12px -> pc 14px · PC 폭 1134.
  */
-const CtaBanner = ({ text, href }: CtaBannerProps) => {
-  const barClass =
-    'relative mx-auto flex h-[2.3125rem] w-full max-w-[70.875rem] items-center justify-between overflow-hidden rounded-xl bg-secondary-200 px-4 pc:h-[2.8125rem] pc:px-8'
+const CtaBanner = ({ text, href, onClick, tone = 'secondary' }: CtaBannerProps) => {
+  const barClass = cn(
+    'relative mx-auto flex h-[2.3125rem] w-full max-w-[70.875rem] items-center justify-between overflow-hidden rounded-xl px-4 pc:h-[2.8125rem] pc:px-8',
+    TONE_CLASS[tone],
+  )
 
   const content = (
     <>
@@ -71,13 +85,23 @@ const CtaBanner = ({ text, href }: CtaBannerProps) => {
     </>
   )
 
-  return href ? (
-    <Link href={href} className={barClass}>
-      {content}
-    </Link>
-  ) : (
-    <div className={barClass}>{content}</div>
-  )
+  if (href) {
+    return (
+      <Link href={href} className={barClass}>
+        {content}
+      </Link>
+    )
+  }
+
+  if (onClick) {
+    return (
+      <button type="button" onClick={onClick} className={barClass}>
+        {content}
+      </button>
+    )
+  }
+
+  return <div className={barClass}>{content}</div>
 }
 
 export { CtaBanner }
