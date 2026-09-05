@@ -18,6 +18,7 @@ interface TabBarProps {
   children?: ReactNode
   className?: string
   barClassName?: string
+  triggerClassName?: string
   barStyle?: CSSProperties
   ariaLabel?: string
 }
@@ -36,6 +37,7 @@ const TabBar = ({
   children,
   className,
   barClassName,
+  triggerClassName,
   barStyle,
   ariaLabel,
 }: TabBarProps) => {
@@ -56,7 +58,10 @@ const TabBar = ({
                 disabled={item.disabled}
                 variant="underline"
                 size="md"
-                className="after:left-1/2 after:w-[7.25rem] after:-translate-x-1/2 tab:h-[3.8125rem] tab:pt-2 tab:text-base tab:after:left-0 tab:after:h-[0.5625rem] tab:after:w-full tab:after:translate-x-0"
+                className={cn(
+                  'after:left-1/2 after:w-[7.25rem] after:-translate-x-1/2 tab:h-[3.8125rem] tab:pt-2 tab:text-base tab:after:left-0 tab:after:h-[0.5625rem] tab:after:w-full tab:after:translate-x-0',
+                  triggerClassName,
+                )}
               >
                 {item.label}
               </TabsTrigger>
