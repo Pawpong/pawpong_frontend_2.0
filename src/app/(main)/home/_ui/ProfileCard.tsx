@@ -11,6 +11,7 @@ import {
 } from '@tanstack/react-query'
 import { Button, buttonVariants, ProfileAvatar, FollowersModal, type FollowUser } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
+import { formatBreederLocation } from '@/shared/lib/formatBreederLocation'
 import { LocationOnIcon } from '@/shared/assets'
 import { profileQueries } from '@/entities/profile'
 import { useFollowUser, useUnfollowUser, useRemoveFollower } from '@/features/profile'
@@ -228,8 +229,13 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
   const { mutate: removeFollower } = useRemoveFollower()
   // 남의 브리더 홈에서만 카드 우상단 즐겨찾기 아이콘을 띄운다
   const showFavoriteAction = mode === 'breeder' && breederProfile !== null
+  // 특별시·광역시는 city/district 가 사실상 같은 지역이라(서울특별시/서울시) 그대로
+  // 이어 붙이면 중복 표시된다 — 브리더 탐색 카드에서 고친 것과 같은 기준을 여기서도 적용
   const locationText = breederProfile
-    ? `${breederProfile.businessLocation.city} ${breederProfile.businessLocation.district}`
+    ? formatBreederLocation(
+        breederProfile.businessLocation.city,
+        breederProfile.businessLocation.district,
+      )
     : null
 
   const followers = toFollowUsers(followersQuery)
