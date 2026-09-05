@@ -1,6 +1,7 @@
 'use client'
 
 import { useSyncExternalStore } from 'react'
+import { AUTH_STATE_CHANGED } from '@/shared/lib/authStateEvents'
 
 /**
  * 클라이언트 쿠키 기반 로그인 상태 훅
@@ -32,12 +33,14 @@ const readCookie = (name: string): string => {
 
 // 쿠키 변경을 직접 감지하는 표준 이벤트는 없으므로 브라우저 재진입 이벤트에서 다시 읽는다.
 const subscribe = (onChange: () => void) => {
+  window.addEventListener(AUTH_STATE_CHANGED, onChange)
   window.addEventListener('focus', onChange)
   window.addEventListener('pageshow', onChange)
   window.addEventListener('popstate', onChange)
   document.addEventListener('visibilitychange', onChange)
 
   return () => {
+    window.removeEventListener(AUTH_STATE_CHANGED, onChange)
     window.removeEventListener('focus', onChange)
     window.removeEventListener('pageshow', onChange)
     window.removeEventListener('popstate', onChange)
