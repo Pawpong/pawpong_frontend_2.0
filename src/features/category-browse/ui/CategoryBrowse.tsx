@@ -44,9 +44,9 @@ const CategoryBrowse = () => {
       </Container>
 
       {/* 카테고리 밴드 (Figma 2752-269648) — 밴드 py-16(pc py-10) flush.
-          모바일(~767px): 2열 / 태블릿: 3열 / PC: 4개 한 줄 */}
+          모바일·태블릿(~1439px): 2×2 / PC: 4개 한 줄 (태블릿 3+1 낙오 배치 방지) */}
       <Container className="px-4 py-4 pc:py-[0.625rem]">
-        <div className="mx-auto grid w-full grid-cols-[repeat(2,6.640625rem)] place-items-center justify-center gap-x-[2.1875rem] gap-y-2 tab:grid-cols-[repeat(3,6.640625rem)] tab:gap-[2.1875rem] pc:min-h-[10.4621rem] pc:max-w-[60.526rem] pc:grid-cols-4 pc:gap-[4.1875rem]">
+        <div className="mx-auto grid w-full grid-cols-[repeat(2,6.640625rem)] place-items-center justify-center gap-x-[2.1875rem] gap-y-2 tab:gap-[2.1875rem] pc:min-h-[10.4621rem] pc:max-w-[60.526rem] pc:grid-cols-4 pc:gap-[4.1875rem]">
           {CATEGORIES.map((category) => (
             <HomeCategoryButton key={category.label} {...category} />
           ))}
