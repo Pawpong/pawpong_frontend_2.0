@@ -26,19 +26,6 @@ const COMMON_LINKS: SettingsLink[] = [
     label: '알림',
     description: '새 소식과 읽지 않은 알림을 확인해요.',
   },
-  {
-    href: '/bookmarks',
-    label: '저장목록',
-    description: '관심 동물과 저장한 게시글을 모아봐요.',
-  },
-]
-
-const BREEDER_LINKS: SettingsLink[] = [
-  {
-    href: '/adoption/my-listings',
-    label: '분양글 관리',
-    description: '작성한 분양글과 진행 상태를 관리해요.',
-  },
 ]
 
 const ADOPTER_LINKS: SettingsLink[] = [
@@ -66,10 +53,8 @@ const SettingsLinkRow = ({ href, label, description }: SettingsLink) => (
 
 const SettingsContent = ({ userRole }: SettingsContentProps) => {
   const { logoutAndRedirect, isPending } = useLogoutAndRedirect()
-  const links =
-    userRole === 'breeder'
-      ? [...COMMON_LINKS, ...BREEDER_LINKS]
-      : [...COMMON_LINKS, ...ADOPTER_LINKS]
+  // 브리더는 공통 메뉴만, 입양자는 신청·후기 내역이 더해진다
+  const links = userRole === 'breeder' ? COMMON_LINKS : [...COMMON_LINKS, ...ADOPTER_LINKS]
 
   return (
     <div className="flex w-full flex-1 flex-col bg-white pb-16">

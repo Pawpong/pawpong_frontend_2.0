@@ -9,7 +9,6 @@ import { useUpdateAdopterProfile, useDeleteAdopterAccount } from '@/features/ado
 import { useUpdateBreederProfile } from '@/features/breeder'
 import { useUpdateMyProfile } from '@/features/profile'
 import { useUploadSingleFile } from '@/features/upload'
-import { useLogout } from '@/features/auth'
 import { normalizeApiError } from '@/shared/api'
 import { useToast } from '@/shared/lib/useToast'
 import { useExitGuard } from '@/shared/lib/useExitGuard'
@@ -123,7 +122,6 @@ const ProfileEditContent = () => {
   const updateBreederProfile = useUpdateBreederProfile()
   const updateMyProfile = useUpdateMyProfile()
   const deleteAccount = useDeleteAdopterAccount()
-  const logout = useLogout()
 
   // 활동명만 필수. 소개는 서버 스펙상 빈 문자열이 "소개 비우기"로 허용돼 막지 않는다.
   // 브리더 활동명은 이 화면에서 readOnly라 검사에서 제외 — 비어 있어도 저장을 막으면 손쓸 방법이 없다
@@ -184,15 +182,6 @@ const ProfileEditContent = () => {
       router.replace('/')
     } catch (error) {
       showError(error, '탈퇴 처리에 실패했습니다.') // [refactored]
-    }
-  }
-
-  const handleLogout = async () => {
-    try {
-      await logout.mutateAsync()
-      router.replace('/')
-    } catch (error) {
-      showError(error, '로그아웃에 실패했습니다.') // [refactored]
     }
   }
 
@@ -308,18 +297,12 @@ const ProfileEditContent = () => {
           </div>
         </div>
 
-        {/* 탈퇴 / 로그아웃 */}
-        <div className="flex items-center gap-10">
-          {/* 탈퇴는 입양자 전용 API(useDeleteAdopterAccount) — 브리더에선 숨김 */}
-          {!isBreeder && (
-            <Button variant="text" onClick={() => setShowLeave(true)}>
-              탈퇴
-            </Button>
-          )}
-          <Button variant="text" onClick={handleLogout}>
-            로그아웃
+        {/* 탈퇴는 입양자 전용 API(useDeleteAdopterAccount) — 브리더에선 숨김 */}
+        {!isBreeder && (
+          <Button variant="text" onClick={() => setShowLeave(true)}>
+            탈퇴
           </Button>
-        </div>
+        )}
       </Container>
 
       {/* 하단 고정 CTA — 공통 FooterCtaBar (Figma 1054-36832 / 모바일 1056-47239) */}
