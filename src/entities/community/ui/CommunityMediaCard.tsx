@@ -52,7 +52,7 @@ const CommunityMediaCard = ({
         'group relative block shrink-0 overflow-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500',
         isProfileGrid
           ? 'aspect-square w-full bg-neutral-700 pc:rounded-lg pc:border pc:border-neutral-300'
-          : 'size-[7.625rem] rounded-lg border border-neutral-300 bg-point-50 transition-shadow duration-200 pc:size-[18.75rem] pc:hover:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]',
+          : 'size-[7.625rem] rounded-lg border border-neutral-300 bg-point-50 transition-shadow duration-200 tab:aspect-square tab:size-auto tab:w-full pc:hover:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]',
         className,
       )}
     >
@@ -61,7 +61,7 @@ const CommunityMediaCard = ({
           src={imageUrl!}
           alt=""
           fill
-          sizes="(min-width: 1440px) 300px, 122px"
+          sizes="(min-width: 768px) 20vw, 122px"
           loading={preload ? 'eager' : 'lazy'}
           fetchPriority={preload ? 'high' : 'auto'}
           onError={() => setFailedImageUrl(imageUrl)}

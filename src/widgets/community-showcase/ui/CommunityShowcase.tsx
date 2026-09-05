@@ -39,9 +39,10 @@ const CommunityShowcase = () => {
         emptyText="아직 등록된 커뮤니티 게시글이 없습니다."
       >
         {/* Figma Community Feed Card-my home:
-            mo는 122px 타일을 12px 간격으로 스크롤, tab은 5개, pc는 300px 4개. */}
-        <div className="mx-auto w-full max-w-[21.4375rem] overflow-x-auto tab:max-w-[42rem] pc:max-w-none">
-          <div className="flex w-max gap-3 tab:w-full tab:justify-between tab:gap-0">
+            mo는 122px 타일을 12px 간격으로 스크롤, tab부터는 화면 폭에 비례해 확대
+            (분양중인 동물 카드와 같은 보간) — tab 5열, pc 4열(≈300px). */}
+        <div className="mx-auto w-full max-w-[21.4375rem] overflow-x-auto tab:max-w-[80rem] pc:max-w-none">
+          <div className="flex w-max gap-3 tab:grid tab:w-full tab:grid-cols-5 tab:gap-[clamp(0.75rem,2vw,1.667rem)] pc:grid-cols-4">
             {fetched.map((post, index) => (
               <CommunityMediaCard
                 key={post.detailHref ?? index}
