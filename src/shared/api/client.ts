@@ -6,6 +6,7 @@ import axios, {
 } from 'axios'
 import { ApiError, normalizeApiError } from './unwrap'
 import { getAccessToken } from './token'
+import { notifyAuthStateChanged } from '@/shared/lib/authStateEvents'
 
 export interface ApiRequestConfig extends AxiosRequestConfig {
   skipAuth?: boolean
@@ -114,7 +115,7 @@ function createApiClient(): AxiosInstance {
           }
 
           if (refreshData.data?.accessToken && refreshData.data?.refreshToken) {
-            await fetch('/api/auth/set-cookie', {
+            const saved = await fetch('/api/auth/set-cookie', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -122,8 +123,13 @@ function createApiClient(): AxiosInstance {
                 refreshToken: refreshData.data.refreshToken,
               }),
             })
+            if (!saved.ok) throw new ApiError('인증 쿠키 저장 실패', 401)
           }
 
+          if (!refreshData.data?.accessToken || getAccessToken() !== refreshData.data.accessToken) {
+            throw new ApiError('인증 쿠키 저장 실패', 401)
+          }
+          notifyAuthStateChanged()
           processQueue(null)
           return instance(originalRequest)
         } catch (refreshError) {
@@ -138,6 +144,7 @@ function createApiClient(): AxiosInstance {
             document.cookie = 'userRole=; path=/; max-age=0'
             // refreshToken(httpOnly)은 서버 라우트로만 제거 가능 — 네비게이션이 요청을 끊지 않도록 완료를 기다린다.
             await fetch('/api/auth/clear-cookie', { method: 'POST' }).catch(() => {})
+            notifyAuthStateChanged()
             try {
               localStorage.removeItem('auth-storage')
             } catch {
