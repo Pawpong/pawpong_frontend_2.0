@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useSearchParams, useRouter, usePathname } from 'next/navigation'
+import { useSearchParams, usePathname } from 'next/navigation'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { Container, InfiniteScrollTrigger, ListState, TabBar } from '@/shared/ui'
 import { CATEGORY_TO_PET_TYPE } from '@/shared/lib/petCategory'
@@ -39,8 +39,19 @@ const FILTER_TO_QUERY = {
 
 const ExploreContent = () => {
   const searchParams = useSearchParams()
-  const router = useRouter()
   const pathname = usePathname()
+
+  // 탭·카테고리·검색어는 서버 데이터가 아니라 클라이언트 조회 조건이라 URL만 얕게 바꾼다.
+  // 정적 프리렌더된 이 페이지에서 같은 pathname 의 searchParams-only router.replace 는
+  // 프로덕션에서 라우터가 현재 URL 로 되돌려 무시되므로(개발 모드는 동적 렌더라 정상),
+  // Next 가 지원하는 네이티브 history.replaceState 를 쓴다 — useSearchParams 가 자동 동기화된다.
+  const replaceSearch = useCallback(
+    (params: URLSearchParams) => {
+      const query = params.toString()
+      window.history.replaceState(null, '', `${pathname}${query ? `?${query}` : ''}`)
+    },
+    [pathname],
+  )
 
   const typeParam = searchParams.get('type')
   const selectedType: ExploreType = typeParam === 'breeder' ? 'breeder' : 'adoption'
@@ -87,10 +98,9 @@ const ExploreContent = () => {
       // 탭을 바꾸면 카테고리 칩(URL 파라미터)이 초기화되므로 목록 필터도 같이 되돌린다
       // (브리더 탭 필터는 컴포넌트가 언마운트되며 저절로 초기화된다)
       setAdoptionListFilter('all')
-      const query = params.toString()
-      router.replace(`${pathname}${query ? `?${query}` : ''}`, { scroll: false })
+      replaceSearch(params)
     },
-    [router, pathname],
+    [replaceSearch],
   )
 
   const handleCategoryChange = useCallback(
@@ -101,10 +111,9 @@ const ExploreContent = () => {
       } else {
         params.set('category', category)
       }
-      const query = params.toString()
-      router.replace(`${pathname}${query ? `?${query}` : ''}`, { scroll: false })
+      replaceSearch(params)
     },
-    [searchParams, router, pathname],
+    [searchParams, replaceSearch],
   )
 
   // 검색어는 카테고리·필터와 함께 URL에 실어 서버 조회 조건으로 합류시킨다
@@ -116,10 +125,9 @@ const ExploreContent = () => {
       } else {
         params.delete('keyword')
       }
-      const query = params.toString()
-      router.replace(`${pathname}${query ? `?${query}` : ''}`, { scroll: false })
+      replaceSearch(params)
     },
-    [searchParams, router, pathname],
+    [searchParams, replaceSearch],
   )
 
   // 스크롤 인터랙션: 픽셀 카테고리+큰 검색바가 스크롤로 벗어나면 컴팩트 필터바를
