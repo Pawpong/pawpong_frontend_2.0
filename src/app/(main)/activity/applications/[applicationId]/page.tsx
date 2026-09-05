@@ -1,5 +1,6 @@
-import { requireRole } from '@/features/auth/server'
+import { requireAuth } from '@/features/auth/server'
 import { ApplicationDetailContent } from './_ui/ApplicationDetailContent'
+import { ReceivedApplicationDetailContent } from './_ui/ReceivedApplicationDetailContent'
 
 interface ApplicationDetailPageProps {
   params: Promise<{ applicationId: string }>
@@ -7,9 +8,13 @@ interface ApplicationDetailPageProps {
 
 const ApplicationDetailPage = async ({ params }: ApplicationDetailPageProps) => {
   const { applicationId } = await params
-  await requireRole('adopter', `/activity/applications/${applicationId}`)
+  const userRole = await requireAuth(`/activity/applications/${applicationId}`)
 
-  return <ApplicationDetailContent applicationId={applicationId} />
+  return userRole === 'breeder' ? (
+    <ReceivedApplicationDetailContent applicationId={applicationId} />
+  ) : (
+    <ApplicationDetailContent applicationId={applicationId} />
+  )
 }
 
 export default ApplicationDetailPage

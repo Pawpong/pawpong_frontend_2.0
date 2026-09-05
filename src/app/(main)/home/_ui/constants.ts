@@ -10,7 +10,6 @@ const HOME_TAB = {
   feed: { id: 'posts', label: '피드' },
   myPosts: { id: 'posts', label: '내가 쓴 글' },
   favoriteBreeders: { id: 'breeders', label: '즐겨찾는 브리더', Icon: SearchIcon },
-  receivedApplications: { id: 'applications', label: '받은 신청' },
 } satisfies Record<string, HomeTabConfig>
 
 // [refactored] 배열은 항목 조합만 담당
@@ -22,7 +21,6 @@ const BREEDER_HOME_TABS: HomeTabConfig[] = [HOME_TAB.publicListings, HOME_TAB.fe
 const BREEDER_MY_HOME_TABS: HomeTabConfig[] = [
   HOME_TAB.listings,
   HOME_TAB.posts,
-  HOME_TAB.receivedApplications,
   HOME_TAB.favoriteBreeders,
 ]
 

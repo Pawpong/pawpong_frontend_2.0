@@ -5,7 +5,7 @@ import { breederQueries } from '@/entities/breeder'
 import { formatDate } from '@/shared/lib/formatDate'
 import { AsyncState, Button, Container, NavigationBar } from '@/shared/ui'
 import type { CustomQuestionResponse, StandardResponses } from '@/shared/types'
-import { ApplicationStatusBadge } from '@/app/(main)/activity/_ui/ActivityBadges'
+import { ApplicationStatusBadge } from '../../../_ui/ActivityBadges'
 
 const STANDARD_QUESTIONS: Array<{ key: keyof StandardResponses; label: string }> = [
   { key: 'selfIntroduction', label: '자기소개' },
@@ -89,7 +89,7 @@ const ReceivedApplicationDetailContent = ({ applicationId }: { applicationId: st
 
   return (
     <div className="flex w-full flex-1 flex-col bg-white pb-16">
-      <NavigationBar title="신청 상세" backHref="/home?tab=applications" />
+      <NavigationBar title="신청 상세" backHref="/activity?tab=applications" />
 
       <Container className="px-4 py-5 tab:py-8 pc:py-10">
         <div className="mx-auto flex w-full max-w-168 flex-col gap-5 pc:max-w-[59.25rem]">

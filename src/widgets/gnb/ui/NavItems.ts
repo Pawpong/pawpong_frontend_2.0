@@ -1,8 +1,6 @@
 export interface NavItem {
   name: string
   href: string
-  /** 브리더는 href 대신 이 경로로 보낸다 (예: 입양 신청서 — 브리더는 마이홈 받은 신청 탭) */
-  breederHref?: string
   /** 로그인해야 열리는 화면 — 비로그인은 숨기지 않고 로그인으로 보낸다 */
   requiresAuth?: boolean
 }
@@ -15,12 +13,7 @@ export interface NavItem {
 // 항목은 로그인 여부·역할과 무관하게 전부 노출하고, 비로그인은 returnUrl 을 실어 로그인으로 보낸다.
 export const MOBILE_MENU_ITEMS: NavItem[] = [
   { name: '알림', href: '/notifications', requiresAuth: true },
-  {
-    name: '입양 신청서',
-    href: '/activity',
-    breederHref: '/home?tab=applications',
-    requiresAuth: true,
-  },
+  { name: '입양 신청서', href: '/activity', requiresAuth: true },
   // Figma 목록에는 없지만 이 메뉴가 유일한 진입로라 유지한다
   { name: '저장목록', href: '/bookmarks', requiresAuth: true },
   { name: '명예의 전당', href: '/hall-of-fame' },

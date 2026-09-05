@@ -1,4 +1,4 @@
-import { requireRole } from '@/features/auth/server'
+import { requireAuth } from '@/features/auth/server'
 import { ActivityContent } from './_ui/ActivityContent'
 
 interface ActivityPageProps {
@@ -6,10 +6,15 @@ interface ActivityPageProps {
 }
 
 const ActivityPage = async ({ searchParams }: ActivityPageProps) => {
-  await requireRole('adopter', '/activity')
+  const userRole = await requireAuth('/activity')
   const { tab } = await searchParams
 
-  return <ActivityContent initialTab={tab === 'reviews' ? 'reviews' : 'applications'} />
+  return (
+    <ActivityContent
+      userRole={userRole}
+      initialTab={tab === 'reviews' ? 'reviews' : 'applications'}
+    />
+  )
 }
 
 export default ActivityPage

@@ -270,12 +270,21 @@ export interface PetMessageResponse {
 /** 내게 달린 후기 목록 아이템 (GET /breeder-management/my-reviews) */
 export interface BreederMyReviewItem {
   reviewId: string
-  breederNickname: string
-  breederProfileImage: string
-  breedingPetType: string
+  adopterId: string
+  adopterName: string
+  petName?: string
+  rating: number
+  petHealthRating?: number
+  communicationRating?: number
   content: string
-  reviewType: string
+  photos?: string[]
   writtenAt: string
+  type?: 'adoption' | 'visit'
+  isVisible: boolean
+  reportCount?: number
+  replyContent?: string
+  replyWrittenAt?: string
+  replyUpdatedAt?: string
 }
 
 /** 내 후기 목록 조회 파라미터 */
