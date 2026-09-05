@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#ffffff" />
+    <title>포퐁 | 잠시 업데이트 중이에요</title>
+    <link rel="icon" href="/assets/logo.svg" type="image/svg+xml" />
+    <link rel="preload" href="/assets/Cafe24PROUP.woff2" as="font" type="font/woff2" crossorigin />
+    <link
+      rel="preload"
+      href="/assets/PretendardVariable.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <style>
+      @font-face {
+        font-family: Cafe24PROUP;
+        src: url('/assets/Cafe24PROUP.woff2') format('woff2');
+        font-weight: 400;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: Pretendard;
+        src: url('/assets/PretendardVariable.woff2') format('woff2');
+        font-weight: 100 900;
+        font-display: swap;
+      }
+      /* Figma 139:70 / src/app/globals.css. Static deployment: no app runtime. */
+      :root {
+        --primary-500: #ad651d;
+        --primary-600: #8a5117;
+        --secondary-50: #fef9ef;
+        --secondary-200: #ffe6b3;
+        --neutral-150: #e4e4e4;
+        --neutral-700: #6b6b6b;
+        --neutral-850: #3e3e3e;
+        --white: #ffffff;
+        color-scheme: light;
+        font-family: Pretendard, sans-serif;
+        color: var(--neutral-850);
+        background: var(--white);
+        font-synthesis: none;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100svh;
+        display: flex;
+        flex-direction: column;
+      }
+      .shell {
+        width: 100%;
+        max-width: 704px;
+        margin-inline: auto;
+        padding-inline: 20px;
+      }
+      header {
+        padding-block: 16px;
+      }
+      .logo {
+        display: block;
+        width: 84px;
+        height: 28px;
+      }
+      main {
+        flex: 1;
+        display: grid;
+        place-items: center;
+        padding-block: 40px 56px;
+      }
+      .notice {
+        width: 100%;
+        max-width: 672px;
+        text-align: center;
+      }
+      /* Exact exported artwork from Home 3349:1763363; preserve both viewBox ratios. */
+      .illustration {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 28px;
+      }
+      .cat {
+        display: block;
+        width: 105px;
+        height: 95px;
+      }
+      .sign {
+        position: relative;
+        display: grid;
+        place-items: center;
+        width: 212.5px;
+        height: 68px;
+        margin-top: -4px;
+      }
+      .sign img {
+        position: absolute;
+        inset: 0;
+        width: 212.5px;
+        height: 68px;
+      }
+      .sign span {
+        position: relative;
+        padding-bottom: 8px;
+        font:
+          400 20px/1.5 Cafe24PROUP,
+          sans-serif;
+        color: var(--primary-500);
+      }
+      h1 {
+        margin: 0;
+        font:
+          400 24px/1.5 Cafe24PROUP,
+          sans-serif;
+        word-break: keep-all;
+        text-wrap: balance;
+      }
+      h1 span {
+        color: var(--primary-500);
+      }
+      .description {
+        margin: 16px 0 0;
+        font-size: 14px;
+        line-height: 1.5;
+        color: var(--neutral-700);
+        word-break: keep-all;
+      }
+      .schedule {
+        max-width: 440px;
+        margin: 32px auto 0;
+        padding: 24px 16px;
+        border: 1px solid var(--secondary-200);
+        border-radius: 16px;
+        background: var(--secondary-50);
+      }
+      .schedule h2 {
+        margin: 0 0 8px;
+        font:
+          400 14px/1.5 Cafe24PROUP,
+          sans-serif;
+        color: var(--primary-600);
+      }
+      .schedule time {
+        display: block;
+        font:
+          400 24px/1.5 Cafe24PROUP,
+          sans-serif;
+      }
+      .note {
+        margin: 12px 0 0;
+        font-size: 12px;
+        line-height: 1.5;
+        color: var(--neutral-700);
+        word-break: keep-all;
+      }
+      .thanks {
+        margin: 28px 0 0;
+        font-size: 14px;
+        line-height: 1.5;
+        color: var(--neutral-700);
+      }
+      footer {
+        padding-block: 24px;
+        border-top: 1px solid var(--neutral-150);
+        text-align: center;
+        color: var(--neutral-700);
+        font-size: 12px;
+        line-height: 1.5;
+      }
+      footer p {
+        margin: 0;
+        word-break: keep-all;
+      }
+      @media (min-width: 768px) {
+        .shell {
+          max-width: 1376px;
+          padding-inline: 48px;
+        }
+        header {
+          padding-block: 20px;
+        }
+        .logo {
+          width: 96px;
+          height: 32px;
+        }
+        main {
+          padding-block: 48px 64px;
+        }
+        .illustration {
+          margin-bottom: 32px;
+        }
+        h1 {
+          font-size: 32px;
+        }
+        .description {
+          font-size: 16px;
+        }
+        .schedule {
+          margin-top: 36px;
+        }
+      }
+      @media (min-width: 1440px) {
+        .shell {
+          max-width: 1440px;
+          padding-inline: 80px;
+        }
+        h1 {
+          font-size: 40px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="shell">
+      <img class="logo" src="/assets/logo.svg" alt="포퐁 Pawpong" width="96" height="32" />
+    </header>
+    <main class="shell">
+      <section class="notice" aria-labelledby="title">
+        <div class="illustration">
+          <img class="cat" src="/assets/cat.svg" alt="" width="105" height="95" />
+          <div class="sign">
+            <img src="/assets/pixel-sign.svg" alt="" width="212.5" height="68" /><span
+              >업데이트 중</span
+            >
+          </div>
+        </div>
+        <h1 id="title">더 반가운 만남을 위해<br /><span>포퐁이 새로워지고 있어요</span></h1>
+        <p class="description">
+          더 나은 서비스를 위해 잠시 업데이트 중이에요.<br />준비를 마치고 새로운 모습으로
+          찾아올게요.
+        </p>
+        <section class="schedule" aria-labelledby="schedule-title">
+          <h2 id="schedule-title">서비스 오픈 예정</h2>
+          <time datetime="2026-09-05T18:00:00+09:00">9월 5일 · 오후 6시</time>
+        </section>
+        <p class="note">한국 시간(KST) 기준 · 진행 상황에 따라 변경될 수 있어요.</p>
+        <p class="thanks">기다려 주셔서 감사합니다.</p>
+      </section>
+    </main>
+    <footer><p class="shell">믿을 수 있는 만남의 시작, 포퐁 · © Pawpong</p></footer>
+  </body>
+</html>
