@@ -15,8 +15,8 @@ const SERVICE_LINKS = [
 ] as const
 
 const LEGAL_LINKS = [
-  { href: 'https://pawpong.kr/terms-of-service', label: '이용약관' },
-  { href: 'https://pawpong.kr/terms-of-privacy', label: '개인정보처리방침' },
+  { href: '/terms-of-service', label: '이용약관' },
+  { href: '/terms-of-privacy', label: '개인정보처리방침' },
 ] as const
 
 /**
