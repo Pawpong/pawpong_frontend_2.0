@@ -147,7 +147,12 @@ const FaqContent = () => {
         </div>
       </Container>
 
-      <InquiryModal open={inquiryOpen} onOpenChange={setInquiryOpen} />
+      <InquiryModal
+        key={audience}
+        audience={audience}
+        open={inquiryOpen}
+        onOpenChange={setInquiryOpen}
+      />
     </div>
   )
 }
