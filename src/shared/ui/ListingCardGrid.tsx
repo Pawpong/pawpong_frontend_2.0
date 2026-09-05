@@ -19,6 +19,9 @@ const listingCardGrid = tv({
        */
       compact:
         'mx-auto w-full max-w-[21.4375rem] grid-cols-[repeat(2,minmax(0,10.25rem))] justify-between gap-y-4 tab:max-w-[55.375rem] tab:grid-cols-[repeat(3,minmax(0,17.625rem))] tab:justify-center tab:gap-5 pc:max-w-[74.25rem] pc:grid-cols-[repeat(4,minmax(0,17.625rem))]',
+      /** 공개 브리더 홈: mo 2열 / tab 2열 / pc 4열 (Figma 4199:546202). */
+      publicBreeder:
+        'mx-auto w-full max-w-[21.4375rem] grid-cols-[repeat(2,minmax(0,10.25rem))] justify-between gap-x-[0.9375rem] gap-y-4 tab:max-w-[38rem] tab:grid-cols-[repeat(2,17.625rem)] tab:gap-x-11 tab:gap-y-6 pc:max-w-[74.625rem] pc:grid-cols-[repeat(4,17.625rem)] pc:gap-x-[1.375rem]',
     },
   },
   defaultVariants: { layout: 'explore' },

@@ -9,14 +9,7 @@ import {
   type InfiniteData,
   type UseInfiniteQueryResult,
 } from '@tanstack/react-query'
-import {
-  Badge,
-  Button,
-  buttonVariants,
-  ProfileAvatar,
-  FollowersModal,
-  type FollowUser,
-} from '@/shared/ui'
+import { Button, buttonVariants, ProfileAvatar, FollowersModal, type FollowUser } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { LocationOnIcon } from '@/shared/assets'
 import { profileQueries } from '@/entities/profile'
@@ -44,6 +37,11 @@ type FollowListQuery = UseInfiniteQueryResult<InfiniteData<PaginationResponse<Fo
 const toFollowUsers = (query: FollowListQuery): FollowUser[] =>
   (query.data?.pages ?? []).flatMap((page) => page.items.map(toFollowUser))
 
+const toMutualFollowers = (query: FollowListQuery): FollowUser[] =>
+  (query.data?.pages ?? []).flatMap((page) =>
+    page.items.filter((card) => card.isFollowing).map(toFollowUser),
+  )
+
 const toPaging = (query: FollowListQuery) => ({
   hasMore: query.hasNextPage,
   isLoadingMore: query.isFetchingNextPage,
@@ -68,11 +66,15 @@ type ProfileCardProps = ProfileCardBaseProps | ProfileCardBreederProps
 // flex-col-reverse로 뒤집어 마크업 중복을 피한다.
 const FollowerSection = ({
   vertical,
+  label = '친구 목록',
+  users = [],
   className,
   textClassName,
   onClick,
 }: {
   vertical?: boolean
+  label?: string
+  users?: FollowUser[]
   className?: string
   textClassName?: string
   onClick?: () => void
@@ -88,22 +90,24 @@ const FollowerSection = ({
   >
     {/* 친구 목록 미리보기 — ProfileAvatar xsmall(24) + 회색 테두리, 살짝 겹침 */}
     <div className="flex items-center">
-      {[0, 1, 2].map((i) => (
+      {(users.length > 0 ? users.slice(0, 3) : [undefined, undefined, undefined]).map((user, i) => (
         <ProfileAvatar
-          key={i}
+          key={user?.id ?? i}
           size="xsmall"
+          src={user?.profileImageUrl}
+          alt={user?.nickname}
           className={cn('border-2 border-neutral-150', i < 2 && '-mr-[0.3125rem]')}
         />
       ))}
     </div>
-    <span className={cn('font-medium text-neutral-850', textClassName)}>친구 목록</span>
+    <span className={cn('font-medium text-neutral-850', textClassName)}>{label}</span>
   </button>
 )
 
 const LocationInfo = ({ location, className }: { location: string; className?: string }) => (
   <div className={cn('flex items-center gap-1.5', className)}>
-    <LocationOnIcon className="size-5 text-text-secondary" />
-    <span className="text-sm font-medium text-text-secondary">{location}</span>
+    <LocationOnIcon className="size-5 text-primary-500 pc:size-6" />
+    <span className="text-sm font-medium text-primary-500">{location}</span>
   </div>
 )
 
@@ -180,27 +184,24 @@ const FollowActionButton = ({ targetId, isFollowing }: VisitorActionsProps) => {
       onClick={() => (isFollowing ? unfollow : follow).mutate(targetId)}
       className={cn(ACTION_SIZE, 'pc:max-w-[16.125rem]')}
     >
-      {isFollowing ? '팔로잉' : '팔로우'}
+      {isFollowing ? '팔로우 취소' : '팔로우'}
     </Button>
   )
 }
 
-// 채팅방 계약은 입양자↔브리더 전용이라 브리더 홈에서만 메시지 액션을 노출한다.
-const BreederVisitorActions = (props: VisitorActionsProps) => (
+const VisitorActions = (props: VisitorActionsProps) => (
   <>
     <FollowActionButton {...props} />
     <MessageButton targetId={props.targetId} />
   </>
 )
 
-const AdopterVisitorActions = (props: VisitorActionsProps) => <FollowActionButton {...props} />
-
 // 내 홈 액션은 props 를 쓰지 않는다 (같은 자리에서 렌더되므로 시그니처만 맞춤)
 const ACTION_MAP = {
   mine: MineActions,
   'mine-breeder': MineActions,
-  breeder: BreederVisitorActions,
-  other: AdopterVisitorActions,
+  breeder: VisitorActions,
+  other: VisitorActions,
 } satisfies Record<ProfileMode, ComponentType<VisitorActionsProps>>
 
 /* ── ProfileCard ── */
@@ -212,13 +213,17 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
   // [refactored] 브리더 판별을 한 곳에서 — 이전엔 'isFavorited' in / 'breederId' in /
   // 'businessLocation' in 으로 같은 판정을 네 번 했다 (타입 단언 없이 in-내로잉)
   const breederProfile = 'businessLocation' in profile ? profile : null
-  const isBreederProfile = breederProfile !== null
   const profileUserId = breederProfile?.breederId ?? (profile as AdopterPublicProfile).userId
   const isFollowing = breederProfile?.isFollowing ?? (profile as AdopterPublicProfile).isFollowing
+  const isVisitor = mode === 'other' || mode === 'breeder'
 
-  // 친구 목록 — 모달이 열릴 때만 조회
-  const followersQuery = useInfiniteQuery(profileQueries.followers(profileUserId, followOpen))
-  const followingsQuery = useInfiniteQuery(profileQueries.followings(profileUserId, followOpen))
+  // 공개 홈은 팔로우 중일 때 함께 팔로우하는 사람 미리보기도 필요하다.
+  const followersQuery = useInfiniteQuery(
+    profileQueries.followers(profileUserId, followOpen || (isVisitor && isFollowing)),
+  )
+  const followingsQuery = useInfiniteQuery(
+    profileQueries.followings(profileUserId, followOpen && !isVisitor),
+  )
   const { mutate: unfollow } = useUnfollowUser()
   const { mutate: removeFollower } = useRemoveFollower()
   // 남의 브리더 홈에서만 카드 우상단 즐겨찾기 아이콘을 띄운다
@@ -227,24 +232,10 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
     ? `${breederProfile.businessLocation.city} ${breederProfile.businessLocation.district}`
     : null
 
-  // 상단 뱃지 (전 모드 공통) — point-500 채움 + primary-500 테두리/텍스트
-  // 모바일 md(10px·h-24) / PC lg(14px). PC 높이는 디자인 노드 기준 32px로 맞춘다.
-  const renderBadges = (size?: 'md') => {
-    // [refactored] size 미지정(=PC lg)일 때만 높이를 32로 맞춘다는 규칙을 이름으로 드러냄
-    const badgeProps = {
-      variant: 'pointFilled',
-      size,
-      className: size ? undefined : 'h-8',
-    } as const
-
-    return (
-      <>
-        {isBreederProfile && <Badge {...badgeProps}>브리더</Badge>}
-        {/* BPM 뱃지 — 정책 미확정으로 노출 보류 (docs/design.md — BPM/EXP 는 추정 구현하지 않는다)
-        <Badge {...badgeProps}>{profile.bpm} BPM</Badge> */}
-      </>
-    )
-  }
+  const followers = toFollowUsers(followersQuery)
+  const following = toFollowUsers(followingsQuery)
+  const mutualFollowers = isVisitor ? toMutualFollowers(followersQuery) : []
+  const showMutualFollowers = isVisitor && isFollowing && mutualFollowers.length > 0
 
   return (
     <>
@@ -255,7 +246,6 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
           {/* 상단: 좌(뱃지·이름) / 우(아바타 large 52) */}
           <div className="flex w-full items-center justify-between gap-3">
             <div className="flex min-w-0 flex-col items-start gap-2">
-              <div className="flex flex-wrap items-start gap-3">{renderBadges('md')}</div>
               <ProfileName className="text-xl">{profile.nickname}</ProfileName>
             </div>
             <ProfileAvatar
@@ -268,8 +258,20 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
           {/* 소개 */}
           <ProfileBio className="w-full text-sm">{profile.bio}</ProfileBio>
           {locationText && <LocationInfo location={locationText} />}
-          {/* 친구 목록 */}
-          <FollowerSection textClassName="text-xs" onClick={() => setFollowOpen(true)} />
+          {isVisitor ? (
+            <div className="flex min-h-6 items-start">
+              {showMutualFollowers && (
+                <FollowerSection
+                  label="함께 팔로우하는 사람"
+                  users={mutualFollowers}
+                  textClassName="text-xs"
+                  onClick={() => setFollowOpen(true)}
+                />
+              )}
+            </div>
+          ) : (
+            <FollowerSection textClassName="text-xs" onClick={() => setFollowOpen(true)} />
+          )}
         </div>
         {/* 하단: 모드별 버튼 (풀폭, gap-10, h-40) */}
         <div className="flex w-full items-start gap-2.5">
@@ -278,12 +280,11 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
       </div>
 
       {/* ===== Desktop (디자인 node 1021-20324) ===== */}
-      <div className="mx-auto hidden max-w-[59.25rem] overflow-hidden rounded-lg bg-point-50 pc:block">
+      <div className="mx-auto hidden max-w-[59.25rem] overflow-hidden rounded-lg pc:block">
         {/* 상단: 좌(프로필 정보) / 우(즐겨찾기 아이콘·팔로워·아바타) */}
         <div className="flex items-center justify-center overflow-hidden px-5 py-8">
-          <div className="flex w-full max-w-[48.75rem] items-start justify-between gap-3">
-            <div className="flex min-w-0 flex-1 flex-col items-start gap-3">
-              <div className="flex items-start gap-3">{renderBadges()}</div>
+          <div className="flex h-40 w-full max-w-[48.75rem] items-start justify-between gap-3">
+            <div className="flex min-w-0 flex-1 flex-col items-start justify-center gap-3 self-stretch">
               <ProfileName className="text-2xl">{profile.nickname}</ProfileName>
               {/* 디자인상 이름·소개 블록 폭 440. 위치는 소개 아래 (모바일 블록과 같은 순서) */}
               <ProfileBio className="w-full max-w-[27.5rem] text-base">{profile.bio}</ProfileBio>
@@ -293,42 +294,50 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
                 실제 차이는 즐겨찾기 행 유무와 래퍼 폭뿐 */}
             <div
               className={cn(
-                'flex items-end gap-3',
-                showFavoriteAction ? 'min-w-0 flex-1 flex-col items-end self-stretch' : 'shrink-0',
+                'flex min-w-0 flex-col items-end gap-3 self-stretch',
+                showFavoriteAction ? 'flex-1' : 'w-[13.5625rem] shrink-0',
               )}
             >
-              {showFavoriteAction && (
-                <div className="flex h-12 w-full items-center justify-end">
+              <div className="flex h-12 w-full shrink-0 items-center justify-end">
+                {showFavoriteAction && (
                   <FavoriteBreederIconButton
                     breederId={breederProfile.breederId}
                     isFavorited={breederProfile.isFavorited}
                   />
-                </div>
-              )}
-              <div
-                className={cn(
-                  'flex items-end gap-3',
-                  showFavoriteAction && 'w-[13.5625rem] justify-end',
                 )}
-              >
-                <FollowerSection
-                  vertical
-                  textClassName="text-xs"
-                  onClick={() => setFollowOpen(true)}
-                />
+              </div>
+              <div className="flex w-[13.5625rem] items-end justify-end gap-3">
+                {isVisitor ? (
+                  showMutualFollowers && (
+                    <FollowerSection
+                      vertical
+                      label="함께 팔로우하는 사람"
+                      users={mutualFollowers}
+                      className="min-w-0 flex-1"
+                      textClassName="text-xs"
+                      onClick={() => setFollowOpen(true)}
+                    />
+                  )
+                ) : (
+                  <FollowerSection
+                    vertical
+                    className="min-w-0 flex-1"
+                    textClassName="text-xs"
+                    onClick={() => setFollowOpen(true)}
+                  />
+                )}
                 <ProfileAvatar size="xlarge" src={profile.profileImageUrl} alt={profile.nickname} />
               </div>
             </div>
           </div>
         </div>
 
-        {/* 하단: 구분선 + 모드별 버튼 */}
-        <div className="flex flex-col items-center gap-3 pb-8">
-          <div className="h-px w-full bg-neutral-150" />
+        {/* 하단 액션 */}
+        <div className="flex flex-col items-center pb-8">
           <div
             className={cn(
-              'flex w-full items-start gap-6',
-              mode === 'breeder' ? 'max-w-[48rem]' : 'max-w-[43rem] px-5',
+              'flex w-full items-start justify-center gap-6',
+              isVisitor ? 'max-w-[48rem]' : 'max-w-[30.375rem]',
             )}
           >
             <Actions targetId={profileUserId} isFollowing={isFollowing} />
@@ -339,10 +348,11 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
       <FollowersModal
         open={followOpen}
         onOpenChange={setFollowOpen}
-        followerCount={profile.followerCount}
+        variant={isVisitor ? 'mutual' : 'manage'}
+        followerCount={isVisitor ? mutualFollowers.length : profile.followerCount}
         followingCount={profile.followingCount}
-        followers={toFollowUsers(followersQuery)}
-        following={toFollowUsers(followingsQuery)}
+        followers={isVisitor ? mutualFollowers : followers}
+        following={following}
         onRemoveFollower={removeFollower}
         onUnfollow={unfollow}
         getProfileHref={(id) => `/home/${id}`}
