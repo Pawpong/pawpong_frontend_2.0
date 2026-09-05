@@ -3,16 +3,14 @@ import { formatDate } from '@/shared/lib/formatDate'
 import { formatBirthDate } from '@/shared/lib/formatBirthDate'
 import { petTypeToCategory } from '@/shared/lib/petCategory'
 
-// AdoptionCard 는 <Image src> 를 무조건 렌더 — 사진 없는 분양글의 빈 URL 크래시 방어
-const FALLBACK_THUMBNAIL = '/images/mock-pet.jpg'
-
 /** v2 입양 목록/인기 API 카드(AdoptionPetCard) → 탐색 그리드 뷰모델(AdoptionListingCard) */
 export const mapAdoptionCard = (c: AdoptionPetCard): AdoptionListingCard => ({
   listingId: c.petId,
   name: c.name,
   gender: c.gender,
   birthDateText: formatBirthDate(c.birthDate),
-  thumbnailUrl: c.primaryPhotoUrl || c.photoUrls?.[0] || FALLBACK_THUMBNAIL,
+  // 사진이 없으면 빈 문자열 그대로 넘긴다 — 카드가 목업 사진 대신 홈과 같은 paw 폴백을 그린다
+  thumbnailUrl: c.primaryPhotoUrl || c.photoUrls?.[0] || '',
   status: c.status,
   category: petTypeToCategory(c.petType),
   inquiryCount: c.inquiryCount,

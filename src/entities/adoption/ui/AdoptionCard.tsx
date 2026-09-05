@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import { PawIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 
 import { FavoriteButton, FavoriteToggle, ListingStats, PopularBadge } from '@/shared/ui'
@@ -33,15 +34,26 @@ const CardImage = ({
   preload?: boolean
   className?: string
 }) => (
-  <div className={cn('relative aspect-[348/284] w-full overflow-hidden bg-neutral-700', className)}>
-    <Image
-      src={listing.thumbnailUrl}
-      alt={listing.name}
-      fill
-      sizes="(max-width: 767px) 50vw, (max-width: 1200px) 33vw, 25vw"
-      preload={preload}
-      className="object-cover"
-    />
+  <div className={cn('relative aspect-[348/284] w-full overflow-hidden bg-point-50', className)}>
+    {listing.thumbnailUrl ? (
+      <Image
+        src={listing.thumbnailUrl}
+        alt={listing.name}
+        fill
+        sizes="(max-width: 767px) 50vw, (max-width: 1200px) 33vw, 25vw"
+        preload={preload}
+        className="object-cover"
+      />
+    ) : (
+      // 사진이 없으면 홈과 같은 paw 폴백을 그린다 (mock-pet.jpg 대신)
+      <div
+        className="absolute inset-0 flex items-center justify-center text-primary-300"
+        role="img"
+        aria-label={`${listing.name} 이미지 없음`}
+      >
+        <PawIcon className="size-12 opacity-70 pc:size-14" />
+      </div>
+    )}
     {isCompleted && <div className="absolute inset-0 bg-white/70" />}
     {/* 인기(bestBadge) 좌상단 배지 — Figma 796-81671 (mo 14px/py-2 · tab 16px/py-4) */}
     {listing.isPopular && (
@@ -179,15 +191,25 @@ const AdoptionCardHorizontal = ({
       )}
     >
       {/* 이미지 100x100 */}
-      <div className="relative size-[6.25rem] shrink-0 overflow-hidden">
-        <Image
-          src={listing.thumbnailUrl}
-          alt={listing.name}
-          fill
-          sizes="100px"
-          preload={preload}
-          className="object-cover"
-        />
+      <div className="relative size-[6.25rem] shrink-0 overflow-hidden bg-point-50">
+        {listing.thumbnailUrl ? (
+          <Image
+            src={listing.thumbnailUrl}
+            alt={listing.name}
+            fill
+            sizes="100px"
+            preload={preload}
+            className="object-cover"
+          />
+        ) : (
+          <div
+            className="absolute inset-0 flex items-center justify-center text-primary-300"
+            role="img"
+            aria-label={`${listing.name} 이미지 없음`}
+          >
+            <PawIcon className="size-8" />
+          </div>
+        )}
       </div>
 
       {/* 정보 */}

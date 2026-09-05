@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import type { Swiper as SwiperClass } from 'swiper'
-import { PixelArrowRightIcon } from '@/shared/assets'
+import { PawIcon, PixelArrowRightIcon } from '@/shared/assets'
 import 'swiper/css'
 
 // [refactored] 히어로 이미지 캐러셀 — Swiper 기반(모바일/탭 스와이프) + 커스텀 화살표·인디케이터
@@ -20,6 +20,19 @@ const HeroImageCarousel = ({
 }) => {
   const [swiper, setSwiper] = useState<SwiperClass | null>(null)
   const [activeIndex, setActiveIndex] = useState(0)
+
+  // 사진이 하나도 없으면 캐러셀 대신 홈과 같은 paw 폴백을 그린다 (빈 Swiper 대신)
+  if (images.length === 0) {
+    return (
+      <div
+        className="relative flex aspect-[375/279] w-full items-center justify-center overflow-hidden bg-point-50 text-primary-300 pc:aspect-square pc:h-[31.25rem] pc:w-[31.25rem] pc:rounded-[0.5rem]"
+        role="img"
+        aria-label={`${alt} 이미지 없음`}
+      >
+        <PawIcon className="size-16 opacity-70 pc:size-20" />
+      </div>
+    )
+  }
 
   return (
     <div className="relative aspect-[375/279] w-full overflow-hidden pc:aspect-square pc:h-[31.25rem] pc:w-[31.25rem] pc:rounded-[0.5rem]">

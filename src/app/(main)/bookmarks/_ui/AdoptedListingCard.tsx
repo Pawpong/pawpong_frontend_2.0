@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import { PawIcon } from '@/shared/assets'
 import { Badge, Button, CtaModal, ListingStats } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import type { AdoptedListingCard as AdoptedListingCardType } from '@/shared/types'
@@ -25,14 +26,25 @@ const CardImage = ({
   className?: string
   badgeClassName?: string
 }) => (
-  <div className={cn('relative shrink-0 overflow-hidden bg-neutral-700', className)}>
-    <Image
-      src={listing.thumbnailUrl}
-      alt={listing.name}
-      fill
-      sizes="(max-width: 1439px) 110px, 280px"
-      className="object-cover"
-    />
+  <div className={cn('relative shrink-0 overflow-hidden bg-point-50', className)}>
+    {listing.thumbnailUrl ? (
+      <Image
+        src={listing.thumbnailUrl}
+        alt={listing.name}
+        fill
+        sizes="(max-width: 1439px) 110px, 280px"
+        className="object-cover"
+      />
+    ) : (
+      // 사진이 없으면 홈과 같은 paw 폴백을 그린다 (mock-pet.jpg 대신)
+      <div
+        className="absolute inset-0 flex items-center justify-center text-primary-300"
+        role="img"
+        aria-label={`${listing.name} 이미지 없음`}
+      >
+        <PawIcon className="size-8 pc:size-10" />
+      </div>
+    )}
     {isCompleted && <div className="absolute inset-0 bg-white/70" />}
     {listing.isPopular && (
       <Badge variant="outline" className={cn('absolute', badgeClassName)}>
