@@ -36,6 +36,7 @@ export default defineConfig([
       './src/app/(main)/activity/page.tsx',
       './src/app/(main)/activity/applications/[applicationId]/page.tsx',
       './src/app/(main)/activity/reviews/[reviewId]/page.tsx',
+      './src/app/(main)/home/applications/[applicationId]/page.tsx',
     ],
     rules: {
       'fsd/no-public-api-sidestep': 'off',

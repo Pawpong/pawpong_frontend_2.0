@@ -2,6 +2,7 @@
 
 import { useLayoutEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { BookmarkIcon } from '@/shared/assets'
 import { Button, Container, CtaBanner, InputUpload, NavigationBar } from '@/shared/ui'
@@ -16,6 +17,7 @@ import { ProfileCard } from './ProfileCard'
 import { HomeTabs, TabsContent } from './HomeTabs'
 import { FavoriteBreedersContent } from './FavoriteBreedersContent'
 import { HomePostGrid } from './HomePostGrid'
+import { ReceivedApplicationList } from './ReceivedApplicationList'
 import { MY_HOME_TABS, BREEDER_MY_HOME_TABS } from './constants'
 
 const HOME_LISTING_PAGE_SIZE = 16
@@ -61,7 +63,9 @@ const MyHomeContent = () => {
   const defaultTab = isBreeder ? 'listings' : 'posts'
   // 프로필 조회 전에는 역할을 모르므로 선택값을 비워두고, 조회 후 역할별 기본 탭을 사용한다.
   // useState(defaultTab)로 바로 시드하면 최초 adopter 기본값('posts')이 브리더에게도 고정된다.
-  const [selectedTab, setSelectedTab] = useState<string | null>(null)
+  // ?tab= 쿼리가 있으면 초기 선택값으로 사용 (예: GNB '입양 신청서' → /home?tab=applications)
+  const searchParams = useSearchParams()
+  const [selectedTab, setSelectedTab] = useState<string | null>(searchParams.get('tab'))
   const activeTab = tabs.find((tab) => tab.id === selectedTab)?.id ?? defaultTab
   const posts = myPostsData?.items ?? []
   const profileCardProps = myProfile ? toMyProfileCardProps(myProfile) : null
@@ -157,6 +161,12 @@ const MyHomeContent = () => {
             emptyText="내가 쓴 글이 없습니다."
           />
         </TabsContent>
+
+        {isBreeder && (
+          <TabsContent value="applications" className="mt-0">
+            <ReceivedApplicationList />
+          </TabsContent>
+        )}
 
         <TabsContent value="breeders" className="mt-0">
           <FavoriteBreedersContent />

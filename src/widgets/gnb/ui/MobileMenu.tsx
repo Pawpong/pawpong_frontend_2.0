@@ -17,11 +17,13 @@ interface MobileMenuProps {
 }
 
 const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
-  const { isLoggedIn } = useAuthStatus()
+  const { isLoggedIn, userRole } = useAuthStatus()
   const close = () => onOpenChange(false)
   // 인증이 필요한 화면도 목록에서 감추지 않고, 비로그인이면 돌아올 주소를 실어 로그인으로 보낸다
-  const hrefFor = ({ href, requiresAuth }: NavItem) =>
-    requiresAuth && !isLoggedIn ? `/login?returnUrl=${encodeURIComponent(href)}` : href
+  const hrefFor = ({ href, breederHref, requiresAuth }: NavItem) => {
+    const target = userRole === 'breeder' && breederHref ? breederHref : href
+    return requiresAuth && !isLoggedIn ? `/login?returnUrl=${encodeURIComponent(target)}` : target
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
