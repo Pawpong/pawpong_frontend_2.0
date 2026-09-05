@@ -7,7 +7,8 @@ interface AdoptionCreateSuccessPageProps {
 
 const AdoptionCreateSuccessPage = async ({ searchParams }: AdoptionCreateSuccessPageProps) => {
   const { petId } = await searchParams
-  if (!petId) redirect('/adoption/my-listings')
+  // /adoption/my-listings 는 마이홈 분양중 탭과 완전히 중복이라 삭제됨
+  if (!petId) redirect('/home')
   return <AdoptionCreateSuccessContent petId={petId} />
 }
 
