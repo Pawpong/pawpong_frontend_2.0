@@ -1,8 +1,5 @@
 import * as Sentry from '@sentry/nextjs'
+import { sentryEnvironmentOptions } from './sentry.environment'
 
-Sentry.init({
-  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
-  tracesSampleRate: 1,
-  enableLogs: true,
-  sendDefaultPii: true,
-})
+const options = sentryEnvironmentOptions()
+if (options.enabled) Sentry.init(options)
