@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Container, PixelSelectCard } from '@/shared/ui'
+import { loadSocialSignupSession } from '@/shared/lib/socialSignupSession'
 import {
   StepLayout,
   StepNavButtons,
@@ -17,9 +18,16 @@ const SignupTypeSelect = () => {
   const [selected, setSelected] = useState<UserType | null>(null)
 
   const handleNext = () => {
-    if (selected) {
-      router.push(`/signup/${selected}`)
+    if (!selected) return
+
+    // 가입은 소셜 tempId 가 있어야 진행된다. 세션 없이 유형만 고르면 다음 화면의 라우트 가드가
+    // 다시 여기로 돌려보내 무한 반복이 되므로, 그 전에 로그인으로 보낸다.
+    if (!loadSocialSignupSession()?.tempId) {
+      router.replace('/login')
+      return
     }
+
+    router.push(`/signup/${selected}`)
   }
 
   return (
@@ -43,7 +51,8 @@ const SignupTypeSelect = () => {
       <StepNavButtons
         className="static w-full"
         onNext={handleNext}
-        onBack={() => router.back()}
+        // router.back() 은 방금 떠나온 다음 단계로 되감긴다 — 가입을 그만두는 것이므로 홈으로 보낸다
+        onBack={() => router.push('/')}
         backLabel="그만두기"
         nextDisabled={!selected}
       />

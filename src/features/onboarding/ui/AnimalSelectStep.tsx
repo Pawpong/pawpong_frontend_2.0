@@ -13,7 +13,8 @@ const ANIMAL_OPTIONS = [
 ] as const
 
 const AnimalSelectStep = () => {
-  // 첫 단계라 goBack 은 /signup(유형 선택)으로 되돌린다 — 라벨이 '그만두기'인 이유
+  // 첫 단계라 goBack 은 /signup(유형 선택)으로 되돌린다 — 가입을 끝내는 게 아니라 앞 화면으로
+  // 가는 것이라 라벨도 '이전'이다 ('그만두기'는 유형 선택 화면에서 홈으로 나갈 때 쓴다)
   const { control, handleSubmit, watch, onSubmit, firstErrorMessage, goBack } = useStepForm(
     'animal-select',
     animalSelectSchema,
@@ -28,7 +29,7 @@ const AnimalSelectStep = () => {
       subtitle="한 가지를 선택해주세요."
       onNext={() => handleSubmit(onSubmit)()}
       onBack={goBack}
-      backLabel="그만두기"
+      backLabel="이전"
       navError={firstErrorMessage}
       nextDisabled={!selected}
       layoutClassName="min-h-[calc(100dvh-3rem)] pb-0 tab:min-h-0"
