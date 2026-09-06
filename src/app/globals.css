@@ -191,4 +191,15 @@
   .banner-swiper .swiper-wrapper {
     align-items: center;
   }
+
+  /* 양옆 미리보기 배너는 Figma의 반투명 흰색 오버레이로 비활성 상태를 표현한다. */
+  .banner-swiper .swiper-slide-prev [data-banner-slide]::after,
+  .banner-swiper .swiper-slide-next [data-banner-slide]::after {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    content: '';
+    background-color: #ffffffcc;
+    pointer-events: none;
+  }
 }

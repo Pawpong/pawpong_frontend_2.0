@@ -16,13 +16,11 @@ const PIXEL_BORDER =
 const PIXEL_FILL =
   'M220.442 20.04H240.482V189.539H220.442V201.938H30.0605V189.539H10.0205V20.04H30.0605V10.0205H220.442V20.04Z'
 
-// 카드 크기: mo = medium(187.65x160), tab+ = large(250.503x213.591) / 텍스트: mo 32px, tab+ 40px
+// 카드 크기: mo·tab 187.65×160 / pc 250.503×213.591. 텍스트는 32px / 40px.
 const pixelSelectCard = tv({
   slots: {
-    root: 'group relative flex h-[10rem] w-[11.728rem] items-center justify-center transition-colors tab:h-[13.3494rem] tab:w-[15.6564rem]',
+    root: 'group relative flex h-[10rem] w-[11.728rem] shrink-0 items-center justify-center transition-colors pc:h-[13.3494rem] pc:w-[15.6564rem]',
     fill: '',
-    // 활성(컬러) 일러스트는 기본(회색) 위에 겹쳐 두고 노출만 토글한다
-    activeArt: 'absolute top-0 left-0 h-full w-auto',
     paw: 'pointer-events-none absolute top-[57.52%] left-[76.44%] aspect-square w-[19.43%] -translate-x-1/2 -translate-y-1/2 rotate-30 items-center justify-center text-secondary-500',
   },
   variants: {
@@ -30,13 +28,11 @@ const pixelSelectCard = tv({
       true: {
         root: 'text-primary-500',
         fill: 'fill-point-500',
-        activeArt: 'block',
         paw: 'flex',
       },
       false: {
-        root: 'text-neutral-500 hover:text-secondary-500',
-        fill: 'fill-neutral-50 group-hover:fill-point-100',
-        activeArt: 'hidden group-hover:block',
+        root: 'text-primary-500 hover:text-primary-700',
+        fill: 'fill-point-100 group-hover:fill-point-300',
         paw: 'hidden group-hover:flex',
       },
     },
@@ -45,10 +41,9 @@ const pixelSelectCard = tv({
 })
 
 interface PixelIllustration {
-  /** 기본(회색) / 활성(컬러) 두 벌 — 디자인상 색만 다른 별개 에셋이라 필터로 대체 불가 */
-  defaultSrc: string
-  activeSrc: string
-  /** 원본 픽셀 크기. 종마다 가로가 달라(강아지 94, 나머지 88) 비율 보존에 필요 */
+  /** Figma 원본: 상태가 바뀌어도 일러스트 색상은 유지한다. */
+  src: string
+  /** 원본 비율 */
   width: number
   height: number
 }
@@ -57,7 +52,7 @@ interface PixelSelectCardProps {
   label: string
   selected?: boolean
   onClick: () => void
-  /** 라벨 위 픽셀 일러스트 (Figma animal md — 높이 99.643) */
+  /** 라벨 위 픽셀 일러스트 (mo·tab 49.75px / pc 80px) */
   illustration?: PixelIllustration
 }
 
@@ -78,23 +73,13 @@ const PixelSelectCard = ({ label, selected, onClick, illustration }: PixelSelect
 
       <span className="relative flex flex-col items-center gap-0.5">
         {illustration && (
-          // 높이만 고정하고 가로는 원본 비율에 맡긴다
-          <span className="relative block h-[4.6656rem] tab:h-[6.2277rem]">
+          <span className="relative block size-[3.109375rem] pc:size-20">
             <Image
-              src={illustration.defaultSrc}
+              src={illustration.src}
               alt=""
               width={illustration.width}
               height={illustration.height}
-              className="h-full w-auto"
-            />
-            {/* priority: 지연 로드되면 첫 hover 때 컬러 전환이 한 박자 늦는다 */}
-            <Image
-              src={illustration.activeSrc}
-              alt=""
-              width={illustration.width}
-              height={illustration.height}
-              priority
-              className={styles.activeArt()}
+              className="size-full object-contain"
             />
           </span>
         )}
@@ -102,7 +87,7 @@ const PixelSelectCard = ({ label, selected, onClick, illustration }: PixelSelect
         <span
           className={cn(
             cafe24Proup.className,
-            'relative font-cafe24 text-[2rem] leading-[1.5] font-bold tab:text-[2.5rem]',
+            'relative font-cafe24 text-[2rem] leading-[1.5] font-bold pc:text-[2.5rem]',
           )}
         >
           {label}

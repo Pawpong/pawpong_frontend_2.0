@@ -13,7 +13,7 @@ const StepTitle = ({ children, subtitle }: StepTitleProps) => (
     <h1
       className={cn(
         cafe24Proup.className,
-        'text-center font-cafe24 text-[1.25rem] leading-[1.5] font-bold text-neutral-850',
+        'text-center font-cafe24 text-[0.875rem] leading-[1.5] font-bold text-neutral-850 tab:text-[1.25rem]',
       )}
     >
       {children}

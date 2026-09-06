@@ -43,9 +43,17 @@ interface PixelTabProps {
   className?: string
   labelClassName?: string
   pawClassName?: string
+  compactTablet?: boolean
 }
 
-const PixelTab = ({ label, status, className, labelClassName, pawClassName }: PixelTabProps) => {
+const PixelTab = ({
+  label,
+  status,
+  className,
+  labelClassName,
+  pawClassName,
+  compactTablet = false,
+}: PixelTabProps) => {
   const styles = pixelTab({ status })
 
   return (
@@ -54,7 +62,7 @@ const PixelTab = ({ label, status, className, labelClassName, pawClassName }: Pi
         viewBox="0 0 106.25 34"
         preserveAspectRatio="none"
         aria-hidden="true"
-        className="absolute inset-0 size-full tab:hidden"
+        className={cn('absolute inset-0 size-full', compactTablet ? 'pc:hidden' : 'tab:hidden')}
       >
         <path d={MD_BORDER} fill="currentColor" />
         <path d={MD_FILL} className={styles.fill()} />
@@ -63,7 +71,10 @@ const PixelTab = ({ label, status, className, labelClassName, pawClassName }: Pi
         viewBox="0 0 191.854 61.3936"
         preserveAspectRatio="none"
         aria-hidden="true"
-        className="absolute inset-0 hidden size-full tab:block"
+        className={cn(
+          'absolute inset-0 hidden size-full',
+          compactTablet ? 'pc:block' : 'tab:block',
+        )}
       >
         <path d={LG_BORDER} fill="currentColor" />
         <path d={LG_FILL} className={styles.fill()} />

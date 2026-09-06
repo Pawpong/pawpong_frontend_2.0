@@ -3,7 +3,7 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
-import { BookmarkIcon } from '@/shared/assets'
+import { MoreVertIcon } from '@/shared/assets'
 import { Button, Container, CtaBanner, InputUpload, NavigationBar } from '@/shared/ui'
 import { useGnbHeight } from '@/shared/lib/useGnbHeight'
 import { transientQueryRecoveryOptions } from '@/shared/api'
@@ -99,15 +99,14 @@ const MyHomeContent = () => {
       <div ref={navRef} className="bg-white tab:sticky tab:z-sticky" style={{ top: gnbH }}>
         <NavigationBar
           title="마이홈"
-          // 디자인(node 2046-160996): 마이홈 모바일 navbar는 좌우 margin-tab(48px) — 공통 기본(16)을 덮어씀
-          className="px-12"
+          className="px-4 tab:px-12 pc:px-20"
           right={
             <Link
               href="/bookmarks"
               aria-label="저장목록"
               className="-m-2 flex size-10 items-center justify-center rounded-lg transition-colors hover:bg-primary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
             >
-              <BookmarkIcon className="size-6 text-neutral-850" />
+              <MoreVertIcon className="size-6 rotate-90 text-neutral-700" />
             </Link>
           }
         />
