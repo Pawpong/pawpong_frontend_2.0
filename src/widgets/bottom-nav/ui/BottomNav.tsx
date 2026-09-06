@@ -2,12 +2,19 @@
 
 import { Suspense } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { cn } from '@/shared/lib/cn'
 import { MAIN_NAV } from '@/shared/config'
 import { useMe } from '@/features/auth'
 
 const BOTTOM_NAV_PATHS = new Set(['/', '/explore', '/chat', '/community', '/home'])
+
+// 하단 내비게이션 전용 Figma 원본. 데스크톱 헤더 아이콘은 유지한다.
+const BOTTOM_ICONS: Record<string, string> = {
+  '/': '/images/nav/bottom-home.svg',
+  '/chat': '/images/nav/bottom-chat.svg',
+}
 
 const BottomNavView = ({ pathname }: { pathname: string }) => {
   const { me } = useMe()
@@ -33,11 +40,23 @@ const BottomNavView = ({ pathname }: { pathname: string }) => {
               )}
               aria-current={isActive(pathname) ? 'page' : undefined}
             >
-              <Icon
-                className="size-[1.875rem] shrink-0"
-                src={href === '/home' ? me?.profileImageUrl : undefined}
-                active={isActive(pathname)}
-              />
+              {!isActive(pathname) && BOTTOM_ICONS[href] ? (
+                <span className="flex size-[1.875rem] shrink-0 items-center justify-center">
+                  <Image
+                    src={BOTTOM_ICONS[href]}
+                    alt=""
+                    width={30}
+                    height={30}
+                    className="size-[1.875rem]"
+                  />
+                </span>
+              ) : (
+                <Icon
+                  className="size-[1.875rem] shrink-0"
+                  src={href === '/home' ? me?.profileImageUrl : undefined}
+                  active={isActive(pathname)}
+                />
+              )}
               <span
                 className={cn(
                   'text-xs leading-[1.5]',

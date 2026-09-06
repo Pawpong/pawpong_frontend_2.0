@@ -6,6 +6,7 @@ import { useBreakpoint } from '@/shared/lib/useBreakpoint'
 import { SearchIcon } from './SearchIcon'
 
 interface SearchBarProps {
+  variant?: 'default' | 'home'
   placeholder?: {
     mobile: string
     desktop: string
@@ -22,21 +23,26 @@ const DEFAULT_PLACEHOLDER = {
   desktop: '검색해서 원하는 아이 찾기',
 }
 
+const HOME_PLACEHOLDER = {
+  mobile: '검색해보세요',
+  desktop: '검색해보세요',
+}
+
 const INPUT_NAME = 'keyword'
 
-/**
- * 탐색 검색바.
- * 회색 테두리 사각 인풋 대신 크림빛 면 위의 알약 — 주변 필터칩·버튼과 같은 형태 언어를 쓴다.
- * 포커스는 브랜드 브라운 테두리 + 포인트 옐로우 글로우로, 파란 시스템 색(info)을 쓰지 않는다.
- */
+//QA: 검색 동작 공통화 — 홈과 Explore가 동일한 form submit/router 동작을 사용한다.
+//QA: 화면별 스타일 분리 — 홈은 Figma 검색 레이아웃, 기본값은 Explore 스타일을 사용한다.
 export const SearchBar = ({
-  placeholder = DEFAULT_PLACEHOLDER,
+  variant = 'default',
+  placeholder,
   defaultValue,
   onSubmit,
   className,
 }: SearchBarProps) => {
   const isTablet = useBreakpoint('tab')
   const router = useRouter()
+  const resolvedPlaceholder =
+    placeholder ?? (variant === 'home' ? HOME_PLACEHOLDER : DEFAULT_PLACEHOLDER)
 
   // 비제어 입력 + form submit — Enter와 아이콘 클릭이 같은 경로를 타고,
   // 페이지마다 검색어 state를 따로 들 필요가 없다
@@ -56,7 +62,9 @@ export const SearchBar = ({
       role="search"
       onSubmit={handleSubmit}
       className={cn(
-        'group flex h-12 w-full items-center gap-2 rounded-full border border-neutral-300 bg-white py-1 pr-1.5 pl-5 pc:h-14 pc:pl-6',
+        variant === 'home'
+          ? 'group flex h-10 w-full items-center justify-between rounded-lg border border-neutral-500 bg-white p-3'
+          : 'group flex h-12 w-full items-center gap-2 rounded-full border border-neutral-300 bg-white py-1 pr-1.5 pl-5 pc:h-14 pc:pl-6',
         'transition-[border-color,box-shadow] duration-150',
         // 포커스: 브랜드 테두리 + 옐로우 글로우 (파란 시스템 색은 쓰지 않는다)
         'focus-within:border-primary-500 focus-within:shadow-[0_0_0_0.25rem_rgba(255,254,114,0.45)]',
@@ -67,16 +75,21 @@ export const SearchBar = ({
         type="text"
         name={INPUT_NAME}
         defaultValue={defaultValue}
-        placeholder={isTablet ? placeholder.desktop : placeholder.mobile}
+        placeholder={isTablet ? resolvedPlaceholder.desktop : resolvedPlaceholder.mobile}
         className="min-w-0 flex-1 bg-transparent text-base leading-[1.5] font-medium text-neutral-850 outline-none placeholder:text-neutral-500"
       />
       <button
         type="submit"
         aria-label="검색"
-        // 평소엔 회색, 검색바가 포커스되면 테두리와 같은 브랜드 색으로 함께 바뀐다
-        className="flex size-10 shrink-0 items-center justify-center rounded-full text-neutral-700 transition-colors group-focus-within:text-primary-500 hover:bg-primary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 pc:size-11"
+        //QA: 검색 아이콘 상태 — 평소에는 회색, 포커스 시 브랜드 색으로 함께 바뀐다.
+        className={cn(
+          variant === 'home'
+            ? 'flex size-8 shrink-0 items-center justify-center rounded-lg p-1.5 text-neutral-700'
+            : 'flex size-10 shrink-0 items-center justify-center rounded-full text-neutral-700 pc:size-11',
+          'transition-colors group-focus-within:text-primary-500 hover:bg-primary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500',
+        )}
       >
-        <SearchIcon className="size-7 pc:size-8" />
+        <SearchIcon className={variant === 'home' ? 'size-5' : 'size-7 pc:size-8'} />
       </button>
     </form>
   )

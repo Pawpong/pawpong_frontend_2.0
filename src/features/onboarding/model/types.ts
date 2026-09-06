@@ -23,8 +23,8 @@ export type FormStepId = keyof OnboardingFormData
 export type StepId = FormStepId | 'complete'
 
 export const USER_TYPE_OPTIONS = [
-  { value: 'general', label: '일반' },
   { value: 'breeder', label: '브리더' },
+  { value: 'general', label: '일반 회원' },
 ] as const satisfies ReadonlyArray<{ value: UserType; label: string }>
 
 export const VALID_USER_TYPES = USER_TYPE_OPTIONS.map(({ value }) => value)

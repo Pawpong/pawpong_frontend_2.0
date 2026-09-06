@@ -20,7 +20,14 @@ const SignupLogoLink = () => {
 
   return (
     <Link href="/" aria-label="홈으로 이동" onClick={handleClick}>
-      <Image src="/images/logo/logo.svg" alt="Pawpong" width={96} height={32} priority />
+      <Image
+        src="/images/logo/logo.svg"
+        alt="Pawpong"
+        width={96}
+        height={32}
+        priority
+        className="h-7 w-auto tab:h-8"
+      />
     </Link>
   )
 }
