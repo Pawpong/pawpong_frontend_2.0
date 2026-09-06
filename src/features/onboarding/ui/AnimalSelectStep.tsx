@@ -36,7 +36,7 @@ const AnimalSelectStep = () => {
       /* 카드 3장 = 250.503*3 + gap 48*2 = 847.5px (기본 650px 로는 좁다).
          단계 칩 하단 -> 카드 상단 168.2px (Figma 3134-344275) */
       contentClassName="tab:max-w-[52.9693rem] tab:gap-[10.5128rem]"
-      navClassName="static right-auto bottom-auto left-auto z-auto tab:mt-[4rem]"
+      navClassName="static right-auto bottom-auto left-auto z-auto w-full tab:mt-[4rem]"
     >
       {/* 동물 선택 카드 — 카드/간격 규격은 유형 선택(SignupTypeSelect)과 동일, spacing/48 */}
       <Controller

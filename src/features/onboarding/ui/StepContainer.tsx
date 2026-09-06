@@ -46,7 +46,7 @@ const StepContainer = ({
         자연 높이 + pb로 fixed nav 가림 방지(내용이 뷰포트보다 커도 잘리지 않고 페이지 스크롤) */}
     <div
       className={cn(
-        'flex w-full max-w-[40.625rem] flex-col items-center gap-8 px-4 pt-12 pb-[7rem] tab:min-h-0 tab:flex-1 tab:gap-[3.625rem] tab:px-0 tab:pt-7 tab:pb-12',
+        'flex w-full max-w-[40.625rem] flex-col items-center gap-8 px-4 pt-12 pb-[calc(7.5rem+env(safe-area-inset-bottom))] tab:min-h-0 tab:flex-1 tab:gap-[3.625rem] tab:px-0 tab:pt-7 tab:pb-12',
         contentClassName,
       )}
     >

@@ -40,13 +40,16 @@ type PixelTabStatus = 'default' | 'unactive' | 'active' | 'disabled'
 interface PixelTabProps {
   label: string
   status?: PixelTabStatus
+  className?: string
+  labelClassName?: string
+  pawClassName?: string
 }
 
-const PixelTab = ({ label, status }: PixelTabProps) => {
+const PixelTab = ({ label, status, className, labelClassName, pawClassName }: PixelTabProps) => {
   const styles = pixelTab({ status })
 
   return (
-    <span className={styles.root()}>
+    <span className={cn(styles.root(), className)}>
       <svg
         viewBox="0 0 106.25 34"
         preserveAspectRatio="none"
@@ -73,7 +76,10 @@ const PixelTab = ({ label, status }: PixelTabProps) => {
       {status === 'active' && (
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute top-1/2 left-[78.11%] flex aspect-square w-[16.68%] -translate-x-1/2 -translate-y-1/2 rotate-30 items-center justify-center text-secondary-500"
+          className={cn(
+            'pointer-events-none absolute top-1/2 left-[78.11%] flex aspect-square w-[16.68%] -translate-x-1/2 -translate-y-1/2 rotate-30 items-center justify-center text-secondary-500',
+            pawClassName,
+          )}
         >
           <PawPrintIcon className="h-auto w-[68.8%]" />
         </span>
@@ -83,6 +89,7 @@ const PixelTab = ({ label, status }: PixelTabProps) => {
         className={cn(
           cafe24Proup.className,
           'relative font-cafe24 text-[0.625rem] leading-[1.5] font-bold whitespace-nowrap tab:text-base',
+          labelClassName,
         )}
       >
         {label}
