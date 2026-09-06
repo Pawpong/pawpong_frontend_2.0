@@ -13,25 +13,25 @@ const CHIP: Record<AnimalCategory, { src: string; on: string; ratio: string; hei
     src: '/images/category/filter-all.svg',
     on: '/images/category/filter-all-active.svg',
     ratio: 'aspect-[237/62]',
-    height: 'h-[2.5rem] tab:h-[2.1875rem] pc:h-[3.875rem]',
+    height: 'tab:h-[2.1875rem] pc:h-[3.875rem]',
   },
   dog: {
     src: '/images/category/filter-dog.svg',
     on: '/images/category/filter-dog-active.svg',
     ratio: 'aspect-[237/97]',
-    height: 'h-[3.5rem] tab:h-[3.40625rem] pc:h-[6.0625rem]',
+    height: 'tab:h-[3.40625rem] pc:h-[6.0625rem]',
   },
   cat: {
     src: '/images/category/filter-cat.svg',
     on: '/images/category/filter-cat-active.svg',
     ratio: 'aspect-[225/100]',
-    height: 'h-[3.75rem] tab:h-[3.5rem] pc:h-[6.25rem]',
+    height: 'tab:h-[3.5rem] pc:h-[6.25rem]',
   },
   lizard: {
     src: '/images/category/filter-lizard.svg',
     on: '/images/category/filter-lizard-active.svg',
     ratio: 'aspect-[237/99]',
-    height: 'h-[3.5625rem] tab:h-[3.46875rem] pc:h-[6.1875rem]',
+    height: 'tab:h-[3.46875rem] pc:h-[6.1875rem]',
   },
 }
 
@@ -45,8 +45,8 @@ const CategoryFilter = ({ selected, onChange, className }: CategoryFilterProps) 
   return (
     <div
       className={cn(
-        // 모바일: 2열 grid(폭 이등분) / tab+: flex 한 줄
-        'grid grid-cols-2 items-end justify-items-center gap-x-[1.375rem] gap-y-2 tab:flex tab:flex-wrap tab:justify-center tab:gap-x-3',
+        //QA: Explore 카테고리 배치 수정 — 홈과 동일하게 모바일에서도 4개를 한 줄로 정렬한다.
+        'grid w-full grid-cols-4 items-end justify-items-center gap-x-2 gap-y-2 tab:flex tab:flex-wrap tab:justify-center tab:gap-x-3',
         className,
       )}
     >
@@ -61,7 +61,7 @@ const CategoryFilter = ({ selected, onChange, className }: CategoryFilterProps) 
             aria-pressed={active}
             aria-label={CATEGORY_LABEL[category]}
             onClick={() => onChange(category)}
-            className={cn('relative w-auto shrink-0', chip.height, chip.ratio)}
+            className={cn('relative w-full min-w-0 shrink-0 tab:w-auto', chip.height, chip.ratio)}
           >
             {/* 라벨은 button의 aria-label이 담당 — 이미지는 장식 */}
             <Image
