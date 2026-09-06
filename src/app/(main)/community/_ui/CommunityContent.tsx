@@ -125,10 +125,12 @@ const CommunityContent = () => {
         </div>
       </Container>
 
-      {/* 글작성 — 상단 작성 유도 바를 대신하는 우하단 고정 FAB (Figma "글작성" BaseButton) */}
+      {/* 글작성 — 상단 작성 유도 바를 대신하는 우하단 고정 FAB (Figma "글작성" BaseButton)
+          mo·tab 은 BottomNav(높이 3.5rem, 같은 z-sticky)가 뒤에 렌더되어 겹치면 FAB을 덮으므로
+          네비 높이 + 기존 여백 1.5rem 만큼 띄운다. pc 는 BottomNav 가 없어 원래 위치를 쓴다. */}
       <Link
         href="/community/write"
-        className="fixed right-6 bottom-6 z-sticky flex h-12 items-center gap-1 rounded-full bg-point-500 px-4 shadow-[0_7px_7px_rgba(55,55,55,0.1)]"
+        className="fixed right-6 bottom-[calc(3.5rem+1.5rem+env(safe-area-inset-bottom))] z-sticky flex h-12 items-center gap-1 rounded-full bg-point-500 px-4 shadow-[0_7px_7px_rgba(55,55,55,0.1)] pc:bottom-6"
       >
         <PlusIcon className="size-6 text-neutral-850" />
         <span className="text-base leading-[1.5] font-semibold text-neutral-850">글작성</span>
