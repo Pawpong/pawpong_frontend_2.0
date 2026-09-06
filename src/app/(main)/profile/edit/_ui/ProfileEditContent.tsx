@@ -7,7 +7,7 @@ import { adopterQueries } from '@/entities/adopter'
 import { profileQueries } from '@/entities/profile'
 import { useUpdateAdopterProfile, useDeleteAdopterAccount } from '@/features/adopter'
 import { useLogoutAndRedirect } from '@/features/auth'
-import { useUpdateBreederProfile } from '@/features/breeder'
+import { useUpdateBreederProfile, useDeleteBreederAccount } from '@/features/breeder'
 import { useUpdateMyProfile } from '@/features/profile'
 import { useUploadSingleFile } from '@/features/upload'
 import { normalizeApiError } from '@/shared/api'
@@ -123,6 +123,7 @@ const ProfileEditContent = () => {
   const updateBreederProfile = useUpdateBreederProfile()
   const updateMyProfile = useUpdateMyProfile()
   const deleteAccount = useDeleteAdopterAccount()
+  const deleteBreederAccount = useDeleteBreederAccount()
   const { logoutAndRedirect } = useLogoutAndRedirect()
 
   // 활동명만 필수. 소개는 서버 스펙상 빈 문자열이 "소개 비우기"로 허용돼 막지 않는다.
@@ -185,7 +186,12 @@ const ProfileEditContent = () => {
   const handleLeave = async () => {
     setShowLeave(false)
     try {
-      await deleteAccount.mutateAsync({ reason: WithdrawReason.OTHER })
+      // 역할별로 엔드포인트가 다르다 (adopter/account vs breeder-management/account)
+      if (isBreeder) {
+        await deleteBreederAccount.mutateAsync({ reason: 'other' })
+      } else {
+        await deleteAccount.mutateAsync({ reason: WithdrawReason.OTHER })
+      }
       // 쿠키 정리 + 홈 이동까지 한 번에 (서버 로그아웃이 실패해도 로컬 세션은 비운다)
       logoutAndRedirect()
     } catch (error) {
@@ -305,12 +311,10 @@ const ProfileEditContent = () => {
           </div>
         </div>
 
-        {/* 탈퇴는 입양자 전용 API(useDeleteAdopterAccount) — 브리더에선 숨김 */}
-        {!isBreeder && (
-          <Button variant="text" onClick={() => setShowLeave(true)}>
-            탈퇴
-          </Button>
-        )}
+        {/* 탈퇴는 역할별로 다른 API 를 쓴다 — handleLeave 에서 분기한다 */}
+        <Button variant="text" onClick={() => setShowLeave(true)}>
+          탈퇴
+        </Button>
       </Container>
 
       {/* 하단 고정 CTA — 공통 FooterCtaBar (Figma 1054-36832 / 모바일 1056-47239) */}
