@@ -40,7 +40,7 @@ const StepIndicator = () => {
               // 지나온 구간은 갈색(active), 아직 안 온 구간은 회색(inactive)
               <OnboardingArrow
                 className={cn(
-                  'size-2 tab:size-6',
+                  'size-2 tab:size-[0.875rem] pc:size-6',
                   index <= currentStepIndex ? 'text-primary-500' : 'text-neutral-400',
                 )}
               />
@@ -50,9 +50,10 @@ const StepIndicator = () => {
               className="min-w-0 flex-1 tab:flex-none tab:shrink-0"
             >
               <PixelTab
+                compactTablet
                 label={step.label}
-                className="w-full min-w-0 p-0.5 tab:w-[11.991rem] tab:p-2"
-                labelClassName="text-[0.5rem] tab:text-base"
+                className="w-full min-w-0 p-0.5 tab:h-[2.125rem] tab:w-[6.640625rem] tab:p-1 pc:h-[3.837rem] pc:w-[11.991rem] pc:p-2"
+                labelClassName="text-[0.5rem] tab:text-[0.625rem] pc:text-base"
                 pawClassName="hidden tab:flex"
                 status={
                   index < currentStepIndex

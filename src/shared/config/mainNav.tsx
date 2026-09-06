@@ -50,12 +50,25 @@ const NavChatIcon = ({ className }: NavIconProps) => (
   </svg>
 )
 
-const NavCommunityIcon = ({ className }: NavIconProps) => (
-  <svg viewBox="0 0 32 32" fill="currentColor" className={className} aria-hidden>
-    <g transform="translate(3.037 8.81)">
-      <path d="M15.2803 7.74121H16.6035V8.51562H17.5967V9.29004H18.2588V9.7373H18.3145V8.96387H22.9473V9.7373H24.2715V10.5117H25.2646V11.2861H25.9268V14.3828H15.335V12.3867H10.5918V14.3828H0V11.2861H0.662109V10.5117H1.65527V9.7373H2.97852V8.96387H7.6123V9.7373H7.66699V9.29004H8.3291V8.51562H9.32227V7.74121H10.6465V6.96777H15.2803V7.74121ZM6.79199 2.76953H7.54004V3.54395H8.28809V5.86719H7.54004V6.64062H6.79199V7.80176H3.7998V6.64062H3.05176V5.86719H2.30371V3.54395H3.05176V2.76953H3.7998V1.99609H6.79199V2.76953ZM22.127 2.76953H22.875V3.54395H23.623V5.86719H22.875V6.64062H22.127V7.80176H19.1348V6.64062H18.3867V5.86719H17.6387V3.54395H18.3867V2.76953H19.1348V1.99609H22.127V2.76953ZM14.459 0.773438H15.207V1.54785H15.9551V3.87109H15.207V4.64453H14.459V5.80566H11.4668V4.64453H10.7188V3.87109H9.9707V1.54785H10.7188V0.773438H11.4668V0H14.459V0.773438Z" />
-    </g>
-  </svg>
+const NavCommunityIcon = ({ className, active }: NavIconProps) => (
+  <span className={cn('flex items-center justify-center', className)} aria-hidden>
+    {active ? (
+      <Image
+        src="/images/nav/bottom-community-active.svg"
+        alt=""
+        width={18}
+        height={18}
+        className="size-3/5"
+      />
+    ) : (
+      <span
+        className="size-full bg-current"
+        style={{
+          mask: 'url(/images/nav/bottom-community.svg) center / 100% 100% no-repeat',
+        }}
+      />
+    )}
+  </span>
 )
 
 /**
@@ -116,7 +129,7 @@ export const MAIN_NAV: MainNavItem[] = [
   {
     href: '/community',
     label: '커뮤니티',
-    Icon: withActiveIcon(NavCommunityIcon, '/images/nav/nav-community-active.svg'),
+    Icon: NavCommunityIcon,
     isActive: (p) => p.startsWith('/community'),
   },
   { href: '/home', label: '마이홈', Icon: NavMyHomeIcon, isActive: (p) => p.startsWith('/home') },

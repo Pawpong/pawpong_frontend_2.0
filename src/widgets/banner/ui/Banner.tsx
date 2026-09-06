@@ -22,13 +22,13 @@ const NAV_ARROWS = [
   {
     className: NAV_PREV_CLASS,
     label: '이전 배너',
-    position: 'tab:left-0 pc:left-[max(1rem,calc(50%-40rem))]',
+    position: 'tab:left-[calc(50%-21.3175rem)] pc:left-[calc(50%-39.5953rem)]',
     mirrored: true,
   },
   {
     className: NAV_NEXT_CLASS,
     label: '다음 배너',
-    position: 'tab:right-0 pc:right-[max(1rem,calc(50%-40rem))]',
+    position: 'tab:right-[calc(50%-21.3175rem)] pc:right-[calc(50%-39.5953rem)]',
     mirrored: false,
   },
 ] as const
@@ -111,8 +111,8 @@ const Banner = () => {
         ))}
       </Swiper>
 
-      {/* //QA: 페이지네이션 수정 — 모바일은 배경 없이, 탭·PC는 Figma의 하단 그라디언트를 사용한다. */}
-      <div className="absolute inset-x-0 bottom-0 z-10 flex justify-center py-2.5 tab:bg-[linear-gradient(to_top,rgba(0,0,0,0.2),transparent)] pc:bottom-10">
+      {/* 모바일은 배너 아래에 배경 없이 배치하고, 탭·PC에서는 배너 내부에 배치한다. */}
+      <div className="relative z-10 flex justify-center py-2.5 tab:absolute tab:inset-x-0 tab:bottom-0 pc:bottom-10">
         <div className="flex h-4 w-25 items-center justify-center gap-1 rounded-full px-4 py-1">
           {orderedBanners.map((banner, index) => (
             <button

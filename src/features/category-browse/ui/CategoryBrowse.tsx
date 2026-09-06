@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { Container, CtaBanner } from '@/shared/ui'
+import { Container } from '@/shared/ui'
 
 //QA: 홈 카테고리 에셋 교체 — SVG 렌더링 깨짐을 방지하기 위해 Figma PNG를 적용한다.
 const CATEGORIES = [
@@ -105,11 +105,6 @@ const HomeCategoryButton = ({ label, href, compact, desktop }: (typeof CATEGORIE
 const CategoryBrowse = () => {
   return (
     <>
-      {/* 브리더 CTA 스트립 (Figma 2937-336918) — PC와 모바일·탭의 발자국 배치를 분기한다. */}
-      <Container className="px-4 py-3 tab:py-2">
-        <CtaBanner text="신뢰할 수 있는 브리더 포퐁에서 만나요 !" tone="point" />
-      </Container>
-
       {/*
         //QA: 모바일 카테고리 배치 수정 — 375~767px에서는 2x2, 탭·PC에서는 4개 한 줄로 정렬한다.
         //QA: 버튼 크기 수정 — 각 PNG의 원본 비율을 유지하면서 태블릿·PC 간격을 적용한다.
