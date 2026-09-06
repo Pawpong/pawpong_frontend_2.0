@@ -6,6 +6,7 @@ import { ApplicationList } from './ApplicationList'
 import { ReviewList } from './ReviewList'
 import { ReceivedApplicationList } from './ReceivedApplicationList'
 import { ReceivedReviewList } from './ReceivedReviewList'
+import { CounselProfileForm } from './CounselProfileForm'
 import { isActivityTab, type ActivityTab } from '../_lib/activityTab'
 
 type ActivityUserRole = 'adopter' | 'breeder'
@@ -19,6 +20,8 @@ const TABS_BY_ROLE: Record<
   adopter: [
     { value: 'applications', label: '신청 내역' },
     { value: 'reviews', label: '내 후기' },
+    // 신청마다 같은 내용을 다시 쓰지 않도록, 가입 때 작성한 공통 신청서를 여기서 고친다
+    { value: 'counsel-profile', label: '내 신청서' },
   ],
   breeder: [
     { value: 'applications', label: '받은 신청' },
@@ -71,6 +74,12 @@ const ActivityContent = ({
         {isBreeder && (
           <TabsContent value="sent-reviews" className="mt-0">
             <ReviewList />
+          </TabsContent>
+        )}
+        {/* 공통 신청서는 입양자 스키마(counselDefaultProfile)에만 있어 브리더 탭에서는 제외한다 */}
+        {!isBreeder && (
+          <TabsContent value="counsel-profile" className="mt-0">
+            <CounselProfileForm />
           </TabsContent>
         )}
       </TabBar>
