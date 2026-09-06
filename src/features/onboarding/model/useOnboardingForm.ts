@@ -75,7 +75,10 @@ export const useOnboardingForm = create<OnboardingFormStore>()(
           state.ownerTempId === tempId ? state : { ownerTempId: tempId, ...EMPTY_PROGRESS },
         ),
 
-      clear: () => set({ ownerTempId: undefined, ...EMPTY_PROGRESS }),
+      // 그만하기는 입력값을 버리는 것이지 소셜 가입 세션을 끝내는 것이 아니다.
+      // ownerTempId 까지 지우면 유형 선택으로 돌아간 뒤 라우트 가드가 세션 없음으로 보고
+      // 다시 유형 선택으로 돌려보내 무한 반복이 된다.
+      clear: () => set({ ...EMPTY_PROGRESS }),
     }),
     {
       name: 'pawpong:onboarding-form',
