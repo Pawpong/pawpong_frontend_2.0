@@ -96,12 +96,25 @@ const FooterCtaBar = ({
   isValid,
   isPending,
   children,
+  cancelLabel = '신청 취소',
+  cancelLabelPc = '신청 취소하기',
+  submitLabel = '상담 신청하기',
+  submitLabelTab = '입양 상담',
+  submitLabelPc = '입양 상담하기',
+  pendingLabel = '제출 중...',
 }: {
   onCancel: () => void
   isValid: boolean
   isPending: boolean
   /** 바 위에 겹쳐 띄우는 요소 (실패 토스트) — 위치는 바가 자기 높이를 알고 잡는다 */
   children?: ReactNode
+  /** 신청서 수정 화면 등 다른 문구가 필요한 호출부를 위한 오버라이드 — 기본은 신규 신청 문구 */
+  cancelLabel?: string
+  cancelLabelPc?: string
+  submitLabel?: string
+  submitLabelTab?: string
+  submitLabelPc?: string
+  pendingLabel?: string
 }) => (
   <div className="fixed inset-x-0 bottom-0 z-10 flex items-center gap-2.5 bg-white px-4 py-4 tab:justify-end tab:gap-5 tab:px-12 tab:py-3 pc:px-20">
     {/* [refactored] bottom 값은 바 높이(mo 80 / tab+ 64)에서 나오므로 호출부가 아니라 여기서 관리 */}
@@ -118,8 +131,8 @@ const FooterCtaBar = ({
         onClick={onCancel}
         className="w-[7.3125rem] shrink-0 whitespace-nowrap tab:h-10 tab:w-auto tab:max-w-[16.125rem] tab:flex-1"
       >
-        <span className="pc:hidden">신청 취소</span>
-        <span className="hidden pc:inline">신청 취소하기</span>
+        <span className="pc:hidden">{cancelLabel}</span>
+        <span className="hidden pc:inline">{cancelLabelPc}</span>
       </Button>
       <Button
         type="submit"
@@ -128,12 +141,12 @@ const FooterCtaBar = ({
         className="max-w-[18.5625rem] flex-1 whitespace-nowrap tab:h-10 tab:max-w-[16.125rem]"
       >
         {isPending ? (
-          '제출 중...'
+          pendingLabel
         ) : (
           <>
-            <span className="tab:hidden">상담 신청하기</span>
-            <span className="hidden tab:inline pc:hidden">입양 상담</span>
-            <span className="hidden pc:inline">입양 상담하기</span>
+            <span className="tab:hidden">{submitLabel}</span>
+            <span className="hidden tab:inline pc:hidden">{submitLabelTab}</span>
+            <span className="hidden pc:inline">{submitLabelPc}</span>
           </>
         )}
       </Button>

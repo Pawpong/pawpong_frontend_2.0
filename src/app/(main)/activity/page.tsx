@@ -1,5 +1,5 @@
 import { requireAuth } from '@/features/auth/server'
-import { ActivityContent } from './_ui/ActivityContent'
+import { ActivityContent, isActivityTab } from './_ui/ActivityContent'
 
 interface ActivityPageProps {
   searchParams: Promise<{ tab?: string }>
@@ -12,7 +12,7 @@ const ActivityPage = async ({ searchParams }: ActivityPageProps) => {
   return (
     <ActivityContent
       userRole={userRole}
-      initialTab={tab === 'reviews' ? 'reviews' : 'applications'}
+      initialTab={tab && isActivityTab(tab) ? tab : 'applications'}
     />
   )
 }
