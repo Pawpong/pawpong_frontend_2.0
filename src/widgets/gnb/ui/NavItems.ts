@@ -13,7 +13,6 @@ export interface NavItem {
 // 항목은 로그인 여부·역할과 무관하게 전부 노출하고, 비로그인은 returnUrl 을 실어 로그인으로 보낸다.
 export const MOBILE_MENU_ITEMS: NavItem[] = [
   { name: '설정', href: '/settings', requiresAuth: true },
-  { name: '알림', href: '/notifications', requiresAuth: true },
   { name: '입양 신청서', href: '/activity', requiresAuth: true },
   // Figma 목록에는 없지만 이 메뉴가 유일한 진입로라 유지한다
   { name: '저장목록', href: '/bookmarks', requiresAuth: true },

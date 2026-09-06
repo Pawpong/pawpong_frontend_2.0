@@ -15,8 +15,8 @@ import {
 } from '@/shared/ui'
 import { ArrowRightIcon, CheckIcon, GenderIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
-import { GENDER_LABEL } from '@/shared/types'
-import type { AdoptionDetailDto, PetStatus } from '@/shared/types'
+import { CATEGORY_LABEL, GENDER_LABEL } from '@/shared/types'
+import type { AdoptionDetailDto, AnimalCategory, PetStatus } from '@/shared/types'
 import { ADOPTION_CARD_STATUS } from '@/entities/adoption'
 import { HeroImageCarousel } from './HeroImageCarousel'
 import { FavoriteShareActions } from './FavoriteShareActions'
@@ -29,8 +29,9 @@ interface AdoptionDetailHeroProps {
   showFavoriteAction: boolean
 }
 
-// [refactored] JSX 안에 있던 브레드크럼 라벨을 모듈 상수로 분리
-const BREADCRUMB = ['홈', '입양', '도마뱀']
+// 브레드크럼 마지막 칸은 실제 축종을 따라간다.
+// (초기 시안이 도마뱀 예시였던 탓에 '도마뱀'이 하드코딩돼 있어 모든 개체가 도마뱀으로 표시됐다)
+const buildBreadcrumb = (category: AnimalCategory) => ['홈', '입양', CATEGORY_LABEL[category]]
 
 // [refactored] InfoItem과 소개글이 각자 들고 있던 동일한 타이포 클래스를 상수로 통일
 // 피그마: 라벨 body/lg/medium 16px neutral-700 (pc 20px), 값 body/lg/bold 16px neutral-850
@@ -66,7 +67,7 @@ const AdoptionDetailHero = ({
         <div className="relative -mx-[1rem] tab:-mx-[3rem] pc:mx-0 pc:flex pc:w-[31.25rem] pc:shrink-0 pc:flex-col pc:gap-[0.75rem]">
           {/* 브레드크럼 (데스크탑 전용) — 피그마: 라벨(body/md/bold 14px #6b6b6b) + chevron */}
           <div className="hidden items-end py-[0.625rem] pc:flex">
-            {BREADCRUMB.map((label, index) => (
+            {buildBreadcrumb(detail.category).map((label, index) => (
               <Fragment key={label}>
                 {index > 0 && <ArrowRightIcon className="size-[1.5rem] text-neutral-700" />}
                 <span className="p-[0.125rem] text-[0.875rem] leading-[1.5] font-semibold text-neutral-700">

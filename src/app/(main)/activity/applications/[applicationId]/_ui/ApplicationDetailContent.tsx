@@ -13,6 +13,7 @@ import {
   buttonVariants,
 } from '@/shared/ui'
 import type { CustomQuestionResponse, StandardResponses } from '@/shared/types'
+import { ApplicationChatButton } from '@/features/chat-entry'
 import { ApplicationStatusBadge, getReviewTypeForStatus } from '../../../_ui/ActivityBadges'
 import { ReviewComposer } from '../../../_ui/ReviewComposer'
 
@@ -133,7 +134,14 @@ const ApplicationDetailContent = ({ applicationId }: { applicationId: string }) 
                       {data.processedAt && ` · 처리일 ${formatDate(data.processedAt)}`}
                     </p>
                   </div>
-                  <div className="flex shrink-0 gap-2">
+                  {/* 신청 상세에서 바로 대화로 넘어갈 수 있게 한다 — 이 동선이 없어
+                      상담 신청 후 브리더 홈을 다시 찾아가야만 대화를 시작할 수 있었다. */}
+                  <div className="flex shrink-0 flex-wrap items-start gap-2">
+                    <ApplicationChatButton
+                      counterpartUserId={data.breederId}
+                      applicationId={data.applicationId}
+                    />
+                    {/* 아직 브리더가 손대지 않은 신청만 수정할 수 있다 */}
                     {data.status === 'consultation_pending' && (
                       <Link
                         href={`/activity/applications/${data.applicationId}/edit`}

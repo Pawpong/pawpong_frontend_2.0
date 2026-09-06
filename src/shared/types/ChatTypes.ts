@@ -57,9 +57,13 @@ export interface WsMessagesRead {
   readBy: string
 }
 
-/** 채팅방 생성 요청 */
+/** 채팅방 생성 요청 (POST /v2/chat/rooms — 이미 방이 있으면 기존 방을 돌려준다) */
 export interface CreateRoomRequestDto {
-  breederId: string
+  /** 대화 상대 userId. 입양자·브리더 어느 쪽이든 상대를 지정할 수 있다 */
+  counterpartUserId?: string
+  /** @deprecated counterpartUserId 를 쓸 것. 브리더만 상대로 지정할 수 있던 시절의 필드 */
+  breederId?: string
+  /** 연결할 상담 신청 id — 채팅방 상단 펫 정보 카드가 이 값으로 채워진다 */
   applicationId?: string
 }
 

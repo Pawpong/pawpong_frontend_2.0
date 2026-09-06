@@ -3,11 +3,18 @@ import { redirect } from 'next/navigation'
 
 type AuthRole = 'adopter' | 'breeder'
 
-/** 로그인 쿠키를 서버에서 확인하고 유효한 역할을 반환한다. */
+/**
+ * 로그인 쿠키를 서버에서 확인하고 유효한 역할을 반환한다.
+ *
+ * 판정 기준은 클라이언트 가드(SocialLoginList)와 반드시 같아야 한다.
+ * 한쪽이 "로그인됨", 다른 쪽이 "비로그인"으로 보면 /login ↔ 보호화면 사이를 오가는
+ * 무한 리다이렉트가 된다. (쿠키가 빈 값으로 남았을 때 실제로 발생했다)
+ */
 export const requireAuth = async (returnUrl?: string): Promise<AuthRole> => {
   const cookieStore = await cookies()
-  const accessToken = cookieStore.get('accessToken')?.value
-  const userRole = cookieStore.get('userRole')?.value
+  // max-age=0 삭제가 빈 문자열로 남는 경우가 있어 존재 여부가 아니라 값으로 판정한다
+  const accessToken = cookieStore.get('accessToken')?.value?.trim()
+  const userRole = cookieStore.get('userRole')?.value?.trim()
 
   if (!accessToken || (userRole !== 'adopter' && userRole !== 'breeder')) {
     redirect(returnUrl ? `/login?returnUrl=${encodeURIComponent(returnUrl)}` : '/login')

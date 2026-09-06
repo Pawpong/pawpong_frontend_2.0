@@ -7,6 +7,7 @@ import { cn } from '@/shared/lib/cn'
 import { AuthActions } from './AuthActions'
 import { LogoButton } from './LogoButton'
 import { NavBar } from './NavBar'
+import { NotificationBell } from './NotificationBell'
 import { MobileMenu } from './MobileMenu'
 
 const Gnb = () => {
@@ -33,6 +34,9 @@ const Gnb = () => {
             {/* [refactored] 노출 조건은 AuthActions 가 판단한다. PC 는 NavBar 안 마이홈 자리에서 렌더 */}
             <AuthActions className="pc:hidden" />
             <NavBar className="hidden pc:flex" />
+            {/* 알림은 상시 확인하는 정보라 메뉴 안에 숨기지 않고 헤더에 상주시킨다.
+                (드롭다운·안읽음 뱃지를 갖춘 NotificationBell 이 만들어져 있었는데 어디에도 붙어 있지 않았다) */}
+            <NotificationBell />
             {/* 햄버거 메뉴 — 탭·모바일은 nav 대체, 데스크탑은 보조 메뉴 (전 브레이크포인트) */}
             <button
               type="button"
