@@ -25,10 +25,7 @@ export const requireAuth = async (returnUrl?: string): Promise<AuthRole> => {
  * @param returnUrl 로그인 후 돌아올 경로. 서버 컴포넌트는 자신의 pathname 을 알 수 없어
  *                  호출부가 넘겨준다. 넘기면 /login?returnUrl=... 체인을 타 원래 화면으로 복귀한다
  */
-export const requireRole = async (
-  role: AuthRole,
-  returnUrl?: string,
-): Promise<void> => {
+export const requireRole = async (role: AuthRole, returnUrl?: string): Promise<void> => {
   const userRole = await requireAuth(returnUrl)
   if (userRole !== role) redirect('/')
 }

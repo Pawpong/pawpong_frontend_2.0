@@ -94,22 +94,19 @@ const useParentImages = () => {
   )
 
   /** 임시저장 복원 — 행 id 와 (URL, 파일키) 를 짝지어 채운다 */
-  const seedExisting = useCallback(
-    (photos: { rowId: string; url: string; fileName: string }[]) => {
-      setByRowId((prev) => {
-        // 사용자가 이미 뭔가 고른 뒤라면 덮어쓰지 않는다 (복원은 최초 1회)
-        if (Object.keys(prev).length > 0) return prev
-        setSeededCount(photos.length)
-        return Object.fromEntries(
-          photos.map((photo) => [
-            photo.rowId,
-            { kind: 'existing' as const, url: photo.url, fileName: photo.fileName },
-          ]),
-        )
-      })
-    },
-    [],
-  )
+  const seedExisting = useCallback((photos: { rowId: string; url: string; fileName: string }[]) => {
+    setByRowId((prev) => {
+      // 사용자가 이미 뭔가 고른 뒤라면 덮어쓰지 않는다 (복원은 최초 1회)
+      if (Object.keys(prev).length > 0) return prev
+      setSeededCount(photos.length)
+      return Object.fromEntries(
+        photos.map((photo) => [
+          photo.rowId,
+          { kind: 'existing' as const, url: photo.url, fileName: photo.fileName },
+        ]),
+      )
+    })
+  }, [])
 
   const images = Object.values(byRowId)
 

@@ -42,7 +42,7 @@ const StepNavButtons = ({
         onClick={onNext}
         disabled={nextDisabled}
         // Figma BaseButton(966-11656): tab+ 258x40 / 16px. mo 는 기존 48 높이 유지
-        className="w-full max-w-[18.5625rem] tab:h-10 tab:w-[16.125rem]"
+        className="w-full max-w-[16.125rem] tab:h-10 tab:w-[16.125rem]"
       >
         {nextLabel}
       </Button>

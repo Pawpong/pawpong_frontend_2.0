@@ -10,7 +10,6 @@ const PAGE_WIDTH_CLASS = 'mx-auto w-full max-w-[90rem]'
  * - tablet: outer 1376px → 48px gutter 화면의 content 1280px
  * - PC: outer 1440px → 80px gutter 화면의 content 1280px
  */
-const RESPONSIVE_SHELL_CLASS =
-  'mx-auto w-full max-w-[44rem] tab:max-w-[86rem] pc:max-w-[90rem]'
+const RESPONSIVE_SHELL_CLASS = 'mx-auto w-full max-w-[44rem] tab:max-w-[86rem] pc:max-w-[90rem]'
 
 export { PAGE_WIDTH_CLASS, RESPONSIVE_SHELL_CLASS }

@@ -20,8 +20,9 @@ import type { ReceivedApplicationItemDto } from '@/shared/types'
 import { ApplicationStatusBadge } from './ActivityBadges'
 
 const ReceivedApplicationRow = ({ application }: { application: ReceivedApplicationItemDto }) => (
+  // view=received — 브리더가 보낸 신청도 같은 경로를 쓰므로 이 목록이 "받은" 쪽임을 명시한다.
   <Link
-    href={`/activity/applications/${application.applicationId}`}
+    href={`/activity/applications/${application.applicationId}?view=received`}
     className="group flex min-h-28 items-center gap-3 px-4 py-4 transition-colors hover:bg-primary-50/60 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-500 tab:min-h-32 tab:gap-4 tab:px-5 tab:py-5"
   >
     <Avatar size="md" className="size-12 bg-neutral-100 tab:size-14">

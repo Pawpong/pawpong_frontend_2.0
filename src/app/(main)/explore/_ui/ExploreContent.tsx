@@ -193,10 +193,10 @@ const ExploreContent = () => {
       </div>
 
       {/* ══════ 콘텐츠 영역 — 섹션별로 각자 Container를 갖도록 분리 (전역 px 제거) ══════ */}
-      {/* 상단: 픽셀 카테고리(모바일 2x2 / tab+ 4열 가운데) + 큰 검색바 — 스크롤되면 위 fixed 칩바로 전환 */}
+      {/* //QA: 상단 카테고리 수정 — 모바일도 4개 한 줄 가운데 정렬, 스크롤 시 fixed 칩바로 전환한다. */}
       <div>
         <CategorySection selected={selectedCategory} onChange={handleCategoryChange} />
-        {/* 검색바: 홈과 동일 — SearchSection 자체 패딩 20px(py-3 tab:py-5) / 80px(pc:px-20) */}
+        {/* 검색바: 홈과 동작 공유 — 화면별 placeholder와 스타일은 SearchSection variant로 분리한다. */}
         <SearchSection
           placeholder={SEARCH_PLACEHOLDERS[selectedType]}
           defaultValue={keyword}

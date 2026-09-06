@@ -133,16 +133,30 @@ const ApplicationDetailContent = ({ applicationId }: { applicationId: string }) 
                       {data.processedAt && ` · 처리일 ${formatDate(data.processedAt)}`}
                     </p>
                   </div>
-                  <Link
-                    href={`/home/${data.breederId}`}
-                    className={buttonVariants({
-                      variant: 'outline',
-                      size: 'sm',
-                      className: 'px-4',
-                    })}
-                  >
-                    브리더 홈
-                  </Link>
+                  <div className="flex shrink-0 gap-2">
+                    {data.status === 'consultation_pending' && (
+                      <Link
+                        href={`/activity/applications/${data.applicationId}/edit`}
+                        className={buttonVariants({
+                          variant: 'outline',
+                          size: 'sm',
+                          className: 'px-4',
+                        })}
+                      >
+                        신청서 수정
+                      </Link>
+                    )}
+                    <Link
+                      href={`/home/${data.breederId}`}
+                      className={buttonVariants({
+                        variant: 'outline',
+                        size: 'sm',
+                        className: 'px-4',
+                      })}
+                    >
+                      브리더 홈
+                    </Link>
+                  </div>
                 </div>
 
                 {data.breederNotes && (

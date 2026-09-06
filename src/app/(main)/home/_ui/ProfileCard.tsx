@@ -89,7 +89,7 @@ const FollowerSection = ({
       className,
     )}
   >
-    {/* 친구 목록 미리보기 — ProfileAvatar xsmall(24) + 회색 테두리, 살짝 겹침 */}
+    {/* 친구 목록 미리보기 — ProfileAvatar xsmall(24) + 흰색 테두리, 살짝 겹침 */}
     <div className="flex items-center">
       {(users.length > 0 ? users.slice(0, 3) : [undefined, undefined, undefined]).map((user, i) => (
         <ProfileAvatar
@@ -97,7 +97,7 @@ const FollowerSection = ({
           size="xsmall"
           src={user?.profileImageUrl}
           alt={user?.nickname}
-          className={cn('border-2 border-neutral-150', i < 2 && '-mr-[0.3125rem]')}
+          className={cn('border-2 border-white', i < 2 && '-mr-[0.3125rem]')}
         />
       ))}
     </div>

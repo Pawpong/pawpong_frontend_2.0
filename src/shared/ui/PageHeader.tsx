@@ -8,7 +8,7 @@ interface PageHeaderProps {
 }
 
 const PageHeader = ({ title, backHref }: PageHeaderProps) => (
-  <Container>
+  <Container className="px-4">
     <div className="flex items-center gap-[0.625rem] py-3 tab:justify-center tab:pt-[1.5rem] tab:pb-[2rem]">
       <Link
         href={backHref}

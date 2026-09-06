@@ -1,13 +1,14 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
-import { CloseIcon, PawIcon } from '@/shared/assets'
 import { RESPONSIVE_SHELL_CLASS } from '@/shared/config'
 import { useAuthStatus } from '@/features/auth'
 import { cn } from '@/shared/lib/cn'
 import { Dialog, DialogOverlay, DialogPortal } from '@/shared/ui'
 import { LogoButton } from './LogoButton'
+import { AuthActions } from './AuthActions'
 import { MOBILE_MENU_ITEMS } from './NavItems'
 import type { NavItem } from './NavItems'
 
@@ -33,21 +34,25 @@ const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
           className="fixed inset-0 z-modal flex min-w-0 flex-col overflow-y-auto bg-white data-[state=closed]:opacity-0 data-[state=open]:opacity-100"
         >
           <DialogPrimitive.Title className="sr-only">전체 메뉴</DialogPrimitive.Title>
-
-          <header className="sticky top-0 z-10 border-b border-neutral-150 bg-white">
+          {/* QA: border-b 제거 */}
+          <header className="sticky top-0 z-10 bg-white">
             <div
               className={cn(
                 RESPONSIVE_SHELL_CLASS,
                 'flex h-12 items-center justify-between px-4 tab:h-16 tab:px-12 pc:px-20',
               )}
             >
-              <LogoButton />
-              <DialogPrimitive.Close
-                className="flex size-10 items-center justify-center rounded-lg text-neutral-700 transition-colors hover:bg-neutral-50 hover:text-neutral-850 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
-                aria-label="메뉴 닫기"
-              >
-                <CloseIcon className="size-6" />
-              </DialogPrimitive.Close>
+              {/* 다른 메뉴 항목과 같이 이동하면서 시트도 닫는다 — 안 닫으면 홈으로 가도 메뉴가 덮는다 */}
+              <LogoButton onNavigate={close} />
+              <div className="flex items-center gap-2">
+                <AuthActions placement="menu-header" />
+                <DialogPrimitive.Close
+                  className="flex size-10 items-center justify-center rounded-lg text-neutral-700 transition-colors hover:bg-neutral-50 hover:text-neutral-850 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+                  aria-label="메뉴 닫기"
+                >
+                  <Image src="/images/nav/menu-close.svg" alt="" width={24} height={24} />
+                </DialogPrimitive.Close>
+              </div>
             </div>
           </header>
 
@@ -58,11 +63,6 @@ const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
               'flex flex-1 flex-col gap-8 px-4 py-10 tab:px-12 pc:px-20',
             )}
           >
-            <h2 className="flex items-center gap-1 text-base leading-[1.5] font-bold text-primary-500">
-              <PawIcon className="size-8 shrink-0" aria-hidden />
-              설정
-            </h2>
-
             <nav className="flex flex-col gap-8" aria-label="설정">
               {MOBILE_MENU_ITEMS.map((item) => (
                 <Link
@@ -75,6 +75,9 @@ const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
                 </Link>
               ))}
             </nav>
+            <div className="flex flex-1 items-end justify-center">
+              <AuthActions placement="menu-footer" />
+            </div>
           </div>
         </DialogPrimitive.Content>
       </DialogPortal>

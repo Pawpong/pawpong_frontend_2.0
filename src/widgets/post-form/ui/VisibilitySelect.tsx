@@ -21,11 +21,12 @@ type VisibilityType = (typeof VISIBILITY_OPTIONS)[number]['id']
 const SELECTABLE_OPTIONS = VISIBILITY_OPTIONS.filter((option) => option.id !== 'private')
 
 interface VisibilitySelectProps {
+  disabled?: boolean
   value: VisibilityType
   onChange: (value: VisibilityType) => void
 }
 
-const VisibilitySelect = ({ value, onChange }: VisibilitySelectProps) => {
+const VisibilitySelect = ({ value, onChange, disabled }: VisibilitySelectProps) => {
   const activeLabel = VISIBILITY_OPTIONS.find((o) => o.id === value)?.label
 
   return (
@@ -34,7 +35,9 @@ const VisibilitySelect = ({ value, onChange }: VisibilitySelectProps) => {
         {/* Figma 1058-47323: 풀 너비 h-45, p-12, radius 8 — Textarea와 같은 테두리 톤 */}
         <button
           type="button"
-          className="flex h-[2.8125rem] w-full items-center justify-between rounded-lg border border-neutral-300 bg-white p-3"
+          aria-label="게시글 공개 범위"
+          disabled={disabled}
+          className="flex h-[2.8125rem] w-full items-center justify-between rounded-lg border border-neutral-300 bg-white p-3 focus-visible:outline-2 focus-visible:outline-primary-500 disabled:opacity-50"
         >
           <span className="flex-1 text-left text-sm leading-[1.5] font-medium whitespace-nowrap text-neutral-850">
             {activeLabel}

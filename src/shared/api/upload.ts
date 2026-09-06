@@ -8,11 +8,11 @@ export const uploadRepresentativePhotos = (files: File[]) => {
   const formData = new FormData()
   files.forEach((file) => formData.append('files', file))
   return apiClient
-    .post<{ success: boolean; data: UploadResponse[]; message?: string }>(
-      `${API_VERSION}/upload/representative-photos`,
-      formData,
-      { timeout: UPLOAD_TIMEOUT },
-    )
+    .post<{
+      success: boolean
+      data: UploadResponse[]
+      message?: string
+    }>(`${API_VERSION}/upload/representative-photos`, formData, { timeout: UPLOAD_TIMEOUT })
     .then(unwrap)
 }
 
@@ -25,11 +25,11 @@ export const uploadParentPetPhoto = async (
   formData.append('files', file)
   existingPhotos.forEach((photo) => formData.append('existingPhotos', photo))
   const result = await apiClient
-    .post<{ success: boolean; data: UploadResponse | UploadResponse[]; message?: string }>(
-      `${API_VERSION}/upload/parent-pet-photos/${petId}`,
-      formData,
-      { timeout: UPLOAD_TIMEOUT },
-    )
+    .post<{
+      success: boolean
+      data: UploadResponse | UploadResponse[]
+      message?: string
+    }>(`${API_VERSION}/upload/parent-pet-photos/${petId}`, formData, { timeout: UPLOAD_TIMEOUT })
     .then(unwrap)
   return Array.isArray(result) ? result[0] : result
 }
@@ -43,11 +43,11 @@ export const uploadAvailablePetPhoto = async (
   formData.append('files', file)
   existingPhotos.forEach((photo) => formData.append('existingPhotos', photo))
   const result = await apiClient
-    .post<{ success: boolean; data: UploadResponse | UploadResponse[]; message?: string }>(
-      `${API_VERSION}/upload/available-pet-photos/${petId}`,
-      formData,
-      { timeout: UPLOAD_TIMEOUT },
-    )
+    .post<{
+      success: boolean
+      data: UploadResponse | UploadResponse[]
+      message?: string
+    }>(`${API_VERSION}/upload/available-pet-photos/${petId}`, formData, { timeout: UPLOAD_TIMEOUT })
     .then(unwrap)
   return Array.isArray(result) ? result[0] : result
 }
@@ -57,11 +57,11 @@ export const uploadSingleFile = (file: File, folder?: string) => {
   formData.append('file', file)
   if (folder) formData.append('folder', folder)
   return apiClient
-    .post<{ success: boolean; data: UploadResponse; message?: string }>(
-      `${API_VERSION}/upload/single`,
-      formData,
-      { timeout: UPLOAD_TIMEOUT },
-    )
+    .post<{
+      success: boolean
+      data: UploadResponse
+      message?: string
+    }>(`${API_VERSION}/upload/single`, formData, { timeout: UPLOAD_TIMEOUT })
     .then(unwrap)
 }
 
@@ -70,11 +70,11 @@ export const uploadMultipleFiles = (files: File[], folder?: string) => {
   files.forEach((file) => formData.append('files', file))
   if (folder) formData.append('folder', folder)
   return apiClient
-    .post<{ success: boolean; data: UploadResponse[]; message?: string }>(
-      `${API_VERSION}/upload/multiple`,
-      formData,
-      { timeout: UPLOAD_TIMEOUT },
-    )
+    .post<{
+      success: boolean
+      data: UploadResponse[]
+      message?: string
+    }>(`${API_VERSION}/upload/multiple`, formData, { timeout: UPLOAD_TIMEOUT })
     .then(unwrap)
 }
 

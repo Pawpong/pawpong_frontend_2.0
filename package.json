@@ -30,6 +30,7 @@
     "@tanstack/react-query-devtools": "^5.96.2",
     "axios": "^1.15.0",
     "clsx": "^2.1.1",
+    "heic-to": "1.5.2",
     "next": "^16.2.2",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",

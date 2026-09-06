@@ -105,13 +105,17 @@ const useCreatePostingSubmission = () => {
           rest[parentFiles.length] ?? [],
         )[0]
 
-        const request = toCreatePetPostingRequest(values, {
-          // 이미 올라간 사진은 재업로드하지 않고 키를 그대로 쓴다 (고아 파일 방지)
-          pet: composeImageKeys(petEntries, pet),
-          representativeIndex,
-          parents,
-          breedingEnv,
-        }, draftId)
+        const request = toCreatePetPostingRequest(
+          values,
+          {
+            // 이미 올라간 사진은 재업로드하지 않고 키를 그대로 쓴다 (고아 파일 방지)
+            pet: composeImageKeys(petEntries, pet),
+            representativeIndex,
+            parents,
+            breedingEnv,
+          },
+          draftId,
+        )
 
         createRequestStarted = true
         const { petId } = await createPostingAsync(request)

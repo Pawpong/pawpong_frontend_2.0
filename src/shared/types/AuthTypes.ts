@@ -95,3 +95,40 @@ export interface LogoutResponseDto {
   message: string
   loggedOutAt: string
 }
+
+// ─── SSO 탈퇴 계정 복구 (POST /api/v2/auth/reactivate) ───
+
+/**
+ * 소셜 콜백이 탈퇴 계정 로그인 시 /login 쿼리로 넘겨주는 복구 안내 정보.
+ *
+ * 주의: 안내 문구는 `error` 가 아니라 `message` 파라미터로 온다.
+ *       (정지 계정처럼 복구 대상이 아닌 차단 케이스는 기존대로 `error` 로 온다)
+ */
+export interface ReactivationPrompt {
+  /** 소셜 콜백에서만 발급되는 단기 JWT — 이 값이 있어야 복구 확인 UI를 띄운다 */
+  reactivationToken: string
+  message?: string
+  email?: string
+  /** 입양자는 닉네임, 브리더는 상호명 */
+  name?: string
+  /** 탈퇴 일시 (ISO8601) — 백엔드가 못 채울 수 있다 */
+  deletedAt?: string
+  returnUrl?: string
+  /** 복구 토큰 유효시간(초). 콜백 기본값 600(10분) */
+  expiresIn: number
+}
+
+/** 복구 성공 응답 — 소셜 로그인 성공과 동일한 토큰 세트를 준다 */
+export interface ReactivateAccountResponse {
+  accessToken: string
+  refreshToken: string
+  accessTokenExpiresIn: number
+  refreshTokenExpiresIn: number
+  role: 'adopter' | 'breeder'
+  userInfo: {
+    userId: string
+    email: string
+    name: string
+    profileImage?: string
+  }
+}
