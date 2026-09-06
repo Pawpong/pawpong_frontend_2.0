@@ -53,7 +53,13 @@ const AdoptionCtaBar = ({
         </button>
 
         {applyBlockedReason ? (
-          <p aria-live="polite" className={`${ACTION_CLASS} bg-neutral-100 text-neutral-500`}>
+          // 브리더 사유("브리더 계정은...")가 ACTION_CLASS의 max-w(297px)에서 2줄로 줄바꿈되며
+          // 고정 높이(h-3rem)를 넘쳐 버튼 영역을 침범했다 — max-w를 없애 남는 폭을 옆으로 다 쓰고
+          // (모바일은 하트 옆 남은 공간, 탭/pc는 스페이서 옆 공간), 한 줄 유지 + 폰트를 살짝 줄인다.
+          <p
+            aria-live="polite"
+            className="flex h-[3rem] flex-1 items-center justify-center overflow-hidden rounded-full bg-neutral-100 px-[0.75rem] text-[0.875rem] font-semibold whitespace-nowrap text-neutral-500 tab:h-[2.5rem] tab:text-[1rem]"
+          >
             {applyBlockedReason}
           </p>
         ) : (
