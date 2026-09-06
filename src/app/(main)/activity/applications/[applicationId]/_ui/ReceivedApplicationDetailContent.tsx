@@ -283,4 +283,4 @@ const ReceivedApplicationDetailContent = ({ applicationId }: { applicationId: st
   )
 }
 
-export { ReceivedApplicationDetailContent, StatusActionSection, AnswerSection }
+export { ReceivedApplicationDetailContent }
