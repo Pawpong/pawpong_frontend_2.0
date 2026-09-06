@@ -80,7 +80,9 @@ const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
                 </Link>
               ))}
             </nav>
-            <div className="flex flex-1 items-end justify-center pc:flex-none pc:border-t pc:border-neutral-150 pc:pt-4">
+            {/* pc 는 드롭다운이라 뒤로 헤더가 그대로 보인다 — 헤더에 이미 있는 로그아웃을 또 두지 않는다.
+                mo·tab 은 전체화면 시트가 헤더를 덮으므로 여기에도 있어야 한다. */}
+            <div className="flex flex-1 items-end justify-center pc:hidden">
               <AuthActions placement="menu-footer" />
             </div>
           </div>
