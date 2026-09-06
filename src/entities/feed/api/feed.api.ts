@@ -1,5 +1,5 @@
 import { apiClient, API_VERSION, unwrap } from '@/shared/api'
-import type { FeedVideo, FeedComment, PaginationResponse } from '@/shared/types'
+import type { ApiResponseFull, FeedVideo, FeedComment, PaginationResponse } from '@/shared/types'
 
 /** 백엔드 원본 비디오 타입 */
 interface BackendFeedVideo {
@@ -83,14 +83,17 @@ export const getFeedVideos = async (
   const params = new URLSearchParams({ page: String(page), limit: String(limit), sortBy })
   if (tags) params.append('tags', tags)
 
-  const response = await apiClient.get<{
-    items: BackendFeedVideo[]
-    pagination: PaginationResponse<FeedVideo>['pagination']
-  }>(`${API_VERSION}/feed/videos?${params.toString()}`)
+  const response = await apiClient.get<
+    ApiResponseFull<{
+      items: BackendFeedVideo[]
+      pagination: PaginationResponse<FeedVideo>['pagination']
+    }>
+  >(`${API_VERSION}/feed/videos?${params.toString()}`)
 
+  const data = unwrap(response, '피드 조회에 실패했습니다.')
   return {
-    items: response.data.items.map(transformVideo),
-    pagination: response.data.pagination,
+    items: data.items.map(transformVideo),
+    pagination: data.pagination,
   }
 }
 
@@ -100,10 +103,9 @@ export const getVideoComments = async (
   page = 1,
   limit = 20,
 ): Promise<{ items: FeedComment[]; totalCount: number; hasNextPage: boolean }> => {
-  const response = await apiClient.get<{
-    success: boolean
-    data: { comments: BackendComment[]; totalCount: number; hasNextPage: boolean }
-  }>(`${API_VERSION}/feed/comment/${videoId}?page=${page}&limit=${limit}`)
+  const response = await apiClient.get<
+    ApiResponseFull<{ comments: BackendComment[]; totalCount: number; hasNextPage: boolean }>
+  >(`${API_VERSION}/feed/comment/${videoId}?page=${page}&limit=${limit}`)
 
   const data = unwrap(response, '댓글 목록 조회에 실패했습니다.')
   return {
@@ -113,14 +115,19 @@ export const getVideoComments = async (
   }
 }
 
-/** 태그 검색 */
+/**
+ * 태그 자동완성
+ *
+ * 기존에는 /feed/tag/search 를 호출했으나 그쪽은 "해당 태그가 달린 영상 목록"이라
+ * 자동완성 후보를 돌려주지 않고, 필수 파라미터 이름도 tag 라 q 로는 동작하지 않았다.
+ * 자동완성 전용 엔드포인트인 /feed/tag/suggest 로 연결한다.
+ */
 export const searchTags = (query: string) =>
   apiClient
-    .get<{
-      success: boolean
-      data: { tags: string[] }
-    }>(`${API_VERSION}/feed/tag/search?q=${encodeURIComponent(query)}`)
-    .then((res) => unwrap(res, '태그 검색에 실패했습니다.').tags)
+    .get<
+      ApiResponseFull<Array<{ tag: string; videoCount: number }>>
+    >(`${API_VERSION}/feed/tag/suggest?q=${encodeURIComponent(query)}`)
+    .then((res) => unwrap(res, '태그 검색에 실패했습니다.').map((item) => item.tag))
 
 /** HLS 스트리밍 URL 생성 */
 export const getHlsStreamUrl = (videoId: string, filename: string): string => {

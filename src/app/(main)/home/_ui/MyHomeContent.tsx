@@ -2,39 +2,42 @@
 
 import { useLayoutEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { BookmarkIcon } from '@/shared/assets'
-import { Container, CtaBanner, DeleteConfirmModal, NavigationBar, InputUpload } from '@/shared/ui'
+import { Button, Container, CtaBanner, InputUpload, NavigationBar } from '@/shared/ui'
 import { useGnbHeight } from '@/shared/lib/useGnbHeight'
+import { transientQueryRecoveryOptions } from '@/shared/api'
 import { profileQueries } from '@/entities/profile'
 import { communityQueries } from '@/entities/community'
-import { useDeletePostConfirm } from '@/features/community'
 // [refactored] 분양 페이지와 동일한 목록 블록 — 위젯으로 공유
 import { MyPetPostingList } from '@/widgets/my-pet-postings'
 import { toMyProfileCardProps } from '../_lib/toMyProfileCardProps'
 import { ProfileCard } from './ProfileCard'
 import { HomeTabs, TabsContent } from './HomeTabs'
-import { PostList } from './PostList'
 import { FavoriteBreedersContent } from './FavoriteBreedersContent'
+import { HomePostGrid } from './HomePostGrid'
 import { MY_HOME_TABS, BREEDER_MY_HOME_TABS } from './constants'
 
 const HOME_LISTING_PAGE_SIZE = 16
 
 const MyHomeContent = () => {
-  const router = useRouter()
-  // 내 글 카드 ⋯ 메뉴 — 수정 화면 이동 또는 삭제 확인 후 DELETE
-  // [refactored] 삭제 확인 state·mutation·핸들러를 useDeletePostConfirm으로 (커뮤니티 피드와 공유)
-  const { requestDelete, modalProps: deleteModalProps } = useDeletePostConfirm()
-
   // 마이홈 프로필 카드: /profile/me 로 내 프로필 조회 (role 에 따라 adopter/breeder 분기, 프로필 이미지 포함)
-  const { data: myProfile } = useQuery(profileQueries.me())
+  const profileQuery = useQuery({
+    ...profileQueries.me(),
+    ...transientQueryRecoveryOptions,
+    refetchOnMount: 'always',
+    throwOnError: false,
+  })
+  const myProfile = profileQuery.data
   const isBreeder = myProfile?.role === 'breeder'
 
   // 마이홈 '게시글' 탭 — 내가 작성한 커뮤니티 글을 백엔드에서 조회 (profile 로드 후 활성화)
-  const { data: myPostsData } = useQuery(communityQueries.myPosts(!!myProfile))
-  // 임시저장 글 수 — 있을 때만 '게시글' 탭 상단에 이어쓰기 진입점을 띄운다
-  const { data: draftsData } = useQuery(communityQueries.drafts(!!myProfile))
+  const postsQuery = useQuery({
+    ...communityQueries.myPosts(!!myProfile),
+    refetchOnMount: 'always',
+    throwOnError: false,
+  })
+  const myPostsData = postsQuery.data
 
   // sticky 헤더 스택: GNB → navbar(top=gnbH) → 탭바(top=gnbH+navH)
   const gnbH = useGnbHeight()
@@ -56,20 +59,39 @@ const MyHomeContent = () => {
 
   const tabs = isBreeder ? BREEDER_MY_HOME_TABS : MY_HOME_TABS
   const defaultTab = isBreeder ? 'listings' : 'posts'
-  // [refactored] 작성 바 문구/링크를 역할별로 분리 — 단일 InputUpload 인스턴스로 렌더
-  const writeBar = isBreeder
-    ? { text: '분양할 동물 작성하러가기', href: '/adoption/create' }
-    : { text: '게시글을 올려보세요', href: '/community/write' }
-
   // 프로필 조회 전에는 역할을 모르므로 선택값을 비워두고, 조회 후 역할별 기본 탭을 사용한다.
   // useState(defaultTab)로 바로 시드하면 최초 adopter 기본값('posts')이 브리더에게도 고정된다.
   const [selectedTab, setSelectedTab] = useState<string | null>(null)
   const activeTab = tabs.find((tab) => tab.id === selectedTab)?.id ?? defaultTab
   const posts = myPostsData?.items ?? []
-  const draftCount = draftsData?.items.length ?? 0
   const profileCardProps = myProfile ? toMyProfileCardProps(myProfile) : null
 
-  if (!profileCardProps) return null
+  if (!profileCardProps) {
+    return (
+      <div className="flex w-full flex-col">
+        <NavigationBar title="마이홈" />
+        <Container className="flex min-h-60 items-center justify-center px-4 py-10">
+          {profileQuery.isPending ? (
+            <p role="status" className="text-sm font-medium text-neutral-700">
+              프로필을 불러오는 중입니다.
+            </p>
+          ) : (
+            <div role="alert" className="flex flex-col items-center gap-3 text-center">
+              <p className="text-sm font-medium text-neutral-700">프로필을 불러오지 못했습니다.</p>
+              <Button
+                variant="fill"
+                size="sm"
+                onClick={() => void profileQuery.refetch()}
+                className="px-4"
+              >
+                다시 시도
+              </Button>
+            </div>
+          )}
+        </Container>
+      </div>
+    )
+  }
 
   return (
     <div className="flex w-full flex-col">
@@ -80,15 +102,19 @@ const MyHomeContent = () => {
           // 디자인(node 2046-160996): 마이홈 모바일 navbar는 좌우 margin-tab(48px) — 공통 기본(16)을 덮어씀
           className="px-12"
           right={
-            <button type="button" aria-label="북마크">
+            <Link
+              href="/bookmarks"
+              aria-label="저장목록"
+              className="-m-2 flex size-10 items-center justify-center rounded-lg transition-colors hover:bg-primary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+            >
               <BookmarkIcon className="size-6 text-neutral-850" />
-            </button>
+            </Link>
           }
         />
       </div>
 
       {/* 디자인: 모바일 px-16(margin-mo)·py-20 / 탭 px-48·PC px-80·py-40 */}
-      <Container className="px-4 py-5 tab:py-10">
+      <Container className="px-4 py-5 tab:px-12 tab:py-5 pc:px-20 pc:py-10">
         <ProfileCard {...profileCardProps} />
       </Container>
 
@@ -98,16 +124,14 @@ const MyHomeContent = () => {
         onTabChange={setSelectedTab}
         stickyTop={gnbH + navH}
       >
-        {/* 브리더: 분양글 작성 바 / 일반: 게시글 작성 바 (공통 InputUpload) */}
-        <InputUpload text={writeBar.text} href={writeBar.href} className="px-4" />
-
         {/* 분양 목록 탭 (브리더만) — 시안 3170-790275: 배너 -> 라벨+필터 -> 카드 4열 */}
         {isBreeder && (
           <TabsContent value="listings" className="mt-0">
-            {/* 배너는 콘텐츠 Container 밖의 독립 밴드 (시안 3170-800323) — 홈 CTA 스트립과 같은 배치.
-                위쪽은 작성 바(InputUpload)와 붙지 않게 여백을 더 준다 */}
-            <Container className="px-4 pt-10 pb-2">
-              <CtaBanner text="분양 페이지 바로가기" href="/adoption" />
+            <InputUpload text="분양글 작성하기" href="/adoption/create" className="px-4" />
+
+            {/* 배너는 콘텐츠 Container 밖의 독립 밴드 (시안 3170-800323) — 홈 CTA 스트립과 같은 배치 */}
+            <Container className="px-4 pt-4 pb-2">
+              <CtaBanner text="분양 페이지 바로가기" href="/explore" />
             </Container>
 
             <Container className="py-5 tab:py-10">
@@ -119,35 +143,25 @@ const MyHomeContent = () => {
           </TabsContent>
         )}
 
-        {/* 디자인: 모바일(1023-23241) px-16·py-24 / 탭·PC(2046-160971) px-48·80·py-40 */}
+        {/* Figma 4145:721426 — 모바일·태블릿 3열, PC 4열의 정사각 미디어 그리드 */}
         <TabsContent value="posts" className="mt-0">
-          <Container className="px-4 py-6 tab:py-10">
-            {/* 임시저장이 있을 때만 노출 — 목록에서 이어서 작성 */}
-            {draftCount > 0 && (
-              <Link
-                href="/community/drafts"
-                className="mb-4 flex items-center justify-between rounded-lg border border-neutral-300 px-4 py-3 text-sm font-semibold text-neutral-850 tab:mx-auto tab:max-w-[59.25rem]"
-              >
-                <span>임시저장 {draftCount}개</span>
-                <span className="text-xs font-medium text-text-secondary">이어서 쓰기</span>
-              </Link>
-            )}
-            <PostList
-              posts={posts}
-              emptyText="내가 쓴 글이 없습니다."
-              onEdit={(postId) => router.push(`/community/post/${postId}/edit`)}
-              onDelete={requestDelete}
-            />
-          </Container>
+          <InputUpload text="작성하기" href="/community/write" variant="compact" />
+
+          <HomePostGrid
+            posts={posts}
+            isPending={postsQuery.isPending}
+            isError={postsQuery.isError}
+            onRetry={() => void postsQuery.refetch()}
+            loadingText="내가 쓴 글을 불러오는 중입니다."
+            errorText="내가 쓴 글을 불러오지 못했습니다."
+            emptyText="내가 쓴 글이 없습니다."
+          />
         </TabsContent>
 
         <TabsContent value="breeders" className="mt-0">
           <FavoriteBreedersContent />
         </TabsContent>
       </HomeTabs>
-
-      {/* [refactored] 게시글 삭제 확인 — 공통 DeleteConfirmModal */}
-      <DeleteConfirmModal target="게시글" {...deleteModalProps} />
     </div>
   )
 }

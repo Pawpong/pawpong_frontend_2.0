@@ -6,9 +6,15 @@ import axios, {
 } from 'axios'
 import { ApiError, normalizeApiError } from './unwrap'
 import { getAccessToken } from './token'
+import { notifyAuthStateChanged } from '@/shared/lib/authStateEvents'
 
 export interface ApiRequestConfig extends AxiosRequestConfig {
   skipAuth?: boolean
+  /**
+   * 401 응답 시 자동 토큰 refresh(→ set-cookie 재로그인)를 건너뛴다.
+   * 로그아웃처럼 "세션을 되살리면 안 되는" 요청에서 사용한다.
+   */
+  skipAuthRefresh?: boolean
 }
 
 const getBaseURL = () => (process.env.NEXT_PUBLIC_API_BASE_URL ?? '').replace(/\/+$/, '')
@@ -55,6 +61,7 @@ function createApiClient(): AxiosInstance {
       const originalRequest = (error.config ?? {}) as InternalAxiosRequestConfig & {
         _retry?: boolean
         skipAuth?: boolean
+        skipAuthRefresh?: boolean
       }
 
       const errorData = error.response?.data
@@ -69,6 +76,11 @@ function createApiClient(): AxiosInstance {
         return Promise.reject(
           new ApiError(errorMessage, error.response?.status, undefined, errorData),
         )
+      }
+
+      // 로그아웃 등 세션 복구를 원치 않는 요청은 refresh 인터셉터를 타지 않고 그대로 실패시킨다.
+      if (error.response?.status === 401 && originalRequest.skipAuthRefresh) {
+        return Promise.reject(new ApiError(errorMessage || '인증이 필요합니다.', 401))
       }
 
       if (error.response?.status === 401 && !originalRequest._retry) {
@@ -103,7 +115,7 @@ function createApiClient(): AxiosInstance {
           }
 
           if (refreshData.data?.accessToken && refreshData.data?.refreshToken) {
-            await fetch('/api/auth/set-cookie', {
+            const saved = await fetch('/api/auth/set-cookie', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -111,8 +123,13 @@ function createApiClient(): AxiosInstance {
                 refreshToken: refreshData.data.refreshToken,
               }),
             })
+            if (!saved.ok) throw new ApiError('인증 쿠키 저장 실패', 401)
           }
 
+          if (!refreshData.data?.accessToken || getAccessToken() !== refreshData.data.accessToken) {
+            throw new ApiError('인증 쿠키 저장 실패', 401)
+          }
+          notifyAuthStateChanged()
           processQueue(null)
           return instance(originalRequest)
         } catch (refreshError) {
@@ -121,7 +138,13 @@ function createApiClient(): AxiosInstance {
           )
 
           if (typeof window !== 'undefined') {
-            fetch('/api/auth/clear-cookie', { method: 'POST' }).catch(() => {})
+            // 무효 토큰이 남아 재-401 → /login 무한 루프에 빠지지 않도록 클라이언트 쿠키를 즉시 동기 제거한다.
+            // (httpOnly=false 인 accessToken/userRole 은 JS 로 지울 수 있고, isLoggedIn 판정이 이 쿠키에 의존한다)
+            document.cookie = 'accessToken=; path=/; max-age=0'
+            document.cookie = 'userRole=; path=/; max-age=0'
+            // refreshToken(httpOnly)은 서버 라우트로만 제거 가능 — 네비게이션이 요청을 끊지 않도록 완료를 기다린다.
+            await fetch('/api/auth/clear-cookie', { method: 'POST' }).catch(() => {})
+            notifyAuthStateChanged()
             try {
               localStorage.removeItem('auth-storage')
             } catch {
@@ -129,7 +152,12 @@ function createApiClient(): AxiosInstance {
             }
 
             if (!window.location.pathname.startsWith('/login')) {
-              window.location.href = '/login'
+              // href 할당(=history push) 대신 replace 로 이동해 /login 이 히스토리에 중복 축적되는 것을 막는다.
+              // (여러 번 401 이 나도 뒤로가기가 /login 사이를 맴도는 트랩 방지 + 로그인 후 원래 위치로 복귀)
+              const returnUrl = encodeURIComponent(
+                window.location.pathname + window.location.search,
+              )
+              window.location.replace(`/login?returnUrl=${returnUrl}`)
             }
           }
 

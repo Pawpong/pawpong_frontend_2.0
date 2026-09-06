@@ -2,13 +2,22 @@ import type { ChatMessageType } from '@/shared/types'
 
 const ATTACHMENT_PREFIX = '__PAWPONG_ATTACHMENT_V1__'
 
-interface ChatAttachmentPayload {
+interface ChatFileAttachmentPayload {
   kind: 'image' | 'file'
   url: string
   name: string
   size: number
   mimeType: string
 }
+
+interface ChatLocationPayload {
+  kind: 'location'
+  latitude: number
+  longitude: number
+  accuracy: number
+}
+
+type ChatAttachmentPayload = ChatFileAttachmentPayload | ChatLocationPayload
 
 const isSafeRemoteUrl = (value: string) => {
   try {
@@ -22,6 +31,33 @@ const isSafeRemoteUrl = (value: string) => {
 const serializeChatAttachment = (payload: ChatAttachmentPayload) =>
   `${ATTACHMENT_PREFIX}${JSON.stringify(payload)}`
 
+const isValidCoordinate = (value: unknown, min: number, max: number): value is number =>
+  typeof value === 'number' && Number.isFinite(value) && value >= min && value <= max
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null
+
+const isLocationPayload = (value: unknown): value is ChatLocationPayload =>
+  isRecord(value) &&
+  value.kind === 'location' &&
+  isValidCoordinate(value.latitude, -90, 90) &&
+  isValidCoordinate(value.longitude, -180, 180) &&
+  typeof value.accuracy === 'number' &&
+  Number.isFinite(value.accuracy) &&
+  value.accuracy >= 0
+
+const isFileAttachmentPayload = (value: unknown): value is ChatFileAttachmentPayload =>
+  isRecord(value) &&
+  (value.kind === 'image' || value.kind === 'file') &&
+  typeof value.url === 'string' &&
+  isSafeRemoteUrl(value.url) &&
+  typeof value.name === 'string' &&
+  value.name.length > 0 &&
+  typeof value.size === 'number' &&
+  Number.isFinite(value.size) &&
+  value.size >= 0 &&
+  typeof value.mimeType === 'string'
+
 const parseChatAttachment = (
   content: string,
   messageType: ChatMessageType,
@@ -30,27 +66,10 @@ const parseChatAttachment = (
 
   if (content.startsWith(ATTACHMENT_PREFIX)) {
     try {
-      const parsed = JSON.parse(
-        content.slice(ATTACHMENT_PREFIX.length),
-      ) as Partial<ChatAttachmentPayload>
-      if (
-        typeof parsed.url === 'string' &&
-        isSafeRemoteUrl(parsed.url) &&
-        typeof parsed.name === 'string' &&
-        parsed.name.length > 0 &&
-        typeof parsed.size === 'number' &&
-        Number.isFinite(parsed.size) &&
-        parsed.size >= 0 &&
-        typeof parsed.mimeType === 'string'
-      ) {
-        return {
-          kind: parsed.kind === 'image' || parsed.kind === 'file' ? parsed.kind : messageType,
-          url: parsed.url,
-          name: parsed.name,
-          size: parsed.size,
-          mimeType: parsed.mimeType,
-        }
-      }
+      const parsed: unknown = JSON.parse(content.slice(ATTACHMENT_PREFIX.length))
+      if (messageType === 'location' && isLocationPayload(parsed)) return parsed
+
+      if (messageType !== 'location' && isFileAttachmentPayload(parsed)) return parsed
     } catch {
       return null
     }
@@ -58,7 +77,7 @@ const parseChatAttachment = (
   }
 
   // 초기 구현에서 URL만 content로 저장한 첨부 메시지도 계속 표시한다.
-  if (isSafeRemoteUrl(content)) {
+  if (messageType !== 'location' && isSafeRemoteUrl(content)) {
     let name = messageType === 'image' ? '이미지' : '첨부 파일'
     try {
       const pathname = new URL(content).pathname
@@ -77,16 +96,18 @@ const getChatMessagePreview = (content?: string) => {
   if (!content.startsWith(ATTACHMENT_PREFIX)) return content
 
   try {
-    const parsed = JSON.parse(
-      content.slice(ATTACHMENT_PREFIX.length),
-    ) as Partial<ChatAttachmentPayload>
+    const parsed: unknown = JSON.parse(content.slice(ATTACHMENT_PREFIX.length))
+    if (isRecord(parsed) && parsed.kind === 'location') {
+      return '위치를 공유했습니다.'
+    }
     if (
-      parsed.kind === 'image' ||
-      (typeof parsed.mimeType === 'string' && parsed.mimeType.startsWith('image/'))
+      isRecord(parsed) &&
+      (parsed.kind === 'image' ||
+        (typeof parsed.mimeType === 'string' && parsed.mimeType.startsWith('image/')))
     ) {
       return '사진을 보냈습니다.'
     }
-    return typeof parsed.name === 'string' && parsed.name
+    return isRecord(parsed) && typeof parsed.name === 'string' && parsed.name
       ? `파일: ${parsed.name}`
       : '파일을 보냈습니다.'
   } catch {
@@ -103,5 +124,19 @@ const formatFileSize = (bytes: number) => {
   return `${megabytes.toFixed(megabytes >= 10 ? 0 : 1)} MB`
 }
 
-export { formatFileSize, getChatMessagePreview, parseChatAttachment, serializeChatAttachment }
-export type { ChatAttachmentPayload }
+const getLocationMapUrl = ({ latitude, longitude }: ChatLocationPayload) => {
+  const params = new URLSearchParams({
+    mlat: String(latitude),
+    mlon: String(longitude),
+  })
+  return `https://www.openstreetmap.org/?${params.toString()}#map=16/${latitude}/${longitude}`
+}
+
+export {
+  formatFileSize,
+  getChatMessagePreview,
+  getLocationMapUrl,
+  parseChatAttachment,
+  serializeChatAttachment,
+}
+export type { ChatAttachmentPayload, ChatFileAttachmentPayload, ChatLocationPayload }

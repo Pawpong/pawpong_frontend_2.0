@@ -3,7 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { contestQueries } from '@/entities/contest'
 import type { SubmitContestEntryRequest } from '@/shared/types'
-import { submitContestEntry, voteContestEntry } from './contest.api'
+import { cancelContestVote, submitContestEntry, voteContestEntry } from './contest.api'
 
 export const useSubmitContestEntry = () => {
   const qc = useQueryClient()
@@ -19,6 +19,16 @@ export const useVoteContestEntry = () => {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (entryId: string) => voteContestEntry(entryId),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: contestQueries.all() })
+    },
+  })
+}
+
+export const useCancelContestVote = () => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (entryId: string) => cancelContestVote(entryId),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: contestQueries.all() })
     },

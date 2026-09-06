@@ -27,6 +27,8 @@ type FollowTab = 'followers' | 'following'
 interface FollowersModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+  /** 내 목록 관리 또는 공개 홈의 공통 팔로우 목록 */
+  variant?: 'manage' | 'mutual'
   /** 탭에 표시할 총 개수 (로드된 목록 길이와 다를 수 있음) */
   followerCount: number
   followingCount: number
@@ -66,6 +68,7 @@ const CONFIRM: Record<ConfirmMode, { question: string; actionLabel: string }> = 
 const FollowersModal = ({
   open,
   onOpenChange,
+  variant = 'manage',
   followerCount,
   followingCount,
   followers,
@@ -79,13 +82,15 @@ const FollowersModal = ({
   const [tab, setTab] = useState<FollowTab>(defaultTab)
   // 확인 모달 대상 — remove(팔로워 삭제) / unfollow(팔로우 취소)
   const [pending, setPending] = useState<{ user: FollowUser; mode: ConfirmMode } | null>(null)
+  const isMutual = variant === 'mutual'
 
   // [refactored] 탭별 목록/개수를 한 곳에서 조회 (counts 객체 + users 삼항 통합)
   const LISTS: Record<FollowTab, { users: FollowUser[]; count: number }> = {
     followers: { users: followers, count: followerCount },
     following: { users: following, count: followingCount },
   }
-  const { users } = LISTS[tab]
+  const activeTab: FollowTab = isMutual ? 'followers' : tab
+  const { users } = LISTS[activeTab]
 
   const renderName = (user: FollowUser) => {
     const name = <TextLabel size="14">{user.nickname}</TextLabel>
@@ -111,11 +116,13 @@ const FollowersModal = ({
             onOpenAutoFocus={(e) => e.preventDefault()}
             className="fixed inset-0 z-modal flex h-full w-full flex-col overflow-hidden bg-white pc:inset-auto pc:top-1/2 pc:left-1/2 pc:h-[min(40.875rem,90vh)] pc:w-[min(46.0625rem,calc(100vw-2rem))] pc:-translate-x-1/2 pc:-translate-y-1/2 pc:rounded-[1.25rem] pc:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]"
           >
-            <DialogPrimitive.Title className="sr-only">팔로워·팔로잉 목록</DialogPrimitive.Title>
+            <DialogPrimitive.Title className="sr-only">
+              {isMutual ? '함께 팔로우하는 사람' : '팔로워·팔로잉 목록'}
+            </DialogPrimitive.Title>
 
             {/* 모바일·탭: 뒤로가기 + 타이틀 */}
             <NavigationBar
-              title="친구 목록"
+              title={isMutual ? '함께 팔로우하는 사람' : '친구 목록'}
               onBack={() => onOpenChange(false)}
               // 상단 여백 — Figma header 영역 (모바일 48px / 탭 64px)
               className="mt-12 shrink-0 tab:mt-16 pc:hidden"
@@ -130,8 +137,11 @@ const FollowersModal = ({
 
             {/* 탭 */}
             <div className="flex shrink-0 border-b border-neutral-150 px-4 tab:px-12">
-              {TABS.map(({ key, label }) => {
-                const active = tab === key
+              {(isMutual
+                ? [{ key: 'followers' as const, label: '함께 팔로우하는 사람' }]
+                : TABS
+              ).map(({ key, label }) => {
+                const active = activeTab === key
                 // [refactored] 라벨·개수가 공유하는 active 스타일을 한 번만 계산
                 const textClass = cn(
                   'text-sm leading-[1.5]',
@@ -149,7 +159,7 @@ const FollowersModal = ({
                     )}
                   >
                     <span className={cn(textClass, 'pc:text-base')}>{label}</span>
-                    <span className={textClass}>{LISTS[key].count}</span>
+                    {!isMutual && <span className={textClass}>{LISTS[key].count}</span>}
                   </button>
                 )
               })}
@@ -169,30 +179,31 @@ const FollowersModal = ({
                     {renderName(user)}
                   </div>
 
-                  {tab === 'followers' ? (
-                    <Button
-                      variant="text"
-                      onClick={() => setPending({ user, mode: 'remove' })}
-                      className="shrink-0 font-medium text-neutral-500"
-                    >
-                      삭제
-                    </Button>
-                  ) : (
-                    <FollowButton
-                      status={user.mutual ? 'mutual' : 'following'}
-                      size="sm"
-                      onClick={() => setPending({ user, mode: 'unfollow' })}
-                      className="w-[4.5625rem] shrink-0"
-                    />
-                  )}
+                  {!isMutual &&
+                    (activeTab === 'followers' ? (
+                      <Button
+                        variant="text"
+                        onClick={() => setPending({ user, mode: 'remove' })}
+                        className="shrink-0 font-medium text-neutral-500"
+                      >
+                        삭제
+                      </Button>
+                    ) : (
+                      <FollowButton
+                        status={user.mutual ? 'mutual' : 'following'}
+                        size="sm"
+                        onClick={() => setPending({ user, mode: 'unfollow' })}
+                        className="w-[4.5625rem] shrink-0"
+                      />
+                    ))}
                 </div>
               ))}
 
               {paging && (
                 <InfiniteScrollTrigger
-                  onIntersect={paging[tab].onLoadMore}
-                  hasNextPage={paging[tab].hasMore}
-                  isFetchingNextPage={paging[tab].isLoadingMore}
+                  onIntersect={paging[activeTab].onLoadMore}
+                  hasNextPage={paging[activeTab].hasMore}
+                  isFetchingNextPage={paging[activeTab].isLoadingMore}
                 />
               )}
             </div>

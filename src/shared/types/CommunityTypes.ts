@@ -132,6 +132,26 @@ export interface CommunityUnsaveResponse {
   unsaved: boolean
 }
 
+/** 커뮤니티 게시글 신고 사유 — 백엔드 CommunityReportReason과 동일 */
+export type CommunityReportReason =
+  | 'spam'
+  | 'inappropriate_content'
+  | 'false_info'
+  | 'hateful_content'
+  | 'other'
+
+/** 게시글 신고 요청 */
+export interface CommunityPostReportRequest {
+  reason: CommunityReportReason
+  description?: string
+}
+
+/** 게시글 신고 응답 — 중복 신고는 reported=false로 멱등 처리된다 */
+export interface CommunityPostReportResponse {
+  postId: string
+  reported: boolean
+}
+
 /** 내 북마크 목록 조회 파라미터 */
 export interface CommunityBookmarkListParams {
   page?: number

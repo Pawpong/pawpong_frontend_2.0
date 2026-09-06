@@ -15,7 +15,7 @@ interface FaqSectionProps {
 // Figma card-3 (1555-88222) — 신뢰 CTA. adopter는 브리더 찾기, breeder는 입양자 찾기
 const TRUST_CTA: Record<HomeUserType, { subject: string; action: string; href: string }> = {
   adopter: { subject: '브리더', action: '브리더 탐색하기', href: '/explore?type=breeder' },
-  breeder: { subject: '입양자', action: '분양 페이지', href: '/adoption' },
+  breeder: { subject: '입양자', action: '분양 페이지', href: '/explore' },
 }
 
 const FaqSection = ({ userType = 'adopter' }: FaqSectionProps) => {

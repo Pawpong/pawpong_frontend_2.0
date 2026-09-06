@@ -1,38 +1,71 @@
 'use client'
 
-import { Fragment } from 'react'
+import { Fragment, useLayoutEffect, useRef } from 'react'
 import { PixelTab } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { useOnboarding } from '../model/OnboardingContext'
 
 const StepIndicator = () => {
   const { steps, currentStepIndex } = useOnboarding()
+  const viewportRef = useRef<HTMLDivElement>(null)
+  const activeStepRef = useRef<HTMLSpanElement>(null)
 
   const visibleSteps = steps.filter((step) => step.id !== 'complete')
 
+  // tab 구간에서는 큰 탭이 영역을 넘을 수 있어 현재 단계가 보이도록 가운데로 맞춘다.
+  // 모바일은 아래에서 탭을 균등 분배하므로 스크롤 없이 전체 단계가 한 번에 노출된다.
+  useLayoutEffect(() => {
+    const viewport = viewportRef.current
+    const activeStep = activeStepRef.current
+    if (!viewport || !activeStep) return
+
+    const centeredLeft = activeStep.offsetLeft - (viewport.clientWidth - activeStep.offsetWidth) / 2
+    viewport.scrollLeft = Math.max(
+      0,
+      Math.min(centeredLeft, viewport.scrollWidth - viewport.clientWidth),
+    )
+  }, [currentStepIndex, visibleSteps.length])
+
   return (
-    // 칩·화살표 간격 spacing/4 (Figma 3124-328220)
-    <div className="flex items-center gap-1">
-      {visibleSteps.map((step, index) => (
-        <Fragment key={step.id}>
-          {index > 0 && (
-            // 지나온 구간은 갈색(active), 아직 안 온 구간은 회색(inactive)
-            <OnboardingArrow
-              className={index <= currentStepIndex ? 'text-primary-500' : 'text-neutral-400'}
-            />
-          )}
-          <PixelTab
-            label={step.label}
-            status={
-              index < currentStepIndex
-                ? 'default'
-                : index === currentStepIndex
-                  ? 'active'
-                  : 'disabled'
-            }
-          />
-        </Fragment>
-      ))}
+    <div
+      ref={viewportRef}
+      aria-label="회원가입 진행 단계"
+      className="w-full max-w-full min-w-0 self-stretch overflow-x-hidden overflow-y-hidden tab:overflow-x-auto tab:overscroll-x-contain pc:w-auto pc:max-w-none pc:self-auto pc:overflow-visible"
+    >
+      {/* 칩·화살표 간격 spacing/4 (Figma 3124-328220) */}
+      <div className="flex w-full min-w-0 items-center justify-center gap-0.5 px-px tab:w-max tab:min-w-full tab:gap-1">
+        {visibleSteps.map((step, index) => (
+          <Fragment key={step.id}>
+            {index > 0 && (
+              // 지나온 구간은 갈색(active), 아직 안 온 구간은 회색(inactive)
+              <OnboardingArrow
+                className={cn(
+                  'size-2 tab:size-6',
+                  index <= currentStepIndex ? 'text-primary-500' : 'text-neutral-400',
+                )}
+              />
+            )}
+            <span
+              ref={index === currentStepIndex ? activeStepRef : undefined}
+              className="min-w-0 flex-1 tab:flex-none tab:shrink-0"
+            >
+              <PixelTab
+                label={step.label}
+                className="w-full min-w-0 p-0.5 tab:w-[11.991rem] tab:p-2"
+                labelClassName="text-[0.5rem] tab:text-base"
+                pawClassName="hidden tab:flex"
+                status={
+                  index < currentStepIndex
+                    ? 'default'
+                    : index === currentStepIndex
+                      ? 'active'
+                      : 'disabled'
+                }
+              />
+            </span>
+          </Fragment>
+        ))}
+      </div>
     </div>
   )
 }

@@ -11,7 +11,12 @@ import { useAuthStatus } from './useAuthStatus'
  */
 const useMe = () => {
   const { isLoggedIn } = useAuthStatus()
-  const { data: me } = useQuery({ ...profileQueries.me(), enabled: isLoggedIn })
+  const { data: me } = useQuery({
+    ...profileQueries.me(),
+    enabled: isLoggedIn,
+    refetchOnMount: 'always',
+    throwOnError: false,
+  })
 
   return { isLoggedIn, me }
 }

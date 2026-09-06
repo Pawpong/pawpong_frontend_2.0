@@ -5,6 +5,7 @@ import { useInfiniteQuery } from '@tanstack/react-query'
 import { FilterChip, InfiniteScrollTrigger, ListState, TextLabel } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { flattenPages, getTotalItems } from '@/shared/lib/infiniteList'
+import { dedupeBy } from '@/shared/lib/dedupeBy'
 import type { PetStatus } from '@/shared/types'
 import { ADOPTION_CARD_STATUS, AdoptionGridCard } from '@/entities/adoption'
 import { petPostingQueries } from '@/entities/pet-posting'
@@ -24,10 +25,7 @@ interface MyPetPostingListProps {
 }
 
 /**
- * 내 분양글 목록 (상태 필터 + 그리드 + 무한 스크롤).
- *
- * [refactored] 분양 페이지(`/adoption/my-listings`)와 브리더 마이홈 분양 탭이
- * 쿼리·필터 상태·빈/에러 문구·카드 그리드까지 똑같아 한 곳으로 모았다.
+ * 내 분양글 목록 (상태 필터 + 그리드 + 무한 스크롤). 브리더 마이홈의 분양중 탭이 쓴다.
  * 바깥 여백은 호출부의 Container 가 담당한다.
  */
 const MyPetPostingList = ({
@@ -41,7 +39,8 @@ const MyPetPostingList = ({
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending, isError } =
     useInfiniteQuery(petPostingQueries.myList(status ?? undefined, pageSize))
 
-  const postings = flattenPages(data)
+  // 무한스크롤 페이지 병합 시 petId 중복 제거 (React key 중복 방어)
+  const postings = dedupeBy(flattenPages(data), (posting) => posting.petId)
 
   return (
     <div className="flex flex-col gap-3">

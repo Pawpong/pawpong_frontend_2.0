@@ -2,13 +2,13 @@
 
 import { useMutation } from '@tanstack/react-query'
 import {
-  uploadRepresentativePhotos,
-  uploadParentPetPhoto,
-  uploadAvailablePetPhoto,
-  uploadSingleFile,
-  uploadMultipleFiles,
   deleteFile,
-} from './upload.api'
+  uploadAvailablePetPhoto,
+  uploadMultipleFiles,
+  uploadParentPetPhoto,
+  uploadRepresentativePhotos,
+  uploadSingleFile,
+} from '@/shared/api'
 
 export const useUploadRepresentativePhotos = () =>
   useMutation({ mutationFn: (files: File[]) => uploadRepresentativePhotos(files) })

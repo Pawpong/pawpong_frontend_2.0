@@ -1,64 +1,6 @@
 'use client'
 
 import { useMutation } from '@tanstack/react-query'
-import {
-  checkEmailDuplicate,
-  checkNicknameDuplicate,
-  checkBreederNameDuplicate,
-  sendVerificationCode,
-  verifyCode,
-  registerAdopter,
-  registerBreeder,
-  uploadBreederDocuments,
-  uploadProfileImage,
-  logout,
-} from './auth.api'
-import type {
-  BreederUploadDocumentType,
-  RegisterAdopterRequest,
-  RegisterBreederRequest,
-} from '@/shared/types'
-
-export const useCheckEmailDuplicate = () =>
-  useMutation({ mutationFn: (email: string) => checkEmailDuplicate(email) })
-
-export const useCheckNicknameDuplicate = () =>
-  useMutation({ mutationFn: (nickname: string) => checkNicknameDuplicate(nickname) })
-
-export const useCheckBreederNameDuplicate = () =>
-  useMutation({ mutationFn: (name: string) => checkBreederNameDuplicate(name) })
-
-export const useSendVerificationCode = () =>
-  useMutation({ mutationFn: (phone: string) => sendVerificationCode(phone) })
-
-export const useVerifyCode = () =>
-  useMutation({
-    mutationFn: ({ phone, code }: { phone: string; code: string }) => verifyCode(phone, code),
-  })
-
-export const useRegisterAdopter = () =>
-  useMutation({ mutationFn: (data: RegisterAdopterRequest) => registerAdopter(data) })
-
-export const useRegisterBreeder = () =>
-  useMutation({ mutationFn: (data: RegisterBreederRequest) => registerBreeder(data) })
-
-export const useUploadBreederDocuments = () =>
-  useMutation({
-    mutationFn: ({
-      tempId,
-      files,
-      level,
-    }: {
-      tempId: string
-      files: { type: BreederUploadDocumentType; file: File }[]
-      level: 'new' | 'elite'
-    }) => uploadBreederDocuments(tempId, files, level),
-  })
-
-export const useUploadProfileImage = () =>
-  useMutation({
-    mutationFn: ({ file, tempId }: { file: File; tempId?: string }) =>
-      uploadProfileImage(file, tempId),
-  })
+import { logout } from './auth.api'
 
 export const useLogout = () => useMutation({ mutationFn: logout })

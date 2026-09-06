@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="ko" className={`${pretendard.variable} ${cafe24Proup.variable}`}>
-      <body>
+      <body className="min-w-0 bg-base-white text-neutral-850">
         <QueryProvider>
           <NavigationGuardProvider>{children}</NavigationGuardProvider>
         </QueryProvider>

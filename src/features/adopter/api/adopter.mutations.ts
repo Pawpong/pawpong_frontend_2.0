@@ -7,6 +7,7 @@ import {
   type QueryClient,
 } from '@tanstack/react-query'
 import { adopterQueries } from '@/entities/adopter'
+import { applicationQueries } from '@/entities/application'
 import { breederQueries } from '@/entities/breeder'
 import { communityQueries } from '@/entities/community'
 import { profileQueries } from '@/entities/profile'
@@ -107,8 +108,11 @@ export const useCreateReview = () => {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (data: ReviewCreateRequest) => createReview(data),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: adopterQueries.reviews().queryKey })
+    onSuccess: async () => {
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: [...adopterQueries.all(), 'reviews'] }),
+        qc.invalidateQueries({ queryKey: applicationQueries.all() }),
+      ])
     },
   })
 }

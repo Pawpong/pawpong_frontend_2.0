@@ -14,11 +14,11 @@ export type BreederVerificationStatus =
   | 'rejected'
   | 'not_submitted'
 
-export type BreederLevel = 'new' | 'elite'
-
 export type PetGender = 'male' | 'female'
 
 export type PetStatus = 'available' | 'reserved' | 'adopted'
+
+export type BreederPetType = 'dog' | 'cat' | 'reptile'
 
 // ==================== 공통 서브타입 ====================
 
@@ -37,6 +37,7 @@ export interface BreederPriceRangeDto {
 export interface BreederDocumentDto {
   type: string
   url: string
+  fileName?: string
   originalFileName?: string
   uploadedAt?: string
 }
@@ -63,7 +64,6 @@ export interface BreederStatsDto {
 export interface BreederVerificationDto {
   status: BreederVerificationStatus
   plan?: string
-  level?: BreederLevel
   submittedAt?: string
   reviewedAt?: string
   rejectionReason?: string
@@ -89,16 +89,6 @@ export interface ParentPetAddRequest extends PetBase {
 
 /** 수정 요청: 부모 동물 (PATCH) — 전 필드 선택 */
 export type ParentPetUpdateRequest = Partial<ParentPetAddRequest>
-
-/** 등록/수정 요청: 분양 동물 (POST/PATCH /breeder-management/available-pets) */
-export interface AvailablePetAddRequest extends PetBase {
-  price: number
-  parentInfo?: {
-    mother?: string
-    father?: string
-  }
-  photos?: string[]
-}
 
 /** 공개 프로필용 부모 동물 요약 */
 export type ParentPetSummaryDto = Pick<
@@ -165,8 +155,8 @@ export interface BreederPublicProfile {
   longDescription?: string
   bpm: number
   followerCount: number
-  followingCount?: number
-  level: BreederLevel
+  /** 이 브리더가 팔로우 중인 수 (즐겨찾기와 별개) */
+  followingCount: number
   plan: 'basic' | 'pro'
   businessLocation: {
     city: string
@@ -200,8 +190,7 @@ export interface BreederProfileUpdateResponseDto {
 export interface Breeder {
   breederId: string
   breederName: string
-  breederLevel: BreederLevel
-  petType: string
+  petType: BreederPetType
   location: string
   mainBreed: string
   specializationTypes?: string[]
@@ -221,7 +210,7 @@ export interface Breeder {
 }
 
 export interface SearchBreederParams {
-  petType?: 'dog' | 'cat'
+  petType?: BreederPetType
   /** 검색어 — 브리더명/품종/지역 부분 일치 */
   keyword?: string
   dogSize?: string[]
@@ -230,7 +219,6 @@ export interface SearchBreederParams {
   province?: string[]
   city?: string[]
   isAdoptionAvailable?: boolean
-  breederLevel?: string[]
   sortBy?: 'latest' | 'favorite' | 'review' | 'price_asc' | 'price_desc'
   page?: number
   limit?: number
@@ -266,36 +254,7 @@ export interface DashboardResponseDto {
   }>
 }
 
-// ==================== 내 개체 목록 (breeder-management) ====================
-
-/** 내 개체 목록 아이템 (GET /breeder-management/my-pets) */
-export interface BreederMyPetItem {
-  petId: string
-  name: string
-  breed: string
-  gender: PetGender
-  birthDate: string
-  ageInMonths: number
-  price: number
-  status: PetStatus
-  isActive: boolean
-  mainPhoto: string
-  photoCount: number
-  viewCount: number
-  applicationCount: number
-  createdAt: string
-  updatedAt: string
-}
-
-/** 내 개체 목록 조회 파라미터 */
-export interface MyPetsParams {
-  status?: PetStatus
-  includeInactive?: boolean
-  page?: number
-  limit?: number
-}
-
-// ==================== 개체 등록/수정/상태 응답 ====================
+// ==================== 개체 등록/수정 응답 ====================
 
 export interface PetAddResponse {
   petId: string
@@ -306,23 +265,26 @@ export interface PetMessageResponse {
   message: string
 }
 
-/** 개체 상태 변경 요청 (PATCH available-pets/{petId}/status) */
-export interface PetStatusUpdateRequest {
-  petStatus: PetStatus
-}
-
 // ==================== 브리더 후기 (브리더 수신) ====================
 
 /** 내게 달린 후기 목록 아이템 (GET /breeder-management/my-reviews) */
 export interface BreederMyReviewItem {
   reviewId: string
-  breederNickname: string
-  breederProfileImage: string
-  breederLevel: string
-  breedingPetType: string
+  adopterId: string
+  adopterName: string
+  petName?: string
+  rating: number
+  petHealthRating?: number
+  communicationRating?: number
   content: string
-  reviewType: string
+  photos?: string[]
   writtenAt: string
+  type?: 'adoption' | 'visit'
+  isVisible: boolean
+  reportCount?: number
+  replyContent?: string
+  replyWrittenAt?: string
+  replyUpdatedAt?: string
 }
 
 /** 내 후기 목록 조회 파라미터 */
@@ -347,59 +309,6 @@ export interface ReviewReplyResponseDto {
 export interface ReviewReplyDeleteResponseDto {
   reviewId: string
   message: string
-}
-
-// ==================== 인증 ====================
-
-/** 브리더 인증 상태 조회 응답 (GET /breeder-management/verification) */
-export interface VerificationStatusResponse {
-  status: 'pending' | 'reviewing' | 'approved' | 'rejected'
-  plan?: 'basic' | 'premium' | 'enterprise'
-  level?: 'new' | 'intermediate' | 'advanced' | 'expert'
-  submittedAt?: string
-  reviewedAt?: string
-  documents?: BreederDocumentDto[]
-  rejectionReason?: string
-  submittedByEmail?: boolean
-}
-
-/** 브리더 인증 신청 요청 (POST /breeder-management/verification) */
-export interface VerificationSubmitRequest {
-  businessNumber: string
-  businessName: string
-  plan: 'basic' | 'premium' | 'enterprise'
-  documents: string[]
-  businessAddress: string
-  experienceYears: string
-  specialBreeds: string
-  facilityDescription: string
-  veterinaryPartnership?: string
-  submittedByEmail?: boolean
-  additionalMessage?: string
-}
-
-export interface VerificationSubmitResponse {
-  message: string
-}
-
-// ==================== 인증 서류 ====================
-
-export interface UploadedDocumentDto extends BreederDocumentDto {
-  fileName: string
-  size: number
-}
-
-export interface UploadDocumentsResponseDto {
-  count: number
-  level: BreederLevel
-  documents: UploadedDocumentDto[]
-}
-
-/** 인증 서류 제출 (간소화) 요청 (POST /breeder-management/verification/submit) */
-export interface SubmitDocumentsRequest {
-  level: BreederLevel
-  documents: Array<{ type: string; fileName: string; originalFileName?: string }>
-  submittedByEmail?: boolean
 }
 
 // ==================== 입양 신청 폼 (간소화) ====================

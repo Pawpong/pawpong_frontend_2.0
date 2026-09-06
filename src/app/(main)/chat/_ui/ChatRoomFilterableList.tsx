@@ -10,6 +10,7 @@ import { ChatRoomItem } from './ChatRoomItem'
 interface ChatRoomFilterableListProps {
   activeRoomId: string | null
   onSelectRoom: (room: ChatRoomResponseDto) => void
+  onRoomClosed?: (roomId: string) => void
   /** 방 목록 컨테이너 클래스 (사이드바는 독립 스크롤을 위해 flex-1/overflow 전달) */
   listClassName?: string
   /** 가로 패딩 (전체 목록=반응형 페이지 마진, 사이드바=px-4) */
@@ -20,6 +21,7 @@ interface ChatRoomFilterableListProps {
 const ChatRoomFilterableList = ({
   activeRoomId,
   onSelectRoom,
+  onRoomClosed,
   listClassName,
   gutterClassName = CHAT_GUTTER_X,
 }: ChatRoomFilterableListProps) => {
@@ -64,6 +66,7 @@ const ChatRoomFilterableList = ({
               isActive={room.roomId === activeRoomId}
               unreadCount={room.unreadCount}
               onClick={() => onSelectRoom(room)}
+              onRoomClosed={() => onRoomClosed?.(room.roomId)}
             />
           ))}
         </div>

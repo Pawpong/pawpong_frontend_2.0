@@ -38,7 +38,7 @@ const CommentComposerBar = ({ thread, className }: CommentComposerBarProps) => {
           <button
             type="button"
             onClick={openPrompt}
-            className="flex h-14 min-w-0 flex-1 items-center rounded-lg border border-neutral-500 px-3 text-left text-base leading-[1.5] font-medium text-neutral-500"
+            className="flex h-14 min-w-0 flex-1 items-center rounded-lg border border-neutral-500 bg-white px-3 text-left text-base leading-[1.5] font-medium text-neutral-500 transition-[border-color,background-color] hover:border-primary-500 hover:bg-point-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
           >
             로그인하고 댓글을 남겨보세요
           </button>

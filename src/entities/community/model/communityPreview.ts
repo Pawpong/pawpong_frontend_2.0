@@ -41,5 +41,9 @@ const toCommunityPreviewProps = (post: CommunityPostCard): CommunityPreviewProps
   },
 })
 
-export { toCommunityPreviewProps }
+/** 텍스트 전용 글을 건너뛰고 실제 첫 LCP 후보가 되는 사진 글을 찾는다. */
+const getFirstPhotoPostId = (posts: CommunityPostCard[]): string | undefined =>
+  posts.find((post) => post.photoUrls.length > 0)?.postId
+
+export { getFirstPhotoPostId, toCommunityPreviewProps }
 export type { CommunityPreviewAuthor, CommunityPreviewProps }

@@ -7,6 +7,7 @@ import { useGnbHeight } from '@/shared/lib/useGnbHeight'
 interface HomeTabConfig {
   id: string
   label: string
+  mobileLabel?: string
   Icon?: (props: SVGProps<SVGSVGElement>) => React.ReactElement
 }
 
@@ -29,7 +30,14 @@ const HomeTabs = ({ tabs, activeTab, onTabChange, children, stickyTop }: HomeTab
         value: tab.id,
         label: (
           <span className="flex items-center justify-center gap-2.5">
-            {tab.label}
+            {tab.mobileLabel ? (
+              <>
+                <span className="tab:hidden">{tab.mobileLabel}</span>
+                <span className="hidden tab:inline">{tab.label}</span>
+              </>
+            ) : (
+              tab.label
+            )}
             {tab.Icon && <tab.Icon className="size-6 shrink-0 tab:size-8" />}
           </span>
         ),
@@ -37,6 +45,7 @@ const HomeTabs = ({ tabs, activeTab, onTabChange, children, stickyTop }: HomeTab
       value={activeTab}
       onValueChange={onTabChange}
       barClassName="tab:sticky tab:z-sticky"
+      triggerClassName="tab:h-[3.1264rem] tab:text-sm"
       barStyle={{ top }}
       ariaLabel="홈 콘텐츠"
     >

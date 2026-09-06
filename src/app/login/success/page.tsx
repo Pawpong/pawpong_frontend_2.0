@@ -2,6 +2,8 @@
 
 import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { normalizeReturnUrl } from '@/shared/lib/normalizeReturnUrl'
+import { saveAuthTokens } from '@/shared/lib/saveAuthTokens'
 
 /**
  * 소셜 로그인 성공 랜딩 (기존 회원)
@@ -26,7 +28,7 @@ const LoginSuccessContent = () => {
     const run = async () => {
       const accessToken = searchParams.get('accessToken')
       const refreshToken = searchParams.get('refreshToken')
-      const returnUrl = searchParams.get('returnUrl') || '/'
+      const returnUrl = normalizeReturnUrl(searchParams.get('returnUrl'))
 
       if (!accessToken || !refreshToken) {
         router.replace('/login')
@@ -34,14 +36,19 @@ const LoginSuccessContent = () => {
       }
 
       try {
-        const res = await fetch('/api/auth/set-cookie', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ accessToken, refreshToken }),
-          credentials: 'include',
-        })
+        if (!(await saveAuthTokens({ accessToken, refreshToken }))) {
+          throw new Error('인증 쿠키 저장 실패')
+        }
 
-        if (!res.ok) throw new Error('set-cookie 실패')
+        // RN WebView 환경이면 네이티브로 accessToken을 전달해 FCM 디바이스 토큰 등록을 트리거한다.
+        // (RN HomeScreen이 REQUEST_FCM_TOKEN 수신 → messaging().getToken() → 백엔드 등록)
+        const native = (
+          window as unknown as { ReactNativeWebView?: { postMessage: (m: string) => void } }
+        ).ReactNativeWebView
+        if (native) {
+          native.postMessage(JSON.stringify({ type: 'REQUEST_FCM_TOKEN', accessToken }))
+        }
+
         router.replace(returnUrl)
       } catch (err) {
         console.error('로그인 처리 중 오류:', err)
@@ -57,7 +64,7 @@ const LoginSuccessContent = () => {
     <div className="flex min-h-screen items-center justify-center">
       {error ? (
         <div className="text-center">
-          <p className="text-red-500">{error}</p>
+          <p className="text-error-500">{error}</p>
           <p className="mt-2 text-sm text-neutral-700">로그인 페이지로 이동합니다...</p>
         </div>
       ) : (

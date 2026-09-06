@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { Fragment, type ReactNode } from 'react'
 import {
-  AffectionBadge,
+  // AffectionBadge — 애정도 뱃지 보류 (복구 시 함께 되살린다)
   Container,
   PopularBadge,
   ProfileAvatar,
@@ -26,6 +26,7 @@ interface AdoptionDetailHeroProps {
   onImageClick: (images: string[], index?: number) => void
   isFavorite: boolean
   onToggleFavorite: () => void
+  showFavoriteAction: boolean
 }
 
 // [refactored] JSX 안에 있던 브레드크럼 라벨을 모듈 상수로 분리
@@ -43,6 +44,7 @@ const AdoptionDetailHero = ({
   onImageClick,
   isFavorite,
   onToggleFavorite,
+  showFavoriteAction,
 }: AdoptionDetailHeroProps) => {
   // [refactored] 모바일·pc 두 블록이 똑같이 넘기던 props를 한 곳에서 만든다
   const statsProps = {
@@ -139,6 +141,8 @@ const AdoptionDetailHero = ({
               labelClassName="hidden text-neutral-700 tab:inline"
               isFavorite={isFavorite}
               onToggle={onToggleFavorite}
+              showFavorite={showFavoriteAction}
+              favoriteClassName="hidden tab:flex"
             />
           </div>
 
@@ -149,6 +153,7 @@ const AdoptionDetailHero = ({
               {...shareProps}
               isFavorite={isFavorite}
               onToggle={onToggleFavorite}
+              showFavorite={showFavoriteAction}
             />
           </div>
         </div>
@@ -168,33 +173,43 @@ const BreederProfileRow = ({
 }: {
   breeder: AdoptionDetailDto['breeder']
   className?: string
-}) => (
-  <div className={cn('w-full items-center gap-0 pc:gap-[1.75rem]', className)}>
-    <div className="flex min-w-px flex-1 items-center gap-[0.5rem] pc:gap-[1.25rem]">
-      <div className="flex items-center gap-[0.5rem]">
-        {/* [refactored] 로컬 아바타 → 공통 ProfileAvatar (빈 src 폴백 내장) */}
-        <ProfileAvatar
-          src={breeder.profileImageUrl}
-          alt={breeder.nickname}
-          size="responsivePc"
-          className="shrink-0"
-        />
-        <p className="text-[0.875rem] leading-[1.5] font-semibold text-neutral-850 pc:text-[1rem]">
-          {breeder.nickname}
-        </p>
+}) => {
+  // 탈퇴한 브리더는 API가 닉네임을 빈 문자열로 내려준다(별도 플래그 없음). 이 신호로
+  // 브리더홈 링크를 끊는다 — 링크를 그대로 두면 Link 프리페치가 /profile/breeders/{id},
+  // /profile/users/{id} 를 곧장 호출해 400을 반복하고, 눌러도 갈 곳 없는 화면으로 보낸다.
+  const isWithdrawn = !breeder.nickname.trim()
+
+  return (
+    <div className={cn('w-full items-center gap-0 pc:gap-[1.75rem]', className)}>
+      <div className="flex min-w-px flex-1 items-center gap-[0.5rem] pc:gap-[1.25rem]">
+        <div className="flex items-center gap-[0.5rem]">
+          {/* [refactored] 로컬 아바타 → 공통 ProfileAvatar (빈 src 폴백 내장) */}
+          <ProfileAvatar
+            src={breeder.profileImageUrl}
+            alt={breeder.nickname}
+            size="responsivePc"
+            className="shrink-0"
+          />
+          <p className="text-[0.875rem] leading-[1.5] font-semibold text-neutral-850 pc:text-[1rem]">
+            {isWithdrawn ? '탈퇴한 브리더' : breeder.nickname}
+          </p>
+        </div>
+        {/* 애정도 뱃지 — 정책 미확정으로 노출 보류 (docs/design.md — BPM/EXP 는 추정 구현하지 않는다)
+            (뱃지는 size prop이 반응형이 아니라 md 기준 + pc에서 lg 치수로 덮는다)
+        <AffectionBadge size="md" className="pc:h-[1.8125rem] pc:py-1 pc:text-sm" /> */}
       </div>
-      {/* 뱃지는 size prop이 반응형이 아니라 md 기준 + pc에서 lg 치수로 덮는다 */}
-      <AffectionBadge size="md" className="pc:h-[1.8125rem] pc:py-1 pc:text-sm" />
+      {!isWithdrawn && (
+        <Link
+          href={`/home/${breeder.id}`}
+          className="flex shrink-0 items-center gap-0 px-[0.25rem] text-[0.875rem] leading-[1.5] font-semibold text-neutral-850 pc:gap-[0.125rem]"
+        >
+          브리더홈
+          <ArrowRightIcon className="size-[1.25rem]" />
+        </Link>
+      )}
     </div>
-    <Link
-      href={`/home/${breeder.id}`}
-      className="flex shrink-0 items-center gap-0 px-[0.25rem] text-[0.875rem] leading-[1.5] font-semibold text-neutral-850 pc:gap-[0.125rem]"
-    >
-      브리더홈
-      <ArrowRightIcon className="size-[1.25rem]" />
-    </Link>
-  </div>
-)
+  )
+}
 
 /* ── 정보 항목 (라벨 ↔ 내용: 가로 배치 gap-12px) ── */
 /* 피그마: 라벨 body/lg/medium 16px neutral-700, 내용 body/lg/bold 16px neutral-850 (leading 1.5) — pc는 라벨만 20px */

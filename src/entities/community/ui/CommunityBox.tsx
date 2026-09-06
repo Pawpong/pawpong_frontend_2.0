@@ -1,8 +1,9 @@
 'use client'
 
+import type { ReactNode } from 'react'
+
 import Image from 'next/image'
 import Link from 'next/link'
-import { MoreVertIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import type { CommunityPreviewAuthor, CommunityPreviewProps } from '../model/communityPreview'
 import { CommunityPostActions } from './CommunityPostActions'
@@ -14,6 +15,8 @@ interface CommunityBoxProps extends CommunityPreviewProps {
   /** 좋아요·북마크 토글 — features의 ConnectedCommunityBox에서 주입 */
   onToggleLike?: () => void
   onToggleSave?: () => void
+  /** 기능 레이어에서 주입하는 게시글 추가 액션 */
+  moreAction?: ReactNode
   className?: string
 }
 
@@ -33,6 +36,7 @@ const CommunityBox = ({
   detailHref,
   onToggleLike,
   onToggleSave,
+  moreAction,
   className,
 }: CommunityBoxProps) => {
   const primaryImage = images[0]
@@ -58,10 +62,10 @@ const CommunityBox = ({
   return (
     <article
       className={cn(
-        // 카드 폭이 그리드를 채우므로 높이도 고정값이 아닌 비율로 — 디자인 기준(tab 321x329 / pc 407x376)
-        'flex aspect-[321/329] w-full flex-col items-start overflow-hidden rounded-lg border border-neutral-300 bg-white p-3 pc:aspect-[407/376]',
-        // Figma hover/press (923-18992): 배경 #f6f6f6 + drop shadow
-        'transition-[background-color,box-shadow] hover:bg-neutral-50 hover:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)] active:bg-neutral-50 active:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]',
+        // 디자인 기준: mo·tab 321×326 / pc 407×376.
+        'flex h-[20.375rem] w-full flex-col items-start overflow-hidden rounded-lg border border-neutral-300 bg-white p-3 pc:h-[23.5rem]',
+        // 이미지 색을 회색으로 탁하게 만들지 않고 Figma의 얕은 elevation만 사용한다.
+        'transition-shadow focus-within:ring-2 focus-within:ring-primary-500 focus-within:ring-offset-2 pc:hover:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]',
         className,
       )}
     >
@@ -73,13 +77,7 @@ const CommunityBox = ({
         ) : (
           profile
         )}
-        <button
-          type="button"
-          aria-label="게시글 더보기"
-          className="size-6 shrink-0 text-neutral-850"
-        >
-          <MoreVertIcon className="size-6" />
-        </button>
+        {moreAction}
       </header>
 
       <div className="min-h-0 w-full flex-1">

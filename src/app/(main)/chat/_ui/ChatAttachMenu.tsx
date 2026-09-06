@@ -18,9 +18,10 @@ const ATTACH_ITEMS = [
 interface ChatAttachMenuProps {
   disabled?: boolean
   onSelectFile: (file: File, type: 'image' | 'file') => void
+  onSelectLocation: () => void
 }
 
-const ChatAttachMenu = ({ disabled, onSelectFile }: ChatAttachMenuProps) => {
+const ChatAttachMenu = ({ disabled, onSelectFile, onSelectLocation }: ChatAttachMenuProps) => {
   const imageInputRef = React.useRef<HTMLInputElement>(null)
   const fileInputRef = React.useRef<HTMLInputElement>(null)
 
@@ -49,15 +50,14 @@ const ChatAttachMenu = ({ disabled, onSelectFile }: ChatAttachMenuProps) => {
             <DropdownMenuItem
               key={label}
               className="h-[3.0625rem]"
-              disabled={type === 'location'}
               onSelect={() => {
                 if (type === 'image') imageInputRef.current?.click()
+                if (type === 'location') onSelectLocation()
                 if (type === 'file') fileInputRef.current?.click()
               }}
             >
               <Icon className="size-8 shrink-0" />
               <span className="p-0.5">{label}</span>
-              {type === 'location' && <span className="ml-auto text-xs">준비 중</span>}
             </DropdownMenuItem>
           ))}
         </DropdownMenuContent>

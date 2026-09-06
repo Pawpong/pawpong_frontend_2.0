@@ -1,7 +1,7 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { termsQueries } from '@/entities/terms'
+import { termsQueries } from '@/entities/term'
 import { useOnboarding } from '../model/OnboardingContext'
 import { useStepForm } from '../model/useStepForm'
 import { profileSchema } from '../model/schema'

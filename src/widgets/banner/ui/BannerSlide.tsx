@@ -29,30 +29,27 @@ const BannerSlide = ({ banner }: { banner: BannerDto }) => {
   return (
     <BannerLink banner={banner}>
       <section className="relative w-full overflow-hidden rounded-[0.4455rem] bg-[#d9d9d9] tab:rounded pc:rounded-xl">
-        <div className="relative hidden tab:block tab:aspect-[673.61/268.494] pc:aspect-[1120/447]">
+        <div className="relative aspect-[375/191.6667] tab:aspect-[604.8/241.0667] pc:aspect-[1134/452]">
           <Image
             src={banner.desktopImageUrl}
             alt={banner.title ?? ''}
             fill
-            sizes="(min-width: 90rem) 70rem, 42.1007rem"
-            className="object-cover"
-            priority
+            sizes="(min-width: 90rem) 70.875rem, 37.8rem"
+            className="hidden object-cover tab:block"
+            loading="eager"
           />
-        </div>
-
-        <div className="relative block aspect-[315/161] tab:hidden">
           <Image
             src={mobileImageUrl}
             alt={banner.title ?? ''}
             fill
-            sizes="19.6875rem"
-            className="object-cover"
+            sizes="23.4375rem"
+            className="object-cover tab:hidden"
             onError={() => {
               if (!mobileImageFailed && mobileImageUrl !== banner.desktopImageUrl) {
                 setMobileImageFailed(true)
               }
             }}
-            priority
+            loading="eager"
           />
         </div>
       </section>

@@ -226,7 +226,7 @@ const ShareModal = ({
               aria-live="polite"
               className={cn(
                 'px-5 pb-5 text-center text-sm leading-[1.5] font-medium',
-                feedback.tone === 'error' ? 'text-red-600' : 'text-neutral-700',
+                feedback.tone === 'error' ? 'text-error-600' : 'text-neutral-700',
               )}
             >
               {feedback.message}

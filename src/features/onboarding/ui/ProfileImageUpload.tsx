@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from 'react'
 import { PawPrintIcon } from '@/shared/assets'
 import { Button, HelpMessage } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
-import { useUploadProfileImage, loadSocialSignupSession } from '@/features/auth'
+import { loadSocialSignupSession } from '@/shared/lib/socialSignupSession'
+import { useUploadProfileImage } from '../api/onboarding.mutations'
 import type { UploadedProfileImageFormValue } from '../model/schema'
 
 interface ProfileImageUploadProps {

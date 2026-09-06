@@ -20,6 +20,8 @@ interface PostFormLayoutProps {
   /** 본문 아래 추가 영역 (공개 설정 등) */
   belowContent?: ReactNode
   error?: string | null
+  /** 작성 이탈 가드를 적용한 닫기 동작. 미전달 시 브라우저 뒤로가기. */
+  onBack?: () => void
   /** 하단 CTA — PostFormCTA 로 그대로 전달 */
   cta: PostFormCTAProps
 }
@@ -28,7 +30,7 @@ interface PostFormLayoutProps {
  * 작성 폼 공통 셸 — 상단바 + 이미지·본문 2단 + 하단 CTA.
  *
  * 게시글 작성/수정과 콘테스트 참여가 같은 레이아웃을 쓰고 제목·본문 문구·제출 로직만 다르다.
- * Figma 1056-46147(PC) / 1056-46891(tab·mo): PC는 이미지 372 + 본문 2단(gap 100).
+ * Figma 1056-46147(PC) / 1056-46891(tab·mo): 1440 화면에서 이미지 372 + 본문 2단(gap 100).
  */
 const PostFormLayout = ({
   title,
@@ -38,6 +40,7 @@ const PostFormLayout = ({
   maxLength,
   belowContent,
   error,
+  onBack,
   cta,
 }: PostFormLayoutProps) => {
   const router = useRouter()
@@ -49,12 +52,11 @@ const PostFormLayout = ({
         title={title}
         mobileTitle={mobileTitle}
         icon="close"
-        onBack={() => router.back()}
+        onBack={onBack ?? (() => router.back())}
       />
 
       <Container className="flex-1 py-5 pb-30 pc:py-12">
-        {/* PC 콘텐츠 폭 1280 고정 (1440 - 좌우 80) */}
-        <div className="mx-auto w-full pc:max-w-320">
+        <div className="mx-auto w-full tab:max-w-168 pc:max-w-320">
           <div className="flex flex-col gap-[1.1875rem] pc:flex-row pc:gap-25">
             <div className="flex flex-col gap-1 pc:w-93 pc:shrink-0 pc:gap-2">
               <TextLabel size="14" requirement="선택">

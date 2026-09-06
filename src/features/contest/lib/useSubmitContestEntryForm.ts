@@ -1,7 +1,8 @@
 'use client'
 
 import { useCallback, useState } from 'react'
-import { useUploadSingleFile } from '@/features/upload'
+import { useMutation } from '@tanstack/react-query'
+import { uploadSingleFile } from '@/shared/api'
 import { useSubmitContestEntry } from '../api/contest.mutations'
 
 /** 콘테스트 응모 사진이 업로드되는 스토리지 폴더 */
@@ -16,7 +17,10 @@ const CONTEST_UPLOAD_FOLDER = 'contest'
  * 성공 시 entryId 를 반환한다. 콘테스트는 임시저장 개념이 없다.
  */
 export const useSubmitContestEntryForm = () => {
-  const uploadMutation = useUploadSingleFile()
+  const uploadMutation = useMutation({
+    mutationFn: ({ file, folder }: { file: File; folder?: string }) =>
+      uploadSingleFile(file, folder),
+  })
   const submitMutation = useSubmitContestEntry()
   const [error, setError] = useState<string | null>(null)
 

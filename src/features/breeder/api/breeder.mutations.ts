@@ -7,34 +7,21 @@ import { profileQueries } from '@/entities/profile'
 import type {
   ProfileUpdateRequestDto,
   ApplicationStatusUpdateRequest,
-  SendChatMessageRequest,
-  AvailablePetAddRequest,
   ParentPetAddRequest,
   ParentPetUpdateRequest,
-  PetStatusUpdateRequest,
   ReviewReplyRequest,
-  VerificationSubmitRequest,
-  SubmitDocumentsRequest,
   SimpleApplicationFormUpdateRequest,
   BreederAccountDeleteRequest,
 } from '@/shared/types'
 import {
   updateBreederProfile,
   updateBreederApplicationStatus,
-  sendApplicationChatMessage,
-  addAvailablePet,
-  updateAvailablePet,
-  deleteAvailablePet,
-  updateAvailablePetStatus,
   addParentPet,
   updateParentPet,
   deleteParentPet,
   createReviewReply,
   updateReviewReply,
   deleteReviewReply,
-  submitVerification,
-  submitVerificationDocuments,
-  uploadVerificationDocuments,
   updateSimpleApplicationForm,
   deleteBreederAccount,
 } from './breeder.api'
@@ -60,62 +47,8 @@ export const useUpdateBreederApplicationStatus = () => {
       data,
     }: {
       applicationId: string
-      data: ApplicationStatusUpdateRequest
+      data: Omit<ApplicationStatusUpdateRequest, 'applicationId'>
     }) => updateBreederApplicationStatus(applicationId, data),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: breederQueries.all() })
-    },
-  })
-}
-
-export const useSendChatMessage = (applicationId: string) => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (data: SendChatMessageRequest) => sendApplicationChatMessage(applicationId, data),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: breederQueries.chatMessages(applicationId).queryKey })
-    },
-  })
-}
-
-// ==================== 분양 개체 ====================
-
-export const useAddAvailablePet = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (data: AvailablePetAddRequest) => addAvailablePet(data),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: breederQueries.all() })
-    },
-  })
-}
-
-export const useUpdateAvailablePet = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: ({ petId, data }: { petId: string; data: AvailablePetAddRequest }) =>
-      updateAvailablePet(petId, data),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: breederQueries.all() })
-    },
-  })
-}
-
-export const useDeleteAvailablePet = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (petId: string) => deleteAvailablePet(petId),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: breederQueries.all() })
-    },
-  })
-}
-
-export const useUpdateAvailablePetStatus = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: ({ petId, data }: { petId: string; data: PetStatusUpdateRequest }) =>
-      updateAvailablePetStatus(petId, data),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: breederQueries.all() })
     },
@@ -186,40 +119,6 @@ export const useDeleteReviewReply = () => {
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: breederQueries.all() })
     },
-  })
-}
-
-// ==================== 인증 ====================
-
-export const useSubmitVerification = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (data: VerificationSubmitRequest) => submitVerification(data),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: breederQueries.verification().queryKey })
-    },
-  })
-}
-
-export const useSubmitVerificationDocuments = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (data: SubmitDocumentsRequest) => submitVerificationDocuments(data),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: breederQueries.verification().queryKey })
-    },
-  })
-}
-
-export const useUploadVerificationDocuments = () => {
-  return useMutation({
-    mutationFn: ({
-      files,
-      level,
-    }: {
-      files: { type: string; file: File }[]
-      level: 'new' | 'elite'
-    }) => uploadVerificationDocuments(files, level),
   })
 }
 

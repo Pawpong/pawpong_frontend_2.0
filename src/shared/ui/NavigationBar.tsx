@@ -17,6 +17,8 @@ interface NavigationBarProps {
   icon?: 'arrow' | 'close'
   /** 오른쪽 액션 슬롯 (아이콘 버튼 등) */
   right?: ReactNode
+  /** 타이틀 타이포 오버라이드 (브랜드 디스플레이 서체 등) */
+  titleClassName?: string
   className?: string
 }
 
@@ -28,6 +30,7 @@ const NavigationBar = ({
   onBack,
   icon = 'arrow',
   right,
+  titleClassName,
   className,
 }: NavigationBarProps) => {
   const isClose = icon === 'close'
@@ -42,17 +45,31 @@ const NavigationBar = ({
     <Container className={cn('flex items-center bg-white px-4 py-1 tab:py-2', className)}>
       <div className="flex min-w-0 flex-1 items-center">
         {onBack && (
-          <button type="button" onClick={onBack} aria-label={backLabel} className="shrink-0">
+          <button
+            type="button"
+            onClick={onBack}
+            aria-label={backLabel}
+            className="-m-2 flex size-10 shrink-0 items-center justify-center rounded-lg transition-colors hover:bg-primary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+          >
             {backIcon}
           </button>
         )}
         {!onBack && backHref && (
-          <Link href={backHref} aria-label={backLabel} className="shrink-0">
+          <Link
+            href={backHref}
+            aria-label={backLabel}
+            className="-m-2 flex size-10 shrink-0 items-center justify-center rounded-lg transition-colors hover:bg-primary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+          >
             {backIcon}
           </Link>
         )}
         {/* Figma: medium(mo) 14 / large(tab+) 16 — 라벨 높이가 바 높이(33/44)를 결정한다 */}
-        <TextLabel className="min-w-0 flex-1 truncate text-center text-sm tab:text-base">
+        <TextLabel
+          className={cn(
+            'min-w-0 flex-1 truncate text-center text-sm tab:text-base',
+            titleClassName,
+          )}
+        >
           {mobileTitle ? (
             <>
               <span className="tab:hidden">{mobileTitle}</span>

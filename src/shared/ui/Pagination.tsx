@@ -35,15 +35,15 @@ export const PaginationLink = React.forwardRef<HTMLAnchorElement, PaginationLink
       ref={ref}
       aria-current={isActive ? 'page' : undefined}
       className={cn(
-        'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors',
-        'focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white focus-visible:outline-none dark:focus-visible:ring-offset-zinc-950',
+        'inline-flex items-center justify-center rounded-lg text-sm font-medium text-neutral-700 transition-colors',
+        'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white focus-visible:outline-none',
         size === 'default' && 'h-9 min-w-9 px-4 py-2',
         size === 'sm' && 'h-8 min-w-8 gap-1 px-3 text-xs',
         size === 'lg' && 'h-10 min-w-10 px-6',
         size === 'icon' && 'size-9',
         isActive
-          ? 'border border-zinc-200 bg-zinc-100 text-zinc-950 dark:border-zinc-800 dark:bg-zinc-800 dark:text-zinc-50'
-          : 'hover:bg-zinc-100 hover:text-zinc-950 dark:hover:bg-zinc-800 dark:hover:text-zinc-50',
+          ? 'border border-primary-500 bg-primary-50 text-primary-500'
+          : 'hover:bg-neutral-100 hover:text-neutral-850',
         className,
       )}
       {...props}
@@ -59,7 +59,7 @@ export const PaginationPrevious = ({
   <PaginationLink
     aria-label="이전 페이지"
     size="default"
-    className={cn('gap-1 pl-2.5 sm:pr-4', className)}
+    className={cn('gap-1 pl-2.5 tab:pr-4', className)}
     {...props}
   >
     <svg
@@ -73,7 +73,7 @@ export const PaginationPrevious = ({
     >
       <path d="m15 18-6-6 6-6" />
     </svg>
-    <span className="hidden sm:inline">이전</span>
+    <span className="hidden tab:inline">이전</span>
   </PaginationLink>
 )
 
@@ -84,10 +84,10 @@ export const PaginationNext = ({
   <PaginationLink
     aria-label="다음 페이지"
     size="default"
-    className={cn('gap-1 pr-2.5 sm:pl-4', className)}
+    className={cn('gap-1 pr-2.5 tab:pl-4', className)}
     {...props}
   >
-    <span className="hidden sm:inline">다음</span>
+    <span className="hidden tab:inline">다음</span>
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"

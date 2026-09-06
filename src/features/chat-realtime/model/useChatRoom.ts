@@ -38,6 +38,7 @@ const useChatRoom = (roomId: string, currentUserId: string) => {
     ...chatQueries.messages(roomId),
     refetchInterval: usePolling ? 3_000 : false,
     refetchIntervalInBackground: false,
+    throwOnError: false,
   })
 
   const handleConnect = useCallback(() => {

@@ -16,6 +16,7 @@ export const toMyProfileCardProps = (profile: MyProfile): MyProfileCardProps => 
         bio: profile.bio,
         bpm: profile.bpm,
         followerCount: profile.followerCount,
+        followingCount: profile.followingCount,
         isFollowing: false,
       },
     }
@@ -31,7 +32,7 @@ export const toMyProfileCardProps = (profile: MyProfile): MyProfileCardProps => 
       longDescription: profile.longDescription,
       bpm: profile.bpm,
       followerCount: profile.followerCount,
-      level: profile.level ?? 'new',
+      followingCount: profile.followingCount,
       plan: profile.plan ?? 'basic',
       businessLocation: {
         city: profile.businessLocation?.city ?? '',

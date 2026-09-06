@@ -1,25 +1,17 @@
-import { apiClient, API_VERSION, unwrap, unwrapNullable } from '@/shared/api'
+import { apiClient, API_VERSION, unwrap } from '@/shared/api'
 import type {
   ApiResponseFull,
   ProfileUpdateRequestDto,
   BreederProfileUpdateResponseDto,
   ApplicationStatusUpdateRequest,
   ApplicationStatusUpdateResponseDto,
-  ChatMessageDto,
-  SendChatMessageRequest,
-  AvailablePetAddRequest,
   ParentPetAddRequest,
   ParentPetUpdateRequest,
   PetAddResponse,
   PetMessageResponse,
-  PetStatusUpdateRequest,
   ReviewReplyRequest,
   ReviewReplyResponseDto,
   ReviewReplyDeleteResponseDto,
-  VerificationSubmitRequest,
-  VerificationSubmitResponse,
-  SubmitDocumentsRequest,
-  UploadDocumentsResponseDto,
   SimpleApplicationFormUpdateRequest,
   SimpleApplicationFormUpdateResponse,
   BreederAccountDeleteRequest,
@@ -34,55 +26,15 @@ export const updateBreederProfile = (data: ProfileUpdateRequestDto) =>
     >(`${API_VERSION}/breeder-management/profile`, data)
     .then(unwrap)
 
-/** 신청 상태 변경 (브리더용) */
+/** 신청 상태 변경 (브리더용) — applicationId는 URL과 body 둘 다 필요해 호출부 대신 여기서 채운다 */
 export const updateBreederApplicationStatus = (
   applicationId: string,
-  data: ApplicationStatusUpdateRequest,
+  data: Omit<ApplicationStatusUpdateRequest, 'applicationId'>,
 ) =>
   apiClient
     .patch<
       ApiResponseFull<ApplicationStatusUpdateResponseDto>
-    >(`${API_VERSION}/breeder-management/applications/${applicationId}`, data)
-    .then(unwrap)
-
-/** 채팅 메시지 전송 */
-export const sendApplicationChatMessage = (applicationId: string, data: SendChatMessageRequest) =>
-  apiClient
-    .post<
-      ApiResponseFull<ChatMessageDto | null>
-    >(`${API_VERSION}/breeder-management/applications/${applicationId}/chat/messages`, data)
-    .then((res) => unwrapNullable(res, '채팅 메시지 전송에 실패했습니다.'))
-
-// ==================== 분양 개체 (available-pets) ====================
-
-/** 분양 개체 추가 */
-export const addAvailablePet = (data: AvailablePetAddRequest) =>
-  apiClient
-    .post<ApiResponseFull<PetAddResponse>>(`${API_VERSION}/breeder-management/available-pets`, data)
-    .then(unwrap)
-
-/** 분양 개체 수정 */
-export const updateAvailablePet = (petId: string, data: AvailablePetAddRequest) =>
-  apiClient
-    .patch<
-      ApiResponseFull<PetMessageResponse>
-    >(`${API_VERSION}/breeder-management/available-pets/${petId}`, data)
-    .then(unwrap)
-
-/** 분양 개체 삭제 */
-export const deleteAvailablePet = (petId: string) =>
-  apiClient
-    .delete<
-      ApiResponseFull<PetMessageResponse>
-    >(`${API_VERSION}/breeder-management/available-pets/${petId}`)
-    .then(unwrap)
-
-/** 분양 개체 상태 변경 */
-export const updateAvailablePetStatus = (petId: string, data: PetStatusUpdateRequest) =>
-  apiClient
-    .patch<
-      ApiResponseFull<PetMessageResponse>
-    >(`${API_VERSION}/breeder-management/available-pets/${petId}/status`, data)
+    >(`${API_VERSION}/breeder-management/applications/${applicationId}`, { applicationId, ...data })
     .then(unwrap)
 
 // ==================== 부모견/묘 (parent-pets) ====================
@@ -134,41 +86,6 @@ export const deleteReviewReply = (reviewId: string) =>
       ApiResponseFull<ReviewReplyDeleteResponseDto>
     >(`${API_VERSION}/breeder-management/reviews/${reviewId}/reply`)
     .then(unwrap)
-
-// ==================== 인증 (verification) ====================
-
-/** 브리더 인증 신청 */
-export const submitVerification = (data: VerificationSubmitRequest) =>
-  apiClient
-    .post<
-      ApiResponseFull<VerificationSubmitResponse>
-    >(`${API_VERSION}/breeder-management/verification`, data)
-    .then(unwrap)
-
-/** 브리더 인증 서류 제출 (간소화) */
-export const submitVerificationDocuments = (data: SubmitDocumentsRequest) =>
-  apiClient
-    .post<
-      ApiResponseFull<VerificationSubmitResponse>
-    >(`${API_VERSION}/breeder-management/verification/submit`, data)
-    .then(unwrap)
-
-/** 브리더 인증 서류 업로드 (multipart) */
-export const uploadVerificationDocuments = (
-  files: { type: string; file: File }[],
-  level: 'new' | 'elite',
-) => {
-  const formData = new FormData()
-  files.forEach(({ file }) => formData.append('files', file))
-  formData.append('types', JSON.stringify(files.map(({ type }) => type)))
-  formData.append('level', level)
-
-  return apiClient
-    .post<
-      ApiResponseFull<UploadDocumentsResponseDto>
-    >(`${API_VERSION}/breeder-management/verification/upload`, formData)
-    .then(unwrap)
-}
 
 // ==================== 입양 신청 폼 (간소화) ====================
 

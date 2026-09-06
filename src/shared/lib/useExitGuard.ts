@@ -59,7 +59,7 @@ const useExitGuard = ({
     }
 
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (!hasChangesRef.current) return
+      if (allowNavigationRef.current || !hasChangesRef.current) return
       event.preventDefault()
       event.returnValue = ''
     }

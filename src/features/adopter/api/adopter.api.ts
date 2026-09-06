@@ -4,6 +4,7 @@ import type {
   FavoriteAddResponseDto,
   FavoriteRemoveResponseDto,
   ReviewCreateRequest,
+  ReviewCreateResponseDto,
   WithdrawReason,
 } from '@/shared/types'
 
@@ -52,7 +53,7 @@ export const createReview = (data: ReviewCreateRequest) =>
   apiClient
     .post<{
       success: boolean
-      data: { reviewId: string; message: string }
+      data: ReviewCreateResponseDto
       message?: string
     }>(`${API_VERSION}/adopter/review`, data)
     .then(unwrap)

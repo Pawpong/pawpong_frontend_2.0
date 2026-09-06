@@ -24,8 +24,11 @@ const DEFAULT_PLACEHOLDER = {
 
 const INPUT_NAME = 'keyword'
 
-// Figma: tab h48 / PC h56 / rounded8 / border #a6a6a6(포커스 #256EF4 — 모바일·탭 1px / PC 2px) / p12,
-// 입력 텍스트 #3E3E3E, placeholder Pretendard medium 16px #a6a6a6, 우측 32px 검색 아이콘
+/**
+ * 탐색 검색바.
+ * 회색 테두리 사각 인풋 대신 크림빛 면 위의 알약 — 주변 필터칩·버튼과 같은 형태 언어를 쓴다.
+ * 포커스는 브랜드 브라운 테두리 + 포인트 옐로우 글로우로, 파란 시스템 색(info)을 쓰지 않는다.
+ */
 export const SearchBar = ({
   placeholder = DEFAULT_PLACEHOLDER,
   defaultValue,
@@ -53,7 +56,10 @@ export const SearchBar = ({
       role="search"
       onSubmit={handleSubmit}
       className={cn(
-        'flex h-12 w-full items-center justify-between gap-3 rounded-lg border border-neutral-500 bg-white p-3 focus-within:border-info-500 pc:h-14 pc:focus-within:border-2',
+        'group flex h-12 w-full items-center gap-2 rounded-full border border-neutral-300 bg-white py-1 pr-1.5 pl-5 pc:h-14 pc:pl-6',
+        'transition-[border-color,box-shadow] duration-150',
+        // 포커스: 브랜드 테두리 + 옐로우 글로우 (파란 시스템 색은 쓰지 않는다)
+        'focus-within:border-primary-500 focus-within:shadow-[0_0_0_0.25rem_rgba(255,254,114,0.45)]',
         className,
       )}
     >
@@ -64,8 +70,13 @@ export const SearchBar = ({
         placeholder={isTablet ? placeholder.desktop : placeholder.mobile}
         className="min-w-0 flex-1 bg-transparent text-base leading-[1.5] font-medium text-neutral-850 outline-none placeholder:text-neutral-500"
       />
-      <button type="submit" aria-label="검색" className="shrink-0">
-        <SearchIcon className="size-8 text-neutral-700" />
+      <button
+        type="submit"
+        aria-label="검색"
+        // 평소엔 회색, 검색바가 포커스되면 테두리와 같은 브랜드 색으로 함께 바뀐다
+        className="flex size-10 shrink-0 items-center justify-center rounded-full text-neutral-700 transition-colors group-focus-within:text-primary-500 hover:bg-primary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 pc:size-11"
+      >
+        <SearchIcon className="size-7 pc:size-8" />
       </button>
     </form>
   )

@@ -1,6 +1,6 @@
 'use client'
 
-import { Container, CtaModal, NavigationBar } from '@/shared/ui'
+import { Button, Container, CtaModal, NavigationBar } from '@/shared/ui'
 import { PostFormCTA } from '@/widgets/post-form'
 import { useAdoptionCreateForm } from '../_lib/useAdoptionCreateForm'
 import { PET_IMAGE_MAX } from '../_lib/constants'
@@ -19,8 +19,12 @@ const AdoptionCreateContent = () => {
     representativeIndex,
     setRepresentativeIndex,
     isSubmitting,
+    isSavingDraft,
     canSubmit,
     submitError,
+    isLoadingDraft,
+    isDraftLoadError,
+    retryDraft,
     showGuard,
     cancelExit,
     handleCloseClick,
@@ -34,6 +38,36 @@ const AdoptionCreateContent = () => {
     control,
     formState: { errors },
   } = form
+
+  if (isLoadingDraft || isDraftLoadError) {
+    return (
+      <div className="flex min-h-screen w-full flex-col bg-white">
+        <NavigationBar title="분양글 작성" icon="close" onBack={handleCloseClick} />
+        <Container className="flex flex-1 items-center justify-center px-4 py-12">
+          <div className="flex flex-col items-center gap-4 text-center">
+            <p
+              role={isDraftLoadError ? 'alert' : 'status'}
+              className="text-sm font-medium text-neutral-700"
+            >
+              {isDraftLoadError
+                ? '임시저장 글을 불러오지 못했습니다.'
+                : '임시저장 글을 불러오는 중입니다.'}
+            </p>
+            {isDraftLoadError && (
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={handleCloseClick} className="px-4">
+                  목록으로
+                </Button>
+                <Button variant="fill" size="sm" onClick={() => void retryDraft()} className="px-4">
+                  다시 시도
+                </Button>
+              </div>
+            )}
+          </div>
+        </Container>
+      </div>
+    )
+  }
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-white">
@@ -87,7 +121,7 @@ const AdoptionCreateContent = () => {
         onSaveDraft={handleSaveDraft}
         onSubmit={handleUpload}
         isValid={canSubmit}
-        isSubmitting={isSubmitting}
+        isSubmitting={isSubmitting || isSavingDraft}
       />
 
       <CtaModal
@@ -96,9 +130,24 @@ const AdoptionCreateContent = () => {
         title="분양글 작성을 그만하시겠어요?"
         description="임시저장하면 나중에 이어서 작성할 수 있어요."
         actions={[
-          { label: '임시저장', variant: 'fill', onClick: handleSaveDraft },
-          { label: '분양글 작성 그만하기', variant: 'outline', onClick: handleExitConfirm },
-          { label: '닫기', variant: 'ghost', onClick: cancelExit },
+          {
+            label: '임시저장',
+            variant: 'fill',
+            onClick: handleSaveDraft,
+            disabled: isSavingDraft || isSubmitting,
+          },
+          {
+            label: '분양글 작성 그만하기',
+            variant: 'outline',
+            onClick: handleExitConfirm,
+            disabled: isSavingDraft || isSubmitting,
+          },
+          {
+            label: '닫기',
+            variant: 'ghost',
+            onClick: cancelExit,
+            disabled: isSavingDraft || isSubmitting,
+          },
         ]}
       />
     </div>

@@ -18,13 +18,22 @@ interface FollowButtonProps {
   status: FollowStatus
   size?: keyof typeof SIZE
   onClick?: () => void
+  /** mutation 진행 중 중복 클릭 방지 (Button의 disabled 스타일 그대로 사용) */
+  disabled?: boolean
   className?: string
 }
 
-const FollowButton = ({ status, size = 'lg', onClick, className }: FollowButtonProps) => (
+const FollowButton = ({
+  status,
+  size = 'lg',
+  onClick,
+  disabled,
+  className,
+}: FollowButtonProps) => (
   <Button
     variant="outline"
     onClick={onClick}
+    disabled={disabled}
     className={cn(SIZE[size], STATUS[status].className, className)}
   >
     {STATUS[status].label}

@@ -1,11 +1,11 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRightIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import type { ContestEntry } from '@/shared/types'
 import { ProfileAvatar } from '@/shared/ui'
+import { ContestEntryImage } from './ContestEntryImage'
 import { ContestVoteButton } from './ContestVoteButton'
 
 type ContestVoteCardType = 'large' | 'md' | 'md-avatar'
@@ -83,10 +83,9 @@ const ContestVoteCard = ({
         )}
         aria-label={`${entry.userDisplayName} 참여작 자세히 보기`}
       >
-        <Image
+        <ContestEntryImage
           src={entry.photoUrl}
           alt={entry.description}
-          fill
           sizes={
             isMdAvatar
               ? '110px'
@@ -96,7 +95,6 @@ const ContestVoteCard = ({
                   ? '282px'
                   : '164px'
           }
-          className="object-cover"
         />
 
         {canShowDetail && (

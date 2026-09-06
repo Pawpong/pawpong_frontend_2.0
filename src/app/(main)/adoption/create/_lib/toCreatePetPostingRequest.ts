@@ -25,6 +25,8 @@ interface PhotoFileNames {
 export const toCreatePetPostingRequest = (
   values: AdoptionCreateParsedValues,
   photos: PhotoFileNames,
+  /** 임시저장에서 이어 쓴 경우 — 발행되면 서버가 그 초안을 정리한다 */
+  draftId?: string | null,
 ): CreatePetPostingRequest => {
   // 미선택('')은 superRefine 이 막으므로 여기 도달하면 항상 completed | incomplete
   const vaccinationStatus = values.vaccinationStatus as Exclude<typeof values.vaccinationStatus, ''>
@@ -89,6 +91,7 @@ export const toCreatePetPostingRequest = (
 
     ...(parentPetSnapshots.length > 0 ? { parentPetSnapshots } : {}),
     ...(breedingEnvironment ? { breedingEnvironment } : {}),
+    ...(draftId ? { draftId } : {}),
   }
 }
 

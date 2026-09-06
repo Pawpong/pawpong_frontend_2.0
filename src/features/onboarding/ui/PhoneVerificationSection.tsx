@@ -2,7 +2,7 @@
 
 import { useEffect, useSyncExternalStore } from 'react'
 import { useWatch, type Control, type UseFormRegister, type UseFormSetValue } from 'react-hook-form'
-import { loadSocialSignupSession } from '@/features/auth'
+import { loadSocialSignupSession } from '@/shared/lib/socialSignupSession'
 import { Input, InputField, HelpMessage } from '@/shared/ui'
 import type { ProfileFormData } from '../model/schema'
 import { usePhoneVerification } from '../model/usePhoneVerification'

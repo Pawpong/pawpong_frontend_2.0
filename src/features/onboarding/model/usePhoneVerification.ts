@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { CheckRoundedIcon } from '@/shared/assets'
-import { useSendVerificationCode, useVerifyCode } from '@/features/auth'
+import { useSendVerificationCode, useVerifyCode } from '../api/onboarding.mutations'
 import type { HelpMessageState } from '@/shared/ui'
 
 /** 백엔드 인증코드 만료(3분)와 동일 */

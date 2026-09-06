@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import { PawIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 
 import { FavoriteButton, FavoriteToggle, ListingStats, PopularBadge } from '@/shared/ui'
@@ -18,20 +19,41 @@ interface AdoptionCardProps {
   // 제어형 관심 상태 — mutation 연결은 features 레이어 래퍼(FavoriteAdoptionCard)에서 주입
   isFavorite?: boolean
   onToggle?: () => void
+  preload?: boolean
 }
 
 // [refactored] 세로형 카드 이미지(이미지 + 분양완료 오버레이) — 모바일/태블릿 공통, rounded만 className으로 차이
 const CardImage = ({
   listing,
   isCompleted,
+  preload = false,
   className,
 }: {
   listing: AdoptionListingCard
   isCompleted: boolean
+  preload?: boolean
   className?: string
 }) => (
-  <div className={cn('relative aspect-[348/284] w-full overflow-hidden bg-neutral-700', className)}>
-    <Image src={listing.thumbnailUrl} alt={listing.name} fill className="object-cover" />
+  <div className={cn('relative aspect-[348/284] w-full overflow-hidden bg-point-50', className)}>
+    {listing.thumbnailUrl ? (
+      <Image
+        src={listing.thumbnailUrl}
+        alt={listing.name}
+        fill
+        sizes="(max-width: 767px) 50vw, (max-width: 1200px) 33vw, 25vw"
+        preload={preload}
+        className="object-cover"
+      />
+    ) : (
+      // 사진이 없으면 홈과 같은 paw 폴백을 그린다 (mock-pet.jpg 대신)
+      <div
+        className="absolute inset-0 flex items-center justify-center text-primary-300"
+        role="img"
+        aria-label={`${listing.name} 이미지 없음`}
+      >
+        <PawIcon className="size-12 opacity-70 pc:size-14" />
+      </div>
+    )}
     {isCompleted && <div className="absolute inset-0 bg-white/70" />}
     {/* 인기(bestBadge) 좌상단 배지 — Figma 796-81671 (mo 14px/py-2 · tab 16px/py-4) */}
     {listing.isPopular && (
@@ -68,7 +90,7 @@ const CardStats = ({
    - 모바일: medium (1023-40492) — rounded-4, 상/하 2행(제목·배지 / stats·하트), 제목=품종명, stats 12px
    - 태블릿+: large (796-81669) — rounded-8, 좌/우 2단(제목·stats / 배지·관심있어요), 제목=품종ǀ성별 나이
    ═══════════════════════════════════════════════ */
-const AdoptionCard = ({ listing, className, isFavorite, onToggle }: AdoptionCardProps) => {
+const AdoptionCard = ({ listing, className, isFavorite, onToggle, preload }: AdoptionCardProps) => {
   const isCompleted = listing.status === 'adopted'
 
   return (
@@ -77,7 +99,12 @@ const AdoptionCard = ({ listing, className, isFavorite, onToggle }: AdoptionCard
       <div className="flex flex-col tab:hidden">
         {/* 이미지 + 우하단 하트 48px 오버레이 (medium은 하트가 정보영역이 아닌 이미지 위) */}
         <div className="relative">
-          <CardImage listing={listing} isCompleted={isCompleted} className="rounded-[0.25rem]" />
+          <CardImage
+            listing={listing}
+            isCompleted={isCompleted}
+            preload={preload}
+            className="rounded-[0.25rem]"
+          />
           <FavoriteToggle
             isFavorite={isFavorite}
             onToggle={onToggle}
@@ -104,10 +131,15 @@ const AdoptionCard = ({ listing, className, isFavorite, onToggle }: AdoptionCard
 
       {/* ══════ 태블릿+ 카드 (Figma 796-81669, large) ══════ */}
       {/* 카드 배경 없음 — 이미지만 rounded-8, 정보는 2단(제목/stats · 상태배지/관심있어요) */}
-      {/* hover: bg white + rounded-20 + drop shadow (Figma 1867-254861) */}
-      <div className="hidden h-full flex-col transition-shadow tab:flex tab:hover:overflow-hidden tab:hover:rounded-[1.25rem] tab:hover:bg-white tab:hover:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]">
+      {/* hover: bg neutral-50 + rounded-20 + drop shadow (Figma 1867-254861) */}
+      <div className="hidden h-full flex-col transition-[background-color,border-radius,box-shadow] duration-200 ease-out tab:flex pc:hover:overflow-hidden pc:hover:rounded-[1.25rem] pc:hover:bg-neutral-50 pc:hover:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]">
         {/* [refactored] 이미지 공통 컴포넌트 — rounded-8 */}
-        <CardImage listing={listing} isCompleted={isCompleted} className="rounded-[0.5rem]" />
+        <CardImage
+          listing={listing}
+          isCompleted={isCompleted}
+          preload={preload}
+          className="rounded-[0.5rem]"
+        />
 
         {/* 정보: flex-1, p-12, 좌(제목/stats) · 우(상태배지/관심있어요) */}
         <div className="flex min-h-[7.5rem] flex-1 justify-between gap-[0.5rem] p-[0.75rem]">
@@ -148,6 +180,7 @@ const AdoptionCardHorizontal = ({
   className,
   isFavorite,
   onToggle,
+  preload,
 }: AdoptionCardProps) => {
   return (
     <Link
@@ -158,8 +191,25 @@ const AdoptionCardHorizontal = ({
       )}
     >
       {/* 이미지 100x100 */}
-      <div className="relative size-[6.25rem] shrink-0 overflow-hidden">
-        <Image src={listing.thumbnailUrl} alt={listing.name} fill className="object-cover" />
+      <div className="relative size-[6.25rem] shrink-0 overflow-hidden bg-point-50">
+        {listing.thumbnailUrl ? (
+          <Image
+            src={listing.thumbnailUrl}
+            alt={listing.name}
+            fill
+            sizes="100px"
+            preload={preload}
+            className="object-cover"
+          />
+        ) : (
+          <div
+            className="absolute inset-0 flex items-center justify-center text-primary-300"
+            role="img"
+            aria-label={`${listing.name} 이미지 없음`}
+          >
+            <PawIcon className="size-8" />
+          </div>
+        )}
       </div>
 
       {/* 정보 */}

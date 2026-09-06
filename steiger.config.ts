@@ -29,7 +29,13 @@ export default defineConfig([
      */
     files: [
       './src/app/(main)/adoption/create/layout.tsx',
+      './src/app/(main)/adoption/drafts/page.tsx',
       './src/app/(main)/adoption/my-listings/page.tsx',
+      './src/app/(main)/settings/page.tsx',
+      './src/app/(main)/grade-policy/apply/page.tsx',
+      './src/app/(main)/activity/page.tsx',
+      './src/app/(main)/activity/applications/[applicationId]/page.tsx',
+      './src/app/(main)/activity/reviews/[reviewId]/page.tsx',
     ],
     rules: {
       'fsd/no-public-api-sidestep': 'off',

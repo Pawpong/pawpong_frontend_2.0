@@ -1,4 +1,4 @@
-import type { SocialSignupSession } from '@/features/auth'
+import type { SocialSignupSession } from '@/shared/lib/socialSignupSession'
 import type { RegisterAdopterRequest, TermsAgreementItem } from '@/shared/types'
 import type { InfoFormData, ProfileFormData, SurveyFormData } from './schema'
 

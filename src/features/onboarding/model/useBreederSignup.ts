@@ -1,16 +1,13 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { useRegisterBreeder, useUploadBreederDocuments } from '@/features/auth'
-import { useUpdateMyProfile } from '@/features/profile'
+import { useRegisterBreeder, useUploadBreederDocuments } from '../api/onboarding.mutations'
+import { updateMyProfile } from '@/entities/profile'
 import { useOnboarding } from './OnboardingContext'
 import { useSignupCompletion } from './useSignupCompletion' // [refactored]
 import { SIGNUP_ERROR } from './signupErrors' // [refactored]
 import type { DocumentsFormData } from './schema'
-import {
-  buildBreederRegistrationRequest,
-  DEFAULT_BREEDER_LEVEL,
-} from './buildBreederRegistrationRequest'
+import { buildBreederRegistrationRequest } from './buildBreederRegistrationRequest'
 import { getBreederDocumentsSignature, getSelectedBreederDocuments } from './breederDocuments'
 
 /**
@@ -23,7 +20,6 @@ export const useBreederSignup = () => {
   const { formData, setFormData } = useOnboarding()
   const { mutateAsync: registerBreeder, isPending: isCompleting } = useRegisterBreeder()
   const { mutateAsync: uploadDocuments, isPending: isUploading } = useUploadBreederDocuments()
-  const updateMyProfile = useUpdateMyProfile()
   // 가입 요청이 실패해 다시 시도할 때 같은 서류를 또 올리지 않도록 업로드 결과를 들고 있는다
   const uploadedRef = useRef<{
     signature: string
@@ -92,7 +88,6 @@ export const useBreederSignup = () => {
         uploaded = await uploadDocuments({
           tempId: social.tempId,
           files: documents,
-          level: DEFAULT_BREEDER_LEVEL,
         })
         uploadedRef.current = { signature, result: uploaded }
       }
@@ -107,7 +102,7 @@ export const useBreederSignup = () => {
       await complete(tokens, async () => {
         if (!intro) return
         try {
-          await updateMyProfile.mutateAsync({ bio: intro })
+          await updateMyProfile({ bio: intro })
         } catch {
           // bio 저장 실패는 무시 — 마이홈에서 다시 입력 가능
         }

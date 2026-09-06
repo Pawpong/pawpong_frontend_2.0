@@ -6,8 +6,9 @@ import {
   useToggleCommunityPostBookmark,
   useToggleCommunityPostLike,
 } from '../api/communityReaction.mutations'
+import { ReportPostAction } from './ReportPostAction'
 
-type InjectedActions = 'onToggleLike' | 'onToggleSave'
+type InjectedActions = 'onToggleLike' | 'onToggleSave' | 'moreAction'
 
 /** entities 카드가 표시만 하는 좋아요·북마크를 mutation에 연결한다. */
 const useCardReactions = (postId: string, isLiked: boolean, isSaved: boolean) => {
@@ -24,7 +25,13 @@ const useCardReactions = (postId: string, isLiked: boolean, isSaved: boolean) =>
 const ConnectedPostCard = (props: Omit<ComponentProps<typeof PostCard>, InjectedActions>) => {
   const reactions = useCardReactions(props.postId, props.isLiked, props.isSaved)
 
-  return <PostCard {...props} {...reactions} />
+  return (
+    <PostCard
+      {...props}
+      {...reactions}
+      moreAction={props.onDelete ? undefined : <ReportPostAction postId={props.postId} />}
+    />
+  )
 }
 
 const ConnectedCommunityBox = (
@@ -32,11 +39,19 @@ const ConnectedCommunityBox = (
 ) => {
   const reactions = useCardReactions(props.postId, props.isLiked, props.isSaved)
 
-  return <CommunityBox {...props} {...reactions} />
+  return (
+    <CommunityBox
+      {...props}
+      {...reactions}
+      moreAction={<ReportPostAction postId={props.postId} />}
+    />
+  )
 }
 
-interface ConnectedFeedCardProps
-  extends Omit<ComponentProps<typeof CommunityFeedCard>, InjectedActions> {
+interface ConnectedFeedCardProps extends Omit<
+  ComponentProps<typeof CommunityFeedCard>,
+  InjectedActions
+> {
   /**
    * 로그인이 필요한 동작을 감싸는 가드 (features/auth의 useLoginGuard).
    * 같은 레이어의 auth 슬라이스를 직접 참조하지 않도록 앱 레이어에서 주입받는다.
@@ -52,6 +67,7 @@ const ConnectedFeedCard = ({ guard, ...props }: ConnectedFeedCardProps) => {
       {...props}
       onToggleLike={guard ? guard(reactions.onToggleLike) : reactions.onToggleLike}
       onToggleSave={guard ? guard(reactions.onToggleSave) : reactions.onToggleSave}
+      moreAction={props.onDelete ? undefined : <ReportPostAction postId={props.postId} />}
     />
   )
 }

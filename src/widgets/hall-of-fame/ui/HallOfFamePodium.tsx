@@ -1,12 +1,12 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import type { ContestEntry } from '@/shared/types'
 import { ArrowRightIcon } from '@/shared/assets'
 import { ProfileAvatar } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
+import { ContestEntryImage, isContestImageSourceSupported } from '@/entities/contest'
 import 'swiper/css'
 
 interface HallOfFamePodiumProps {
@@ -116,12 +116,13 @@ const PixelFrame = ({
   const photo = (
     <>
       {entry && (
-        <Image
+        <ContestEntryImage
           src={entry.photoUrl}
           alt={entry.description || `${entry.userDisplayName}의 명예의 전당 사진`}
-          fill
           sizes="(min-width: 1440px) 211px, 122px"
-          className="object-cover"
+          loading="eager"
+          fetchPriority={rank === 1 ? 'high' : 'auto'}
+          fallbackIconClassName="size-12 pc:size-16"
         />
       )}
     </>
@@ -133,7 +134,7 @@ const PixelFrame = ({
         <CrownIcon rank={rank} />
       </div>
 
-      {entry && onClick ? (
+      {entry && onClick && isContestImageSourceSupported(entry.photoUrl) ? (
         <button
           type="button"
           onClick={onClick}
@@ -197,17 +198,19 @@ const PodiumCard = ({
             className="shrink-0"
           />
           <span className="min-w-0 truncate text-xs leading-[1.5] font-semibold text-neutral-850 pc:text-base">
-            {entry?.userDisplayName ?? 'profile'}
+            {entry?.userDisplayName ?? '수상자 없음'}
           </span>
         </div>
 
-        <Link
-          href={entry ? `/home/${entry.userId}` : '/home'}
-          className="hidden shrink-0 items-center px-1 text-sm leading-[1.5] font-semibold whitespace-nowrap text-neutral-850 pc:flex"
-        >
-          브리더홈
-          <ArrowRightIcon className="size-5" />
-        </Link>
+        {entry && (
+          <Link
+            href={`/home/${entry.userId}`}
+            className="hidden shrink-0 items-center px-1 text-sm leading-[1.5] font-semibold whitespace-nowrap text-neutral-850 pc:flex"
+          >
+            브리더홈
+            <ArrowRightIcon className="size-5" />
+          </Link>
+        )}
       </div>
     </article>
   )
@@ -219,7 +222,7 @@ const HallOfFamePodium = ({ entries, onEntryClick, className }: HallOfFamePodium
   return (
     <div
       className={cn(
-        'relative flex h-[13.8125rem] w-full shrink-0 items-center overflow-hidden rounded-xl bg-secondary-200 px-4 py-8 tab:h-[16.8rem] tab:items-start tab:justify-center tab:p-8 pc:h-[26.425rem] pc:min-w-0 pc:shrink pc:flex-1',
+        'relative flex h-[13.8125rem] w-full shrink-0 items-center overflow-hidden rounded-xl bg-secondary-200 px-4 py-8 tab:h-[16.8rem] tab:items-start tab:justify-center tab:p-8 pc:h-[26.425rem] pc:min-w-0 pc:flex-1 pc:shrink',
         className,
       )}
     >

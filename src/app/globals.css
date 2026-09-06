@@ -24,9 +24,9 @@
 @theme {
   --breakpoint-mo: 375px;
   --breakpoint-tab: 768px;
-  /* 셸 상한(max-w-[90rem], 1440)과 같은 값이면 스크롤바 폭 때문에 1440 모니터에서 pc:가 끝내 안 켜진다.
-     디자인 기준은 1440 그대로 두고 진입점만 노트북 폭으로 내린다 */
-  --breakpoint-pc: 1280px;
+  /* Figma 2026 Pawpong의 반응형 구간: Mo 375~767 / Tab 768~1439 / PC 1440~.
+     JS 런타임 판별(useBreakpoint)과 동일한 값으로 유지한다. */
+  --breakpoint-pc: 1440px;
 
   /* typography — Body 스케일 (line-height 150% 포함). weight는 font-* 유틸로: font-normal/medium/semibold */
   --text-body-sm: 0.75rem; /* 12 */
@@ -186,42 +186,9 @@
   height: 0;
 }
 
-/* 배너 캐러셀 페이지네이션 (Figma 2752:261987) */
-.banner-swiper {
-  --swiper-pagination-color: #eac499;
-  --swiper-pagination-bullet-inactive-color: #d3e2fd;
-  --swiper-pagination-bullet-inactive-opacity: 1;
-  --swiper-pagination-bullet-width: 0.5rem;
-  --swiper-pagination-bullet-height: 0.5rem;
-  --swiper-pagination-bullet-horizontal-gap: 0.125rem;
-  --swiper-pagination-bottom: 1rem;
-}
-
-.banner-swiper .swiper-pagination-bullet-active {
-  width: 1.25rem;
-  border-radius: 0.5rem;
-}
-
-@media (width < 48rem) {
-  .banner-swiper .swiper-pagination {
-    display: none;
-  }
-}
-
-/* 중앙 배너 외 이전/다음 슬라이드는 태블릿 이상에서 흐리게 표시 */
+/* 배너는 한 번에 한 장만 보인다 — 스와이퍼 폭을 슬라이드 폭에 맞춰 앞뒤 슬라이드는 밖으로 잘린다. */
 @media (width >= 48rem) {
-  .banner-swiper .swiper-slide {
-    opacity: 0.3;
-    transition: opacity 200ms ease;
-  }
-
-  .banner-swiper .swiper-slide-active {
-    opacity: 1;
-  }
-}
-
-@media (width >= 90rem) {
-  .banner-swiper {
-    --swiper-pagination-bottom: 2.5rem;
+  .banner-swiper .swiper-wrapper {
+    align-items: center;
   }
 }

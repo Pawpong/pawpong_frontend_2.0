@@ -31,6 +31,7 @@ interface DropdownProps {
   onValueChange?: (value: string) => void
   placeholder?: string
   disabled?: boolean
+  ariaLabel?: string
   /** 트리거 추가 클래스 (너비 등) */
   className?: string
 }
@@ -41,10 +42,11 @@ const Dropdown = ({
   onValueChange,
   placeholder,
   disabled,
+  ariaLabel,
   className,
 }: DropdownProps) => (
   <SelectPrimitive.Root value={value} onValueChange={onValueChange} disabled={disabled}>
-    <SelectPrimitive.Trigger className={cn(slots.trigger(), className)}>
+    <SelectPrimitive.Trigger aria-label={ariaLabel} className={cn(slots.trigger(), className)}>
       <SelectPrimitive.Value placeholder={placeholder} />
       <SelectPrimitive.Icon asChild>
         <ChevronDownIcon className="size-6 shrink-0 text-neutral-850 transition-transform" />

@@ -1,10 +1,11 @@
 'use client'
 
+import type { ReactNode } from 'react'
+
 import Image from 'next/image'
 import Link from 'next/link'
 import { OwnerActionsMenu, ProfileHeader, TextLabel } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
-import { MoreVertIcon } from '@/shared/assets'
 import type { CommunityPreviewProps } from '../model/communityPreview'
 import { CommunityPostActions } from './CommunityPostActions'
 import { CommunityPostProfile } from './CommunityPostProfile'
@@ -22,6 +23,8 @@ interface PostCardProps extends CommunityPreviewProps {
   /** 좋아요·북마크 토글 — features의 ConnectedPostCard에서 주입 */
   onToggleLike?: () => void
   onToggleSave?: () => void
+  /** 남의 글에 표시할 기능 레이어 액션(예: 신고 메뉴) */
+  moreAction?: ReactNode
   className?: string
 }
 
@@ -43,7 +46,13 @@ const ImagesRow = ({
           className="relative h-[13.1875rem] w-[17.5625rem] shrink-0 overflow-hidden rounded-lg bg-neutral-700 tab:h-60 tab:w-80"
         >
           {src && (
-            <Image src={src} alt={`게시글 이미지 ${index + 1}`} fill className="object-cover" />
+            <Image
+              src={src}
+              alt={`게시글 이미지 ${index + 1}`}
+              fill
+              sizes="(max-width: 767px) 281px, 320px"
+              className="object-cover"
+            />
           )}
         </div>
       ))}
@@ -82,6 +91,7 @@ const PostCard = ({
   onDelete,
   onToggleLike,
   onToggleSave,
+  moreAction,
   className,
 }: PostCardProps) => {
   const hasImages = images.length > 0
@@ -108,6 +118,17 @@ const PostCard = ({
           profileImageUrl={author.profileImageUrl}
           detailHref={detailHref}
           showMore={showMore}
+          action={
+            onDelete ? (
+              <OwnerActionsMenu
+                onEdit={onEdit}
+                onDelete={onDelete}
+                className="shrink-0 text-neutral-850"
+              />
+            ) : (
+              moreAction
+            )
+          }
           className="p-2 pc:px-0"
         />
       ) : (
@@ -126,10 +147,7 @@ const PostCard = ({
               className="shrink-0 text-neutral-850"
             />
           ) : (
-            // ponytail: 남의 글 ⋯ 는 액션 미정(신고 등) — 스펙 나오면 여기 연결
-            <button type="button" aria-label="더보기" className="shrink-0">
-              <MoreVertIcon className="size-6 text-neutral-850" />
-            </button>
+            moreAction
           )}
         </div>
       )}

@@ -12,6 +12,7 @@ import { useToggleAdoptionFavorite } from '../api/adoption.mutations'
 interface FavoriteAdoptionCardProps {
   listing: AdoptionListingCard
   className?: string
+  preload?: boolean
 }
 
 /**
@@ -27,7 +28,7 @@ const createFavoriteCard = (
     | typeof AdoptionShowcaseCard,
   displayName: string,
 ) => {
-  const FavoriteCard = ({ listing, className }: FavoriteAdoptionCardProps) => {
+  const FavoriteCard = ({ listing, className, preload }: FavoriteAdoptionCardProps) => {
     const { isFavorite, toggleFavorite } = useToggleAdoptionFavorite(
       listing.listingId,
       listing.isFavorited,
@@ -37,6 +38,7 @@ const createFavoriteCard = (
       <Card
         listing={listing}
         className={className}
+        preload={preload}
         isFavorite={isFavorite}
         onToggle={toggleFavorite}
       />

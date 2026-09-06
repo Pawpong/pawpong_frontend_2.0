@@ -44,7 +44,7 @@ export interface AdopterPublicProfile {
   bpm: number
   followerCount: number
   /** 내가 팔로우하는 수 */
-  followingCount?: number
+  followingCount: number
   isFollowing: boolean
 }
 
@@ -91,7 +91,6 @@ export interface FavoriteItemDto {
   breederName: string
   profileImage?: string
   representativePhotos?: string[]
-  breederLevel?: string
   petType?: string
   location: string
   specialization?: string[]
@@ -110,13 +109,10 @@ export interface FavoriteItemDto {
 export type FavoritesListResponseDto = PaginationResponse<FavoriteItemDto>
 
 export interface FavoriteAddResponseDto {
-  favoriteId: string
-  breederId: string
   message: string
 }
 
 export interface FavoriteRemoveResponseDto {
-  breederId: string
   message: string
 }
 
@@ -133,11 +129,10 @@ export interface MyReviewItemDto {
   breederId: string | null
   breederNickname: string
   breederProfileImage: string | null
-  breederLevel: string
   breedingPetType: string
   content: string
   reviewType: string
-  writtenAt: Date
+  writtenAt: string
 }
 
 export interface MyReviewDetailDto extends MyReviewItemDto {
@@ -156,12 +151,8 @@ export interface ReviewCreateRequest {
 /** 후기 작성 응답 (adopter.ts) */
 export interface ReviewCreateResponseDto {
   reviewId: string
-  breederId: string
-  breederName: string
-  adopterId: string
-  adopterName: string
   applicationId: string
+  breederId: string
   reviewType: string
-  content: string
-  createdAt: string
+  writtenAt: string
 }

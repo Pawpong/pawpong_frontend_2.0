@@ -1,10 +1,10 @@
 'use client'
 
 import { cn } from '@/shared/lib/cn'
-import { MoreVertIcon } from '@/shared/assets'
 import type { ChatRoomResponseDto } from '@/shared/types'
 import { ProfileAvatar } from '@/shared/ui'
 import { getChatMessagePreview } from '../_lib/attachment'
+import { ChatRoomActionsMenu } from './ChatRoomActionsMenu'
 import { RelativeTime } from './RelativeTime'
 
 interface ChatRoomItemProps {
@@ -12,9 +12,16 @@ interface ChatRoomItemProps {
   isActive: boolean
   unreadCount?: number
   onClick: () => void
+  onRoomClosed?: () => void
 }
 
-const ChatRoomItem = ({ room, isActive, unreadCount = 0, onClick }: ChatRoomItemProps) => {
+const ChatRoomItem = ({
+  room,
+  isActive,
+  unreadCount = 0,
+  onClick,
+  onRoomClosed,
+}: ChatRoomItemProps) => {
   return (
     <div
       className={cn(
@@ -52,9 +59,11 @@ const ChatRoomItem = ({ room, isActive, unreadCount = 0, onClick }: ChatRoomItem
           </span>
         )}
       </button>
-      <button type="button" aria-label="더보기" className="shrink-0">
-        <MoreVertIcon className="size-6 text-neutral-850" />
-      </button>
+      <ChatRoomActionsMenu
+        roomId={room.roomId}
+        counterpartName={room.counterpart.nickname}
+        onClosed={onRoomClosed}
+      />
     </div>
   )
 }

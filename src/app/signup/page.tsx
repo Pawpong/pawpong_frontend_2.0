@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import { SignupTypeSelect } from '@/widgets/signup-type-select'
 import { SignupSessionCapture } from './_ui/SignupSessionCapture'
+import { SignupEntryGuard } from './_ui/SignupEntryGuard'
 
 /**
  * 회원가입 진입 (유형 선택: 입양자 / 브리더)
@@ -22,9 +23,11 @@ const SignupPage = () => {
     <>
       {/* 소셜 신규가입 파라미터(tempId 등) 캡처 — useSearchParams 사용으로 Suspense 필요 */}
       <Suspense fallback={null}>
-        <SignupSessionCapture />
+        <SignupEntryGuard>
+          <SignupSessionCapture />
+          <SignupTypeSelect />
+        </SignupEntryGuard>
       </Suspense>
-      <SignupTypeSelect />
     </>
   )
 }

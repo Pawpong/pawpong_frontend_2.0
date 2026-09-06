@@ -9,16 +9,18 @@ import { useUpdateAdopterProfile, useDeleteAdopterAccount } from '@/features/ado
 import { useUpdateBreederProfile } from '@/features/breeder'
 import { useUpdateMyProfile } from '@/features/profile'
 import { useUploadSingleFile } from '@/features/upload'
-import { useLogout } from '@/features/auth'
 import { normalizeApiError } from '@/shared/api'
 import { useToast } from '@/shared/lib/useToast'
+import { useExitGuard } from '@/shared/lib/useExitGuard'
 import { WithdrawReason } from '@/shared/types'
 import {
   AlertMessage,
+  AsyncState,
   Button,
   Container,
   CtaModal,
   FooterCtaBar,
+  ExitConfirmModal,
   NavigationBar,
   ProfileAvatar,
   InputField,
@@ -82,14 +84,22 @@ const ProfileEditContent = () => {
   }
 
   // 역할 판별: /profile/me 는 입양자·브리더 공용 (nickname·bio·profileImageUrl·role 제공)
-  const { data: myProfile } = useQuery(profileQueries.me())
+  const myProfileQuery = useQuery({
+    ...profileQueries.me(),
+    refetchOnMount: 'always',
+    throwOnError: false,
+  })
+  const myProfile = myProfileQuery.data
   const isBreeder = myProfile?.role === 'breeder'
 
   // 활동명·이메일은 입양자 전용(/adopter/profile) — 브리더는 호출하지 않는다(조회 실패 방지)
-  const { data: adopterProfile } = useQuery({
+  const adopterProfileQuery = useQuery({
     ...adopterQueries.profile(),
     enabled: myProfile?.role === 'adopter',
+    refetchOnMount: 'always',
+    throwOnError: false,
   })
+  const adopterProfile = adopterProfileQuery.data
 
   // 서버 원본값 — 폼 시드와 변경 감지(isDirty)의 기준. 저장 후 쿼리가 갱신되면 같이 따라간다
   const savedName = (isBreeder ? myProfile?.nickname : adopterProfile?.nickname) ?? ''
@@ -112,7 +122,6 @@ const ProfileEditContent = () => {
   const updateBreederProfile = useUpdateBreederProfile()
   const updateMyProfile = useUpdateMyProfile()
   const deleteAccount = useDeleteAdopterAccount()
-  const logout = useLogout()
 
   // 활동명만 필수. 소개는 서버 스펙상 빈 문자열이 "소개 비우기"로 허용돼 막지 않는다.
   // 브리더 활동명은 이 화면에서 readOnly라 검사에서 제외 — 비어 있어도 저장을 막으면 손쓸 방법이 없다
@@ -124,6 +133,14 @@ const ProfileEditContent = () => {
     updateBreederProfile.isPending ||
     updateMyProfile.isPending ||
     uploadFile.isPending
+  const { showGuard, requestExit, confirmExit, cancelExit } = useExitGuard({
+    hasChanges: isDirty,
+    enabled: seedReady,
+  })
+  const handleClose = () => {
+    if (requestExit()) router.push('/home')
+  }
+  const handleExitConfirm = () => confirmExit(() => router.push('/home'))
 
   // 적용: 소개(bio)는 양쪽 공용 PATCH /profile/me.
   //  - 입양자: 활동명·사진 → PATCH /adopter/profile
@@ -168,18 +185,50 @@ const ProfileEditContent = () => {
     }
   }
 
-  const handleLogout = async () => {
-    try {
-      await logout.mutateAsync()
-      router.replace('/')
-    } catch (error) {
-      showError(error, '로그아웃에 실패했습니다.') // [refactored]
-    }
+  const profilePending =
+    myProfileQuery.isPending || (myProfile?.role === 'adopter' && adopterProfileQuery.isPending)
+  const profileError =
+    !profilePending &&
+    (myProfileQuery.isError ||
+      !myProfile ||
+      (myProfile.role === 'adopter' && (adopterProfileQuery.isError || !adopterProfile)))
+
+  if (!seedReady) {
+    return (
+      <div className="flex w-full flex-col">
+        <NavigationBar title="프로필 편집" backHref="/home" />
+        <AsyncState
+          status={profileError ? 'error' : 'loading'}
+          message={
+            profileError
+              ? '프로필을 불러오지 못했습니다.'
+              : profilePending
+                ? '프로필을 불러오는 중입니다.'
+                : '프로필을 확인할 수 없습니다.'
+          }
+          action={
+            profileError ? (
+              <Button
+                variant="fill"
+                size="sm"
+                onClick={() => {
+                  void myProfileQuery.refetch()
+                  if (myProfile?.role === 'adopter') void adopterProfileQuery.refetch()
+                }}
+              >
+                다시 시도
+              </Button>
+            ) : undefined
+          }
+          className="min-h-[calc(100dvh-7rem)]"
+        />
+      </div>
+    )
   }
 
   return (
     <div className="flex w-full flex-col">
-      <NavigationBar title="프로필 편집" backHref="/home" />
+      <NavigationBar title="프로필 편집" onBack={handleClose} />
 
       {/* 디자인: 모바일 px-16(margin-mo) / 탭+ px-80(margin-pc), py-48
           하단 CTA 바가 고정이라 그 높이(94px)만큼 아래 여백을 둔다 */}
@@ -248,23 +297,17 @@ const ProfileEditContent = () => {
           </div>
         </div>
 
-        {/* 탈퇴 / 로그아웃 */}
-        <div className="flex items-center gap-10">
-          {/* 탈퇴는 입양자 전용 API(useDeleteAdopterAccount) — 브리더에선 숨김 */}
-          {!isBreeder && (
-            <Button variant="text" onClick={() => setShowLeave(true)}>
-              탈퇴
-            </Button>
-          )}
-          <Button variant="text" onClick={handleLogout}>
-            로그아웃
+        {/* 탈퇴는 입양자 전용 API(useDeleteAdopterAccount) — 브리더에선 숨김 */}
+        {!isBreeder && (
+          <Button variant="text" onClick={() => setShowLeave(true)}>
+            탈퇴
           </Button>
-        </div>
+        )}
       </Container>
 
       {/* 하단 고정 CTA — 공통 FooterCtaBar (Figma 1054-36832 / 모바일 1056-47239) */}
       <FooterCtaBar
-        secondary={{ label: '그만두기', onClick: () => router.back() }}
+        secondary={{ label: '그만두기', onClick: handleClose }}
         primary={{
           label: '프로필 적용',
           onClick: () => setShowApply(true),
@@ -306,6 +349,13 @@ const ProfileEditContent = () => {
           { label: '계정 탈퇴', variant: 'outline', onClick: handleLeave },
           { label: '다시 생각해볼게요', variant: 'fill', onClick: () => setShowLeave(false) },
         ]}
+      />
+
+      <ExitConfirmModal
+        open={showGuard}
+        onClose={cancelExit}
+        onConfirm={handleExitConfirm}
+        title="프로필 수정을 그만하시겠어요?"
       />
     </div>
   )

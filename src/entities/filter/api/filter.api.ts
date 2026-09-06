@@ -3,7 +3,6 @@ import { apiClient, API_VERSION, unwrap } from '@/shared/api'
 import type {
   ApiResponseFull,
   AllFilterOptions,
-  BreederLevelOption,
   SortOption,
   DogSizeOption,
   CatFurLengthOption,
@@ -15,12 +14,6 @@ import type {
 /** 전체 필터 옵션 조회 */
 export const getAllFilterOptions = () =>
   apiClient.get<ApiResponseFull<AllFilterOptions>>(`${API_VERSION}/filter-options`).then(unwrap)
-
-/** 브리더 레벨 옵션 조회 */
-export const getBreederLevels = () =>
-  apiClient
-    .get<ApiResponseFull<BreederLevelOption[]>>(`${API_VERSION}/filter-options/breeder-levels`)
-    .then(unwrap)
 
 /** 정렬 옵션 조회 */
 export const getSortOptions = () =>

@@ -18,6 +18,7 @@ import {
   COMMUNITY_LOGIN_PROMPT,
   CommunityFeedCardSkeleton,
   communityQueries,
+  getFirstPhotoPostId,
   toCommunityPreviewProps,
 } from '@/entities/community'
 import { ConnectedFeedCard, useDeletePostConfirm } from '@/features/community'
@@ -41,10 +42,11 @@ const CommunityContent = () => {
       communityQueries.posts('latest', undefined, undefined, appliedSearch || undefined),
     )
   const posts = flattenPages(data)
+  const firstPhotoPostId = getFirstPhotoPostId(posts)
 
   return (
     <div className="flex w-full flex-col">
-      {/* 상단바 — 공통 NavigationBar (Figma 2063-213675 navigation bar) */}
+      {/* 커뮤니티의 화면 정체성과 뒤로가기 기준은 전 구간에서 유지한다. */}
       <NavigationBar title="포퐁커뮤니티" backHref="/" />
 
       {/* 검색 (Figma 1657-251460 — 버튼 클릭 시 focus 입력 pill로 전환)
@@ -67,11 +69,12 @@ const CommunityContent = () => {
         />
       </Container>
 
-      {/* Main: Feed — 인스타그램 홈처럼 카드 하나하나를 스크롤하는 단일 컬럼 피드.
-          pc는 이미지가 도드라지도록 게시판형 폭(948px) 대신 좁은 피드 폭(415px)으로 가운데 정렬.
-          모바일은 좌우 여백을 없애 카드가 화면 끝까지 닿게 한다 (tab/pc는 Container 기본 여백 유지) */}
-      <Container className="px-0 pb-10 tab:pb-16">
-        <div className="mx-auto w-full pc:max-w-[25.9375rem]">
+      {/* Main: Feed — Figma "1440 · 커뮤니티 홈" 기준. 흰 표면 위 단일 컬럼이고
+          카드 폭 상한은 mo/tab 343px, PC 415px 다.
+          중립 회색 표면을 페이지 셸 폭(PC 1440) 전체에 깔면 343px 컬럼 좌우로 470px 씩
+          빈 띠가 생겨 데스크탑에 모바일 화면을 끼워 넣은 것처럼 보인다 — 시안대로 흰 배경을 쓴다. */}
+      <Container className="px-4 pt-5 pb-10 tab:pt-8 tab:pb-16">
+        <div className="mx-auto w-full max-w-[21.4375rem] pc:max-w-[25.9375rem]">
           {/* 로딩은 ListState 문구 대신 카드 골격으로 — 피드는 화면 대부분이 이미지라 덜 흔들린다 */}
           {isPending && (
             <div className="flex min-w-0 flex-col gap-6 tab:gap-8 pc:gap-10">
@@ -99,6 +102,7 @@ const CommunityContent = () => {
                 return (
                   <ConnectedFeedCard
                     key={post.postId}
+                    preload={post.postId === firstPhotoPostId}
                     guard={guard}
                     {...toCommunityPreviewProps(post)}
                     onEdit={
@@ -121,10 +125,12 @@ const CommunityContent = () => {
         </div>
       </Container>
 
-      {/* 글작성 — 상단 작성 유도 바를 대신하는 우하단 고정 FAB (Figma "글작성" BaseButton) */}
+      {/* 글작성 — 상단 작성 유도 바를 대신하는 우하단 고정 FAB (Figma "글작성" BaseButton)
+          mo·tab 은 BottomNav(높이 3.5rem, 같은 z-sticky)가 뒤에 렌더되어 겹치면 FAB을 덮으므로
+          네비 높이 + 기존 여백 1.5rem 만큼 띄운다. pc 는 BottomNav 가 없어 원래 위치를 쓴다. */}
       <Link
         href="/community/write"
-        className="fixed right-6 bottom-6 z-sticky flex h-12 items-center gap-1 rounded-full bg-point-500 px-4 shadow-[0_7px_7px_rgba(55,55,55,0.1)]"
+        className="fixed right-6 bottom-[calc(3.5rem+1.5rem+env(safe-area-inset-bottom))] z-sticky flex h-12 items-center gap-1 rounded-full bg-point-500 px-4 shadow-[0_7px_7px_rgba(55,55,55,0.1)] pc:bottom-6"
       >
         <PlusIcon className="size-6 text-neutral-850" />
         <span className="text-base leading-[1.5] font-semibold text-neutral-850">글작성</span>

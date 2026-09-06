@@ -79,7 +79,7 @@ const StepProgressBar = () => {
       style={{ top: gnbH }}
       className="sticky z-20 flex w-full items-center justify-center bg-white px-4 py-1 tab:px-12 tab:py-2 pc:px-20"
     >
-      <div className="flex w-full items-center justify-center gap-[0.125rem]">
+      <div className="flex w-full max-w-[39rem] min-w-0 items-center justify-center gap-[0.125rem]">
         <div
           className={cn(
             cafe24Proup.className,
@@ -89,7 +89,7 @@ const StepProgressBar = () => {
           <span className="-mb-[0.3125rem] text-[#a9835a]">EXP</span>
           <span className="text-[#39d264]">{progressPercent}%</span>
         </div>
-        <div className="relative px-2 py-[0.125rem]">
+        <div className="relative min-w-0 flex-1 px-2 py-[0.125rem]">
           <div className="h-[0.829rem] w-full max-w-[17.562rem] tab:h-[1.644rem] tab:max-w-[34.846rem]">
             <ProgressBarSvg percent={progressPercent} />
           </div>

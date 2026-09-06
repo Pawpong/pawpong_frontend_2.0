@@ -14,12 +14,8 @@ import type {
   ReceivedApplicationItemDto,
   ReceivedApplicationDetailDto,
   BreederApplicationFormDto,
-  ChatMessageDto,
-  BreederMyPetItem,
-  MyPetsParams,
   BreederMyReviewItem,
   MyReviewsParams,
-  VerificationStatusResponse,
 } from '@/shared/types'
 
 /** 브리더 공개 프로필 조회 (브리더홈) */
@@ -130,14 +126,6 @@ export const getReceivedApplicationDetail = (applicationId: string) =>
     >(`${API_VERSION}/breeder-management/applications/${applicationId}`)
     .then(unwrap)
 
-/** 내 개체 목록 조회 (브리더 관리) */
-export const getMyPets = (params: MyPetsParams = {}) =>
-  apiClient
-    .get<
-      ApiResponseFull<PaginationResponse<BreederMyPetItem>>
-    >(`${API_VERSION}/breeder-management/my-pets`, { params })
-    .then(unwrap)
-
 /** 내게 달린 후기 목록 조회 (브리더 관리) */
 export const getMyReceivedReviews = (params: MyReviewsParams = {}) =>
   apiClient
@@ -145,26 +133,3 @@ export const getMyReceivedReviews = (params: MyReviewsParams = {}) =>
       ApiResponseFull<PaginationResponse<BreederMyReviewItem>>
     >(`${API_VERSION}/breeder-management/my-reviews`, { params })
     .then(unwrap)
-
-/** 브리더 인증 상태 조회 */
-export const getBreederVerification = () =>
-  apiClient
-    .get<
-      ApiResponseFull<VerificationStatusResponse>
-    >(`${API_VERSION}/breeder-management/verification`)
-    .then(unwrap)
-
-/** 채팅 메시지 조회 */
-export const getApplicationChatMessages = async (
-  applicationId: string,
-): Promise<ChatMessageDto[]> => {
-  const res = await apiClient.get<
-    ApiResponseFull<ChatMessageDto[] | { messages?: ChatMessageDto[]; items?: ChatMessageDto[] }>
-  >(`${API_VERSION}/breeder-management/applications/${applicationId}/chat/messages`)
-
-  const data = unwrap(res)
-  if (Array.isArray(data)) return data
-  if ('messages' in data && Array.isArray(data.messages)) return data.messages
-  if ('items' in data && Array.isArray(data.items)) return data.items!
-  return []
-}

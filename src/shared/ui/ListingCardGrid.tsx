@@ -5,11 +5,23 @@ const listingCardGrid = tv({
   base: 'grid grid-cols-2',
   variants: {
     layout: {
-      /** 탐색·저장목록 — tab 2열 유지, PC 4열. 좌우 여백은 Container가 담당한다 */
-      explore: 'gap-4 tab:gap-5 pc:grid-cols-4',
-      /** 즐겨찾기 브리더·브리더 홈 분양목록 (Figma 1023-38692) — tab 3열, PC 1188px 가운데 정렬 */
+      /**
+       * 탐색·저장목록 (Figma 797:93446)
+       * - mo: 2열 / tab: 3열이 Container 폭을 그대로 채운다. 폭 상한을 두면 양옆이 비어 보인다.
+       * - PC: 1280px 안에 282px 카드 4개를 양끝 정렬해 Figma의 50.67px 간격을 만든다.
+       */
+      explore:
+        'w-full gap-4 tab:grid-cols-3 tab:gap-5 pc:grid-cols-[repeat(4,17.625rem)] pc:justify-between',
+      /**
+       * 즐겨찾기 브리더·브리더 홈 분양목록 (Figma 1023:38692)
+       * - mo: 164px 카드 2개 / tab: 최대 282px 카드 3개 / PC: 282px 카드 4개.
+       * - 각 구간 상한을 두어 1439px 카드가 1440px 카드보다 커지는 역전을 막는다.
+       */
       compact:
-        'gap-x-2.5 gap-y-4 tab:grid-cols-3 tab:gap-5 pc:mx-auto pc:max-w-[74.25rem] pc:grid-cols-4',
+        'mx-auto w-full max-w-[21.4375rem] grid-cols-[repeat(2,minmax(0,10.25rem))] justify-between gap-y-4 tab:max-w-[55.375rem] tab:grid-cols-[repeat(3,minmax(0,17.625rem))] tab:justify-center tab:gap-5 pc:max-w-[74.25rem] pc:grid-cols-[repeat(4,minmax(0,17.625rem))]',
+      /** 공개 브리더 홈: mo 2열 / tab 2열 / pc 4열 (Figma 4199:546202). */
+      publicBreeder:
+        'mx-auto w-full max-w-[21.4375rem] grid-cols-[repeat(2,minmax(0,10.25rem))] justify-between gap-x-[0.9375rem] gap-y-4 tab:max-w-[38rem] tab:grid-cols-[repeat(2,17.625rem)] tab:gap-x-11 tab:gap-y-6 pc:max-w-[74.625rem] pc:grid-cols-[repeat(4,17.625rem)] pc:gap-x-[1.375rem]',
     },
   },
   defaultVariants: { layout: 'explore' },
@@ -18,14 +30,14 @@ const listingCardGrid = tv({
 interface ListingCardGridProps<T> extends VariantProps<typeof listingCardGrid> {
   items: readonly T[]
   getKey: (item: T) => Key
-  renderItem: (item: T) => ReactNode
+  renderItem: (item: T, index: number) => ReactNode
 }
 
 /** 카드 목록 공용 그리드. 화면군마다 시안 규격이 달라 layout 으로 나눈다. */
 const ListingCardGrid = <T,>({ items, getKey, renderItem, layout }: ListingCardGridProps<T>) => (
   <div className={listingCardGrid({ layout })}>
-    {items.map((item) => (
-      <Fragment key={getKey(item)}>{renderItem(item)}</Fragment>
+    {items.map((item, index) => (
+      <Fragment key={getKey(item)}>{renderItem(item, index)}</Fragment>
     ))}
   </div>
 )

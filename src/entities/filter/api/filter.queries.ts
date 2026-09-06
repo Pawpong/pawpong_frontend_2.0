@@ -1,7 +1,6 @@
 import { createQuery, STALE_TIME } from '@/shared/api'
 import {
   getAllFilterOptions,
-  getBreederLevels,
   getSortOptions,
   getDogSizes,
   getCatFurLengths,
@@ -15,13 +14,6 @@ export const filterQueries = {
     createQuery({
       queryKey: [...filterQueries.all(), 'options'],
       queryFn: getAllFilterOptions,
-      staleTime: STALE_TIME.STATIC,
-    }),
-
-  breederLevels: () =>
-    createQuery({
-      queryKey: [...filterQueries.all(), 'breederLevels'],
-      queryFn: getBreederLevels,
       staleTime: STALE_TIME.STATIC,
     }),
 

@@ -2,8 +2,8 @@
 
 import { useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { saveSocialSignupSession } from '../lib/socialSignupSession'
-import type { SocialSignupSession } from '../lib/socialSignupSession'
+import { saveSocialSignupSession } from '@/shared/lib/socialSignupSession'
+import type { SocialSignupSession } from '@/shared/lib/socialSignupSession'
 
 interface SocialSignupCaptureProps {
   onCapture?: (session: SocialSignupSession) => void

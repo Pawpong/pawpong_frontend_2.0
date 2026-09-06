@@ -18,6 +18,7 @@ interface TabBarProps {
   children?: ReactNode
   className?: string
   barClassName?: string
+  triggerClassName?: string
   barStyle?: CSSProperties
   ariaLabel?: string
 }
@@ -36,18 +37,19 @@ const TabBar = ({
   children,
   className,
   barClassName,
+  triggerClassName,
   barStyle,
   ariaLabel,
 }: TabBarProps) => {
   return (
     <Tabs value={value} onValueChange={onValueChange} className={cn('w-full', className)}>
-      {/* 폭은 페이지 셸과 동일(PAGE_WIDTH_CLASS) — 하단 구분선도 1440에서 끊기도록 바 자체에 상한을 건다.
-          여백만 탭 바 디자인에 맞춤. Container를 쓰지 않는 이유: tab/pc는 Container와 같지만 모바일만 16px(Container는 20px). */}
+      {/* 탭과 하단선은 PAGE_WIDTH_CLASS 전체를 사용한다. 콘텐츠 카드 폭 상한을 탭에
+          재사용하면 넓은 화면에서 탭만 940px로 좁아지므로, 거터만 반응형으로 유지한다. */}
       <div
         className={cn(PAGE_WIDTH_CLASS, 'border-b border-neutral-300 bg-white', barClassName)}
         style={barStyle}
       >
-        <div className="px-4 pt-3 tab:px-12 tab:pt-4 pc:px-20">
+        <div className="w-full px-4 pt-3 tab:px-12 tab:pt-4 pc:px-20">
           <TabsList variant="underline" aria-label={ariaLabel}>
             {items.map((item) => (
               <TabsTrigger
@@ -56,7 +58,10 @@ const TabBar = ({
                 disabled={item.disabled}
                 variant="underline"
                 size="md"
-                className="after:left-1/2 after:w-[7.25rem] after:-translate-x-1/2 tab:h-[3.8125rem] tab:pt-2 tab:text-base tab:after:left-0 tab:after:h-[0.5625rem] tab:after:w-full tab:after:translate-x-0"
+                className={cn(
+                  'after:left-1/2 after:w-[7.25rem] after:-translate-x-1/2 tab:h-[3.8125rem] tab:pt-2 tab:text-base tab:after:left-0 tab:after:h-[0.5625rem] tab:after:w-full tab:after:translate-x-0',
+                  triggerClassName,
+                )}
               >
                 {item.label}
               </TabsTrigger>

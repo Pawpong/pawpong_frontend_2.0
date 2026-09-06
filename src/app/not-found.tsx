@@ -1,16 +1,20 @@
 import Link from 'next/link'
+import { buttonVariants, FullPageMessage } from '@/shared/ui'
 
 export default function NotFound() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-4">
-      <h1 className="mb-4 text-4xl font-bold text-primary-500">404</h1>
-      <p className="text-body-m text-grayscale-gray5 mb-6">페이지를 찾을 수 없습니다</p>
-      <Link
-        href="/"
-        className="bg-primary rounded-lg px-6 py-3 text-white transition-opacity hover:opacity-90"
-      >
-        홈으로 돌아가기
-      </Link>
-    </div>
+    <FullPageMessage
+      badge="404"
+      title="페이지를 찾을 수 없어요"
+      description={<p>주소가 바뀌었거나 사라진 페이지예요. 홈에서 다시 찾아볼까요?</p>}
+      actions={
+        <Link
+          href="/"
+          className={buttonVariants({ variant: 'primary', size: 'lg', className: 'w-full px-5' })}
+        >
+          홈으로 돌아가기
+        </Link>
+      }
+    />
   )
 }

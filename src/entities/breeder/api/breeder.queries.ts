@@ -6,8 +6,6 @@ import type {
   ParentPetSummaryDto,
   PublicReviewDto,
   ReceivedApplicationItemDto,
-  BreederMyPetItem,
-  MyPetsParams,
   BreederMyReviewItem,
   MyReviewsParams,
 } from '@/shared/types'
@@ -24,10 +22,7 @@ import {
   getBreederApplicationForm,
   getReceivedApplications,
   getReceivedApplicationDetail,
-  getApplicationChatMessages,
-  getMyPets,
   getMyReceivedReviews,
-  getBreederVerification,
 } from './breeder.api'
 
 export const breederQueries = {
@@ -114,30 +109,9 @@ export const breederQueries = {
       enabled: !!applicationId,
     }),
 
-  chatMessages: (applicationId: string) =>
-    createQuery({
-      queryKey: [...breederQueries.all(), 'chat', applicationId],
-      queryFn: () => getApplicationChatMessages(applicationId),
-      enabled: !!applicationId,
-      staleTime: STALE_TIME.REALTIME,
-    }),
-
-  myPets: (params: MyPetsParams = {}, limit = 20) =>
-    createInfiniteQuery<BreederMyPetItem>({
-      queryKey: [...breederQueries.all(), 'my-pets', params, limit],
-      queryFn: (page) => getMyPets({ ...params, page, limit }),
-    }),
-
   myReviews: (params: MyReviewsParams = {}, limit = 10) =>
     createInfiniteQuery<BreederMyReviewItem>({
       queryKey: [...breederQueries.all(), 'my-reviews', params, limit],
       queryFn: (page) => getMyReceivedReviews({ ...params, page, limit }),
-    }),
-
-  verification: () =>
-    createQuery({
-      queryKey: [...breederQueries.all(), 'verification'],
-      queryFn: getBreederVerification,
-      staleTime: STALE_TIME.VERY_LONG,
     }),
 }

@@ -2,9 +2,9 @@
 
 import { useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query'
 import { breederQueries } from '@/entities/breeder'
-import { profileQueries } from '@/entities/profile'
+import { profileQueries, updateMyProfile } from '@/entities/profile'
 import type { UpdateMyProfileRequest } from '@/shared/types'
-import { updateMyProfile, followUser, unfollowUser, removeFollower } from './profile.api'
+import { followUser, unfollowUser, removeFollower } from './profile.api'
 
 export const useUpdateMyProfile = () => {
   const qc = useQueryClient()

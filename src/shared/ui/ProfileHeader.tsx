@@ -1,5 +1,7 @@
 'use client'
 
+import type { ReactNode } from 'react'
+
 import Link from 'next/link'
 import { ProfileAvatar } from './ProfileAvatar'
 import { MoreVertIcon } from '@/shared/assets'
@@ -25,6 +27,8 @@ interface ProfileHeaderProps {
   /** 미리보기 끝에 [더보기] 라벨 노출 (홈 쇼케이스 모바일·태블릿) */
   showMore?: boolean
   onMore?: () => void
+  /** 우측 액션 슬롯. 지정하지 않으면 onMore가 있을 때만 더보기 버튼을 노출한다. */
+  action?: ReactNode
   className?: string
 }
 
@@ -38,6 +42,7 @@ const ProfileHeader = ({
   detailHref,
   showMore,
   onMore,
+  action,
   className,
 }: ProfileHeaderProps) => {
   // 홈 쇼케이스(community home-contents) 전용 스펙: 이름 14 / 시각 10 / 미리보기 12 / 가로 더보기(⋯)
@@ -102,10 +107,18 @@ const ProfileHeader = ({
           </span>
         )}
       </div>
-      <button type="button" aria-label="더보기" onClick={onMore} className="shrink-0">
-        {/* 쇼케이스는 가로 더보기(⋯) — 세로 아이콘 90도 회전 재사용 */}
-        <MoreVertIcon className={cn('size-6 text-neutral-850', isShowcase && 'rotate-90')} />
-      </button>
+      {action ??
+        (onMore && (
+          <button
+            type="button"
+            aria-label="더보기"
+            onClick={onMore}
+            className="-m-2 flex size-10 shrink-0 items-center justify-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+          >
+            {/* 쇼케이스는 가로 더보기(⋯) — 세로 아이콘 90도 회전 재사용 */}
+            <MoreVertIcon className={cn('size-6 text-neutral-850', isShowcase && 'rotate-90')} />
+          </button>
+        ))}
     </div>
   )
 }

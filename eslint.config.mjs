@@ -70,7 +70,20 @@ const eslintConfig = defineConfig([
       ],
     },
   },
-  globalIgnores(['.next/**', 'out/**', 'build/**', 'next-env.d.ts']),
+  // api.generated.ts 는 openapi-typescript 산출물이라 사람이 고치지 않는다 (린트 대상 제외, tsc 는 그대로 검사)
+  globalIgnores([
+    '.next/**',
+    'out/**',
+    'build/**',
+    'next-env.d.ts',
+    'src/shared/types/api.generated.ts',
+    // .claude/worktrees 는 도구가 만든 리포 사본이라 lint 대상이 아니다.
+    // (gitignore 돼 있지만 eslint flat config 는 .gitignore 를 자동으로 따르지 않아 `pnpm lint` 가 통째로 실패했다)
+    '.claude/**',
+    // tests/*.cjs 는 Next 앱 코드가 아니라 순수 Node 테스트 스크립트라 Next 전용 규칙이 맞지 않는다
+    // (module 변수를 CommonJS 샌드박스용으로 직접 만드는 걸 no-assign-module-variable 이 오탐한다)
+    'tests/**',
+  ]),
 ])
 
 export default eslintConfig

@@ -51,7 +51,7 @@ const CommentComposer = ({
 
   // [refactored] py-3 래퍼·아바타 마크업을 CommentComposerShell로 위임
   const banner = replyingToNickname && (
-    <div className="flex items-center justify-between text-sm text-neutral-700">
+    <div className="flex items-center justify-between rounded-lg bg-point-50 px-3 py-2 text-sm text-neutral-700">
       <span className="font-semibold">@{replyingToNickname}에게 답글</span>
       <button
         type="button"
@@ -71,8 +71,7 @@ const CommentComposer = ({
 
   return (
     <CommentComposerShell profileImageUrl={profileImageUrl} banner={banner} footer={error}>
-      {/* 테두리 색이 포커스 여부를 그대로 따른다 (회색 → 파랑) */}
-      <div className="flex h-14 flex-1 items-center justify-between gap-2 rounded-lg border border-neutral-500 p-3 transition-colors focus-within:border-info-500">
+      <div className="flex h-14 flex-1 items-center justify-between gap-2 rounded-lg border border-neutral-500 bg-white p-3 transition-[border-color,box-shadow] focus-within:border-primary-500 focus-within:shadow-[0_0_0_3px_rgba(245,234,223,0.9)]">
         <input
           ref={inputRef}
           type="text"
@@ -90,9 +89,12 @@ const CommentComposer = ({
           type="button"
           onClick={handleSubmit}
           disabled={!trimmed || isSubmitting}
+          aria-busy={isSubmitting}
           className={cn(
-            'shrink-0 text-sm leading-[1.5] whitespace-nowrap transition-colors',
-            trimmed ? 'font-semibold text-info-500' : 'font-medium text-neutral-400',
+            'flex h-8 shrink-0 items-center rounded-full px-3 text-sm leading-[1.5] whitespace-nowrap transition-colors disabled:px-0',
+            trimmed
+              ? 'bg-point-500 font-semibold text-neutral-850 hover:bg-point-300 active:bg-point-600'
+              : 'font-medium text-neutral-400',
           )}
         >
           게시
