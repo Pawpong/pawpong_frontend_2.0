@@ -23,13 +23,7 @@ interface FollowButtonProps {
   className?: string
 }
 
-const FollowButton = ({
-  status,
-  size = 'lg',
-  onClick,
-  disabled,
-  className,
-}: FollowButtonProps) => (
+const FollowButton = ({ status, size = 'lg', onClick, disabled, className }: FollowButtonProps) => (
   <Button
     variant="outline"
     onClick={onClick}

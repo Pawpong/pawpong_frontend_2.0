@@ -31,9 +31,7 @@ export const reactivateAccount = async (
   reactivationToken: string,
 ): Promise<ReactivateAccountResponse> =>
   apiClient
-    .post<ApiResponse<ReactivateAccountResponse>>(
-      `${API_VERSION}/auth/reactivate`,
-      { reactivationToken },
-      { skipAuth: true, skipAuthRefresh: true } as ApiRequestConfig,
-    )
+    .post<
+      ApiResponse<ReactivateAccountResponse>
+    >(`${API_VERSION}/auth/reactivate`, { reactivationToken }, { skipAuth: true, skipAuthRefresh: true } as ApiRequestConfig)
     .then((res) => unwrap(res, '계정 복구에 실패했습니다.'))

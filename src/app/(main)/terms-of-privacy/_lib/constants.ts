@@ -1,7 +1,7 @@
 import type { TermsSection } from '../../_ui/TermsArticle'
 
 export const TERMS_OF_PRIVACY_INTRO =
-  '포퐁(이하 “회사”)은 「개인정보 보호법」 등 관련 법령을 준수하며, 회원의 개인정보를 안전하게 보호하기 위해 다음과 같이 개인정보 처리방침을 수립·공개합니다.';
+  '포퐁(이하 “회사”)은 「개인정보 보호법」 등 관련 법령을 준수하며, 회원의 개인정보를 안전하게 보호하기 위해 다음과 같이 개인정보 처리방침을 수립·공개합니다.'
 
 export const TERMS_OF_PRIVACY_SECTIONS: TermsSection[] = [
   {
@@ -158,4 +158,4 @@ export const TERMS_OF_PRIVACY_SECTIONS: TermsSection[] = [
       { text: '· 시행일자: 2025년 12월 23일', indentLevel: 0 },
     ],
   },
-];
+]
