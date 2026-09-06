@@ -69,15 +69,20 @@ export const SocialLoginList = () => {
   const hasAccessToken = () =>
     document.cookie.split(';').some((c) => c.trim().startsWith('accessToken='))
 
+  // 탈퇴 계정 복구 안내로 들어온 경우엔 자동 이탈시키지 않는다.
+  // 지난 세션의 accessToken 쿠키가 남아 있으면 복구 확인 모달을 보기도 전에 튕겨 나가고,
+  // 그 사이 유효시간 10분짜리 reactivationToken 이 URL 과 함께 유실된다.
+  const isReactivationPrompt = searchParams.get('type') === 'deleted_account'
+
   // 이미 로그인된 상태로 /login 에 진입하면(뒤로가기 등) 즉시 벗어난다 — 로그인 페이지 트랩 방지.
   // replace 로 이동해 /login 이 히스토리에 남지 않게 한다.
   useEffect(() => {
-    if (hasAccessToken()) router.replace(returnUrl)
-  }, [router, returnUrl])
+    if (!isReactivationPrompt && hasAccessToken()) router.replace(returnUrl)
+  }, [router, returnUrl, isReactivationPrompt])
 
   // 버튼 클릭 시점에도 한 번 더 확인 (마운트 이후 다른 탭에서 로그인된 경우 등)
   const redirectIfLoggedIn = (): boolean => {
-    if (hasAccessToken()) {
+    if (!isReactivationPrompt && hasAccessToken()) {
       router.replace(returnUrl)
       return true
     }
