@@ -53,6 +53,8 @@ export interface AdopterProfileUpdateRequest {
   phone?: string
   profileImage?: string
   marketingConsent?: boolean
+  /** 상담 사전 정보(공통 신청서) — 넘긴 필드만 부분 수정된다. 동의 시각은 서버가 보존한다 */
+  counselDefaultProfile?: Omit<AdopterCounselProfile, 'counselPrivacyAgreedAt'>
 }
 
 export interface AdopterProfileUpdateDto {

@@ -1,7 +1,7 @@
 import type { TermsSection } from '../../_ui/TermsArticle'
 
 export const TERMS_OF_SERVICE_INTRO =
-  '본 약관은 포퐁(이하 “회사”)이 제공하는 온라인 반려동물 입양·분양 연결 플랫폼 서비스(이하 “서비스”)의 이용조건 및 절차, 회사와 회원 간의 권리·의무 및 책임사항, 기타 필요한 사항을 규정합니다.';
+  '본 약관은 포퐁(이하 “회사”)이 제공하는 온라인 반려동물 입양·분양 연결 플랫폼 서비스(이하 “서비스”)의 이용조건 및 절차, 회사와 회원 간의 권리·의무 및 책임사항, 기타 필요한 사항을 규정합니다.'
 
 export const TERMS_OF_SERVICE_SECTIONS: TermsSection[] = [
   {
@@ -220,4 +220,4 @@ export const TERMS_OF_SERVICE_SECTIONS: TermsSection[] = [
       },
     ],
   },
-];
+]

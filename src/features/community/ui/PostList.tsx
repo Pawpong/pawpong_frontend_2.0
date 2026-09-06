@@ -28,7 +28,7 @@ const PostList = ({ posts, emptyText = '게시글이 없습니다.', onEdit, onD
   const firstPhotoPostId = getFirstPhotoPostId(posts)
 
   return (
-    <div className="mx-auto flex w-full min-w-0 max-w-168 flex-col gap-3 tab:gap-4 pc:max-w-[59.25rem] pc:gap-5">
+    <div className="mx-auto flex w-full max-w-168 min-w-0 flex-col gap-3 tab:gap-4 pc:max-w-[59.25rem] pc:gap-5">
       {posts.map((post, index) => (
         <Fragment key={post.postId}>
           <ConnectedFeedCard

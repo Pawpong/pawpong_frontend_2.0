@@ -1,0 +1,8 @@
+# 생성·관리 도구가 직접 쓰는 파일 — 포맷하면 도구가 다시 덮어써 diff 만 커진다
+pnpm-lock.yaml
+swagger.json
+dtoken.tokens.json
+
+# 빌드 산출물
+.next/
+node_modules/

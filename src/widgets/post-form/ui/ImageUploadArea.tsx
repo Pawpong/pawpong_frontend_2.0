@@ -104,8 +104,7 @@ const ImageUploadArea = ({
     }
   }
 
-  const isTabletUp = () =>
-    window.matchMedia(`(min-width: ${BREAKPOINTS.tab}px)`).matches
+  const isTabletUp = () => window.matchMedia(`(min-width: ${BREAKPOINTS.tab}px)`).matches
 
   const handleImageClick = (index: number) => {
     if (hasRepresentative) {
