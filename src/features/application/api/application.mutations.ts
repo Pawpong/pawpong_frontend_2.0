@@ -2,16 +2,8 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { applicationQueries } from '@/entities/application'
-import type {
-  ApplicationCreateRequest,
-  ApplicationStatusUpdateRequest,
-  ApplicationFormSimpleUpdateRequest,
-} from '@/shared/types'
-import {
-  createApplication,
-  updateApplicationStatus,
-  updateApplicationForm,
-} from './application.api'
+import type { ApplicationCreateRequest, ApplicationUpdateRequest } from '@/shared/types'
+import { createApplication, updateApplication } from './application.api'
 
 export const useCreateApplication = () => {
   const qc = useQueryClient()
@@ -23,7 +15,7 @@ export const useCreateApplication = () => {
   })
 }
 
-export const useUpdateApplicationStatus = () => {
+export const useUpdateApplication = () => {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: ({
@@ -31,20 +23,10 @@ export const useUpdateApplicationStatus = () => {
       data,
     }: {
       applicationId: string
-      data: ApplicationStatusUpdateRequest
-    }) => updateApplicationStatus(applicationId, data),
+      data: ApplicationUpdateRequest
+    }) => updateApplication(applicationId, data),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: applicationQueries.all() })
-    },
-  })
-}
-
-export const useUpdateApplicationForm = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (data: ApplicationFormSimpleUpdateRequest) => updateApplicationForm(data),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: applicationQueries.form().queryKey })
     },
   })
 }

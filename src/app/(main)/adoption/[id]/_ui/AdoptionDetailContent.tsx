@@ -38,17 +38,15 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
   // 내 분양글에는 신청 CTA 자체를 두지 않는다 (자기 개체에 신청할 일이 없다)
   const isMyListing = !!me && me.userId === detail.breeder.id
 
-  // 서버가 어차피 거절하는 경우를 버튼 단계에서 알린다 —
-  // 신청 생성은 status: 'available' 인 펫만 받고(findApplicablePet), adopter role 전용이다.
-  // 비로그인은 그대로 노출해 신청 페이지에서 로그인 유도 흐름을 타게 둔다.
+  // 서버가 어차피 거절하는 경우를 버튼 단계에서 알린다 — 신청 생성은 status: 'available' 인
+  // 펫만 받는다(findApplicablePet). 브리더 계정도 다른 브리더에게 입양 신청을 넣을 수 있어
+  // role 로는 막지 않는다. 비로그인은 그대로 노출해 신청 페이지에서 로그인 유도 흐름을 타게 둔다.
   const applyBlockedReason =
     detail.status === 'adopted'
       ? '분양이 완료된 개체예요'
       : detail.status === 'reserved'
         ? '예약 중인 개체예요'
-        : me?.role === 'breeder'
-          ? '브리더 계정은 입양 신청을 할 수 없어요'
-          : undefined
+        : undefined
 
   return (
     <div className="pb-[6rem] tab:pb-[6rem]">

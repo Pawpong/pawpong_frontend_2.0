@@ -73,16 +73,6 @@ export interface ApplicationFormUpdateRequest {
   customQuestions: ApplicationFormQuestion[]
 }
 
-export interface ApplicationFormSimpleUpdateRequest {
-  questions: Array<{ question: string }>
-}
-
-export interface ApplicationFormSimpleUpdateResponse {
-  message: string
-  customQuestions: Array<Pick<ApplicationFormQuestion, 'id' | 'order'> & { question: string }>
-  totalQuestions: number
-}
-
 // ==================== 신청 생성 ====================
 
 export interface ApplicationCreateRequest extends Omit<
@@ -107,6 +97,9 @@ export interface ApplicationCreateRequest extends Omit<
   canAffordMedicalExpenses: boolean
   customResponses?: Array<Pick<CustomQuestionResponse, 'questionId' | 'answer'>>
 }
+
+/** 신청서 전체 수정 요청 — breederId/petId는 수정 범위가 아니라 생성 요청에서 뺀다 */
+export type ApplicationUpdateRequest = Omit<ApplicationCreateRequest, 'breederId' | 'petId'>
 
 // ==================== 신청 목록 ====================
 

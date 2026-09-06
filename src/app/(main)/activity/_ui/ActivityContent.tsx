@@ -6,11 +6,12 @@ import { ApplicationList } from './ApplicationList'
 import { ReviewList } from './ReviewList'
 import { ReceivedApplicationList } from './ReceivedApplicationList'
 import { ReceivedReviewList } from './ReceivedReviewList'
+import { isActivityTab, type ActivityTab } from '../_lib/activityTab'
 
-type ActivityTab = 'applications' | 'reviews'
 type ActivityUserRole = 'adopter' | 'breeder'
 
-// 입양자는 보낸 신청/작성한 후기, 브리더는 받은 신청/받은 후기 — 같은 라우터를 역할별로 분기한다
+// 입양자는 보낸 신청/작성한 후기만 본다. 브리더도 이제 다른 브리더에게 신청·후기를 보낼 수 있어
+// 받은 것(신청/후기)에 더해 자기가 보낸 것도 같은 라우터에서 탭으로 본다.
 const TABS_BY_ROLE: Record<
   ActivityUserRole,
   ReadonlyArray<{ value: ActivityTab; label: string }>
@@ -22,6 +23,8 @@ const TABS_BY_ROLE: Record<
   breeder: [
     { value: 'applications', label: '받은 신청' },
     { value: 'reviews', label: '받은 후기' },
+    { value: 'sent-applications', label: '보낸 신청' },
+    { value: 'sent-reviews', label: '보낸 후기' },
   ],
 }
 
@@ -36,15 +39,15 @@ const ActivityContent = ({
   const isBreeder = userRole === 'breeder'
 
   const changeTab = (value: string) => {
-    const nextTab: ActivityTab = value === 'reviews' ? 'reviews' : 'applications'
+    const nextTab: ActivityTab = isActivityTab(value) ? value : 'applications'
     router.replace(`/activity?tab=${nextTab}`, { scroll: false })
   }
 
   return (
     <div className="flex w-full flex-1 flex-col bg-white pb-16">
       <NavigationBar
-        title={isBreeder ? '받은 신청·후기' : '신청·후기 내역'}
-        mobileTitle={isBreeder ? '받은 신청·후기' : '신청·후기'}
+        title={isBreeder ? '받은/보낸 신청·후기' : '신청·후기 내역'}
+        mobileTitle="신청·후기"
         backHref="/home"
       />
 
@@ -60,6 +63,16 @@ const ActivityContent = ({
         <TabsContent value="reviews" className="mt-0">
           {isBreeder ? <ReceivedReviewList /> : <ReviewList />}
         </TabsContent>
+        {isBreeder && (
+          <TabsContent value="sent-applications" className="mt-0">
+            <ApplicationList />
+          </TabsContent>
+        )}
+        {isBreeder && (
+          <TabsContent value="sent-reviews" className="mt-0">
+            <ReviewList />
+          </TabsContent>
+        )}
       </TabBar>
     </div>
   )

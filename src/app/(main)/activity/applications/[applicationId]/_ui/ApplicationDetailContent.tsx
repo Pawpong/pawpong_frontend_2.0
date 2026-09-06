@@ -141,6 +141,19 @@ const ApplicationDetailContent = ({ applicationId }: { applicationId: string }) 
                       counterpartUserId={data.breederId}
                       applicationId={data.applicationId}
                     />
+                    {/* 아직 브리더가 손대지 않은 신청만 수정할 수 있다 */}
+                    {data.status === 'consultation_pending' && (
+                      <Link
+                        href={`/activity/applications/${data.applicationId}/edit`}
+                        className={buttonVariants({
+                          variant: 'outline',
+                          size: 'sm',
+                          className: 'px-4',
+                        })}
+                      >
+                        신청서 수정
+                      </Link>
+                    )}
                     <Link
                       href={`/home/${data.breederId}`}
                       className={buttonVariants({

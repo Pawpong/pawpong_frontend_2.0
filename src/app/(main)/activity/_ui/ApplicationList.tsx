@@ -26,8 +26,10 @@ const getReviewActionLabel = (application: ApplicationListItemDto) => {
 }
 
 const ApplicationRow = ({ application }: { application: ApplicationListItemDto }) => (
+  // view=sent — 브리더도 신청을 "보낼" 수 있어, role만으로는 상세 페이지가 보낸 신청인지
+  // 받은 신청인지 구분할 수 없다. 목록이 어느 쪽인지 알고 있으니 여기서 명시해 전달한다.
   <Link
-    href={`/activity/applications/${application.applicationId}`}
+    href={`/activity/applications/${application.applicationId}?view=sent`}
     className="group flex min-h-28 items-center gap-3 px-4 py-4 transition-colors hover:bg-primary-50/60 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-500 tab:min-h-32 tab:gap-4 tab:px-5 tab:py-5"
   >
     <Avatar size="md" className="size-12 bg-neutral-100 tab:size-14">

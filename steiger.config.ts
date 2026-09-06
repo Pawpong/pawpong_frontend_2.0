@@ -35,6 +35,7 @@ export default defineConfig([
       './src/app/(main)/grade-policy/apply/page.tsx',
       './src/app/(main)/activity/page.tsx',
       './src/app/(main)/activity/applications/[applicationId]/page.tsx',
+      './src/app/(main)/activity/applications/[applicationId]/edit/page.tsx',
       './src/app/(main)/activity/reviews/[reviewId]/page.tsx',
     ],
     rules: {
