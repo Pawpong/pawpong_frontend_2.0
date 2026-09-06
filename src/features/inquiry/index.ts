@@ -1,2 +1,2 @@
 export * from './api/inquiry.mutations'
-export { askSupport } from './api/support.api'
+export { askSupport, submitSupportFeedback } from './api/support.api'
