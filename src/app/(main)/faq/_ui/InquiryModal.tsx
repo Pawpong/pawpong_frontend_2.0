@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
-import { askSupport } from '@/features/inquiry'
+import { askSupport, submitSupportFeedback } from '@/features/inquiry'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { CloseIcon } from '@/shared/assets'
 import {
@@ -37,10 +37,20 @@ const InquiryModal = ({ open, onOpenChange, audience }: InquiryModalProps) => {
     retry: false,
     throwOnError: false,
   })
+  const feedback = useMutation({
+    mutationFn: () => submitSupportFeedback(text.trim(), audience),
+    retry: false,
+    throwOnError: false,
+  })
+  const isPending = answer.isPending || feedback.isPending
 
   // 입력 중인 내용이 있으면 바로 닫지 않고 삭제 확인을 먼저 보여준다
   const requestClose = () => {
-    if (answer.isPending) return
+    if (isPending) return
+    if (feedback.isSuccess) {
+      discard()
+      return
+    }
     if (text.trim()) {
       setShowExitConfirm(true)
       return
@@ -52,6 +62,7 @@ const InquiryModal = ({ open, onOpenChange, audience }: InquiryModalProps) => {
     setShowExitConfirm(false)
     setText('')
     answer.reset()
+    feedback.reset()
     onOpenChange(false)
   }
 
@@ -80,7 +91,7 @@ const InquiryModal = ({ open, onOpenChange, audience }: InquiryModalProps) => {
                 type="button"
                 onClick={requestClose}
                 aria-label="닫기"
-                disabled={answer.isPending}
+                disabled={isPending}
                 className="rounded-lg p-1 text-neutral-700 transition-colors hover:bg-neutral-50 hover:text-neutral-850 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
               >
                 <CloseIcon className="size-5 tab:size-6" />
@@ -89,8 +100,8 @@ const InquiryModal = ({ open, onOpenChange, audience }: InquiryModalProps) => {
 
             <div className="px-3 pb-3 tab:px-6 tab:pb-4">
               <p className="mb-3 text-sm text-neutral-700">
-                AI가 자주 묻는 질문에서 안내를 찾아드려요. 개인정보는 입력하지 마세요. 담당자 문의는
-                아래 이메일 버튼을 이용해 주세요.
+                AI가 자주 묻는 질문에서 안내를 찾아드려요. 피드백을 보내면 내용이 저장되어 운영팀에
+                전달됩니다. 개인정보는 입력하지 마세요. 개별 답변은 이메일로 문의해 주세요.
               </p>
               <Textarea
                 aria-label="서비스 이용 질문"
@@ -98,14 +109,33 @@ const InquiryModal = ({ open, onOpenChange, audience }: InquiryModalProps) => {
                 onChange={(event) => {
                   setText(event.target.value)
                   answer.reset()
+                  feedback.reset()
                 }}
                 maxLength={2000}
-                disabled={answer.isPending}
+                disabled={isPending}
                 placeholder="문의를 남겨주세요"
                 className="h-52"
                 autoFocus
               />
               <span className="text-xs text-neutral-500">{text.length}/2000</span>
+              {feedback.isPending && (
+                <p role="status" className="mt-3 text-sm">
+                  피드백을 접수하고 있어요…
+                </p>
+              )}
+              {feedback.isError && (
+                <p role="alert" className="mt-3 text-sm text-error-500">
+                  피드백을 접수하지 못했습니다. 작성 내용은 유지됩니다. 잠시 후 다시 시도하거나
+                  이메일로 문의해 주세요.
+                </p>
+              )}
+              {feedback.data && (
+                <p role="status" className="mt-3 text-sm text-neutral-700">
+                  피드백이 접수되었습니다. 운영팀이 확인할게요.
+                  <br />
+                  <span className="text-xs break-all">접수번호: {feedback.data.receiptId}</span>
+                </p>
+              )}
               {answer.isPending && (
                 <p role="status" className="mt-3 text-sm">
                   관련 안내를 찾고 있어요…
@@ -147,14 +177,21 @@ const InquiryModal = ({ open, onOpenChange, audience }: InquiryModalProps) => {
               <Button
                 variant="primary"
                 onClick={() => answer.mutate()}
-                disabled={!text.trim() || answer.isPending}
+                disabled={!text.trim() || isPending}
               >
                 AI 안내 받기
               </Button>
               <Button
                 variant="primary"
+                onClick={() => feedback.mutate()}
+                disabled={!text.trim() || isPending || feedback.isSuccess}
+              >
+                피드백 보내기
+              </Button>
+              <Button
+                variant="primary"
                 onClick={handleSend}
-                disabled={!text.trim() || answer.isPending}
+                disabled={!text.trim() || isPending}
                 className="h-10 w-full max-w-[16.125rem]"
               >
                 담당자에게 이메일 문의
