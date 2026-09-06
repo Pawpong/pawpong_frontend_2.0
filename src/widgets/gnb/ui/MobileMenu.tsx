@@ -48,7 +48,8 @@ const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
                 'flex h-12 items-center justify-between px-4 tab:h-16 tab:px-12 pc:px-20',
               )}
             >
-              <LogoButton />
+              {/* 다른 메뉴 항목과 같이 이동하면서 시트도 닫는다 — 안 닫으면 홈으로 가도 메뉴가 덮는다 */}
+              <LogoButton onNavigate={close} />
               <div className="flex items-center gap-2">
                 <AuthActions placement="menu-header" />
                 <DialogPrimitive.Close

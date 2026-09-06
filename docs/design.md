@@ -357,3 +357,15 @@ Screens connected as a single entry flow — full menu, FAQ, settings — are no
 - When a shared component or variant is added, update the catalog and its usage conditions with it.
 - When adding a new breakpoint, arbitrary color, arbitrary shadow, or page-specific modal, record why the existing shared rules could not solve it.
 - Once a feature passes browser, API, and build checks, update both this document's status table and the Pawpong Obsidian notes.
+
+### Contest participation (2026-09-06)
+
+`/hall-of-fame/participate` uses a dedicated photo-and-description composer based on the Hall of Fame `3349:1763500` point-100 surface and shared page/form primitives. `PhotoUploadField` is the single-photo variant for replacement, drop, processing and preview states; multi-image post forms retain `ImageUploadArea`. The action is in document flow, with one column below 768px and two columns above. Verification and photo normalization limits are recorded in `.kiro/specs/contest-participation/verification.md`.
+
+### Shared composers (2026-09-07)
+
+Community write/edit and contest participation share `ComposerLayout`, `ComposerColumns`, `ComposerSectionHeading`, and `PhotoSelectPrompt`. These compose the existing `Container`, `NavigationBar`, `PawIcon`, `TextareaField`, and `Button` primitives with point/primary/neutral tokens. Both inputs use the unmodified shared textarea style; no per-page height, padding, radius, font-size or resize override is applied.
+
+The community `ImageUploadArea` uses the opt-in `composer` variant: an empty photo invitation, a large first-photo preview and thumbnails for up to 10 photos. Its existing `default`/`post` variants remain available for adoption screens. `PostFormCTA` supports `placement="inline"` for the community composer while the default fixed placement remains in adoption. Visibility selection is in one consistent position below the body at every breakpoint. Creation, editing, draft continuation and exit confirmation retain their existing API contracts.
+
+Validated both routes at 375/767/768/1024/1439/1440/1920px in browser iframe viewports: no horizontal overflow; shared textarea stays 105px high, 8px radius, resize-none. Community interaction checks passed: empty buttons disabled, photo-only draft enabled, publish requires body, 10-photo limit, removal restores add action, and dirty exit opens confirmation. TypeScript, changed-file ESLint, FSD and production build passed. No test post was published.

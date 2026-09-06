@@ -65,3 +65,6 @@ export * from './PostActionButton'
 export * from './FavoriteToggle'
 export * from './PixelSelectCard'
 export * from './PixelTab'
+
+export * from './ComposerLayout'
+export * from './PhotoSelectPrompt'

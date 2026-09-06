@@ -28,7 +28,7 @@ interface PostFormProps {
 
 // [refactored] postId 유무로 갈리던 문구를 모드별 룩업으로 한 곳에 모음
 const FORM_TEXT = {
-  create: { title: '글 작성', mobileTitle: '게시글 작성', submitLabel: '업로드' },
+  create: { title: '글 작성', mobileTitle: '게시글 작성', submitLabel: '이야기 올리기' },
   edit: { title: '글 수정', mobileTitle: '게시글 수정', submitLabel: '수정 완료' },
 } as const
 
@@ -86,7 +86,9 @@ const PostForm = ({ postId, post }: PostFormProps) => {
         title={formText.title}
         mobileTitle={formText.mobileTitle}
         form={form}
-        placeholder="입력해보세요"
+        introTitle={isEdit ? '우리 아이의 이야기를 다듬어주세요' : '우리 아이의 일상을 나눠주세요'}
+        introDescription="함께 웃고, 궁금한 것을 묻고, 반려동물과의 소중한 순간을 기록해요."
+        placeholder="오늘 우리 아이는 어떤 하루를 보냈나요?"
         error={error}
         onBack={handleClose}
         cta={{
@@ -97,18 +99,18 @@ const PostForm = ({ postId, post }: PostFormProps) => {
           onSaveDraft: isEdit ? undefined : handleSaveDraft,
           isSaveDraftValid: canSaveDraft,
           isSubmitting,
-          leftSlot: (
-            // Figma 1054-36832: 바 왼쪽 드롭다운 100px.
-            // 고정폭이면 '팔로워 공개'가 잘려 최소폭으로 두고 라벨만큼 늘어나게 한다
-            <div className="hidden min-w-25 pc:block">
-              <VisibilitySelect value={visibility} onChange={setVisibility} />
-            </div>
-          ),
         }}
         belowContent={
-          // 공개 설정 — tab·mo는 본문 아래 풀 너비, PC는 하단 CTA 바 왼쪽(Figma 1054-36832)
-          <div className="mt-3 pc:hidden">
-            <VisibilitySelect value={visibility} onChange={setVisibility} />
+          <div className="rounded-xl bg-neutral-50 p-5">
+            <h3 className="mb-2 text-sm font-semibold">누구와 나눌까요?</h3>
+            <p className="mb-3 text-xs leading-relaxed text-neutral-700">
+              {visibility === 'followers'
+                ? '나를 팔로우하는 사람들에게만 보여요.'
+                : visibility === 'private'
+                  ? '이 글은 나에게만 보여요.'
+                  : '포퐁을 방문하는 누구나 볼 수 있어요.'}
+            </p>
+            <VisibilitySelect value={visibility} onChange={setVisibility} disabled={isSubmitting} />
           </div>
         }
       />

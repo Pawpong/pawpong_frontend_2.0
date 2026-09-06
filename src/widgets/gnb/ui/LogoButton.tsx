@@ -6,11 +6,17 @@ import { type MouseEvent } from 'react'
 import { usePathname } from 'next/navigation'
 import { useNavigationGuardContext } from '@/shared/lib/NavigationGuardContext'
 
-const LogoButton = () => {
+interface LogoButtonProps {
+  /** 이동 직전 호출 — 전체 메뉴처럼 열려 있는 오버레이를 닫을 때 쓴다 */
+  onNavigate?: () => void
+}
+
+const LogoButton = ({ onNavigate }: LogoButtonProps) => {
   const pathname = usePathname()
   const guardContext = useNavigationGuardContext()
 
   const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    onNavigate?.()
     if (!guardContext?.guardNavigation || pathname === '/') return
     e.preventDefault()
     guardContext.guardNavigation('/')
