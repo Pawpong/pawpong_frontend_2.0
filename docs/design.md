@@ -357,3 +357,7 @@ Screens connected as a single entry flow — full menu, FAQ, settings — are no
 - When a shared component or variant is added, update the catalog and its usage conditions with it.
 - When adding a new breakpoint, arbitrary color, arbitrary shadow, or page-specific modal, record why the existing shared rules could not solve it.
 - Once a feature passes browser, API, and build checks, update both this document's status table and the Pawpong Obsidian notes.
+
+### Contest participation (2026-09-06)
+
+`/hall-of-fame/participate` uses a dedicated photo-and-description composer based on the Hall of Fame `3349:1763500` point-100 surface and shared page/form primitives. `PhotoUploadField` is the single-photo variant for replacement, drop, processing and preview states; multi-image post forms retain `ImageUploadArea`. The action is in document flow, with one column below 768px and two columns above. Verification and photo normalization limits are recorded in `.kiro/specs/contest-participation/verification.md`.
