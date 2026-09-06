@@ -2,10 +2,11 @@
 
 import { useId, useRef, useState } from 'react'
 import Image from 'next/image'
-import { CameraIcon, CloseIcon } from '@/shared/assets'
+import { CloseIcon } from '@/shared/assets'
 import { PHOTO_ACCEPT } from '@/shared/lib/preparePhoto'
 import { cn } from '@/shared/lib/cn'
 import { Button } from './Button'
+import { PhotoSelectPrompt } from './PhotoSelectPrompt'
 
 interface PhotoUploadFieldProps {
   preview?: string
@@ -64,18 +65,10 @@ export function PhotoUploadField({
               className="object-contain"
             />
           ) : (
-            <>
-              <span className="flex size-16 items-center justify-center rounded-full bg-white text-primary-500">
-                <CameraIcon className="size-8" />
-              </span>
-              <span className="text-base font-semibold text-primary-700">
-                가장 사랑스러운 순간을 담아주세요
-              </span>
-              <span className="text-sm text-neutral-700">사진을 선택하거나 여기에 놓아주세요</span>
-              <span className="rounded-full bg-point-500 px-6 py-2.5 text-sm font-semibold text-neutral-850">
-                사진 선택하기
-              </span>
-            </>
+            <PhotoSelectPrompt
+              title="가장 사랑스러운 순간을 담아주세요"
+              description="사진을 선택하거나 여기에 놓아주세요"
+            />
           )}
         </button>
         {preview && !busy && (

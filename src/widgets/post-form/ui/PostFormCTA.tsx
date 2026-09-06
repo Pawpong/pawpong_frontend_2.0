@@ -1,8 +1,10 @@
 'use client'
 
-import { FooterCtaBar } from '@/shared/ui'
+import { Button, FooterCtaBar } from '@/shared/ui'
 
 interface PostFormCTAProps {
+  /** Community groups actions below the body; adoption retains its fixed footer. */
+  placement?: 'fixed' | 'inline'
   /** 미전달 시 임시저장 버튼 숨김 (수정 화면 등) */
   onSaveDraft?: () => void
   onSubmit: () => void
@@ -26,19 +28,43 @@ const PostFormCTA = ({
   isSaveDraftValid = true,
   isSubmitting = false,
   leftSlot,
-}: PostFormCTAProps) => (
-  <FooterCtaBar
-    leftSlot={leftSlot}
-    secondary={
-      onSaveDraft && {
-        label: '임시저장',
-        onClick: onSaveDraft,
-        disabled: !isSaveDraftValid || isSubmitting,
+  placement = 'fixed',
+}: PostFormCTAProps) =>
+  placement === 'inline' ? (
+    <div className="flex flex-wrap gap-3">
+      {onSaveDraft && (
+        <Button
+          variant="outline"
+          size="lg"
+          onClick={onSaveDraft}
+          disabled={!isSaveDraftValid || isSubmitting}
+          className="min-w-28 flex-1 focus-visible:outline-2 focus-visible:outline-primary-500"
+        >
+          임시저장
+        </Button>
+      )}
+      <Button
+        size="lg"
+        onClick={onSubmit}
+        disabled={!isValid || isSubmitting}
+        className="min-w-36 flex-[2] focus-visible:outline-2 focus-visible:outline-primary-500"
+      >
+        {isSubmitting ? '저장 중…' : submitLabel}
+      </Button>
+    </div>
+  ) : (
+    <FooterCtaBar
+      leftSlot={leftSlot}
+      secondary={
+        onSaveDraft && {
+          label: '임시저장',
+          onClick: onSaveDraft,
+          disabled: !isSaveDraftValid || isSubmitting,
+        }
       }
-    }
-    primary={{ label: submitLabel, onClick: onSubmit, disabled: !isValid || isSubmitting }}
-  />
-)
+      primary={{ label: submitLabel, onClick: onSubmit, disabled: !isValid || isSubmitting }}
+    />
+  )
 
 export { PostFormCTA }
 export type { PostFormCTAProps }

@@ -1,40 +1,33 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import { useId, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
-import { Container, NavigationBar, TextareaField, TextLabel } from '@/shared/ui'
+import { ComposerLayout, ComposerColumns, ComposerSectionHeading, TextareaField } from '@/shared/ui'
 import type { PostFormState } from '../lib/usePostForm'
 import { ImageUploadArea } from './ImageUploadArea'
 import { PostFormCTA, type PostFormCTAProps } from './PostFormCTA'
 
 interface PostFormLayoutProps {
-  /** 상단바 제목 (tab+) */
   title: string
-  /** mo 에서만 다른 제목을 쓸 때 */
   mobileTitle?: string
-  /** usePostForm 반환 그대로 — 이미지·본문 상태와 핸들러가 한 묶음으로 다닌다 */
+  introTitle: string
+  introDescription: string
   form: PostFormState
   placeholder?: string
-  /** 서버 계약상 길이 제한이 있을 때만 — 지정하면 글자 수 카운터가 붙는다 */
   maxLength?: number
-  /** 본문 아래 추가 영역 (공개 설정 등) */
   belowContent?: ReactNode
   error?: string | null
-  /** 작성 이탈 가드를 적용한 닫기 동작. 미전달 시 브라우저 뒤로가기. */
   onBack?: () => void
-  /** 하단 CTA — PostFormCTA 로 그대로 전달 */
   cta: PostFormCTAProps
 }
 
-/**
- * 작성 폼 공통 셸 — 상단바 + 이미지·본문 2단 + 하단 CTA.
- *
- * 게시글 작성/수정과 콘테스트 참여가 같은 레이아웃을 쓰고 제목·본문 문구·제출 로직만 다르다.
- * Figma 1056-46147(PC) / 1056-46891(tab·mo): 1440 화면에서 이미지 372 + 본문 2단(gap 100).
- */
+/** Community create/edit composer. Shared textarea defaults and photo actions are
+ * preserved; the Hall of Fame surface groups the form and its actions together. */
 const PostFormLayout = ({
   title,
   mobileTitle,
+  introTitle,
+  introDescription,
   form,
   placeholder,
   maxLength,
@@ -44,56 +37,82 @@ const PostFormLayout = ({
   cta,
 }: PostFormLayoutProps) => {
   const router = useRouter()
-
+  const id = useId()
   return (
-    <div className="flex min-h-screen flex-col bg-white">
-      {/* Figma 976-25818 navigation bar — 작성 화면이라 선두 아이콘은 닫기 */}
-      <NavigationBar
-        title={title}
-        mobileTitle={mobileTitle}
-        icon="close"
-        onBack={onBack ?? (() => router.back())}
-      />
-
-      <Container className="flex-1 py-5 pb-30 pc:py-12">
-        <div className="mx-auto w-full tab:max-w-168 pc:max-w-320">
-          <div className="flex flex-col gap-[1.1875rem] pc:flex-row pc:gap-25">
-            <div className="flex flex-col gap-1 pc:w-93 pc:shrink-0 pc:gap-2">
-              <TextLabel size="14" requirement="선택">
-                이미지
-              </TextLabel>
-              <ImageUploadArea
-                size="post"
-                hideLabel
-                images={form.images}
-                onAdd={form.handleAddImages}
-                onRemove={form.handleRemoveImage}
-                maxImages={form.maxImages}
-              />
-            </div>
-
-            {/* 본문 입력 높이: tab·mo 105(Textarea 기본) / PC 180 */}
-            <TextareaField
-              label="게시글"
+    <ComposerLayout
+      title={title}
+      mobileTitle={mobileTitle}
+      category="포퐁 커뮤니티"
+      introTitle={introTitle}
+      description={introDescription}
+      onBack={onBack ?? (() => router.back())}
+    >
+      <ComposerColumns>
+        <section aria-labelledby={`${id}-photos`} className="min-w-0">
+          <ComposerSectionHeading
+            id={`${id}-photos`}
+            step={1}
+            trailing={`${form.images.length}/${form.maxImages}`}
+          >
+            사진으로 담은 순간
+          </ComposerSectionHeading>
+          <ImageUploadArea
+            size="composer"
+            hideLabel
+            images={form.images}
+            onAdd={form.handleAddImages}
+            onRemove={form.handleRemoveImage}
+            maxImages={form.maxImages}
+            disabled={cta.isSubmitting}
+          />
+          <p className="mt-3 text-xs leading-relaxed text-neutral-700">
+            사진은 최대 {form.maxImages}장까지 올릴 수 있어요. 사진 없이 글만 작성해도 좋아요.
+          </p>
+        </section>
+        <section aria-labelledby={`${id}-body-heading`} className="flex min-w-0 flex-col gap-6">
+          <div>
+            <ComposerSectionHeading
+              id={`${id}-body-heading`}
+              step={2}
               required
+              htmlFor={`${id}-body`}
+            >
+              들려주고 싶은 이야기
+            </ComposerSectionHeading>
+            <TextareaField
+              id={`${id}-body`}
+              aria-required
               value={form.text}
+              disabled={cta.isSubmitting}
               onChange={(event) => form.setText(event.target.value)}
               placeholder={placeholder}
               maxLength={maxLength}
               currentLength={maxLength === undefined ? undefined : form.text.length}
-              wrapperClassName="pc:flex-1"
-              className="pc:h-45"
+              aria-describedby={`${id}-hint`}
             />
+            <p id={`${id}-hint`} className="mt-2 text-xs leading-relaxed text-neutral-700">
+              소소한 일상부터 궁금한 점까지, 편하게 남겨주세요.
+            </p>
           </div>
-
           {belowContent}
-
-          {error && <p className="mt-3 text-sm text-error-500">{error}</p>}
-        </div>
-      </Container>
-
-      <PostFormCTA {...cta} />
-    </div>
+          <div className="border-t border-neutral-150 pt-5">
+            <p role="status" className="mb-3 text-sm text-neutral-700">
+              {cta.isSubmitting
+                ? '사진과 이야기를 저장하고 있어요…'
+                : cta.onSaveDraft
+                  ? '아직 작성 중이라면 임시저장하고 나중에 이어 쓰세요.'
+                  : '수정한 내용을 확인한 뒤 저장해 주세요.'}
+            </p>
+            {error && (
+              <p role="alert" className="mb-3 text-sm text-error-500">
+                {error}
+              </p>
+            )}
+            <PostFormCTA {...cta} placement="inline" />
+          </div>
+        </section>
+      </ComposerColumns>
+    </ComposerLayout>
   )
 }
 
