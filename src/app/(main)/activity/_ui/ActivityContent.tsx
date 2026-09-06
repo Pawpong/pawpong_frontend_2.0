@@ -6,19 +6,9 @@ import { ApplicationList } from './ApplicationList'
 import { ReviewList } from './ReviewList'
 import { ReceivedApplicationList } from './ReceivedApplicationList'
 import { ReceivedReviewList } from './ReceivedReviewList'
+import { isActivityTab, type ActivityTab } from '../_lib/activityTab'
 
-type ActivityTab = 'applications' | 'reviews' | 'sent-applications' | 'sent-reviews'
 type ActivityUserRole = 'adopter' | 'breeder'
-
-const ACTIVITY_TABS: ActivityTab[] = [
-  'applications',
-  'reviews',
-  'sent-applications',
-  'sent-reviews',
-]
-
-const isActivityTab = (value: string): value is ActivityTab =>
-  (ACTIVITY_TABS as string[]).includes(value)
 
 // 입양자는 보낸 신청/작성한 후기만 본다. 브리더도 이제 다른 브리더에게 신청·후기를 보낼 수 있어
 // 받은 것(신청/후기)에 더해 자기가 보낸 것도 같은 라우터에서 탭으로 본다.
@@ -88,5 +78,4 @@ const ActivityContent = ({
   )
 }
 
-export { ActivityContent, isActivityTab }
-export type { ActivityTab }
+export { ActivityContent }

@@ -1,5 +1,6 @@
 import { requireAuth } from '@/features/auth/server'
-import { ActivityContent, isActivityTab } from './_ui/ActivityContent'
+import { ActivityContent } from './_ui/ActivityContent'
+import { isActivityTab } from './_lib/activityTab'
 
 interface ActivityPageProps {
   searchParams: Promise<{ tab?: string }>
