@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { resolveSentryEnvironment as resolve } from '../sentry.environment.ts'
+import { resolveSentryEnvironment as resolve, createErrorBudget } from '../sentry.environment.ts'
 const base = {
   nodeEnv: 'production',
   environment: 'production',
@@ -26,4 +26,15 @@ test('개발 opt-in은 서로 다른 DSN일 때만 허용함', () => {
       .dsn,
     'dev',
   )
+})
+
+test('반복 오류와 실행 환경당 분당 20건 제한 및 다음 창 복구', () => {
+  let time = 0
+  const filter = createErrorBudget(() => time)
+  assert.ok(filter({ message: 'first' }))
+  assert.equal(filter({ message: 'first' }), null)
+  for (let i = 1; i < 20; i++) assert.ok(filter({ message: String(i) }))
+  assert.equal(filter({ message: 'overflow' }), null)
+  time = 60_000
+  assert.ok(filter({ message: 'first' }))
 })
