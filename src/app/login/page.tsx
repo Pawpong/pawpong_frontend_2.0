@@ -1,5 +1,5 @@
 import { Suspense } from 'react'
-import { SocialLoginList } from '@/features/auth'
+import { ReactivateAccountPrompt, SocialLoginList } from '@/features/auth'
 import { RESPONSIVE_SHELL_CLASS } from '@/shared/config'
 import { AlertMessage } from '@/shared/ui'
 import { CheckRoundedIcon } from '@/shared/assets'
@@ -21,6 +21,10 @@ import { LogoButton } from '@/widgets/gnb'
  *
  * ?signup=completed 로 들어오면 "가입은 끝났는데 토큰 쿠키 저장만 실패한" 경우다.
  *   (온보딩 마지막 단계의 saveAuthTokens 가 false 를 반환하면 여기로 보낸다)
+ *
+ * ?type=deleted_account 로 들어오면 탈퇴 계정으로 소셜 로그인한 경우다.
+ *   - reactivationToken 이 함께 오면 → 복구 확인 모달 (ReactivateAccountPrompt)
+ *   - 없으면(정지 계정 등 복구 불가) → error 사유만 안내
  *
  * Figma: PC 3414:750712 / Tablet 3414:751419 / Mobile 3414:751420
  * 원본의 이메일·비밀번호 안내와 별도 회원가입 링크는 현재 소셜 전용 인증 계약에 맞게
@@ -68,6 +72,11 @@ const LoginPage = async ({ searchParams }: { searchParams: Promise<{ signup?: st
                 className="justify-center"
               />
             )}
+
+            {/* 탈퇴 계정 복구 안내 — useSearchParams 를 쓰므로 Suspense 필요 (Next 16) */}
+            <Suspense fallback={null}>
+              <ReactivateAccountPrompt />
+            </Suspense>
 
             {/* SocialLoginList 는 useSearchParams(returnUrl) 를 쓰므로 Suspense 로 감싼다 (Next 16 요구사항) */}
             <Suspense fallback={<SocialLoginFallback />}>
