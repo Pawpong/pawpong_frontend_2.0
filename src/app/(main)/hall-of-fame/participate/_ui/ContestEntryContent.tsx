@@ -169,7 +169,6 @@ const ContestEntryContent = () => {
                   placeholder="이름과 매력 포인트를 알려주세요. 예) 햇살 아래 낮잠을 좋아하는 파이리예요!"
                   maxLength={MAX_DESCRIPTION}
                   currentLength={text.length}
-                  className="h-44 resize-y rounded-xl p-4 text-base"
                   aria-describedby="description-help"
                 />
                 <p id="description-help" className="mt-2 text-xs text-neutral-700">
