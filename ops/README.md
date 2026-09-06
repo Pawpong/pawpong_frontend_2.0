@@ -11,3 +11,9 @@
 - 무료 플랜용 Discord 중계는 백엔드 저장소 `ops/observability/sentry-monitor.py`에서 5분 주기로 수행함.
 - `deployment_status`를 통해 Vercel의 성공/실패와 별도의 공개 HTTP 헬스체크 결과를 Discord에 전달함. 보호된 Preview는 헬스체크 미확인으로 표시함.
 - Git 작성자는 Vercel 팀에 연결된 Git 계정과 일치해야 함. 권한 문제는 계정 연결로 해결하고 다른 사람의 작성자 정보를 사용하지 않음.
+
+## 브랜치 흐름
+
+- 기능 작업은 `dev`에서 `feature/*`를 만들어 진행하고 검증 후 `dev`로 합침.
+- `dev.pawpong.kr`에서 통합 검증한 변경을 `main`으로 승격해 `pawpong.kr`에 배포함.
+- 기존 `test` 작업 이력은 `dev`에 병합함. 이후 새 작업의 기준 브랜치는 `dev`이며 `test`는 삭제하지 않고 이력 보관용으로 둠.
