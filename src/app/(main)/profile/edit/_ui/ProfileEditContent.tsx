@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 import { adopterQueries } from '@/entities/adopter'
 import { profileQueries } from '@/entities/profile'
 import { useUpdateAdopterProfile, useDeleteAdopterAccount } from '@/features/adopter'
+import { useLogoutAndRedirect } from '@/features/auth'
 import { useUpdateBreederProfile } from '@/features/breeder'
 import { useUpdateMyProfile } from '@/features/profile'
 import { useUploadSingleFile } from '@/features/upload'
@@ -122,6 +123,7 @@ const ProfileEditContent = () => {
   const updateBreederProfile = useUpdateBreederProfile()
   const updateMyProfile = useUpdateMyProfile()
   const deleteAccount = useDeleteAdopterAccount()
+  const { logoutAndRedirect } = useLogoutAndRedirect()
 
   // 활동명만 필수. 소개는 서버 스펙상 빈 문자열이 "소개 비우기"로 허용돼 막지 않는다.
   // 브리더 활동명은 이 화면에서 readOnly라 검사에서 제외 — 비어 있어도 저장을 막으면 손쓸 방법이 없다
@@ -175,11 +177,17 @@ const ProfileEditContent = () => {
   }
 
   // 탈퇴: 사유를 묻지 않고 바로 요청 — API 가 reason 을 필수로 받아 'other' 로 보낸다
+  //
+  // 탈퇴 성공 뒤에는 반드시 세션을 끊는다. 이동만 시키면 accessToken/userRole 쿠키가
+  // 그대로 남아 이미 삭제된 계정으로 로그인된 것처럼 보이고, 이후 요청이 401 로 떨어질
+  // 때까지 로그아웃이 안 된 상태가 유지된다. 같은 소셜 계정으로 다시 로그인해 복구
+  // 안내를 받는 흐름도 남은 쿠키에 막힌다.
   const handleLeave = async () => {
     setShowLeave(false)
     try {
       await deleteAccount.mutateAsync({ reason: WithdrawReason.OTHER })
-      router.replace('/')
+      // 쿠키 정리 + 홈 이동까지 한 번에 (서버 로그아웃이 실패해도 로컬 세션은 비운다)
+      logoutAndRedirect()
     } catch (error) {
       showError(error, '탈퇴 처리에 실패했습니다.') // [refactored]
     }
