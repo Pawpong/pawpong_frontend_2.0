@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { ApplicationChatButton } from '@/features/chat-entry'
 import { FavoriteIcon } from '@/shared/assets'
 import { FAVORITE_ACTIVE } from '@/shared/ui'
 
@@ -11,6 +12,11 @@ interface AdoptionCtaBarProps {
    * (서버가 어차피 거절하는 요청을 폼까지 다 채운 뒤에 알게 되는 걸 막는다)
    */
   applyBlockedReason?: string
+  /**
+   * 로그인 사용자가 이 개체에 이미 넣어둔 신청. 있으면 신청 버튼 대신
+   * 채팅·신청서 보기로 바꾼다 — 다시 신청해도 서버가 409 로 막기 때문이다.
+   */
+  myApplication?: { applicationId: string; breederUserId: string }
 }
 
 /* ── 하단 고정 CTA 바 (입양 신청) ──
@@ -24,6 +30,7 @@ const AdoptionCtaBar = ({
   isFavorite,
   onToggleFavorite,
   applyBlockedReason,
+  myApplication,
 }: AdoptionCtaBarProps) => {
   // 버튼/비활성 문구가 폭·높이 스펙을 공유한다
   const ACTION_CLASS =
@@ -52,7 +59,23 @@ const AdoptionCtaBar = ({
           />
         </button>
 
-        {applyBlockedReason ? (
+        {myApplication ? (
+          // 이미 신청한 개체 — 신청 버튼을 다시 보여주면 폼을 다 채운 뒤에야 409 로 막힌다.
+          // 신청 이후 할 일은 대화이므로 채팅을 주 액션으로 두고, 신청서 확인 경로를 함께 남긴다.
+          <div className="flex flex-1 items-center justify-end gap-[0.625rem] tab:gap-[0.75rem]">
+            <Link
+              href={`/activity/applications/${myApplication.applicationId}`}
+              className={`${ACTION_CLASS} border border-neutral-300 bg-white text-neutral-850 hover:text-neutral-700`}
+            >
+              내 신청서 보기
+            </Link>
+            <ApplicationChatButton
+              counterpartUserId={myApplication.breederUserId}
+              applicationId={myApplication.applicationId}
+              className={`${ACTION_CLASS} bg-point-500 text-neutral-850 hover:text-neutral-700 active:bg-point-600`}
+            />
+          </div>
+        ) : applyBlockedReason ? (
           // 브리더 사유("브리더 계정은...")가 ACTION_CLASS의 max-w(297px)에서 2줄로 줄바꿈되며
           // 고정 높이(h-3rem)를 넘쳐 버튼 영역을 침범했다 — max-w를 없애 남는 폭을 옆으로 다 쓰고
           // (모바일은 하트 옆 남은 공간, 탭/pc는 스페이서 옆 공간), 한 줄 유지 + 폰트를 살짝 줄인다.

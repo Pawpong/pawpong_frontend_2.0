@@ -2,6 +2,7 @@
  * 입양 탐색 페이지 관련 타입 정의
  */
 
+import type { ApplicationStatus } from './ApplicationTypes'
 import type { PetGender, PetStatus } from './BreederTypes'
 import type { CommunityPetType } from './CommunityTypes'
 import type {
@@ -137,6 +138,10 @@ export interface AdoptionDetailDto {
   chatCount: number
   isFavorited: boolean
   isPopular: boolean
+  /** 로그인 사용자가 이 개체에 넣어둔 신청 id — 재신청을 막는 상태(대기·상담완료·확정)일 때만 내려온다 */
+  myApplicationId?: string
+  /** 위 신청의 상태. 거절된 신청은 재신청이 가능하므로 아예 내려오지 않는다 */
+  myApplicationStatus?: ApplicationStatus
   breeder: BreederSummary
   health: HealthInfo
   parents: ParentInfo[]
@@ -261,6 +266,10 @@ export interface AdoptionBreederSummary {
 
 /** v2 입양 동물 상세 */
 export interface AdoptionPetDetail extends AdoptionPetCard {
+  /** 로그인 사용자의 이 개체 신청 id — 재신청을 막는 상태일 때만 내려온다 (거절 건은 제외) */
+  myApplicationId?: string
+  /** 위 신청의 상태 */
+  myApplicationStatus?: ApplicationStatus
   description: string
   tags: string[]
   birthDate: string

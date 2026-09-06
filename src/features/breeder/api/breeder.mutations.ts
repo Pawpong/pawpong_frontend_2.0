@@ -1,6 +1,8 @@
 'use client'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { adoptionQueries } from '@/entities/adoption'
+import { applicationQueries } from '@/entities/application'
 import { breederQueries } from '@/entities/breeder'
 import { communityQueries } from '@/entities/community'
 import { profileQueries } from '@/entities/profile'
@@ -50,7 +52,14 @@ export const useUpdateBreederApplicationStatus = () => {
       data: Omit<ApplicationStatusUpdateRequest, 'applicationId'>
     }) => updateBreederApplicationStatus(applicationId, data),
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: breederQueries.all() })
+      // 입양 확정은 신청서 한 건으로 끝나지 않는다 — 서버가 펫 상태를 adopted 로 바꾸고
+      // 같은 펫의 다른 대기 신청을 거절 처리하므로, 분양글·신청 캐시까지 함께 버린다.
+      // (breeder 쿼리만 버리면 확정 후에도 카드가 '분양중'인 채로 남는다)
+      void Promise.all([
+        qc.invalidateQueries({ queryKey: breederQueries.all() }),
+        qc.invalidateQueries({ queryKey: adoptionQueries.all() }),
+        qc.invalidateQueries({ queryKey: applicationQueries.all() }),
+      ])
     },
   })
 }

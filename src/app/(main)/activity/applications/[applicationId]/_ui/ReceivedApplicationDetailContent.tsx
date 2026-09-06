@@ -8,7 +8,13 @@ import { normalizeApiError } from '@/shared/api'
 import { ChevronDownIcon } from '@/shared/assets'
 import { formatDate } from '@/shared/lib/formatDate'
 import { AlertMessage, AsyncState, Button, Container, CtaModal, NavigationBar } from '@/shared/ui'
-import type { ApplicationStatus, CustomQuestionResponse, StandardResponses } from '@/shared/types'
+import type {
+  ApplicationStatus,
+  CustomQuestionResponse,
+  ReceivedApplicationDetailDto,
+  StandardResponses,
+} from '@/shared/types'
+import { ApplicationChatButton } from '@/features/chat-entry'
 import { ApplicationStatusBadge } from '../../../_ui/ActivityBadges'
 
 interface StatusAction {
@@ -69,6 +75,10 @@ const STANDARD_QUESTIONS: Array<{ key: keyof StandardResponses; label: string }>
   { key: 'additionalNotes', label: '추가 문의사항' },
   { key: 'adoptionPlan', label: '입양 계획' },
 ]
+
+/** adopterId 는 문자열이거나 populate 된 객체로 내려온다 — 채팅 상대 지정에는 순수 id 만 필요하다 */
+const toCounterpartUserId = (adopterId: ReceivedApplicationDetailDto['adopterId']) =>
+  typeof adopterId === 'string' ? adopterId : (adopterId?._id ?? null)
 
 const formatAnswer = (answer: unknown) => {
   if (typeof answer === 'boolean') return answer ? '동의해요' : '동의하지 않아요'
@@ -216,6 +226,7 @@ const ReceivedApplicationDetailContent = ({ applicationId }: { applicationId: st
   const { data, isPending, isError, refetch } = useQuery(
     breederQueries.receivedApplicationDetail(applicationId),
   )
+  const counterpartUserId = data ? toCounterpartUserId(data.adopterId) : null
 
   return (
     <div className="flex w-full flex-1 flex-col bg-white pb-16">
@@ -257,6 +268,17 @@ const ReceivedApplicationDetailContent = ({ applicationId }: { applicationId: st
                     {data.adopterEmail}
                     {data.adopterPhone && ` · ${data.adopterPhone}`}
                   </p>
+
+                  {/* 신청서를 보다가 바로 대화로 넘어갈 수 있게 한다 — 이 동선이 없어
+                      브리더가 신청을 받고도 입양자 프로필을 따로 찾아가야 했다. */}
+                  {counterpartUserId && (
+                    <div className="mt-2 flex flex-wrap items-start gap-2">
+                      <ApplicationChatButton
+                        counterpartUserId={counterpartUserId}
+                        applicationId={data.applicationId}
+                      />
+                    </div>
+                  )}
                 </div>
 
                 {data.breederNotes && (

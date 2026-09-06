@@ -1,5 +1,6 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { AlertCircleIcon, PawIcon } from '@/shared/assets'
 import {
   AlertMessage,
@@ -38,6 +39,7 @@ interface ApplicationFormProps {
 }
 
 const ApplicationForm = ({ detail }: ApplicationFormProps) => {
+  const router = useRouter()
   const {
     register,
     control,
@@ -72,9 +74,15 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
   // 조사 건너뜀 여부를 확인하지 못한 상태에서 폼을 열면 서버 필수 흐름을 누락할 수 있으므로
   // 프로필 조회가 복구될 때까지 같은 화면 안에서 재시도한다.
   if (isProfilePending || isProfileError) {
+    // 폼을 아직 열지도 못한 상태라 지킬 입력값이 없다 — 나가기 확인 모달 없이 바로 되돌아간다.
+    // (이 분기는 아래 ExitConfirmModal 앞에서 return 하므로, 여기서 handleCloseClick 을 쓰면
+    //  모달 플래그만 켜지고 그릴 모달이 없어 X 버튼이 먹통이 된다)
     return (
       <div>
-        {stickyHeader}
+        <div className="sticky top-12 z-sticky tab:top-14">
+          <NavigationBar title={APPLY_TITLE} icon="close" onBack={() => router.back()} />
+          <PetInfoCard detail={detail} />
+        </div>
         <AsyncState
           status={isProfileError ? 'error' : 'loading'}
           message={

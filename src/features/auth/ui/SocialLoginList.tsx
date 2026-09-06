@@ -66,8 +66,20 @@ export const SocialLoginList = () => {
   const searchParams = useSearchParams()
   const returnUrl = normalizeReturnUrl(searchParams.get('returnUrl'))
 
-  const hasAccessToken = () =>
-    document.cookie.split(';').some((c) => c.trim().startsWith('accessToken='))
+  // 서버 가드(requireAuth)와 같은 기준으로 판정한다.
+  // 이름만 보고 판정하면 max-age=0 삭제가 빈 값(`accessToken=`)으로 남았을 때 "로그인됨"이 되고,
+  // 서버는 빈 값을 비로그인으로 봐서 /login 으로 되돌린다 → 서로 떠넘기는 무한 리다이렉트가 된다.
+  // (실제로 로그아웃 직후 replaceState 100회 제한에 걸려 페이지가 죽었다)
+  const readCookie = (name: string) => {
+    const prefix = `${name}=`
+    const found = document.cookie.split('; ').find((row) => row.startsWith(prefix))
+    return found ? decodeURIComponent(found.slice(prefix.length)) : ''
+  }
+
+  const isLoggedIn = () => {
+    const role = readCookie('userRole')
+    return Boolean(readCookie('accessToken')) && (role === 'adopter' || role === 'breeder')
+  }
 
   // 탈퇴 계정 복구 안내로 들어온 경우엔 자동 이탈시키지 않는다.
   // 지난 세션의 accessToken 쿠키가 남아 있으면 복구 확인 모달을 보기도 전에 튕겨 나가고,
@@ -77,12 +89,14 @@ export const SocialLoginList = () => {
   // 이미 로그인된 상태로 /login 에 진입하면(뒤로가기 등) 즉시 벗어난다 — 로그인 페이지 트랩 방지.
   // replace 로 이동해 /login 이 히스토리에 남지 않게 한다.
   useEffect(() => {
-    if (!isReactivationPrompt && hasAccessToken()) router.replace(returnUrl)
+    // 복구 안내로 들어온 경우는 잔여 쿠키가 있어도 모달을 봐야 하므로 튕기지 않는다
+    if (!isReactivationPrompt && isLoggedIn()) router.replace(returnUrl)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router, returnUrl, isReactivationPrompt])
 
   // 버튼 클릭 시점에도 한 번 더 확인 (마운트 이후 다른 탭에서 로그인된 경우 등)
   const redirectIfLoggedIn = (): boolean => {
-    if (!isReactivationPrompt && hasAccessToken()) {
+    if (!isReactivationPrompt && isLoggedIn()) {
       router.replace(returnUrl)
       return true
     }
