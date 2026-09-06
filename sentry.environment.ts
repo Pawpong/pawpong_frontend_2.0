@@ -10,7 +10,9 @@ export function resolveSentryEnvironment(input: {
   const local =
     input.hostname !== undefined && !['pawpong.kr', 'www.pawpong.kr'].includes(input.hostname)
   const environment =
-    input.nodeEnv !== 'production' || local ? 'development' : input.environment || 'development'
+    input.nodeEnv === 'production' && !local && input.environment === 'production'
+      ? 'production'
+      : 'development'
   const production = environment === 'production'
   const dsn = production ? input.productionDsn : input.developmentDsn
   const enabled = Boolean(
