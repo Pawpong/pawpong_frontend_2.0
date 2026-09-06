@@ -27,15 +27,21 @@ const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogPortal>
-        {/* 전체화면 시트라 Content 배경만으로는 뒤 페이지가 비친다 — 불투명 base 를 Overlay 로 깐다 */}
-        <DialogOverlay className="bg-base-white" />
+        {/* mo·tab 은 전체화면 시트라 뒤 페이지가 비치지 않게 불투명 base 를 깐다.
+            pc 는 우측 상단 드롭다운이라 화면을 가리지 않고 흐릿한 딤만 둔다. */}
+        <DialogOverlay className="bg-base-white pc:bg-neutral-850/20" />
         <DialogPrimitive.Content
           aria-describedby={undefined}
-          className="fixed inset-0 z-modal flex min-w-0 flex-col overflow-y-auto bg-white data-[state=closed]:opacity-0 data-[state=open]:opacity-100"
+          className={cn(
+            'fixed inset-0 z-modal flex min-w-0 flex-col overflow-y-auto bg-white',
+            'data-[state=closed]:opacity-0 data-[state=open]:opacity-100',
+            // pc: 링크 8개 때문에 1440px 화면을 통째로 덮을 이유가 없다 — 우측 상단 패널로 띄운다
+            'pc:inset-auto pc:top-[4.5rem] pc:right-20 pc:h-auto pc:w-[18rem] pc:rounded-2xl pc:border pc:border-neutral-150 pc:shadow-[0_12px_24px_rgba(55,55,55,0.12)]',
+          )}
         >
           <DialogPrimitive.Title className="sr-only">전체 메뉴</DialogPrimitive.Title>
           {/* QA: border-b 제거 */}
-          <header className="sticky top-0 z-10 bg-white">
+          <header className="sticky top-0 z-10 bg-white pc:hidden">
             <div
               className={cn(
                 RESPONSIVE_SHELL_CLASS,
@@ -59,10 +65,10 @@ const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
           <div
             className={cn(
               RESPONSIVE_SHELL_CLASS,
-              'flex flex-1 flex-col gap-8 px-4 py-10 tab:px-12 pc:px-20',
+              'flex flex-1 flex-col gap-8 px-4 py-10 tab:px-12 pc:gap-5 pc:px-5 pc:py-5',
             )}
           >
-            <nav className="flex flex-col gap-8" aria-label="설정">
+            <nav className="flex flex-col gap-8 pc:gap-4" aria-label="설정">
               {MOBILE_MENU_ITEMS.map((item) => (
                 <Link
                   key={item.href}
@@ -74,7 +80,7 @@ const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
                 </Link>
               ))}
             </nav>
-            <div className="flex flex-1 items-end justify-center">
+            <div className="flex flex-1 items-end justify-center pc:flex-none pc:border-t pc:border-neutral-150 pc:pt-4">
               <AuthActions placement="menu-footer" />
             </div>
           </div>
