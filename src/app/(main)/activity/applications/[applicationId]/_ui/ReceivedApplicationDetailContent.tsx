@@ -1,11 +1,58 @@
 'use client'
 
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { breederQueries } from '@/entities/breeder'
+import { useUpdateBreederApplicationStatus } from '@/features/breeder'
+import { normalizeApiError } from '@/shared/api'
+import { ChevronDownIcon } from '@/shared/assets'
 import { formatDate } from '@/shared/lib/formatDate'
-import { AsyncState, Button, Container, NavigationBar } from '@/shared/ui'
-import type { CustomQuestionResponse, StandardResponses } from '@/shared/types'
+import { AlertMessage, AsyncState, Button, Container, CtaModal, NavigationBar } from '@/shared/ui'
+import type { ApplicationStatus, CustomQuestionResponse, StandardResponses } from '@/shared/types'
 import { ApplicationStatusBadge } from '../../../_ui/ActivityBadges'
+
+interface StatusAction {
+  label: string
+  nextStatus: ApplicationStatus
+  variant: 'primary' | 'outline'
+  /** 되돌리기 어려운 결정이라 확인창을 거친다 (상담 완료 표시는 바로 적용) */
+  confirm?: { title: string; description: string }
+}
+
+const STATUS_ACTIONS: Partial<Record<ApplicationStatus, StatusAction[]>> = {
+  consultation_pending: [
+    { label: '상담 완료로 표시', nextStatus: 'consultation_completed', variant: 'primary' },
+    {
+      label: '신청 거절',
+      nextStatus: 'adoption_rejected',
+      variant: 'outline',
+      confirm: {
+        title: '신청을 거절할까요?',
+        description: '거절하면 입양자에게 진행 종료로 표시됩니다.',
+      },
+    },
+  ],
+  consultation_completed: [
+    {
+      label: '입양 확정',
+      nextStatus: 'adoption_approved',
+      variant: 'primary',
+      confirm: {
+        title: '입양을 확정할까요?',
+        description: '확정하면 입양자가 후기를 작성할 수 있게 됩니다.',
+      },
+    },
+    {
+      label: '신청 거절',
+      nextStatus: 'adoption_rejected',
+      variant: 'outline',
+      confirm: {
+        title: '신청을 거절할까요?',
+        description: '거절하면 입양자에게 진행 종료로 표시됩니다.',
+      },
+    },
+  ],
+}
 
 const STANDARD_QUESTIONS: Array<{ key: keyof StandardResponses; label: string }> = [
   { key: 'selfIntroduction', label: '자기소개' },
@@ -34,7 +81,7 @@ const AnswerRow = ({ label, answer }: { label: string; answer: unknown }) => {
   if (!value) return null
 
   return (
-    <div className="grid gap-1 px-4 py-3 tab:grid-cols-[12rem_1fr] tab:gap-5 tab:px-5 tab:py-4">
+    <div className="grid gap-1 py-3 tab:grid-cols-[12rem_1fr] tab:gap-5 tab:py-4">
       <dt className="text-xs font-semibold text-neutral-500 tab:text-sm">{label}</dt>
       <dd className="text-sm leading-[1.6] font-medium whitespace-pre-wrap text-neutral-850">
         {value}
@@ -44,9 +91,13 @@ const AnswerRow = ({ label, answer }: { label: string; answer: unknown }) => {
 }
 
 const AnswerSection = ({
+  applicationId,
+  status,
   standardResponses,
   customResponses,
 }: {
+  applicationId: string
+  status: ApplicationStatus
   standardResponses?: StandardResponses
   customResponses: CustomQuestionResponse[]
 }) => {
@@ -55,13 +106,17 @@ const AnswerSection = ({
   )
   const hasAnswers = standardAnswers.length > 0 || customResponses.length > 0
 
+  // 답변이 많아지면 상세 페이지가 지나치게 길어져 접이식으로 둔다 — design.md 원칙대로
+  // 별도 JS 아코디언 대신 native details/summary를 그대로 쓴다 (FaqContent와 동일 패턴).
+  // 카드 자체는 위 정보 카드에 속해 있어 자체 border/bg 없이 구분선만 둔다.
   return (
-    <section className="overflow-hidden rounded-xl border border-neutral-150 bg-white shadow-[0_7px_7px_rgba(55,55,55,0.06)]">
-      <h2 className="px-4 pt-4 pb-2 font-cafe24 text-sm text-primary-600 tab:px-5 tab:text-base">
-        신청서 답변
-      </h2>
+    <details className="group mt-4 border-t border-neutral-150 pt-4">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-2 [&::-webkit-details-marker]:hidden">
+        <span className="font-cafe24 text-sm text-primary-600 tab:text-base">신청서 보기</span>
+        <ChevronDownIcon className="size-5 shrink-0 text-neutral-700 transition-transform group-open:rotate-180" />
+      </summary>
       {hasAnswers ? (
-        <dl className="divide-y divide-neutral-150">
+        <dl className="mt-2 divide-y divide-neutral-150 border-t border-neutral-150">
           {standardAnswers.map(({ key, label }) => (
             <AnswerRow key={key} label={label} answer={standardResponses?.[key]} />
           ))}
@@ -74,11 +129,86 @@ const AnswerSection = ({
           ))}
         </dl>
       ) : (
-        <p className="px-4 py-6 text-sm font-medium text-neutral-500 tab:px-5">
+        <p className="mt-2 border-t border-neutral-150 py-6 text-sm font-medium text-neutral-500">
           저장된 신청 답변이 없습니다.
         </p>
       )}
-    </section>
+
+      <StatusActionSection applicationId={applicationId} status={status} />
+    </details>
+  )
+}
+
+const StatusActionSection = ({
+  applicationId,
+  status,
+}: {
+  applicationId: string
+  status: ApplicationStatus
+}) => {
+  const [pendingAction, setPendingAction] = useState<StatusAction | null>(null)
+  const updateStatus = useUpdateBreederApplicationStatus()
+  const actions = STATUS_ACTIONS[status]
+  if (!actions) return null
+
+  const applyStatus = (nextStatus: ApplicationStatus) => {
+    updateStatus.mutate(
+      { applicationId, data: { status: nextStatus } },
+      { onSuccess: () => setPendingAction(null) },
+    )
+  }
+
+  const errorMessage = updateStatus.isError
+    ? normalizeApiError(updateStatus.error, '상태를 변경하지 못했습니다.').message
+    : null
+
+  return (
+    <div className="mt-4 flex flex-col gap-3 border-t border-neutral-150 pt-4">
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="font-cafe24 text-sm text-primary-600 tab:text-base">신청 처리</h2>
+        <div className="flex flex-wrap justify-end gap-2">
+          {actions.map((action) => (
+            <Button
+              key={action.nextStatus}
+              variant={action.variant}
+              size="sm"
+              className="px-4"
+              disabled={updateStatus.isPending}
+              onClick={() =>
+                action.confirm ? setPendingAction(action) : applyStatus(action.nextStatus)
+              }
+            >
+              {action.label}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      {errorMessage && <AlertMessage status="error" size="responsive" message={errorMessage} />}
+
+      {pendingAction?.confirm && (
+        <CtaModal
+          open
+          onOpenChange={(open) => !open && setPendingAction(null)}
+          title={pendingAction.confirm.title}
+          description={pendingAction.confirm.description}
+          actions={[
+            {
+              label: '취소',
+              variant: 'outline',
+              onClick: () => setPendingAction(null),
+              disabled: updateStatus.isPending,
+            },
+            {
+              label: pendingAction.label,
+              variant: 'fill',
+              onClick: () => applyStatus(pendingAction.nextStatus),
+              disabled: updateStatus.isPending,
+            },
+          ]}
+        />
+      )}
+    </div>
   )
 }
 
@@ -137,12 +267,14 @@ const ReceivedApplicationDetailContent = ({ applicationId }: { applicationId: st
                     </p>
                   </div>
                 )}
-              </section>
 
-              <AnswerSection
-                standardResponses={data.standardResponses}
-                customResponses={data.customResponses}
-              />
+                <AnswerSection
+                  applicationId={applicationId}
+                  status={data.status}
+                  standardResponses={data.standardResponses}
+                  customResponses={data.customResponses}
+                />
+              </section>
             </>
           )}
         </div>
@@ -151,4 +283,4 @@ const ReceivedApplicationDetailContent = ({ applicationId }: { applicationId: st
   )
 }
 
-export { ReceivedApplicationDetailContent }
+export { ReceivedApplicationDetailContent, StatusActionSection, AnswerSection }

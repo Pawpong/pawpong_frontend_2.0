@@ -47,7 +47,7 @@ export const useUpdateBreederApplicationStatus = () => {
       data,
     }: {
       applicationId: string
-      data: ApplicationStatusUpdateRequest
+      data: Omit<ApplicationStatusUpdateRequest, 'applicationId'>
     }) => updateBreederApplicationStatus(applicationId, data),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: breederQueries.all() })

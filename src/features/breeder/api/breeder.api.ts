@@ -26,15 +26,15 @@ export const updateBreederProfile = (data: ProfileUpdateRequestDto) =>
     >(`${API_VERSION}/breeder-management/profile`, data)
     .then(unwrap)
 
-/** 신청 상태 변경 (브리더용) */
+/** 신청 상태 변경 (브리더용) — applicationId는 URL과 body 둘 다 필요해 호출부 대신 여기서 채운다 */
 export const updateBreederApplicationStatus = (
   applicationId: string,
-  data: ApplicationStatusUpdateRequest,
+  data: Omit<ApplicationStatusUpdateRequest, 'applicationId'>,
 ) =>
   apiClient
     .patch<
       ApiResponseFull<ApplicationStatusUpdateResponseDto>
-    >(`${API_VERSION}/breeder-management/applications/${applicationId}`, data)
+    >(`${API_VERSION}/breeder-management/applications/${applicationId}`, { applicationId, ...data })
     .then(unwrap)
 
 // ==================== 부모견/묘 (parent-pets) ====================

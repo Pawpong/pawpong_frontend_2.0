@@ -179,8 +179,11 @@ export interface ReceivedApplicationDetailDto extends ApplicationDetailBase {
 // ==================== 상태 변경 ====================
 
 export interface ApplicationStatusUpdateRequest {
-  newStatus: ApplicationStatus
-  breederNotes?: string
+  applicationId: string
+  status: ApplicationStatus
+  notes?: string
+  actionTaken?: string
+  nextSteps?: string
 }
 
 export interface ApplicationStatusUpdateResponseDto {
