@@ -101,6 +101,11 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
           isFavorite={isFavorite}
           onToggleFavorite={toggleFavorite}
           applyBlockedReason={applyBlockedReason}
+          myApplication={
+            detail.myApplicationId
+              ? { applicationId: detail.myApplicationId, breederUserId: detail.breeder.id }
+              : undefined
+          }
         />
       )}
 
