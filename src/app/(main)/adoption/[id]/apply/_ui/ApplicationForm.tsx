@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { AlertCircleIcon, PawIcon } from '@/shared/assets'
+import { AlertCircleIcon, PawPrintIcon } from '@/shared/assets'
 import {
   AlertMessage,
   AsyncState,
@@ -193,7 +193,7 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
       <CtaModal
         open={showConsultConfirm}
         onOpenChange={(isOpen) => !isOpen && cancelConsult()}
-        icon={<PawIcon className="size-8 text-neutral-700" />}
+        icon={<PawPrintIcon className="size-9 text-neutral-700" />}
         title={CONSULT_CONFIRM_TITLE}
         direction="row"
         actions={[

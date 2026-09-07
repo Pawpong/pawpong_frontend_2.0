@@ -17,18 +17,20 @@ const AUTOPLAY_DELAY_MS = 4000
 const NAV_PREV_CLASS = 'banner-nav-prev'
 const NAV_NEXT_CLASS = 'banner-nav-next'
 
-//QA: 화살표 위치/방향 — Figma 기준 반응형 위치와 좌우 반전을 한 곳에서 관리한다.
+//QA: 화살표 위치 — Figma 기준(768px→21.3175rem / 1440px→39.5953rem) 두 지점이 뷰포트 폭에
+//QA: 거의 정비례(43.995vw)하므로, 768~1440 사이에서도 배너 폭과 같은 비율로 이동하도록
+//QA: 비례식으로 바꾸고 1440 이상은 배너 폭처럼 고정값으로 캡한다.
 const NAV_ARROWS = [
   {
     className: NAV_PREV_CLASS,
     label: '이전 배너',
-    position: 'tab:left-[calc(50%-21.3175rem)] pc:left-[calc(50%-39.5953rem)]',
+    position: 'tab:left-[calc(50%-min(39.5953rem,43.995vw))]',
     mirrored: true,
   },
   {
     className: NAV_NEXT_CLASS,
     label: '다음 배너',
-    position: 'tab:right-[calc(50%-21.3175rem)] pc:right-[calc(50%-39.5953rem)]',
+    position: 'tab:right-[calc(50%-min(39.5953rem,43.995vw))]',
     mirrored: false,
   },
 ] as const
@@ -69,7 +71,9 @@ const Banner = () => {
   return (
     <div className="relative w-full overflow-hidden">
       {/*
-        //QA: 배너 비율 수정 — breakpoint별 캔버스 높이와 BannerSlide의 aspect-ratio를 분리한다.
+        //QA: 배너 반응형 수정 — 캔버스 높이는 h-auto로 슬라이드 폭(aspect-ratio 연동)에 맡기고,
+        //QA: 슬라이드 폭 자체를 78.75vw(1134/1440) 비례식으로 둬 768~1440 사이에서도
+        //QA: 배너가 끊김 없이 같은 비율로 줄고 늘어난다 (Figma 4161-825592).
         //QA: PC 미리보기 수정 — Coverflow로 활성/양옆 배너의 비율과 간격을 함께 축소한다.
       */}
       <Swiper
@@ -99,12 +103,12 @@ const Banner = () => {
           setActiveIndex(normalizeIndex(swiper.realIndex))
         }}
         onRealIndexChange={(swiper) => setActiveIndex(normalizeIndex(swiper.realIndex))}
-        className="banner-swiper mx-auto h-auto w-full max-w-full py-0 tab:h-[16.2333rem] tab:w-full tab:py-[0.5833rem] pc:h-[30.4375rem] pc:w-full pc:py-[clamp(0.75rem,1.09375vw,1.09375rem)]"
+        className="banner-swiper mx-auto h-auto w-full max-w-full py-0 tab:py-[clamp(0.75rem,1.09375vw,1.09375rem)]"
       >
         {carouselBanners.map(({ banner }) => (
           <SwiperSlide
             key={banner.bannerId}
-            className="!h-auto !w-full tab:!w-[37.8rem] pc:!w-[min(70.875rem,calc(100vw-2rem))]"
+            className="!h-auto !w-full tab:!w-[min(70.875rem,78.75vw)]"
           >
             <BannerSlide banner={banner} />
           </SwiperSlide>
@@ -130,7 +134,9 @@ const Banner = () => {
         </div>
       </div>
 
-      {/* //QA: 네비게이션 수정 — 시작/끝 상태는 loop=false와 Swiper disabled 상태로 표현한다. */}
+      {/* //QA: 네비게이션 수정 — 시작/끝 상태는 loop=false와 Swiper disabled 상태로 표현한다.
+          //QA: 버튼·아이콘 크기도 1440(48px/40px/25px)을 기준으로 3.333vw·2.778vw·1.736vw
+          //QA: 비례식으로 둬, 768~1439 구간에서 배너와 같은 비율로 줄어들게 한다. */}
       {hasMultiple &&
         NAV_ARROWS.map(({ className, label, position, mirrored }) => (
           <button
@@ -138,14 +144,14 @@ const Banner = () => {
             type="button"
             aria-label={label}
             className={cn(
-              'absolute top-1/2 z-10 hidden size-8 -translate-y-1/2 items-center justify-center text-primary-500 transition-[color,transform] hover:text-primary-700 focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 tab:flex pc:size-[clamp(2rem,3.333vw,3rem)] [&.swiper-button-disabled]:cursor-default [&.swiper-button-disabled]:text-neutral-400 [&.swiper-button-disabled]:hover:text-neutral-400',
+              'absolute top-1/2 z-10 hidden -translate-y-1/2 items-center justify-center text-primary-500 transition-[color,transform] hover:text-primary-700 focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 tab:flex tab:size-[min(3rem,3.333vw)] [&.swiper-button-disabled]:cursor-default [&.swiper-button-disabled]:text-neutral-400 [&.swiper-button-disabled]:hover:text-neutral-400',
               position,
               className,
             )}
           >
             <ChevronRight
               className={cn(
-                'h-[1.25rem] w-[0.78125rem] pc:h-[clamp(1.6667rem,2.778vw,2.5rem)] pc:w-[clamp(1.0417rem,1.736vw,1.5625rem)]',
+                'tab:h-[min(2.5rem,2.778vw)] tab:w-[min(1.5625rem,1.736vw)]',
                 mirrored && '-scale-x-100',
               )}
             />

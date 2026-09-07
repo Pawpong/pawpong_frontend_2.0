@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { NotificationListItem, notificationQueries } from '@/entities/notification'
 import { useDeleteNotification, useMarkAllAsRead, useMarkAsRead } from '@/features/notification'
-import { PawIcon } from '@/shared/assets'
+import { PawPrintIcon } from '@/shared/assets'
 import type { NotificationResponseDto } from '@/shared/types'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
 import { flattenPages } from '@/shared/lib/infiniteList'
@@ -63,7 +63,7 @@ const NotificationsContent = () => {
           <div className="mb-4 flex min-h-14 items-center justify-between gap-4 rounded-xl bg-primary-50 px-4 py-3 tab:px-5">
             <div className="flex min-w-0 items-center gap-3">
               <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white text-primary-500 shadow-[0_3px_12px_rgba(73,45,20,0.08)]">
-                <PawIcon className="size-5" />
+                <PawPrintIcon className="size-6" />
               </span>
               <p className="truncate text-sm font-medium text-neutral-700 tab:text-base">
                 {unreadCountQuery.isError ? (

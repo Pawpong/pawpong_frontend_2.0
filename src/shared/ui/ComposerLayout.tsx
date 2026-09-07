@@ -1,12 +1,12 @@
 import type { ReactNode } from 'react'
-import { PawIcon } from '@/shared/assets'
+import { PawPrintIcon } from '@/shared/assets'
 import { Container } from './Container'
 import { NavigationBar } from './NavigationBar'
 
 interface ComposerLayoutProps {
   title: string
   mobileTitle?: string
-  category: string
+  category?: string
   introTitle: ReactNode
   description: string
   onBack: () => void
@@ -30,20 +30,20 @@ export function ComposerLayout({
         <div className="mx-auto max-w-264">
           <header className="relative mb-6 overflow-hidden rounded-xl bg-point-100 px-5 py-6 tab:mb-8 tab:px-8 tab:py-8">
             <div className="relative z-10 pc:pr-28">
-              <p className="mb-3 flex items-center gap-2 text-sm font-semibold text-primary-600">
-                <PawIcon aria-hidden="true" className="size-5" />
-                {category}
-              </p>
-              <h1 className="text-2xl leading-snug font-bold tracking-tight tab:text-3xl">
-                {introTitle}
-              </h1>
+              {category && (
+                <p className="mb-3 flex items-center gap-2 text-sm font-semibold text-primary-600">
+                  <PawPrintIcon aria-hidden="true" className="size-6" />
+                  {category}
+                </p>
+              )}
+              <h1 className="font-cafe24 text-xl leading-[1.5] tab:text-2xl">{introTitle}</h1>
               <p className="mt-3 text-sm leading-relaxed text-neutral-700 tab:text-base">
                 {description}
               </p>
             </div>
-            <PawIcon
+            <PawPrintIcon
               aria-hidden="true"
-              className="pointer-events-none absolute right-8 bottom-5 hidden size-24 -rotate-12 text-point-300 pc:block"
+              className="pointer-events-none absolute right-8 bottom-5 hidden size-28 -rotate-12 text-point-300 pc:block"
             />
           </header>
           {children}
@@ -55,7 +55,7 @@ export function ComposerLayout({
 
 export function ComposerColumns({ children }: { children: ReactNode }) {
   return (
-    <div className="grid gap-8 tab:grid-cols-2 pc:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] pc:gap-12">
+    <div className="grid gap-8 pc:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] pc:gap-12">
       {children}
     </div>
   )

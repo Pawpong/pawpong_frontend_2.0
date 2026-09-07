@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { PawIcon } from '@/shared/assets'
+import { PawPrintIcon } from '@/shared/assets'
 import { Badge, Button, CtaModal, ListingStats } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import type { AdoptedListingCard as AdoptedListingCardType } from '@/shared/types'
@@ -42,7 +42,7 @@ const CardImage = ({
         role="img"
         aria-label={`${listing.name} 이미지 없음`}
       >
-        <PawIcon className="size-8 pc:size-10" />
+        <PawPrintIcon className="size-9 pc:size-11" />
       </div>
     )}
     {isCompleted && <div className="absolute inset-0 bg-white/70" />}

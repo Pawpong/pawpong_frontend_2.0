@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { PawIcon } from '@/shared/assets'
+import { PawPrintIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 
 interface ContestEntryImageProps {
@@ -72,7 +72,7 @@ const ContestEntryImage = ({
         fallbackClassName,
       )}
     >
-      <PawIcon className={cn('size-10 opacity-70', fallbackIconClassName)} aria-hidden="true" />
+      <PawPrintIcon className={cn('size-11 opacity-70', fallbackIconClassName)} aria-hidden="true" />
     </span>
   )
 }

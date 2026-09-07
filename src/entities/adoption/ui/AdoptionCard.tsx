@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { PawIcon } from '@/shared/assets'
+import { PawPrintIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 
 import { FavoriteButton, FavoriteToggle, ListingStats, PopularBadge } from '@/shared/ui'
@@ -51,7 +51,7 @@ const CardImage = ({
         role="img"
         aria-label={`${listing.name} 이미지 없음`}
       >
-        <PawIcon className="size-12 opacity-70 pc:size-14" />
+        <PawPrintIcon className="size-14 opacity-70 pc:size-16" />
       </div>
     )}
     {isCompleted && <div className="absolute inset-0 bg-white/70" />}
@@ -207,7 +207,7 @@ const AdoptionCardHorizontal = ({
             role="img"
             aria-label={`${listing.name} 이미지 없음`}
           >
-            <PawIcon className="size-8" />
+            <PawPrintIcon className="size-9" />
           </div>
         )}
       </div>
