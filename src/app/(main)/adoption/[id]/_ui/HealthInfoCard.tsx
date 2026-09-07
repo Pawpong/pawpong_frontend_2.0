@@ -4,7 +4,7 @@ import { Badge } from '@/shared/ui'
 import { CheckIcon } from '@/shared/assets'
 import type { AdoptionDetailDto } from '@/shared/types'
 import { BaseInfoCard } from './BaseInfoCard'
-import { EmptyNote } from './EmptyNote'
+import { HealthRecordEmpty } from './HealthRecordEmpty'
 
 const CompletionBadge = ({ completed }: { completed: boolean }) => (
   <Badge variant={completed ? 'primaryOutline' : 'neutralFilled'} size="lg">
@@ -67,10 +67,11 @@ const HealthInfoCard = ({ detail }: { detail: AdoptionDetailDto }) => (
             ))}
           </Table>
         ) : (
-          // 미완료 사유가 있으면 그대로 노출 (분양글 작성 시 브리더가 입력)
-          <EmptyNote>
-            {detail.health.vaccinationIncompleteReason || '등록된 접종 정보가 없어요.'}
-          </EmptyNote>
+          // 미완료 사유가 있으면 일러스트와 함께 노출 (분양글 작성 시 브리더가 필수로 입력)
+          <HealthRecordEmpty
+            reason={detail.health.vaccinationIncompleteReason}
+            fallback="등록된 접종 정보가 없어요."
+          />
         )}
       </div>
 
@@ -103,9 +104,10 @@ const HealthInfoCard = ({ detail }: { detail: AdoptionDetailDto }) => (
             ))}
           </Table>
         ) : (
-          <EmptyNote>
-            {detail.health.geneticTestIncompleteReason || '등록된 유전병 검사 정보가 없어요.'}
-          </EmptyNote>
+          <HealthRecordEmpty
+            reason={detail.health.geneticTestIncompleteReason}
+            fallback="등록된 유전병 검사 정보가 없어요."
+          />
         )}
       </div>
     </div>
