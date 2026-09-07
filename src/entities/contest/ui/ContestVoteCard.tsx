@@ -62,11 +62,9 @@ const ContestVoteCard = ({
         isMdAvatar
           ? 'flex h-[7.875rem] w-[20.9375rem] items-center gap-4 rounded-lg bg-neutral-50 p-2 active:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]'
           : 'flex flex-col',
-        isLarge && 'w-[17.614rem] rounded-lg hover:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]',
-        isMd && 'w-[10.25rem] rounded-sm hover:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]',
-        isMd &&
-          responsive &&
-          'w-full pc:rounded-lg pc:hover:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]',
+        isLarge && 'w-[17.614rem] rounded-lg card-interactive',
+        isMd && 'w-[10.25rem] rounded-sm card-interactive',
+        isMd && responsive && 'w-full card-interactive pc:rounded-lg',
         (showDetailOverlay || showPressedStyle) && 'shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]',
         className,
       )}

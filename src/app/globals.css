@@ -203,3 +203,23 @@
     pointer-events: none;
   }
 }
+
+/* Shared discovery-card feedback; preserve geometry and avoid sticky touch hover. */
+@utility card-interactive {
+  transition: box-shadow 160ms ease-out;
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      box-shadow: 0 0 0 1px var(--color-secondary-400);
+    }
+  }
+
+  &:focus-within {
+    outline: 2px solid var(--color-primary-500);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
