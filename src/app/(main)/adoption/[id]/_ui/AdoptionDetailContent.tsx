@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import type { ReactNode } from 'react'
-import { Container, Separator, ImageDetailModal, NavigationBar } from '@/shared/ui'
+import { Container, EmptyState, Separator, ImageDetailModal, NavigationBar } from '@/shared/ui'
 import { useImageModal } from '@/shared/lib/useImageModal'
 import { useToggleAdoptionFavorite } from '@/features/adoption'
 import { useMe } from '@/features/auth'
@@ -84,11 +84,15 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
           <p className="text-[0.75rem] leading-[1.375rem] font-medium text-[#5d5d5d] pc:text-[1.25rem] pc:leading-[1.5] pc:font-semibold pc:text-neutral-850">
             브리더의 다른 분양건 {detail.otherListings.length}
           </p>
-          <div className="flex flex-col gap-[0.75rem] pc:gap-6">
-            {detail.otherListings.map((listing) => (
-              <OtherListingCard key={listing.listingId} listing={listing} />
-            ))}
-          </div>
+          {detail.otherListings.length > 0 ? (
+            <div className="flex flex-col gap-[0.75rem] pc:gap-6">
+              {detail.otherListings.map((listing) => (
+                <OtherListingCard key={listing.listingId} listing={listing} />
+              ))}
+            </div>
+          ) : (
+            <EmptyState message="브리더의 다른 분양건이 없어요." className="py-8 pc:py-12" />
+          )}
         </div>
       </Section>
 

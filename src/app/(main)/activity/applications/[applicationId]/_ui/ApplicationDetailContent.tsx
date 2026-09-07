@@ -9,6 +9,7 @@ import {
   AsyncState,
   Button,
   Container,
+  EmptyState,
   NavigationBar,
   buttonVariants,
 } from '@/shared/ui'
@@ -84,9 +85,10 @@ const AnswerSection = ({
           ))}
         </dl>
       ) : (
-        <p className="px-4 py-6 text-sm font-medium text-neutral-500 tab:px-5">
-          저장된 신청 답변이 없습니다.
-        </p>
+        <EmptyState
+          message="저장된 신청 답변이 없습니다."
+          className="px-4 py-6 text-neutral-500 tab:px-5"
+        />
       )}
     </section>
   )
