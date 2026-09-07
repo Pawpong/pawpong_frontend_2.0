@@ -35,7 +35,7 @@ const ContestEntryPanel = (props: ContestEntryPanelProps) => {
   return (
     <Link
       href="/hall-of-fame/participate"
-      className="group flex w-full flex-col items-center gap-5 rounded-sm border-2 border-dashed border-secondary-400 bg-secondary-200 px-6 py-10 text-center transition-colors hover:border-secondary-600 hover:bg-secondary-100 tab:flex-row tab:justify-between tab:gap-6 tab:rounded-xl tab:px-10 tab:py-8 tab:text-left"
+      className="group flex w-full flex-col items-center gap-5 rounded-sm border-2 border-dashed border-secondary-400 bg-secondary-100 px-6 py-10 text-center transition-colors hover:border-secondary-600 hover:bg-secondary-200 tab:flex-row tab:justify-between tab:gap-6 tab:rounded-xl tab:px-10 tab:py-8 tab:text-left"
     >
       <div className="flex flex-col items-center gap-4 tab:flex-row tab:gap-5">
         <span className="flex size-16 shrink-0 items-center justify-center rounded-full bg-secondary-200 transition-transform duration-200 group-hover:-translate-y-1">
