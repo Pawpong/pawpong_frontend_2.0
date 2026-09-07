@@ -36,8 +36,7 @@ const AdoptionDraftsContent = () => {
 
   return (
     <div className="flex w-full flex-col">
-      {/* /adoption/my-listings 는 마이홈 분양중 탭과 완전히 중복이라 삭제됨 — 뒤로가기는 그 탭으로 */}
-      <NavigationBar title="임시저장" backHref="/home" />
+      <NavigationBar title="임시저장" backHref="/adoption/my-listings" />
 
       <Container className="px-4 pb-10 tab:pb-16">
         <div className="mx-auto w-full pc:max-w-[59.25rem]">

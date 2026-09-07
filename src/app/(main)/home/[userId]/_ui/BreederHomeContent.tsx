@@ -8,6 +8,7 @@ import { breederQueries } from '@/entities/breeder'
 import { HomeTabs, TabsContent } from '../../_ui/HomeTabs'
 import { BREEDER_HOME_TABS } from '../../_ui/constants'
 import { PublicBreederListings } from './PublicBreederListings'
+import { PublicBreederReviews } from './PublicBreederReviews'
 import { PublicHomePosts } from './PublicHomePosts'
 import { PublicHomeProfileSection } from './PublicHomeProfileSection'
 
@@ -54,6 +55,10 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
 
         <TabsContent value="posts" className="mt-0">
           <PublicHomePosts userId={userId} />
+        </TabsContent>
+
+        <TabsContent value="reviews" className="mt-0">
+          <PublicBreederReviews breederId={profile.breederId} />
         </TabsContent>
       </HomeTabs>
     </div>
