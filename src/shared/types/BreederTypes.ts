@@ -121,13 +121,18 @@ export interface MyPetItemDto {
 
 // ==================== 브리더 프로필 응답 ====================
 
+/** GET /breeder/{id}/reviews 의 BreederReviewItemDto. 별점·사진은 스펙에 없다. */
 export interface PublicReviewDto {
   reviewId: string
+  applicationId: string
   adopterName: string
-  rating: number
-  comment: string
-  photos?: string[]
-  createdAt: string
+  petName?: string
+  content: string
+  writtenAt: string
+  type: 'consultation' | 'adoption'
+  replyContent?: string | null
+  replyWrittenAt?: string | null
+  replyUpdatedAt?: string | null
 }
 
 /** 브리더 상세 프로필 응답 (공개/내 프로필 공통) */
@@ -272,14 +277,17 @@ export interface BreederMyReviewItem {
   reviewId: string
   adopterId: string
   adopterName: string
+  /** 서버 매퍼가 아직 '' 로 고정해 보낸다 (후기에 반려동물 연결이 없음) */
   petName?: string
+  /** 별점 기능 미구현 — 서버 매퍼가 0 고정. 화면에 노출하지 말 것 */
   rating: number
   petHealthRating?: number
   communicationRating?: number
   content: string
+  /** 서버 매퍼가 아직 [] 로 고정해 보낸다 */
   photos?: string[]
   writtenAt: string
-  type?: 'adoption' | 'visit'
+  type?: 'adoption' | 'consultation'
   isVisible: boolean
   reportCount?: number
   replyContent?: string

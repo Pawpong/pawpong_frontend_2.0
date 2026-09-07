@@ -8,6 +8,7 @@ const HOME_TAB = {
   publicListings: { id: 'listings', label: '분양 목록', mobileLabel: '분양목록' },
   posts: { id: 'posts', label: '게시글' },
   feed: { id: 'posts', label: '피드' },
+  reviews: { id: 'reviews', label: '후기' },
   myPosts: { id: 'posts', label: '내가 쓴 글' },
   favoriteBreeders: { id: 'breeders', label: '즐겨찾는 브리더', Icon: SearchIcon },
 } satisfies Record<string, HomeTabConfig>
@@ -15,7 +16,11 @@ const HOME_TAB = {
 // [refactored] 배열은 항목 조합만 담당
 const MY_HOME_TABS: HomeTabConfig[] = [HOME_TAB.myPosts, HOME_TAB.favoriteBreeders]
 
-const BREEDER_HOME_TABS: HomeTabConfig[] = [HOME_TAB.publicListings, HOME_TAB.feed]
+const BREEDER_HOME_TABS: HomeTabConfig[] = [
+  HOME_TAB.publicListings,
+  HOME_TAB.feed,
+  HOME_TAB.reviews,
+]
 
 // 브리더 마이홈은 시안(3170-825849)이 '게시글' 표기 — 입양자 마이홈의 '내가 쓴 글'과 다르다
 const BREEDER_MY_HOME_TABS: HomeTabConfig[] = [
