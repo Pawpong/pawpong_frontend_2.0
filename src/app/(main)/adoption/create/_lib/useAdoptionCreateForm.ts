@@ -161,8 +161,7 @@ const useAdoptionCreateForm = () => {
     hasChanges: () => isDirty || hasUnsavedImageChanges || hasUnsavedRepresentativeChange,
   })
 
-  // /adoption/my-listings 는 마이홈 분양중 탭과 완전히 중복이라 삭제됨
-  const exitHref = draftId ? '/adoption/drafts' : '/home'
+  const exitHref = draftId ? '/adoption/drafts' : '/adoption/my-listings'
 
   const handleCloseClick = () => {
     if (requestExit()) {
