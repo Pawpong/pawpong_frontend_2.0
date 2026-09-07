@@ -3,7 +3,7 @@
 import { useState, type MouseEventHandler } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { FavoriteIcon, PawIcon, PixelMessageIcon } from '@/shared/assets'
+import { FavoriteIcon, PawPrintIcon, PixelMessageIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 
 interface CommunityMediaCardProps {
@@ -76,7 +76,7 @@ const CommunityMediaCard = ({
           className="absolute inset-0 flex items-center justify-center bg-point-50 text-primary-300"
           aria-hidden="true"
         >
-          <PawIcon className="size-10 opacity-70 pc:size-16" />
+          <PawPrintIcon className="size-11 opacity-70 pc:size-20" />
         </span>
       ) : null}
 

@@ -29,7 +29,7 @@ const SiteFooter = () => {
   if (!FOOTER_PATHS.has(pathname)) return null
 
   return (
-    <footer className="border-t border-primary-100 bg-point-50">
+    <footer className="bg-point-50">
       <Container className="py-8 tab:py-10 pc:py-12">
         <div className="flex flex-col gap-8 pc:flex-row pc:items-start pc:justify-between">
           <div className="flex max-w-md flex-col gap-3">
@@ -58,7 +58,7 @@ const SiteFooter = () => {
           </nav>
         </div>
 
-        <div className="mt-8 border-t border-primary-100 pt-6 tab:mt-10 tab:pt-8">
+        <div className="mt-8 pt-6 tab:mt-10 tab:pt-8">
           <address className="flex flex-col gap-2 text-xs leading-[1.6] font-medium text-neutral-700 not-italic tab:text-sm">
             <div className="flex flex-wrap gap-x-4 gap-y-1">
               <span>상호 콜딩(Colding)</span>
@@ -74,7 +74,7 @@ const SiteFooter = () => {
             </a>
           </address>
 
-          <div className="mt-6 flex flex-col gap-3 border-t border-primary-100 pt-5 tab:flex-row tab:items-center tab:justify-between">
+          <div className="mt-6 flex flex-col gap-3 pt-5 tab:flex-row tab:items-center tab:justify-between">
             <p className="text-xs font-medium text-neutral-500">
               Copyright © 2025 Pawpong Inc. All rights reserved.
             </p>

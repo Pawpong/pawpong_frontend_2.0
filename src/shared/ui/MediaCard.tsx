@@ -4,7 +4,7 @@ import type { ReactNode } from 'react'
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { PawIcon } from '@/shared/assets'
+import { PawPrintIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 
 interface MediaCardProps {
@@ -79,7 +79,7 @@ const MediaCard = ({
             role="img"
             aria-label={`${alt} 이미지 없음`}
           >
-            <PawIcon className="size-12 opacity-70 pc:size-14" />
+            <PawPrintIcon className="size-14 opacity-70 pc:size-16" />
           </div>
         )}
 
