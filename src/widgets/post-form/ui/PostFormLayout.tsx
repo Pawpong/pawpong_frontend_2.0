@@ -42,7 +42,6 @@ const PostFormLayout = ({
     <ComposerLayout
       title={title}
       mobileTitle={mobileTitle}
-      category="포퐁 커뮤니티"
       introTitle={introTitle}
       description={introDescription}
       onBack={onBack ?? (() => router.back())}

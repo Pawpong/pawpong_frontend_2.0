@@ -4,9 +4,8 @@ import { useRef, useState } from 'react'
 import Image from 'next/image'
 import { tv, type VariantProps } from 'tailwind-variants'
 import { CameraIcon, ImageIcon, CloseIcon } from '@/shared/assets'
-import { cn } from '@/shared/lib/cn'
 import { BREAKPOINTS } from '@/shared/lib/useBreakpoint'
-import { ImageModal, PhotoSelectPrompt } from '@/shared/ui'
+import { ImageModal } from '@/shared/ui'
 import {
   Dialog,
   DialogClose,
@@ -46,12 +45,12 @@ const imageUploadVariants = tv({
       },
       composer: {
         root: 'gap-3',
-        tiles: 'grid grid-cols-3 gap-3',
+        tiles: 'flex-wrap gap-3',
         addButton:
-          'aspect-square w-full justify-center gap-2 rounded-xl border border-primary-200 bg-point-50 p-3 text-primary-700 transition-colors hover:bg-point-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 disabled:opacity-50',
-        addIcon: 'size-8 text-primary-500',
-        addCounter: 'text-xs font-semibold text-primary-700',
-        preview: 'aspect-square min-w-0 rounded-xl border border-neutral-150 bg-point-50',
+          'size-25 items-center justify-center gap-0.5 rounded border border-neutral-500 bg-white p-2 text-neutral-700 transition-colors hover:bg-neutral-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 disabled:opacity-50 pc:size-45 pc:gap-2 pc:rounded-lg',
+        addIcon: 'size-8 text-neutral-700',
+        addCounter: 'text-body-md font-semibold text-neutral-700 pc:text-body-lg',
+        preview: 'size-25 rounded border border-neutral-150 bg-point-50 pc:size-45 pc:rounded-lg',
       },
       post: {
         root: 'gap-1 pc:gap-2',
@@ -149,31 +148,24 @@ const ImageUploadArea = ({
       )}
 
       <div className={styles.tiles()}>
-        {/* Composer starts with a large invitation, then keeps an add tile in the gallery. */}
         {(!isComposer || images.length < maxImages) && (
           <button
             type="button"
             onClick={handleClick}
             disabled={disabled || images.length >= maxImages}
             aria-label={`사진 추가 (${images.length}/${maxImages})`}
-            className={cn(
-              styles.addButton(),
-              isComposer && images.length === 0 && 'col-span-3 gap-4 p-6',
-            )}
+            className={styles.addButton()}
           >
-            {isComposer && images.length === 0 ? (
-              <PhotoSelectPrompt
-                title="함께 나누고 싶은 순간이 있나요?"
-                description="우리 아이의 사진을 골라주세요"
-              />
-            ) : (
-              <>
-                <AddIcon className={styles.addIcon()} />
-                <span className={styles.addCounter()}>
-                  {images.length}/{maxImages}
-                </span>
-              </>
-            )}
+            <AddIcon className={styles.addIcon()} />
+            <span className={styles.addCounter()}>
+              {isComposer ? (
+                <>
+                  <span className="text-info-500">{images.length}</span>/{maxImages}
+                </>
+              ) : (
+                `${images.length}/${maxImages}`
+              )}
+            </span>
           </button>
         )}
 
@@ -189,33 +181,35 @@ const ImageUploadArea = ({
 
         {/* Image Previews */}
         {images.map((src, index) => (
-          <div
-            key={src}
-            className={cn(styles.preview(), isComposer && index === 0 && 'order-first col-span-3')}
-          >
+          <div key={src} className={styles.preview()}>
             <button
               type="button"
               disabled={disabled}
               className="size-full focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-500"
               onClick={() => handleImageClick(index)}
-              aria-label={`이미지 ${index + 1} ${isRepresentative(index) ? '대표사진' : '미리보기'}`}
+              aria-label={`이미지 ${index + 1} ${isComposer && index === 0 ? '대표 이미지' : isRepresentative(index) ? '대표사진' : '미리보기'}`}
             >
               <Image
                 src={src}
                 alt={`업로드 이미지 ${index + 1}`}
                 fill
                 sizes={
-                  isComposer
-                    ? index === 0
-                      ? '(min-width: 1440px) 420px, (min-width: 768px) 50vw, 100vw'
-                      : '(min-width: 1440px) 132px, (min-width: 768px) 17vw, 33vw'
-                    : size === 'post'
-                      ? '(min-width: 1440px) 180px, 100px'
-                      : '(max-width: 767px) 61px, 198px'
+                  isComposer || size === 'post'
+                    ? '(min-width: 1440px) 180px, 100px'
+                    : '(max-width: 767px) 61px, 198px'
                 }
-                className={isComposer && index === 0 ? 'object-contain' : 'object-cover'}
+                className="object-cover"
               />
             </button>
+
+            {/* 대표 이미지 라벨 — 등록 순서상 첫 번째 이미지 (composer 전용) */}
+            {isComposer && index === 0 && (
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-center bg-black/60 px-2.5 py-0.5 pc:py-1">
+                <span className="text-[0.625rem] font-medium text-white pc:text-xs">
+                  대표 이미지
+                </span>
+              </div>
+            )}
 
             {/* 대표사진 뱃지 */}
             {isRepresentative(index) && (
@@ -236,12 +230,12 @@ const ImageUploadArea = ({
               }}
               className={
                 isComposer
-                  ? 'absolute top-1 right-1 flex size-11 items-center justify-center rounded-full border border-neutral-150 bg-white text-neutral-850 focus-visible:outline-2 focus-visible:outline-primary-500 disabled:opacity-50'
+                  ? 'absolute top-1 right-1 flex size-5 items-center justify-center rounded-full border border-neutral-150 bg-white text-neutral-850 focus-visible:outline-2 focus-visible:outline-primary-500 disabled:opacity-50 pc:size-6'
                   : 'absolute top-1 right-1 flex size-4 items-center justify-center rounded-full bg-text-primary/60 tab:top-[0.323rem] tab:right-[0.323rem] tab:size-6'
               }
               aria-label={`이미지 ${index + 1} 삭제`}
             >
-              <CloseIcon className={isComposer ? 'size-5' : 'size-2.5 text-white tab:size-3.5'} />
+              <CloseIcon className={isComposer ? 'size-3 pc:size-3.5' : 'size-2.5 text-white tab:size-3.5'} />
             </button>
 
             {/* 순번 — desktop only. post 타일(100·180)에는 45px 배지가 과해 노출하지 않는다 */}

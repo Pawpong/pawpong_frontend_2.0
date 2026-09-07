@@ -21,19 +21,37 @@ const crownPalette = {
   3: { light: '#F2BC82', main: '#CD7F32', shade: '#A75E2B', dark: '#7C401F' },
 } as const
 
+/**
+ * 왕관 (Figma 2940-284195, 왕관-asset). 등수별로 색만 다르고 형태는 동일한 하나의
+ * 컴포넌트라, 금(type=금) 베리언츠에서 뽑은 정확한 픽셀 패스를 그대로 쓰고
+ * 색상 4곳(shade/main/light/dark)만 crownPalette로 교체한다. 테두리(#AD651D)는
+ * 등수와 무관하게 고정 — 실제 은/동 조각을 샘플링해 확인함.
+ */
 const CrownIcon = ({ rank }: { rank: 1 | 2 | 3 }) => {
   const color = crownPalette[rank]
 
   return (
-    <svg viewBox="0 0 48 39" fill="none" aria-hidden="true" className="h-8 w-10">
+    <svg viewBox="0 0 47.8388 38.2503" fill="none" aria-hidden="true" className="h-8 w-10">
       <path
-        d="M0 0h4v7h3v6h6V7h3V0h4v7h8V0h4v7h3v6h6V7h3V0h4v20h-3v16h-4v3H4v-3H0V20h3V7H0V0Z"
-        fill="#406DFF"
+        d="M3.74874 0.6H0.6V6.87501H3.74874V0.6ZM19.4901 0.6H16.3413V6.87501H19.4901V0.6ZM28.9327 0.6H25.784V6.87501H28.9327V0.6ZM44.685 0.6H41.5362V6.87501H44.685V0.6ZM6.89254 6.87527H3.74379V13.1502H6.89254V6.87527ZM16.3463 6.87527H13.1974V13.1502H16.3463V6.87527ZM32.0875 6.87527H28.9388V13.1502H32.0875V6.87527ZM41.5301 6.87527H38.3814V13.1502H41.5301V6.87527ZM13.1963 13.1498H6.8987V16.2873H13.1963V13.1498ZM38.3801 13.1498H32.0827V16.2873H38.3801V13.1498ZM10.0474 16.2873H6.8987V19.4248H10.0474V16.2873ZM38.3862 16.2873H35.2375V19.4248H38.3862V16.2873Z"
+        fill="#ad651d"
+        stroke="#ad651d"
+        strokeWidth={1.2}
+        strokeLinecap="square"
       />
-      <path d="M4 7h3v10h6v3H4V7Zm40 0h-3v10h-6v3h9V7Z" fill={color.shade} />
-      <path d="M7 20h34v13H7V20ZM20 7h8v13h-8V7Z" fill={color.main} />
-      <path d="M13 13h7v7h-7v-7Zm15 0h7v7h-7v-7Z" fill={color.light} />
-      <path d="M7 29h34v4H7v-4Zm4 4h26v3H11v-3Z" fill={color.dark} />
+      <path
+        d="M19.4901 6.87527H16.3413V13.1502H19.4901V6.87527ZM6.89254 13.1498H3.74379V19.4249H6.89254V13.1498ZM19.484 13.1498H13.1864V16.2873H19.484V13.1498ZM19.4888 16.2873H10.0426V19.4248H19.4888V16.2873ZM19.4876 19.425H3.74379V28.8375H19.4876V19.425ZM19.4876 31.9746H3.74379V38.2497H19.4876V31.9746Z"
+        fill={color.shade}
+      />
+      <path
+        d="M25.7937 0.6H19.4961V13.15H25.7937V0.6ZM3.74874 6.87527H0.6V38.2503H3.74874V6.87527ZM28.9424 6.87527H19.4961V28.8373H28.9424V6.87527ZM28.9424 31.9746H19.4961V38.2497H28.9424V31.9746ZM47.8337 6.87527H41.5362V13.1502H47.8337V6.87527ZM47.8388 13.1498H38.3925V19.4249H47.8388V13.1498ZM47.8325 19.425H35.2375V38.25H47.8325V19.425Z"
+        fill={color.main}
+      />
+      <path
+        d="M32.0875 13.1498H28.9388V16.2873H32.0875V13.1498ZM35.2363 16.2873H28.9388V28.8374H35.2363V16.2873ZM35.2363 31.9746H28.9388V38.2497H35.2363V31.9746Z"
+        fill={color.light}
+      />
+      <path d="M44.6825 28.8378H0.6V31.9753H44.6825V28.8378Z" fill={color.dark} />
     </svg>
   )
 }
@@ -47,57 +65,39 @@ const PawIcon = ({ className }: { className?: string }) => (
   </svg>
 )
 
-type PawPatternSize = 'pc' | 'tab' | 'mo'
+// //QA: 발자국 패턴 재검증 (Figma 2950-318018, "Group 92") — mo엔 발자국이 아예 없고,
+// //QA: tab·pc는 좌하단 근처에 같은 4개짜리 뭉치 하나(189.41×66.98px)만 놓인다(기존처럼
+// //QA: 화면 전체에 8개씩 흩뿌리지 않음). 색도 secondary-400이 아니라 primary-200(#ddbe9f).
+const PAW_CLUSTER = [
+  { left: 0, top: 20.35 },
+  { left: 64.12, top: 31.65 },
+  { left: 154.08, top: 16.66 },
+  { left: 103.27, top: 0 },
+] as const
 
-const PAW_POSITIONS = {
-  pc: [
-    { top: 11.75, right: 323.97 },
-    { top: 32, right: 236.92 },
-    { top: -14.84, right: 169.86 },
-    { top: 19.1, right: 78.49 },
-    { top: 348.46, right: 1100.23 },
-    { top: 368.71, right: 1013.18 },
-    { top: 321.87, right: 946.12 },
-    { top: 355.81, right: 854.75 },
-  ],
-  tab: [
-    { top: 199.59, right: 715.65 },
-    { top: 219.84, right: 628.6 },
-    { top: 173, right: 561.54 },
-    { top: 206.95, right: 470.17 },
-    { top: 7.95, right: 248.97 },
-    { top: 28.2, right: 161.92 },
-    { top: -18.64, right: 94.86 },
-    { top: 15.3, right: 3.49 },
-  ],
-  mo: [
-    { top: 0.39, left: 164 },
-    { top: 13.48, left: 220.27 },
-    { top: -16.8, left: 263.62 },
-    { top: 5.14, left: 322.68 },
-  ],
+type PawPatternVariant = 'tab' | 'pc'
+
+const PAW_CLUSTER_OFFSET = {
+  tab: { left: -22.25, top: 196.443 },
+  pc: { left: -15.412, top: 314.567 },
 } as const
 
-const PawPattern = ({ variant, className }: { variant: PawPatternSize; className?: string }) => {
-  const compact = variant === 'mo'
+const PawPattern = ({ variant, className }: { variant: PawPatternVariant; className?: string }) => {
+  const offset = PAW_CLUSTER_OFFSET[variant]
 
   return (
-    <div className={cn('pointer-events-none absolute inset-0', className)} aria-hidden="true">
-      {PAW_POSITIONS[variant].map((position, index) => (
+    <div
+      className={cn('pointer-events-none absolute h-[66.98px] w-[189.412px]', className)}
+      style={{ left: offset.left, top: offset.top }}
+      aria-hidden="true"
+    >
+      {PAW_CLUSTER.map((position, index) => (
         <span
           key={index}
-          className={cn(
-            'absolute flex items-center justify-center text-secondary-400',
-            compact ? 'size-[2.708rem]' : 'size-[4.189rem]',
-          )}
+          className="absolute flex size-[35.333px] items-center justify-center text-primary-200"
           style={position}
         >
-          <PawIcon
-            className={cn(
-              'rotate-[52.47deg]',
-              compact ? 'h-[1.75rem] w-[2.0625rem]' : 'h-[2.6875rem] w-[3.1875rem]',
-            )}
-          />
+          <PawIcon className="h-[1.719rem] w-[2.0625rem] rotate-[43.2deg]" />
         </span>
       ))}
     </div>
@@ -122,29 +122,41 @@ const PixelFrame = ({
           sizes="(min-width: 1440px) 211px, 122px"
           loading="eager"
           fetchPriority={rank === 1 ? 'high' : 'auto'}
-          fallbackIconClassName="size-12 pc:size-16"
+          fallbackIconClassName="size-14 pc:size-20"
         />
       )}
     </>
   )
 
+  const canOpen = Boolean(entry && onClick && isContestImageSourceSupported(entry.photoUrl))
+
   return (
-    <div className="relative h-[7.0625rem] w-[8.25rem] shrink-0 pc:h-[12.1875rem] pc:w-[14.3125rem]">
-      <div className="absolute top-[-1rem] left-1/2 z-20 -translate-x-1/2">
+    // //QA: 그림자 위치 수정 — Figma(2752-270622)의 drop-shadow는 카드 전체가 아니라
+    // //QA: 프레임(사진) 자체에 걸려있다. 알약은 기본 상태엔 그림자가 없다(profile-hover 때만 생김).
+    <div className="group/frame relative h-[7.0625rem] w-[8.25rem] shrink-0 drop-shadow-[0_7px_3.5px_rgba(55,55,55,0.1)] pc:h-[12.1875rem] pc:w-[14.3125rem]">
+      {/* //QA: 왕관 위치 — Figma(2752-269969)의 top:-16px/aspect-40x32 그대로, 프레임 상단 중앙에 살짝 겹쳐 띄운다. */}
+      <div className="absolute inset-x-[41.27%] top-[-1rem] z-20 flex justify-center">
         <CrownIcon rank={rank} />
       </div>
 
-      {entry && onClick && isContestImageSourceSupported(entry.photoUrl) ? (
+      {canOpen ? (
         <button
           type="button"
           onClick={onClick}
-          aria-label={`${entry.userDisplayName} 사진 자세히 보기`}
-          className="absolute inset-[4.6%_4%_5.55%_4%] overflow-hidden rounded-lg bg-[#e1e8ff]"
+          aria-label={`${entry!.userDisplayName} 사진 자세히 보기`}
+          className="absolute inset-[4.6%_4%_5.55%_4%] overflow-hidden rounded-lg bg-neutral-100"
         >
           {photo}
+          {/* //QA: hover 안내 — Figma는 size=md(=pc)에만 status=hover(2752-270622)가 있고
+              //QA: size=sm(mo/tab)엔 hover 베리언츠 자체가 없어, PC 전용으로만 딤+"자세히"를 낸다. */}
+          <span className="pointer-events-none absolute inset-0 hidden items-center justify-center bg-black/0 transition-colors pc:flex pc:group-hover/frame:bg-black/60">
+            <span className="rounded-full border border-white px-2 py-1 text-sm font-semibold text-white opacity-0 transition-opacity pc:group-hover/frame:opacity-100">
+              자세히
+            </span>
+          </span>
         </button>
       ) : (
-        <div className="absolute inset-[4.6%_4%_5.55%_4%] overflow-hidden rounded-lg bg-[#e1e8ff]">
+        <div className="absolute inset-[4.6%_4%_5.55%_4%] overflow-hidden rounded-lg bg-neutral-100">
           {photo}
         </div>
       )}
@@ -153,7 +165,7 @@ const PixelFrame = ({
         viewBox="0 0 132 113"
         preserveAspectRatio="none"
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 size-full text-secondary-500 pc:hidden"
+        className="pointer-events-none absolute inset-0 size-full text-primary-500 pc:hidden"
       >
         <path
           d="M116.16 5.302h10.561v5.3H132v18.554h-.002V113H10.56v-6.165H5.28v-6.559h10.561v6.56h100.318v-6.56h10.561V10.603h-10.561V5.302H15.84v5.3H5.281v-5.3H15.84V0h100.32v5.302Zm-110.88 94.974H0V10.602h5.28v89.674Z"
@@ -164,7 +176,7 @@ const PixelFrame = ({
         viewBox="0 0 229 195"
         preserveAspectRatio="none"
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 hidden size-full text-secondary-500 pc:block"
+        className="pointer-events-none absolute inset-0 hidden size-full text-primary-500 pc:block"
       >
         <path
           d="M229 18.296v32.019h-.003V195H18.318v-10.639H9.163v-11.318h18.318v11.319h174.04v-11.319h18.32V18.296H229ZM9.16 173.043H0V18.296h9.16v154.747ZM201.52 9.148H27.48v9.148H9.163V9.148h18.318V0H201.52v9.148Zm18.321 0v9.148h-18.32V9.148h18.32Z"
@@ -185,10 +197,14 @@ const PodiumCard = ({
   onClick?: () => void
 }) => {
   return (
-    <article className="relative z-10 flex w-[9.25rem] shrink-0 flex-col items-center gap-2 rounded-xl bg-secondary-50 p-2 shadow-[0_7px_7px_rgba(55,55,55,0.1)] pc:w-[16.3125rem] pc:px-4 pc:py-2">
+    // //QA: 카드 배경 제거 — Figma(2752-270620)는 카드 자체 배경/보더가 없다 (기존
+    // //QA: bg-secondary-50 박스 제거). 그림자는 프레임/알약 각자가 갖는다(PixelFrame 참고).
+    <article className="relative z-10 flex w-[9.25rem] shrink-0 flex-col items-center gap-2 pc:w-[16.3125rem]">
       <PixelFrame entry={entry} rank={rank} onClick={onClick} />
 
-      <div className="flex w-full items-center p-0.5 pc:p-1">
+      {/* //QA: profile-hover(2752-270764) — 알약에 마우스를 올리면 bg가 point-100→white로,
+          //QA: 그림자가 새로 생긴다. */}
+      <div className="flex w-full items-center gap-[1.75rem] rounded-full bg-point-100 p-1 transition-[background-color,box-shadow] hover:bg-white hover:shadow-[0_7px_3.5px_rgba(55,55,55,0.1)] pc:gap-5 pc:p-2">
         <div className="flex min-w-0 flex-1 items-center gap-1 pc:gap-2">
           {/* [refactored] CardAvatar 제거 — ProfileAvatar 폴백(paw)으로 통일 */}
           <ProfileAvatar
@@ -220,13 +236,15 @@ const HallOfFamePodium = ({ entries, onEntryClick, className }: HallOfFamePodium
   const ranked = ([1, 2, 3] as const).map((rank, index) => ({ rank, entry: entries[index] }))
 
   return (
+    // //QA: 배경 재검증(Figma 2950-318018) — bg-secondary-200(테두리 없음) →
+    // //QA: bg-point-100 + border-primary-500 (mo/tab/pc 공통).
     <div
       className={cn(
-        'relative flex h-[13.8125rem] w-full shrink-0 items-center overflow-hidden rounded-xl bg-secondary-200 px-4 py-8 tab:h-[16.8rem] tab:items-start tab:justify-center tab:p-8 pc:h-[26.425rem] pc:min-w-0 pc:flex-1 pc:shrink',
+        'relative flex h-[13.8125rem] w-full shrink-0 items-center overflow-hidden rounded-xl border border-primary-500 bg-point-100 px-4 py-8 tab:h-[16.8rem] tab:items-start tab:justify-center tab:p-8 pc:h-[26.425rem] pc:min-w-0 pc:flex-1 pc:shrink',
         className,
       )}
     >
-      <PawPattern variant="mo" className="tab:hidden" />
+      {/* //QA: mo는 발자국 없음 (Figma에 해당 레이어 자체가 없음) */}
       <PawPattern variant="tab" className="hidden tab:block pc:hidden" />
       <PawPattern variant="pc" className="hidden pc:block" />
 

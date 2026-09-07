@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import type { Swiper as SwiperClass } from 'swiper'
-import { PawIcon, PixelArrowRightIcon } from '@/shared/assets'
+import { PawPrintIcon, PixelArrowRightIcon } from '@/shared/assets'
 import 'swiper/css'
 
 // [refactored] 히어로 이미지 캐러셀 — Swiper 기반(모바일/탭 스와이프) + 커스텀 화살표·인디케이터
@@ -29,7 +29,7 @@ const HeroImageCarousel = ({
         role="img"
         aria-label={`${alt} 이미지 없음`}
       >
-        <PawIcon className="size-16 opacity-70 pc:size-20" />
+        <PawPrintIcon className="size-20 opacity-70 pc:size-24" />
       </div>
     )
   }

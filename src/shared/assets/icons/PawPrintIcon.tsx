@@ -1,8 +1,9 @@
 import type { SVGProps } from 'react'
 
-// Figma 3312-1228576 icon/paw (디자인시스템 발바닥).
-// 기존 PawIcon(1019-20799)과 다른 글리프 — 발가락이 정사각(4.96x4.96)이 아니라
-// 세로로 긴 타원(7.44x9.84)이라 그대로 대체할 수 없다.
+// Figma 3312-1228576 icon/paw (디자인시스템 발바닥) — 프로젝트 공통 paw 아이콘.
+// viewBox 비율이 세로로 긴 타원(7.44x9.84 발가락)이라 정사각 컨테이너에서는
+// 상하 레터박싱이 생기므로, 기존 PawIcon(1019-20799) 대체 시 각 자리 사이즈를
+// 한 단계씩 키워 체감 축소를 보정했다.
 const PawPrintIcon = (props: SVGProps<SVGSVGElement>) => {
   return (
     <svg
