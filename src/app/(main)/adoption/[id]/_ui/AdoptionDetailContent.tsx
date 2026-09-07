@@ -1,10 +1,17 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import type { ReactNode } from 'react'
-import { Container, Separator, ImageDetailModal, NavigationBar } from '@/shared/ui'
+import { useState, type ReactNode } from 'react'
+import {
+  Container,
+  Separator,
+  ImageDetailModal,
+  NavigationBar,
+  DeleteConfirmModal,
+} from '@/shared/ui'
 import { useImageModal } from '@/shared/lib/useImageModal'
 import { useToggleAdoptionFavorite } from '@/features/adoption'
+import { useDeletePetPosting } from '@/features/pet-posting'
 import { useMe } from '@/features/auth'
 import type { AdoptionDetailDto } from '@/shared/types'
 import { HealthInfoCard } from './HealthInfoCard'
@@ -13,6 +20,7 @@ import { BreedingEnvironmentCard } from './BreedingEnvironmentCard'
 import { OtherListingCard } from './OtherListingCard'
 import { AdoptionDetailHero } from './AdoptionDetailHero'
 import { AdoptionCtaBar } from './AdoptionCtaBar'
+import { AdoptionOwnerBar } from './AdoptionOwnerBar'
 
 interface AdoptionDetailContentProps {
   detail: AdoptionDetailDto
@@ -37,6 +45,21 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
 
   // 내 분양글에는 신청 CTA 자체를 두지 않는다 (자기 개체에 신청할 일이 없다)
   const isMyListing = !!me && me.userId === detail.breeder.id
+
+  // 내 글일 때만 수정·삭제 진입점을 준다. 삭제는 소프트 삭제라 목록에서 사라지므로
+  // 성공 후 상세에 머무르면 없는 글을 보게 된다 — 마이홈으로 돌려보낸다.
+  const deletePosting = useDeletePetPosting()
+  const [confirmDelete, setConfirmDelete] = useState(false)
+
+  const handleDelete = () => {
+    if (deletePosting.isPending) return
+    deletePosting.mutate(detail.listingId, {
+      onSuccess: () => {
+        setConfirmDelete(false)
+        router.replace('/home')
+      },
+    })
+  }
 
   // 서버가 어차피 거절하는 경우를 버튼 단계에서 알린다 — 신청 생성은 status: 'available' 인
   // 펫만 받는다(findApplicablePet). 브리더 계정도 다른 브리더에게 입양 신청을 넣을 수 있어
@@ -92,8 +115,14 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
         </div>
       </Section>
 
-      {/* ═══ CTA 하단 고정 바 ═══ */}
-      {!isMyListing && (
+      {/* ═══ CTA 하단 고정 바 ═══ 내 글이면 신청 대신 수정·삭제 */}
+      {isMyListing ? (
+        <AdoptionOwnerBar
+          listingId={detail.listingId}
+          onDelete={() => setConfirmDelete(true)}
+          isDeleting={deletePosting.isPending}
+        />
+      ) : (
         <AdoptionCtaBar
           listingId={detail.listingId}
           isFavorite={isFavorite}
@@ -106,6 +135,14 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
           }
         />
       )}
+
+      <DeleteConfirmModal
+        open={confirmDelete}
+        onOpenChange={setConfirmDelete}
+        target="분양글"
+        onConfirm={handleDelete}
+        isPending={deletePosting.isPending}
+      />
 
       {/* ═══ 이미지 모달 — 공통 ImageDetailModal (Figma 1952-260350: 이미지+대표뱃지+캐러셀만,
           프로필/소개/투표/버튼 없음) ═══ */}
