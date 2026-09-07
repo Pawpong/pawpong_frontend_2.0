@@ -29,7 +29,7 @@ const SiteFooter = () => {
   if (!FOOTER_PATHS.has(pathname)) return null
 
   return (
-    <footer className="border-t border-secondary-400 bg-secondary-200">
+    <footer className="border-t border-secondary-400 bg-secondary-50">
       <Container className="py-8 tab:py-10 pc:py-12">
         <div className="flex flex-col gap-8 pc:flex-row pc:items-start pc:justify-between">
           <div className="flex max-w-md flex-col gap-3">
