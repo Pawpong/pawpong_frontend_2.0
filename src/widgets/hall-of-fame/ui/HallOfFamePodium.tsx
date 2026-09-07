@@ -139,12 +139,12 @@ const PixelFrame = ({
           type="button"
           onClick={onClick}
           aria-label={`${entry.userDisplayName} 사진 자세히 보기`}
-          className="absolute inset-[4.6%_4%_5.55%_4%] overflow-hidden rounded-lg bg-[#e1e8ff]"
+          className="absolute inset-[4.6%_4%_5.55%_4%] overflow-hidden rounded-lg bg-secondary-100"
         >
           {photo}
         </button>
       ) : (
-        <div className="absolute inset-[4.6%_4%_5.55%_4%] overflow-hidden rounded-lg bg-[#e1e8ff]">
+        <div className="absolute inset-[4.6%_4%_5.55%_4%] overflow-hidden rounded-lg bg-secondary-100">
           {photo}
         </div>
       )}

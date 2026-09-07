@@ -68,11 +68,14 @@ const ContestEntryImage = ({
       role="img"
       aria-label={`${alt} 이미지 없음`}
       className={cn(
-        'absolute inset-0 flex items-center justify-center bg-point-100 text-primary-300',
+        'absolute inset-0 flex items-center justify-center bg-secondary-100 text-primary-400',
         fallbackClassName,
       )}
     >
-      <PawPrintIcon className={cn('size-11 opacity-70', fallbackIconClassName)} aria-hidden="true" />
+      <PawPrintIcon
+        className={cn('size-11 opacity-70', fallbackIconClassName)}
+        aria-hidden="true"
+      />
     </span>
   )
 }
