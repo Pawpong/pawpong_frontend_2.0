@@ -77,8 +77,8 @@ interface CtaBannerProps {
 }
 
 const TONE_CLASS = {
-  secondary: 'border border-secondary-400 bg-secondary-50',
-  point: 'border border-secondary-400 bg-secondary-50',
+  secondary: 'border border-secondary-400 bg-secondary-200',
+  point: 'border border-secondary-400 bg-secondary-200',
 } as const
 
 /**

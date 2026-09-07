@@ -222,7 +222,7 @@ const HallOfFamePodium = ({ entries, onEntryClick, className }: HallOfFamePodium
   return (
     <div
       className={cn(
-        'relative flex h-[13.8125rem] w-full shrink-0 items-center overflow-hidden rounded-xl border border-secondary-400 bg-secondary-50 px-4 py-8 tab:h-[16.8rem] tab:items-start tab:justify-center tab:p-8 pc:h-[26.425rem] pc:min-w-0 pc:flex-1 pc:shrink',
+        'relative flex h-[13.8125rem] w-full shrink-0 items-center overflow-hidden rounded-xl border border-secondary-400 bg-secondary-200 px-4 py-8 tab:h-[16.8rem] tab:items-start tab:justify-center tab:p-8 pc:h-[26.425rem] pc:min-w-0 pc:flex-1 pc:shrink',
         className,
       )}
     >
