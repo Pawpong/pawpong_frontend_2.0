@@ -14,20 +14,15 @@ import { flattenPages } from '@/shared/lib/infiniteList'
 import { formatDate } from '@/shared/lib/formatDate'
 import {
   AlertMessage,
-  Badge,
   Button,
   Container,
   DeleteConfirmModal,
   InfiniteScrollTrigger,
   ListState,
+  ReviewTypeBadge,
   TextareaField,
 } from '@/shared/ui'
 import type { BreederMyReviewItem } from '@/shared/types'
-
-const REVIEW_TYPE_LABEL: Record<string, string> = {
-  adoption: '입양 후기',
-  visit: '방문 후기',
-}
 
 const ReviewReplyForm = ({
   reviewId,
@@ -99,12 +94,7 @@ const ReviewRow = ({ review }: { review: BreederMyReviewItem }) => {
         <span className="text-sm font-semibold text-neutral-850 tab:text-base">
           {review.adopterName}
         </span>
-        {review.type && (
-          <Badge variant="primaryOutline" size="md">
-            {REVIEW_TYPE_LABEL[review.type] ?? review.type}
-          </Badge>
-        )}
-        <span className="text-xs font-medium text-neutral-500">{review.rating.toFixed(1)}점</span>
+        {review.type && <ReviewTypeBadge reviewType={review.type} />}
       </div>
 
       {review.petName && (
