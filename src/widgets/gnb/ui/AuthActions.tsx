@@ -7,7 +7,7 @@ import { Button, buttonVariants } from '@/shared/ui'
 
 interface AuthActionsProps {
   className?: string
-  placement?: 'header' | 'menu-header' | 'menu-footer'
+  placement?: 'header' | 'header-mobile' | 'menu-header' | 'menu-footer'
 }
 
 const PILL =
@@ -24,7 +24,10 @@ const AuthActions = ({ className, placement = 'header' }: AuthActionsProps) => {
 
   // 서버 렌더는 항상 비로그인이라, 쿠키를 읽기 전에 그리면 로그인 사용자에게 버튼이 스쳤다 사라진다
   if (!isReady) return null
-  if (placement === 'menu-header' && isLoggedIn) return null
+  // 로그아웃 버튼은 pc 헤더(NavBar)와 전체메뉴 푸터에만 둔다. mo·tab 헤더와 전체메뉴 헤더는
+  // 로그인 사용자에게 아무것도 그리지 않는다 — 좁은 헤더를 밀어내고, 로그아웃은 메뉴 푸터에 있다.
+  const showsLogout = placement === 'header' || placement === 'menu-footer'
+  if (isLoggedIn && !showsLogout) return null
 
   if (isLoggedIn || placement === 'menu-footer') {
     return (
