@@ -84,6 +84,18 @@ export interface UpdatePetPostingRequest {
   status?: PetStatus
   photos?: string[]
   representativePhotoIndex?: number
+  /**
+   * 아래 4개 필드군은 서버가 '보낸 것만 전체 교체' 로 처리한다.
+   * 접종·유전병은 status 와 records/사유가 한 묶음이라, 그룹 중 하나라도 보내면 status 도 함께 보내야 한다.
+   */
+  vaccinationStatus?: VaccinationStatusType
+  vaccinationRecords?: PetVaccinationRecord[]
+  vaccinationIncompleteReason?: string
+  geneticTestStatus?: GeneticTestStatusType
+  geneticTestRecords?: PetGeneticTestRecord[]
+  geneticTestIncompleteReason?: string
+  parentPetSnapshots?: ParentPetSnapshot[]
+  breedingEnvironment?: PetBreedingEnvironment
 }
 
 // ==================== 분양글 삭제 응답 ====================
@@ -167,6 +179,29 @@ export interface PetPostingDraftDetail {
   draftId: string
   form: SavePetPostingDraftRequest
   photoUrls: PetPostingDraftPhotoUrls
+  updatedAt: string
+}
+
+/**
+ * 발행된 분양글의 수정용 사진 URL.
+ * 임시저장과 같은 구조 — form 의 파일키와 같은 순서로 미리보기 URL 을 나란히 받는다.
+ */
+export interface PetPostingEditPhotoUrls extends PetPostingDraftPhotoUrls {
+  /** 사육 환경 사진 전체 (breedingEnvironment 는 그중 첫 장) */
+  breedingEnvironmentPhotos: string[]
+}
+
+/**
+ * 수정 화면을 채우기 위한 분양글 단건 (브리더 본인만).
+ *
+ * 공개 상세(AdoptionDetailDto)는 표시용이라 사진을 URL 로만 준다 — 파일키가 없어
+ * 그대로 되돌려 보낼 수 없다. 그래서 수정에는 이 응답을 쓴다.
+ */
+export interface PetPostingEditDetail {
+  petId: string
+  form: SavePetPostingDraftRequest
+  photoUrls: PetPostingEditPhotoUrls
+  status: PetStatus
   updatedAt: string
 }
 

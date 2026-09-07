@@ -31,10 +31,13 @@ export const useCreatePetPosting = () => {
   })
 }
 
-export const useUpdatePetPosting = (petId: string) => {
+// petId 를 훅 인자가 아니라 변수로 받는다 — 수정 화면은 라우트 파라미터가 준비된 뒤에
+// 제출하므로, 훅 호출 시점에 id 를 요구하면 로딩 중 빈 문자열을 넘겨야 한다
+export const useUpdatePetPosting = () => {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (data: UpdatePetPostingRequest) => updatePetPosting(petId, data),
+    mutationFn: ({ petId, data }: { petId: string; data: UpdatePetPostingRequest }) =>
+      updatePetPosting(petId, data),
     onSuccess: () => invalidatePostingCaches(qc),
   })
 }
