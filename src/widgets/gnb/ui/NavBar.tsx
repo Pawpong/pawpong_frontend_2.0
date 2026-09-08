@@ -55,7 +55,7 @@ const NavBar = ({ className }: NavBarProps) => {
       {/* 알림은 마이홈 옆에 붙인다 (비로그인이면 NotificationBell 이 스스로 null) */}
       <NotificationBell />
       {/* [refactored] 노출 조건은 AuthActions 내부 판단 */}
-      <AuthActions className="hidden pc:block" />
+      <AuthActions className="hidden pc:inline-flex" />
     </nav>
   )
 }
