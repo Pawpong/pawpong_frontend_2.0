@@ -12,10 +12,12 @@ const HOME_LISTING_PAGE_SIZE = 16
 
 interface PublicBreederListingsProps {
   breederId: string
+  /** 2단 레이아웃처럼 컬럼이 좁아지는 자리에서 고정폭 4열 대신 쓴다 */
+  gridClassName?: string
 }
 
 /** 브리더 공개 홈의 분양 목록. 카드 자체는 탐색 화면과 같은 공용 카드다. */
-const PublicBreederListings = ({ breederId }: PublicBreederListingsProps) => {
+const PublicBreederListings = ({ breederId, gridClassName }: PublicBreederListingsProps) => {
   const query = useInfiniteQuery({
     ...adoptionQueries.breederPets(breederId, undefined, HOME_LISTING_PAGE_SIZE),
     refetchOnMount: 'always',
@@ -49,6 +51,7 @@ const PublicBreederListings = ({ breederId }: PublicBreederListingsProps) => {
         >
           <ListingCardGrid
             layout="publicBreeder"
+            className={gridClassName}
             items={listings}
             getKey={(listing) => listing.listingId}
             renderItem={(listing, index) => (

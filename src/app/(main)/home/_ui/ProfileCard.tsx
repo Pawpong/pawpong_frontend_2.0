@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, type ComponentType, type ReactNode } from 'react'
+import { useState, type ComponentType } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -51,82 +51,65 @@ const toPaging = (query: FollowListQuery) => ({
 
 type ProfileMode = 'mine' | 'mine-breeder' | 'other' | 'breeder'
 
+/**
+ * strip  — 가로 한 줄 (아바타 | 이름·카운트·소개 | 액션). 공개 홈처럼 폭이 넉넉한 자리.
+ * sidebar — PC 2단 레이아웃의 좁은 좌측 컬럼에서 세로로 쌓는다 (블로그형 마이홈).
+ */
+type ProfileCardLayout = 'strip' | 'sidebar'
+
 interface ProfileCardBaseProps {
   profile: AdopterPublicProfile
   mode?: 'mine' | 'other'
+  layout?: ProfileCardLayout
 }
 
 interface ProfileCardBreederProps {
   profile: BreederPublicProfile
   mode: 'breeder' | 'mine-breeder'
+  layout?: ProfileCardLayout
 }
 
 type ProfileCardProps = ProfileCardBaseProps | ProfileCardBreederProps
 
-// 모바일은 가로(아바타 → 라벨), PC는 세로(라벨 → 아바타). DOM 순서는 하나로 두고
-// flex-col-reverse로 뒤집어 마크업 중복을 피한다.
-const FollowerSection = ({
-  vertical,
-  label = '친구 목록',
-  users = [],
-  className,
-  textClassName,
+// [refactored] 아바타 미리보기 + "친구 목록" 라벨 → 실제 팔로워/팔로잉 숫자.
+// 카운트는 profile 에 이미 있는데 모달에만 넘기고 있어서, 카드가 공간만 쓰고 정보는 없었다.
+const FollowCounts = ({
+  followerCount,
+  followingCount,
   onClick,
 }: {
-  vertical?: boolean
-  label?: string
-  users?: FollowUser[]
-  className?: string
-  textClassName?: string
-  onClick?: () => void
+  followerCount: number
+  followingCount: number
+  onClick: () => void
 }) => (
   <button
     type="button"
     onClick={onClick}
-    className={cn(
-      'flex gap-0.5',
-      vertical ? 'flex-col-reverse items-start gap-2' : 'items-center',
-      className,
-    )}
+    className="flex items-center gap-1 text-neutral-700 hover:text-neutral-850"
   >
-    {/* 친구 목록 미리보기 — ProfileAvatar xsmall(24) + 흰색 테두리, 살짝 겹침 */}
-    <div className="flex items-center">
-      {(users.length > 0 ? users.slice(0, 3) : [undefined, undefined, undefined]).map((user, i) => (
-        <ProfileAvatar
-          key={user?.id ?? i}
-          size="xsmall"
-          src={user?.profileImageUrl}
-          alt={user?.nickname}
-          className={cn('border-2 border-white', i < 2 && '-mr-[0.3125rem]')}
-        />
-      ))}
-    </div>
-    <span className={cn('font-medium text-neutral-850', textClassName)}>{label}</span>
+    <span>팔로워</span>
+    <span className="font-semibold text-neutral-850">{followerCount}</span>
+    <span aria-hidden className="px-0.5 text-neutral-300">
+      ·
+    </span>
+    <span>팔로잉</span>
+    <span className="font-semibold text-neutral-850">{followingCount}</span>
   </button>
 )
 
-const LocationInfo = ({ location, className }: { location: string; className?: string }) => (
-  <div className={cn('flex items-center gap-1.5', className)}>
-    <LocationOnIcon className="size-5 text-primary-500 pc:size-6" />
-    <span className="text-sm font-medium text-primary-500">{location}</span>
-  </div>
-)
-
-// [refactored] 프로필 이름/소개 타이포 — 공통 스타일을 한 곳에, 크기만 className으로 분기
-const ProfileName = ({ children, className }: { children: ReactNode; className?: string }) => (
-  <p className={cn('leading-[1.5] font-semibold text-neutral-850', className)}>{children}</p>
-)
-
-const ProfileBio = ({ children, className }: { children: ReactNode; className?: string }) => (
-  <p className={cn('leading-[1.5] font-semibold break-words text-neutral-850', className)}>
-    {children}
-  </p>
+const LocationInfo = ({ location }: { location: string }) => (
+  <span className="flex items-center gap-0.5 text-primary-500">
+    <LocationOnIcon className="size-4" />
+    {location}
+  </span>
 )
 
 /* ── mode별 하단 액션 (디자인: pill border 버튼) ── */
 
 // 프로필 편집·팔로우·메시지 공통 크기 — 모바일 32, PC 40
-const ACTION_SIZE = 'h-8 flex-1 text-sm pc:h-10 pc:text-base'
+// [refactored] flex-1 + min-w 로 두어 컨테이너가 폭을 정한다.
+// (strip 은 w-auto 라 min-w 만큼, sidebar 는 w-full 이라 컬럼을 채운다 — max-w 캡 두 개 제거)
+const ACTION_SIZE = 'h-8 flex-1 text-sm pc:h-10 pc:min-w-30 pc:px-6 pc:text-base'
 
 const EditButton = () => (
   <Link href="/profile/edit" className={cn(buttonVariants({ variant: 'outline' }), ACTION_SIZE)}>
@@ -183,7 +166,7 @@ const FollowActionButton = ({ targetId, isFollowing }: VisitorActionsProps) => {
       variant={isFollowing ? 'outline' : 'primary'}
       disabled={isPending}
       onClick={() => (isFollowing ? unfollow : follow).mutate(targetId)}
-      className={cn(ACTION_SIZE, 'pc:max-w-[16.125rem]')}
+      className={ACTION_SIZE}
     >
       {isFollowing ? '팔로우 취소' : '팔로우'}
     </Button>
@@ -207,8 +190,10 @@ const ACTION_MAP = {
 
 /* ── ProfileCard ── */
 
-const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
+const ProfileCard = ({ profile, mode = 'mine', layout = 'strip' }: ProfileCardProps) => {
   const Actions = ACTION_MAP[mode]
+  // 세로 배치는 PC 2단에서만 — 그 아래 해상도는 두 레이아웃 모두 같은 가로 스트립이다
+  const isSidebar = layout === 'sidebar'
   const [followOpen, setFollowOpen] = useState(false)
 
   // [refactored] 브리더 판별을 한 곳에서 — 이전엔 'isFavorited' in / 'breederId' in /
@@ -218,10 +203,8 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
   const isFollowing = breederProfile?.isFollowing ?? (profile as AdopterPublicProfile).isFollowing
   const isVisitor = mode === 'other' || mode === 'breeder'
 
-  // 공개 홈은 팔로우 중일 때 함께 팔로우하는 사람 미리보기도 필요하다.
-  const followersQuery = useInfiniteQuery(
-    profileQueries.followers(profileUserId, followOpen || (isVisitor && isFollowing)),
-  )
+  // [refactored] 카드에서 미리보기가 사라져 모달을 열 때만 받는다 (공개 홈 진입 시 선요청 제거)
+  const followersQuery = useInfiniteQuery(profileQueries.followers(profileUserId, followOpen))
   const followingsQuery = useInfiniteQuery(
     profileQueries.followings(profileUserId, followOpen && !isVisitor),
   )
@@ -241,113 +224,78 @@ const ProfileCard = ({ profile, mode = 'mine' }: ProfileCardProps) => {
   const followers = toFollowUsers(followersQuery)
   const following = toFollowUsers(followingsQuery)
   const mutualFollowers = isVisitor ? toMutualFollowers(followersQuery) : []
-  const showMutualFollowers = isVisitor && isFollowing && mutualFollowers.length > 0
 
   return (
     <>
-      {/* ===== Mobile (디자인 node 1023-22324) — 세로 gap-16 ===== */}
-      <div className="mx-auto flex w-full max-w-168 flex-col gap-4 pc:hidden">
-        {/* 프로필 정보 (세로 gap-12) */}
-        <div className="flex flex-col items-start gap-3">
-          {/* 상단: 좌(뱃지·이름) / 우(아바타 large 52) */}
-          <div className="flex w-full items-center justify-between gap-3">
-            <div className="flex min-w-0 flex-col items-start gap-2">
-              <ProfileName className="text-xl">{profile.nickname}</ProfileName>
-            </div>
-            <ProfileAvatar
-              size="large"
-              src={profile.profileImageUrl}
-              alt={profile.nickname}
-              className="shrink-0"
-            />
-          </div>
-          {/* 소개 */}
-          <ProfileBio className="w-full text-sm">{profile.bio}</ProfileBio>
-          {locationText && <LocationInfo location={locationText} />}
-          {isVisitor ? (
-            <div className="flex min-h-6 items-start">
-              {showMutualFollowers && (
-                <FollowerSection
-                  label="함께 팔로우하는 사람"
-                  users={mutualFollowers}
-                  textClassName="text-xs"
-                  onClick={() => setFollowOpen(true)}
-                />
-              )}
-            </div>
-          ) : (
-            <FollowerSection textClassName="text-xs" onClick={() => setFollowOpen(true)} />
+      {/* [refactored] 아바타 + (이름·카운트·소개) + 액션을 한 행으로.
+          모바일에서는 액션만 다음 줄로 감싸(w-full) 두 버튼이 눌리기 좋은 폭을 갖는다.
+          sidebar 레이아웃은 PC 에서만 세로로 쌓는다.
+          즐겨찾기는 팔로우·메시지와 급이 다른 보조 토글이라(Figma 3349-2026986) 액션 행에
+          섞지 않고 카드 우상단에 따로 뗀다 — 안 그러면 팔로우/메시지 폭이 좁아지고 위계가 깨진다. */}
+      <div
+        className={cn(
+          'relative mx-auto flex w-full max-w-168 flex-wrap items-start gap-x-4 gap-y-3',
+          isSidebar ? 'pc:max-w-none pc:flex-col pc:gap-4' : 'pc:max-w-[48.75rem]',
+        )}
+      >
+        {showFavoriteAction && (
+          <FavoriteBreederIconButton
+            breederId={breederProfile.breederId}
+            isFavorited={breederProfile.isFavorited}
+            size="nav"
+            className="absolute top-0 right-0"
+          />
+        )}
+
+        <div
+          className={cn(
+            'flex min-w-0 flex-1 items-start gap-3 pc:gap-4',
+            isSidebar && 'pc:w-full pc:flex-none pc:flex-col',
           )}
-        </div>
-        {/* 하단: 모드별 버튼 (풀폭, gap-10, h-40) */}
-        <div className="flex w-full items-start gap-2.5">
-          <Actions targetId={profileUserId} isFollowing={isFollowing} />
-        </div>
-      </div>
-
-      {/* ===== Desktop (디자인 node 1021-20324) ===== */}
-      <div className="mx-auto hidden max-w-[59.25rem] overflow-hidden rounded-lg pc:block">
-        {/* 상단: 좌(프로필 정보) / 우(즐겨찾기 아이콘·팔로워·아바타) */}
-        <div className="flex items-center justify-center overflow-hidden px-5 py-8">
-          <div className="flex h-40 w-full max-w-[48.75rem] items-start justify-between gap-3">
-            <div className="flex min-w-0 flex-1 flex-col items-start justify-center gap-3 self-stretch">
-              <ProfileName className="text-2xl">{profile.nickname}</ProfileName>
-              {/* 디자인상 이름·소개 블록 폭 440. 위치는 소개 아래 (모바일 블록과 같은 순서) */}
-              <ProfileBio className="w-full max-w-[27.5rem] text-base">{profile.bio}</ProfileBio>
-              {locationText && <LocationInfo location={locationText} />}
-            </div>
-            {/* [refactored] 두 갈래가 팔로워+아바타를 똑같이 그리고 있어 한 벌로 합쳤다.
-                실제 차이는 즐겨찾기 행 유무와 래퍼 폭뿐 */}
-            <div
-              className={cn(
-                'flex min-w-0 flex-col items-end gap-3 self-stretch',
-                showFavoriteAction ? 'flex-1' : 'w-[13.5625rem] shrink-0',
-              )}
-            >
-              <div className="flex h-12 w-full shrink-0 items-center justify-end">
-                {showFavoriteAction && (
-                  <FavoriteBreederIconButton
-                    breederId={breederProfile.breederId}
-                    isFavorited={breederProfile.isFavorited}
-                  />
-                )}
-              </div>
-              <div className="flex w-[13.5625rem] items-end justify-end gap-3">
-                {isVisitor ? (
-                  showMutualFollowers && (
-                    <FollowerSection
-                      vertical
-                      label="함께 팔로우하는 사람"
-                      users={mutualFollowers}
-                      className="min-w-0 flex-1"
-                      textClassName="text-xs"
-                      onClick={() => setFollowOpen(true)}
-                    />
-                  )
-                ) : (
-                  <FollowerSection
-                    vertical
-                    className="min-w-0 flex-1"
-                    textClassName="text-xs"
-                    onClick={() => setFollowOpen(true)}
-                  />
-                )}
-                <ProfileAvatar size="xlarge" src={profile.profileImageUrl} alt={profile.nickname} />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* 하단 액션 */}
-        <div className="flex flex-col items-center pb-8">
+        >
+          <ProfileAvatar
+            size="responsiveProfile"
+            src={profile.profileImageUrl}
+            alt={profile.nickname}
+            className={cn('shrink-0', isSidebar && 'pc:size-24')}
+          />
           <div
             className={cn(
-              'flex w-full items-start justify-center gap-6',
-              isVisitor ? 'max-w-[48rem]' : 'max-w-[30.375rem]',
+              'flex w-full min-w-0 flex-1 flex-col gap-0.5',
+              showFavoriteAction && 'pr-8',
             )}
           >
-            <Actions targetId={profileUserId} isFollowing={isFollowing} />
+            <p className="truncate text-lg leading-[1.5] font-semibold text-neutral-850 pc:text-xl">
+              {profile.nickname}
+            </p>
+            <div className="flex flex-wrap items-center gap-x-2 text-sm leading-[1.5] font-medium">
+              <FollowCounts
+                followerCount={profile.followerCount}
+                followingCount={profile.followingCount}
+                onClick={() => setFollowOpen(true)}
+              />
+              {locationText && <LocationInfo location={locationText} />}
+            </div>
+            {/* 스트립은 한 줄, 사이드바는 폭이 좁으니 세 줄까지 편다 */}
+            <p
+              className={cn(
+                'text-sm leading-[1.5] font-medium break-words text-neutral-700',
+                isSidebar ? 'truncate pc:line-clamp-3 pc:text-clip' : 'truncate',
+              )}
+            >
+              {profile.bio}
+            </p>
           </div>
+        </div>
+
+        {/* 팔로우 + 메시지 — 동급 액션 두 개가 폭을 반씩 나눠 갖는다(ACTION_SIZE의 flex-1) */}
+        <div
+          className={cn(
+            'flex w-full shrink-0 items-center gap-2.5 pc:gap-3',
+            isSidebar ? 'pc:w-full' : 'pc:w-auto',
+          )}
+        >
+          <Actions targetId={profileUserId} isFollowing={isFollowing} />
         </div>
       </div>
 

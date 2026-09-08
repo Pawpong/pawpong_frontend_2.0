@@ -6,7 +6,15 @@ interface ProfileAvatarProps {
   /** 프로필 이미지 URL (없으면 픽셀 글리프 placeholder) */
   src?: string
   alt?: string
-  size?: 'xsmall' | 'small' | 'medium' | 'large' | 'xlarge' | 'responsive' | 'responsivePc'
+  size?:
+    | 'xsmall'
+    | 'small'
+    | 'medium'
+    | 'large'
+    | 'xlarge'
+    | 'responsive'
+    | 'responsivePc'
+    | 'responsiveProfile'
   className?: string
 }
 
@@ -24,6 +32,8 @@ const AVATAR_SIZE = {
   responsive: { box: 'size-8 tab:size-10', glyph: 'size-5 tab:h-[1.625rem] tab:w-[1.5625rem]' },
   // small(32) → medium(40): PC에서만 커짐 (홈 우리아이자랑 쇼케이스)
   responsivePc: { box: 'size-8 pc:size-10', glyph: 'size-5 pc:h-[1.625rem] pc:w-[1.5625rem]' },
+  // 56 → 64: PC에서만 커짐 (마이홈·공개홈 프로필 카드)
+  responsiveProfile: { box: 'size-14 pc:size-16', glyph: 'size-9 pc:size-10' },
 } as const
 
 /**

@@ -29,4 +29,8 @@ const BREEDER_MY_HOME_TABS: HomeTabConfig[] = [
   HOME_TAB.favoriteBreeders,
 ]
 
-export { MY_HOME_TABS, BREEDER_HOME_TABS, BREEDER_MY_HOME_TABS }
+// PC 2단 우측 컬럼은 약 980px — 고정폭 4열(1200px+)이 안 들어가 밖으로 넘친다.
+// 폭에 맞춰 3열로 내리면 카드가 약 300px 로 시안(282px)에 오히려 가깝다.
+const COLUMN_GRID = 'pc:max-w-none pc:grid-cols-[repeat(3,minmax(0,1fr))] pc:justify-normal'
+
+export { MY_HOME_TABS, BREEDER_HOME_TABS, BREEDER_MY_HOME_TABS, COLUMN_GRID }

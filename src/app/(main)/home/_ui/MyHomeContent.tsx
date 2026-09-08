@@ -16,15 +16,11 @@ import { ProfileCard } from './ProfileCard'
 import { HomeTabs, TabsContent } from './HomeTabs'
 import { FavoriteBreedersContent } from './FavoriteBreedersContent'
 import { HomePostGrid } from './HomePostGrid'
-import { MY_HOME_TABS, BREEDER_MY_HOME_TABS } from './constants'
+import { MY_HOME_TABS, BREEDER_MY_HOME_TABS, COLUMN_GRID } from './constants'
 
 const HOME_LISTING_PAGE_SIZE = 16
 
 // PC 사이드바 하단 이동 링크 — 전체메뉴에만 있던 내 계정 화면들을 마이홈에 모은다
-// PC 2단 우측 컬럼은 약 980px — 고정폭 4열(1200px+)이 안 들어가 밖으로 넘친다.
-// 폭에 맞춰 3열로 내리면 카드가 약 300px 로 시안(282px)에 오히려 가깝다.
-const COLUMN_GRID = 'pc:max-w-none pc:grid-cols-[repeat(3,minmax(0,1fr))] pc:justify-normal'
-
 const MY_HOME_SIDE_LINKS = [
   { label: '저장목록', href: '/bookmarks' },
   { label: '입양 신청서', href: '/activity' },
