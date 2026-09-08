@@ -6,7 +6,13 @@ export interface ReportReviewPayload {
 
 export interface ReportBreederPayload {
   breederId: string
-  reason: string
+  reason:
+    | 'no_contract'
+    | 'false_info'
+    | 'inappropriate_content'
+    | 'poor_conditions'
+    | 'fraud'
+    | 'other'
   description?: string
   evidence?: string[]
   contactInfo?: string

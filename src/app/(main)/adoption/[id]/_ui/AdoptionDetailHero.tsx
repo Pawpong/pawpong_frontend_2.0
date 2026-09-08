@@ -1,6 +1,8 @@
 'use client'
 
 import Link from 'next/link'
+import { useAuthStatus } from '@/features/auth'
+import { ReportBreederAction } from '@/features/report'
 import { Fragment, type ReactNode } from 'react'
 import {
   // AffectionBadge — 애정도 뱃지 보류 (복구 시 함께 되살린다)
@@ -179,6 +181,9 @@ const BreederProfileRow = ({
   // 브리더홈 링크를 끊는다 — 링크를 그대로 두면 Link 프리페치가 /profile/breeders/{id},
   // /profile/users/{id} 를 곧장 호출해 400을 반복하고, 눌러도 갈 곳 없는 화면으로 보낸다.
   const isWithdrawn = !breeder.nickname.trim()
+  const { isReady, isLoggedIn, userRole } = useAuthStatus()
+  // [refactored] 신고 노출 조건에 이름을 붙인다 — 브리더 신고는 입양자(비로그인 포함)에게만 보인다
+  const canReportBreeder = isReady && (!isLoggedIn || userRole === 'adopter')
 
   return (
     <div className={cn('w-full items-center gap-0 pc:gap-[1.75rem]', className)}>
@@ -200,13 +205,18 @@ const BreederProfileRow = ({
         <AffectionBadge size="md" className="pc:h-[1.8125rem] pc:py-1 pc:text-sm" /> */}
       </div>
       {!isWithdrawn && (
-        <Link
-          href={`/home/${breeder.id}`}
-          className="flex shrink-0 items-center gap-0 px-[0.25rem] text-[0.875rem] leading-[1.5] font-semibold text-neutral-850 pc:gap-[0.125rem]"
-        >
-          브리더홈
-          <ArrowRightIcon className="size-[1.25rem]" />
-        </Link>
+        <div className="flex shrink-0 items-center gap-2">
+          <Link
+            href={`/home/${breeder.id}`}
+            className="flex shrink-0 items-center gap-0 px-[0.25rem] text-[0.875rem] leading-[1.5] font-semibold text-neutral-850 pc:gap-[0.125rem]"
+          >
+            브리더홈
+            <ArrowRightIcon className="size-[1.25rem]" />
+          </Link>
+          {canReportBreeder && (
+            <ReportBreederAction breederId={breeder.id} />
+          )}
+        </div>
       )}
     </div>
   )

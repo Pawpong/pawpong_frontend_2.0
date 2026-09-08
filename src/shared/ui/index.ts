@@ -70,3 +70,4 @@ export * from './PixelTab'
 
 export * from './ComposerLayout'
 export * from './PhotoSelectPrompt'
+export * from './ReportAction'

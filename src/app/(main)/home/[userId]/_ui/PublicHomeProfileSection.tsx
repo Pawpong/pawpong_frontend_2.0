@@ -1,6 +1,8 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { useAuthStatus } from '@/features/auth'
+import { ReportBreederAction } from '@/features/report'
 import { Container, NavigationBar } from '@/shared/ui'
 import type { AdopterPublicProfile, BreederPublicProfile } from '@/shared/types'
 import { FavoriteBreederIconButton } from '../../_ui/FavoriteBreederIconButton'
@@ -13,6 +15,9 @@ type PublicHomeProfileSectionProps =
 /** 공개 사용자 홈의 내비게이션과 프로필 영역. 사용자 유형에 따른 슬롯만 분기한다. */
 const PublicHomeProfileSection = ({ kind, profile }: PublicHomeProfileSectionProps) => {
   const router = useRouter()
+  const { isReady, isLoggedIn, userRole } = useAuthStatus()
+  // [refactored] 신고 노출 조건에 이름을 붙인다 — 브리더 신고는 입양자(비로그인 포함)에게만 보인다
+  const canReportBreeder = isReady && (!isLoggedIn || userRole === 'adopter')
   const isBreeder = kind === 'breeder'
 
   return (
@@ -22,12 +27,17 @@ const PublicHomeProfileSection = ({ kind, profile }: PublicHomeProfileSectionPro
         onBack={isBreeder ? () => router.back() : undefined}
         right={
           isBreeder ? (
-            <FavoriteBreederIconButton
-              breederId={profile.breederId}
-              isFavorited={profile.isFavorited}
-              size="nav"
-              className="pc:hidden"
-            />
+            <div className="flex items-center gap-2">
+              <FavoriteBreederIconButton
+                breederId={profile.breederId}
+                isFavorited={profile.isFavorited}
+                size="nav"
+                className="pc:hidden"
+              />
+              {canReportBreeder && (
+                <ReportBreederAction breederId={profile.breederId} />
+              )}
+            </div>
           ) : undefined
         }
       />
