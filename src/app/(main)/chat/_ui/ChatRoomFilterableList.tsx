@@ -2,6 +2,7 @@
 
 import { cn } from '@/shared/lib/cn'
 import type { ChatRoomResponseDto } from '@/shared/types'
+import { EmptyState } from '@/shared/ui'
 import { CHAT_GUTTER_X } from '../_lib/constants'
 import { useChatRoomFilter } from '../_lib/useChatRoomFilter'
 import { ChatFilterTabs } from './ChatFilterTabs'
@@ -54,9 +55,7 @@ const ChatRoomFilterableList = ({
           </button>
         </div>
       ) : filteredRooms.length === 0 ? (
-        <div className="flex items-center justify-center py-20">
-          <p className="text-sm font-medium text-neutral-700">채팅방이 없습니다</p>
-        </div>
+        <EmptyState message="채팅방이 없습니다." className="py-20" />
       ) : (
         <div className={cn('flex flex-col gap-5 py-6 pc:py-10', gutterClassName, listClassName)}>
           {filteredRooms.map((room) => (

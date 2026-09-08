@@ -1,10 +1,9 @@
 import type { ReactNode } from 'react'
 import { cn } from '@/shared/lib/cn'
-import { Badge } from '@/shared/ui'
+import { Badge, EmptyState } from '@/shared/ui'
 import { CheckIcon } from '@/shared/assets'
 import type { AdoptionDetailDto } from '@/shared/types'
 import { BaseInfoCard } from './BaseInfoCard'
-import { HealthRecordEmpty } from './HealthRecordEmpty'
 
 const CompletionBadge = ({ completed }: { completed: boolean }) => (
   <Badge variant={completed ? 'primaryOutline' : 'neutralFilled'} size="lg">
@@ -50,7 +49,8 @@ const HealthInfoCard = ({ detail }: { detail: AdoptionDetailDto }) => (
         {/* [refactored] SectionHeader 사용 */}
         <SectionHeader title="예방 접종 현황" completed={detail.health.vaccinationCompleted} />
 
-        {/* [refactored] Table/TableRow 사용 (3컬럼: 접종명/접종일/차수) */}
+        {/* [refactored] Table/TableRow 사용 (3컬럼: 접종명/접종일/차수).
+            데이터가 없을 때 미완료 사유가 있으면 브리더가 입력한 사유를 그대로 노출한다. */}
         {detail.health.vaccinations.length > 0 ? (
           <Table>
             <TableRow className="py-[0.25rem] font-medium text-neutral-700">
@@ -67,10 +67,11 @@ const HealthInfoCard = ({ detail }: { detail: AdoptionDetailDto }) => (
             ))}
           </Table>
         ) : (
-          // 미완료 사유가 있으면 일러스트와 함께 노출 (분양글 작성 시 브리더가 필수로 입력)
-          <HealthRecordEmpty
-            reason={detail.health.vaccinationIncompleteReason}
-            fallback="등록된 접종 정보가 없어요."
+          // 미완료 사유는 일러스트 아래에 그대로 노출한다 (작성 폼에서 필수로 받는 값).
+          // 레거시 글처럼 사유가 비어 있을 때만 기본 문구로 대체한다.
+          <EmptyState
+            message={detail.health.vaccinationIncompleteReason || '등록된 접종 정보가 없어요.'}
+            size="compact"
           />
         )}
       </div>
@@ -104,9 +105,11 @@ const HealthInfoCard = ({ detail }: { detail: AdoptionDetailDto }) => (
             ))}
           </Table>
         ) : (
-          <HealthRecordEmpty
-            reason={detail.health.geneticTestIncompleteReason}
-            fallback="등록된 유전병 검사 정보가 없어요."
+          <EmptyState
+            message={
+              detail.health.geneticTestIncompleteReason || '등록된 유전병 검사 정보가 없어요.'
+            }
+            size="compact"
           />
         )}
       </div>

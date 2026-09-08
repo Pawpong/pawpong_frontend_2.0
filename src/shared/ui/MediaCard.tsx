@@ -51,8 +51,8 @@ const MediaCard = ({
   return (
     <article
       className={cn(
-        'group/media relative flex h-full w-full flex-col overflow-hidden rounded-lg bg-white transition-[background-color,border-radius,box-shadow] duration-200 ease-out',
-        'focus-within:ring-2 focus-within:ring-primary-500 focus-within:ring-offset-2 pc:hover:rounded-[1.25rem] pc:hover:bg-neutral-50 pc:hover:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]',
+        'group/media relative flex h-full w-full flex-col overflow-hidden rounded-lg bg-white',
+        'card-interactive',
         className,
       )}
     >

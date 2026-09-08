@@ -64,8 +64,8 @@ const CommunityBox = ({
       className={cn(
         // 디자인 기준: mo·tab 321×326 / pc 407×376.
         'flex h-[20.375rem] w-full flex-col items-start overflow-hidden rounded-lg border border-neutral-300 bg-white p-3 pc:h-[23.5rem]',
-        // 이미지 색을 회색으로 탁하게 만들지 않고 Figma의 얕은 elevation만 사용한다.
-        'transition-shadow focus-within:ring-2 focus-within:ring-primary-500 focus-within:ring-offset-2 pc:hover:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]',
+        // 다른 탐색 카드와 동일한 인터랙션 토큰을 사용한다.
+        'card-interactive transition-shadow',
         className,
       )}
     >

@@ -1,5 +1,6 @@
 import { Fragment } from 'react'
 import { getFirstPhotoPostId, toCommunityPreviewProps } from '@/entities/community'
+import { EmptyState } from '@/shared/ui'
 import { ConnectedFeedCard } from './ConnectedPostCard'
 import type { CommunityPostCard } from '@/shared/types'
 
@@ -18,11 +19,7 @@ interface PostListProps {
 // (gap을 커뮤니티의 절반으로 두어 구분선 포함 간격이 24/32/40으로 같아진다)
 const PostList = ({ posts, emptyText = '게시글이 없습니다.', onEdit, onDelete }: PostListProps) => {
   if (posts.length === 0) {
-    return (
-      <p className="py-10 text-center text-sm leading-[1.5] font-medium text-neutral-700">
-        {emptyText}
-      </p>
-    )
+    return <EmptyState message={emptyText} />
   }
 
   const firstPhotoPostId = getFirstPhotoPostId(posts)

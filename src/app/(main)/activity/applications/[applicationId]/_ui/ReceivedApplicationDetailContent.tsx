@@ -7,7 +7,15 @@ import { useUpdateBreederApplicationStatus } from '@/features/breeder'
 import { normalizeApiError } from '@/shared/api'
 import { ChevronDownIcon } from '@/shared/assets'
 import { formatDate } from '@/shared/lib/formatDate'
-import { AlertMessage, AsyncState, Button, Container, CtaModal, NavigationBar } from '@/shared/ui'
+import {
+  AlertMessage,
+  AsyncState,
+  Button,
+  Container,
+  CtaModal,
+  EmptyState,
+  NavigationBar,
+} from '@/shared/ui'
 import type {
   ApplicationStatus,
   CustomQuestionResponse,
@@ -139,9 +147,11 @@ const AnswerSection = ({
           ))}
         </dl>
       ) : (
-        <p className="mt-2 border-t border-neutral-150 py-6 text-sm font-medium text-neutral-500">
-          저장된 신청 답변이 없습니다.
-        </p>
+        <EmptyState
+          message="저장된 신청 답변이 없습니다."
+          size="compact"
+          className="mt-2 border-t border-neutral-150 text-neutral-500"
+        />
       )}
 
       <StatusActionSection applicationId={applicationId} status={status} />

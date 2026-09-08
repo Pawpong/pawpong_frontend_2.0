@@ -9,7 +9,7 @@ import { NotificationListItem, notificationQueries } from '@/entities/notificati
 import { uniqueBy } from '@/shared/lib/uniqueBy'
 import { useMarkAsRead, useMarkAllAsRead } from '@/features/notification'
 import type { NotificationResponseDto } from '@/shared/types'
-import { Button } from '@/shared/ui'
+import { Button, EmptyState } from '@/shared/ui'
 
 // Figma icon/ bell (1596:77455 세트, 1596:97271) — nav 아이콘과 같은 픽셀 글리프라 currentColor 로 그린다.
 // Figma 원본은 속이 찬 실루엣 하나뿐이라, nav 아이콘들처럼 비활성은 외곽선만 남기고
@@ -131,7 +131,7 @@ const NotificationBell = ({ className }: { className?: string }) => {
                 알림을 불러오지 못했습니다.
               </p>
             ) : notifications.length === 0 ? (
-              <p className="px-4 py-10 text-center text-sm text-neutral-700">알림이 없습니다.</p>
+              <EmptyState message="알림이 없습니다." className="py-8" />
             ) : (
               <div className="flex flex-col divide-y divide-neutral-100">
                 {notifications.map((item) => (
