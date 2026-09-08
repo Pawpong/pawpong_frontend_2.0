@@ -34,9 +34,7 @@ const PublicHomeProfileSection = ({ kind, profile }: PublicHomeProfileSectionPro
                 size="nav"
                 className="pc:hidden"
               />
-              {canReportBreeder && (
-                <ReportBreederAction breederId={profile.breederId} />
-              )}
+              {canReportBreeder && <ReportBreederAction breederId={profile.breederId} />}
             </div>
           ) : undefined
         }

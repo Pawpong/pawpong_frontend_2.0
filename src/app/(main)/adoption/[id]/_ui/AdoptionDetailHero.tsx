@@ -213,9 +213,7 @@ const BreederProfileRow = ({
             브리더홈
             <ArrowRightIcon className="size-[1.25rem]" />
           </Link>
-          {canReportBreeder && (
-            <ReportBreederAction breederId={breeder.id} />
-          )}
+          {canReportBreeder && <ReportBreederAction breederId={breeder.id} />}
         </div>
       )}
     </div>
