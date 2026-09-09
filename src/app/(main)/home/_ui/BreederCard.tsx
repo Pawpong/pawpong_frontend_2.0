@@ -1,7 +1,7 @@
 'use client'
 
-import { Badge, MediaCard } from '@/shared/ui'
-import { LocationOnIcon } from '@/shared/assets'
+import { Badge, LocationText, MediaCard } from '@/shared/ui'
+import { formatJoinedBreederLocation } from '@/shared/lib/formatBreederLocation'
 import { FavoriteBreederIconButton } from './FavoriteBreederIconButton'
 import type { FavoriteBreeder } from '@/shared/types'
 
@@ -50,16 +50,11 @@ const BreederCard = ({ breeder, showPopularBadge, preload = false }: BreederCard
         </>
       }
     >
-      {/* 이름 mo 12 / pc 16 bold, 위치 mo 10 / pc 14 medium #6b6b6b */}
+      {/* 이름 mo 12 / pc 16 bold */}
       <p className="truncate text-xs leading-[1.5] font-semibold text-neutral-850 tab:text-base">
         {breeder.nickname}
       </p>
-      <div className="flex min-w-0 items-center">
-        <LocationOnIcon className="size-5 shrink-0 text-neutral-700 tab:size-6" />
-        <span className="truncate text-[0.625rem] leading-[1.5] font-medium text-neutral-700 tab:text-sm">
-          {breeder.location}
-        </span>
-      </div>
+      <LocationText location={formatJoinedBreederLocation(breeder.location)} size="compact" />
     </MediaCard>
   )
 }

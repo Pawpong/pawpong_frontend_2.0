@@ -1,11 +1,10 @@
 'use client'
 
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import { BookmarkIcon } from '@/shared/assets'
-import { Button, Container, CtaBanner, InputUpload, NavigationBar } from '@/shared/ui'
-import { useGnbHeight } from '@/shared/lib/useGnbHeight'
+import { Button, Container, InputUpload, NavigationBar } from '@/shared/ui'
 import { transientQueryRecoveryOptions } from '@/shared/api'
 import { profileQueries } from '@/entities/profile'
 import { communityQueries } from '@/entities/community'
@@ -16,16 +15,15 @@ import { ProfileCard } from './ProfileCard'
 import { HomeTabs, TabsContent } from './HomeTabs'
 import { FavoriteBreedersContent } from './FavoriteBreedersContent'
 import { HomePostGrid } from './HomePostGrid'
-import { MY_HOME_TABS, BREEDER_MY_HOME_TABS, COLUMN_GRID } from './constants'
+import {
+  MY_HOME_TABS,
+  BREEDER_MY_HOME_TABS,
+  MY_HOME_SIDE_LINKS,
+  CARD_GRID,
+  PHOTO_GRID,
+} from './constants'
 
 const HOME_LISTING_PAGE_SIZE = 16
-
-// PC 사이드바 하단 이동 링크 — 전체메뉴에만 있던 내 계정 화면들을 마이홈에 모은다
-const MY_HOME_SIDE_LINKS = [
-  { label: '저장목록', href: '/bookmarks' },
-  { label: '입양 신청서', href: '/activity' },
-  { label: '설정', href: '/settings' },
-]
 
 const MyHomeContent = () => {
   // 마이홈 프로필 카드: /profile/me 로 내 프로필 조회 (role 에 따라 adopter/breeder 분기, 프로필 이미지 포함)
@@ -46,24 +44,8 @@ const MyHomeContent = () => {
   })
   const myPostsData = postsQuery.data
 
-  // sticky 헤더 스택: GNB → navbar(top=gnbH) → 탭바(top=gnbH+navH)
-  const gnbH = useGnbHeight()
-  const navRef = useRef<HTMLDivElement>(null)
-  const [navH, setNavH] = useState(0)
-
-  useLayoutEffect(() => {
-    const nav = navRef.current
-    if (!nav) return
-
-    const measure = () => setNavH(nav.offsetHeight)
-    measure()
-
-    const observer = new ResizeObserver(measure)
-    observer.observe(nav)
-
-    return () => observer.disconnect()
-  }, [])
-
+  // [refactored] navbar 는 2단(tab+)에서 숨고 sticky 도 아니라 높이를 잴 이유가 없어졌다.
+  // sticky 기준은 GNB 하나뿐이고, 그건 HomeTabs 가 스스로 읽는다.
   const tabs = isBreeder ? BREEDER_MY_HOME_TABS : MY_HOME_TABS
   const defaultTab = isBreeder ? 'listings' : 'posts'
   // 프로필 조회 전에는 역할을 모르므로 선택값을 비워두고, 조회 후 역할별 기본 탭을 사용한다.
@@ -104,7 +86,7 @@ const MyHomeContent = () => {
     <div className="flex w-full flex-col">
       {/* 스크롤 시 GNB 아래 고정(sticky) — tab+만. PC는 사이드바가 프로필/현재 위치를 이미 보여줘
           타이틀 바가 GNB의 '마이홈' 활성 표시와 겹쳐 위계가 흐트러지므로 숨긴다 */}
-      <div ref={navRef} className="bg-white tab:sticky tab:z-sticky pc:hidden" style={{ top: gnbH }}>
+      <div className="bg-white tab:hidden">
         <NavigationBar
           title="마이홈"
           titleClassName="font-cafe24 text-lg text-neutral-850 tab:text-xl"
@@ -125,24 +107,20 @@ const MyHomeContent = () => {
         tabs={tabs}
         activeTab={activeTab}
         onTabChange={setSelectedTab}
-        stickyTop={gnbH + navH}
         sidebar={<ProfileCard {...profileCardProps} layout="sidebar" />}
         sideLinks={MY_HOME_SIDE_LINKS}
       >
-        {/* 분양 목록 탭 (브리더만) — 시안 3170-790275: 배너 -> 라벨+필터 -> 카드 4열 */}
+        {/* 분양 목록 탭 (브리더만) — 시안 3170-790275: 라벨+필터 -> 카드 그리드.
+            '분양 페이지 바로가기' 배너 제거 — /adoption/my-listings 가 이 탭과 같은
+            목록 위젯을 그대로 보여줘 따로 링크할 이유가 없다 */}
         {isBreeder && (
           <TabsContent value="listings" className="mt-0">
-            <InputUpload text="분양글 작성하기" href="/adoption/create" className="px-4 pc:px-0" />
+            <InputUpload text="분양글 작성하기" href="/adoption/create" className="px-4" />
 
-            {/* 배너는 콘텐츠 Container 밖의 독립 밴드 (시안 3170-800323) — 홈 CTA 스트립과 같은 배치 */}
-            <Container className="px-4 pt-4 pb-2 pc:px-0">
-              <CtaBanner text="분양 페이지 바로가기" href="/adoption/my-listings" />
-            </Container>
-
-            <Container className="py-5 tab:py-10 pc:px-0">
+            <Container className="py-5">
               <MyPetPostingList
                 pageSize={HOME_LISTING_PAGE_SIZE}
-                gridClassName="pc:grid-cols-3 pc:gap-x-[1.375rem]"
+                gridClassName={`${CARD_GRID} pc:gap-x-[1.375rem]`}
               />
             </Container>
           </TabsContent>
@@ -150,12 +128,7 @@ const MyHomeContent = () => {
 
         {/* Figma 4145:721426 — 모바일·태블릿 3열, PC 4열의 정사각 미디어 그리드 */}
         <TabsContent value="posts" className="mt-0">
-          <InputUpload
-            text="작성하기"
-            href="/community/write"
-            variant="compact"
-            className="pc:px-0"
-          />
+          <InputUpload text="작성하기" href="/community/write" className="px-4" />
 
           <HomePostGrid
             posts={posts}
@@ -165,13 +138,12 @@ const MyHomeContent = () => {
             loadingText="내가 쓴 글을 불러오는 중입니다."
             errorText="내가 쓴 글을 불러오지 못했습니다."
             emptyText="내가 쓴 글이 없습니다."
-            className="pc:px-0"
-            gridClassName={COLUMN_GRID}
+            gridClassName={PHOTO_GRID}
           />
         </TabsContent>
 
         <TabsContent value="breeders" className="mt-0">
-          <FavoriteBreedersContent className="pc:px-0" gridClassName={COLUMN_GRID} />
+          <FavoriteBreedersContent gridClassName={CARD_GRID} />
         </TabsContent>
       </HomeTabs>
     </div>

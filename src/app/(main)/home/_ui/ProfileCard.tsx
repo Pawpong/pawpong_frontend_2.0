@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, type ComponentType } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
@@ -9,11 +8,19 @@ import {
   type InfiniteData,
   type UseInfiniteQueryResult,
 } from '@tanstack/react-query'
-import { Button, buttonVariants, ProfileAvatar, FollowersModal, type FollowUser } from '@/shared/ui'
+import {
+  Button,
+  buttonVariants,
+  LocationText,
+  ProfileAvatar,
+  FollowersModal,
+  type FollowUser,
+} from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { formatBreederLocation } from '@/shared/lib/formatBreederLocation'
-import { LocationOnIcon } from '@/shared/assets'
 import { profileQueries } from '@/entities/profile'
+import { useAuthStatus } from '@/features/auth'
+import { ReportBreederAction } from '@/features/report'
 import { useFollowUser, useUnfollowUser, useRemoveFollower } from '@/features/profile'
 import { useCreateOrGetChatRoom } from '@/features/send-message'
 import type {
@@ -85,7 +92,7 @@ const FollowCounts = ({
   <button
     type="button"
     onClick={onClick}
-    className="flex items-center gap-1 text-neutral-700 hover:text-neutral-850"
+    className="flex items-center gap-1 text-sm leading-[1.5] font-medium whitespace-nowrap text-neutral-700 hover:text-neutral-850"
   >
     <span>팔로워</span>
     <span className="font-semibold text-neutral-850">{followerCount}</span>
@@ -97,19 +104,12 @@ const FollowCounts = ({
   </button>
 )
 
-const LocationInfo = ({ location }: { location: string }) => (
-  <span className="flex items-center gap-0.5 text-primary-500">
-    <LocationOnIcon className="size-4" />
-    {location}
-  </span>
-)
-
 /* ── mode별 하단 액션 (디자인: pill border 버튼) ── */
 
 // 프로필 편집·팔로우·메시지 공통 크기 — 모바일 32, PC 40
 // [refactored] flex-1 + min-w 로 두어 컨테이너가 폭을 정한다.
 // (strip 은 w-auto 라 min-w 만큼, sidebar 는 w-full 이라 컬럼을 채운다 — max-w 캡 두 개 제거)
-const ACTION_SIZE = 'h-8 flex-1 text-sm pc:h-10 pc:min-w-30 pc:px-6 pc:text-base'
+const ACTION_SIZE = 'h-8 flex-1 text-sm whitespace-nowrap pc:h-10 pc:min-w-30 pc:px-6 pc:text-base'
 
 const EditButton = () => (
   <Link href="/profile/edit" className={cn(buttonVariants({ variant: 'outline' }), ACTION_SIZE)}>
@@ -140,9 +140,8 @@ const MessageButton = ({ targetId }: { targetId: string }) => {
           },
         )
       }
-      className={cn(ACTION_SIZE, 'gap-1.5 pc:gap-2')}
+      className={ACTION_SIZE}
     >
-      <Image src="/chat.svg" alt="" width={24} height={24} className="size-5 pc:size-6" />
       메시지
     </Button>
   )
@@ -192,7 +191,7 @@ const ACTION_MAP = {
 
 const ProfileCard = ({ profile, mode = 'mine', layout = 'strip' }: ProfileCardProps) => {
   const Actions = ACTION_MAP[mode]
-  // 세로 배치는 PC 2단에서만 — 그 아래 해상도는 두 레이아웃 모두 같은 가로 스트립이다
+  // 세로 배치는 2단(tab+)에서만 — 모바일은 두 레이아웃 모두 같은 가로 스트립이다
   const isSidebar = layout === 'sidebar'
   const [followOpen, setFollowOpen] = useState(false)
 
@@ -210,8 +209,11 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip' }: ProfileCardPr
   )
   const { mutate: unfollow } = useUnfollowUser()
   const { mutate: removeFollower } = useRemoveFollower()
-  // 남의 브리더 홈에서만 카드 우상단 즐겨찾기 아이콘을 띄운다
+  // 남의 브리더 홈에서만 카드 우상단 즐겨찾기·신고를 띄운다
   const showFavoriteAction = mode === 'breeder' && breederProfile !== null
+  // 브리더 신고는 입양자(비로그인 포함)에게만 보인다
+  const { isReady, isLoggedIn, userRole } = useAuthStatus()
+  const canReportBreeder = isReady && (!isLoggedIn || userRole === 'adopter')
   // 특별시·광역시는 city/district 가 사실상 같은 지역이라(서울특별시/서울시) 그대로
   // 이어 붙이면 중복 표시된다 — 브리더 탐색 카드에서 고친 것과 같은 기준을 여기서도 적용
   const locationText = breederProfile
@@ -231,56 +233,55 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip' }: ProfileCardPr
           모바일에서는 액션만 다음 줄로 감싸(w-full) 두 버튼이 눌리기 좋은 폭을 갖는다.
           sidebar 레이아웃은 PC 에서만 세로로 쌓는다.
           즐겨찾기는 팔로우·메시지와 급이 다른 보조 토글이라(Figma 3349-2026986) 액션 행에
-          섞지 않고 카드 우상단에 따로 뗀다 — 안 그러면 팔로우/메시지 폭이 좁아지고 위계가 깨진다. */}
+          섞지 않고 이름 줄 오른쪽에 둔다 — 안 그러면 팔로우/메시지 폭이 좁아지고 위계가 깨진다. */}
       <div
         className={cn(
-          'relative mx-auto flex w-full max-w-168 flex-wrap items-start gap-x-4 gap-y-3',
-          isSidebar ? 'pc:max-w-none pc:flex-col pc:gap-4' : 'pc:max-w-[48.75rem]',
+          'mx-auto flex w-full max-w-168 flex-wrap items-start gap-x-4 gap-y-3',
+          isSidebar ? 'tab:max-w-none tab:flex-col tab:gap-4' : 'pc:max-w-[48.75rem]',
         )}
       >
-        {showFavoriteAction && (
-          <FavoriteBreederIconButton
-            breederId={breederProfile.breederId}
-            isFavorited={breederProfile.isFavorited}
-            size="nav"
-            className="absolute top-0 right-0"
-          />
-        )}
-
         <div
           className={cn(
             'flex min-w-0 flex-1 items-start gap-3 pc:gap-4',
-            isSidebar && 'pc:w-full pc:flex-none pc:flex-col',
+            isSidebar && 'tab:w-full tab:flex-none tab:flex-col',
           )}
         >
           <ProfileAvatar
             size="responsiveProfile"
             src={profile.profileImageUrl}
             alt={profile.nickname}
-            className={cn('shrink-0', isSidebar && 'pc:size-24')}
+            className={cn('shrink-0', isSidebar && 'tab:size-20 pc:size-24')}
           />
-          <div
-            className={cn(
-              'flex w-full min-w-0 flex-1 flex-col gap-0.5',
-              showFavoriteAction && 'pr-8',
-            )}
-          >
-            <p className="truncate text-lg leading-[1.5] font-semibold text-neutral-850 pc:text-xl">
-              {profile.nickname}
-            </p>
-            <div className="flex flex-wrap items-center gap-x-2 text-sm leading-[1.5] font-medium">
-              <FollowCounts
-                followerCount={profile.followerCount}
-                followingCount={profile.followingCount}
-                onClick={() => setFollowOpen(true)}
-              />
-              {locationText && <LocationInfo location={locationText} />}
+          <div className="flex w-full min-w-0 flex-1 flex-col gap-0.5">
+            {/* 즐겨찾기·신고는 카드가 유일한 진입점이다 (상단 nav 는 2단에서 사라진다).
+                절대배치 대신 이름 줄에 나란히 둬서 자리를 예약할 필요가 없다 */}
+            <div className="flex items-start gap-1">
+              <p className="min-w-0 flex-1 truncate text-lg leading-[1.5] font-semibold text-neutral-850 pc:text-xl">
+                {profile.nickname}
+              </p>
+              {showFavoriteAction && (
+                <div className="flex shrink-0 items-center gap-1">
+                  <FavoriteBreederIconButton
+                    breederId={breederProfile.breederId}
+                    isFavorited={breederProfile.isFavorited}
+                    size="nav"
+                  />
+                  {canReportBreeder && <ReportBreederAction breederId={breederProfile.breederId} />}
+                </div>
+              )}
             </div>
+            {/* 위치 → 카운트 순으로 이름 아래에 각각 한 줄씩 (같은 줄에 묶지 않는다) */}
+            {locationText && <LocationText location={locationText} />}
+            <FollowCounts
+              followerCount={profile.followerCount}
+              followingCount={profile.followingCount}
+              onClick={() => setFollowOpen(true)}
+            />
             {/* 스트립은 한 줄, 사이드바는 폭이 좁으니 세 줄까지 편다 */}
             <p
               className={cn(
                 'text-sm leading-[1.5] font-medium break-words text-neutral-700',
-                isSidebar ? 'truncate pc:line-clamp-3 pc:text-clip' : 'truncate',
+                isSidebar ? 'truncate tab:line-clamp-3 tab:text-clip' : 'truncate',
               )}
             >
               {profile.bio}
@@ -292,7 +293,8 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip' }: ProfileCardPr
         <div
           className={cn(
             'flex w-full shrink-0 items-center gap-2.5 pc:gap-3',
-            isSidebar ? 'pc:w-full' : 'pc:w-auto',
+            // 좁은 컬럼에 팔로우+메시지를 나란히 두면 라벨이 두 줄로 깨진다
+            isSidebar ? 'tab:w-full' : 'pc:w-auto',
           )}
         >
           <Actions targetId={profileUserId} isFollowing={isFollowing} />

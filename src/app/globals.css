@@ -21,6 +21,24 @@
   z-index: 80;
 }
 
+/* 페이지 좌우 여백. px-[var(--page-gutter)] 는 v4 가 길이로 추론하지 못해 유틸리티로 정의한다. */
+@utility page-gutter-x {
+  padding-inline: var(--page-gutter);
+}
+
+/* 페이지 좌우 여백(거터). Container·TabBar 등 페이지 폭 블록이 모두 이 값을 쓴다.
+   2단 레이아웃처럼 이미 여백을 가진 컬럼 안에서는 래퍼에 [--page-gutter:0px] 한 번만 걸면
+   그 안의 모든 블록이 따라간다 — 블록마다 px-0 을 덮어쓰지 않는다. */
+:root {
+  --page-gutter: 3rem;
+}
+
+@media (min-width: 1440px) {
+  :root {
+    --page-gutter: 5rem;
+  }
+}
+
 @theme {
   --breakpoint-mo: 375px;
   --breakpoint-tab: 768px;

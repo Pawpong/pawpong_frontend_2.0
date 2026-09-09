@@ -11,7 +11,7 @@ interface ContainerProps {
 const Container = ({ children, className, style }: ContainerProps) => {
   return (
     <div
-      className={cn(RESPONSIVE_SHELL_CLASS, 'px-[1.25rem] tab:px-[3rem] pc:px-[5rem]', className)}
+      className={cn(RESPONSIVE_SHELL_CLASS, 'px-[1.25rem] tab:page-gutter-x', className)}
       style={style}
     >
       {children}

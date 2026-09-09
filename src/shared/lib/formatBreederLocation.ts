@@ -27,3 +27,12 @@ export const formatBreederLocation = (city?: string, district?: string): string 
 
   return `${cityName} ${districtName}`
 }
+
+/**
+ * 백엔드가 이미 "시/도 + 시군구" 로 합쳐 보낸 소재지 문자열에 같은 규칙을 적용한다.
+ * (브리더 탐색·즐겨찾기 응답은 "서울특별시 서울시" 처럼 중복된 채로 내려온다.)
+ */
+export const formatJoinedBreederLocation = (location?: string): string => {
+  const [city = '', ...rest] = (location ?? '').trim().split(/\s+/)
+  return formatBreederLocation(city, rest.join(' '))
+}

@@ -30,7 +30,7 @@ const PublicBreederListings = ({ breederId, gridClassName }: PublicBreederListin
   const totalItems = getTotalItems(query.data)
 
   return (
-    <Container className="px-4 py-5 tab:px-20 tab:py-10 pc:px-0">
+    <Container className="px-4 py-5 tab:py-10">
       <div className="mx-auto flex w-full max-w-[74.625rem] flex-col gap-5">
         <p className="px-0.5 text-sm leading-6 font-semibold text-neutral-850 tab:text-base">
           전체 분양건 {totalItems}

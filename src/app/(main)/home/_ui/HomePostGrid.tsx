@@ -46,7 +46,7 @@ const HomePostGrid = ({
   return (
     <>
       <Container
-        className={cn('px-0 py-5 tab:px-0 tab:pt-6 tab:pb-10 pc:px-20 pc:py-10', className)}
+        className={cn('px-0 py-5 tab:pt-6 tab:pb-10 pc:page-gutter-x pc:py-10', className)}
       >
         <ListState
           isPending={isPending}

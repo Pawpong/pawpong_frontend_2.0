@@ -1,11 +1,12 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { AsyncState, Button, Container } from '@/shared/ui'
+import { AsyncState, Button } from '@/shared/ui'
 import { transientQueryRecoveryOptions } from '@/shared/api'
 import { useGnbHeight } from '@/shared/lib/useGnbHeight'
 import { adopterQueries } from '@/entities/adopter'
-import { COLUMN_GRID } from '../../_ui/constants'
+import { PHOTO_GRID } from '../../_ui/constants'
+import { HomeColumns } from '../../_ui/HomeColumns'
 import { ProfileCard } from '../../_ui/ProfileCard'
 import { PublicHomePosts } from './PublicHomePosts'
 import { PublicHomeProfileSection } from './PublicHomeProfileSection'
@@ -46,19 +47,13 @@ const UserHomeContent = ({ userId }: UserHomeContentProps) => {
     <div className="flex w-full flex-col">
       <PublicHomeProfileSection kind="adopter" profile={profile} />
 
-      {/* 마이홈과 같은 PC 2단 골격 — 탭이 없는 화면이라 HomeTabs 대신 직접 구성 */}
-      <div className="pc:mx-auto pc:flex pc:w-full pc:max-w-[90rem] pc:items-start pc:gap-10 pc:px-20">
-        <Container
-          className="px-4 py-5 tab:px-12 tab:py-5 pc:sticky pc:w-65 pc:shrink-0 pc:px-0 pc:py-10"
-          style={{ top: gnbH }}
-        >
-          <ProfileCard profile={profile} mode="other" layout="sidebar" />
-        </Container>
-
-        <div className="min-w-0 pc:flex-1 pc:pt-10">
-          <PublicHomePosts userId={userId} className="pc:px-0" gridClassName={COLUMN_GRID} />
-        </div>
-      </div>
+      {/* [refactored] 손으로 복제하던 2단 골격 → HomeColumns 공유 (pc: 프리픽스라 tab 구간이 빠져 있었다) */}
+      <HomeColumns
+        stickyTop={gnbH}
+        sidebar={<ProfileCard profile={profile} mode="other" layout="sidebar" />}
+      >
+        <PublicHomePosts userId={userId} gridClassName={PHOTO_GRID} />
+      </HomeColumns>
     </div>
   )
 }

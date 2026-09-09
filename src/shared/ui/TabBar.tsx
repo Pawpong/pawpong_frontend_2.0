@@ -18,8 +18,6 @@ interface TabBarProps {
   children?: ReactNode
   className?: string
   barClassName?: string
-  /** 탭 좌우 거터 — 2단 레이아웃 컬럼 안처럼 페이지 거터가 필요 없을 때 끈다 */
-  gutterClassName?: string
   triggerClassName?: string
   barStyle?: CSSProperties
   ariaLabel?: string
@@ -42,7 +40,6 @@ type TabBarListProps = Omit<TabBarProps, 'value' | 'onValueChange' | 'children' 
 const TabBarList = ({
   items,
   barClassName,
-  gutterClassName,
   triggerClassName,
   barStyle,
   ariaLabel,
@@ -53,7 +50,7 @@ const TabBarList = ({
     className={cn(PAGE_WIDTH_CLASS, 'border-b border-neutral-300 bg-white', barClassName)}
     style={barStyle}
   >
-    <div className={cn('w-full px-4 pt-3 tab:px-12 tab:pt-4 pc:px-20', gutterClassName)}>
+    <div className="w-full px-4 pt-3 tab:page-gutter-x tab:pt-4">
       <TabsList variant="underline" aria-label={ariaLabel}>
         {items.map((item) => (
           <TabsTrigger
