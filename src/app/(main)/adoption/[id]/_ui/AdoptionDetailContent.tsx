@@ -1,15 +1,22 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { Container, EmptyState, ImageDetailModal, NavigationBar } from '@/shared/ui'
+import {
+  Container,
+  EmptyState,
+  ImageDetailModal,
+  ListingCardGrid,
+  NavigationBar,
+} from '@/shared/ui'
 import { useImageModal } from '@/shared/lib/useImageModal'
-import { useToggleAdoptionFavorite } from '@/features/adoption'
+import { FavoriteAdoptionGridCard, useToggleAdoptionFavorite } from '@/features/adoption'
 import { useMe } from '@/features/auth'
+import { cn } from '@/shared/lib/cn'
 import type { AdoptionDetailDto } from '@/shared/types'
+import { PHOTO_GRID_COLS } from '../_lib/detailTypography'
 import { HealthInfoCard } from './HealthInfoCard'
 import { ParentInfoCard } from './ParentInfoCard'
 import { BreedingEnvironmentCard } from './BreedingEnvironmentCard'
-import { OtherListingCard } from './OtherListingCard'
 import { AdoptionDetailRail } from './AdoptionDetailRail'
 import { AboutSection } from './AboutSection'
 import { DetailSection } from './DetailSection'
@@ -92,11 +99,16 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
 
           <DetailSection title={`브리더의 다른 분양건 ${detail.otherListings.length}`}>
             {detail.otherListings.length > 0 ? (
-              <div className="flex flex-col gap-3 tab:gap-5">
-                {detail.otherListings.map((listing) => (
-                  <OtherListingCard key={listing.listingId} listing={listing} />
-                ))}
-              </div>
+              // 공개 브리더 홈 분양 목록과 같은 그리드 카드 — 같은 정보를 두 화면이 다른
+              // 모양으로 보여줄 이유가 없다. 컬럼 폭이 유동이라 열 수는 auto-fill 로 맞춘다
+              <ListingCardGrid
+                className={cn(PHOTO_GRID_COLS, 'max-w-none justify-normal gap-x-5')}
+                items={detail.otherListings}
+                getKey={(listing) => listing.listingId}
+                renderItem={(listing, index) => (
+                  <FavoriteAdoptionGridCard listing={listing} preload={index < 2} />
+                )}
+              />
             ) : (
               <EmptyState message="브리더의 다른 분양건이 없어요." size="compact" />
             )}
