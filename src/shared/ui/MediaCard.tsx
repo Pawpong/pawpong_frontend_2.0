@@ -4,7 +4,7 @@ import type { ReactNode } from 'react'
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { PawIcon } from '@/shared/assets'
+import { PawPrintIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 
 interface MediaCardProps {
@@ -51,8 +51,8 @@ const MediaCard = ({
   return (
     <article
       className={cn(
-        'group/media relative flex h-full w-full flex-col overflow-hidden rounded-lg bg-white transition-[background-color,border-radius,box-shadow] duration-200 ease-out',
-        'focus-within:ring-2 focus-within:ring-primary-500 focus-within:ring-offset-2 pc:hover:rounded-[1.25rem] pc:hover:bg-neutral-50 pc:hover:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]',
+        'group/media relative flex h-full w-full flex-col overflow-hidden rounded-lg bg-white',
+        'card-interactive',
         className,
       )}
     >
@@ -79,7 +79,7 @@ const MediaCard = ({
             role="img"
             aria-label={`${alt} 이미지 없음`}
           >
-            <PawIcon className="size-12 opacity-70 pc:size-14" />
+            <PawPrintIcon className="size-14 opacity-70 pc:size-16" />
           </div>
         )}
 

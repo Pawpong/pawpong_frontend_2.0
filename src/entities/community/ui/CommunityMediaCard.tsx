@@ -3,7 +3,7 @@
 import { useState, type MouseEventHandler } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { FavoriteIcon, PawIcon, PixelMessageIcon } from '@/shared/assets'
+import { FavoriteIcon, PawPrintIcon, PixelMessageIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 
 interface CommunityMediaCardProps {
@@ -52,7 +52,7 @@ const CommunityMediaCard = ({
         'group relative block shrink-0 overflow-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500',
         isProfileGrid
           ? 'aspect-square w-full bg-neutral-700 pc:rounded-lg pc:border pc:border-neutral-300'
-          : 'size-[7.625rem] rounded-lg border border-neutral-300 bg-point-50 transition-shadow duration-200 tab:aspect-square tab:size-auto tab:w-full pc:hover:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]',
+          : 'size-[7.625rem] rounded-lg border border-neutral-300 bg-point-50 card-interactive transition-shadow duration-200 tab:aspect-square tab:size-auto tab:w-full',
         className,
       )}
     >
@@ -65,18 +65,14 @@ const CommunityMediaCard = ({
           loading={preload ? 'eager' : 'lazy'}
           fetchPriority={preload ? 'high' : 'auto'}
           onError={() => setFailedImageUrl(imageUrl)}
-          className={cn(
-            'object-cover',
-            !isProfileGrid &&
-              'transition-transform duration-200 ease-out pc:group-hover:scale-[1.02]',
-          )}
+          className="object-cover"
         />
       ) : !isProfileGrid ? (
         <span
           className="absolute inset-0 flex items-center justify-center bg-point-50 text-primary-300"
           aria-hidden="true"
         >
-          <PawIcon className="size-10 opacity-70 pc:size-16" />
+          <PawPrintIcon className="size-11 opacity-70 pc:size-20" />
         </span>
       ) : null}
 

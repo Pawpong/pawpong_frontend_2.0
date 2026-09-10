@@ -1,9 +1,14 @@
 'use client'
 
 import { Fragment, useLayoutEffect, useRef } from 'react'
-import { PixelTab } from '@/shared/ui'
+import { PixelTab, type PixelTabStatus } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { useOnboarding } from '../model/OnboardingContext'
+
+const CHIP_CLASS_NAME =
+  'h-[2.125rem] w-[6.640625rem] p-1 tab:h-[2.125rem] tab:w-[6.640625rem] pc:h-[3.837rem] pc:w-[11.991rem] pc:p-2'
+const LABEL_CLASS_NAME = 'text-[0.625rem] tab:text-[0.625rem] pc:text-base'
+const ARROW_CLASS_NAME = 'size-[0.875rem] tab:size-[0.875rem] pc:size-8'
 
 const StepIndicator = () => {
   const { steps, currentStepIndex } = useOnboarding()
@@ -12,8 +17,11 @@ const StepIndicator = () => {
 
   const visibleSteps = steps.filter((step) => step.id !== 'complete')
 
+  const statusOf = (index: number): PixelTabStatus =>
+    index < currentStepIndex ? 'default' : index === currentStepIndex ? 'active' : 'disabled'
+
   // tab 구간에서는 큰 탭이 영역을 넘을 수 있어 현재 단계가 보이도록 가운데로 맞춘다.
-  // 모바일은 아래에서 탭을 균등 분배하므로 스크롤 없이 전체 단계가 한 번에 노출된다.
+  // mo(~767)는 2단 고정 배열이라 전체가 한 번에 노출되므로 스크롤이 필요 없다 (Figma 4048-957505).
   useLayoutEffect(() => {
     const viewport = viewportRef.current
     const activeStep = activeStepRef.current
@@ -26,46 +34,82 @@ const StepIndicator = () => {
     )
   }, [currentStepIndex, visibleSteps.length])
 
+  // mo(375~767): Figma 4048-957505처럼 2개씩 고정 2행 배열 — 행 사이에는 화살표가 없다.
+  const rows: (typeof visibleSteps)[] = []
+  for (let i = 0; i < visibleSteps.length; i += 2) {
+    rows.push(visibleSteps.slice(i, i + 2))
+  }
+
   return (
     <div
-      ref={viewportRef}
       aria-label="회원가입 진행 단계"
-      className="w-full max-w-full min-w-0 self-stretch overflow-x-hidden overflow-y-hidden tab:overflow-x-auto tab:overscroll-x-contain pc:w-auto pc:max-w-none pc:self-auto pc:overflow-visible"
+      className="w-full max-w-full min-w-0 self-stretch pc:w-auto pc:max-w-none pc:self-auto"
     >
-      {/* 칩·화살표 간격 spacing/4 (Figma 3124-328220) */}
-      <div className="flex w-full min-w-0 items-center justify-center gap-0.5 px-px tab:w-max tab:min-w-full tab:gap-1">
-        {visibleSteps.map((step, index) => (
-          <Fragment key={step.id}>
-            {index > 0 && (
-              // 지나온 구간은 갈색(active), 아직 안 온 구간은 회색(inactive)
-              <OnboardingArrow
-                className={cn(
-                  'size-2 tab:size-[0.875rem] pc:size-6',
-                  index <= currentStepIndex ? 'text-primary-500' : 'text-neutral-400',
-                )}
-              />
-            )}
-            <span
-              ref={index === currentStepIndex ? activeStepRef : undefined}
-              className="min-w-0 flex-1 tab:flex-none tab:shrink-0"
-            >
-              <PixelTab
-                compactTablet
-                label={step.label}
-                className="w-full min-w-0 p-0.5 tab:h-[2.125rem] tab:w-[6.640625rem] tab:p-1 pc:h-[3.837rem] pc:w-[11.991rem] pc:p-2"
-                labelClassName="text-[0.5rem] tab:text-[0.625rem] pc:text-base"
-                pawClassName="hidden tab:flex"
-                status={
-                  index < currentStepIndex
-                    ? 'default'
-                    : index === currentStepIndex
-                      ? 'active'
-                      : 'disabled'
-                }
-              />
-            </span>
-          </Fragment>
+      {/* mo(~767) 전용: 2단 고정 배열, 폭에 상관없이 항상 2개씩 줄바꿈 */}
+      <div className="flex flex-col items-center justify-center gap-y-5 tab:hidden">
+        {rows.map((row, rowIndex) => (
+          <div key={row[0].id} className="flex items-center justify-center">
+            {row.map((step, i) => {
+              const index = rowIndex * 2 + i
+              return (
+                <Fragment key={step.id}>
+                  {i > 0 && (
+                    <OnboardingArrow
+                      className={cn(
+                        ARROW_CLASS_NAME,
+                        index <= currentStepIndex ? 'text-primary-500' : 'text-neutral-400',
+                      )}
+                    />
+                  )}
+                  <span className="shrink-0">
+                    <PixelTab
+                      compactTablet
+                      label={step.label}
+                      className={CHIP_CLASS_NAME}
+                      labelClassName={LABEL_CLASS_NAME}
+                      pawClassName="flex"
+                      status={statusOf(index)}
+                    />
+                  </span>
+                </Fragment>
+              )
+            })}
+          </div>
         ))}
+      </div>
+
+      {/* tab+(768~): 한 줄 유지, 다 안 들어오면 현재 단계가 보이도록 가로 스크롤 */}
+      <div
+        ref={viewportRef}
+        className="hidden tab:block tab:overflow-x-auto tab:overscroll-x-contain pc:overflow-visible"
+      >
+        <div className="flex w-max min-w-full items-center justify-center gap-1">
+          {visibleSteps.map((step, index) => (
+            <Fragment key={step.id}>
+              {index > 0 && (
+                <OnboardingArrow
+                  className={cn(
+                    ARROW_CLASS_NAME,
+                    index <= currentStepIndex ? 'text-primary-500' : 'text-neutral-400',
+                  )}
+                />
+              )}
+              <span
+                ref={index === currentStepIndex ? activeStepRef : undefined}
+                className="shrink-0"
+              >
+                <PixelTab
+                  compactTablet
+                  label={step.label}
+                  className={CHIP_CLASS_NAME}
+                  labelClassName={LABEL_CLASS_NAME}
+                  pawClassName="flex"
+                  status={statusOf(index)}
+                />
+              </span>
+            </Fragment>
+          ))}
+        </div>
       </div>
     </div>
   )
@@ -73,7 +117,7 @@ const StepIndicator = () => {
 
 /**
  * 픽셀 화살표 (Figma 924-21749 arrow-onboarding).
- * 아트(12.331x19.73)는 박스 정중앙에 놓인다 — 박스는 mo 14 / tab+ 32.
+ * 아트(12.331x19.73)는 박스 정중앙에 놓인다 — 박스는 mo·tab 14 / pc 32.
  * 정사각 5칸이 계단으로 겹쳐 꺾이는 모양이라 칸 크기를 바꾸면 픽셀 결이 깨진다.
  */
 const OnboardingArrow = ({ className }: { className?: string }) => (

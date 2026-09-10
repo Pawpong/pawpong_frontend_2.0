@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { PawIcon } from '@/shared/assets'
+import { PawPrintIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 
 import { FavoriteButton, FavoriteToggle, ListingStats, PopularBadge } from '@/shared/ui'
@@ -51,7 +51,7 @@ const CardImage = ({
         role="img"
         aria-label={`${listing.name} 이미지 없음`}
       >
-        <PawIcon className="size-12 opacity-70 pc:size-14" />
+        <PawPrintIcon className="size-14 opacity-70 pc:size-16" />
       </div>
     )}
     {isCompleted && <div className="absolute inset-0 bg-white/70" />}
@@ -132,7 +132,7 @@ const AdoptionCard = ({ listing, className, isFavorite, onToggle, preload }: Ado
       {/* ══════ 태블릿+ 카드 (Figma 796-81669, large) ══════ */}
       {/* 카드 배경 없음 — 이미지만 rounded-8, 정보는 2단(제목/stats · 상태배지/관심있어요) */}
       {/* hover: bg neutral-50 + rounded-20 + drop shadow (Figma 1867-254861) */}
-      <div className="hidden h-full flex-col transition-[background-color,border-radius,box-shadow] duration-200 ease-out tab:flex pc:hover:overflow-hidden pc:hover:rounded-[1.25rem] pc:hover:bg-neutral-50 pc:hover:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]">
+      <div className="hidden h-full flex-col card-interactive tab:flex">
         {/* [refactored] 이미지 공통 컴포넌트 — rounded-8 */}
         <CardImage
           listing={listing}
@@ -207,7 +207,7 @@ const AdoptionCardHorizontal = ({
             role="img"
             aria-label={`${listing.name} 이미지 없음`}
           >
-            <PawIcon className="size-8" />
+            <PawPrintIcon className="size-9" />
           </div>
         )}
       </div>

@@ -1,9 +1,8 @@
 import Image from 'next/image'
-import { Badge } from '@/shared/ui'
+import { Badge, EmptyState } from '@/shared/ui'
 import { GenderIcon } from '@/shared/assets'
 import type { AdoptionDetailDto } from '@/shared/types'
 import { BaseInfoCard } from './BaseInfoCard'
-import { EmptyNote } from './EmptyNote'
 
 interface ParentInfoCardProps {
   detail: AdoptionDetailDto
@@ -19,7 +18,9 @@ const ParentInfoCard = ({ detail, onImageClick }: ParentInfoCardProps) => {
       title="부모 정보"
       className="mt-[0.75rem] pc:col-start-2 pc:row-span-2 pc:row-start-1 pc:mt-0"
     >
-      {detail.parents.length === 0 && <EmptyNote>등록된 부모 정보가 없어요.</EmptyNote>}
+      {detail.parents.length === 0 && (
+        <EmptyState message="등록된 부모 정보가 없어요." size="compact" />
+      )}
 
       {/* 세로 배치: 4:3 이미지 → 배지(role + 성별 아이콘) + 이름/생일 — Figma 1240-45069 */}
       <div className="flex flex-col gap-[0.75rem] pc:gap-5">

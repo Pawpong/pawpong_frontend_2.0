@@ -1,4 +1,5 @@
-import { Badge } from '@/shared/ui'
+// [refactored] ReviewTypeBadge 는 shared/ui 로 옮겼다. 기존 import 경로를 깨지 않으려고 여기서 재수출한다.
+import { Badge, ReviewTypeBadge } from '@/shared/ui'
 import type { ApplicationStatus } from '@/shared/types'
 
 const STATUS_LABEL: Record<ApplicationStatus, string> = {
@@ -24,12 +25,6 @@ const ApplicationStatusBadge = ({ status }: { status: ApplicationStatus }) => {
     </Badge>
   )
 }
-
-const ReviewTypeBadge = ({ reviewType }: { reviewType: string }) => (
-  <Badge variant={reviewType === 'adoption' ? 'primaryFilled' : 'pointFilled'} size="md">
-    {reviewType === 'adoption' ? '입양 후기' : '상담 후기'}
-  </Badge>
-)
 
 const getReviewTypeForStatus = (status: ApplicationStatus): 'consultation' | 'adoption' | null => {
   if (status === 'consultation_completed') return 'consultation'

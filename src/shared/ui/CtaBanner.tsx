@@ -77,8 +77,8 @@ interface CtaBannerProps {
 }
 
 const TONE_CLASS = {
-  secondary: 'bg-secondary-200',
-  point: 'border border-primary-200 bg-point-100',
+  secondary: 'border border-secondary-400 bg-secondary-200',
+  point: 'border border-secondary-400 bg-secondary-200',
 } as const
 
 /**
@@ -90,13 +90,10 @@ const CtaBanner = ({ text, href, onClick, tone = 'secondary' }: CtaBannerProps) 
     'relative mx-auto flex h-[2.3125rem] w-full max-w-[70.875rem] items-center justify-between overflow-hidden rounded-xl px-4 pc:h-[2.8125rem] pc:px-8',
     TONE_CLASS[tone],
   )
+  // point 톤의 발자국 색(secondary-500)이 기본 톤과 같아져 동일 에셋을 재사용한다.
   const pawSrc = {
-    compact:
-      tone === 'point'
-        ? '/images/category/cta-paw-point-compact.svg'
-        : '/images/category/cta-paw.svg',
-    desktop:
-      tone === 'point' ? '/images/category/cta-paw-point.svg' : '/images/category/cta-paw.svg',
+    compact: '/images/category/cta-paw.svg',
+    desktop: '/images/category/cta-paw.svg',
   }
 
   const content = (

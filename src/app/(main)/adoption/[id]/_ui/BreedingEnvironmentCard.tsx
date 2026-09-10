@@ -3,8 +3,8 @@
 import Image from 'next/image'
 import { cn } from '@/shared/lib/cn'
 import type { AdoptionDetailDto } from '@/shared/types'
+import { EmptyState } from '@/shared/ui'
 import { BaseInfoCard } from './BaseInfoCard'
-import { EmptyNote } from './EmptyNote'
 
 interface BreedingEnvironmentCardProps {
   detail: AdoptionDetailDto
@@ -56,7 +56,9 @@ const BreedingEnvironmentCard = ({
             {description}
           </p>
         ) : (
-          imageUrls.length === 0 && <EmptyNote>등록된 사육 환경 정보가 없어요.</EmptyNote>
+          imageUrls.length === 0 && (
+            <EmptyState message="등록된 사육 환경 정보가 없어요." size="compact" />
+          )
         )}
         {/* 사진이 없으면 빈 영역이 자리를 차지하지 않도록 행 자체를 렌더하지 않음 */}
         {imageUrls.length > 0 && (

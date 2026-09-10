@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { cn } from '@/shared/lib/cn'
-import { Badge } from '@/shared/ui'
+import { Badge, EmptyState } from '@/shared/ui'
 import { CheckIcon } from '@/shared/assets'
 import type { AdoptionDetailDto } from '@/shared/types'
 import { BaseInfoCard } from './BaseInfoCard'
@@ -50,7 +50,8 @@ const HealthInfoCard = ({ detail }: { detail: AdoptionDetailDto }) => (
         {/* [refactored] SectionHeader 사용 */}
         <SectionHeader title="예방 접종 현황" completed={detail.health.vaccinationCompleted} />
 
-        {/* [refactored] Table/TableRow 사용 (3컬럼: 접종명/접종일/차수) */}
+        {/* [refactored] Table/TableRow 사용 (3컬럼: 접종명/접종일/차수).
+            데이터가 없을 때 미완료 사유가 있으면 브리더가 입력한 사유를 그대로 노출한다. */}
         {detail.health.vaccinations.length > 0 ? (
           <Table>
             <TableRow className="py-[0.25rem] font-medium text-neutral-700">
@@ -66,11 +67,10 @@ const HealthInfoCard = ({ detail }: { detail: AdoptionDetailDto }) => (
               </TableRow>
             ))}
           </Table>
+        ) : detail.health.vaccinationIncompleteReason ? (
+          <EmptyNote>{detail.health.vaccinationIncompleteReason}</EmptyNote>
         ) : (
-          // 미완료 사유가 있으면 그대로 노출 (분양글 작성 시 브리더가 입력)
-          <EmptyNote>
-            {detail.health.vaccinationIncompleteReason || '등록된 접종 정보가 없어요.'}
-          </EmptyNote>
+          <EmptyState message="등록된 접종 정보가 없어요." size="compact" />
         )}
       </div>
 
@@ -102,10 +102,10 @@ const HealthInfoCard = ({ detail }: { detail: AdoptionDetailDto }) => (
               </TableRow>
             ))}
           </Table>
+        ) : detail.health.geneticTestIncompleteReason ? (
+          <EmptyNote>{detail.health.geneticTestIncompleteReason}</EmptyNote>
         ) : (
-          <EmptyNote>
-            {detail.health.geneticTestIncompleteReason || '등록된 유전병 검사 정보가 없어요.'}
-          </EmptyNote>
+          <EmptyState message="등록된 유전병 검사 정보가 없어요." size="compact" />
         )}
       </div>
     </div>

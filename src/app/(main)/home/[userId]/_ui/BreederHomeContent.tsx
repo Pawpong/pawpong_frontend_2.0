@@ -6,8 +6,10 @@ import { AsyncState, Button } from '@/shared/ui'
 import { transientQueryRecoveryOptions } from '@/shared/api'
 import { breederQueries } from '@/entities/breeder'
 import { HomeTabs, TabsContent } from '../../_ui/HomeTabs'
-import { BREEDER_HOME_TABS } from '../../_ui/constants'
+import { BREEDER_HOME_TABS, CARD_GRID, PHOTO_GRID } from '../../_ui/constants'
+import { ProfileCard } from '../../_ui/ProfileCard'
 import { PublicBreederListings } from './PublicBreederListings'
+import { PublicBreederReviews } from './PublicBreederReviews'
 import { PublicHomePosts } from './PublicHomePosts'
 import { PublicHomeProfileSection } from './PublicHomeProfileSection'
 
@@ -47,13 +49,22 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
     <div className="flex w-full flex-col">
       <PublicHomeProfileSection kind="breeder" profile={profile} />
 
-      <HomeTabs tabs={BREEDER_HOME_TABS} activeTab={activeTab} onTabChange={setActiveTab}>
+      <HomeTabs
+        tabs={BREEDER_HOME_TABS}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        sidebar={<ProfileCard profile={profile} mode="breeder" layout="sidebar" />}
+      >
         <TabsContent value="listings" className="mt-0">
-          <PublicBreederListings breederId={profile.breederId} />
+          <PublicBreederListings breederId={profile.breederId} gridClassName={CARD_GRID} />
         </TabsContent>
 
         <TabsContent value="posts" className="mt-0">
-          <PublicHomePosts userId={userId} />
+          <PublicHomePosts userId={userId} gridClassName={PHOTO_GRID} />
+        </TabsContent>
+
+        <TabsContent value="reviews" className="mt-0">
+          <PublicBreederReviews breederId={profile.breederId} />
         </TabsContent>
       </HomeTabs>
     </div>

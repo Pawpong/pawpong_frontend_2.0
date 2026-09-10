@@ -29,7 +29,7 @@ const SiteFooter = () => {
   if (!FOOTER_PATHS.has(pathname)) return null
 
   return (
-    <footer className="border-t border-primary-100 bg-point-50">
+    <footer className="border-t border-secondary-400 bg-secondary-200">
       <Container className="py-8 tab:py-10 pc:py-12">
         <div className="flex flex-col gap-8 pc:flex-row pc:items-start pc:justify-between">
           <div className="flex max-w-md flex-col gap-3">
@@ -50,7 +50,7 @@ const SiteFooter = () => {
               <Link
                 key={link.href}
                 href={link.href}
-                className="rounded text-sm font-semibold text-neutral-700 transition-colors hover:text-primary-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+                className="rounded text-sm font-semibold text-neutral-850 transition-colors hover:text-primary-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
               >
                 {link.label}
               </Link>
@@ -58,7 +58,7 @@ const SiteFooter = () => {
           </nav>
         </div>
 
-        <div className="mt-8 border-t border-primary-100 pt-6 tab:mt-10 tab:pt-8">
+        <div className="mt-8 border-t border-secondary-200 pt-6 tab:mt-10 tab:pt-8">
           <address className="flex flex-col gap-2 text-xs leading-[1.6] font-medium text-neutral-700 not-italic tab:text-sm">
             <div className="flex flex-wrap gap-x-4 gap-y-1">
               <span>상호 콜딩(Colding)</span>
@@ -68,14 +68,14 @@ const SiteFooter = () => {
             <p>경기도 김포시 김포한강9로75번길 66, 5층 (구래동, 국제프라자)</p>
             <a
               href="mailto:coldingcontact@gmail.com"
-              className="w-fit rounded transition-colors hover:text-primary-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+              className="w-fit rounded transition-colors hover:text-primary-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
             >
               coldingcontact@gmail.com
             </a>
           </address>
 
-          <div className="mt-6 flex flex-col gap-3 border-t border-primary-100 pt-5 tab:flex-row tab:items-center tab:justify-between">
-            <p className="text-xs font-medium text-neutral-500">
+          <div className="mt-6 flex flex-col gap-3 pt-5 tab:flex-row tab:items-center tab:justify-between">
+            <p className="text-xs font-medium text-neutral-600">
               Copyright © 2025 Pawpong Inc. All rights reserved.
             </p>
             <nav aria-label="법적 고지" className="flex flex-wrap gap-4">
@@ -85,7 +85,7 @@ const SiteFooter = () => {
                   href={link.href}
                   target="_blank"
                   rel="noreferrer"
-                  className="rounded text-xs font-semibold text-neutral-700 transition-colors hover:text-primary-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+                  className="rounded text-xs font-semibold text-neutral-700 transition-colors hover:text-primary-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
                 >
                   {link.label}
                 </a>
