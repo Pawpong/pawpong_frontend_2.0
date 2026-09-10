@@ -1,8 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import type { ReactNode } from 'react'
-import { Container, EmptyState, Separator, ImageDetailModal, NavigationBar } from '@/shared/ui'
+import { Container, EmptyState, ImageDetailModal, NavigationBar } from '@/shared/ui'
 import { useImageModal } from '@/shared/lib/useImageModal'
 import { useToggleAdoptionFavorite } from '@/features/adoption'
 import { useMe } from '@/features/auth'
@@ -11,7 +10,9 @@ import { HealthInfoCard } from './HealthInfoCard'
 import { ParentInfoCard } from './ParentInfoCard'
 import { BreedingEnvironmentCard } from './BreedingEnvironmentCard'
 import { OtherListingCard } from './OtherListingCard'
-import { AdoptionDetailHero } from './AdoptionDetailHero'
+import { AdoptionDetailRail } from './AdoptionDetailRail'
+import { AboutSection } from './AboutSection'
+import { DetailSection } from './DetailSection'
 import { AdoptionCtaBar } from './AdoptionCtaBar'
 
 interface AdoptionDetailContentProps {
@@ -20,9 +21,13 @@ interface AdoptionDetailContentProps {
 
 /* ═══════════════════════════════════════════════
    입양 상세 페이지 오케스트레이터
-   - 모바일 서브헤더 + 히어로 + 하단 섹션 + CTA + 이미지 모달
-   - 이미지 모달 상태는 히어로/하단 카드가 공유하므로 여기서 보관
-   - 관심 상태도 히어로(pc)/CTA바(모바일·탭)가 공유하므로 여기서 보관
+
+   배치: 좌 결정 레일(sticky) | 우 근거 섹션 — 1024+ 에서만 2단으로 갈라진다.
+   결정 정보(이미지·이름·상태·분양가·브리더)가 스크롤 내내 시야에 남아,
+   "가격 보고 → 내려가 건강 확인 → 다시 올라와 신청" 왕복이 사라진다.
+
+   - 이미지 모달 상태는 레일/부모/사육환경이 공유하므로 여기서 보관
+   - 관심 상태도 레일(관심 버튼)/CTA바가 공유하므로 여기서 보관
    ═══════════════════════════════════════════════ */
 const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
   const router = useRouter()
@@ -48,71 +53,65 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
         ? '예약 중인 개체예요'
         : undefined
 
+  // 레일(1024+)과 하단 고정 바(1024 미만)가 같은 값을 쓴다 — 한 곳에서 만든다
+  const ctaProps = {
+    listingId: detail.listingId,
+    isFavorite,
+    onToggleFavorite: toggleFavorite,
+    applyBlockedReason,
+    myApplication: detail.myApplicationId
+      ? { applicationId: detail.myApplicationId, breederUserId: detail.breeder.id }
+      : undefined,
+  }
+
   return (
-    <div className="pb-[6rem] tab:pb-[6rem]">
-      {/* Figma 976:25819 — 공용 40px 뒤로가기와 가운데 제목. 동작 없는 케밥은 노출하지 않는다. */}
-      <NavigationBar title={detail.name} onBack={() => router.back()} className="pc:hidden" />
+    <div className="pb-24 lap:pb-10">
+      {/* Figma 976:25819 — 공용 40px 뒤로가기와 가운데 제목. 레일이 이름을 갖고 있어 2단에선 숨긴다. */}
+      <NavigationBar title={detail.name} onBack={() => router.back()} className="lap:hidden" />
 
-      {/* ═══ 히어로 섹션 ═══ */}
-      <AdoptionDetailHero
-        detail={detail}
-        onImageClick={openImageModal}
-        isFavorite={isFavorite}
-        onToggleFavorite={toggleFavorite}
-        showFavoriteAction={!isMyListing}
-      />
-
-      {/* ═══ 하단 콘텐츠 ═══ 피그마 tab: 섹션별 컨테이너 px-48 py-12 */}
-      {/* [refactored] 반복되던 <Container className="tab:py-[0.75rem] pc:py-[1.25rem]"> 를 Section으로 추출 */}
-      {/* 건강 + 부모 + 사육 — pc: 좌(건강↑/사육↓) | 우(부모 전체 높이) grid / 모바일·탭: 세로 (Figma 1226-54550) */}
-      <Section>
-        <div className="pc:grid pc:grid-cols-[55.75rem_minmax(0,1fr)] pc:gap-[1.75rem]">
-          <HealthInfoCard detail={detail} />
-          <ParentInfoCard detail={detail} onImageClick={openImageModal} />
-          <BreedingEnvironmentCard
-            detail={detail}
-            onImageClick={openImageModal}
-            className="mt-[1.5rem] pc:col-start-1 pc:row-start-2 pc:mt-0"
-          />
-        </div>
-      </Section>
-
-      {/* 브리더의 다른 분양건 — 피그마: 컬럼 920px 중앙(외곽서 260px), 제목 위 48px, gap 39px */}
-      <Section>
-        <Separator className="bg-[#d4d4d4]" />
-        <div className="mt-[1rem] flex flex-col gap-[0.75rem] pc:mx-auto pc:mt-[3rem] pc:max-w-[57.5rem] pc:gap-2">
-          <p className="text-[0.75rem] leading-[1.375rem] font-medium text-[#5d5d5d] pc:text-[1.25rem] pc:leading-[1.5] pc:font-semibold pc:text-neutral-850">
-            브리더의 다른 분양건 {detail.otherListings.length}
-          </p>
-          {detail.otherListings.length > 0 ? (
-            <div className="flex flex-col gap-[0.75rem] pc:gap-6">
-              {detail.otherListings.map((listing) => (
-                <OtherListingCard key={listing.listingId} listing={listing} />
-              ))}
-            </div>
-          ) : (
-            <EmptyState message="브리더의 다른 분양건이 없어요." className="py-8 pc:py-12" />
-          )}
-        </div>
-      </Section>
-
-      {/* ═══ CTA 하단 고정 바 ═══ */}
-      {!isMyListing && (
-        <AdoptionCtaBar
-          listingId={detail.listingId}
+      <Container className="px-4 py-4 lap:flex lap:items-start lap:gap-8 lap:py-8 pc:gap-10 pc:py-10">
+        <AdoptionDetailRail
+          detail={detail}
+          onImageClick={openImageModal}
           isFavorite={isFavorite}
           onToggleFavorite={toggleFavorite}
-          applyBlockedReason={applyBlockedReason}
-          myApplication={
-            detail.myApplicationId
-              ? { applicationId: detail.myApplicationId, breederUserId: detail.breeder.id }
-              : undefined
-          }
+          showFavoriteAction={!isMyListing}
+          cta={!isMyListing && <AdoptionCtaBar {...ctaProps} variant="inline" />}
         />
+
+        {/* 우측은 근거만 — 스펙 → 건강(강조) → 부모·사육환경 → 다른 분양건 */}
+        <div className="flex min-w-0 flex-1 flex-col gap-8 pt-6 lap:gap-12 lap:pt-0">
+          <AboutSection detail={detail} />
+          <HealthInfoCard detail={detail} />
+
+          {/* 둘 다 사진 위주라 짝지어 놓는다 — 전폭 섹션이 세로로만 늘어지는 것을 한 번 끊는다 */}
+          <div className="grid gap-8 tab:grid-cols-2 tab:gap-6 lap:gap-8">
+            <ParentInfoCard detail={detail} onImageClick={openImageModal} />
+            <BreedingEnvironmentCard detail={detail} onImageClick={openImageModal} />
+          </div>
+
+          <DetailSection title={`브리더의 다른 분양건 ${detail.otherListings.length}`}>
+            {detail.otherListings.length > 0 ? (
+              <div className="flex flex-col gap-3 tab:gap-5">
+                {detail.otherListings.map((listing) => (
+                  <OtherListingCard key={listing.listingId} listing={listing} />
+                ))}
+              </div>
+            ) : (
+              <EmptyState message="브리더의 다른 분양건이 없어요." size="compact" />
+            )}
+          </DetailSection>
+        </div>
+      </Container>
+
+      {/* 하단 고정 CTA — 레일에 신청 진입점이 생기는 1024 미만에서만 */}
+      {!isMyListing && (
+        <div className="lap:hidden">
+          <AdoptionCtaBar {...ctaProps} />
+        </div>
       )}
 
-      {/* ═══ 이미지 모달 — 공통 ImageDetailModal (Figma 1952-260350: 이미지+대표뱃지+캐러셀만,
-          프로필/소개/투표/버튼 없음) ═══ */}
+      {/* Figma 1952-260350: 이미지+대표뱃지+캐러셀만, 프로필/소개/투표/버튼 없음 */}
       <ImageDetailModal
         images={modalImages}
         initialIndex={modalInitialIndex}
@@ -124,10 +123,5 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
     </div>
   )
 }
-
-// [refactored] 하단 섹션 공용 컨테이너 — 섹션 패딩: 모바일 12/16, 탭 12/48, pc 20/80 (px는 Container 기본)
-const Section = ({ children }: { children: ReactNode }) => (
-  <Container className="px-[1rem] py-[0.75rem] pc:py-[1.25rem]">{children}</Container>
-)
 
 export { AdoptionDetailContent }
