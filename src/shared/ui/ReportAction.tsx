@@ -2,7 +2,7 @@
 
 import { useId, useState, type FormEvent } from 'react'
 import { getAccessToken, normalizeApiError } from '@/shared/api'
-import { MoreVertIcon } from '@/shared/assets'
+import { MoreVertIcon, ReportFlagIcon } from '@/shared/assets'
 import { Button } from './Button'
 import { CtaModal } from './CtaModal'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './Dialog'
@@ -16,6 +16,7 @@ import { LoginPromptModal } from './LoginPromptModal'
 import { TextareaField } from './TextareaField'
 
 interface ReportActionProps<Reason extends string> {
+  triggerVariant?: 'menu' | 'flag'
   targetLabel: string
   options: readonly { value: Reason; label: string }[]
   onSubmit: (data: { reason: Reason; description?: string }) => Promise<string>
@@ -24,6 +25,7 @@ interface ReportActionProps<Reason extends string> {
 
 /** 신고 대상별 API와 사유만 주입하는 공통 신고 흐름. */
 export const ReportAction = <Reason extends string>({
+  triggerVariant = 'menu',
   targetLabel,
   options,
   onSubmit,
@@ -84,25 +86,38 @@ export const ReportAction = <Reason extends string>({
 
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <button
-            type="button"
-            aria-label={`${targetLabel} 더보기`}
-            className="flex size-10 shrink-0 items-center justify-center rounded-lg text-neutral-850 hover:bg-neutral-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
-          >
-            <MoreVertIcon className="size-6" />
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem
-            onSelect={() => (getAccessToken() ? changeOpen(true) : setLoginOpen(true))}
-            className="text-error-500 focus:text-error-600"
-          >
-            신고
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      {triggerVariant === 'flag' ? (
+        <button
+          type="button"
+          aria-label={`${targetLabel} 신고`}
+          title="신고하기"
+          aria-haspopup="dialog"
+          onClick={() => (getAccessToken() ? changeOpen(true) : setLoginOpen(true))}
+          className="flex size-10 shrink-0 items-center justify-center rounded-lg text-primary-500 transition-colors hover:bg-primary-50 hover:text-primary-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+        >
+          <ReportFlagIcon className="size-6" />
+        </button>
+      ) : (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              aria-label={`${targetLabel} 더보기`}
+              className="flex size-10 shrink-0 items-center justify-center rounded-lg text-neutral-850 hover:bg-neutral-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+            >
+              <MoreVertIcon className="size-6" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem
+              onSelect={() => (getAccessToken() ? changeOpen(true) : setLoginOpen(true))}
+              className="text-error-500 focus:text-error-600"
+            >
+              신고
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
 
       <Dialog open={open} onOpenChange={changeOpen}>
         <DialogContent

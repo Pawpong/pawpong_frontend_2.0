@@ -1,7 +1,7 @@
 'use client'
 
 import type { MouseEvent } from 'react'
-import { PixelStarFillIcon, PixelStarOutlineIcon } from '@/shared/assets'
+import { PixelStarFillIcon, PixelStarOutlineIcon, ProfileStarIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { useAddFavorite, useRemoveFavorite } from '@/features/adopter'
 
@@ -16,12 +16,12 @@ interface FavoriteBreederIconButtonProps {
 
 // 박스 / 글리프 크기 (시안 icon/star: md 32+padding4 -> 24, lg 48+padding4 -> 40)
 const SIZE = {
-  nav: { box: 'size-6', icon: 'size-6' },
+  nav: { box: 'size-10', icon: 'size-6' },
   profile: { box: 'size-12 p-1', icon: 'size-10' },
   card: { box: 'size-8 tab:size-12', icon: 'size-6 tab:size-10' },
 } as const
 
-/** 브리더 즐겨찾기 토글 — Figma의 다이아몬드형 pixel star 액션. */
+/** 브리더 즐겨찾기 토글 — 프로필 상단은 별, 이미지 카드는 기존 픽셀 아이콘. */
 const FavoriteBreederIconButton = ({
   breederId,
   isFavorited,
@@ -49,11 +49,24 @@ const FavoriteBreederIconButton = ({
       type="button"
       onClick={handleClick}
       aria-label={label}
+      title={label}
       aria-pressed={isFavorited}
       aria-disabled={isPending}
-      className={cn('flex shrink-0 items-center justify-center', SIZE[size].box, className)}
+      className={cn(
+        'flex shrink-0 items-center justify-center',
+        SIZE[size].box,
+        size === 'nav' &&
+          'rounded-lg text-primary-500 transition-colors hover:bg-primary-50 hover:text-primary-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500',
+        className,
+      )}
     >
-      <Icon className={cn(SIZE[size].icon, !isFavorited && 'text-primary-500/60', iconClassName)} />
+      {size === 'nav' ? (
+        <ProfileStarIcon filled={isFavorited} className={cn(SIZE[size].icon, iconClassName)} />
+      ) : (
+        <Icon
+          className={cn(SIZE[size].icon, !isFavorited && 'text-primary-500/60', iconClassName)}
+        />
+      )}
     </button>
   )
 }
