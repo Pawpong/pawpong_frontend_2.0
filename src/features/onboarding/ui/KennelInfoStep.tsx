@@ -5,10 +5,11 @@ import { useStepForm } from '../model/useStepForm'
 import { useDuplicateCheck } from '../model/useDuplicateCheck'
 import { useCheckBreederNameDuplicate } from '../api/onboarding.mutations'
 import { kennelInfoSchema, INTRODUCTION_MAX_LENGTH, REGIONS } from '../model/schema'
-import { BREED_KEYWORDS } from '../model/breedKeywords'
+import { cn } from '@/shared/lib/cn'
+import { STEP_LAYOUT } from '../model/stepLayout'
 import { StepContainer } from './StepContainer'
 import { Dropdown, InputField, TextareaField } from '@/shared/ui'
-import { ChipSelect } from './ChipSelect'
+import { KeywordTextField } from './KeywordTextField'
 import { ProfileImageUpload } from './ProfileImageUpload'
 import { DuplicateCheckField } from './DuplicateCheckField'
 
@@ -46,9 +47,8 @@ const KennelInfoStep = () => {
       onNext={handleNext}
       onBack={goBack}
       navError={firstErrorMessage}
-      contentClassName="tab:max-w-[40.9727rem]"
     >
-      <div className="flex w-full flex-col items-center gap-[2rem] px-5 tab:gap-[3.625rem] tab:px-0">
+      <div className={cn('flex w-full flex-col items-center px-1 tab:px-0', STEP_LAYOUT.blockGap)}>
         {/* 업로드 후 받은 URL을 폼(profileImage)에 보관 → DocumentsStep의 가입 요청에서 전송 */}
         <Controller
           name="profileImage"
@@ -59,7 +59,7 @@ const KennelInfoStep = () => {
         />
 
         {/* 폼 영역 */}
-        <div className="flex w-full flex-col gap-4">
+        <div className={cn('flex w-full flex-col', STEP_LAYOUT.fieldGap)}>
           {/* 브리더명 + 중복검사 — 공통 DuplicateCheckField */}
           <DuplicateCheckField
             label="별명"
@@ -97,20 +97,22 @@ const KennelInfoStep = () => {
             {...register('introduction')}
           />
 
-          {/* 품종 키워드 — 별명·주소와 같은 필드 묶음 (간격 spacing/16) */}
-          <Controller
-            name="selectedBreeds"
-            control={control}
-            render={({ field }) => (
-              <ChipSelect
-                label="케어하고 있는 품종 (최대 5개)"
-                items={[...BREED_KEYWORDS]}
-                value={field.value}
-                onChange={field.onChange}
-                maxSelected={5}
-              />
-            )}
-          />
+          {/* 품종 키워드 — 별명·주소와 같은 필드 묶음 (간격 spacing/16).
+              서버는 breeds 를 자유 문자열 배열로 받아(enum 없음) 콤마 구분 입력으로 받는다 */}
+          <InputField label="케어하고 있는 품종 (최대 5개)" required>
+            <Controller
+              name="selectedBreeds"
+              control={control}
+              render={({ field }) => (
+                <KeywordTextField
+                  value={field.value}
+                  onChange={field.onChange}
+                  maxSelected={5}
+                  placeholder="품종을 콤마(,)로 구분해 입력해주세요"
+                />
+              )}
+            />
+          </InputField>
         </div>
       </div>
     </StepContainer>
