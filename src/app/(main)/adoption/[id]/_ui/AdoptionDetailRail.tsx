@@ -18,7 +18,7 @@ import { cn } from '@/shared/lib/cn'
 import { CATEGORY_LABEL } from '@/shared/types'
 import type { AdoptionDetailDto, PetStatus } from '@/shared/types'
 import { ADOPTION_CARD_STATUS } from '@/entities/adoption'
-import { DETAIL_TYPE } from '../_lib/detailTypography'
+import { TEXT } from '@/shared/config'
 import { HeroImageCarousel } from './HeroImageCarousel'
 import { FavoriteShareActions } from './FavoriteShareActions'
 
@@ -80,14 +80,14 @@ const BreederRow = ({ breeder }: { breeder: AdoptionDetailDto['breeder'] }) => {
         size="responsivePc"
         className="shrink-0"
       />
-      <p className={cn(DETAIL_TYPE.body, 'min-w-0 flex-1 truncate')}>
+      <p className={cn(TEXT.body, 'min-w-0 flex-1 truncate')}>
         {isWithdrawn ? '탈퇴한 브리더' : breeder.nickname}
       </p>
       {!isWithdrawn && (
         <div className="flex shrink-0 items-center gap-1">
           <Link
             href={`/home/${breeder.id}`}
-            className={cn(DETAIL_TYPE.sub, 'flex items-center text-neutral-850')}
+            className={cn(TEXT.sub, 'flex items-center text-neutral-850')}
           >
             브리더홈
             <ArrowRightIcon className="size-5" />
@@ -120,12 +120,10 @@ const AdoptionDetailRail = ({
     />
 
     <div className="flex flex-col gap-3 px-4 tab:px-0">
-      <p className={DETAIL_TYPE.meta}>
-        {['홈', '입양', CATEGORY_LABEL[detail.category]].join(' · ')}
-      </p>
+      <p className={TEXT.meta}>{['홈', '입양', CATEGORY_LABEL[detail.category]].join(' · ')}</p>
 
       <div className="flex flex-wrap items-center gap-2">
-        <h1 className={DETAIL_TYPE.display}>{detail.name}</h1>
+        <h1 className={TEXT.display}>{detail.name}</h1>
         <StatusDropdown currentStatus={detail.status} />
         {detail.isPopular && (
           <PopularBadge
@@ -137,7 +135,7 @@ const AdoptionDetailRail = ({
 
       {/* 결정 정보는 분양가 하나 — 생일·성별·품종은 '이 아이에 대해' 로 내렸다 */}
       <div className="flex items-baseline gap-2">
-        <span className={DETAIL_TYPE.sub}>분양가</span>
+        <span className={TEXT.sub}>분양가</span>
         <span className="font-cafe24 text-xl leading-[1.4] text-primary-500 tab:text-2xl">
           {detail.price}
         </span>

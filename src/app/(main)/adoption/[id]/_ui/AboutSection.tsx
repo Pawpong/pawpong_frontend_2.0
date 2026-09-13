@@ -3,14 +3,14 @@ import { GenderIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { CATEGORY_LABEL, GENDER_LABEL } from '@/shared/types'
 import type { AdoptionDetailDto } from '@/shared/types'
-import { DETAIL_TYPE } from '../_lib/detailTypography'
+import { TEXT } from '@/shared/config'
 import { DetailSection } from './DetailSection'
 
 /** 라벨 ↔ 값 한 줄. 건강 정보 표와 같은 리듬으로 읽히도록 괘선을 공유한다. */
 const Row = ({ label, value }: { label: string; value: ReactNode }) => (
   <div className="flex items-start justify-between gap-4 border-b border-neutral-150 py-3 last:border-0">
-    <span className={cn(DETAIL_TYPE.sub, 'shrink-0')}>{label}</span>
-    <span className={cn(DETAIL_TYPE.body, 'text-right')}>{value}</span>
+    <span className={cn(TEXT.sub, 'shrink-0')}>{label}</span>
+    <span className={cn(TEXT.body, 'text-right')}>{value}</span>
   </div>
 )
 
@@ -36,8 +36,8 @@ const AboutSection = ({ detail }: { detail: AdoptionDetailDto }) => (
 
     {detail.description && (
       <div className="flex flex-col gap-2">
-        <p className={DETAIL_TYPE.sub}>소개글</p>
-        <p className={DETAIL_TYPE.prose}>{detail.description}</p>
+        <p className={TEXT.sub}>소개글</p>
+        <p className={TEXT.prose}>{detail.description}</p>
       </div>
     )}
   </DetailSection>
