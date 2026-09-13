@@ -2,6 +2,7 @@
 
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { Button, Container, InfiniteScrollTrigger, ListState, ListingCardGrid } from '@/shared/ui'
+import { cn } from '@/shared/lib/cn'
 import { profileQueries } from '@/entities/profile'
 import type { FavoriteBreederCard } from '@/shared/types'
 import type { FavoriteBreeder } from '@/shared/types'
@@ -20,7 +21,13 @@ const toBreederCardModel = (breeder: FavoriteBreederCard): FavoriteBreeder => ({
   isFavorited: breeder.isFavorited,
 })
 
-const FavoriteBreedersContent = () => {
+const FavoriteBreedersContent = ({
+  className,
+  gridClassName,
+}: {
+  className?: string
+  gridClassName?: string
+}) => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending, isError, refetch } =
     useInfiniteQuery(profileQueries.favoriteBreeders())
 
@@ -28,7 +35,7 @@ const FavoriteBreedersContent = () => {
 
   return (
     /* 디자인(1023-38692): 모바일 2열 / PC 4열, gap-20. PC는 1188px로 묶어 가운데 정렬 */
-    <Container className="px-4 py-5 tab:py-10 pc:pb-27">
+    <Container className={cn('px-4 py-5 tab:py-10 pc:pb-27', className)}>
       {/* 조회 실패를 "즐겨찾는 브리더가 없습니다"로 뭉뚱그리면 권한·네트워크 문제가 빈 목록으로 위장된다 */}
       <ListState
         isPending={isPending}
@@ -45,6 +52,7 @@ const FavoriteBreedersContent = () => {
       >
         <ListingCardGrid
           layout="compact"
+          className={gridClassName}
           items={breeders}
           getKey={(breeder) => breeder.id}
           renderItem={(breeder, index) => (

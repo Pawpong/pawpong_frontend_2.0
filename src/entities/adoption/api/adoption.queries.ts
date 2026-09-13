@@ -24,10 +24,17 @@ export const adoptionQueries = {
       staleTime: STALE_TIME.DEFAULT,
     }),
 
-  breederPets: (breederId: string, excludePetId?: string, pageSize = 15) =>
+  breederPets: (breederId: string, excludePetId?: string, pageSize = 15, status?: PetStatus) =>
     createInfiniteQuery({
-      queryKey: [...adoptionQueries.all(), 'breederPets', breederId, excludePetId, pageSize],
-      queryFn: (page) => getAdoptionList({ breederId, excludePetId, page, pageSize }),
+      queryKey: [
+        ...adoptionQueries.all(),
+        'breederPets',
+        breederId,
+        excludePetId,
+        pageSize,
+        status,
+      ],
+      queryFn: (page) => getAdoptionList({ breederId, excludePetId, status, page, pageSize }),
       enabled: !!breederId,
       staleTime: STALE_TIME.DEFAULT,
     }),

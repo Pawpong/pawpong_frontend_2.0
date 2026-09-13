@@ -11,7 +11,6 @@ interface PetInfoCardProps {
 }
 
 /* 입양 신청 상단 동물 요약 카드 (Figma 1862-173641, 데스크탑 전용)
-   골격은 브리더의 다른 분양건 카드(OtherListingCard)와 동일:
    이미지(좌, 가운데정렬) + 우측 정보 컬럼(flex-col justify-between self-stretch) + 하단 행 */
 const PetInfoCard = ({ detail }: PetInfoCardProps) => {
   const title = `${detail.name} | ${GENDER_LABEL[detail.gender]} ${detail.birthDate}`

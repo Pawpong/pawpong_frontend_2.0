@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ApplicationChatButton } from '@/features/chat-entry'
 import { FavoriteIcon } from '@/shared/assets'
 import { FAVORITE_ACTIVE } from '@/shared/ui'
+import { cn } from '@/shared/lib/cn'
 
 interface AdoptionCtaBarProps {
   listingId: string
@@ -17,6 +18,12 @@ interface AdoptionCtaBarProps {
    * 채팅·신청서 보기로 바꾼다 — 다시 신청해도 서버가 409 로 막기 때문이다.
    */
   myApplication?: { applicationId: string; breederUserId: string }
+  /**
+   * fixed  — 하단 고정 바 (1024 미만)
+   * inline — 결정 레일 안에 그대로 놓는 형태 (1024+). 고정 위치·스페이서·하트를 뺀다
+   *          (관심 버튼은 레일이 이미 갖고 있다)
+   */
+  variant?: 'fixed' | 'inline'
 }
 
 /* ── 하단 고정 CTA 바 (입양 신청) ──
@@ -31,18 +38,36 @@ const AdoptionCtaBar = ({
   onToggleFavorite,
   applyBlockedReason,
   myApplication,
+  variant = 'fixed',
 }: AdoptionCtaBarProps) => {
+  const isInline = variant === 'inline'
   // 버튼/비활성 문구가 폭·높이 스펙을 공유한다
-  const ACTION_CLASS =
-    'flex h-[3rem] max-w-[18.5625rem] flex-1 items-center justify-center rounded-full px-[0.5rem] text-[1rem] font-semibold tab:h-[2.5rem] tab:max-w-[16.125rem]'
+  const ACTION_CLASS = cn(
+    'flex h-[3rem] flex-1 items-center justify-center rounded-full px-[0.5rem] text-[1rem] font-semibold tab:h-[2.5rem]',
+    // 레일 안에서는 컬럼 폭을 그대로 쓴다 (고정 바에서만 시안의 최대 폭을 지킨다)
+    isInline ? 'tab:h-[2.75rem]' : 'max-w-[18.5625rem] tab:max-w-[16.125rem]',
+  )
 
   return (
-    <div className="fixed right-0 bottom-0 left-0 z-10 flex items-center justify-center gap-[0.625rem] bg-white px-[1rem] py-[1rem] tab:justify-end tab:gap-[1.25rem] tab:px-[3rem] tab:py-[0.75rem] pc:px-[5rem]">
+    <div
+      className={cn(
+        'flex items-center gap-[0.625rem]',
+        isInline
+          ? 'w-full'
+          : 'fixed right-0 bottom-0 left-0 z-10 justify-center bg-white px-[1rem] py-[1rem] tab:justify-end tab:gap-[1.25rem] tab:px-[3rem] tab:py-[0.75rem] pc:px-[5rem]',
+      )}
+    >
       {/* 탭·pc 우측 정렬용 좌측 스페이서 (피그마 flex-1 h-45) */}
-      <div className="hidden tab:block tab:h-[2.8125rem] tab:flex-1" />
+      {!isInline && <div className="hidden tab:block tab:h-[2.8125rem] tab:flex-1" />}
 
       {/* 하트 + 버튼 그룹 — 모바일: 가득 / 탭·pc: w-360 우측 고정 */}
-      <div className="flex w-full items-center justify-center gap-[0.625rem] tab:w-[22.5rem] tab:max-w-[33.5rem] tab:min-w-[22.5rem] tab:justify-end tab:gap-[1.25rem]">
+      <div
+        className={cn(
+          'flex w-full items-center justify-center gap-[0.625rem]',
+          !isInline &&
+            'tab:w-[22.5rem] tab:max-w-[33.5rem] tab:min-w-[22.5rem] tab:justify-end tab:gap-[1.25rem]',
+        )}
+      >
         {/* 관심(하트) — 모바일 전용(탭·pc는 없음). size="lg"(48px)가 Figma 스펙이라 FavoriteToggle 대신 직접 사용
             상태가 예약중·분양완료여도 관심 등록은 계속 가능하다(서버도 isActive 만 본다) */}
         <button
@@ -50,7 +75,7 @@ const AdoptionCtaBar = ({
           aria-label="관심있어요"
           aria-pressed={isFavorite}
           onClick={onToggleFavorite}
-          className="shrink-0 tab:hidden"
+          className={cn('shrink-0 tab:hidden', isInline && 'hidden')}
         >
           <FavoriteIcon
             size="lg"

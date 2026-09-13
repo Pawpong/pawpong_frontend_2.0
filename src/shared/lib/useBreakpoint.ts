@@ -5,6 +5,8 @@ import { useCallback, useSyncExternalStore } from 'react'
 export const BREAKPOINTS = {
   mo: 375,
   tab: 768,
+  /** 노트북 — Tab(768)과 PC(1440) 사이가 넓어 2단 배치가 성립하는 구간을 따로 둔다 */
+  lap: 1024,
   pc: 1440,
 } as const
 

@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import type { Swiper as SwiperClass } from 'swiper'
 import { PawPrintIcon, PixelArrowRightIcon } from '@/shared/assets'
+import { cn } from '@/shared/lib/cn'
 import 'swiper/css'
 
 // [refactored] 히어로 이미지 캐러셀 — Swiper 기반(모바일/탭 스와이프) + 커스텀 화살표·인디케이터
@@ -13,10 +14,13 @@ const HeroImageCarousel = ({
   images,
   alt,
   onImageClick,
+  className,
 }: {
   images: string[]
   alt: string
   onImageClick: (index: number) => void
+  /** 비율·모서리를 자리에 맞춰 덮어쓴다 */
+  className?: string
 }) => {
   const [swiper, setSwiper] = useState<SwiperClass | null>(null)
   const [activeIndex, setActiveIndex] = useState(0)
@@ -25,7 +29,10 @@ const HeroImageCarousel = ({
   if (images.length === 0) {
     return (
       <div
-        className="relative flex aspect-[375/279] w-full items-center justify-center overflow-hidden bg-point-50 text-primary-300 pc:aspect-square pc:h-[31.25rem] pc:w-[31.25rem] pc:rounded-[0.5rem]"
+        className={cn(
+          'relative flex aspect-[375/279] w-full items-center justify-center overflow-hidden bg-point-50 text-primary-300 tab:aspect-square tab:rounded-lg',
+          className,
+        )}
         role="img"
         aria-label={`${alt} 이미지 없음`}
       >
@@ -35,7 +42,12 @@ const HeroImageCarousel = ({
   }
 
   return (
-    <div className="relative aspect-[375/279] w-full overflow-hidden pc:aspect-square pc:h-[31.25rem] pc:w-[31.25rem] pc:rounded-[0.5rem]">
+    <div
+      className={cn(
+        'relative aspect-[375/279] w-full overflow-hidden tab:aspect-square tab:rounded-lg',
+        className,
+      )}
+    >
       <Swiper
         onSwiper={setSwiper}
         onSlideChange={(s) => setActiveIndex(s.activeIndex)}
@@ -54,7 +66,7 @@ const HeroImageCarousel = ({
                 src={url}
                 alt={alt}
                 fill
-                sizes="(max-width: 1439px) 100vw, 500px"
+                sizes="(max-width: 1023px) 100vw, 384px"
                 preload={index === 0}
                 draggable={false}
                 className="object-cover"

@@ -3,7 +3,11 @@
 import { useQuery } from '@tanstack/react-query'
 import { AsyncState, Button } from '@/shared/ui'
 import { transientQueryRecoveryOptions } from '@/shared/api'
+import { useGnbHeight } from '@/shared/lib/useGnbHeight'
 import { adopterQueries } from '@/entities/adopter'
+import { PHOTO_GRID } from '../../_ui/constants'
+import { HomeColumns } from '../../_ui/HomeColumns'
+import { ProfileCard } from '../../_ui/ProfileCard'
 import { PublicHomePosts } from './PublicHomePosts'
 import { PublicHomeProfileSection } from './PublicHomeProfileSection'
 
@@ -12,6 +16,7 @@ interface UserHomeContentProps {
 }
 
 const UserHomeContent = ({ userId }: UserHomeContentProps) => {
+  const gnbH = useGnbHeight()
   const profileQuery = useQuery({
     ...adopterQueries.publicProfile(userId),
     ...transientQueryRecoveryOptions,
@@ -41,7 +46,14 @@ const UserHomeContent = ({ userId }: UserHomeContentProps) => {
   return (
     <div className="flex w-full flex-col">
       <PublicHomeProfileSection kind="adopter" profile={profile} />
-      <PublicHomePosts userId={userId} />
+
+      {/* [refactored] 손으로 복제하던 2단 골격 → HomeColumns 공유 (pc: 프리픽스라 tab 구간이 빠져 있었다) */}
+      <HomeColumns
+        stickyTop={gnbH}
+        sidebar={<ProfileCard profile={profile} mode="other" layout="sidebar" />}
+      >
+        <PublicHomePosts userId={userId} gridClassName={PHOTO_GRID} />
+      </HomeColumns>
     </div>
   )
 }
