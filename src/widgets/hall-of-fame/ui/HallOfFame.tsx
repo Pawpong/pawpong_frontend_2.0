@@ -75,7 +75,6 @@ const HallOfFame = () => {
             avatarUrl: selected.userProfileImageUrl ?? undefined,
             homeHref: `/home/${selected.userId}`,
           }}
-          showActions={false}
         />
       )}
     </section>

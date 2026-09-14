@@ -130,7 +130,6 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
         open={imageModalOpen}
         onOpenChange={setImageModalOpen}
         representativeIndex={0}
-        showActions={false}
       />
     </div>
   )
