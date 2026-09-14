@@ -1,17 +1,17 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import {
-  Container,
+  Button,
   DeleteConfirmModal,
+  FilterChip,
   InfiniteScrollTrigger,
   ListState,
   LoginPromptModal,
   NavigationBar,
-  SearchButton,
+  SearchBar,
 } from '@/shared/ui'
 import { PlusIcon } from '@/shared/assets'
 import {
@@ -24,126 +24,219 @@ import {
 import { ConnectedFeedCard, useDeletePostConfirm } from '@/features/community'
 import { useLoginGuard, useMe } from '@/features/auth'
 import { flattenPages } from '@/shared/lib/infiniteList'
+import { cn } from '@/shared/lib/cn'
+import type { CommunityPetType, CommunitySortType } from '@/shared/types'
+import { COMMUNITY_SORT_OPTIONS } from './constants'
+
+const PET_OPTIONS = [
+  { value: '', label: '전체 이야기', shortLabel: '전체' },
+  { value: 'cat', label: '고양이 이야기', shortLabel: '고양이' },
+  { value: 'dog', label: '강아지 이야기', shortLabel: '강아지' },
+  { value: 'reptile', label: '파충류 이야기', shortLabel: '파충류' },
+] as const
 
 const CommunityContent = () => {
   const router = useRouter()
-  // 입력 중인 값과 실제 조회 조건을 분리한다 — 타이핑마다 재조회하지 않도록
-  const [searchOpen, setSearchOpen] = useState(false)
-  const [query, setQuery] = useState('')
+  const [petType, setPetType] = useState<CommunityPetType | ''>('')
+  const [sort, setSort] = useState<CommunitySortType>('latest')
   const [appliedSearch, setAppliedSearch] = useState('')
-  // 좋아요·북마크는 비로그인 요청이 401로 떨어지므로 먼저 로그인으로 유도한다
   const { guard, isPromptOpen, setPromptOpen } = useLoginGuard()
   const { me } = useMe()
-  // [refactored] 삭제 확인 state·mutation·핸들러를 useDeletePostConfirm으로 (마이홈과 공유)
   const { requestDelete, modalProps: deleteModalProps } = useDeletePostConfirm()
-
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending, isError } =
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending, isError, refetch } =
     useInfiniteQuery(
-      communityQueries.posts('latest', undefined, undefined, appliedSearch || undefined),
+      communityQueries.posts(sort, petType || undefined, undefined, appliedSearch || undefined),
     )
   const posts = flattenPages(data)
   const firstPhotoPostId = getFirstPhotoPostId(posts)
+  const writePost = guard(() => router.push('/community/write'))
+  const selectedLabel = PET_OPTIONS.find((option) => option.value === petType)?.label
 
   return (
-    <div className="flex w-full flex-col">
-      {/* 커뮤니티의 화면 정체성과 뒤로가기 기준은 전 구간에서 유지한다. */}
-      <NavigationBar title="포퐁커뮤니티" backHref="/" />
-
-      {/* 검색 (Figma 1657-251460 — 버튼 클릭 시 focus 입력 pill로 전환)
-          padding: mo 8·16 / tab 12·48 (px-4=모바일 16, tab48은 Container 기본값) */}
-      <Container className="flex justify-end px-4 py-2 tab:py-3">
-        <SearchButton
-          active={searchOpen}
-          value={query}
-          onChange={setQuery}
-          onClick={() => setSearchOpen(true)}
-          onSubmit={() => setAppliedSearch(query.trim())}
-          // 비어 있을 때 포커스 잃으면 트리거로 복귀 (적용된 검색어도 함께 해제)
-          onBlur={() => {
-            if (query.trim() !== '') return
-            setSearchOpen(false)
-            setAppliedSearch('')
-          }}
-          // 모바일은 풀폭, tab+는 최대 300px
-          className="max-w-none tab:max-w-[18.75rem]"
-        />
-      </Container>
-
-      {/* Main: Feed — Figma "1440 · 커뮤니티 홈" 기준. 흰 표면 위 단일 컬럼이고
-          카드 폭 상한은 mo/tab 343px, PC 415px 다.
-          중립 회색 표면을 페이지 셸 폭(PC 1440) 전체에 깔면 343px 컬럼 좌우로 470px 씩
-          빈 띠가 생겨 데스크탑에 모바일 화면을 끼워 넣은 것처럼 보인다 — 시안대로 흰 배경을 쓴다. */}
-      <Container className="px-4 pt-5 pb-10 tab:pt-8 tab:pb-16">
-        <div className="mx-auto w-full max-w-[21.4375rem] pc:max-w-[25.9375rem]">
-          {/* 로딩은 ListState 문구 대신 카드 골격으로 — 피드는 화면 대부분이 이미지라 덜 흔들린다 */}
-          {isPending && (
-            <div className="flex min-w-0 flex-col gap-6 tab:gap-8 pc:gap-10">
-              {[0, 1, 2].map((i) => (
-                <CommunityFeedCardSkeleton key={i} />
-              ))}
-            </div>
-          )}
-
-          <ListState
-            isPending={false}
-            isError={isError}
-            isEmpty={!isPending && posts.length === 0}
-            loadingText="게시글을 불러오는 중입니다."
-            errorText="게시글을 불러오지 못했습니다."
-            emptyText={
-              appliedSearch ? `'${appliedSearch}' 검색 결과가 없습니다.` : '게시글이 없습니다.'
-            }
+    <>
+      <NavigationBar
+        title="커뮤니티"
+        titleVariant="page"
+        right={
+          <Button
+            onClick={writePost}
+            variant="primary"
+            className="hidden h-10 shrink-0 gap-1.5 rounded-xl px-4 tab:flex pc:hidden"
           >
-            <div className="flex min-w-0 flex-col gap-6 tab:gap-8 pc:gap-10">
-              {posts.map((post) => {
-                // [refactored] 같은 소유자 판정을 onEdit·onDelete에서 두 번 하던 것을 이름으로
-                const isMyPost = me?.userId === post.authorId
-
-                return (
-                  <ConnectedFeedCard
-                    key={post.postId}
-                    preload={post.postId === firstPhotoPostId}
-                    guard={guard}
-                    {...toCommunityPreviewProps(post)}
-                    onEdit={
-                      isMyPost
-                        ? () => router.push(`/community/post/${post.postId}/edit`)
-                        : undefined
-                    }
-                    onDelete={isMyPost ? () => requestDelete(post.postId) : undefined}
-                  />
-                )
-              })}
-            </div>
-          </ListState>
-
-          <InfiniteScrollTrigger
-            onIntersect={fetchNextPage}
-            hasNextPage={hasNextPage ?? false}
-            isFetchingNextPage={isFetchingNextPage}
-          />
-        </div>
-      </Container>
-
-      {/* 글작성 — 상단 작성 유도 바를 대신하는 우하단 고정 FAB (Figma "글작성" BaseButton)
-          mo·tab 은 BottomNav(높이 3.5rem, 같은 z-sticky)가 뒤에 렌더되어 겹치면 FAB을 덮으므로
-          네비 높이 + 기존 여백 1.5rem 만큼 띄운다. pc 는 BottomNav 가 없어 원래 위치를 쓴다. */}
-      <Link
-        href="/community/write"
-        className="fixed right-6 bottom-[calc(3.5rem+1.5rem+env(safe-area-inset-bottom))] z-sticky flex h-12 items-center gap-1 rounded-full bg-point-500 px-4 shadow-[0_7px_7px_rgba(55,55,55,0.1)] pc:bottom-6"
-      >
-        <PlusIcon className="size-6 text-neutral-850" />
-        <span className="text-base leading-[1.5] font-semibold text-neutral-850">글작성</span>
-      </Link>
-
-      <LoginPromptModal
-        open={isPromptOpen}
-        onOpenChange={setPromptOpen}
-        description={COMMUNITY_LOGIN_PROMPT.reaction} // [refactored]
+            <PlusIcon className="size-5" />
+            글쓰기
+          </Button>
+        }
       />
 
-      <DeleteConfirmModal target="게시글" {...deleteModalProps} />
-    </div>
+      <div className="mx-auto w-full max-w-[68rem] px-5 pt-5 pb-28 tab:px-8 tab:pt-8 pc:px-10">
+        <div className="grid min-w-0 grid-cols-1 pc:grid-cols-[13rem_minmax(0,1fr)] pc:items-start pc:gap-12">
+          <aside className="sticky top-24 hidden pc:block" aria-label="커뮤니티 탐색">
+            <nav aria-label="동물별 이야기" className="flex flex-col gap-1">
+              {PET_OPTIONS.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  aria-pressed={petType === option.value}
+                  onClick={() => setPetType(option.value)}
+                  className={cn(
+                    'flex min-h-12 items-center justify-between rounded-xl px-4 text-left text-[0.9375rem] transition-colors focus-visible:outline-2 focus-visible:outline-primary-500',
+                    petType === option.value
+                      ? 'bg-neutral-100 font-semibold text-neutral-850'
+                      : 'font-medium text-neutral-500 hover:bg-neutral-50 hover:text-neutral-850',
+                  )}
+                >
+                  {option.label}
+                  {petType === option.value && (
+                    <span aria-hidden className="size-1.5 rounded-full bg-primary-500" />
+                  )}
+                </button>
+              ))}
+            </nav>
+            <div className="mt-6 border-t border-neutral-100 pt-6">
+              <Button variant="primary" onClick={writePost} className="h-12 w-full rounded-xl">
+                글쓰기
+              </Button>
+              <p className="mt-3 px-1 text-xs leading-relaxed text-neutral-500">
+                작은 일상도, 궁금한 것도
+                <br />
+                편하게 나눠주세요.
+              </p>
+            </div>
+          </aside>
+
+          <section className="min-w-0" aria-label="커뮤니티 게시글">
+            <SearchBar
+              key={appliedSearch}
+              className="mb-6"
+              placeholder={{
+                mobile: '궁금한 이야기 검색',
+                desktop: '궁금한 이야기를 검색해보세요',
+              }}
+              defaultValue={appliedSearch}
+              onSubmit={setAppliedSearch}
+            />
+
+            <nav
+              aria-label="동물별 이야기"
+              className="mb-6 flex gap-2 overflow-x-auto pb-1 pc:hidden"
+            >
+              {PET_OPTIONS.map((option) => (
+                <FilterChip
+                  key={option.value}
+                  selected={petType === option.value}
+                  onClick={() => setPetType(option.value)}
+                  className="shrink-0"
+                >
+                  {option.shortLabel}
+                </FilterChip>
+              ))}
+            </nav>
+
+            <div className="flex items-center justify-between gap-3 border-b border-neutral-150 pb-4">
+              <h2 className="text-base font-semibold text-neutral-850">
+                {appliedSearch ? '검색 결과' : selectedLabel}
+              </h2>
+              <div className="flex items-center gap-3" aria-label="게시글 정렬">
+                {COMMUNITY_SORT_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    aria-pressed={sort === option.value}
+                    onClick={() => setSort(option.value)}
+                    className={cn(
+                      'min-h-10 rounded px-1 text-sm focus-visible:outline-2 focus-visible:outline-primary-500',
+                      sort === option.value
+                        ? 'font-semibold text-neutral-850'
+                        : 'text-neutral-500 hover:text-neutral-850',
+                    )}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {appliedSearch && (
+              <div className="flex items-center justify-between gap-3 border-b border-neutral-100 py-3 text-sm">
+                <p className="min-w-0 truncate text-neutral-700">“{appliedSearch}” 검색 결과</p>
+                <button
+                  type="button"
+                  onClick={() => setAppliedSearch('')}
+                  className="min-h-10 shrink-0 rounded px-2 font-medium text-neutral-500 hover:text-neutral-850"
+                >
+                  검색 해제
+                </button>
+              </div>
+            )}
+            {isPending && (
+              <div>
+                {[0, 1, 2].map((i) => (
+                  <CommunityFeedCardSkeleton key={i} wide />
+                ))}
+              </div>
+            )}
+            <ListState
+              isPending={false}
+              isError={isError}
+              isEmpty={!isPending && posts.length === 0}
+              loadingText="게시글을 불러오는 중입니다."
+              errorText="이야기를 불러오지 못했어요."
+              errorAction={
+                <Button variant="outline" onClick={() => void refetch()}>
+                  다시 시도
+                </Button>
+              }
+              emptyText={
+                appliedSearch
+                  ? '검색 결과가 없어요. 다른 검색어로 찾아보세요.'
+                  : '아직 이야기가 없어요. 첫 이야기를 들려주세요.'
+              }
+            >
+              <div>
+                {posts.map((post) => {
+                  const isMyPost = me?.userId === post.authorId
+                  return (
+                    <ConnectedFeedCard
+                      wide
+                      key={post.postId}
+                      preload={post.postId === firstPhotoPostId}
+                      guard={guard}
+                      {...toCommunityPreviewProps(post)}
+                      onEdit={
+                        isMyPost
+                          ? () => router.push(`/community/post/${post.postId}/edit`)
+                          : undefined
+                      }
+                      onDelete={isMyPost ? () => requestDelete(post.postId) : undefined}
+                    />
+                  )
+                })}
+              </div>
+            </ListState>
+            <InfiniteScrollTrigger
+              onIntersect={fetchNextPage}
+              hasNextPage={hasNextPage ?? false}
+              isFetchingNextPage={isFetchingNextPage}
+            />
+          </section>
+        </div>
+
+        <Button
+          onClick={writePost}
+          variant="primary"
+          className="fixed right-5 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-sticky h-12 gap-1.5 px-5 shadow-md tab:hidden"
+        >
+          <PlusIcon className="size-5" />
+          글쓰기
+        </Button>
+        <LoginPromptModal
+          open={isPromptOpen}
+          onOpenChange={setPromptOpen}
+          description={COMMUNITY_LOGIN_PROMPT.reaction}
+        />
+        <DeleteConfirmModal target="게시글" {...deleteModalProps} />
+      </div>
+    </>
   )
 }
 

@@ -21,7 +21,7 @@ const InputField = ({
   children,
 }: InputFieldProps) => (
   <div className={cn('flex flex-col', className)}>
-    {/* 공통 TextLabel + requirement — Figma label-필수 medium(14) */}
+    {/* 공통 TextLabel + requirement — Figma label-필수 semibold(14) */}
     {label && (
       <TextLabel size="14" requirement={requirement ?? (required ? '필수' : undefined)}>
         {label}

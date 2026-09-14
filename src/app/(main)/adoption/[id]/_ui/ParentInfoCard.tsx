@@ -3,7 +3,8 @@ import { Badge, EmptyState } from '@/shared/ui'
 import { GenderIcon } from '@/shared/assets'
 import type { AdoptionDetailDto } from '@/shared/types'
 import { cn } from '@/shared/lib/cn'
-import { DETAIL_TYPE, PHOTO_GRID_COLS } from '../_lib/detailTypography'
+import { TEXT } from '@/shared/config'
+import { PHOTO_GRID_COLS } from '../_lib/detailTypography'
 import { DetailSection } from './DetailSection'
 
 interface ParentInfoCardProps {
@@ -44,7 +45,7 @@ const ParentInfoCard = ({ detail, onImageClick }: ParentInfoCardProps) => {
             </button>
 
             {/* 배지(role + 성별 아이콘) + 이름/생일 */}
-            <div className={cn('flex items-start gap-2', DETAIL_TYPE.body)}>
+            <div className={cn('flex items-start gap-2', TEXT.body)}>
               <Badge variant="primaryOutline" size="lg" className="shrink-0">
                 {parent.role}
                 <GenderIcon
@@ -54,7 +55,7 @@ const ParentInfoCard = ({ detail, onImageClick }: ParentInfoCardProps) => {
               </Badge>
               <div className="flex min-w-0 flex-col gap-[0.125rem]">
                 <span>{parent.name}</span>
-                <span className={DETAIL_TYPE.meta}>{parent.birthDate}</span>
+                <span className={TEXT.meta}>{parent.birthDate}</span>
               </div>
             </div>
           </div>

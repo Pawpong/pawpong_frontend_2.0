@@ -96,7 +96,7 @@ const HallOfFameContent = () => {
 
   return (
     <div className="flex w-full flex-col bg-base-white pb-12">
-      <NavigationBar title="명예의 전당" backHref="/" />
+      <NavigationBar title="명예의 전당" titleVariant="page" />
 
       <section className="w-full">
         <Container className="px-4 py-4 tab:px-12 tab:py-10 pc:max-w-[80rem] pc:px-0">

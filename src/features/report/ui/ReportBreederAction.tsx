@@ -17,6 +17,7 @@ export const ReportBreederAction = ({ breederId }: { breederId: string }) => {
   const reportBreeder = useReportBreeder()
   return (
     <ReportAction
+      triggerVariant="flag"
       targetLabel="브리더"
       options={BREEDER_REPORT_OPTIONS}
       requireOtherDescription

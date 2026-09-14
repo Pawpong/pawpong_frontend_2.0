@@ -4,6 +4,8 @@ import { Controller, type UseFormRegister } from 'react-hook-form'
 import { useStepForm } from '../model/useStepForm'
 import { useAdopterSignup } from '../model/useAdopterSignup'
 import { surveySchema, SURVEY_TEXT_MAX_LENGTH, type SurveyFormData } from '../model/schema'
+import { cn } from '@/shared/lib/cn'
+import { STEP_LAYOUT } from '../model/stepLayout'
 import { StepContainer } from './StepContainer'
 import { TextareaField, TextLabel } from '@/shared/ui'
 import { CheckboxField } from './CheckboxField'
@@ -86,7 +88,7 @@ const SurveyStep = () => {
       navError={firstErrorMessage ?? error ?? undefined}
     >
       {/* 콘텐츠 영역 — 섹션 간 gap: 모바일 32px / tab+ 58px (Figma root gap, mt 대신 gap) */}
-      <div className="flex w-full flex-col gap-8 tab:gap-[3.625rem]">
+      <div className={cn('flex w-full flex-col', STEP_LAYOUT.blockGap)}>
         {/* 섹션 1: 개인정보 수집 동의 — 항목 간 gap 8px (Figma spacing/8) */}
         <div className="flex flex-col gap-2">
           <TextLabel size="16" requirement="필수">
@@ -115,7 +117,7 @@ const SurveyStep = () => {
         </div>
 
         {/* 섹션 2: 조사 항목 — 버튼·라벨·텍스트에어리어 전부 flat gap 12px (Figma 966:22241) */}
-        <div className="flex w-full flex-col gap-3">
+        <div className={cn('flex w-full flex-col', STEP_LAYOUT.fieldGap)}>
           <button
             type="button"
             onClick={handleSkip}

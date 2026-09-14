@@ -69,10 +69,16 @@ const ProgressBarSvg = ({ percent }: ProgressBarSvgProps) => {
 
 const StepProgressBar = () => {
   const { currentStepIndex, steps } = useOnboarding()
-  const gnbH = useGnbHeight() // 위쪽 sticky 헤더(로고) 아래에 고정
 
   const visibleSteps = steps.filter((step) => step.id !== 'complete')
   const progressPercent = Math.round(((currentStepIndex + 1) / (visibleSteps.length + 1)) * 100)
+
+  return <OnboardingProgressBar percent={progressPercent} />
+}
+
+const OnboardingProgressBar = ({ percent }: ProgressBarSvgProps) => {
+  const gnbH = useGnbHeight() // 위쪽 sticky 헤더(로고) 아래에 고정
+  const progressPercent = Math.min(100, Math.max(0, percent))
 
   return (
     <div
@@ -99,4 +105,4 @@ const StepProgressBar = () => {
   )
 }
 
-export { StepProgressBar }
+export { StepProgressBar, OnboardingProgressBar }

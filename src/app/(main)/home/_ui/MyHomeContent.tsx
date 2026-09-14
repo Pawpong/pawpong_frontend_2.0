@@ -89,7 +89,7 @@ const MyHomeContent = () => {
       <div className="bg-white tab:hidden">
         <NavigationBar
           title="마이홈"
-          titleClassName="font-cafe24 text-lg text-neutral-850 tab:text-xl"
+          titleVariant="page"
           className="px-4 tab:px-12"
           right={
             <Link

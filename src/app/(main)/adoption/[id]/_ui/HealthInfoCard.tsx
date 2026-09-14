@@ -3,13 +3,13 @@ import { cn } from '@/shared/lib/cn'
 import { Badge, EmptyState } from '@/shared/ui'
 import { CheckIcon } from '@/shared/assets'
 import type { AdoptionDetailDto } from '@/shared/types'
-import { DETAIL_TYPE } from '../_lib/detailTypography'
+import { TEXT } from '@/shared/config'
 import { DetailSection } from './DetailSection'
 import { EmptyNote } from './EmptyNote'
 
 // 피그마 TableLayout 컨테이너
 const Table = ({ children }: { children: ReactNode }) => (
-  <div className={cn('flex flex-col', DETAIL_TYPE.body)}>{children}</div>
+  <div className={cn('flex flex-col', TEXT.body)}>{children}</div>
 )
 
 // 테이블 행(border, gap-8, 기본 py-8) — 헤더는 className 으로 py-4
@@ -47,7 +47,7 @@ const HealthBlock = ({
 }) => (
   <div className="flex flex-col gap-2">
     <div className="flex items-center justify-between gap-2">
-      <p className={DETAIL_TYPE.sub}>{title}</p>
+      <p className={TEXT.sub}>{title}</p>
       <Badge variant={completed ? 'primaryOutline' : 'neutralFilled'} size="lg">
         {completed && <CheckIcon className="size-4" />}
         <span>{completed ? '검사 완료' : '미완료'}</span>
@@ -75,7 +75,7 @@ const HealthInfoCard = ({ detail }: { detail: AdoptionDetailDto }) => (
         incompleteReason={detail.health.vaccinationIncompleteReason}
         emptyText="등록된 접종 정보가 없어요."
       >
-        <TableRow className={cn('py-[0.25rem]', DETAIL_TYPE.sub)}>
+        <TableRow className={cn('py-[0.25rem]', TEXT.sub)}>
           <span className="min-w-px flex-1">접종명</span>
           <span className="min-w-px flex-1">접종일</span>
           <span className="shrink-0 whitespace-nowrap">차수</span>
@@ -98,18 +98,18 @@ const HealthInfoCard = ({ detail }: { detail: AdoptionDetailDto }) => (
         emptyText="등록된 유전병 검사 정보가 없어요."
       >
         <TableRow>
-          <span className={cn('min-w-px flex-1', DETAIL_TYPE.sub)}>검진일</span>
+          <span className={cn('min-w-px flex-1', TEXT.sub)}>검진일</span>
           <span className="shrink-0 whitespace-nowrap">{detail.health.geneticTest.date}</span>
         </TableRow>
         <TableRow>
-          <span className={cn('min-w-px flex-1', DETAIL_TYPE.sub)}>검사기관</span>
+          <span className={cn('min-w-px flex-1', TEXT.sub)}>검사기관</span>
           <span className="shrink-0 whitespace-nowrap">
             {detail.health.geneticTest.institution}
           </span>
         </TableRow>
         {detail.health.geneticTest.results.map((r, i) => (
           <TableRow key={`${r.disease}-${i}`}>
-            <span className={cn('min-w-px flex-1', DETAIL_TYPE.sub)}>{i === 0 ? '결과' : ''}</span>
+            <span className={cn('min-w-px flex-1', TEXT.sub)}>{i === 0 ? '결과' : ''}</span>
             <span className="min-w-px flex-1">{r.disease}</span>
             <span className="shrink-0 whitespace-nowrap">{r.result}</span>
           </TableRow>

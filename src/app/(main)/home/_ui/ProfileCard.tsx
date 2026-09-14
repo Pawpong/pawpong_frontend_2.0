@@ -227,6 +227,18 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip' }: ProfileCardPr
   const following = toFollowUsers(followingsQuery)
   const mutualFollowers = isVisitor ? toMutualFollowers(followersQuery) : []
 
+  // 즐겨찾기·더보기 — 2단(tab+)에서는 아바타 줄로, 모바일에서는 이름 줄로 자리를 옮긴다
+  const favoriteActions = showFavoriteAction ? (
+    <div className="flex shrink-0 items-center gap-1">
+      <FavoriteBreederIconButton
+        breederId={breederProfile.breederId}
+        isFavorited={breederProfile.isFavorited}
+        size="nav"
+      />
+      {canReportBreeder && <ReportBreederAction breederId={breederProfile.breederId} />}
+    </div>
+  ) : null
+
   return (
     <>
       {/* [refactored] 아바타 + (이름·카운트·소개) + 액션을 한 행으로.
@@ -246,28 +258,34 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip' }: ProfileCardPr
             isSidebar && 'tab:w-full tab:flex-none tab:flex-col',
           )}
         >
-          <ProfileAvatar
-            size="responsiveProfile"
-            src={profile.profileImageUrl}
-            alt={profile.nickname}
-            className={cn('shrink-0', isSidebar && 'tab:size-20 pc:size-24')}
-          />
+          {isSidebar ? (
+            <div className="flex items-start gap-3 tab:w-full tab:justify-between">
+              <ProfileAvatar
+                size="responsiveProfile"
+                src={profile.profileImageUrl}
+                alt={profile.nickname}
+                className="shrink-0 tab:size-20 pc:size-24"
+              />
+              {favoriteActions && <div className="hidden tab:block">{favoriteActions}</div>}
+            </div>
+          ) : (
+            <ProfileAvatar
+              size="responsiveProfile"
+              src={profile.profileImageUrl}
+              alt={profile.nickname}
+              className="shrink-0"
+            />
+          )}
           <div className="flex w-full min-w-0 flex-1 flex-col gap-0.5">
             {/* 즐겨찾기·신고는 카드가 유일한 진입점이다 (상단 nav 는 2단에서 사라진다).
-                절대배치 대신 이름 줄에 나란히 둬서 자리를 예약할 필요가 없다 */}
+                절대배치 대신 이름 줄에 나란히 둬서 자리를 예약할 필요가 없다.
+                2단(tab+)에서는 아바타 줄로 옮겨가 여기선 숨긴다 */}
             <div className="flex items-start gap-1">
               <p className="min-w-0 flex-1 truncate text-lg leading-[1.5] font-semibold text-neutral-850 pc:text-xl">
                 {profile.nickname}
               </p>
-              {showFavoriteAction && (
-                <div className="flex shrink-0 items-center gap-1">
-                  <FavoriteBreederIconButton
-                    breederId={breederProfile.breederId}
-                    isFavorited={breederProfile.isFavorited}
-                    size="nav"
-                  />
-                  {canReportBreeder && <ReportBreederAction breederId={breederProfile.breederId} />}
-                </div>
+              {favoriteActions && (
+                <div className={cn(isSidebar && 'tab:hidden')}>{favoriteActions}</div>
               )}
             </div>
             {/* 위치 → 카운트 순으로 이름 아래에 각각 한 줄씩 (같은 줄에 묶지 않는다) */}

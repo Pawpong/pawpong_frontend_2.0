@@ -24,13 +24,15 @@ interface CommunityFeedCardProps extends CommunityPreviewProps {
   mediaLayout?: 'carousel' | 'row'
   /** 목록의 첫 카드처럼 LCP 후보인 첫 이미지만 선로딩 */
   preload?: boolean
+  /** 커뮤니티 메인의 본문 우선 피드 스타일 */
+  wide?: boolean
   className?: string
 }
 
 /**
  * 인스타그램식 단일 컬럼 피드 카드 (Figma CommunityFeedCard, node 3606:622637)
  * - 이미지가 있으면 1:1 캐러셀, 없으면 본문을 큼직하게
- * - Figma 고정 카드 문법(343px·radius 16)을 모든 화면 크기에서 유지한다
+ * - wide는 커뮤니티 메인의 본문 우선·구분선 스타일, 나머지 화면은 기본 카드 유지
  */
 const CommunityFeedCard = ({
   postId,
@@ -50,6 +52,7 @@ const CommunityFeedCard = ({
   moreAction,
   mediaLayout = 'carousel',
   preload = false,
+  wide = false,
   className,
 }: CommunityFeedCardProps) => {
   const href = detailHref ?? `/community/post/${postId}`
@@ -78,9 +81,15 @@ const CommunityFeedCard = ({
   }
 
   return (
-    <article className={cn('flex flex-col overflow-hidden rounded-2xl bg-white', className)}>
+    <article
+      className={cn(
+        'flex flex-col overflow-hidden rounded-2xl bg-white',
+        wide && 'rounded-none border-b border-neutral-100 py-6 tab:py-8',
+        className,
+      )}
+    >
       {/* 헤더 — 아바타·닉네임·작성시각 */}
-      <div className="flex items-center justify-between gap-2 p-3">
+      <div className={cn('flex items-center justify-between gap-2 p-3', wide && 'p-0 pb-4')}>
         <Link href={href} prefetch={false} className="flex min-w-0 flex-1 items-center gap-2">
           <ProfileAvatar
             size="medium"
@@ -111,6 +120,18 @@ const CommunityFeedCard = ({
         )}
       </div>
 
+      {wide && text && (
+        <Link
+          href={href}
+          prefetch={false}
+          className="mb-4 block rounded focus-visible:outline-2 focus-visible:outline-primary-500"
+        >
+          <p className="line-clamp-4 text-[0.9375rem] leading-7 font-normal whitespace-pre-line text-neutral-850">
+            {text}
+          </p>
+        </Link>
+      )}
+
       {/* 미디어 — 기본은 카드 폭을 채우는 1:1 캐러셀 (여러 장이면 우상단에 장수 배지),
           row 는 사진을 원래 비율 그대로 가로로 늘어놓고 넘치면 스크롤한다 */}
       {hasImages && mediaLayout === 'row' && (
@@ -139,7 +160,10 @@ const CommunityFeedCard = ({
 
       {hasImages && mediaLayout === 'carousel' && (
         <div
-          className="relative aspect-square w-full cursor-pointer overflow-hidden rounded-lg"
+          className={cn(
+            'relative aspect-square w-full cursor-pointer overflow-hidden rounded-lg',
+            wide && 'aspect-[4/3] max-h-[26rem] rounded-xl',
+          )}
           onPointerDown={handleImagePointerDown}
           onPointerUp={handleImagePointerUp}
         >
@@ -147,8 +171,8 @@ const CommunityFeedCard = ({
             images={images}
             alt={author.nickname}
             className="absolute inset-0"
-            bgClassName="bg-neutral-700"
-            imageClassName="object-cover"
+            bgClassName={wide ? 'bg-neutral-50' : 'bg-neutral-700'}
+            imageClassName={wide ? 'object-contain' : 'object-cover'}
             preloadFirstImage={preload}
             {...COMMUNITY_CAROUSEL_STYLE} // [refactored] 상세와 공유하는 상수로
           />
@@ -161,7 +185,7 @@ const CommunityFeedCard = ({
       )}
 
       {/* 사진이 없으면 본문을 큼직하게 (있으면 아래 캡션에서 보여준다) */}
-      {!hasImages && (
+      {!hasImages && !wide && (
         <Link href={href} prefetch={false} className="block px-3 py-5">
           <p className="line-clamp-6 text-base leading-[1.5] font-semibold whitespace-pre-line text-neutral-850">
             {text}
@@ -170,7 +194,7 @@ const CommunityFeedCard = ({
       )}
 
       {/* 액션 — 댓글 아이콘은 상세 링크 (community/@modal 인터셉트가 이 이동을 모달로 가로챈다) */}
-      <div className="px-3 py-2">
+      <div className={cn('px-3 py-2', wide && 'px-0 pt-4 pb-0')}>
         <CommunityPostActions
           likeCount={likeCount}
           commentCount={commentCount}
@@ -183,13 +207,18 @@ const CommunityFeedCard = ({
       </div>
 
       {/* 캡션 — 이미지가 있을 때만 (없으면 위에서 본문을 이미 보여줬다) */}
-      {hasImages && (
+      {hasImages && !wide && (
         <Link href={href} prefetch={false} className="block px-3 pb-3">
-          <p className="flex items-center gap-3 overflow-hidden">
+          <p className={cn('flex items-center gap-3 overflow-hidden', wide && 'tab:items-start')}>
             <span className="shrink-0 text-sm leading-[1.5] font-semibold text-neutral-850">
               {author.nickname}
             </span>
-            <span className="min-w-0 flex-1 truncate text-xs leading-[1.5] font-semibold text-neutral-850">
+            <span
+              className={cn(
+                'min-w-0 flex-1 truncate text-xs leading-[1.5] font-semibold text-neutral-850',
+                wide && 'tab:line-clamp-3 tab:text-sm tab:font-medium tab:whitespace-pre-line',
+              )}
+            >
               {text}
             </span>
           </p>

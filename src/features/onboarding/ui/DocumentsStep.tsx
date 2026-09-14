@@ -7,6 +7,8 @@ import { useBreederSignup } from '../model/useBreederSignup'
 import { documentsSchema } from '../model/schema'
 import { PolicyModal } from '@/shared/ui'
 import { POLICIES } from '../model/policyContent'
+import { cn } from '@/shared/lib/cn'
+import { STEP_LAYOUT } from '../model/stepLayout'
 import { StepContainer } from './StepContainer'
 import { DocumentUploadButton } from './DocumentUploadButton'
 import { CheckboxField } from './CheckboxField'
@@ -40,7 +42,7 @@ const DocumentsStep = () => {
       navError={firstErrorMessage ?? error ?? undefined}
     >
       {/* 서류 영역 — 행 간격 spacing/16 (Figma 3134-343522) */}
-      <div className="flex w-full flex-col gap-4">
+      <div className={cn('flex w-full flex-col', STEP_LAYOUT.fieldGap)}>
         {BREEDER_DOCUMENT_FIELDS.map(({ field, label }) => {
           const selectedFile = field === 'idDocument' ? idDocument : registrationCert
           return (
