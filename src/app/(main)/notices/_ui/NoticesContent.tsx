@@ -52,7 +52,7 @@ const NoticesContent = () => {
 
   return (
     <div className="flex w-full flex-1 flex-col bg-white pb-16">
-      <NavigationBar title="공지사항" titleClassName="font-cafe24 text-2xl tab:text-2xl" />
+      <NavigationBar title="공지사항" titleVariant="page" />
 
       <Container className="py-5 tab:py-8 pc:py-10">
         {/* FAQ 목록과 같은 1134px 열 (pc:max-w-[70.875rem]) */}

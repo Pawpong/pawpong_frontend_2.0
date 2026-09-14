@@ -22,12 +22,7 @@ const parseKeywords = (text: string, maxSelected?: number): string[] => {
 // 이유가 없어 콤마로 구분해 입력받는다. 매 키 입력마다 배열로 되접으면 콤마 뒤 빈
 // 항목이 filter 돼 커서가 튀므로, 텍스트는 로컬 state 로 자유롭게 두고 blur 시점에만
 // 폼 값(배열)에 반영한다.
-const KeywordTextField = ({
-  value,
-  onChange,
-  placeholder,
-  maxSelected,
-}: KeywordTextFieldProps) => {
+const KeywordTextField = ({ value, onChange, placeholder, maxSelected }: KeywordTextFieldProps) => {
   const [text, setText] = useState(() => value.join(', '))
 
   return (
