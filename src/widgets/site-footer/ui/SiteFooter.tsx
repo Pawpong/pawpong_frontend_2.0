@@ -5,13 +5,14 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Container } from '@/shared/ui'
 
-const FOOTER_PATHS = new Set(['/', '/explore', '/community', '/hall-of-fame', '/faq'])
+const FOOTER_PATHS = new Set(['/', '/explore', '/community', '/hall-of-fame', '/about', '/faq'])
 
 const SERVICE_LINKS = [
   { href: '/', label: '서비스 홈' },
   { href: '/explore', label: '탐색' },
   { href: '/hall-of-fame', label: '명예의 전당' },
-  { href: '/faq', label: 'FAQ' },
+  { href: '/about', label: '서비스 소개' },
+  { href: '/faq', label: '자주 묻는 질문' },
 ] as const
 
 const LEGAL_LINKS = [
