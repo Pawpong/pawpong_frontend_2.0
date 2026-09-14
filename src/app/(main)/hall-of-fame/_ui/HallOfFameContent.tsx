@@ -230,7 +230,6 @@ const HallOfFameContent = () => {
             avatarUrl: selectedEntry.userProfileImageUrl ?? undefined,
             homeHref: `/home/${selectedEntry.userId}`,
           }}
-          showActions={false}
         />
       )}
     </div>

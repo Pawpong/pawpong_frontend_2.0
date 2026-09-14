@@ -1,9 +1,15 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowRightIcon } from '@/shared/assets'
+import { AlertCircleIcon, ArrowRightIcon, CheckIcon } from '@/shared/assets'
+import { useDeleteAdopterAccount } from '@/features/adopter'
 import { useLogoutAndRedirect } from '@/features/auth'
-import { Container, NavigationBar } from '@/shared/ui'
+import { useDeleteBreederAccount } from '@/features/breeder'
+import { normalizeApiError } from '@/shared/api'
+import { useToast } from '@/shared/lib/useToast'
+import { WithdrawReason } from '@/shared/types'
+import { AlertMessage, Container, CtaModal, NavigationBar } from '@/shared/ui'
 
 interface SettingsContentProps {
   userRole: 'adopter' | 'breeder'
@@ -36,6 +42,15 @@ const ADOPTER_LINKS: SettingsLink[] = [
   },
 ]
 
+// 탈퇴 모달 설명 (Figma 2145-193207) — 프로필 편집의 탈퇴 모달과 같은 문구
+const LEAVE_DESCRIPTION = (
+  <>
+    계정 삭제시 모든 개인정보가 삭제되며
+    <br />
+    복구되지 않습니다
+  </>
+)
+
 const SettingsLinkRow = ({ href, label, description }: SettingsLink) => (
   <Link
     href={href}
@@ -53,8 +68,30 @@ const SettingsLinkRow = ({ href, label, description }: SettingsLink) => (
 
 const SettingsContent = ({ userRole }: SettingsContentProps) => {
   const { logoutAndRedirect, isPending } = useLogoutAndRedirect()
+  const toast = useToast()
+  const [showLeave, setShowLeave] = useState(false)
+  const isBreeder = userRole === 'breeder'
+  const deleteAccount = useDeleteAdopterAccount()
+  const deleteBreederAccount = useDeleteBreederAccount()
+  const isLeavePending = deleteAccount.isPending || deleteBreederAccount.isPending
   // 브리더는 공통 메뉴만, 입양자는 신청·후기 내역이 더해진다
   const links = userRole === 'breeder' ? COMMON_LINKS : [...COMMON_LINKS, ...ADOPTER_LINKS]
+
+  // 탈퇴: 사유를 묻지 않고 바로 요청 — 프로필 편집의 탈퇴와 같은 정책(API가 reason을 필수로 받아 'other'로 보낸다)
+  // 탈퇴 성공 뒤에는 반드시 세션을 끊는다 (프로필 편집과 같은 이유 — 남은 쿠키로 로그인된 것처럼 보이는 것 방지)
+  const handleLeave = async () => {
+    setShowLeave(false)
+    try {
+      if (isBreeder) {
+        await deleteBreederAccount.mutateAsync({ reason: 'other' })
+      } else {
+        await deleteAccount.mutateAsync({ reason: WithdrawReason.OTHER })
+      }
+      logoutAndRedirect()
+    } catch (error) {
+      toast.error(normalizeApiError(error, '탈퇴 처리에 실패했습니다.').message)
+    }
+  }
 
   return (
     <div className="flex w-full flex-1 flex-col bg-white pb-16">
@@ -90,9 +127,49 @@ const SettingsContent = ({ userRole }: SettingsContentProps) => {
                 이 기기의 포퐁 계정에서 로그아웃해요.
               </span>
             </button>
+            <div className="border-t border-neutral-150">
+              <button
+                type="button"
+                onClick={() => setShowLeave(true)}
+                disabled={isLeavePending}
+                className="flex min-h-18 w-full flex-col items-start justify-center gap-0.5 px-4 py-3 text-left transition-colors hover:bg-error-50/40 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-500 disabled:cursor-not-allowed disabled:opacity-50 tab:px-5"
+              >
+                <span className="text-sm font-semibold text-error-600 tab:text-base">탈퇴</span>
+                <span className="text-xs leading-[1.5] font-medium text-neutral-500 tab:text-sm">
+                  계정을 삭제하고 포퐁을 떠나요.
+                </span>
+              </button>
+            </div>
           </section>
         </div>
       </Container>
+
+      {toast.current && (
+        <Container className="fixed inset-x-0 bottom-4 z-header">
+          <AlertMessage
+            status={toast.current.status}
+            size="responsive"
+            icon={toast.current.status === 'error' ? AlertCircleIcon : CheckIcon}
+            message={toast.current.message}
+            onClose={toast.hide}
+          />
+        </Container>
+      )}
+
+      {/* 계정 탈퇴 확인 (디자인 2145-193207 / 모바일·탭 2145-193342) — 프로필 편집과 같은 모달 */}
+      <CtaModal
+        open={showLeave}
+        onOpenChange={setShowLeave}
+        icon={null}
+        showClose={false}
+        direction="responsive-reverse"
+        title="포퐁을 떠나실 건가요?"
+        description={LEAVE_DESCRIPTION}
+        actions={[
+          { label: '계정 탈퇴', variant: 'outline', onClick: handleLeave },
+          { label: '다시 생각해볼게요', variant: 'fill', onClick: () => setShowLeave(false) },
+        ]}
+      />
     </div>
   )
 }
