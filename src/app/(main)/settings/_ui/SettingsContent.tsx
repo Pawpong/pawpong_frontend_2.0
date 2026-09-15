@@ -42,6 +42,14 @@ const ADOPTER_LINKS: SettingsLink[] = [
   },
 ]
 
+const BREEDER_LINKS: SettingsLink[] = [
+  {
+    href: '/adoption/application-form',
+    label: '신청서 질문 관리',
+    description: '입양 신청서에 추가로 물어볼 질문을 관리해요.',
+  },
+]
+
 // 탈퇴 모달 설명 (Figma 2145-193207) — 프로필 편집의 탈퇴 모달과 같은 문구
 const LEAVE_DESCRIPTION = (
   <>
@@ -74,8 +82,10 @@ const SettingsContent = ({ userRole }: SettingsContentProps) => {
   const deleteAccount = useDeleteAdopterAccount()
   const deleteBreederAccount = useDeleteBreederAccount()
   const isLeavePending = deleteAccount.isPending || deleteBreederAccount.isPending
-  // 브리더는 공통 메뉴만, 입양자는 신청·후기 내역이 더해진다
-  const links = userRole === 'breeder' ? COMMON_LINKS : [...COMMON_LINKS, ...ADOPTER_LINKS]
+  const links =
+    userRole === 'breeder'
+      ? [...COMMON_LINKS, ...BREEDER_LINKS]
+      : [...COMMON_LINKS, ...ADOPTER_LINKS]
 
   // 탈퇴: 사유를 묻지 않고 바로 요청 — 프로필 편집의 탈퇴와 같은 정책(API가 reason을 필수로 받아 'other'로 보낸다)
   // 탈퇴 성공 뒤에는 반드시 세션을 끊는다 (프로필 편집과 같은 이유 — 남은 쿠키로 로그인된 것처럼 보이는 것 방지)
