@@ -36,6 +36,14 @@ const MY_HOME_SIDE_LINKS = [
   { label: '설정', href: '/settings' },
 ]
 
+// 브리더 마이홈 전용 — 신청서 질문 관리는 브리더만 쓴다
+const BREEDER_MY_HOME_SIDE_LINKS = [
+  { label: '저장목록', href: '/bookmarks' },
+  { label: '입양 신청서', href: '/activity' },
+  { label: '신청서 질문 관리', href: '/adoption/application-form' },
+  { label: '설정', href: '/settings' },
+]
+
 // 카드 그리드(분양·브리더). 폭에 맞춰 열 수가 늘도록 모든 구간에서 auto-fill 로 채운다.
 // 원본 변형이 모바일을 max-w-[21.4375rem] 2열로 묶어둬서, 그 상한·정렬·gap 을 함께 푼다.
 // 최소 152px: 320→1열, 375→2열, 710→4열. PC 2단(우측 980px)에서만 4열로 고정해 카드가 더 잘게
@@ -55,6 +63,7 @@ export {
   BREEDER_HOME_TABS,
   BREEDER_MY_HOME_TABS,
   MY_HOME_SIDE_LINKS,
+  BREEDER_MY_HOME_SIDE_LINKS,
   CARD_GRID,
   PHOTO_GRID,
 }

@@ -19,6 +19,7 @@ import {
   MY_HOME_TABS,
   BREEDER_MY_HOME_TABS,
   MY_HOME_SIDE_LINKS,
+  BREEDER_MY_HOME_SIDE_LINKS,
   CARD_GRID,
   PHOTO_GRID,
 } from './constants'
@@ -108,7 +109,7 @@ const MyHomeContent = () => {
         activeTab={activeTab}
         onTabChange={setSelectedTab}
         sidebar={<ProfileCard {...profileCardProps} layout="sidebar" />}
-        sideLinks={MY_HOME_SIDE_LINKS}
+        sideLinks={isBreeder ? BREEDER_MY_HOME_SIDE_LINKS : MY_HOME_SIDE_LINKS}
       >
         {/* 분양 목록 탭 (브리더만) — 시안 3170-790275: 라벨+필터 -> 카드 그리드.
             '분양 페이지 바로가기' 배너 제거 — /adoption/my-listings 가 이 탭과 같은
