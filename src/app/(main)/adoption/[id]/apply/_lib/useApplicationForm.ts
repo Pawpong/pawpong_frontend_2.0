@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useCreateApplication } from '@/features/application'
 import { adopterQueries } from '@/entities/adopter'
+import { breederQueries } from '@/entities/breeder'
 import { useExitGuard } from '@/shared/lib/useExitGuard'
 import { useToast } from '@/shared/lib/useToast'
 import { normalizeApiError } from '@/shared/api'
@@ -88,7 +89,10 @@ const useApplicationForm = (detail: AdoptionDetailDto) => {
   const confirmConsult = () => {
     const data = pendingData.current
     if (!data) return
-    createApplication(toCreateApplicationRequest(detail, data), {
+    const customResponses = customQuestions
+      .filter((q) => customAnswers[q.id]?.trim())
+      .map((q) => ({ questionId: q.id, answer: customAnswers[q.id].trim() }))
+    createApplication(toCreateApplicationRequest(detail, data, customResponses), {
       onSuccess: () => {
         setShowConsultConfirm(false)
         router.push(`/adoption/${detail.listingId}`)
@@ -113,12 +117,23 @@ const useApplicationForm = (detail: AdoptionDetailDto) => {
 
   const petSummary = `${detail.name} . ${GENDER_LABEL[detail.gender]} . ${detail.birthDate}`
 
+  // 브리더가 신청서 질문 관리에서 추가한 커스텀 질문 — react-hook-form 스키마는 정적이라
+  // 브리더마다 다른 질문 목록을 태울 수 없어 별도 상태로 관리하고 제출 시 합친다.
+  const customFormQuery = useQuery(breederQueries.applicationForm(detail.breeder.id))
+  const customQuestions = customFormQuery.data?.customQuestions ?? []
+  const [customAnswers, setCustomAnswers] = useState<Record<string, string>>({})
+  const setCustomAnswer = (questionId: string, value: string) =>
+    setCustomAnswers((prev) => ({ ...prev, [questionId]: value }))
+  const customQuestionsValid = customQuestions.every(
+    (q) => !q.required || (customAnswers[q.id]?.trim().length ?? 0) > 0,
+  )
+
   return {
     register,
     control,
     handleSubmit,
     watch,
-    isValid,
+    isValid: isValid && customQuestionsValid,
     isPending,
     showGuard,
     confirmExit,
@@ -131,6 +146,9 @@ const useApplicationForm = (detail: AdoptionDetailDto) => {
     giveUpFromConsult,
     petSummary,
     needsSurvey,
+    customQuestions,
+    customAnswers,
+    setCustomAnswer,
     isProfilePending: adopterProfileQuery.isPending,
     isProfileError: adopterProfileQuery.isError,
     retryProfile: adopterProfileQuery.refetch,

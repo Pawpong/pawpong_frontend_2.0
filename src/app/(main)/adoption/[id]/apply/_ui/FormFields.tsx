@@ -8,6 +8,7 @@ import {
 } from 'react-hook-form'
 import { Button, Checkbox, Container, Input, TextLabel, TextareaField } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
+import type { ApplicationFormQuestion } from '@/shared/types'
 import type { ApplicationFormValues, ApplicationTextField } from '../_lib/schema'
 
 // [refactored] textarea 글자 수 제한(100)을 공통 컴포넌트 옆으로 이동 (ApplicationForm에서 옮겨옴)
@@ -63,6 +64,36 @@ const CountedTextareaField = ({
 
 // [refactored] 읽기 전용 입력(입양하는 동물) — 규격이 공통 Input과 같아 readOnly로 대체
 const ReadonlyInput = ({ value }: { value: string }) => <Input readOnly value={value} />
+
+/** 브리더가 신청서 질문 관리에서 추가한 커스텀 질문 — 간편 등록은 항상 textarea 타입이지만
+ * 전체 수정 API로 만든 다른 타입도 있을 수 있어 textarea가 아니면 Input으로 대체한다. */
+const CustomQuestionField = ({
+  question,
+  value,
+  onChange,
+}: {
+  question: ApplicationFormQuestion
+  value: string
+  onChange: (value: string) => void
+}) => (
+  <LabeledField title={question.label} requirement={question.required ? '필수' : '선택'}>
+    {question.type === 'textarea' ? (
+      <TextareaField
+        placeholder={question.placeholder || '답변을 입력해주세요'}
+        maxLength={TEXTAREA_MAX_LENGTH}
+        currentLength={value.length}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
+    ) : (
+      <Input
+        placeholder={question.placeholder || '답변을 입력해주세요'}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
+    )}
+  </LabeledField>
+)
 
 // 체크박스 — 공통 Checkbox(기본 large 24px) + 라벨 lg/medium 14→탭+ 16
 const CheckboxField = ({
@@ -154,4 +185,11 @@ const FooterCtaBar = ({
   </div>
 )
 
-export { LabeledField, CountedTextareaField, ReadonlyInput, CheckboxField, FooterCtaBar }
+export {
+  LabeledField,
+  CountedTextareaField,
+  ReadonlyInput,
+  CheckboxField,
+  CustomQuestionField,
+  FooterCtaBar,
+}

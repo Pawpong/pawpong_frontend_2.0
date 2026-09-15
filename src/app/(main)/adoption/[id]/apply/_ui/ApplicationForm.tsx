@@ -31,6 +31,7 @@ import {
   CountedTextareaField,
   ReadonlyInput,
   CheckboxField,
+  CustomQuestionField,
   FooterCtaBar,
 } from './FormFields'
 
@@ -58,6 +59,9 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
     giveUpFromConsult,
     petSummary,
     needsSurvey,
+    customQuestions,
+    customAnswers,
+    setCustomAnswer,
     isProfilePending,
     isProfileError,
     retryProfile,
@@ -162,6 +166,16 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
                 name="allFamilyConsent"
                 label={ALL_FAMILY_CONSENT_LABEL}
               />
+
+              {/* 브리더가 신청서 질문 관리에서 추가한 질문 — 없으면 렌더링하지 않는다 */}
+              {customQuestions.map((question) => (
+                <CustomQuestionField
+                  key={question.id}
+                  question={question}
+                  value={customAnswers[question.id] ?? ''}
+                  onChange={(value) => setCustomAnswer(question.id, value)}
+                />
+              ))}
             </div>
           </div>
         </Container>

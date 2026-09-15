@@ -32,6 +32,7 @@ import { AlertCircleIcon, CheckIcon } from '@/shared/assets'
 
 const NAME_MAX_LENGTH = 30
 const BIO_MAX_LENGTH = 200 // 서버 UpdateMyProfileRequestDto.bio maxLength
+const LONG_DESCRIPTION_MAX_LENGTH = 1500 // 서버 BreederProfileUpdateRequestDto.profileDescription maxLength
 
 // [refactored] 표시 전용 Input 스타일 — 수정 불가(readOnly) + focus 보더 중립화
 const READONLY_INPUT_CLASS = 'cursor-default focus:border-neutral-150'
@@ -55,6 +56,7 @@ const ProfileEditContent = () => {
   const router = useRouter()
   const [name, setName] = useState('')
   const [bio, setBio] = useState('')
+  const [longDescription, setLongDescription] = useState('')
   const [showApply, setShowApply] = useState(false)
   const [showLeave, setShowLeave] = useState(false) // 탈퇴 확인 모달
 
@@ -105,6 +107,7 @@ const ProfileEditContent = () => {
   // 서버 원본값 — 폼 시드와 변경 감지(isDirty)의 기준. 저장 후 쿼리가 갱신되면 같이 따라간다
   const savedName = (isBreeder ? myProfile?.nickname : adopterProfile?.nickname) ?? ''
   const savedBio = myProfile?.bio ?? ''
+  const savedLongDescription = myProfile?.longDescription ?? ''
 
   // 조회값으로 폼 초기화 (최초 1회) — effect 대신 렌더 중 동기화(React 권장 패턴)
   // 브리더는 adopterProfile 을 기다리지 않고 myProfile(닉네임)로 시드한다
@@ -113,6 +116,7 @@ const ProfileEditContent = () => {
   if (!seeded && seedReady) {
     setName(savedName)
     setBio(savedBio)
+    setLongDescription(savedLongDescription)
     setSeeded(true)
   }
 
@@ -130,7 +134,11 @@ const ProfileEditContent = () => {
   // 브리더 활동명은 이 화면에서 readOnly라 검사에서 제외 — 비어 있어도 저장을 막으면 손쓸 방법이 없다
   const isFormFilled = isBreeder || name.trim().length > 0
   // 바뀐 게 없으면 적용할 것도 없다. 저장 성공 시 쿼리 갱신으로 savedName/savedBio 가 따라와 자동으로 false
-  const isDirty = name !== savedName || bio !== savedBio || !!photoFileName
+  const isDirty =
+    name !== savedName ||
+    bio !== savedBio ||
+    longDescription !== savedLongDescription ||
+    !!photoFileName
   const isSaving =
     updateAdopterProfile.isPending ||
     updateBreederProfile.isPending ||
@@ -156,8 +164,15 @@ const ProfileEditContent = () => {
         tasks.push(updateMyProfile.mutateAsync({ bio }))
       }
       if (isBreeder) {
-        if (photoFileName) {
-          tasks.push(updateBreederProfile.mutateAsync({ profileImage: photoFileName }))
+        if (photoFileName || longDescription !== savedLongDescription) {
+          tasks.push(
+            updateBreederProfile.mutateAsync({
+              ...(photoFileName ? { profileImage: photoFileName } : {}),
+              ...(longDescription !== savedLongDescription
+                ? { profileDescription: longDescription }
+                : {}),
+            }),
+          )
         }
       } else if (name !== savedName || photoFileName) {
         tasks.push(
@@ -300,6 +315,19 @@ const ProfileEditContent = () => {
               onChange={(e) => setBio(e.target.value)}
               className="min-h-[6.5625rem]"
             />
+
+            {/* 브리더 전용 — 마이홈 분양목록 탭 상단에 노출되는 긴 소개글 */}
+            {isBreeder && (
+              <TextareaField
+                label="브리더 소개"
+                placeholder="입력해보세요"
+                maxLength={LONG_DESCRIPTION_MAX_LENGTH}
+                currentLength={longDescription.length}
+                value={longDescription}
+                onChange={(e) => setLongDescription(e.target.value)}
+                className="min-h-[10rem]"
+              />
+            )}
 
             {/* 소셜 로그인 이메일은 입양자 프로필에만 있어 브리더에선 숨김 */}
             {!isBreeder && (

@@ -19,6 +19,7 @@ import {
   MY_HOME_TABS,
   BREEDER_MY_HOME_TABS,
   MY_HOME_SIDE_LINKS,
+  BREEDER_MY_HOME_SIDE_LINKS,
   CARD_GRID,
   PHOTO_GRID,
 } from './constants'
@@ -108,13 +109,22 @@ const MyHomeContent = () => {
         activeTab={activeTab}
         onTabChange={setSelectedTab}
         sidebar={<ProfileCard {...profileCardProps} layout="sidebar" />}
-        sideLinks={MY_HOME_SIDE_LINKS}
+        sideLinks={isBreeder ? BREEDER_MY_HOME_SIDE_LINKS : MY_HOME_SIDE_LINKS}
       >
         {/* 분양 목록 탭 (브리더만) — 시안 3170-790275: 라벨+필터 -> 카드 그리드.
             '분양 페이지 바로가기' 배너 제거 — /adoption/my-listings 가 이 탭과 같은
             목록 위젯을 그대로 보여줘 따로 링크할 이유가 없다 */}
         {isBreeder && (
           <TabsContent value="listings" className="mt-0">
+            {myProfile?.longDescription && (
+              <Container className="pt-5">
+                <h2 className="mb-2 text-base font-semibold text-neutral-850">소개</h2>
+                <p className="text-sm leading-[1.5] whitespace-pre-wrap text-neutral-700">
+                  {myProfile.longDescription}
+                </p>
+              </Container>
+            )}
+
             <InputUpload text="분양글 작성하기" href="/adoption/create" className="px-4" />
 
             <Container className="py-5">
