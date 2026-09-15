@@ -9,7 +9,7 @@ import { TEXT } from '@/shared/config'
 import { cn } from '@/shared/lib/cn'
 import { useToast } from '@/shared/lib/useToast'
 import { AlertCircleIcon, CheckIcon, CloseIcon, PlusIcon } from '@/shared/assets'
-import { AlertMessage, AsyncState, Button, Container, Textarea, NavigationBar } from '@/shared/ui'
+import { AlertMessage, AsyncState, Button, Container, Textarea } from '@/shared/ui'
 
 const MAX_QUESTIONS = 5
 const MIN_LENGTH = 2
@@ -89,7 +89,6 @@ const ApplicationFormContent = () => {
   if (!seeded) {
     return (
       <div className="flex w-full flex-col">
-        <NavigationBar title="신청서 질문 관리" backHref="/home" />
         <AsyncState
           status={formQuery.isError ? 'error' : 'loading'}
           message={
@@ -110,8 +109,6 @@ const ApplicationFormContent = () => {
 
   return (
     <div className="flex w-full flex-col">
-      <NavigationBar title="신청서 질문 관리" backHref="/home" />
-
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-8 px-5 pt-8 pb-36 tab:gap-10 tab:px-8 tab:pt-12">
         <header>
           <p className={cn(TEXT.meta, 'mb-2')}>입양 신청서 설정</p>
