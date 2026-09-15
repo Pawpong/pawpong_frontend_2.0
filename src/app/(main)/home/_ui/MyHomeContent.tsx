@@ -115,6 +115,15 @@ const MyHomeContent = () => {
             목록 위젯을 그대로 보여줘 따로 링크할 이유가 없다 */}
         {isBreeder && (
           <TabsContent value="listings" className="mt-0">
+            {myProfile?.longDescription && (
+              <Container className="pt-5">
+                <h2 className="mb-2 text-base font-semibold text-neutral-850">소개</h2>
+                <p className="text-sm leading-[1.5] whitespace-pre-wrap text-neutral-700">
+                  {myProfile.longDescription}
+                </p>
+              </Container>
+            )}
+
             <InputUpload text="분양글 작성하기" href="/adoption/create" className="px-4" />
 
             <Container className="py-5">
