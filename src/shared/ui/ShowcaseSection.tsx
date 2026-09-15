@@ -33,7 +33,8 @@ const ShowcaseSection = ({
         linkHref={linkHref}
         className="h-[1.875rem] justify-center pc:h-auto"
         titleClassName={cn(
-          'p-0 font-cafe24 text-xs leading-[1.5] font-normal whitespace-nowrap text-neutral-850 tab:text-sm pc:text-xl',
+          // 명예의 전당 타이틀(HallOfFame.tsx)과 같은 모바일 크기(text-sm)로 맞춘다
+          'p-0 font-cafe24 text-sm leading-[1.5] font-normal whitespace-nowrap text-neutral-850 pc:text-xl',
           titleClassName,
         )}
         linkClassName={cn('tab:text-xs pc:text-sm', linkClassName)}
