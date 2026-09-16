@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { breederQueries } from '@/entities/breeder'
 import { useSubmitVerificationDocuments, useUploadVerificationDocuments } from '@/features/breeder'
@@ -17,7 +16,7 @@ import {
   DocumentFilePicker,
   FooterCtaBar,
 } from '@/shared/ui'
-import type { BreederUploadDocumentType, BreederVerificationStatus } from '@/shared/types'
+import type { BreederUploadDocumentType } from '@/shared/types'
 
 const DOCUMENT_FIELDS: { type: BreederUploadDocumentType; label: string }[] = [
   { type: 'idCard', label: '신분증 사본' },
@@ -42,18 +41,8 @@ const STATUS_LABEL: Record<string, string> = {
   rejected: '반려됨',
 }
 
-const SAMPLE_REJECTION_REASON =
-  '서류 사진이 흐릿해서 확인이 어려워요. 선명한 사진으로 다시 제출해주세요.'
-
 const VerificationContent = () => {
   const toast = useToast()
-  // QA용 — ?previewStatus=reviewing|approved|rejected 등으로 실제 데이터 없이 상태별 UI를 확인한다.
-  // 서버 승인 로직과는 무관한 화면 표시 전용 오버라이드라 프로덕션에서는 막아둔다.
-  const searchParams = useSearchParams()
-  const previewStatus =
-    process.env.NODE_ENV !== 'production'
-      ? (searchParams.get('previewStatus') as BreederVerificationStatus | null)
-      : null
   const profileQuery = useQuery({ ...breederQueries.myProfile(), refetchOnMount: 'always' })
   const uploadDocs = useUploadVerificationDocuments()
   const submitDocs = useSubmitVerificationDocuments()
@@ -154,27 +143,21 @@ const VerificationContent = () => {
     )
   }
 
-  const displayStatus = previewStatus ?? verification.status
-  const displayRejectionReason =
-    displayStatus === 'rejected'
-      ? (verification.rejectionReason ?? SAMPLE_REJECTION_REASON)
-      : undefined
-
   return (
     <div className="flex w-full flex-col">
       <Container className="flex flex-col gap-6 px-4 pt-8 pb-[7.5rem] tab:px-20">
         <div className="flex flex-col gap-2">
           <p className="text-sm font-semibold text-neutral-850 tab:text-base">브리더 인증 서류</p>
           <Badge
-            variant={displayStatus === 'approved' ? 'primaryFilled' : 'default'}
+            variant={verification.status === 'approved' ? 'primaryFilled' : 'default'}
             size="md"
             className="w-fit"
           >
-            {STATUS_LABEL[displayStatus]}
+            {STATUS_LABEL[verification.status]}
           </Badge>
-          {displayRejectionReason && (
+          {verification.status === 'rejected' && verification.rejectionReason && (
             <p className="text-sm leading-[1.5] font-medium text-error-600">
-              반려 사유: {displayRejectionReason}
+              반려 사유: {verification.rejectionReason}
             </p>
           )}
         </div>
