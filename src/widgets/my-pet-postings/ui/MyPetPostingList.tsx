@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { FilterChip, InfiniteScrollTrigger, ListState, TextLabel } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
@@ -18,6 +18,8 @@ const DEFAULT_GRID = 'grid grid-cols-2 gap-x-3 gap-y-6 tab:grid-cols-3 pc:grid-c
 
 interface MyPetPostingListProps {
   pageSize: number
+  /** 라벨 줄 오른쪽 액션(분양글 작성 등) — 있으면 필터 칩은 다음 줄로 내려간다 */
+  action?: ReactNode
   /** 라벨 옆에 필터 적용 후 전체 개수 표시 (분양 페이지 시안의 '분양 목록 109') */
   showTotalCount?: boolean
   /** 그리드 간격 오버라이드 — 화면마다 시안 값이 다르다 */
@@ -30,6 +32,7 @@ interface MyPetPostingListProps {
  */
 const MyPetPostingList = ({
   pageSize,
+  action,
   showTotalCount = false,
   gridClassName,
 }: MyPetPostingListProps) => {
@@ -44,8 +47,13 @@ const MyPetPostingList = ({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between gap-2">
-        <TextLabel size="16">분양 목록{showTotalCount ? ` ${getTotalItems(data)}` : ''}</TextLabel>
+      <div className={cn('flex gap-2', action ? 'flex-col' : 'items-center justify-between')}>
+        <div className="flex items-center justify-between gap-2">
+          <TextLabel size="16">
+            분양 목록{showTotalCount ? ` ${getTotalItems(data)}` : ''}
+          </TextLabel>
+          {action}
+        </div>
 
         <div className="flex flex-wrap items-center gap-2">
           {STATUS_FILTERS.map((value) => (

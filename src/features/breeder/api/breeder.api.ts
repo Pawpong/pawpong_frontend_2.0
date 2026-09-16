@@ -1,6 +1,7 @@
 import { apiClient, API_VERSION, unwrap } from '@/shared/api'
 import type {
   ApiResponseFull,
+  BreederUploadDocumentType,
   ProfileUpdateRequestDto,
   BreederProfileUpdateResponseDto,
   ApplicationStatusUpdateRequest,
@@ -14,6 +15,9 @@ import type {
   ReviewReplyDeleteResponseDto,
   SimpleApplicationFormUpdateRequest,
   SimpleApplicationFormUpdateResponse,
+  SubmitVerificationDocumentsRequest,
+  UploadVerificationDocumentsResponse,
+  VerificationSubmitResponse,
   BreederAccountDeleteRequest,
   BreederAccountDeleteResponse,
 } from '@/shared/types'
@@ -24,6 +28,30 @@ export const updateBreederProfile = (data: ProfileUpdateRequestDto) =>
     .patch<
       ApiResponseFull<BreederProfileUpdateResponseDto>
     >(`${API_VERSION}/breeder-management/profile`, data)
+    .then(unwrap)
+
+// ==================== 인증 서류 재제출 ====================
+
+/** 인증 서류 업로드 — 새로 선택한 파일만 올린다 */
+export const uploadVerificationDocuments = (
+  files: { type: BreederUploadDocumentType; file: File }[],
+) => {
+  const formData = new FormData()
+  files.forEach(({ file }) => formData.append('files', file))
+  formData.append('types', JSON.stringify(files.map(({ type }) => type)))
+  return apiClient
+    .post<
+      ApiResponseFull<UploadVerificationDocumentsResponse>
+    >(`${API_VERSION}/breeder-management/verification/upload`, formData)
+    .then(unwrap)
+}
+
+/** 인증 서류 제출 — 기존 서류(변경 없음) + 새로 업로드한 서류를 합쳐 보낸다 */
+export const submitVerificationDocuments = (data: SubmitVerificationDocumentsRequest) =>
+  apiClient
+    .post<
+      ApiResponseFull<VerificationSubmitResponse>
+    >(`${API_VERSION}/breeder-management/verification/submit`, data)
     .then(unwrap)
 
 /** 신청 상태 변경 (브리더용) — applicationId는 URL과 body 둘 다 필요해 호출부 대신 여기서 채운다 */

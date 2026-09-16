@@ -1,6 +1,6 @@
 'use client'
 
-import type { ReactNode, SVGProps } from 'react'
+import type { ReactNode } from 'react'
 import Link from 'next/link'
 import { TabBar, TabBarList, TabsContent, TabsList, TabsTrigger, Tabs } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
@@ -11,7 +11,6 @@ interface HomeTabConfig {
   id: string
   label: string
   mobileLabel?: string
-  Icon?: (props: SVGProps<SVGSVGElement>) => React.ReactElement
 }
 
 interface HomeSideLink {
@@ -48,7 +47,6 @@ const toBarItems = (tabs: HomeTabConfig[]) =>
         ) : (
           tab.label
         )}
-        {tab.Icon && <tab.Icon className="size-6 shrink-0 tab:size-8" />}
       </span>
     ),
   }))
