@@ -32,7 +32,7 @@ const BREEDER_MY_HOME_TABS: HomeTabConfig[] = [
 // 마이홈 사이드바 하단 이동 링크 — 전체메뉴에만 있던 내 계정 화면들을 마이홈에 모은다
 const MY_HOME_SIDE_LINKS = [
   { label: '저장목록', href: '/bookmarks' },
-  { label: '입양 신청서', href: '/activity' },
+  { label: '신청·후기', href: '/activity' },
   { label: '설정', href: '/settings' },
 ]
 
