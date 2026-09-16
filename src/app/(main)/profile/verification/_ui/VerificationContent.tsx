@@ -23,6 +23,14 @@ const DOCUMENT_FIELDS: { type: BreederUploadDocumentType; label: string }[] = [
   { type: 'animalProductionLicense', label: '동물생산업 등록증' },
 ]
 
+// 백엔드가 저장 시 항상 snake_case로 정규화해서 GET 응답도 snake_case로 온다
+// (AuthBreederDocumentTypeService.toPersistedType / BreederManagementVerificationDocumentPolicyService
+// 의 DOCUMENT_TYPE_ALIASES와 동일한 매핑) — 조회 시 이 타입으로 변환해서 찾아야 기존 서류가 보인다.
+const PERSISTED_TYPE: Record<BreederUploadDocumentType, string> = {
+  idCard: 'id_card',
+  animalProductionLicense: 'animal_production_license',
+}
+
 const STATUS_LABEL: Record<string, string> = {
   not_submitted: '아직 제출하지 않았어요',
   pending: '제출 완료 · 심사 대기 중',
@@ -41,8 +49,9 @@ const VerificationContent = () => {
 
   const verification = profileQuery.data?.verificationInfo
   const existingByType = new Map((verification?.documents ?? []).map((doc) => [doc.type, doc]))
+  const getExisting = (type: BreederUploadDocumentType) => existingByType.get(PERSISTED_TYPE[type])
   const isSubmitting = uploadDocs.isPending || submitDocs.isPending
-  const hasAnyDocument = DOCUMENT_FIELDS.some(({ type }) => files[type] || existingByType.has(type))
+  const hasAnyDocument = DOCUMENT_FIELDS.some(({ type }) => files[type] || getExisting(type))
 
   const handleFileSelect = (type: BreederUploadDocumentType) => (file: File) => {
     setFiles((prev) => ({ ...prev, [type]: file }))
@@ -73,7 +82,7 @@ const VerificationContent = () => {
             },
           ]
         }
-        const existing = existingByType.get(type)
+        const existing = getExisting(type)
         if (existing?.fileName) {
           return [
             { type, fileName: existing.fileName, originalFileName: existing.originalFileName },
@@ -132,7 +141,7 @@ const VerificationContent = () => {
 
         <div className="flex flex-col gap-3">
           {DOCUMENT_FIELDS.map(({ type, label }) => {
-            const existing = existingByType.get(type)
+            const existing = getExisting(type)
             const selectedFileName =
               files[type]?.name ?? existing?.originalFileName ?? existing?.fileName
             return (
