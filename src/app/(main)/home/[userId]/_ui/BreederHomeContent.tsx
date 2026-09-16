@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { AsyncState, Button } from '@/shared/ui'
+import { AsyncState, Button, Container } from '@/shared/ui'
 import { transientQueryRecoveryOptions } from '@/shared/api'
 import { breederQueries } from '@/entities/breeder'
 import { HomeTabs, TabsContent } from '../../_ui/HomeTabs'
@@ -56,6 +56,14 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
         sidebar={<ProfileCard profile={profile} mode="breeder" layout="sidebar" />}
       >
         <TabsContent value="listings" className="mt-0">
+          {profile.longDescription && (
+            <Container className="pt-5">
+              <h2 className="mb-2 text-base font-semibold text-neutral-850">소개</h2>
+              <p className="text-sm leading-[1.5] whitespace-pre-wrap text-neutral-700">
+                {profile.longDescription}
+              </p>
+            </Container>
+          )}
           <PublicBreederListings breederId={profile.breederId} gridClassName={CARD_GRID} />
         </TabsContent>
 
