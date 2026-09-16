@@ -1,4 +1,3 @@
-import { SearchIcon } from '@/shared/ui'
 import type { HomeTabConfig } from './HomeTabs'
 
 // [refactored] 탭 항목 단일 출처 — 여러 탭셋에서 공유하는 항목 중복 제거
@@ -10,7 +9,7 @@ const HOME_TAB = {
   feed: { id: 'posts', label: '피드' },
   reviews: { id: 'reviews', label: '후기' },
   myPosts: { id: 'posts', label: '내가 쓴 글' },
-  favoriteBreeders: { id: 'breeders', label: '즐겨찾는 브리더', Icon: SearchIcon },
+  favoriteBreeders: { id: 'breeders', label: '즐겨찾는 브리더' },
 } satisfies Record<string, HomeTabConfig>
 
 // [refactored] 배열은 항목 조합만 담당
