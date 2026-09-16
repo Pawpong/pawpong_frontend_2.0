@@ -56,7 +56,7 @@ const DocumentFilePicker = ({
       >
         {previewUrl ? (
           // eslint-disable-next-line @next/next/no-img-element -- blob:/signed URL이라 next/image 도메인 허용이 안 됨
-          <img src={previewUrl} alt="" className="size-9 shrink-0 rounded-lg object-cover" />
+          <img src={previewUrl} alt="" className="size-16 shrink-0 rounded-lg object-cover" />
         ) : (
           <span
             className={cn(
