@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { breederQueries } from '@/entities/breeder'
 import { useSubmitVerificationDocuments, useUploadVerificationDocuments } from '@/features/breeder'
@@ -31,6 +31,8 @@ const PERSISTED_TYPE: Record<BreederUploadDocumentType, string> = {
   animalProductionLicense: 'animal_production_license',
 }
 
+const isImageFile = (name?: string) => !!name && /\.(jpe?g|png|webp|gif)$/i.test(name)
+
 const STATUS_LABEL: Record<string, string> = {
   not_submitted: '아직 제출하지 않았어요',
   pending: '제출 완료 · 심사 대기 중',
@@ -46,6 +48,20 @@ const VerificationContent = () => {
   const submitDocs = useSubmitVerificationDocuments()
 
   const [files, setFiles] = useState<Partial<Record<BreederUploadDocumentType, File>>>({})
+  // 새로 고른 이미지 파일의 로컬 미리보기(blob:) — 언마운트 시 한 번에 해제한다
+  const [localPreviews, setLocalPreviews] = useState<
+    Partial<Record<BreederUploadDocumentType, string>>
+  >({})
+  const localPreviewsRef = useRef(localPreviews)
+  useEffect(() => {
+    localPreviewsRef.current = localPreviews
+  }, [localPreviews])
+  useEffect(
+    () => () => {
+      Object.values(localPreviewsRef.current).forEach((url) => url && URL.revokeObjectURL(url))
+    },
+    [],
+  )
 
   const verification = profileQuery.data?.verificationInfo
   const existingByType = new Map((verification?.documents ?? []).map((doc) => [doc.type, doc]))
@@ -55,6 +71,13 @@ const VerificationContent = () => {
 
   const handleFileSelect = (type: BreederUploadDocumentType) => (file: File) => {
     setFiles((prev) => ({ ...prev, [type]: file }))
+    setLocalPreviews((prev) => {
+      if (prev[type]) URL.revokeObjectURL(prev[type]!)
+      return {
+        ...prev,
+        [type]: file.type.startsWith('image/') ? URL.createObjectURL(file) : undefined,
+      }
+    })
   }
 
   const handleSubmit = async () => {
@@ -144,11 +167,17 @@ const VerificationContent = () => {
             const existing = getExisting(type)
             const selectedFileName =
               files[type]?.name ?? existing?.originalFileName ?? existing?.fileName
+            const existingImageUrl =
+              existing && isImageFile(existing.originalFileName ?? existing.fileName)
+                ? existing.url
+                : undefined
+            const previewUrl = localPreviews[type] ?? existingImageUrl
             return (
               <DocumentFilePicker
                 key={type}
                 label={label}
                 selectedFileName={selectedFileName}
+                previewUrl={previewUrl}
                 disabled={isSubmitting}
                 onFileSelect={handleFileSelect(type)}
               />

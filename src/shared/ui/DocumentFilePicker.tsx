@@ -8,6 +8,8 @@ interface DocumentFilePickerProps {
   label: string
   description?: string
   selectedFileName?: string
+  /** 이미지 서류의 미리보기 URL (로컬 blob: 또는 서버 signed URL). PDF 등은 생략 — 아이콘으로 대체 */
+  previewUrl?: string
   accept?: string
   error?: string
   disabled?: boolean
@@ -20,6 +22,7 @@ const DocumentFilePicker = ({
   label,
   description,
   selectedFileName,
+  previewUrl,
   accept = 'image/jpeg,image/png,image/webp,application/pdf',
   error,
   disabled = false,
@@ -51,18 +54,25 @@ const DocumentFilePicker = ({
               : 'border-neutral-300',
         )}
       >
-        <span
-          className={cn(
-            'flex size-9 shrink-0 items-center justify-center rounded-lg',
-            selectedFileName ? 'bg-primary-50 text-primary-500' : 'bg-neutral-50 text-neutral-700',
-          )}
-        >
-          {selectedFileName ? (
-            <CheckRoundedIcon className="size-5" aria-hidden />
-          ) : (
-            <FileIcon className="size-6" aria-hidden />
-          )}
-        </span>
+        {previewUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element -- blob:/signed URL이라 next/image 도메인 허용이 안 됨
+          <img src={previewUrl} alt="" className="size-9 shrink-0 rounded-lg object-cover" />
+        ) : (
+          <span
+            className={cn(
+              'flex size-9 shrink-0 items-center justify-center rounded-lg',
+              selectedFileName
+                ? 'bg-primary-50 text-primary-500'
+                : 'bg-neutral-50 text-neutral-700',
+            )}
+          >
+            {selectedFileName ? (
+              <CheckRoundedIcon className="size-5" aria-hidden />
+            ) : (
+              <FileIcon className="size-6" aria-hidden />
+            )}
+          </span>
+        )}
 
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span className="text-sm font-semibold text-neutral-850 tab:text-base">{label}</span>
