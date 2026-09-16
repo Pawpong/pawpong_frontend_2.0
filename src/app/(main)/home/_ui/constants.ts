@@ -39,7 +39,7 @@ const MY_HOME_SIDE_LINKS = [
 // 브리더 마이홈 전용 — 신청서 질문 관리는 브리더만 쓴다
 const BREEDER_MY_HOME_SIDE_LINKS = [
   { label: '저장목록', href: '/bookmarks' },
-  { label: '입양 신청서', href: '/activity' },
+  { label: '신청·후기', href: '/activity' },
   { label: '신청서 질문 관리', href: '/adoption/application-form' },
   { label: '설정', href: '/settings' },
 ]
