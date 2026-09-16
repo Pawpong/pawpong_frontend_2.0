@@ -4,14 +4,16 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import { BookmarkIcon } from '@/shared/assets'
-import { Button, Container, InputUpload, NavigationBar } from '@/shared/ui'
+import { Button, buttonVariants, Container, InputUpload, NavigationBar } from '@/shared/ui'
 import { transientQueryRecoveryOptions } from '@/shared/api'
+import { cn } from '@/shared/lib/cn'
 import { profileQueries } from '@/entities/profile'
 import { communityQueries } from '@/entities/community'
 // [refactored] 분양 페이지와 동일한 목록 블록 — 위젯으로 공유
 import { MyPetPostingList } from '@/widgets/my-pet-postings'
 import { toMyProfileCardProps } from '../_lib/toMyProfileCardProps'
 import { ProfileCard } from './ProfileCard'
+import { BreederIntroduction } from './BreederIntroduction'
 import { HomeTabs, TabsContent } from './HomeTabs'
 import { FavoriteBreedersContent } from './FavoriteBreedersContent'
 import { HomePostGrid } from './HomePostGrid'
@@ -116,20 +118,27 @@ const MyHomeContent = () => {
             목록 위젯을 그대로 보여줘 따로 링크할 이유가 없다 */}
         {isBreeder && (
           <TabsContent value="listings" className="mt-0">
-            {myProfile?.longDescription && (
-              <Container className="pt-5">
-                <h2 className="mb-2 text-base font-semibold text-neutral-850">소개</h2>
-                <p className="text-sm leading-[1.5] whitespace-pre-wrap text-neutral-700">
-                  {myProfile.longDescription}
-                </p>
-              </Container>
-            )}
+            <BreederIntroduction
+              nickname={profileCardProps.profile.nickname}
+              description={myProfile?.longDescription}
+              editHref="/profile/edit"
+            />
 
-            <InputUpload text="분양글 작성하기" href="/adoption/create" className="px-4" />
-
+            {/* 작성 버튼은 목록 라벨 줄에 붙인다 — 소개 카드와 목록 사이에 혼자 떠 있지 않게 */}
             <Container className="py-5">
               <MyPetPostingList
                 pageSize={HOME_LISTING_PAGE_SIZE}
+                action={
+                  <Link
+                    href="/adoption/create"
+                    className={cn(
+                      buttonVariants({ variant: 'primary', size: 'sm' }),
+                      'shrink-0 px-4',
+                    )}
+                  >
+                    분양글 작성하기
+                  </Link>
+                }
                 gridClassName={`${CARD_GRID} pc:gap-x-[1.375rem]`}
               />
             </Container>

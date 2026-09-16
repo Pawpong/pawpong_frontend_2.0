@@ -2,12 +2,13 @@
 
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { AsyncState, Button, Container } from '@/shared/ui'
+import { AsyncState, Button } from '@/shared/ui'
 import { transientQueryRecoveryOptions } from '@/shared/api'
 import { breederQueries } from '@/entities/breeder'
 import { HomeTabs, TabsContent } from '../../_ui/HomeTabs'
 import { BREEDER_HOME_TABS, CARD_GRID, PHOTO_GRID } from '../../_ui/constants'
 import { ProfileCard } from '../../_ui/ProfileCard'
+import { BreederIntroduction } from '../../_ui/BreederIntroduction'
 import { PublicBreederListings } from './PublicBreederListings'
 import { PublicBreederReviews } from './PublicBreederReviews'
 import { PublicHomePosts } from './PublicHomePosts'
@@ -56,14 +57,7 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
         sidebar={<ProfileCard profile={profile} mode="breeder" layout="sidebar" />}
       >
         <TabsContent value="listings" className="mt-0">
-          {profile.longDescription && (
-            <Container className="pt-5">
-              <h2 className="mb-2 text-base font-semibold text-neutral-850">소개</h2>
-              <p className="text-sm leading-[1.5] whitespace-pre-wrap text-neutral-700">
-                {profile.longDescription}
-              </p>
-            </Container>
-          )}
+          <BreederIntroduction nickname={profile.nickname} description={profile.longDescription} />
           <PublicBreederListings breederId={profile.breederId} gridClassName={CARD_GRID} />
         </TabsContent>
 
