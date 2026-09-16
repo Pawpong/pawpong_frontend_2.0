@@ -1,13 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
-import {
-  Container,
-  EmptyState,
-  ImageDetailModal,
-  ListingCardGrid,
-  NavigationBar,
-} from '@/shared/ui'
+import { Container, EmptyState, ImageDetailModal, ListingCardGrid } from '@/shared/ui'
 import { useImageModal } from '@/shared/lib/useImageModal'
 import { FavoriteAdoptionGridCard, useToggleAdoptionFavorite } from '@/features/adoption'
 import { useMe } from '@/features/auth'
@@ -37,7 +30,6 @@ interface AdoptionDetailContentProps {
    - 관심 상태도 레일(관심 버튼)/CTA바가 공유하므로 여기서 보관
    ═══════════════════════════════════════════════ */
 const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
-  const router = useRouter()
   const { imageModalOpen, setImageModalOpen, modalImages, modalInitialIndex, openImageModal } =
     useImageModal(detail.imageUrls)
   // listingId = petId (mapAdoptionDetail)
@@ -73,9 +65,6 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
 
   return (
     <div className="pb-24 lap:pb-10">
-      {/* Figma 976:25819 — 공용 40px 뒤로가기와 가운데 제목. 레일이 이름을 갖고 있어 2단에선 숨긴다. */}
-      <NavigationBar title={detail.name} onBack={() => router.back()} className="lap:hidden" />
-
       <Container className="px-4 py-4 lap:flex lap:items-start lap:gap-8 lap:py-8 pc:gap-10 pc:py-10">
         <AdoptionDetailRail
           detail={detail}
