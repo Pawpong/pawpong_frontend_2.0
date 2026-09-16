@@ -70,6 +70,34 @@ export interface BreederVerificationDto {
   documents?: BreederDocumentDto[]
 }
 
+/** 인증 서류 업로드 응답 (POST /breeder-management/verification/upload) */
+export interface UploadedVerificationDocumentDto {
+  type: string
+  url: string
+  fileName: string
+  size: number
+  originalFileName?: string
+}
+
+export interface UploadVerificationDocumentsResponse {
+  count: number
+  documents: UploadedVerificationDocumentDto[]
+}
+
+/** 인증 서류 제출 요청 (POST /breeder-management/verification/submit) */
+export interface SubmitVerificationDocumentsRequest {
+  documents: Array<{
+    type: string
+    fileName: string
+    originalFileName?: string
+  }>
+  submittedByEmail?: boolean
+}
+
+export interface VerificationSubmitResponse {
+  message: string
+}
+
 // ==================== 반려동물 ====================
 
 /** 반려동물 공통 베이스 */

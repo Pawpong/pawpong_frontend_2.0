@@ -72,8 +72,9 @@ const BreederRow = ({ breeder }: { breeder: AdoptionDetailDto['breeder'] }) => {
   // 브리더 신고는 입양자(비로그인 포함)에게만 보인다
   const canReportBreeder = isReady && (!isLoggedIn || userRole === 'adopter')
 
-  return (
-    <div className="flex w-full items-center gap-2">
+  const homeHref = `/home/${breeder.id}`
+  const identity = (
+    <>
       <ProfileAvatar
         src={breeder.profileImageUrl}
         alt={breeder.nickname}
@@ -83,12 +84,25 @@ const BreederRow = ({ breeder }: { breeder: AdoptionDetailDto['breeder'] }) => {
       <p className={cn(TEXT.body, 'min-w-0 flex-1 truncate')}>
         {isWithdrawn ? '탈퇴한 브리더' : breeder.nickname}
       </p>
+    </>
+  )
+
+  return (
+    <div className="flex w-full items-center gap-2">
+      {/* 아바타·닉네임도 브리더홈으로 — 우측 '브리더홈 >' 과 같은 목적지 */}
+      {isWithdrawn ? (
+        identity
+      ) : (
+        <Link
+          href={homeHref}
+          className="flex min-w-0 flex-1 items-center gap-2 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+        >
+          {identity}
+        </Link>
+      )}
       {!isWithdrawn && (
         <div className="flex shrink-0 items-center gap-1">
-          <Link
-            href={`/home/${breeder.id}`}
-            className={cn(TEXT.sub, 'flex items-center text-neutral-850')}
-          >
+          <Link href={homeHref} className={cn(TEXT.sub, 'flex items-center text-neutral-850')}>
             브리더홈
             <ArrowRightIcon className="size-5" />
           </Link>
