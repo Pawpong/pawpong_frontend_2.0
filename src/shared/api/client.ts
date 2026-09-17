@@ -21,12 +21,16 @@ const getBaseURL = () => (process.env.NEXT_PUBLIC_API_BASE_URL ?? '').replace(/\
 
 let isRefreshing = false
 let failedQueue: Array<{
-  resolve: (value?: unknown) => void
+  resolve: (accessToken?: string) => void
   reject: (reason?: unknown) => void
 }> = []
 
-const processQueue = (error: Error | null) => {
-  failedQueue.forEach((prom) => (error ? prom.reject(error) : prom.resolve()))
+const setAuthorizationHeader = (config: InternalAxiosRequestConfig, accessToken: string) => {
+  config.headers['Authorization'] = `Bearer ${accessToken}`
+}
+
+const processQueue = (error: Error | null, accessToken?: string) => {
+  failedQueue.forEach((prom) => (error ? prom.reject(error) : prom.resolve(accessToken)))
   failedQueue = []
 }
 
@@ -89,10 +93,13 @@ function createApiClient(): AxiosInstance {
         }
 
         if (isRefreshing) {
-          return new Promise((resolve, reject) => {
+          return new Promise<string | undefined>((resolve, reject) => {
             failedQueue.push({ resolve, reject })
           })
-            .then(() => instance(originalRequest))
+            .then((accessToken) => {
+              if (accessToken) setAuthorizationHeader(originalRequest, accessToken)
+              return instance(originalRequest)
+            })
             .catch((err) => Promise.reject(err))
         }
 
@@ -114,23 +121,27 @@ function createApiClient(): AxiosInstance {
             throw new ApiError('토큰 갱신 실패', refreshResponse.status, undefined, refreshData)
           }
 
-          if (refreshData.data?.accessToken && refreshData.data?.refreshToken) {
+          const nextAccessToken = refreshData.data?.accessToken
+          const nextRefreshToken = refreshData.data?.refreshToken
+
+          if (nextAccessToken && nextRefreshToken) {
             const saved = await fetch('/api/auth/set-cookie', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                accessToken: refreshData.data.accessToken,
-                refreshToken: refreshData.data.refreshToken,
+                accessToken: nextAccessToken,
+                refreshToken: nextRefreshToken,
               }),
             })
             if (!saved.ok) throw new ApiError('인증 쿠키 저장 실패', 401)
           }
 
-          if (!refreshData.data?.accessToken || getAccessToken() !== refreshData.data.accessToken) {
+          if (!nextAccessToken || getAccessToken() !== nextAccessToken) {
             throw new ApiError('인증 쿠키 저장 실패', 401)
           }
           notifyAuthStateChanged()
-          processQueue(null)
+          processQueue(null, nextAccessToken)
+          setAuthorizationHeader(originalRequest, nextAccessToken)
           return instance(originalRequest)
         } catch (refreshError) {
           processQueue(
