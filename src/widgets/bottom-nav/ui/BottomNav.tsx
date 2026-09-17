@@ -8,7 +8,37 @@ import { cn } from '@/shared/lib/cn'
 import { MAIN_NAV } from '@/shared/config'
 import { useMe } from '@/features/auth'
 
-const BOTTOM_NAV_PATHS = new Set(['/', '/explore', '/chat', '/community', '/home'])
+// 하단 네비를 노출할 화면. 전체 메뉴로 들어가는 화면들도 포함해, 메뉴를 거쳐 온 뒤에도
+// 탐색·커뮤니티·마이홈으로 돌아갈 진입점이 사라지지 않게 한다.
+const BOTTOM_NAV_PATHS = new Set([
+  '/',
+  '/explore',
+  '/chat',
+  '/community',
+  '/home',
+  '/settings',
+  '/activity',
+  '/bookmarks',
+  '/notifications',
+  '/notices',
+  '/hall-of-fame',
+  '/faq',
+  '/about',
+  '/adoption/drafts',
+  '/adoption/my-listings',
+  '/community/drafts',
+])
+
+// 목록에서 들어간 상세도 같은 네비를 유지한다
+const BOTTOM_NAV_PREFIXES = ['/activity/', '/notices/', '/home/']
+
+// 자체 하단 고정 바(FooterCtaBar·AdoptionCtaBar)가 있는 작성·편집·신청 화면은 겹치므로 제외한다
+const BOTTOM_NAV_EXCLUDED = /\/(write|edit|apply|create|participate)$/
+
+const shouldShowBottomNav = (pathname: string) =>
+  !BOTTOM_NAV_EXCLUDED.test(pathname) &&
+  (BOTTOM_NAV_PATHS.has(pathname) ||
+    BOTTOM_NAV_PREFIXES.some((prefix) => pathname.startsWith(prefix)))
 
 // 하단 내비게이션 전용 Figma 원본. 데스크톱 헤더 아이콘은 유지한다.
 const BOTTOM_ICONS: Record<string, string> = {
@@ -89,7 +119,7 @@ const BottomNavContent = ({ pathname }: { pathname: string }) => {
 const BottomNav = () => {
   const pathname = usePathname()
 
-  if (!BOTTOM_NAV_PATHS.has(pathname)) return null
+  if (!shouldShowBottomNav(pathname)) return null
 
   return (
     <Suspense fallback={pathname === '/chat' ? null : <BottomNavView pathname={pathname} />}>
