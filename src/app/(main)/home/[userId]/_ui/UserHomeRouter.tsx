@@ -25,11 +25,7 @@ const UserHomeRouter = ({ userId }: UserHomeRouterProps) => {
     refetchOnMount: 'always',
     throwOnError: false,
   })
-  const {
-    data: myProfile,
-    isPending: isMyProfilePending,
-    isError: isMyProfileError,
-  } = myProfileQuery
+  const { data: myProfile, isPending: isMyProfilePending } = myProfileQuery
   const isMine = myProfile?.userId === userId
 
   const adopterProfileQuery = useQuery({
@@ -63,21 +59,11 @@ const UserHomeRouter = ({ userId }: UserHomeRouterProps) => {
   }
   if (isMine) return null
 
-  // 로그인했지만 내 신원을 확인하지 못하면 자기 자신에게 방문자 액션을 노출할 수 있으므로 중단한다.
-  if (isLoggedIn && isMyProfileError) {
-    return (
-      <AsyncState
-        status="error"
-        message="프로필을 불러오지 못했습니다."
-        action={
-          <Button variant="fill" size="sm" onClick={() => void myProfileQuery.refetch()}>
-            다시 시도
-          </Button>
-        }
-        className="min-h-[calc(100dvh-3.5rem)]"
-      />
-    )
-  }
+  // /profile/me 실패로는 화면을 막지 않는다. 이 값은 '내 홈인지' 판정에만 쓰이는데,
+  // 서버가 브리더 계정에 간헐적으로 400 을 내면서 남의 브리더홈까지 통째로 막혔다.
+  // 본인 홈을 URL 로 직접 연 경우에만 즐겨찾기 버튼이 잠깐 보일 수 있고,
+  // transientQueryRecoveryOptions 로 재조회가 성공하면 /home 으로 리다이렉트된다.
+  // (신고 버튼은 쿠키의 userRole 로 이미 막혀 있어 이 경로와 무관하다)
 
   if (isAdopterError && isNotAdopter) {
     return <BreederHomeContent userId={userId} />
