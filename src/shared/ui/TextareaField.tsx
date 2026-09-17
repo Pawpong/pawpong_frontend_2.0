@@ -49,8 +49,9 @@ const TextareaField = React.forwardRef<HTMLTextAreaElement, TextareaFieldProps>(
     const showCounter = maxLength !== undefined && currentLength !== undefined
     const filled = (currentLength ?? 0) > 0
 
-    // border: error > 명시적 state > 입력값(fill) > default (focus/disabled는 Textarea 의사클래스)
-    const resolvedState = error ? 'error' : (state ?? (filled ? 'fill' : 'default'))
+    // border: error > 명시적 state > default (focus/disabled는 Textarea 의사클래스).
+    // 입력값 유무로는 바꾸지 않는다 — 같은 폼의 Input 은 fill 상태가 없어 textarea 만 진해 보였다.
+    const resolvedState = error ? 'error' : (state ?? 'default')
 
     // 색 tone: 위에서부터 처음 충족하는 status (없으면 default). 라벨은 disabled에만 반응
     const toneRules: [boolean, CounterTone][] = [
