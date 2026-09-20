@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
+import { RepresentativePhoto } from '@/shared/ui/RepresentativePhoto'
 import Link from 'next/link'
 import { PixelArrowRightIcon } from '@/shared/assets'
 import { Container } from '@/shared/ui'
@@ -74,12 +74,10 @@ const BreederIntroduction = ({
                     key={`${url}-${index}`}
                     className="relative aspect-square shrink-0 overflow-hidden rounded bg-neutral-100 tab:size-56"
                   >
-                    <Image
+                    <RepresentativePhoto
                       src={url}
                       alt={`${nickname} 대표 사진 ${index + 1}`}
-                      fill
                       sizes="(max-width: 767px) 33vw, 14rem"
-                      className="object-cover"
                     />
                   </div>
                 ))}

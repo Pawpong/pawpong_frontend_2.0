@@ -15,6 +15,18 @@ export function validatePhoto(file: File) {
   }
 }
 
+export async function isHeifPhoto(blob: Blob): Promise<boolean> {
+  const bytes = new Uint8Array(await blob.slice(0, 64).arrayBuffer())
+  const text = String.fromCharCode(...bytes)
+  if (text.slice(4, 8) !== 'ftyp') return false
+  for (let offset = 8; offset + 4 <= bytes.length; offset += 4) {
+    if (offset === 12) continue // minor version, not a brand
+    if (/^(heic|heix|hevc|hevx|heim|heis|mif1|msf1)$/.test(text.slice(offset, offset + 4)))
+      return true
+  }
+  return false
+}
+
 async function decodePhoto(blob: Blob): Promise<HTMLImageElement> {
   const url = URL.createObjectURL(blob)
   try {
@@ -35,7 +47,11 @@ export async function preparePhoto(file: File): Promise<File> {
   try {
     image = await decodePhoto(file)
   } catch {
-    if (!/\.(heic|heif)$/i.test(file.name) && !/^image\/hei[cf]/i.test(file.type)) {
+    if (
+      !/\.(heic|heif)$/i.test(file.name) &&
+      !/^image\/hei[cf]/i.test(file.type) &&
+      !(await isHeifPhoto(file))
+    ) {
       throw new Error('사진을 읽을 수 없습니다. 파일이 손상되었거나 지원하지 않는 형식입니다.')
     }
     try {
