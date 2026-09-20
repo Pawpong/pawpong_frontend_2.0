@@ -2,17 +2,14 @@
 
 import { useState, type ReactNode } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { FilterChip, InfiniteScrollTrigger, ListState, TextLabel } from '@/shared/ui'
+import { InfiniteScrollTrigger, ListState, TextLabel } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { flattenPages, getTotalItems } from '@/shared/lib/infiniteList'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
 import type { PetStatus } from '@/shared/types'
-import { ADOPTION_CARD_STATUS, AdoptionGridCard } from '@/entities/adoption'
+import { AdoptionGridCard, PetStatusFilter } from '@/entities/adoption'
 import { petPostingQueries } from '@/entities/pet-posting'
 import { mapMyPetPostingCard } from '../model/mapMyPetPostingCard'
-
-// 상태 목록·라벨 단일 소스는 ADOPTION_CARD_STATUS (카드 뱃지와 같은 곳)
-const STATUS_FILTERS = Object.keys(ADOPTION_CARD_STATUS) as PetStatus[]
 
 const DEFAULT_GRID = 'grid grid-cols-2 gap-x-3 gap-y-6 tab:grid-cols-3 pc:grid-cols-4'
 
@@ -55,22 +52,7 @@ const MyPetPostingList = ({
           {action}
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          {/* 전체 — 상태 미지정(null)이 곧 전체라 따로 값을 두지 않는다 */}
-          <FilterChip size="responsive" selected={status === null} onClick={() => setStatus(null)}>
-            전체
-          </FilterChip>
-          {STATUS_FILTERS.map((value) => (
-            <FilterChip
-              key={value}
-              size="responsive"
-              selected={status === value}
-              onClick={() => setStatus(status === value ? null : value)}
-            >
-              {ADOPTION_CARD_STATUS[value].label}
-            </FilterChip>
-          ))}
-        </div>
+        <PetStatusFilter value={status} onChange={setStatus} />
       </div>
 
       <ListState
