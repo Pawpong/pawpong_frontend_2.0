@@ -35,8 +35,10 @@ const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
           className={cn(
             'fixed inset-0 z-modal flex min-w-0 flex-col overflow-y-auto bg-white',
             'data-[state=closed]:opacity-0 data-[state=open]:opacity-100',
-            // pc: 링크 8개 때문에 1440px 화면을 통째로 덮을 이유가 없다 — 우측 상단 패널로 띄운다
-            'pc:inset-auto pc:top-[4.5rem] pc:right-20 pc:h-auto pc:w-[18rem] pc:rounded-2xl pc:border pc:border-neutral-150 pc:shadow-[0_12px_24px_rgba(55,55,55,0.12)]',
+            // pc: 링크 8개 때문에 1440px 화면을 통째로 덮을 이유가 없다 — 우측 상단 패널로 띄운다.
+            // right 는 뷰포트가 셸(1440)보다 넓을 때(브라우저 축소 등) ☰ 버튼을 따라가도록
+            // 셸 우측 거터 기준으로 계산한다: max(80px, (100vw-1440)/2 + 80px) = max(5rem, 50vw-40rem)
+            'pc:inset-auto pc:top-[4.5rem] pc:right-[max(5rem,50vw_-_40rem)] pc:h-auto pc:w-[18rem] pc:rounded-2xl pc:border pc:border-neutral-150 pc:shadow-[0_12px_24px_rgba(55,55,55,0.12)]',
           )}
         >
           <DialogPrimitive.Title className="sr-only">전체 메뉴</DialogPrimitive.Title>

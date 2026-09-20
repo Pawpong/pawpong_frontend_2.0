@@ -54,7 +54,8 @@ const AdoptionCtaBar = ({
         'flex items-center gap-[0.625rem]',
         isInline
           ? 'w-full'
-          : 'fixed right-0 bottom-0 left-0 z-10 justify-center bg-white px-[1rem] py-[1rem] tab:justify-end tab:gap-[1.25rem] tab:px-[3rem] tab:py-[0.75rem] pc:px-[5rem]',
+          : // 바는 전폭이지만 내용 패딩은 셸(콘텐츠 1280) 기준 — 뷰포트가 셸보다 넓어도 버튼이 창 끝에 붙지 않게
+            'fixed right-0 bottom-0 left-0 z-10 justify-center bg-white px-[1rem] py-[1rem] tab:justify-end tab:gap-[1.25rem] tab:px-[max(3rem,50vw_-_40rem)] tab:py-[0.75rem] pc:px-[max(5rem,50vw_-_40rem)]',
       )}
     >
       {/* 탭·pc 우측 정렬용 좌측 스페이서 (피그마 flex-1 h-45) */}
