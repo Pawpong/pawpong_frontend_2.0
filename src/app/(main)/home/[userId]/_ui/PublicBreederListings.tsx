@@ -2,25 +2,15 @@
 
 import { useState } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import {
-  Button,
-  Container,
-  FilterChip,
-  InfiniteScrollTrigger,
-  ListState,
-  ListingCardGrid,
-} from '@/shared/ui'
+import { Button, Container, InfiniteScrollTrigger, ListState, ListingCardGrid } from '@/shared/ui'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
 import { flattenPages, getTotalItems } from '@/shared/lib/infiniteList'
 import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
 import type { PetStatus } from '@/shared/types'
-import { ADOPTION_CARD_STATUS, adoptionQueries } from '@/entities/adoption'
+import { PetStatusFilter, adoptionQueries } from '@/entities/adoption'
 import { FavoriteAdoptionGridCard } from '@/features/adoption'
 
 const HOME_LISTING_PAGE_SIZE = 16
-
-// 상태 목록·라벨 단일 소스는 ADOPTION_CARD_STATUS (카드 뱃지·마이홈 필터와 같은 곳)
-const STATUS_FILTERS = Object.keys(ADOPTION_CARD_STATUS) as PetStatus[]
 
 interface PublicBreederListingsProps {
   breederId: string
@@ -58,18 +48,7 @@ const PublicBreederListings = ({ breederId, gridClassName }: PublicBreederListin
             전체 분양건 {totalItems}
           </p>
 
-          <div className="flex flex-wrap items-center gap-2">
-            {STATUS_FILTERS.map((value) => (
-              <FilterChip
-                key={value}
-                size="responsive"
-                selected={status === value}
-                onClick={() => setStatus(status === value ? null : value)}
-              >
-                {ADOPTION_CARD_STATUS[value].label}
-              </FilterChip>
-            ))}
-          </div>
+          <PetStatusFilter value={status} onChange={setStatus} />
         </div>
 
         <ListState
