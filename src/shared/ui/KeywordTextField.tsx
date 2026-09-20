@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Input } from '@/shared/ui'
+import { Input } from './Input'
 
 interface KeywordTextFieldProps {
   value: string[]

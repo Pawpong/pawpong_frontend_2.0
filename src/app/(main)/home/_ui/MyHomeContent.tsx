@@ -121,6 +121,7 @@ const MyHomeContent = () => {
             <BreederIntroduction
               nickname={profileCardProps.profile.nickname}
               description={myProfile?.longDescription}
+              photos={myProfile?.representativePhotos}
               editHref="/profile/edit"
             />
 

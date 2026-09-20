@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { PixelArrowRightIcon } from '@/shared/assets'
 import { Container } from '@/shared/ui'
@@ -9,6 +10,8 @@ import { cn } from '@/shared/lib/cn'
 interface BreederIntroductionProps {
   nickname: string
   description?: string
+  /** 대표 사진 (최대 3장) — 구분선 아래, 소개글 위 */
+  photos?: string[]
   /** 마이홈에서만 — 수정 링크와 빈 상태 안내를 노출 */
   editHref?: string
 }
@@ -24,12 +27,18 @@ const CLAMP_LINES = 4
  * 껍데기(프레임·타이틀·화살표)만 픽셀, 본문은 Pretendard 로 가독성을 지킨다.
  * blur 없는 오프셋 그림자가 픽셀 인상의 대부분을 만든다.
  */
-const BreederIntroduction = ({ nickname, description, editHref }: BreederIntroductionProps) => {
+const BreederIntroduction = ({
+  nickname,
+  description,
+  photos,
+  editHref,
+}: BreederIntroductionProps) => {
   const [expanded, setExpanded] = useState(false)
   const hasDescription = Boolean(description?.trim())
+  const shownPhotos = photos?.slice(0, 3) ?? []
 
-  // 공개 홈에서 소개가 없으면 섹션 자체를 그리지 않는다
-  if (!hasDescription && !editHref) return null
+  // 공개 홈에서 보여줄 게 하나도 없으면 섹션 자체를 그리지 않는다
+  if (!hasDescription && !editHref && shownPhotos.length === 0) return null
 
   return (
     <Container className="pt-5">
@@ -57,6 +66,25 @@ const BreederIntroduction = ({ nickname, description, editHref }: BreederIntrodu
                 </Link>
               )}
             </div>
+
+            {shownPhotos.length > 0 && (
+              <div className="mt-3 grid grid-cols-3 gap-2 tab:flex tab:flex-wrap">
+                {shownPhotos.map((url, index) => (
+                  <div
+                    key={`${url}-${index}`}
+                    className="relative aspect-square shrink-0 overflow-hidden rounded bg-neutral-100 tab:size-56"
+                  >
+                    <Image
+                      src={url}
+                      alt={`${nickname} 대표 사진 ${index + 1}`}
+                      fill
+                      sizes="(max-width: 767px) 33vw, 14rem"
+                      className="object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
 
             {hasDescription ? (
               <>

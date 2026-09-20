@@ -30,6 +30,7 @@ export const toMyProfileCardProps = (profile: MyProfile): MyProfileCardProps => 
       profileImageUrl: profile.profileImageUrl,
       bio: profile.bio,
       longDescription: profile.longDescription,
+      representativePhotos: profile.representativePhotos,
       bpm: profile.bpm,
       followerCount: profile.followerCount,
       followingCount: profile.followingCount,

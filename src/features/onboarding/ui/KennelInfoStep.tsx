@@ -1,25 +1,24 @@
 'use client'
 
 import { Controller } from 'react-hook-form'
+import { useDistrictOptions } from '@/entities/district'
 import { useStepForm } from '../model/useStepForm'
 import { useDuplicateCheck } from '../model/useDuplicateCheck'
 import { useCheckBreederNameDuplicate } from '../api/onboarding.mutations'
-import { kennelInfoSchema, INTRODUCTION_MAX_LENGTH, REGIONS } from '../model/schema'
+import { kennelInfoSchema, INTRODUCTION_MAX_LENGTH } from '../model/schema'
 import { cn } from '@/shared/lib/cn'
 import { STEP_LAYOUT } from '../model/stepLayout'
 import { StepContainer } from './StepContainer'
-import { Dropdown, InputField, TextareaField } from '@/shared/ui'
-import { KeywordTextField } from './KeywordTextField'
+import { Dropdown, InputField, KeywordTextField, TextareaField } from '@/shared/ui'
 import { ProfileImageUpload } from './ProfileImageUpload'
 import { DuplicateCheckField } from './DuplicateCheckField'
 
-const REGION_OPTIONS = REGIONS.map((r) => ({ value: r, label: r }))
-
 const KennelInfoStep = () => {
-  const { register, control, handleSubmit, watch, onSubmit, firstErrorMessage, goBack } =
+  const { register, control, setValue, handleSubmit, watch, onSubmit, firstErrorMessage, goBack } =
     useStepForm('kennel-info', kennelInfoSchema, {
       breederName: '',
-      region: undefined,
+      city: '',
+      district: '',
       selectedBreeds: [],
       profileImage: undefined,
       introduction: '',
@@ -27,6 +26,9 @@ const KennelInfoStep = () => {
 
   const breederName = watch('breederName')
   const introduction = watch('introduction')
+  const city = watch('city')
+
+  const { cityOptions, districtOptions } = useDistrictOptions(city)
 
   // 브리더명 중복 검사 (백엔드: POST /api/v2/auth/check-breeder-name)
   const breederNameCheck = useDuplicateCheck(useCheckBreederNameDuplicate(), {
@@ -72,20 +74,38 @@ const KennelInfoStep = () => {
             check={breederNameCheck}
           />
 
-          {/* 지역 */}
+          {/* 지역 — 시/도를 바꾸면 이전 시/군구는 그 시/도에 없는 값이라 비운다 */}
           <InputField label="주소" required>
-            <Controller
-              name="region"
-              control={control}
-              render={({ field }) => (
-                <Dropdown
-                  value={field.value ?? ''}
-                  onValueChange={field.onChange}
-                  placeholder="주소를 선택해주세요"
-                  options={REGION_OPTIONS}
-                />
-              )}
-            />
+            <div className="flex flex-col gap-2">
+              <Controller
+                name="city"
+                control={control}
+                render={({ field }) => (
+                  <Dropdown
+                    value={field.value}
+                    onValueChange={(next) => {
+                      field.onChange(next)
+                      setValue('district', '')
+                    }}
+                    placeholder="시/도를 선택해주세요"
+                    options={cityOptions}
+                  />
+                )}
+              />
+              <Controller
+                name="district"
+                control={control}
+                render={({ field }) => (
+                  <Dropdown
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    placeholder="시/군구를 선택해주세요"
+                    options={districtOptions}
+                    disabled={!city}
+                  />
+                )}
+              />
+            </div>
           </InputField>
 
           {/* 소개 — 일반 가입(InfoStep)과 동일 규격. 브리더 가입 DTO 엔 소개가 없어 가입 후 bio 로 저장 */}
