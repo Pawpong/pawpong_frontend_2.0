@@ -27,7 +27,10 @@ const LogoButton = ({ onNavigate }: LogoButtonProps) => {
       href="/"
       aria-label="홈으로 이동"
       onClick={handleClick}
-      className="flex min-h-10 items-center rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+      // cursor-pointer 를 명시한다 — 로고 위에서 손 모양 대신 텍스트 커서(I)가 뜬다는 제보가 있었다.
+      // a[href] 면 UA 기본값이 pointer 라 원래는 불필요하지만, 눌리는 요소라는 신호를 브라우저
+      // 기본값에 맡기지 않고 고정한다(DropdownMenu·Switch 등도 같은 이유로 명시하고 있다).
+      className="flex min-h-10 cursor-pointer items-center rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
     >
       {/* Figma 로고 (742:67105) — mo 28px / tab+ 32px 높이, 폭은 비율 유지 */}
       <Image
