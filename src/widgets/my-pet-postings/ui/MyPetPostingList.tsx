@@ -56,6 +56,10 @@ const MyPetPostingList = ({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          {/* 전체 — 상태 미지정(null)이 곧 전체라 따로 값을 두지 않는다 */}
+          <FilterChip size="responsive" selected={status === null} onClick={() => setStatus(null)}>
+            전체
+          </FilterChip>
           {STATUS_FILTERS.map((value) => (
             <FilterChip
               key={value}
