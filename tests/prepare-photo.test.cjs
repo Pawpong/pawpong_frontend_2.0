@@ -9,6 +9,17 @@ const { outputText } = ts.transpileModule(source, {
 const loaded = { exports: {} }
 new Function('require', 'module', 'exports', outputText)(require, loaded, loaded.exports)
 const { validatePhoto, MAX_PHOTO_BYTES } = loaded.exports
+test('detects HEIF bytes even with a JPEG filename and MIME', async () => {
+  const disguised = new File(['\x00\x00\x00\x18ftypheic\x00\x00\x00\x00mif1heic'], 'photo.jpg', {
+    type: 'image/jpeg',
+  })
+  assert.equal(await loaded.exports.isHeifPhoto(disguised), true)
+  assert.equal(await loaded.exports.isHeifPhoto(new Blob(['not an image'])), false)
+  assert.equal(
+    await loaded.exports.isHeifPhoto(new Blob(['\x00\x00\x00\x18ftypavif\x00\x00\x00\x00avif'])),
+    false,
+  )
+})
 for (const [name, type] of [
   ['iphone.HEIC', 'image/heic'],
   ['iphone.heif', 'image/heif'],

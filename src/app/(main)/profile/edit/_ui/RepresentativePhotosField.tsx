@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
-import Image from 'next/image'
+import { RepresentativePhoto } from '@/shared/ui/RepresentativePhoto'
+import { PHOTO_ACCEPT } from '@/shared/lib/preparePhoto'
 import { Button, InputField } from '@/shared/ui'
 import {
   MAX_REPRESENTATIVE_PHOTOS,
@@ -30,13 +31,11 @@ function PhotoPreview({ photo, index }: { photo: string | File; index: number })
   const src = typeof photo === 'string' ? photo : preview?.file === photo ? preview.url : null
   if (!src) return null
   return (
-    <Image
+    <RepresentativePhoto
       src={src}
       alt={`대표사진 ${index + 1}`}
-      fill
       sizes="(max-width: 767px) 33vw, 12rem"
       unoptimized={typeof photo !== 'string'}
-      className="object-cover"
     />
   )
 }
@@ -68,7 +67,7 @@ export function RepresentativePhotosField({
       <input
         ref={photosInputRef}
         type="file"
-        accept="image/*"
+        accept={PHOTO_ACCEPT}
         multiple
         className="hidden"
         onChange={handlePhotosChange}
@@ -126,8 +125,8 @@ export function RepresentativePhotosField({
         사진 더 고르기
       </Button>
       <p className="mt-1 text-[0.625rem] leading-[1.5] font-medium text-neutral-700">
-        기존 사진은 유지돼요. 사진을 빼거나 빈 칸에 추가한 뒤 프로필을 적용해주세요. 장당 5MB까지
-        올릴 수 있어요.
+        기존 사진은 유지돼요. 사진을 빼거나 추가한 뒤 프로필을 적용해주세요. 장당 100MB까지 선택할
+        수 있으며, 업로드할 때 JPG로 변환해 용량을 줄여요.
       </p>
     </InputField>
   )

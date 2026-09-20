@@ -7,7 +7,23 @@ const { outputText } = ts.transpileModule(source, {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 },
 })
 const loaded = { exports: {} }
-new Function('require', 'module', 'exports', outputText)(require, loaded, loaded.exports)
+const photoModule = { exports: {} }
+const photoOutput = ts.transpileModule(fs.readFileSync('src/shared/lib/preparePhoto.ts', 'utf8'), {
+  compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 },
+}).outputText
+new Function('require', 'module', 'exports', photoOutput)(require, photoModule, photoModule.exports)
+new Function('require', 'module', 'exports', outputText)(
+  (id) =>
+    id === '@/shared/lib/preparePhoto'
+      ? {
+          validatePhoto: photoModule.exports.validatePhoto,
+          preparePhoto: async (file) =>
+            new File(['converted'], file.name + '.jpg', { type: 'image/jpeg' }),
+        }
+      : require(id),
+  loaded,
+  loaded.exports,
+)
 const { addRepresentativePhotos: add, resolveRepresentativePhotos: resolve } = loaded.exports
 const photo = (name) => new File(['photo'], name, { type: 'image/png' })
 
@@ -31,12 +47,22 @@ test('cancelling retains slots; exceeding capacity rejects without losing curren
 })
 test('rejects oversized, empty and non-image files', () => {
   assert.throws(
-    () =>
-      add([], [new File([new Uint8Array(5 * 1024 * 1024 + 1)], 'big.png', { type: 'image/png' })]),
-    /5MB/,
+    () => add([], [{ size: 100 * 1024 * 1024 + 1, name: 'big.png', type: 'image/png' }]),
+    /100MB/,
   )
-  assert.throws(() => add([], [new File([], 'empty.png', { type: 'image/png' })]), /이미지/)
-  assert.throws(() => add([], [new File(['text'], 'text.txt', { type: 'text/plain' })]), /이미지/)
+  assert.throws(() => add([], [new File([], 'empty.png', { type: 'image/png' })]), /비어/)
+  assert.throws(
+    () => add([], [new File(['text'], 'text.txt', { type: 'text/plain' })]),
+    /사진을 선택/,
+  )
+})
+test('accepts empty MIME HEIC, generic MIME JPEG and originals above 5MB', () => {
+  for (const file of [
+    new File(['photo'], 'IMG_0001.HEIC'),
+    new File(['photo'], 'p.jpg', { type: 'application/octet-stream' }),
+    { name: 'large.HEIC', type: '', size: 9 * 1024 * 1024 },
+  ])
+    assert.equal(add([], [file])[0], file)
 })
 test('saving uploads only new files and keeps saved URLs in slot order', async () => {
   const file = photo('new.png'),
@@ -45,7 +71,10 @@ test('saving uploads only new files and keeps saved URLs in slot order', async (
     uploaded.push(f)
     return 'new-url'
   })
-  assert.deepEqual(uploaded, [file])
+  assert.equal(uploaded.length, 1)
+  assert.notEqual(uploaded[0], file)
+  assert.equal(uploaded[0].type, 'image/jpeg')
+  assert.equal(await uploaded[0].text(), 'converted')
   assert.deepEqual(urls, ['existing-url', 'new-url'])
 })
 test('deleting all photos produces an empty saved list without uploads', async () => {
