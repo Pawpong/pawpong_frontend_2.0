@@ -1,0 +1,25 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["BWRD8QZVDN.kr.pawpong.app"],
+        "components": [
+          {
+            "/": "/.well-known/*",
+            "exclude": true,
+            "comment": "검증 파일 자체는 앱으로 넘기지 않는다"
+          },
+          {
+            "/": "/api/*",
+            "exclude": true,
+            "comment": "API 라우트는 앱이 가로채면 안 된다"
+          },
+          {
+            "/": "*",
+            "comment": "나머지 모든 경로는 앱이 열 수 있다"
+          }
+        ]
+      }
+    ]
+  }
+}

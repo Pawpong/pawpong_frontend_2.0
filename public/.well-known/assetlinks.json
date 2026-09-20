@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "kr.pawpong.app",
+      "sha256_cert_fingerprints": [
+        "48:E1:0E:6A:7F:72:9C:8A:EF:49:43:10:89:52:04:D2:53:F2:4F:33:A9:8A:F3:4B:3D:4B:41:07:EC:D4:9F:26"
+      ]
+    }
+  }
+]
