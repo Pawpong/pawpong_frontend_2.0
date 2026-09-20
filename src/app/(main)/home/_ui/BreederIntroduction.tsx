@@ -1,10 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { RepresentativePhoto } from '@/shared/ui/RepresentativePhoto'
 import Link from 'next/link'
 import { PixelArrowRightIcon } from '@/shared/assets'
-import { Container } from '@/shared/ui'
+import { Container, RepresentativePhoto } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 
 interface BreederIntroductionProps {
