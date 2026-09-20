@@ -3,14 +3,14 @@ import { NextResponse, type NextRequest } from 'next/server'
 const DEFAULT_ACCESS_TOKEN_MAX_AGE_SECONDS = 60 * 60 * 24
 const DEFAULT_REFRESH_TOKEN_MAX_AGE_SECONDS = 60 * 60 * 24 * 7
 
-/** 백엔드가 프로덕션 로그인에서 굽는 쿠키의 Domain — 덮어쓰려면 이 값이 정확히 같아야 한다 */
+/** 백엔드가 예전에 운영 로그인에서 굽던 쿠키의 Domain — 잔여분을 지우려면 이 값이 정확히 같아야 한다 */
 const PRODUCTION_COOKIE_DOMAIN = '.pawpong.kr'
 
 /**
- * 백엔드가 쿠키를 굽는 환경인지 — 운영 도메인(pawpong.kr / www.pawpong.kr) 뿐이다.
+ * 옛 Domain 쿠키를 정리해야 하는 환경인지 — 운영 도메인(pawpong.kr / www.pawpong.kr) 뿐이다.
  *
- * dev.pawpong.kr 은 백엔드가 URL 파라미터 경로를 타서 쿠키를 굽지 않으므로 여기 해당하지 않는다.
- * dev 에서 Domain=.pawpong.kr 로 구우면 그 쿠키가 운영 도메인에도 실려 나가므로 반드시 제외한다.
+ * dev.pawpong.kr 은 백엔드가 쿠키를 구운 적이 없어 지울 잔여분도 없다.
+ * 게다가 .pawpong.kr 쿠키를 건드리면 운영 도메인 쿠키까지 영향을 받으므로 반드시 제외한다.
  */
 const isProductionPawpongHost = (host: string | null): boolean =>
   host !== null && /^(www\.)?pawpong\.kr(:\d+)?$/.test(host)
@@ -65,21 +65,21 @@ function resolveJwtMaxAgeSeconds(token: string, fallbackSeconds: number): number
  * - refreshToken: httpOnly=true   → /api/auth/refresh BFF 에서만 사용
  * - userRole    : httpOnly=false  → 프론트에서 역할 분기에 사용
  *
- * ── 운영 도메인에서 Domain 쿠키로 굽는 이유 ──
- * 운영 로그인은 백엔드가 Domain=.pawpong.kr 쿠키를 직접 굽고 /login/success 를 거치지 않는다.
- * 그 뒤 첫 토큰 갱신에서 이 라우트가 host-only 쿠키를 심으면 같은 이름 쿠키가 두 벌이 된다.
+ * ── 인증 쿠키는 이 라우트가 단독으로 소유한다 ──
+ * 백엔드 소셜 로그인은 모든 환경에서 토큰을 URL 파라미터로 넘기고 쿠키를 굽지 않는다.
+ * 그래서 로그인·가입·갱신 어느 경로든 쿠키를 심는 곳은 여기 하나다.
+ *
+ * 예전에는 운영만 백엔드가 Domain=.pawpong.kr 쿠키를 직접 구웠다. 그 시절에 로그인한
+ * 브라우저에는 그 쿠키가 남아 있고, 로그아웃하지 않으면 최대 7일(refreshToken)까지 산다.
+ * 거기에 host-only 쿠키를 새로 심으면 같은 이름 쿠키가 두 벌이 된다 —
  * host-only 와 Domain 쿠키는 서로 다른 쿠키라 덮어써지지 않기 때문이다.
  *
- * 두 벌이 되면 양쪽 모두 첫 항목만 읽어 옛 토큰을 집는다 —
+ * 두 벌이 되면 양쪽 모두 첫 항목만 읽어 옛 토큰을 집는다.
  * 프론트는 getAccessToken() 이, 백엔드는 cookie-parser 가 그렇다.
  * 그러면 갱신에 성공하고도 로그아웃되거나 401 이 반복된다.
  *
- * 그래서 운영 도메인에서는 백엔드와 같은 Domain 으로 구워 덮어쓰고,
- * 이미 두 벌을 가진 사용자를 위해 host-only 쪽을 같은 응답에서 만료시킨다.
- * (삭제하는 clear-cookie 는 이미 두 벌을 처리하고 있어 생성 쪽만 비대칭이었다)
- *
- * 덮어쓰기 판정은 name + domain + path 세 가지다. secure/sameSite/httpOnly/maxAge 는
- * 식별자가 아니라 교체되는 값이므로, 이 셋만 백엔드와 맞으면 한 벌로 수렴한다.
+ * 그래서 운영 도메인에서는 쿠키를 심을 때 옛 Domain 쿠키를 같은 응답에서 만료시킨다.
+ * 전환기용이므로 옛 쿠키 수명(refreshToken 7일)이 지나면 걷어내도 된다.
  *
  * NextResponse.cookies.set 은 같은 이름을 덮어쓰기 때문에 "만료 + 생성"을 함께 내보낼 수 없다.
  * (delete 후 set 하면 delete 가 사라져 Set-Cookie 가 아예 나가지 않는다)
@@ -96,21 +96,26 @@ type AuthCookie = {
   maxAgeSeconds: number
 }
 
-/** 운영 도메인용 — host-only 만료 한 줄 + Domain 생성 한 줄을 같이 내보낸다 */
-function appendProductionCookies(res: NextResponse, cookies: AuthCookie[]) {
+/**
+ * 운영 도메인용 — 옛 Domain 쿠키 만료 한 줄 + host-only 생성 한 줄을 같이 내보낸다.
+ * 만료 줄은 백엔드가 쿠키를 굽던 시절의 잔여분을 정리하기 위한 전환기 조치다.
+ */
+function appendProductionCookies(res: NextResponse, cookies: AuthCookie[], isSecure: boolean) {
   for (const { name, value, httpOnly, maxAgeSeconds } of cookies) {
-    // 기존 사용자 브라우저에 남아 있는 host-only 쿠키 제거 (Domain 쿠키가 덮어쓰지 못한다)
-    res.headers.append('Set-Cookie', `${name}=; Path=/; Max-Age=0`)
+    // 백엔드가 굽던 Domain 쿠키 제거 — 삭제는 name+domain+path 가 모두 맞아야 한다.
+    // SameSite=None 은 Secure 와 함께여야 브라우저가 받아준다.
+    res.headers.append(
+      'Set-Cookie',
+      `${name}=; Path=/; Max-Age=0; Domain=${PRODUCTION_COOKIE_DOMAIN}; Secure; SameSite=None`,
+    )
 
     const attrs = [
       `${name}=${encodeURIComponent(value)}`,
       'Path=/',
       `Max-Age=${maxAgeSeconds}`,
-      `Domain=${PRODUCTION_COOKIE_DOMAIN}`,
-      'Secure',
-      // SameSite=None 은 Secure 와 함께여야 브라우저가 받아준다
-      'SameSite=None',
+      'SameSite=Lax',
     ]
+    if (isSecure) attrs.push('Secure')
     if (httpOnly) attrs.push('HttpOnly')
     res.headers.append('Set-Cookie', attrs.join('; '))
   }
@@ -162,11 +167,13 @@ export async function POST(req: NextRequest) {
 
   const res = NextResponse.json({ ok: true })
 
+  // localhost(HTTP)에서는 Secure 쿠키 사용 불가
+  const isSecure = process.env.NODE_ENV === 'production'
+
   if (isProductionPawpongHost(resolveRequestHost(req))) {
-    appendProductionCookies(res, cookies)
+    appendProductionCookies(res, cookies, isSecure)
   } else {
-    // localhost(HTTP)에서는 Secure 쿠키 사용 불가
-    setHostOnlyCookies(res, cookies, process.env.NODE_ENV === 'production')
+    setHostOnlyCookies(res, cookies, isSecure)
   }
 
   return res
