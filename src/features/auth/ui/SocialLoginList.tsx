@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { GoogleIcon, KakaoIcon, NaverIcon } from '@/shared/assets'
+import { AppleIcon, GoogleIcon, KakaoIcon, NaverIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { normalizeReturnUrl } from '@/shared/lib/normalizeReturnUrl'
 import { Button } from '@/shared/ui/Button'
@@ -24,7 +24,7 @@ import { Button } from '@/shared/ui/Button'
  * Figma: PC 3414:750712 / Tablet 3414:751419 / Mobile 3414:751420.
  * Figma에 없는 네이버는 같은 FillButton 규격에 공식 브랜드 색을 적용한다.
  */
-type SocialProvider = 'kakao' | 'naver' | 'google'
+type SocialProvider = 'kakao' | 'naver' | 'google' | 'apple'
 
 const SOCIAL_BUTTONS: {
   provider: SocialProvider
@@ -51,6 +51,15 @@ const SOCIAL_BUTTONS: {
     label: '네이버 로그인',
     Icon: NaverIcon,
     className: 'bg-[#03C75A] text-white hover:brightness-[0.98] active:brightness-95',
+  },
+  {
+    // App Store 심사 4.8 — 제3자 소셜 로그인만 제공하면 Apple 로그인도 함께 제공해야 한다.
+    // "동등하게 눈에 띄게" 요구하므로 다른 셋과 같은 크기·같은 목록 안에 둔다.
+    // 색상은 Apple 가이드라인의 검정 버튼 규격.
+    provider: 'apple',
+    label: 'Apple로 로그인',
+    Icon: AppleIcon,
+    className: 'bg-black text-white hover:brightness-[1.15] active:brightness-125',
   },
 ]
 
