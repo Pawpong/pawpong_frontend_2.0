@@ -196,6 +196,8 @@ export interface BreederPublicProfile {
     district: string
     address?: string
   }
+  /** 공개 프로필의 대표사진 목록 (최대 3장) */
+  representativePhotos?: string[]
   isFavorited: boolean
   /** 로그인 사용자가 이 브리더를 팔로우 중인지 (비로그인/본인 조회는 false) */
   isFollowing: boolean

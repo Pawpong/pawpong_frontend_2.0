@@ -31,7 +31,7 @@ export const buildBreederRegistrationRequest = ({
   email: social.email || profile.email,
   phoneNumber: profile.phone,
   breederName: kennel.breederName,
-  breederLocation: { city: kennel.region },
+  breederLocation: { city: kennel.city, district: kennel.district || undefined },
   animal: PET_TYPE_MAP[animal.selected],
   breeds: kennel.selectedBreeds,
   plan: DEFAULT_BREEDER_PLAN,

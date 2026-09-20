@@ -2,14 +2,17 @@
 
 import { useState, useRef, type ChangeEvent, type ComponentProps } from 'react'
 import { useRouter } from 'next/navigation'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { adopterQueries } from '@/entities/adopter'
+import { breederQueries } from '@/entities/breeder'
+import { useDistrictOptions } from '@/entities/district'
 import { profileQueries } from '@/entities/profile'
 import { useUpdateAdopterProfile } from '@/features/adopter'
 import { useUpdateBreederProfile } from '@/features/breeder'
 import { useUpdateMyProfile } from '@/features/profile'
 import { useUploadSingleFile } from '@/features/upload'
-import { normalizeApiError } from '@/shared/api'
+import { normalizeApiError, uploadSingleFile } from '@/shared/api'
+import type { ProfileUpdateRequestDto } from '@/shared/types'
 import { useToast } from '@/shared/lib/useToast'
 import { useExitGuard } from '@/shared/lib/useExitGuard'
 import {
@@ -22,17 +25,23 @@ import {
   ExitConfirmModal,
   NavigationBar,
   ProfileAvatar,
+  Dropdown,
   InputField,
   Input,
   TextareaField,
 } from '@/shared/ui'
 import { AlertCircleIcon, CheckIcon } from '@/shared/assets'
 
+import { resolveRepresentativePhotos, type PhotoSlot } from '../_lib/representativePhotos'
+import { RepresentativePhotosField } from './RepresentativePhotosField'
+
 const NAME_MAX_LENGTH = 30
 const BIO_MAX_LENGTH = 200 // 서버 UpdateMyProfileRequestDto.bio maxLength
 const LONG_DESCRIPTION_MAX_LENGTH = 1500 // 서버 BreederProfileUpdateRequestDto.profileDescription maxLength
 
-// [refactored] 표시 전용 Input 스타일 — 수정 불가(readOnly) + focus 보더 중립화
+const EMPTY_PHOTOS: string[] = []
+
+// 읽기 전용 입력은 포커스 보더도 중립 색상으로 유지한다.
 const READONLY_INPUT_CLASS = 'cursor-default focus:border-neutral-150'
 
 // 아이콘·X 없는 반응형 확인 모달 프리셋 (프로필 적용 확인)
@@ -46,10 +55,11 @@ const ProfileEditContent = () => {
   const [name, setName] = useState('')
   const [bio, setBio] = useState('')
   const [longDescription, setLongDescription] = useState('')
+  const [city, setCity] = useState('')
+  const [district, setDistrict] = useState('')
   const [showApply, setShowApply] = useState(false)
 
   const toast = useToast()
-  // [refactored] 서버 메시지 우선, 없으면 fallback — 4개 catch 블록의 반복 제거
   const showError = (error: unknown, fallback: string) =>
     toast.error(normalizeApiError(error, fallback).message)
 
@@ -70,7 +80,7 @@ const ProfileEditContent = () => {
       setPhotoPreview(res.cdnUrl)
       setPhotoFileName(res.fileName)
     } catch (error) {
-      showError(error, '사진 업로드에 실패했습니다.') // [refactored]
+      showError(error, '사진 업로드에 실패했습니다.')
     }
   }
 
@@ -92,10 +102,35 @@ const ProfileEditContent = () => {
   })
   const adopterProfile = adopterProfileQuery.data
 
+  // 주소·대표사진은 공개 프로필 응답(/profile/breeders/{id})에 실려 온다.
+  // 관리 프로필(/breeder-management/profile)은 profileInfo 가 비어 내려와 시드로 못 쓴다.
+  const breederPublicQuery = useQuery({
+    ...breederQueries.publicProfile(isBreeder ? (myProfile?.userId ?? '') : ''),
+    refetchOnMount: 'always',
+    throwOnError: false,
+  })
+  const representativePhotos = breederPublicQuery.data?.representativePhotos ?? EMPTY_PHOTOS
+  const breederLocation = breederPublicQuery.data?.businessLocation
+
+  const { cityOptions, districtOptions } = useDistrictOptions(city, isBreeder)
+
+  // 시/도를 바꾸면 이전 시/군구는 그 시/도에 없는 값이라 비운다
+  const handleCityChange = (next: string) => {
+    setCity(next)
+    setDistrict('')
+  }
+
+  // 기존 URL과 새 파일을 함께 편집하고, 적용 시 새 파일만 업로드한다.
+  const qc = useQueryClient()
+  const [pendingPhotos, setPendingPhotos] = useState<PhotoSlot[] | null>(null)
+  const [isApplying, setIsApplying] = useState(false)
+
   // 서버 원본값 — 폼 시드와 변경 감지(isDirty)의 기준. 저장 후 쿼리가 갱신되면 같이 따라간다
   const savedName = (isBreeder ? myProfile?.nickname : adopterProfile?.nickname) ?? ''
   const savedBio = myProfile?.bio ?? ''
   const savedLongDescription = myProfile?.longDescription ?? ''
+  const savedCity = breederLocation?.city ?? ''
+  const savedDistrict = breederLocation?.district ?? ''
 
   // 조회값으로 폼 초기화 (최초 1회) — effect 대신 렌더 중 동기화(React 권장 패턴)
   // 브리더는 adopterProfile 을 기다리지 않고 myProfile(닉네임)로 시드한다
@@ -106,6 +141,14 @@ const ProfileEditContent = () => {
     setBio(savedBio)
     setLongDescription(savedLongDescription)
     setSeeded(true)
+  }
+
+  // 브리더 프로필은 별도 요청이라 늦게 오거나 실패할 수 있다 — 화면을 막지 않도록 따로 시드한다
+  const [breederSeeded, setBreederSeeded] = useState(false)
+  if (!breederSeeded && breederPublicQuery.data) {
+    setCity(savedCity)
+    setDistrict(savedDistrict)
+    setBreederSeeded(true)
   }
 
   // 소셜 로그인 이메일은 입양자 프로필에만 있다 (브리더는 미표시)
@@ -119,15 +162,19 @@ const ProfileEditContent = () => {
   // 브리더 활동명은 이 화면에서 readOnly라 검사에서 제외 — 비어 있어도 저장을 막으면 손쓸 방법이 없다
   const isFormFilled = isBreeder || name.trim().length > 0
   // 바뀐 게 없으면 적용할 것도 없다. 저장 성공 시 쿼리 갱신으로 savedName/savedBio 가 따라와 자동으로 false
+  const isLocationDirty = city !== savedCity || district !== savedDistrict
   const isDirty =
     name !== savedName ||
     bio !== savedBio ||
     longDescription !== savedLongDescription ||
+    isLocationDirty ||
+    pendingPhotos !== null ||
     !!photoFileName
   const isSaving =
     updateAdopterProfile.isPending ||
     updateBreederProfile.isPending ||
     updateMyProfile.isPending ||
+    isApplying ||
     uploadFile.isPending
   const { showGuard, requestExit, confirmExit, cancelExit } = useExitGuard({
     hasChanges: isDirty,
@@ -142,22 +189,42 @@ const ProfileEditContent = () => {
   //  - 입양자: 활동명·사진 → PATCH /adopter/profile
   //  - 브리더: 사진 → PATCH /breeder-management/profile (활동명은 이 화면에서 미수정)
   const handleApply = async () => {
+    if (isApplying) return
+    setIsApplying(true)
     setShowApply(false)
     try {
       const tasks: Promise<unknown>[] = []
+      const profilePhotos =
+        pendingPhotos === null
+          ? undefined
+          : await resolveRepresentativePhotos(
+              pendingPhotos,
+              async (file) => (await uploadSingleFile(file, 'representative')).cdnUrl,
+            )
       if (bio !== savedBio) {
         tasks.push(updateMyProfile.mutateAsync({ bio }))
       }
       if (isBreeder) {
-        if (photoFileName || longDescription !== savedLongDescription) {
-          tasks.push(
-            updateBreederProfile.mutateAsync({
-              ...(photoFileName ? { profileImage: photoFileName } : {}),
-              ...(longDescription !== savedLongDescription
-                ? { profileDescription: longDescription }
-                : {}),
-            }),
-          )
+        const changes: ProfileUpdateRequestDto = {
+          // 공개 조회는 representativePhotos, 수정 요청은 profilePhotos를 사용한다.
+          ...(profilePhotos !== undefined ? { profilePhotos } : {}),
+          ...(photoFileName ? { profileImage: photoFileName } : {}),
+          ...(longDescription !== savedLongDescription
+            ? { profileDescription: longDescription }
+            : {}),
+          // 이 화면에서 수정하지 않는 상세주소는 기존 값을 유지한다.
+          ...(isLocationDirty
+            ? {
+                locationInfo: {
+                  cityName: city,
+                  districtName: district,
+                  detailAddress: breederLocation?.address,
+                },
+              }
+            : {}),
+        }
+        if (Object.keys(changes).length > 0) {
+          tasks.push(updateBreederProfile.mutateAsync(changes))
         }
       } else if (name !== savedName || photoFileName) {
         tasks.push(
@@ -171,9 +238,13 @@ const ProfileEditContent = () => {
       // 각 mutation 이 최신 프로필 refetch까지 기다리므로 서버 이미지로 안전하게 전환할 수 있다.
       setPhotoFileName(null)
       setPhotoPreview(null)
+      await qc.invalidateQueries({ queryKey: breederQueries.all() })
+      setPendingPhotos(null)
       toast.success('프로필이 변경되었습니다')
     } catch (error) {
-      showError(error, '프로필 적용에 실패했습니다.') // [refactored]
+      showError(error, '프로필 적용에 실패했습니다.')
+    } finally {
+      setIsApplying(false)
     }
   }
 
@@ -260,7 +331,7 @@ const ProfileEditContent = () => {
                 maxLength={NAME_MAX_LENGTH}
                 placeholder="입력해보세요"
                 readOnly={isBreeder}
-                className={isBreeder ? READONLY_INPUT_CLASS : undefined} // [refactored]
+                className={isBreeder ? READONLY_INPUT_CLASS : undefined}
               />
               {!isBreeder && (
                 <p className="mt-1 self-end text-[0.625rem] leading-[1.5] font-medium text-neutral-700">
@@ -292,10 +363,39 @@ const ProfileEditContent = () => {
               />
             )}
 
+            {/* 브리더 전용 — 대표사진과 주소 편집 */}
+            {isBreeder && (
+              <>
+                <RepresentativePhotosField
+                  photos={pendingPhotos ?? representativePhotos}
+                  disabled={isSaving || !breederSeeded}
+                  onChange={setPendingPhotos}
+                  onError={(error) => showError(error, '사진을 선택하지 못했습니다.')}
+                />
+
+                <InputField label="주소">
+                  <div className="flex flex-col gap-2">
+                    <Dropdown
+                      value={city}
+                      onValueChange={handleCityChange}
+                      placeholder="시/도를 선택해주세요"
+                      options={cityOptions}
+                    />
+                    <Dropdown
+                      value={district}
+                      onValueChange={setDistrict}
+                      placeholder="시/군구를 선택해주세요"
+                      options={districtOptions}
+                      disabled={!city}
+                    />
+                  </div>
+                </InputField>
+              </>
+            )}
+
             {/* 소셜 로그인 이메일은 입양자 프로필에만 있어 브리더에선 숨김 */}
             {!isBreeder && (
               <InputField label="소셜 로그인">
-                {/* [refactored] 표시 전용 스타일은 활동명 readOnly와 공유 */}
                 <Input value={email} readOnly className={READONLY_INPUT_CLASS} />
               </InputField>
             )}

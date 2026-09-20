@@ -1,25 +1,6 @@
 import { z } from 'zod'
 
 const PHONE_REGEX = /^01[016789]\d{7,8}$/
-const REGIONS = [
-  '서울',
-  '경기',
-  '인천',
-  '부산',
-  '대구',
-  '대전',
-  '광주',
-  '울산',
-  '세종',
-  '강원',
-  '충북',
-  '충남',
-  '전북',
-  '전남',
-  '경북',
-  '경남',
-  '제주',
-] as const
 const ANIMAL_TYPES = ['cat', 'dog', 'lizard'] as const
 export const SURVEY_TEXT_MAX_LENGTH = 100
 
@@ -134,7 +115,10 @@ export const kennelInfoSchema = z.object({
     .string()
     .min(1, { error: '브리더명을 입력해주세요' })
     .max(30, { error: '브리더명은 30자 이하로 입력해주세요' }),
-  region: z.enum(REGIONS, { error: '지역을 선택해주세요' }),
+  // 지역 값은 서버 목록(GET /districts)에서 고른 그대로 보낸다 — 프로필 편집과 같은 표기.
+  // 시/군구는 가입 API가 선택으로 받아 필수로 막지 않는다
+  city: z.string().min(1, { error: '지역을 선택해주세요' }),
+  district: z.string(),
   // 서버가 6개 이상을 거부한다 (breeds must contain no more than 5 elements)
   selectedBreeds: z
     .array(z.string())
@@ -160,4 +144,4 @@ export type DocumentsFormData = z.infer<typeof documentsSchema>
 
 // ─── 상수 re-export ──────────────────────────────────────────
 
-export { REGIONS, ANIMAL_TYPES }
+export { ANIMAL_TYPES }

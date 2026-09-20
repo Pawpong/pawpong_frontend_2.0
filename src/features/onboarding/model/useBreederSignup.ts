@@ -57,7 +57,7 @@ export const useBreederSignup = () => {
       setError('브리더명을 입력해주세요. (브리더 정보 단계)')
       return
     }
-    if (!kennel.region) {
+    if (!kennel.city) {
       setError('지역을 선택해주세요. (브리더 정보 단계)')
       return
     }

@@ -57,7 +57,11 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
         sidebar={<ProfileCard profile={profile} mode="breeder" layout="sidebar" />}
       >
         <TabsContent value="listings" className="mt-0">
-          <BreederIntroduction nickname={profile.nickname} description={profile.longDescription} />
+          <BreederIntroduction
+            nickname={profile.nickname}
+            description={profile.longDescription}
+            photos={profile.representativePhotos}
+          />
           <PublicBreederListings breederId={profile.breederId} gridClassName={CARD_GRID} />
         </TabsContent>
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { Controller } from 'react-hook-form'
-import { InputField, TextareaField } from '@/shared/ui'
+import { InputField, KeywordTextField, TextareaField } from '@/shared/ui'
 import { useStepForm } from '../model/useStepForm'
 import { useDuplicateCheck } from '../model/useDuplicateCheck'
 import { useCheckNicknameDuplicate } from '../api/onboarding.mutations'
@@ -9,7 +9,6 @@ import { infoSchema, INTRODUCTION_MAX_LENGTH } from '../model/schema'
 import { cn } from '@/shared/lib/cn'
 import { STEP_LAYOUT } from '../model/stepLayout'
 import { StepContainer } from './StepContainer'
-import { KeywordTextField } from './KeywordTextField'
 import { ProfileImageUpload } from './ProfileImageUpload'
 import { DuplicateCheckField } from './DuplicateCheckField'
 
