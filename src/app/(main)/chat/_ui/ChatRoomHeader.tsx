@@ -64,6 +64,7 @@ const ChatRoomHeader = ({
         </div>
         <ChatRoomActionsMenu
           roomId={roomId}
+          counterpartUserId={counterpartUserId}
           counterpartName={displayName}
           onClosed={onRoomClosed}
         />
