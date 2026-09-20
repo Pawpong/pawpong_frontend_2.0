@@ -13,8 +13,8 @@ import { useMe } from '@/features/auth'
 import type { CommunityPostCard, PaginationResponse } from '@/shared/types'
 
 /**
- * 게시글 상세에 필요한 데이터·액션 — 풀페이지(PostDetailContent)와 모달(PostDetailPanel)이
- * 같은 로직을 각자 다른 레이아웃으로 그린다.
+ * 게시글 상세에 필요한 데이터·액션 — PostDetailPanel이 쓰고, 그 패널을 풀페이지(PostDetailContent)와
+ * 모달(PostDetailDialog)이 공유해 항상 같은 로직·같은 레이아웃으로 그린다.
  */
 const usePostDetail = (postId: string) => {
   const router = useRouter()
