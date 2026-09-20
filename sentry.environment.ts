@@ -1,4 +1,8 @@
-/** 로컬·프리뷰는 운영 DSN을 재사용하지 않는다. */
+const PROD_HOSTS = ['pawpong.kr', 'www.pawpong.kr']
+// 개발 수집은 배포된 dev 환경(dev.pawpong.kr)만 — localhost 작업 에러가 메일·디코 알림을 울리지 않게 한다
+const DEV_REPORT_HOSTS = ['dev.pawpong.kr']
+
+/** 로컬·프리뷰는 운영 DSN을 재사용하지 않고, localhost 는 아예 수집하지 않는다. */
 export function resolveSentryEnvironment(input: {
   environment?: string
   nodeEnv?: string
@@ -6,17 +10,27 @@ export function resolveSentryEnvironment(input: {
   productionDsn?: string
   developmentDsn?: string
   enableDevelopment?: string
+  /** 서버 런타임에서 Vercel 위인지 (로컬 next dev/start 는 false) — 클라이언트는 hostname 으로 판정 */
+  onVercel?: boolean
 }) {
   const local =
-    input.hostname !== undefined && !['pawpong.kr', 'www.pawpong.kr'].includes(input.hostname)
+    input.hostname !== undefined && !PROD_HOSTS.includes(input.hostname)
   const environment =
     input.nodeEnv === 'production' && !local && input.environment === 'production'
       ? 'production'
       : 'development'
   const production = environment === 'production'
   const dsn = production ? input.productionDsn : input.developmentDsn
+  // 개발 DSN 허용 조건: 브라우저면 dev.pawpong.kr 에서만, 서버면 Vercel 배포에서만.
+  // NEXT_PUBLIC_SENTRY_ENABLE_DEV 가 켜져 있어도 localhost 는 여기서 걸러진다.
+  const devHostAllowed =
+    input.hostname !== undefined
+      ? DEV_REPORT_HOSTS.includes(input.hostname)
+      : input.onVercel === true
   const enabled = Boolean(
-    dsn && (production || (input.enableDevelopment === 'true' && dsn !== input.productionDsn)),
+    dsn &&
+      (production ||
+        (input.enableDevelopment === 'true' && dsn !== input.productionDsn && devHostAllowed)),
   )
   return { environment, dsn: enabled ? dsn : undefined, enabled }
 }
@@ -30,6 +44,7 @@ export function sentryEnvironmentOptions() {
       productionDsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
       developmentDsn: process.env.NEXT_PUBLIC_SENTRY_DEV_DSN,
       enableDevelopment: process.env.NEXT_PUBLIC_SENTRY_ENABLE_DEV,
+      onVercel: process.env.VERCEL === '1',
     }),
     beforeSend: createErrorBudget(),
     tracesSampleRate: 0,
