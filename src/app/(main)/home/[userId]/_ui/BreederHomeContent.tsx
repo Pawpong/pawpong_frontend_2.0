@@ -8,6 +8,7 @@ import { breederQueries } from '@/entities/breeder'
 import { HomeTabs, TabsContent } from '../../_ui/HomeTabs'
 import { BREEDER_HOME_TABS, CARD_GRID, PHOTO_GRID } from '../../_ui/constants'
 import { ProfileCard } from '../../_ui/ProfileCard'
+import { BreederIntroduction } from '../../_ui/BreederIntroduction'
 import { PublicBreederListings } from './PublicBreederListings'
 import { PublicBreederReviews } from './PublicBreederReviews'
 import { PublicHomePosts } from './PublicHomePosts'
@@ -56,6 +57,7 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
         sidebar={<ProfileCard profile={profile} mode="breeder" layout="sidebar" />}
       >
         <TabsContent value="listings" className="mt-0">
+          <BreederIntroduction nickname={profile.nickname} description={profile.longDescription} />
           <PublicBreederListings breederId={profile.breederId} gridClassName={CARD_GRID} />
         </TabsContent>
 

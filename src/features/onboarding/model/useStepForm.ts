@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, type DefaultValues, type FieldValues, type UseFormReturn } from 'react-hook-form'
+import { SKIP_ONBOARDING_VALIDATION } from './devFlags'
 import { useOnboarding } from './OnboardingContext'
 import type { FormStepId, OnboardingFormData } from './types'
 
@@ -26,7 +27,8 @@ const useStepForm = <K extends FormStepId>(
 
   const saved = formData[stepId]
   const form = useForm<T>({
-    resolver: zodResolver(schema),
+    // 온보딩 화면 작업용 스위치 — 켜면 스텝 검증 없이 다음 단계로 넘어간다 (devFlags 참고)
+    resolver: SKIP_ONBOARDING_VALIDATION ? undefined : zodResolver(schema),
     defaultValues: (saved as DefaultValues<T>) ?? defaultValues,
   })
 

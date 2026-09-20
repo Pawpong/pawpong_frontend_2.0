@@ -4,7 +4,7 @@ export { StepRenderer } from './ui/StepRenderer'
 export { StepLayout } from './ui/StepLayout'
 export { StepTitle } from './ui/StepTitle'
 export { StepNavButtons } from './ui/StepNavButtons'
-export { StepProgressBar } from './ui/StepProgressBar'
+export { StepProgressBar, OnboardingProgressBar } from './ui/StepProgressBar'
 export { OnboardingRouteGuard } from './ui/OnboardingRouteGuard'
 export { OnboardingExitGuard } from './ui/OnboardingExitGuard'
 export {
@@ -15,3 +15,4 @@ export {
   isStepForUser,
 } from './model/types'
 export type { UserType, StepConfig, StepId } from './model/types'
+export { SKIP_ONBOARDING_VALIDATION } from './model/devFlags'

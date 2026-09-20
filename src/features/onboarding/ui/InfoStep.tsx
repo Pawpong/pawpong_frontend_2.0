@@ -1,14 +1,15 @@
 'use client'
 
 import { Controller } from 'react-hook-form'
-import { TextareaField } from '@/shared/ui'
+import { InputField, TextareaField } from '@/shared/ui'
 import { useStepForm } from '../model/useStepForm'
 import { useDuplicateCheck } from '../model/useDuplicateCheck'
 import { useCheckNicknameDuplicate } from '../api/onboarding.mutations'
 import { infoSchema, INTRODUCTION_MAX_LENGTH } from '../model/schema'
-import { INTEREST_KEYWORDS } from '../model/breedKeywords'
+import { cn } from '@/shared/lib/cn'
+import { STEP_LAYOUT } from '../model/stepLayout'
 import { StepContainer } from './StepContainer'
-import { ChipSelect } from './ChipSelect'
+import { KeywordTextField } from './KeywordTextField'
 import { ProfileImageUpload } from './ProfileImageUpload'
 import { DuplicateCheckField } from './DuplicateCheckField'
 
@@ -54,7 +55,7 @@ const InfoStep = () => {
         />
 
         {/* 포퐁 활동명 · 소개 (Figma 3414-752441) — 필드 사이 spacing/20 */}
-        <div className="flex w-full flex-col gap-5">
+        <div className={cn('flex w-full flex-col', STEP_LAYOUT.fieldGap)}>
           {/* 시안의 input-btn(gap 8, items-end) 구조 그대로 — 공통 DuplicateCheckField */}
           <DuplicateCheckField
             label="포퐁 활동명"
@@ -75,19 +76,21 @@ const InfoStep = () => {
             {...register('introduction')}
           />
 
-          {/* 관심있는 키워드 — 활동명·소개와 같은 필드 묶음 (ChipSelect 자체가 w-full flex-col) */}
-          <Controller
-            name="selectedKeywords"
-            control={control}
-            render={({ field }) => (
-              <ChipSelect
-                label="관심있는 키워드"
-                items={[...INTEREST_KEYWORDS]}
-                value={field.value}
-                onChange={field.onChange}
-              />
-            )}
-          />
+          {/* 관심있는 키워드 — 활동명·소개와 같은 필드 묶음. 서버로 전송되진 않지만
+              같은 방식(콤마 구분 자유 입력)으로 통일한다 */}
+          <InputField label="관심있는 키워드">
+            <Controller
+              name="selectedKeywords"
+              control={control}
+              render={({ field }) => (
+                <KeywordTextField
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="관심있는 키워드를 콤마(,)로 구분해 입력해주세요"
+                />
+              )}
+            />
+          </InputField>
         </div>
       </>
     </StepContainer>

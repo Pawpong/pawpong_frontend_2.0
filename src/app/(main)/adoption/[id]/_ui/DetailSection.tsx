@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { cn } from '@/shared/lib/cn'
-import { DETAIL_TYPE } from '../_lib/detailTypography'
+import { TEXT } from '@/shared/config'
 
 interface DetailSectionProps {
   title: string
@@ -26,7 +26,7 @@ const DetailSection = ({ title, emphasis, className, children }: DetailSectionPr
     )}
   >
     <div className="flex flex-col gap-3">
-      <h2 className={DETAIL_TYPE.section}>{title}</h2>
+      <h2 className={TEXT.section}>{title}</h2>
       {!emphasis && <hr className="border-neutral-200" />}
     </div>
     {children}

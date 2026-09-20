@@ -8,7 +8,6 @@ import {
   EmptyState,
   ImageDetailModal,
   ListingCardGrid,
-  NavigationBar,
 } from '@/shared/ui'
 import { useImageModal } from '@/shared/lib/useImageModal'
 import { FavoriteAdoptionGridCard, useToggleAdoptionFavorite } from '@/features/adoption'
@@ -41,6 +40,8 @@ interface AdoptionDetailContentProps {
    - 관심 상태도 레일(관심 버튼)/CTA바가 공유하므로 여기서 보관
    ═══════════════════════════════════════════════ */
 const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
+  // 모바일 상단바가 빠지며 뒤로가기용 router 는 사라졌지만, 소프트 삭제 후 마이홈으로
+  // 돌려보내는 데 여전히 필요하다 (없는 글 상세에 머무르면 안 된다)
   const router = useRouter()
   const { imageModalOpen, setImageModalOpen, modalImages, modalInitialIndex, openImageModal } =
     useImageModal(detail.imageUrls)
@@ -99,9 +100,6 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
 
   return (
     <div className="pb-24 lap:pb-10">
-      {/* Figma 976:25819 — 공용 40px 뒤로가기와 가운데 제목. 레일이 이름을 갖고 있어 2단에선 숨긴다. */}
-      <NavigationBar title={detail.name} onBack={() => router.back()} className="lap:hidden" />
-
       <Container className="px-4 py-4 lap:flex lap:items-start lap:gap-8 lap:py-8 pc:gap-10 pc:py-10">
         <AdoptionDetailRail
           detail={detail}
@@ -168,7 +166,6 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
         open={imageModalOpen}
         onOpenChange={setImageModalOpen}
         representativeIndex={0}
-        showActions={false}
       />
     </div>
   )

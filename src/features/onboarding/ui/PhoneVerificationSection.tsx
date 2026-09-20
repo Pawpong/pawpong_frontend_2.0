@@ -3,9 +3,11 @@
 import { useEffect, useSyncExternalStore } from 'react'
 import { useWatch, type Control, type UseFormRegister, type UseFormSetValue } from 'react-hook-form'
 import { loadSocialSignupSession } from '@/shared/lib/socialSignupSession'
+import { cn } from '@/shared/lib/cn'
 import { Input, InputField, HelpMessage } from '@/shared/ui'
 import type { ProfileFormData } from '../model/schema'
 import { usePhoneVerification } from '../model/usePhoneVerification'
+import { STEP_LAYOUT } from '../model/stepLayout'
 import { StepActionButton } from './StepInput'
 
 const subscribeToStaticSession = () => () => undefined
@@ -51,7 +53,7 @@ const PhoneVerificationSection = ({
   })
 
   return (
-    <div className="flex w-full flex-col gap-4">
+    <div className={cn('flex w-full flex-col', STEP_LAYOUT.fieldGap)}>
       <InputField label="이메일" required>
         <Input
           type="text"

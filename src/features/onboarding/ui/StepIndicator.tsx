@@ -21,7 +21,6 @@ const StepIndicator = () => {
     index < currentStepIndex ? 'default' : index === currentStepIndex ? 'active' : 'disabled'
 
   // tab 구간에서는 큰 탭이 영역을 넘을 수 있어 현재 단계가 보이도록 가운데로 맞춘다.
-  // mo(~767)는 2단 고정 배열이라 전체가 한 번에 노출되므로 스크롤이 필요 없다 (Figma 4048-957505).
   useLayoutEffect(() => {
     const viewport = viewportRef.current
     const activeStep = activeStepRef.current
@@ -34,54 +33,15 @@ const StepIndicator = () => {
     )
   }, [currentStepIndex, visibleSteps.length])
 
-  // mo(375~767): Figma 4048-957505처럼 2개씩 고정 2행 배열 — 행 사이에는 화살표가 없다.
-  const rows: (typeof visibleSteps)[] = []
-  for (let i = 0; i < visibleSteps.length; i += 2) {
-    rows.push(visibleSteps.slice(i, i + 2))
-  }
-
   return (
     <div
       aria-label="회원가입 진행 단계"
-      className="w-full max-w-full min-w-0 self-stretch pc:w-auto pc:max-w-none pc:self-auto"
+      className="hidden w-full max-w-full min-w-0 self-stretch tab:block pc:w-auto pc:max-w-none pc:self-auto"
     >
-      {/* mo(~767) 전용: 2단 고정 배열, 폭에 상관없이 항상 2개씩 줄바꿈 */}
-      <div className="flex flex-col items-center justify-center gap-y-5 tab:hidden">
-        {rows.map((row, rowIndex) => (
-          <div key={row[0].id} className="flex items-center justify-center">
-            {row.map((step, i) => {
-              const index = rowIndex * 2 + i
-              return (
-                <Fragment key={step.id}>
-                  {i > 0 && (
-                    <OnboardingArrow
-                      className={cn(
-                        ARROW_CLASS_NAME,
-                        index <= currentStepIndex ? 'text-primary-500' : 'text-neutral-400',
-                      )}
-                    />
-                  )}
-                  <span className="shrink-0">
-                    <PixelTab
-                      compactTablet
-                      label={step.label}
-                      className={CHIP_CLASS_NAME}
-                      labelClassName={LABEL_CLASS_NAME}
-                      pawClassName="flex"
-                      status={statusOf(index)}
-                    />
-                  </span>
-                </Fragment>
-              )
-            })}
-          </div>
-        ))}
-      </div>
-
-      {/* tab+(768~): 한 줄 유지, 다 안 들어오면 현재 단계가 보이도록 가로 스크롤 */}
+      {/* tab+(768~): 한 줄 유지, 다 안 들어오면 현재 단계가 보이도록 가로 스크롤. 모바일은 표시하지 않는다. */}
       <div
         ref={viewportRef}
-        className="hidden tab:block tab:overflow-x-auto tab:overscroll-x-contain pc:overflow-visible"
+        className="tab:overflow-x-auto tab:overscroll-x-contain pc:overflow-visible"
       >
         <div className="flex w-max min-w-full items-center justify-center gap-1">
           {visibleSteps.map((step, index) => (

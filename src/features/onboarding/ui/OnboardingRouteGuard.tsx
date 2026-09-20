@@ -3,6 +3,7 @@
 import { useEffect, useMemo } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { loadSocialSignupSession } from '@/shared/lib/socialSignupSession'
+import { SKIP_ONBOARDING_VALIDATION } from '../model/devFlags'
 import { getGuardRedirect } from '../model/onboardingGuard'
 import { useOnboardingForm } from '../model/useOnboardingForm'
 import { isStepForUser, type UserType } from '../model/types'
@@ -30,8 +31,9 @@ const OnboardingRouteGuard = ({ userType, children }: OnboardingRouteGuardProps)
   const sessionTempId = useMemo(() => loadSocialSignupSession()?.tempId, [])
 
   const requestedStep = pathname.split('/').pop() ?? ''
+  // 화면 작업용 스위치가 켜져 있으면 순서·세션을 따지지 않는다 (devFlags 참고)
   const redirectTo =
-    hasHydrated && isStepForUser(userType, requestedStep)
+    !SKIP_ONBOARDING_VALIDATION && hasHydrated && isStepForUser(userType, requestedStep)
       ? getGuardRedirect({
           userType,
           requestedStep,
@@ -47,7 +49,7 @@ const OnboardingRouteGuard = ({ userType, children }: OnboardingRouteGuardProps)
   }, [redirectTo, router])
 
   // 복원 전 / 이동 대기 중에는 내용을 그리지 않는다 (한 프레임 보였다 튕기는 깜빡임 방지)
-  if (!hasHydrated || redirectTo) return null
+  if ((!hasHydrated && !SKIP_ONBOARDING_VALIDATION) || redirectTo) return null
 
   return <>{children}</>
 }

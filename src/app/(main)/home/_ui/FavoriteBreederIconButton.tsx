@@ -1,7 +1,7 @@
 'use client'
 
 import type { MouseEvent } from 'react'
-import { PixelStarFillIcon, PixelStarOutlineIcon, ProfileStarIcon } from '@/shared/assets'
+import { ProfileStarIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { useAddFavorite, useRemoveFavorite } from '@/features/adopter'
 
@@ -21,7 +21,7 @@ const SIZE = {
   card: { box: 'size-8 tab:size-12', icon: 'size-6 tab:size-10' },
 } as const
 
-/** 브리더 즐겨찾기 토글 — 프로필 상단은 별, 이미지 카드는 기존 픽셀 아이콘. */
+/** 브리더 즐겨찾기 토글 — 프로필 상단·이미지 카드 모두 같은 별(등록 시 point-500 채움). */
 const FavoriteBreederIconButton = ({
   breederId,
   isFavorited,
@@ -33,7 +33,6 @@ const FavoriteBreederIconButton = ({
   const removeFavorite = useRemoveFavorite()
   const isPending = addFavorite.isPending || removeFavorite.isPending
   const label = isFavorited ? '즐겨찾기 해제' : '즐겨찾기 등록'
-  const Icon = isFavorited ? PixelStarFillIcon : PixelStarOutlineIcon
 
   // 카드 전체가 Link 라 이동을 막고 토글만 한다 (링크 밖에서는 무해)
   const handleClick = (event: MouseEvent) => {
@@ -60,13 +59,7 @@ const FavoriteBreederIconButton = ({
         className,
       )}
     >
-      {size === 'nav' ? (
-        <ProfileStarIcon filled={isFavorited} className={cn(SIZE[size].icon, iconClassName)} />
-      ) : (
-        <Icon
-          className={cn(SIZE[size].icon, !isFavorited && 'text-primary-500/60', iconClassName)}
-        />
-      )}
+      <ProfileStarIcon filled={isFavorited} className={cn(SIZE[size].icon, iconClassName)} />
     </button>
   )
 }

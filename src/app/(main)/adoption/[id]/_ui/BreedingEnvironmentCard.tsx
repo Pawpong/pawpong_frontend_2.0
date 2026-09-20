@@ -4,7 +4,8 @@ import Image from 'next/image'
 import { cn } from '@/shared/lib/cn'
 import type { AdoptionDetailDto } from '@/shared/types'
 import { EmptyState } from '@/shared/ui'
-import { DETAIL_TYPE, PHOTO_GRID_COLS } from '../_lib/detailTypography'
+import { TEXT } from '@/shared/config'
+import { PHOTO_GRID_COLS } from '../_lib/detailTypography'
 import { DetailSection } from './DetailSection'
 
 interface BreedingEnvironmentCardProps {
@@ -53,7 +54,7 @@ const BreedingEnvironmentCard = ({
       {/* 모바일: 설명 → 이미지 / pc: 이미지 → 설명 (order로 순서만 전환) */}
       <div className="flex flex-col gap-3 tab:gap-4">
         {description ? (
-          <p className={cn(DETAIL_TYPE.prose, 'order-1 pc:order-2')}>{description}</p>
+          <p className={cn(TEXT.prose, 'order-1 pc:order-2')}>{description}</p>
         ) : (
           imageUrls.length === 0 && (
             <EmptyState message="등록된 사육 환경 정보가 없어요." size="compact" />

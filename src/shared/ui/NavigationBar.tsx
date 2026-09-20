@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { tv, type VariantProps } from 'tailwind-variants'
 import Link from 'next/link'
 import { cn } from '@/shared/lib/cn'
 import { ArrowBackIcon, CloseIcon } from '@/shared/assets'
@@ -17,10 +18,26 @@ interface NavigationBarProps {
   icon?: 'arrow' | 'close'
   /** 오른쪽 액션 슬롯 (아이콘 버튼 등) */
   right?: ReactNode
-  /** 타이틀 타이포 오버라이드 (브랜드 디스플레이 서체 등) */
+  /** 타이틀 타이포 — page 는 브랜드 서체(최상위 화면). 미세 조정은 titleClassName 으로 */
+  titleVariant?: VariantProps<typeof navigationTitle>['variant']
   titleClassName?: string
   className?: string
 }
+
+// [refactored] 브랜드 타이틀 클래스가 호출부 네 곳에 복제되며 세 가지 값으로 갈라져 있었다
+// (마이홈은 pc 없음 / 커뮤니티·명예의전당은 pc:text-2xl / 공지사항은 모바일부터 2xl).
+const navigationTitle = tv({
+  base: 'min-w-0 flex-1 truncate text-center',
+  variants: {
+    variant: {
+      /** 서브 화면 — Figma: medium(mo) 14 / large(tab+) 16. 라벨 높이가 바 높이(33/44)를 정한다 */
+      default: 'text-sm tab:text-base',
+      /** 하단 네비로 오가는 최상위 화면 (마이홈·커뮤니티·명예의 전당·공지사항) */
+      page: 'font-cafe24 text-lg text-neutral-850 tab:text-xl pc:text-2xl',
+    },
+  },
+  defaultVariants: { variant: 'default' },
+})
 
 /** 서브 페이지 상단바 (가운데 정렬 타이틀 + 옵션 뒤로가기/오른쪽 액션) — Figma node 976:25817 · 2046:160967 */
 const NavigationBar = ({
@@ -30,6 +47,7 @@ const NavigationBar = ({
   onBack,
   icon = 'arrow',
   right,
+  titleVariant,
   titleClassName,
   className,
 }: NavigationBarProps) => {
@@ -63,13 +81,7 @@ const NavigationBar = ({
             {backIcon}
           </Link>
         )}
-        {/* Figma: medium(mo) 14 / large(tab+) 16 — 라벨 높이가 바 높이(33/44)를 결정한다 */}
-        <TextLabel
-          className={cn(
-            'min-w-0 flex-1 truncate text-center text-sm tab:text-base',
-            titleClassName,
-          )}
-        >
+        <TextLabel className={cn(navigationTitle({ variant: titleVariant }), titleClassName)}>
           {mobileTitle ? (
             <>
               <span className="tab:hidden">{mobileTitle}</span>

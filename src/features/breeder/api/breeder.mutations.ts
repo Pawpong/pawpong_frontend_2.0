@@ -13,6 +13,8 @@ import type {
   ParentPetUpdateRequest,
   ReviewReplyRequest,
   SimpleApplicationFormUpdateRequest,
+  SubmitVerificationDocumentsRequest,
+  BreederUploadDocumentType,
   BreederAccountDeleteRequest,
 } from '@/shared/types'
 import {
@@ -25,6 +27,8 @@ import {
   updateReviewReply,
   deleteReviewReply,
   updateSimpleApplicationForm,
+  uploadVerificationDocuments,
+  submitVerificationDocuments,
   deleteBreederAccount,
 } from './breeder.api'
 
@@ -41,8 +45,41 @@ export const useUpdateBreederProfile = () => {
   })
 }
 
-export const useUpdateBreederApplicationStatus = () => {
+// ==================== 인증 서류 재제출 ====================
+
+export const useUploadVerificationDocuments = () =>
+  useMutation({
+    mutationFn: (files: { type: BreederUploadDocumentType; file: File }[]) =>
+      uploadVerificationDocuments(files),
+  })
+
+export const useSubmitVerificationDocuments = () => {
   const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (data: SubmitVerificationDocumentsRequest) => submitVerificationDocuments(data),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: breederQueries.all() })
+    },
+  })
+}
+
+/**
+ * 신청 상태가 바뀌었을 때(또는 바뀐 걸 뒤늦게 알았을 때) 버려야 하는 캐시 묶음.
+ * 성공·실패 양쪽에서 같은 범위를 버린다 — 실패는 대개 "서버가 이미 다른 상태"라는 신호라
+ * 화면을 그대로 두면 낡은 버튼이 남는다.
+ */
+const useInvalidateApplicationScope = () => {
+  const qc = useQueryClient()
+  return () =>
+    Promise.all([
+      qc.invalidateQueries({ queryKey: breederQueries.all() }),
+      qc.invalidateQueries({ queryKey: adoptionQueries.all() }),
+      qc.invalidateQueries({ queryKey: applicationQueries.all() }),
+    ])
+}
+
+export const useUpdateBreederApplicationStatus = () => {
+  const invalidateApplicationScope = useInvalidateApplicationScope()
   return useMutation({
     mutationFn: ({
       applicationId,
@@ -55,11 +92,13 @@ export const useUpdateBreederApplicationStatus = () => {
       // 입양 확정은 신청서 한 건으로 끝나지 않는다 — 서버가 펫 상태를 adopted 로 바꾸고
       // 같은 펫의 다른 대기 신청을 거절 처리하므로, 분양글·신청 캐시까지 함께 버린다.
       // (breeder 쿼리만 버리면 확정 후에도 카드가 '분양중'인 채로 남는다)
-      void Promise.all([
-        qc.invalidateQueries({ queryKey: breederQueries.all() }),
-        qc.invalidateQueries({ queryKey: adoptionQueries.all() }),
-        qc.invalidateQueries({ queryKey: applicationQueries.all() }),
-      ])
+      void invalidateApplicationScope()
+    },
+    onError: () => {
+      // 서버가 전이를 거절하는 건(409) 화면이 실제보다 낡았다는 뜻이다 — 예컨대 같은 펫의 다른
+      // 신청을 확정해서 이 신청이 이미 자동 거절됐는데, 열어둔 탭은 아직 '입양 확정' 버튼을 들고
+      // 있는 경우. 에러만 띄우고 두면 사라졌어야 할 버튼이 계속 남아 다시 누르게 된다.
+      void invalidateApplicationScope()
     },
   })
 }

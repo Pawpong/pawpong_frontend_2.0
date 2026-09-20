@@ -3,10 +3,10 @@
 import * as React from 'react'
 import { cn } from '@/shared/lib/cn'
 import { Textarea, type TextareaProps } from './Textarea'
+import { InputField } from './InputField'
 
 // [refactored] Figma color token(text/interactive/*) — 흩어져 있던 hex를 의미 단위로 명명
 const TEXT = {
-  primary: 'text-neutral-850',
   secondary: 'text-neutral-700',
   disabled: 'text-neutral-400',
   info: 'text-info-500',
@@ -49,8 +49,9 @@ const TextareaField = React.forwardRef<HTMLTextAreaElement, TextareaFieldProps>(
     const showCounter = maxLength !== undefined && currentLength !== undefined
     const filled = (currentLength ?? 0) > 0
 
-    // border: error > 명시적 state > 입력값(fill) > default (focus/disabled는 Textarea 의사클래스)
-    const resolvedState = error ? 'error' : (state ?? (filled ? 'fill' : 'default'))
+    // border: error > 명시적 state > default (focus/disabled는 Textarea 의사클래스).
+    // 입력값 유무로는 바꾸지 않는다 — 같은 폼의 Input 은 fill 상태가 없어 textarea 만 진해 보였다.
+    const resolvedState = error ? 'error' : (state ?? 'default')
 
     // 색 tone: 위에서부터 처음 충족하는 status (없으면 default). 라벨은 disabled에만 반응
     const toneRules: [boolean, CounterTone][] = [
@@ -60,30 +61,16 @@ const TextareaField = React.forwardRef<HTMLTextAreaElement, TextareaFieldProps>(
     ]
     const tone = toneRules.find(([matched]) => matched)?.[1] ?? 'default'
     const counter = COUNTER_TONE[tone]
-    const labelColor = disabled ? TEXT.disabled : TEXT.primary
-    const requiredColor = disabled ? TEXT.disabled : TEXT.secondary
 
     return (
-      <div className={cn('group flex flex-col gap-[0.125rem]', wrapperClassName)}>
-        {label && (
-          <div className="flex items-center gap-1">
-            <span
-              className={cn('p-[0.125rem] text-[0.875rem] leading-[1.5] font-semibold', labelColor)}
-            >
-              {label}
-            </span>
-            {required && (
-              <span
-                className={cn(
-                  'p-[0.125rem] text-[0.875rem] leading-[1.5] font-medium',
-                  requiredColor,
-                )}
-              >
-                필수
-              </span>
-            )}
-          </div>
-        )}
+      // 라벨·필수 칩·에러 문구는 InputField 와 같은 컴포넌트를 써서 다른 필드(별명·주소·품종 등)와
+      // 같은 위계(medium/neutral-700)를 갖는다 — 여기서 따로 그리지 않는다.
+      <InputField
+        label={label}
+        required={required}
+        error={error}
+        className={cn('group gap-[0.125rem]', wrapperClassName)}
+      >
         <Textarea
           ref={ref}
           state={resolvedState}
@@ -97,8 +84,7 @@ const TextareaField = React.forwardRef<HTMLTextAreaElement, TextareaFieldProps>(
             <span className={counter.max}>/{maxLength}</span>
           </p>
         )}
-        {error && <p className={cn('mt-1 text-xs', TEXT.error)}>{error}</p>}
-      </div>
+      </InputField>
     )
   },
 )

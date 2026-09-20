@@ -33,12 +33,12 @@ interface PostDetailPanelProps {
   /** side-by-side: pc 모달 · stacked: tab 모달·mo 페이지 공용 */
   layout: 'side-by-side' | 'stacked'
   /** 헤더 오른쪽 끝 아이콘 — 모달은 닫기(X), mo 페이지는 목록으로 */
-  trailingAction: ReactNode
+  trailingAction?: ReactNode
   className?: string
 }
 
 // [refactored] 두 레이아웃 분기에 같은 값이 있어 상수로
-const COMPOSER_CLASS = 'shrink-0 border-t border-border-light px-4'
+const COMPOSER_CLASS = 'shrink-0 border-t border-neutral-100 px-5'
 
 const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDetailPanelProps) => {
   const {
@@ -111,7 +111,7 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
 
   const caption = (
     <div className="flex shrink-0 items-center justify-between gap-2 px-4 py-3">
-      <p className="min-w-0 flex-1 text-sm font-semibold whitespace-pre-wrap text-neutral-850">
+      <p className="min-w-0 flex-1 text-body-md leading-relaxed font-medium whitespace-pre-wrap text-neutral-850">
         {post.body}
       </p>
       {isOwner && (
@@ -126,7 +126,7 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
 
   // 인스타그램처럼 액션바는 본문 흐름 안에 두고, 하단에는 입력창만 고정한다
   const actionBar = (
-    <div className="border-b border-border-light px-4 py-3">
+    <div className="border-b border-neutral-100 px-4 py-3">
       <CommunityPostActions
         likeCount={post.likeCount}
         commentCount={post.commentCount}
@@ -161,6 +161,8 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
       images={post.photoUrls}
       alt={post.authorNickname}
       preloadFirstImage
+      bgClassName="bg-white"
+      imageClassName="object-contain"
       className={isSideBySide ? 'h-full w-[60%] shrink-0' : 'aspect-square w-full shrink-0'}
       {...COMMUNITY_CAROUSEL_STYLE} // [refactored] 피드 카드와 공유하는 상수로
     />
@@ -170,10 +172,15 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
     return (
       <div className={cn('flex h-full min-h-0 w-full flex-row', className)}>
         {imageCarousel}
-        <div className={cn('flex min-h-0 flex-col', hasImages ? 'w-[40%]' : 'flex-1')}>
+        <div
+          className={cn(
+            'flex min-h-0 flex-col',
+            hasImages ? 'w-[40%] border-l border-neutral-100' : 'flex-1',
+          )}
+        >
           {header}
-          {caption}
           <div className="min-h-0 flex-1 overflow-y-auto">
+            {caption}
             {actionBar}
             <div className="p-4">
               <CommentList thread={thread} />

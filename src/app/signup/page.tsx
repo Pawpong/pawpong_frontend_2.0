@@ -1,4 +1,5 @@
 import { Suspense } from 'react'
+import { OnboardingProgressBar } from '@/features/onboarding'
 import { SignupTypeSelect } from '@/widgets/signup-type-select'
 import { SignupSessionCapture } from './_ui/SignupSessionCapture'
 import { SignupEntryGuard } from './_ui/SignupEntryGuard'
@@ -21,6 +22,7 @@ import { SignupEntryGuard } from './_ui/SignupEntryGuard'
 const SignupPage = () => {
   return (
     <>
+      <OnboardingProgressBar percent={0} />
       {/* 소셜 신규가입 파라미터(tempId 등) 캡처 — useSearchParams 사용으로 Suspense 필요 */}
       <Suspense fallback={null}>
         <SignupEntryGuard>

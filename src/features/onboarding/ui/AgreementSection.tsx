@@ -38,8 +38,8 @@ const AgreementSection = ({ control, setValue, activeTerms }: AgreementSectionPr
 
   return (
     <>
-      <div className="flex w-full flex-col gap-10">
-        <div className="flex flex-col gap-4">
+      <div className="flex w-full flex-col gap-6 tab:gap-10">
+        <div className="flex flex-col gap-3 tab:gap-4">
           <CheckboxField
             label="전체 약관동의"
             checked={allAgreementsChecked}

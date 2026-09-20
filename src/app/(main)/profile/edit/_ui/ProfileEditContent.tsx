@@ -5,15 +5,13 @@ import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { adopterQueries } from '@/entities/adopter'
 import { profileQueries } from '@/entities/profile'
-import { useUpdateAdopterProfile, useDeleteAdopterAccount } from '@/features/adopter'
-import { useLogoutAndRedirect } from '@/features/auth'
-import { useUpdateBreederProfile, useDeleteBreederAccount } from '@/features/breeder'
+import { useUpdateAdopterProfile } from '@/features/adopter'
+import { useUpdateBreederProfile } from '@/features/breeder'
 import { useUpdateMyProfile } from '@/features/profile'
 import { useUploadSingleFile } from '@/features/upload'
 import { normalizeApiError } from '@/shared/api'
 import { useToast } from '@/shared/lib/useToast'
 import { useExitGuard } from '@/shared/lib/useExitGuard'
-import { WithdrawReason } from '@/shared/types'
 import {
   AlertMessage,
   AsyncState,
@@ -32,31 +30,23 @@ import { AlertCircleIcon, CheckIcon } from '@/shared/assets'
 
 const NAME_MAX_LENGTH = 30
 const BIO_MAX_LENGTH = 200 // 서버 UpdateMyProfileRequestDto.bio maxLength
+const LONG_DESCRIPTION_MAX_LENGTH = 1500 // 서버 BreederProfileUpdateRequestDto.profileDescription maxLength
 
 // [refactored] 표시 전용 Input 스타일 — 수정 불가(readOnly) + focus 보더 중립화
 const READONLY_INPUT_CLASS = 'cursor-default focus:border-neutral-150'
 
-// 아이콘·X 없는 반응형 확인 모달 프리셋 (적용/탈퇴 공용)
+// 아이콘·X 없는 반응형 확인 모달 프리셋 (프로필 적용 확인)
 const ConfirmModal = (
   props: Omit<ComponentProps<typeof CtaModal>, 'icon' | 'showClose' | 'direction'>,
 ) => <CtaModal icon={null} showClose={false} direction="responsive-reverse" {...props} />
-
-// 탈퇴 모달 설명 (Figma 2145-193207) — 모바일·탭·PC 모두 같은 문구·줄바꿈
-const LEAVE_DESCRIPTION = (
-  <>
-    계정 삭제시 모든 개인정보가 삭제되며
-    <br />
-    복구되지 않습니다
-  </>
-)
 
 /** 프로필 편집 (Figma node 2145-191107) — GNB는 MainLayout 제공 */
 const ProfileEditContent = () => {
   const router = useRouter()
   const [name, setName] = useState('')
   const [bio, setBio] = useState('')
+  const [longDescription, setLongDescription] = useState('')
   const [showApply, setShowApply] = useState(false)
-  const [showLeave, setShowLeave] = useState(false) // 탈퇴 확인 모달
 
   const toast = useToast()
   // [refactored] 서버 메시지 우선, 없으면 fallback — 4개 catch 블록의 반복 제거
@@ -105,6 +95,7 @@ const ProfileEditContent = () => {
   // 서버 원본값 — 폼 시드와 변경 감지(isDirty)의 기준. 저장 후 쿼리가 갱신되면 같이 따라간다
   const savedName = (isBreeder ? myProfile?.nickname : adopterProfile?.nickname) ?? ''
   const savedBio = myProfile?.bio ?? ''
+  const savedLongDescription = myProfile?.longDescription ?? ''
 
   // 조회값으로 폼 초기화 (최초 1회) — effect 대신 렌더 중 동기화(React 권장 패턴)
   // 브리더는 adopterProfile 을 기다리지 않고 myProfile(닉네임)로 시드한다
@@ -113,6 +104,7 @@ const ProfileEditContent = () => {
   if (!seeded && seedReady) {
     setName(savedName)
     setBio(savedBio)
+    setLongDescription(savedLongDescription)
     setSeeded(true)
   }
 
@@ -122,15 +114,16 @@ const ProfileEditContent = () => {
   const updateAdopterProfile = useUpdateAdopterProfile()
   const updateBreederProfile = useUpdateBreederProfile()
   const updateMyProfile = useUpdateMyProfile()
-  const deleteAccount = useDeleteAdopterAccount()
-  const deleteBreederAccount = useDeleteBreederAccount()
-  const { logoutAndRedirect } = useLogoutAndRedirect()
 
   // 활동명만 필수. 소개는 서버 스펙상 빈 문자열이 "소개 비우기"로 허용돼 막지 않는다.
   // 브리더 활동명은 이 화면에서 readOnly라 검사에서 제외 — 비어 있어도 저장을 막으면 손쓸 방법이 없다
   const isFormFilled = isBreeder || name.trim().length > 0
   // 바뀐 게 없으면 적용할 것도 없다. 저장 성공 시 쿼리 갱신으로 savedName/savedBio 가 따라와 자동으로 false
-  const isDirty = name !== savedName || bio !== savedBio || !!photoFileName
+  const isDirty =
+    name !== savedName ||
+    bio !== savedBio ||
+    longDescription !== savedLongDescription ||
+    !!photoFileName
   const isSaving =
     updateAdopterProfile.isPending ||
     updateBreederProfile.isPending ||
@@ -156,8 +149,15 @@ const ProfileEditContent = () => {
         tasks.push(updateMyProfile.mutateAsync({ bio }))
       }
       if (isBreeder) {
-        if (photoFileName) {
-          tasks.push(updateBreederProfile.mutateAsync({ profileImage: photoFileName }))
+        if (photoFileName || longDescription !== savedLongDescription) {
+          tasks.push(
+            updateBreederProfile.mutateAsync({
+              ...(photoFileName ? { profileImage: photoFileName } : {}),
+              ...(longDescription !== savedLongDescription
+                ? { profileDescription: longDescription }
+                : {}),
+            }),
+          )
         }
       } else if (name !== savedName || photoFileName) {
         tasks.push(
@@ -174,28 +174,6 @@ const ProfileEditContent = () => {
       toast.success('프로필이 변경되었습니다')
     } catch (error) {
       showError(error, '프로필 적용에 실패했습니다.') // [refactored]
-    }
-  }
-
-  // 탈퇴: 사유를 묻지 않고 바로 요청 — API 가 reason 을 필수로 받아 'other' 로 보낸다
-  //
-  // 탈퇴 성공 뒤에는 반드시 세션을 끊는다. 이동만 시키면 accessToken/userRole 쿠키가
-  // 그대로 남아 이미 삭제된 계정으로 로그인된 것처럼 보이고, 이후 요청이 401 로 떨어질
-  // 때까지 로그아웃이 안 된 상태가 유지된다. 같은 소셜 계정으로 다시 로그인해 복구
-  // 안내를 받는 흐름도 남은 쿠키에 막힌다.
-  const handleLeave = async () => {
-    setShowLeave(false)
-    try {
-      // 역할별로 엔드포인트가 다르다 (adopter/account vs breeder-management/account)
-      if (isBreeder) {
-        await deleteBreederAccount.mutateAsync({ reason: 'other' })
-      } else {
-        await deleteAccount.mutateAsync({ reason: WithdrawReason.OTHER })
-      }
-      // 쿠키 정리 + 홈 이동까지 한 번에 (서버 로그아웃이 실패해도 로컬 세션은 비운다)
-      logoutAndRedirect()
-    } catch (error) {
-      showError(error, '탈퇴 처리에 실패했습니다.') // [refactored]
     }
   }
 
@@ -301,6 +279,19 @@ const ProfileEditContent = () => {
               className="min-h-[6.5625rem]"
             />
 
+            {/* 브리더 전용 — 마이홈 분양목록 탭 상단에 노출되는 긴 소개글 */}
+            {isBreeder && (
+              <TextareaField
+                label="브리더 소개"
+                placeholder="입력해보세요"
+                maxLength={LONG_DESCRIPTION_MAX_LENGTH}
+                currentLength={longDescription.length}
+                value={longDescription}
+                onChange={(e) => setLongDescription(e.target.value)}
+                className="min-h-[10rem]"
+              />
+            )}
+
             {/* 소셜 로그인 이메일은 입양자 프로필에만 있어 브리더에선 숨김 */}
             {!isBreeder && (
               <InputField label="소셜 로그인">
@@ -310,11 +301,6 @@ const ProfileEditContent = () => {
             )}
           </div>
         </div>
-
-        {/* 탈퇴는 역할별로 다른 API 를 쓴다 — handleLeave 에서 분기한다 */}
-        <Button variant="text" onClick={() => setShowLeave(true)}>
-          탈퇴
-        </Button>
       </Container>
 
       {/* 하단 고정 CTA — 공통 FooterCtaBar (Figma 1054-36832 / 모바일 1056-47239) */}
@@ -348,18 +334,6 @@ const ProfileEditContent = () => {
         actions={[
           { label: '취소', variant: 'outline', onClick: () => setShowApply(false) },
           { label: '적용하기', variant: 'fill', onClick: handleApply },
-        ]}
-      />
-
-      {/* 계정 탈퇴 확인 (디자인 2145-193207 / 모바일·탭 2145-193342) */}
-      <ConfirmModal
-        open={showLeave}
-        onOpenChange={setShowLeave}
-        title="포퐁을 떠나실 건가요?"
-        description={LEAVE_DESCRIPTION}
-        actions={[
-          { label: '계정 탈퇴', variant: 'outline', onClick: handleLeave },
-          { label: '다시 생각해볼게요', variant: 'fill', onClick: () => setShowLeave(false) },
         ]}
       />
 

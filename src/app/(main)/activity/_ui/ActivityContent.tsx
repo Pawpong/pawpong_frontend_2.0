@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { NavigationBar, TabBar, TabsContent } from '@/shared/ui'
+import { TabBar, TabsContent } from '@/shared/ui'
 import { ApplicationList } from './ApplicationList'
 import { ReviewList } from './ReviewList'
 import { ReceivedApplicationList } from './ReceivedApplicationList'
@@ -48,12 +48,6 @@ const ActivityContent = ({
 
   return (
     <div className="flex w-full flex-1 flex-col bg-white pb-16">
-      <NavigationBar
-        title={isBreeder ? '받은/보낸 신청·후기' : '신청·후기 내역'}
-        mobileTitle="신청·후기"
-        backHref="/home"
-      />
-
       <TabBar
         items={TABS_BY_ROLE[userRole]}
         value={initialTab}

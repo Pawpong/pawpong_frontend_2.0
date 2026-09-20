@@ -4,14 +4,16 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import { BookmarkIcon } from '@/shared/assets'
-import { Button, Container, InputUpload, NavigationBar } from '@/shared/ui'
+import { Button, buttonVariants, Container, InputUpload, NavigationBar } from '@/shared/ui'
 import { transientQueryRecoveryOptions } from '@/shared/api'
+import { cn } from '@/shared/lib/cn'
 import { profileQueries } from '@/entities/profile'
 import { communityQueries } from '@/entities/community'
 // [refactored] 분양 페이지와 동일한 목록 블록 — 위젯으로 공유
 import { MyPetPostingList } from '@/widgets/my-pet-postings'
 import { toMyProfileCardProps } from '../_lib/toMyProfileCardProps'
 import { ProfileCard } from './ProfileCard'
+import { BreederIntroduction } from './BreederIntroduction'
 import { HomeTabs, TabsContent } from './HomeTabs'
 import { FavoriteBreedersContent } from './FavoriteBreedersContent'
 import { HomePostGrid } from './HomePostGrid'
@@ -19,6 +21,7 @@ import {
   MY_HOME_TABS,
   BREEDER_MY_HOME_TABS,
   MY_HOME_SIDE_LINKS,
+  BREEDER_MY_HOME_SIDE_LINKS,
   CARD_GRID,
   PHOTO_GRID,
 } from './constants'
@@ -89,7 +92,7 @@ const MyHomeContent = () => {
       <div className="bg-white tab:hidden">
         <NavigationBar
           title="마이홈"
-          titleClassName="font-cafe24 text-lg text-neutral-850 tab:text-xl"
+          titleVariant="page"
           className="px-4 tab:px-12"
           right={
             <Link
@@ -108,18 +111,34 @@ const MyHomeContent = () => {
         activeTab={activeTab}
         onTabChange={setSelectedTab}
         sidebar={<ProfileCard {...profileCardProps} layout="sidebar" />}
-        sideLinks={MY_HOME_SIDE_LINKS}
+        sideLinks={isBreeder ? BREEDER_MY_HOME_SIDE_LINKS : MY_HOME_SIDE_LINKS}
       >
         {/* 분양 목록 탭 (브리더만) — 시안 3170-790275: 라벨+필터 -> 카드 그리드.
             '분양 페이지 바로가기' 배너 제거 — /adoption/my-listings 가 이 탭과 같은
             목록 위젯을 그대로 보여줘 따로 링크할 이유가 없다 */}
         {isBreeder && (
           <TabsContent value="listings" className="mt-0">
-            <InputUpload text="분양글 작성하기" href="/adoption/create" className="px-4" />
+            <BreederIntroduction
+              nickname={profileCardProps.profile.nickname}
+              description={myProfile?.longDescription}
+              editHref="/profile/edit"
+            />
 
+            {/* 작성 버튼은 목록 라벨 줄에 붙인다 — 소개 카드와 목록 사이에 혼자 떠 있지 않게 */}
             <Container className="py-5">
               <MyPetPostingList
                 pageSize={HOME_LISTING_PAGE_SIZE}
+                action={
+                  <Link
+                    href="/adoption/create"
+                    className={cn(
+                      buttonVariants({ variant: 'primary', size: 'sm' }),
+                      'shrink-0 px-4',
+                    )}
+                  >
+                    분양글 작성하기
+                  </Link>
+                }
                 gridClassName={`${CARD_GRID} pc:gap-x-[1.375rem]`}
               />
             </Container>
