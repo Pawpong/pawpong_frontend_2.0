@@ -1,8 +1,17 @@
 'use client'
 
-import { Container, EmptyState, ImageDetailModal, ListingCardGrid } from '@/shared/ui'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import {
+  Container,
+  DeleteConfirmModal,
+  EmptyState,
+  ImageDetailModal,
+  ListingCardGrid,
+} from '@/shared/ui'
 import { useImageModal } from '@/shared/lib/useImageModal'
 import { FavoriteAdoptionGridCard, useToggleAdoptionFavorite } from '@/features/adoption'
+import { useDeletePetPosting } from '@/features/pet-posting'
 import { useMe } from '@/features/auth'
 import { cn } from '@/shared/lib/cn'
 import type { AdoptionDetailDto } from '@/shared/types'
@@ -14,6 +23,7 @@ import { AdoptionDetailRail } from './AdoptionDetailRail'
 import { AboutSection } from './AboutSection'
 import { DetailSection } from './DetailSection'
 import { AdoptionCtaBar } from './AdoptionCtaBar'
+import { AdoptionOwnerBar } from './AdoptionOwnerBar'
 
 interface AdoptionDetailContentProps {
   detail: AdoptionDetailDto
@@ -30,6 +40,9 @@ interface AdoptionDetailContentProps {
    - 관심 상태도 레일(관심 버튼)/CTA바가 공유하므로 여기서 보관
    ═══════════════════════════════════════════════ */
 const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
+  // 모바일 상단바가 빠지며 뒤로가기용 router 는 사라졌지만, 소프트 삭제 후 마이홈으로
+  // 돌려보내는 데 여전히 필요하다 (없는 글 상세에 머무르면 안 된다)
+  const router = useRouter()
   const { imageModalOpen, setImageModalOpen, modalImages, modalInitialIndex, openImageModal } =
     useImageModal(detail.imageUrls)
   // listingId = petId (mapAdoptionDetail)
@@ -52,6 +65,21 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
         ? '예약 중인 개체예요'
         : undefined
 
+  // 내 글일 때만 수정·삭제 진입점을 준다. 삭제는 소프트 삭제라 목록에서 사라지므로
+  // 성공 후 상세에 머무르면 없는 글을 보게 된다 — 마이홈으로 돌려보낸다.
+  const deletePosting = useDeletePetPosting()
+  const [confirmDelete, setConfirmDelete] = useState(false)
+
+  const handleDelete = () => {
+    if (deletePosting.isPending) return
+    deletePosting.mutate(detail.listingId, {
+      onSuccess: () => {
+        setConfirmDelete(false)
+        router.replace('/home')
+      },
+    })
+  }
+
   // 레일(1024+)과 하단 고정 바(1024 미만)가 같은 값을 쓴다 — 한 곳에서 만든다
   const ctaProps = {
     listingId: detail.listingId,
@@ -63,6 +91,13 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
       : undefined,
   }
 
+  // 내 글이면 신청 자리에 수정·삭제를 놓는다 — CTA 와 같은 자리, 같은 두 벌(레일/고정 바)
+  const ownerProps = {
+    listingId: detail.listingId,
+    onDelete: () => setConfirmDelete(true),
+    isDeleting: deletePosting.isPending,
+  }
+
   return (
     <div className="pb-24 lap:pb-10">
       <Container className="px-4 py-4 lap:flex lap:items-start lap:gap-8 lap:py-8 pc:gap-10 pc:py-10">
@@ -72,7 +107,13 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
           isFavorite={isFavorite}
           onToggleFavorite={toggleFavorite}
           showFavoriteAction={!isMyListing}
-          cta={!isMyListing && <AdoptionCtaBar {...ctaProps} variant="inline" />}
+          cta={
+            isMyListing ? (
+              <AdoptionOwnerBar {...ownerProps} variant="inline" />
+            ) : (
+              <AdoptionCtaBar {...ctaProps} variant="inline" />
+            )
+          }
         />
 
         {/* 우측은 근거만 — 스펙 → 건강(강조) → 부모·사육환경 → 다른 분양건 */}
@@ -105,12 +146,18 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
         </div>
       </Container>
 
-      {/* 하단 고정 CTA — 레일에 신청 진입점이 생기는 1024 미만에서만 */}
-      {!isMyListing && (
-        <div className="lap:hidden">
-          <AdoptionCtaBar {...ctaProps} />
-        </div>
-      )}
+      {/* 하단 고정 바 — 레일에 진입점이 생기는 1024 미만에서만 */}
+      <div className="lap:hidden">
+        {isMyListing ? <AdoptionOwnerBar {...ownerProps} /> : <AdoptionCtaBar {...ctaProps} />}
+      </div>
+
+      <DeleteConfirmModal
+        open={confirmDelete}
+        onOpenChange={setConfirmDelete}
+        target="분양글"
+        onConfirm={handleDelete}
+        isPending={deletePosting.isPending}
+      />
 
       {/* Figma 1952-260350: 이미지+대표뱃지+캐러셀만, 프로필/소개/투표/버튼 없음 */}
       <ImageDetailModal

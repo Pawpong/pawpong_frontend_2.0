@@ -5,7 +5,6 @@ import { CheckIcon } from '@/shared/assets'
 import type { AdoptionDetailDto } from '@/shared/types'
 import { TEXT } from '@/shared/config'
 import { DetailSection } from './DetailSection'
-import { EmptyNote } from './EmptyNote'
 
 // 피그마 TableLayout 컨테이너
 const Table = ({ children }: { children: ReactNode }) => (
@@ -25,9 +24,8 @@ const TableRow = ({ className, children }: { className?: string; children: React
 )
 
 /**
- * [refactored] 접종·유전병 두 블록이 "제목+배지 → 표 | 미완료 사유 | 빈 상태" 3분기를
- * 똑같이 반복하고 있었다. 분기를 여기 한 곳에 두고, 각 블록은 표만 넘긴다.
- * (사유는 데이터가 없을 때만 의미가 있어 표보다 뒤, 기본 빈 상태보다 앞에 온다)
+ * [refactored] 접종·유전병 두 블록이 "제목+배지 → 표 | 빈 상태" 분기를 똑같이
+ * 반복하고 있었다. 분기를 여기 한 곳에 두고, 각 블록은 표만 넘긴다.
  */
 const HealthBlock = ({
   title,
@@ -56,10 +54,11 @@ const HealthBlock = ({
 
     {!isEmpty ? (
       <Table>{children}</Table>
-    ) : incompleteReason ? (
-      <EmptyNote>{incompleteReason}</EmptyNote>
     ) : (
-      <EmptyState message={emptyText} size="compact" />
+      // 사유만 문단으로 띄우면 일러스트가 사라져 "빈 상태"라는 신호가 없어진다.
+      // 일러스트는 그대로 두고 문구 자리에 사유를 넣는다 — 사유는 작성 폼에서 필수로 받는 값이라
+      // 레거시 글처럼 비어 있을 때만 기본 문구로 대체한다.
+      <EmptyState message={incompleteReason || emptyText} size="compact" />
     )}
   </div>
 )
