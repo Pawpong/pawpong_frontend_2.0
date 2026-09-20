@@ -1,9 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
-import { RepresentativePhoto } from '@/shared/ui/RepresentativePhoto'
 import { PHOTO_ACCEPT } from '@/shared/lib/preparePhoto'
-import { Button, InputField } from '@/shared/ui'
+import { Button, InputField, RepresentativePhoto } from '@/shared/ui'
 import {
   MAX_REPRESENTATIVE_PHOTOS,
   addRepresentativePhotos,
