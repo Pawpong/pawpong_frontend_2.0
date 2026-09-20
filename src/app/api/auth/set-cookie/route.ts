@@ -15,6 +15,18 @@ const PRODUCTION_COOKIE_DOMAIN = '.pawpong.kr'
 const isProductionPawpongHost = (host: string | null): boolean =>
   host !== null && /^(www\.)?pawpong\.kr(:\d+)?$/.test(host)
 
+/**
+ * 프록시·CDN 뒤에서는 host 에 내부 호스트가 올 수 있다.
+ * 그러면 운영에서 host-only 분기로 빠져 중복 쿠키가 그대로 재발하므로
+ * 원본 호스트를 실어주는 x-forwarded-host 를 먼저 본다.
+ * (쉼표로 여러 개가 올 수 있어 첫 값만 쓴다)
+ */
+const resolveRequestHost = (req: NextRequest): string | null => {
+  const forwarded = req.headers.get('x-forwarded-host')
+  if (forwarded) return forwarded.split(',')[0].trim()
+  return req.headers.get('host')
+}
+
 type JwtPayload = {
   role?: string
   exp?: number
@@ -150,7 +162,7 @@ export async function POST(req: NextRequest) {
 
   const res = NextResponse.json({ ok: true })
 
-  if (isProductionPawpongHost(req.headers.get('host'))) {
+  if (isProductionPawpongHost(resolveRequestHost(req))) {
     appendProductionCookies(res, cookies)
   } else {
     // localhost(HTTP)에서는 Secure 쿠키 사용 불가
