@@ -19,14 +19,25 @@ const LEVEL_COLOR: Record<string, number> = {
   debug: 0x9ca3af,
 }
 
-interface SentryLegacyPayload {
+interface SentryEventLike {
+  title?: string
+  environment?: string
+  release?: string
+  level?: string
+  culprit?: string
+  web_url?: string
+}
+
+/** 레거시 WebHooks 와 내부 통합(issue alert) 두 형식을 모두 받는다. */
+interface SentryPayload {
   project_name?: string
   project?: string
   level?: string
   message?: string
   culprit?: string
   url?: string
-  event?: { title?: string; environment?: string; release?: string }
+  event?: SentryEventLike
+  data?: { event?: SentryEventLike & { project?: number }; triggered_rule?: string }
 }
 
 export async function POST(request: NextRequest) {
@@ -39,21 +50,25 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, message: 'webhook 미설정' }, { status: 500 })
   }
 
-  let payload: SentryLegacyPayload
+  let payload: SentryPayload
   try {
-    payload = (await request.json()) as SentryLegacyPayload
+    payload = (await request.json()) as SentryPayload
   } catch {
     return NextResponse.json({ ok: false, message: '잘못된 본문' }, { status: 400 })
   }
 
-  const level = payload.level ?? 'error'
-  const title = payload.event?.title ?? payload.message ?? '알 수 없는 오류'
+  // 내부 통합(issue alert)은 data.event 아래에, 레거시는 최상위에 필드가 실린다
+  const event = payload.data?.event ?? payload.event
+  const level = event?.level ?? payload.level ?? 'error'
+  const title = event?.title ?? payload.message ?? '알 수 없는 오류'
+  const url = event?.web_url ?? payload.url
+  const culprit = event?.culprit ?? payload.culprit
   const fields = [
-    { name: '프로젝트', value: payload.project_name ?? payload.project ?? '-', inline: true },
+    { name: '프로젝트', value: payload.project_name ?? payload.project ?? 'pawpong-web', inline: true },
     { name: '레벨', value: level, inline: true },
-    { name: '환경', value: payload.event?.environment ?? '-', inline: true },
+    { name: '환경', value: event?.environment ?? '-', inline: true },
   ]
-  if (payload.culprit) fields.push({ name: '위치', value: payload.culprit.slice(0, 900), inline: false })
+  if (culprit) fields.push({ name: '위치', value: culprit.slice(0, 900), inline: false })
 
   const res = await fetch(webhookUrl, {
     method: 'POST',
@@ -64,7 +79,7 @@ export async function POST(request: NextRequest) {
       embeds: [
         {
           title: title.slice(0, 250),
-          url: payload.url,
+          url,
           color: LEVEL_COLOR[level] ?? LEVEL_COLOR.error,
           fields,
           footer: { text: 'Sentry → Pawpong 중계' },
