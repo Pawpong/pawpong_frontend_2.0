@@ -59,6 +59,8 @@ export async function POST(request: NextRequest) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
+      // 백엔드 오류 웹훅을 공유하므로 보낸이 이름으로 출처를 구분한다
+      username: '포퐁 센트리 (프론트)',
       embeds: [
         {
           title: title.slice(0, 250),
