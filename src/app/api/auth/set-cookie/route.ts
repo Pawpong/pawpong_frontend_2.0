@@ -1,5 +1,32 @@
 import { NextResponse } from 'next/server'
 
+const DEFAULT_ACCESS_TOKEN_MAX_AGE_SECONDS = 60 * 60 * 24
+const DEFAULT_REFRESH_TOKEN_MAX_AGE_SECONDS = 60 * 60 * 24 * 7
+
+type JwtPayload = {
+  role?: string
+  exp?: number
+  iat?: number
+}
+
+function decodeJwtPayload(token: string): JwtPayload {
+  try {
+    const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
+    return JSON.parse(Buffer.from(base64, 'base64').toString('utf8')) as JwtPayload
+  } catch {
+    return {}
+  }
+}
+
+function resolveJwtMaxAgeSeconds(token: string, fallbackSeconds: number): number {
+  const payload = decodeJwtPayload(token)
+  const nowSeconds = Math.floor(Date.now() / 1000)
+  if (typeof payload.exp !== 'number') return fallbackSeconds
+
+  const secondsUntilExpiry = payload.exp - nowSeconds
+  return secondsUntilExpiry > 0 ? secondsUntilExpiry : 0
+}
+
 /**
  * [BFF] 소셜 로그인 토큰 → 인증 쿠키 저장
  *
@@ -17,18 +44,7 @@ import { NextResponse } from 'next/server'
  * TODO(FE): 운영(prod) HTTPS 도메인 확정되면 isSecure 판정/SameSite 정책 재검토.
  */
 function decodeJwtRole(token: string): string {
-  try {
-    const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
-    const json = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join(''),
-    )
-    return (JSON.parse(json).role as string) || 'adopter'
-  } catch {
-    return 'adopter'
-  }
+  return decodeJwtPayload(token).role || 'adopter'
 }
 
 export async function POST(req: Request) {
@@ -51,27 +67,35 @@ export async function POST(req: Request) {
 
   // localhost(HTTP)에서는 Secure 쿠키 사용 불가
   const isSecure = process.env.NODE_ENV === 'production'
+  const accessTokenMaxAge = resolveJwtMaxAgeSeconds(
+    accessToken,
+    DEFAULT_ACCESS_TOKEN_MAX_AGE_SECONDS,
+  )
+  const refreshTokenMaxAge = resolveJwtMaxAgeSeconds(
+    refreshToken,
+    DEFAULT_REFRESH_TOKEN_MAX_AGE_SECONDS,
+  )
 
   res.cookies.set('accessToken', accessToken, {
     httpOnly: false,
     secure: isSecure,
     sameSite: 'lax',
     path: '/',
-    maxAge: 60 * 60 * 24, // 1일
+    maxAge: accessTokenMaxAge,
   })
   res.cookies.set('refreshToken', refreshToken, {
     httpOnly: true,
     secure: isSecure,
     sameSite: 'lax',
     path: '/',
-    maxAge: 60 * 60 * 24 * 30, // 30일
+    maxAge: refreshTokenMaxAge,
   })
   res.cookies.set('userRole', userRole, {
     httpOnly: false,
     secure: isSecure,
     sameSite: 'lax',
     path: '/',
-    maxAge: 60 * 60 * 24, // 1일
+    maxAge: accessTokenMaxAge,
   })
 
   return res
