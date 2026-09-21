@@ -41,7 +41,7 @@ export const toCreatePetPostingRequest = (
         relation: parent.relationship,
         breed: parent.breed,
         name: parent.name,
-        birthDate: parent.birthDate,
+        ...(parent.birthDate ? { birthDate: parent.birthDate } : {}),
         ...(photoFileName ? { photoFileName } : {}),
       },
     ]
@@ -67,27 +67,29 @@ export const toCreatePetPostingRequest = (
     representativePhotoIndex: photos.representativeIndex,
 
     vaccinationStatus,
-    ...(vaccinationStatus === 'completed'
-      ? {
-          vaccinationRecords: values.vaccinations.map((row) => ({
-            name: row.name,
-            date: row.date,
-            round: Number(row.dose),
-          })),
-        }
-      : { vaccinationIncompleteReason: values.vaccinationReason }),
+    vaccinationRecords: values.vaccinations
+      .filter((row) => row.name || row.date || row.dose)
+      .map((row) => ({
+        name: row.name,
+        date: row.date,
+        round: Number(row.dose),
+      })),
+    ...(vaccinationStatus === 'incomplete'
+      ? { vaccinationIncompleteReason: values.vaccinationReason }
+      : {}),
 
     geneticTestStatus,
-    ...(geneticTestStatus === 'completed'
-      ? {
-          geneticTestRecords: values.geneticTests.map((row) => ({
-            date: row.date,
-            institution: row.institution,
-            testName: row.testName,
-            result: row.result,
-          })),
-        }
-      : { geneticTestIncompleteReason: values.geneticTestReason }),
+    geneticTestRecords: values.geneticTests
+      .filter((row) => row.testName || row.result || row.date || row.institution)
+      .map((row) => ({
+        date: row.date,
+        institution: row.institution,
+        testName: row.testName,
+        result: row.result,
+      })),
+    ...(geneticTestStatus === 'incomplete'
+      ? { geneticTestIncompleteReason: values.geneticTestReason }
+      : {}),
 
     ...(parentPetSnapshots.length > 0 ? { parentPetSnapshots } : {}),
     ...(breedingEnvironment ? { breedingEnvironment } : {}),

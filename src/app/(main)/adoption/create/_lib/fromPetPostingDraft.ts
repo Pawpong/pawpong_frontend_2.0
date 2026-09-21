@@ -1,11 +1,6 @@
 import type { SavePetPostingDraftRequest } from '@/shared/types'
 import type { AdoptionCreateFormValues } from './schema'
-import {
-  createAdoptionDefaultValues,
-  createGeneticTestRow,
-  createParentRow,
-  createVaccinationRow,
-} from './defaultValues'
+import { createAdoptionDefaultValues, createParentRow } from './defaultValues'
 
 /** 서버가 비워 보낸 값은 폼 기본값(빈 문자열)으로 되돌린다 */
 const text = (value?: string) => value ?? ''
@@ -15,8 +10,7 @@ const text = (value?: string) => value ?? ''
  *
  * 저장 매퍼(toSavePetPostingDraftRequest)의 역방향이다.
  * 임시저장은 대부분의 칸이 비어 있는 게 정상이므로, 없는 값은 기본값으로 채워
- * 폼이 항상 온전한 형태를 갖게 한다. 행 배열은 최소 1행을 유지해야
- * 화면이 빈 목록으로 무너지지 않는다.
+ * 폼이 항상 온전한 형태를 갖게 한다. 건강 기록이 없으면 빈 배열로 복원한다.
  */
 export const fromPetPostingDraft = (
   draft: SavePetPostingDraftRequest,
@@ -29,7 +23,7 @@ export const fromPetPostingDraft = (
         date: text(row.date),
         dose: row.round === undefined ? '' : String(row.round),
       }))
-    : [createVaccinationRow()]
+    : []
 
   const geneticTests = draft.geneticTestRecords?.length
     ? draft.geneticTestRecords.map((row) => ({
@@ -38,7 +32,7 @@ export const fromPetPostingDraft = (
         date: text(row.date),
         institution: text(row.institution),
       }))
-    : [createGeneticTestRow()]
+    : []
 
   const parents = draft.parentPetSnapshots?.length
     ? draft.parentPetSnapshots.map((parent) => ({

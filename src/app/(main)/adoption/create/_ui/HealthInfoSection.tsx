@@ -1,10 +1,10 @@
 'use client'
 
-import { Controller, type FieldErrors, type UseFormRegister, useFieldArray } from 'react-hook-form'
-import { Dropdown, Input, InputField } from '@/shared/ui'
+import { type FieldErrors, type UseFormRegister, useFieldArray } from 'react-hook-form'
+import { Input, InputField } from '@/shared/ui'
 import { HEALTH_RECORD_TEXT_MAX_LENGTH } from '../_lib/constants'
 import { createGeneticTestRow, createVaccinationRow } from '../_lib/defaultValues'
-import { DOSE_OPTIONS, GENETIC_TEST_OPTIONS, VACCINATION_OPTIONS } from '../_lib/formOptions'
+import { GENETIC_TEST_OPTIONS, VACCINATION_OPTIONS } from '../_lib/formOptions'
 import type { AdoptionCreateFormValues, AdoptionFormControl } from '../_lib/schema'
 import { DateInput } from './MaskedInput'
 import { FormSection } from './FormSection'
@@ -30,13 +30,17 @@ const HealthInfoSection = ({ control, register, errors }: HealthInfoSectionProps
   } = useFieldArray({ control, name: 'geneticTests' })
 
   return (
-    <FormSection title="건강 정보">
-      {/* Figma 3137-387069: 제목 아래 콘텐츠 래퍼 — 예방 접종/유전병 두 블록 사이만 40 */}
-      <div className="flex flex-col gap-10">
+    <FormSection
+      title="건강 정보"
+      step={3}
+      required
+      description="접종수첩과 검사 결과서를 보며 작성해주세요. 기록은 여러 개 추가할 수 있고, 접종·검사 완료가 모든 질병에 대한 건강을 보장하지는 않아요."
+    >
+      <div className="flex flex-col gap-8">
         <HealthStatusBlock
           control={control}
           register={register}
-          label="예방 접종 현황"
+          label="예방접종 상태"
           options={VACCINATION_OPTIONS}
           statusName="vaccinationStatus"
           statusError={errors.vaccinationStatus?.message}
@@ -47,47 +51,53 @@ const HealthInfoSection = ({ control, register, errors }: HealthInfoSectionProps
           {vaccinationFields.map((row, index) => {
             const rowErrors = errors.vaccinations?.[index]
             return (
-              <div key={row.id} className="flex flex-col gap-2">
-                <div className="flex flex-col gap-4 tab:flex-row">
-                  <InputField className="tab:flex-1" error={rowErrors?.name?.message}>
+              <div
+                key={row.id}
+                className="flex flex-col gap-4 rounded-xl border border-neutral-150 bg-white p-4 tab:p-5"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <h4 className="text-sm font-semibold text-neutral-850">접종 기록 {index + 1}</h4>
+                  <RemoveRowButton
+                    label={`접종 기록 ${index + 1} 삭제`}
+                    onClick={() => removeVaccination(index)}
+                    visible
+                  />
+                </div>
+                <div className="grid gap-4 tab:grid-cols-2">
+                  <InputField
+                    label="백신명"
+                    className="tab:col-span-2"
+                    error={rowErrors?.name?.message}
+                  >
                     <Input
-                      placeholder="접종명"
+                      aria-label={`접종 기록 ${index + 1} 백신명`}
+                      placeholder="접종수첩에 적힌 백신명 또는 제품명"
                       maxLength={HEALTH_RECORD_TEXT_MAX_LENGTH}
                       {...register(`vaccinations.${index}.name`)}
                     />
                   </InputField>
-                  <InputField className="tab:flex-1" error={rowErrors?.date?.message}>
+                  <InputField label="접종일" error={rowErrors?.date?.message}>
                     <DateInput
-                      placeholder="접종 날짜 (YYYY-MM-DD)"
+                      aria-label={`접종 기록 ${index + 1} 접종일`}
+                      placeholder="YYYY-MM-DD"
                       registration={register(`vaccinations.${index}.date`)}
                     />
                   </InputField>
-                  <InputField error={rowErrors?.dose?.message}>
-                    <Controller
-                      name={`vaccinations.${index}.dose`}
-                      control={control}
-                      render={({ field }) => (
-                        <Dropdown
-                          options={DOSE_OPTIONS}
-                          value={field.value}
-                          onValueChange={field.onChange}
-                          placeholder="차수"
-                          className="tab:w-25"
-                        />
-                      )}
+                  <InputField label="해당 백신의 차수" error={rowErrors?.dose?.message}>
+                    <Input
+                      aria-label={`접종 기록 ${index + 1} 차수`}
+                      inputMode="numeric"
+                      placeholder="예: 1 (1차 접종)"
+                      {...register(`vaccinations.${index}.dose`)}
                     />
                   </InputField>
                 </div>
-                {/* [refactored] 행 삭제 버튼 공통화 */}
-                <RemoveRowButton
-                  label="접종 기록 삭제"
-                  onClick={() => removeVaccination(index)}
-                  visible={vaccinationFields.length > 1}
-                />
               </div>
             )
           })}
         </HealthStatusBlock>
+
+        <div className="h-px bg-neutral-150" />
 
         <HealthStatusBlock
           control={control}
@@ -103,41 +113,51 @@ const HealthInfoSection = ({ control, register, errors }: HealthInfoSectionProps
           {geneticTestFields.map((row, index) => {
             const rowErrors = errors.geneticTests?.[index]
             return (
-              <div key={row.id} className="flex flex-col gap-4">
-                <div className="flex flex-col gap-4 tab:flex-row">
-                  <InputField className="tab:flex-1" error={rowErrors?.testName?.message}>
+              <div
+                key={row.id}
+                className="flex flex-col gap-4 rounded-xl border border-neutral-150 bg-white p-4 tab:p-5"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <h4 className="text-sm font-semibold text-neutral-850">검사 기록 {index + 1}</h4>
+                  <RemoveRowButton
+                    label={`검사 기록 ${index + 1} 삭제`}
+                    onClick={() => removeGeneticTest(index)}
+                    visible
+                  />
+                </div>
+                <div className="grid gap-4 tab:grid-cols-2">
+                  <InputField label="검사명" error={rowErrors?.testName?.message}>
                     <Input
-                      placeholder="유전병명"
+                      aria-label={`검사 기록 ${index + 1} 검사명`}
+                      placeholder="검사명 (예: 검사서에 적힌 명칭)"
                       maxLength={HEALTH_RECORD_TEXT_MAX_LENGTH}
                       {...register(`geneticTests.${index}.testName`)}
                     />
                   </InputField>
-                  <InputField className="tab:flex-1" error={rowErrors?.result?.message}>
+                  <InputField label="검사 결과" error={rowErrors?.result?.message}>
                     <Input
-                      placeholder="검사 결과"
+                      aria-label={`검사 기록 ${index + 1} 결과`}
+                      placeholder="결과서에 적힌 내용을 입력해주세요"
                       maxLength={HEALTH_RECORD_TEXT_MAX_LENGTH}
                       {...register(`geneticTests.${index}.result`)}
                     />
                   </InputField>
+                  <InputField label="검사일" error={rowErrors?.date?.message}>
+                    <DateInput
+                      aria-label={`검사 기록 ${index + 1} 검사일`}
+                      placeholder="YYYY-MM-DD"
+                      registration={register(`geneticTests.${index}.date`)}
+                    />
+                  </InputField>
+                  <InputField label="검사 기관" error={rowErrors?.institution?.message}>
+                    <Input
+                      aria-label={`검사 기록 ${index + 1} 기관`}
+                      placeholder="동물병원 또는 검사 기관명"
+                      maxLength={HEALTH_RECORD_TEXT_MAX_LENGTH}
+                      {...register(`geneticTests.${index}.institution`)}
+                    />
+                  </InputField>
                 </div>
-                <InputField error={rowErrors?.date?.message}>
-                  <DateInput
-                    placeholder="검진 날짜 (YYYY-MM-DD)"
-                    registration={register(`geneticTests.${index}.date`)}
-                  />
-                </InputField>
-                <InputField error={rowErrors?.institution?.message}>
-                  <Input
-                    placeholder="검사 기관"
-                    maxLength={HEALTH_RECORD_TEXT_MAX_LENGTH}
-                    {...register(`geneticTests.${index}.institution`)}
-                  />
-                </InputField>
-                <RemoveRowButton
-                  label="검사 기록 삭제"
-                  onClick={() => removeGeneticTest(index)}
-                  visible={geneticTestFields.length > 1}
-                />
               </div>
             )
           })}

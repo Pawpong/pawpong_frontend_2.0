@@ -32,7 +32,7 @@ export interface ParentPetSnapshot {
   relation: ParentRelation
   breed: string
   name: string
-  birthDate: string
+  birthDate?: string
   photoFileName?: string
 }
 

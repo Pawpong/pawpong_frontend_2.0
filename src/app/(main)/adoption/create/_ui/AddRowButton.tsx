@@ -25,8 +25,13 @@ interface RemoveRowButtonProps {
 // [refactored] 접종·유전병·부모 세 곳에서 같던 행 삭제 버튼
 const RemoveRowButton = ({ label, onClick, visible }: RemoveRowButtonProps) =>
   visible ? (
-    <Button variant="text" onClick={onClick} className="self-end">
-      {label}
+    <Button
+      variant="text"
+      onClick={onClick}
+      aria-label={label}
+      className="min-h-11 self-end px-2 text-error-500 hover:bg-error-50 active:bg-error-50"
+    >
+      삭제
     </Button>
   ) : null
 

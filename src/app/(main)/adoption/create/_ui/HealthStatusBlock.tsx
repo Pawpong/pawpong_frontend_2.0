@@ -2,18 +2,13 @@
 
 import type { ReactNode } from 'react'
 import { Controller, useWatch, type UseFormRegister } from 'react-hook-form'
-import { Dropdown, Input, InputField } from '@/shared/ui'
+import { Button, TextareaField } from '@/shared/ui'
+import { RadioCardGroup } from '@/shared/ui/RadioCardGroup'
 import { HEALTH_REASON_MAX_LENGTH } from '../_lib/constants'
 import type { AdoptionCreateFormValues, AdoptionFormControl } from '../_lib/schema'
-import { AddRowButton } from './AddRowButton'
 
-/**
- * [refactored] 예방 접종 / 유전병 검사 블록의 공통 골격.
- *
- * 두 블록 모두 "상태 드롭다운 → (완료면 기록 입력 + 작성란 추가 / 아니면 미완료 사유)" 구조가 같고
- * 기록 입력란의 구성만 다르다. 그 부분만 children 으로 받는다.
- */
-const INCOMPLETE_REASON_PLACEHOLDER = '미완료한 이유작성 (예: 태어난지 한달도 안됨)'
+/** 현재 상태와 실제 기록은 독립적으로 입력한다. 상태 전환으로 기록을 지우지 않는다. */
+const INCOMPLETE_REASON_PLACEHOLDER = '현재 상태와 미완료 사유, 예정된 일정이 있다면 알려주세요'
 
 type HealthFieldNames =
   | { statusName: 'vaccinationStatus'; reasonName: 'vaccinationReason' }
@@ -23,7 +18,7 @@ interface HealthStatusBlockCommonProps {
   control: AdoptionFormControl
   register: UseFormRegister<AdoptionCreateFormValues>
   label: string
-  options: { value: string; label: string }[]
+  options: { value: string; label: string; description?: string }[]
   statusError?: string
   reasonError?: string
   onAdd: () => void
@@ -46,39 +41,59 @@ const HealthStatusBlock = ({
   children,
 }: HealthStatusBlockProps) => {
   const status = useWatch({ control, name: statusName })
-  // 상태를 아직 안 고른 단계에서는 기록 입력란을 기본으로 보여준다
-  const showRecords = status === 'completed' || !status
+  const reason = useWatch({ control, name: reasonName })
+  const isVaccination = statusName === 'vaccinationStatus'
 
   return (
     <div className="flex flex-col gap-4">
-      <InputField label={label} required error={statusError}>
-        <Controller
-          name={statusName}
-          control={control}
-          render={({ field }) => (
-            <Dropdown
-              options={options}
-              value={typeof field.value === 'string' ? field.value : ''}
-              onValueChange={field.onChange}
-              placeholder="선택해보세요"
-            />
-          )}
-        />
-      </InputField>
-
-      {showRecords ? (
-        <>
-          {children}
-          <AddRowButton label="작성란 추가하기" onClick={onAdd} />
-        </>
-      ) : (
-        <InputField error={reasonError}>
-          <Input
-            placeholder={INCOMPLETE_REASON_PLACEHOLDER}
-            maxLength={HEALTH_REASON_MAX_LENGTH}
-            {...register(reasonName)}
+      <Controller
+        name={statusName}
+        control={control}
+        render={({ field }) => (
+          <RadioCardGroup
+            name={field.name}
+            label={label}
+            options={options}
+            value={typeof field.value === 'string' ? field.value : ''}
+            onChange={field.onChange}
+            onBlur={field.onBlur}
+            error={statusError}
           />
-        </InputField>
+        )}
+      />
+      {status === 'incomplete' && (
+        <TextareaField
+          label={isVaccination ? '현재 접종 상황과 남은 일정' : '검사를 마치지 않은 이유와 예정'}
+          aria-label={
+            isVaccination ? '현재 접종 상황과 남은 일정' : '검사를 마치지 않은 이유와 예정'
+          }
+          required
+          error={reasonError}
+          placeholder={INCOMPLETE_REASON_PLACEHOLDER}
+          currentLength={reason.length}
+          className="min-h-24"
+          maxLength={HEALTH_REASON_MAX_LENGTH}
+          {...register(reasonName)}
+        />
+      )}
+      {status && (
+        <div className="flex flex-col gap-4">
+          <div>
+            <h3 className="text-sm font-semibold text-neutral-850">
+              {isVaccination ? '실제로 받은 접종 기록' : '결과가 나온 검사 기록'}
+            </h3>
+            <p className="mt-1 text-xs leading-relaxed text-neutral-700">
+              {status === 'completed'
+                ? '확인 가능한 기록을 1개 이상 입력해주세요.'
+                : '이미 받은 기록이 있다면 추가해주세요. 아직 없다면 비워두세요.'}{' '}
+              {isVaccination && '차수는 해당 백신 기준으로 적어주세요.'}
+            </p>
+          </div>
+          {children}
+          <Button variant="outline" onClick={onAdd} className="min-h-11 w-full">
+            {isVaccination ? '접종 기록 추가' : '검사 기록 추가'}
+          </Button>
+        </div>
       )}
     </div>
   )

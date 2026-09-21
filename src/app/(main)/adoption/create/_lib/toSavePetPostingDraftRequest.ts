@@ -33,7 +33,7 @@ export const toSavePetPostingDraftRequest = (
         relation: parent.relationship,
         breed: parent.breed,
         name: parent.name,
-        birthDate: parent.birthDate,
+        ...(parent.birthDate ? { birthDate: parent.birthDate } : {}),
         ...(photoFileName ? { photoFileName } : {}),
       },
     ]
@@ -50,7 +50,7 @@ export const toSavePetPostingDraftRequest = (
       : undefined
 
   // 가격은 폼에서 문자열이고 미입력이면 빈 문자열이다. 숫자로 바꿀 수 있을 때만 담는다
-  const price = Number(values.price)
+  const price = Number(values.price.replaceAll(',', ''))
   const hasPrice = values.price !== '' && Number.isFinite(price)
 
   return {
@@ -65,37 +65,31 @@ export const toSavePetPostingDraftRequest = (
       : {}),
 
     ...(values.vaccinationStatus ? { vaccinationStatus: values.vaccinationStatus } : {}),
-    ...(values.vaccinationStatus === 'completed'
-      ? {
-          vaccinationRecords: values.vaccinations
-            .filter((row) => trimmed(row.name) || trimmed(row.date) || trimmed(row.dose))
-            .map((row) => ({ name: row.name, date: row.date, round: Number(row.dose) || 0 })),
-        }
-      : trimmed(values.vaccinationReason)
-        ? { vaccinationIncompleteReason: values.vaccinationReason }
-        : {}),
+    vaccinationRecords: values.vaccinations
+      .filter((row) => trimmed(row.name) || trimmed(row.date) || trimmed(row.dose))
+      .map((row) => ({ name: row.name, date: row.date, round: Number(row.dose) || 0 })),
+    ...(values.vaccinationStatus === 'incomplete' && trimmed(values.vaccinationReason)
+      ? { vaccinationIncompleteReason: values.vaccinationReason }
+      : {}),
 
     ...(values.geneticTestStatus ? { geneticTestStatus: values.geneticTestStatus } : {}),
-    ...(values.geneticTestStatus === 'completed'
-      ? {
-          geneticTestRecords: values.geneticTests
-            .filter(
-              (row) =>
-                trimmed(row.date) ||
-                trimmed(row.institution) ||
-                trimmed(row.testName) ||
-                trimmed(row.result),
-            )
-            .map((row) => ({
-              date: row.date,
-              institution: row.institution,
-              testName: row.testName,
-              result: row.result,
-            })),
-        }
-      : trimmed(values.geneticTestReason)
-        ? { geneticTestIncompleteReason: values.geneticTestReason }
-        : {}),
+    geneticTestRecords: values.geneticTests
+      .filter(
+        (row) =>
+          trimmed(row.date) ||
+          trimmed(row.institution) ||
+          trimmed(row.testName) ||
+          trimmed(row.result),
+      )
+      .map((row) => ({
+        date: row.date,
+        institution: row.institution,
+        testName: row.testName,
+        result: row.result,
+      })),
+    ...(values.geneticTestStatus === 'incomplete' && trimmed(values.geneticTestReason)
+      ? { geneticTestIncompleteReason: values.geneticTestReason }
+      : {}),
 
     ...(parentPetSnapshots.length > 0 ? { parentPetSnapshots } : {}),
     ...(breedingEnvironment ? { breedingEnvironment } : {}),

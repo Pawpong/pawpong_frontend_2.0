@@ -29,10 +29,10 @@ export const createAdoptionDefaultValues = (): AdoptionCreateFormValues => ({
   introduction: '',
   vaccinationStatus: '',
   vaccinationReason: '',
-  vaccinations: [createVaccinationRow()],
+  vaccinations: [],
   geneticTestStatus: '',
   geneticTestReason: '',
-  geneticTests: [createGeneticTestRow()],
-  parents: [createParentRow()],
+  geneticTests: [],
+  parents: [],
   breedingEnvDescription: '',
 })

@@ -4,7 +4,8 @@ export const ADOPTION_UPLOAD_FOLDER = 'adoption'
 /** 서버 계약: 분양 개체 사진 1~10장 */
 export const PET_IMAGE_MAX = 10
 export const PARENT_IMAGE_MAX = 1
-export const BREEDING_ENV_IMAGE_MAX = 5
+/** 서버는 photoFileName 단일 필드만 받는다. */
+export const BREEDING_ENV_IMAGE_MAX = 1
 
 /** 작성 API 및 화면에서 함께 사용하는 입력 제한 */
 export const PET_DESCRIPTION_MAX_LENGTH = 500

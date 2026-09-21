@@ -59,7 +59,14 @@ const priceField = z
 const vaccinationRowSchema = z.object({
   name: text(HEALTH_RECORD_TEXT_MAX_LENGTH),
   date: dateField,
-  dose: z.string(),
+  dose: z
+    .string()
+    .refine(
+      (value) =>
+        value === '' ||
+        (/^\d+$/.test(value) && Number.isSafeInteger(Number(value)) && Number(value) >= 1),
+      '차수는 1 이상의 정수로 입력해주세요.',
+    ),
 })
 
 /** 유전병 검사 기록 행 (서버 required: date, institution, testName, result) */
@@ -92,7 +99,7 @@ const VACCINATION_ROW_FIELDS = [
 ] as const satisfies ReadonlyArray<readonly [keyof VaccinationRow, string]>
 
 const GENETIC_TEST_ROW_FIELDS = [
-  ['testName', '유전병명을 입력해주세요.'],
+  ['testName', '검사명을 입력해주세요.'],
   ['result', '검사 결과를 입력해주세요.'],
   ['date', '검진 날짜를 입력해주세요.'],
   ['institution', '검사 기관을 입력해주세요.'],
@@ -111,11 +118,11 @@ export const adoptionCreateSchema = z
     /* ── 건강 정보 ── */
     vaccinationStatus: healthStatusField,
     vaccinationReason: text(HEALTH_REASON_MAX_LENGTH),
-    vaccinations: z.array(vaccinationRowSchema).min(1),
+    vaccinations: z.array(vaccinationRowSchema),
 
     geneticTestStatus: healthStatusField,
     geneticTestReason: text(HEALTH_REASON_MAX_LENGTH),
-    geneticTests: z.array(geneticTestRowSchema).min(1),
+    geneticTests: z.array(geneticTestRowSchema),
 
     /* ── 부모 정보 (선택) ── */
     parents: z.array(parentRowSchema).max(PARENT_MAX_COUNT),
@@ -134,11 +141,11 @@ export const adoptionCreateSchema = z
       [!values.geneticTestStatus, ['geneticTestStatus'], '유전병 검사 상태를 선택해주세요.'],
     ]
 
-    // [refactored] 접종·유전병 모두 "완료면 기록 필수 / 미완료면 사유 필수" 로 규칙이 같아
-    // 검사할 필드 목록만 테이블로 두고 한 번에 돌린다 (서버 *IncompleteReason 계약과 대응)
+    // 완료는 기록 필수, 미완료는 사유 필수. 입력한 기록은 상태에 관계없이 검증한다.
     const recordSections = [
       {
         status: values.vaccinationStatus,
+        statusKey: 'vaccinationStatus',
         rowsKey: 'vaccinations',
         rows: values.vaccinations,
         reason: values.vaccinationReason,
@@ -147,6 +154,7 @@ export const adoptionCreateSchema = z
       },
       {
         status: values.geneticTestStatus,
+        statusKey: 'geneticTestStatus',
         rowsKey: 'geneticTests',
         rows: values.geneticTests,
         reason: values.geneticTestReason,
@@ -155,26 +163,32 @@ export const adoptionCreateSchema = z
       },
     ] as const
 
-    recordSections.forEach(({ status, rowsKey, rows, reason, reasonKey, fields }) => {
+    recordSections.forEach(({ status, statusKey, rowsKey, rows, reason, reasonKey, fields }) => {
       if (status === 'completed') {
-        rows.forEach((row: Record<string, string>, i) => {
-          fields.forEach(([field, message]) => {
-            rules.push([!row[field], [rowsKey, i, field], message])
-          })
+        rules.push([
+          !rows.some((row) => Object.values(row).some(Boolean)),
+          [statusKey],
+          '완료 상태는 기록을 1개 이상 추가해주세요.',
+        ])
+      }
+      rows.forEach((row: Record<string, string>, i) => {
+        if (!Object.values(row).some(Boolean)) return
+        fields.forEach(([field, message]) => {
+          rules.push([!row[field], [rowsKey, i, field], message])
         })
-      } else if (status) {
+      })
+      if (status === 'incomplete') {
         rules.push([!reason, [reasonKey], '미완료 사유를 입력해주세요.'])
       }
     })
 
-    // 부모 정보는 통째로 생략 가능하지만, 한 칸이라도 채우면 모든 필드를 필수로 받는다.
+    // 부모 정보는 생략 가능하다. 입력한 행은 관계·이름·품종이 필수다.
     values.parents.forEach((parent, i) => {
       if (!parent.relationship && !parent.name && !parent.breed && !parent.birthDate) return
       rules.push(
         [!parent.relationship, ['parents', i, 'relationship'], '관계를 선택해주세요.'],
         [!parent.name, ['parents', i, 'name'], '이름을 입력해주세요.'],
         [!parent.breed, ['parents', i, 'breed'], '품종을 입력해주세요.'],
-        [!parent.birthDate, ['parents', i, 'birthDate'], '태어난 날짜를 입력해주세요.'],
       )
     })
 

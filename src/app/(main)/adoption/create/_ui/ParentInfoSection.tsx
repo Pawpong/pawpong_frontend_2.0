@@ -23,7 +23,11 @@ const ParentInfoSection = ({ control, register, errors, parentRows }: ParentInfo
   const { fields, append, remove, imagesOf, addImage, removeImage } = parentRows
 
   return (
-    <FormSection title="부모 정보">
+    <FormSection
+      title="부모 정보"
+      step={4}
+      description="알고 있는 부모 정보를 추가해주세요. 부모별 관계·이름·품종은 필수이고, 생년월일과 사진은 선택이에요."
+    >
       {/* 콘텐츠 -> 추가 버튼 간격은 16 (건강 정보 섹션과 동일).
           제목 -> 콘텐츠 간격은 FormSection 의 20 을 그대로 둬야 해서 한 겹 더 감쌌다 */}
       <div className="flex flex-col gap-4">
@@ -33,7 +37,10 @@ const ParentInfoSection = ({ control, register, errors, parentRows }: ParentInfo
             const rowErrors = errors.parents?.[index]
             return (
               // Figma 3137-390591: PC는 이미지 372 + 입력 컬럼 2단(gap 20), 모바일은 세로 스택
-              <div key={row.id} className="flex flex-col gap-5 pc:flex-row">
+              <div
+                key={row.id}
+                className="flex min-w-0 flex-col gap-5 rounded-xl border border-neutral-150 p-4 tab:p-5"
+              >
                 <ImageField
                   images={imagesOf(row.id)}
                   onAdd={(files) => addImage(row.id, files)}
@@ -48,6 +55,7 @@ const ParentInfoSection = ({ control, register, errors, parentRows }: ParentInfo
                       control={control}
                       render={({ field }) => (
                         <Dropdown
+                          ariaLabel="부모 관계"
                           options={RELATIONSHIP_OPTIONS}
                           value={field.value}
                           onValueChange={field.onChange}
@@ -73,7 +81,11 @@ const ParentInfoSection = ({ control, register, errors, parentRows }: ParentInfo
                     />
                   </InputField>
 
-                  <InputField label="태어난 날짜" required error={rowErrors?.birthDate?.message}>
+                  <InputField
+                    label="태어난 날짜"
+                    requirement="선택"
+                    error={rowErrors?.birthDate?.message}
+                  >
                     <DateInput
                       placeholder="YYYY-MM-DD 형식으로 입력해주세요"
                       registration={register(`parents.${index}.birthDate`)}
@@ -84,7 +96,7 @@ const ParentInfoSection = ({ control, register, errors, parentRows }: ParentInfo
                   <RemoveRowButton
                     label="부모 정보 삭제"
                     onClick={() => remove(index)}
-                    visible={fields.length > 1}
+                    visible={fields.length > 0}
                   />
                 </div>
               </div>
@@ -93,7 +105,7 @@ const ParentInfoSection = ({ control, register, errors, parentRows }: ParentInfo
         </div>
 
         <AddRowButton
-          label="부모정보 추가하기"
+          label="부모 정보 추가"
           onClick={append}
           disabled={fields.length >= PARENT_MAX_COUNT}
         />

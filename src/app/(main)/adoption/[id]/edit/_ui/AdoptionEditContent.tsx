@@ -82,6 +82,7 @@ const AdoptionEditContent = ({ petId }: AdoptionEditContentProps) => {
         <form onSubmit={handleSubmit} className="mx-auto w-full pc:max-w-320">
           <div className="flex flex-col gap-[1.1875rem] pc:flex-row pc:gap-25">
             <ImageField
+              className="pc:w-93 pc:shrink-0"
               images={petImages.images}
               onAdd={petImages.handleAddImages}
               onRemove={petImages.handleRemoveImage}

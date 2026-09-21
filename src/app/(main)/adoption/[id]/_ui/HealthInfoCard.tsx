@@ -30,6 +30,7 @@ const TableRow = ({ className, children }: { className?: string; children: React
 const HealthBlock = ({
   title,
   completed,
+  completedLabel,
   isEmpty,
   incompleteReason,
   emptyText,
@@ -37,6 +38,7 @@ const HealthBlock = ({
 }: {
   title: string
   completed: boolean
+  completedLabel: string
   isEmpty: boolean
   /** 미완료 시 브리더가 직접 남긴 사유 — 있으면 기본 문구 대신 그대로 보여준다 */
   incompleteReason?: string
@@ -48,12 +50,19 @@ const HealthBlock = ({
       <p className={TEXT.sub}>{title}</p>
       <Badge variant={completed ? 'primaryOutline' : 'neutralFilled'} size="lg">
         {completed && <CheckIcon className="size-4" />}
-        <span>{completed ? '검사 완료' : '미완료'}</span>
+        <span>{completed ? completedLabel : '미완료'}</span>
       </Badge>
     </div>
 
     {!isEmpty ? (
-      <Table>{children}</Table>
+      <>
+        <Table>{children}</Table>
+        {!completed && incompleteReason && (
+          <p className="rounded-lg bg-neutral-50 p-3 text-sm leading-relaxed text-neutral-700">
+            {incompleteReason}
+          </p>
+        )}
+      </>
     ) : (
       // 사유만 문단으로 띄우면 일러스트가 사라져 "빈 상태"라는 신호가 없어진다.
       // 일러스트는 그대로 두고 문구 자리에 사유를 넣는다 — 사유는 작성 폼에서 필수로 받는 값이라
@@ -69,6 +78,7 @@ const HealthInfoCard = ({ detail }: { detail: AdoptionDetailDto }) => (
       {/* 예방 접종 — 3컬럼(접종명/접종일/차수) */}
       <HealthBlock
         title="예방 접종 현황"
+        completedLabel="접종 완료"
         completed={detail.health.vaccinationCompleted}
         isEmpty={detail.health.vaccinations.length === 0}
         incompleteReason={detail.health.vaccinationIncompleteReason}
@@ -91,6 +101,7 @@ const HealthInfoCard = ({ detail }: { detail: AdoptionDetailDto }) => (
       {/* 유전병 검사 — 검진일·검사기관 뒤에 결과 행 */}
       <HealthBlock
         title="유전병 검사"
+        completedLabel="검사 완료"
         completed={detail.health.geneticTestCompleted}
         isEmpty={detail.health.geneticTest.results.length === 0}
         incompleteReason={detail.health.geneticTestIncompleteReason}
