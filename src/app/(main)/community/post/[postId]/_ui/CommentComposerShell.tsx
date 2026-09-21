@@ -25,8 +25,8 @@ const CommentComposerShell = ({
 }: CommentComposerShellProps) => (
   <div className="flex flex-col gap-2 py-3">
     {banner}
-    <div className="flex items-center gap-3">
-      <ProfileAvatar size="medium" src={profileImageUrl} alt="내 프로필" className="shrink-0" />
+    <div className="flex items-center gap-2">
+      <ProfileAvatar size="responsive" src={profileImageUrl} alt="내 프로필" className="shrink-0" />
       {children}
     </div>
     {footer}

@@ -34,7 +34,7 @@ const CommentItem = ({ comment, currentUserId, onReply, isReply }: CommentItemPr
   return (
     <div className={`flex items-start gap-2 py-3 ${isReply ? 'pl-12' : ''}`}>
       <AuthorInfo
-        size="md"
+        size="sm"
         // 남는 가로를 댓글이 차지해야 ⋯ 메뉴가 오른쪽 끝으로 밀린다
         className="flex min-w-0 flex-1 items-start gap-2"
         authorId={comment.authorId}
@@ -83,7 +83,7 @@ const CommentItem = ({ comment, currentUserId, onReply, isReply }: CommentItemPr
                 )}
               </div>
             ) : (
-              <p className="mt-1 text-sm font-bold break-words whitespace-pre-wrap text-text-secondary">
+              <p className="mt-1.5 text-body-lg font-normal break-words whitespace-pre-wrap text-neutral-850">
                 {comment.body}
               </p>
             )}
@@ -91,9 +91,9 @@ const CommentItem = ({ comment, currentUserId, onReply, isReply }: CommentItemPr
               <button
                 type="button"
                 onClick={() => onReply(comment)}
-                className="mt-1 text-sm font-semibold text-text-secondary"
+                className="inline-flex min-h-6 items-center rounded px-1 text-body-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 hover:text-primary-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
               >
-                답글달기
+                답글 달기
               </button>
             )}
           </>

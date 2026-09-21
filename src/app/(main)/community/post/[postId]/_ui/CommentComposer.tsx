@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { cn } from '@/shared/lib/cn'
+import { Button } from '@/shared/ui'
 import { CommentComposerShell } from './CommentComposerShell'
 
 interface CommentComposerProps {
@@ -17,7 +17,7 @@ interface CommentComposerProps {
 }
 
 /**
- * 댓글/답글 입력창 (Figma 2612:269261 comment-input) — 아바타 + 박스(placeholder "댓글달기" + "게시").
+ * 댓글/답글 입력창 — 아바타 + 뉴트럴 입력 필드 + 브랜드 컬러 게시 버튼.
  * 답글 모드에서는 대상 닉네임 배너 + 취소를 노출한다. 제출 성공 후 입력값을 비운다.
  */
 const CommentComposer = ({
@@ -51,12 +51,12 @@ const CommentComposer = ({
 
   // [refactored] py-3 래퍼·아바타 마크업을 CommentComposerShell로 위임
   const banner = replyingToNickname && (
-    <div className="flex items-center justify-between rounded-lg bg-point-50 px-3 py-2 text-sm text-neutral-700">
-      <span className="font-semibold">@{replyingToNickname}에게 답글</span>
+    <div className="flex items-center justify-between gap-2 rounded-xl bg-primary-50 px-3 py-2 text-body-md text-primary-700">
+      <span className="min-w-0 font-semibold break-words">@{replyingToNickname}에게 답글</span>
       <button
         type="button"
         onClick={onCancelReply}
-        className="text-neutral-700 transition-colors hover:text-neutral-850"
+        className="shrink-0 rounded-full px-2 py-1 text-primary-700 transition-colors hover:bg-primary-100 focus-visible:outline-2 focus-visible:outline-primary-500"
       >
         취소
       </button>
@@ -64,14 +64,14 @@ const CommentComposer = ({
   )
 
   const error = hasSubmitError && (
-    <p role="alert" className="text-xs text-error-700">
+    <p role="alert" className="text-body-sm text-error-700">
       댓글 등록에 실패했습니다. 다시 시도해주세요.
     </p>
   )
 
   return (
     <CommentComposerShell profileImageUrl={profileImageUrl} banner={banner} footer={error}>
-      <div className="flex h-14 flex-1 items-center justify-between gap-2 rounded-lg border border-neutral-500 bg-white p-3 transition-[border-color,box-shadow] focus-within:border-primary-500 focus-within:shadow-[0_0_0_3px_rgba(245,234,223,0.9)]">
+      <div className="flex h-12 min-w-0 flex-1 items-center gap-2 rounded-full border border-neutral-300 bg-base-white py-1 pr-1.5 pl-5 transition-[border-color,box-shadow] duration-150 focus-within:border-primary-500 focus-within:ring-4 focus-within:ring-point-500/45 motion-reduce:transition-none pc:h-14 pc:pl-6">
         <input
           ref={inputRef}
           type="text"
@@ -80,25 +80,27 @@ const CommentComposer = ({
             setValue(e.target.value)
             if (hasSubmitError) onClearSubmitError()
           }}
-          onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-          placeholder="댓글달기"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
+              e.preventDefault()
+              void handleSubmit()
+            }
+          }}
+          aria-label={replyingToNickname ? '답글 입력' : '댓글 입력'}
+          placeholder={replyingToNickname ? '답글을 남겨주세요' : '댓글을 남겨주세요'}
           maxLength={1000}
-          className="min-w-0 flex-1 bg-transparent text-base leading-[1.5] font-medium text-neutral-850 outline-none placeholder:text-neutral-500"
+          className="h-full min-w-0 flex-1 bg-transparent text-body-lg font-medium text-neutral-850 outline-none placeholder:text-neutral-500"
         />
-        <button
-          type="button"
+        <Button
+          variant="primary"
+          size="sm"
           onClick={handleSubmit}
           disabled={!trimmed || isSubmitting}
           aria-busy={isSubmitting}
-          className={cn(
-            'flex h-8 shrink-0 items-center rounded-full px-3 text-sm leading-[1.5] whitespace-nowrap transition-colors disabled:px-0',
-            trimmed
-              ? 'bg-point-500 font-semibold text-neutral-850 hover:bg-point-300 active:bg-point-600'
-              : 'font-medium text-neutral-400',
-          )}
+          className="h-10 min-w-14 shrink-0 px-3 whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 motion-reduce:transition-none pc:h-11"
         >
           게시
-        </button>
+        </Button>
       </div>
     </CommentComposerShell>
   )
