@@ -16,6 +16,9 @@ export type NotificationType =
   | 'ADOPTION_REJECTED'
   | 'NEW_PET_REGISTERED'
   | 'DOCUMENT_REMINDER'
+  | 'COMMUNITY_POST_LIKED'
+  | 'COMMUNITY_POST_COMMENTED'
+  | 'COMMUNITY_COMMENT_REPLIED'
 
 export interface NotificationResponseDto {
   notificationId: string
