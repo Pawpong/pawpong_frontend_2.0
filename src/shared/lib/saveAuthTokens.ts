@@ -1,6 +1,11 @@
 import type { RegisterTokens } from '@/shared/types'
 import { getAccessToken } from '@/shared/api/token'
-import { beginLogin, isAuthSessionCurrent, trackAuthCookieWrite } from './authSessionLifecycle'
+import {
+  beginLogin,
+  isAuthSessionCurrent,
+  trackAuthCookieWrite,
+  waitForAuthCookieWrites,
+} from './authSessionLifecycle'
 import { notifyAuthStateChanged } from './authStateEvents'
 
 /** 가입 결과 토큰을 BFF에 전달해 현재 origin의 인증 쿠키로 저장한다. */
@@ -11,6 +16,8 @@ export const saveAuthTokens = async ({
   if (!accessToken || !refreshToken) return false
   const generation = beginLogin()
   try {
+    await waitForAuthCookieWrites()
+    if (!isAuthSessionCurrent(generation)) return false
     const response = await trackAuthCookieWrite(
       fetch('/api/auth/set-cookie', {
         method: 'POST',

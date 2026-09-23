@@ -1,5 +1,6 @@
 import { beginLogout, waitForAuthCookieWrites } from '@/shared/lib/authSessionLifecycle'
 import { unregisterNativePushSession } from '@/shared/lib/nativePushSession'
+import { clearAuthCookies } from '@/shared/lib/authSessionRecovery'
 import { apiClient, API_VERSION, unwrap } from '@/shared/api'
 import type { ApiRequestConfig } from '@/shared/api'
 import type { ApiResponse, ReactivateAccountResponse } from '@/shared/types'
@@ -15,11 +16,11 @@ export const logout = async (): Promise<{ message: string; loggedOutAt: string }
       { skipAuthRefresh: true } as ApiRequestConfig,
     )
     await waitForAuthCookieWrites()
-    await fetch('/api/auth/clear-cookie', { method: 'POST' })
+    await clearAuthCookies()
     return unwrap(response, '로그아웃에 실패했습니다.')
   } catch (error) {
     await waitForAuthCookieWrites()
-    await fetch('/api/auth/clear-cookie', { method: 'POST' }).catch(() => {})
+    await clearAuthCookies()
     throw error
   }
 }

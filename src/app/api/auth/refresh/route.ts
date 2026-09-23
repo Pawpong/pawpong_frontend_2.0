@@ -13,6 +13,8 @@ import { NextResponse } from 'next/server'
  * 주의: 백엔드 refresh 엔드포인트는 v2 경로다 → POST {API_BASE}/api/v2/auth/refresh
  */
 export async function POST() {
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 8_000)
   try {
     const cookieStore = await cookies()
     const refreshToken = cookieStore.get('refreshToken')?.value
@@ -33,6 +35,8 @@ export async function POST() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refreshToken }),
+      signal: controller.signal,
+      cache: 'no-store',
     })
 
     const data = await response.json()
@@ -51,5 +55,7 @@ export async function POST() {
       { success: false, message: '토큰 갱신 중 오류가 발생했습니다.' },
       { status: 500 },
     )
+  } finally {
+    clearTimeout(timeout)
   }
 }

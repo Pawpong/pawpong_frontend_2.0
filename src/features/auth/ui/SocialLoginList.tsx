@@ -1,12 +1,13 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { AppleIcon, GoogleIcon, KakaoIcon, NaverIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { normalizeReturnUrl } from '@/shared/lib/normalizeReturnUrl'
 import { Button } from '@/shared/ui/Button'
 import { getApiBaseUrl as getConfiguredApiBaseUrl } from '@/shared/config/apiBaseUrl'
+import { restoreAuthSession } from '@/shared/lib/authSessionRecovery'
 
 /**
  * 소셜 로그인 버튼 목록 (카카오 / 네이버 / 구글)
@@ -70,6 +71,7 @@ export const SocialLoginList = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const returnUrl = normalizeReturnUrl(searchParams.get('returnUrl'))
+  const [restoring, setRestoring] = useState(true)
 
   // 서버 가드(requireAuth)와 같은 기준으로 판정한다.
   // 이름만 보고 판정하면 max-age=0 삭제가 빈 값(`accessToken=`)으로 남았을 때 "로그인됨"이 되고,
@@ -94,8 +96,18 @@ export const SocialLoginList = () => {
   // 이미 로그인된 상태로 /login 에 진입하면(뒤로가기 등) 즉시 벗어난다 — 로그인 페이지 트랩 방지.
   // replace 로 이동해 /login 이 히스토리에 남지 않게 한다.
   useEffect(() => {
-    // 복구 안내로 들어온 경우는 잔여 쿠키가 있어도 모달을 봐야 하므로 튕기지 않는다
-    if (!isReactivationPrompt && isLoggedIn()) router.replace(returnUrl)
+    let cancelled = false
+    const restore = async () => {
+      // accessToken 쿠키가 만료되어 서버 가드가 보냈어도 유효한 refresh 세션은 복구한다.
+      if (!isReactivationPrompt) await restoreAuthSession().catch(() => {})
+      if (cancelled) return
+      if (!isReactivationPrompt && isLoggedIn()) router.replace(returnUrl)
+      setRestoring(false)
+    }
+    void restore()
+    return () => {
+      cancelled = true
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router, returnUrl, isReactivationPrompt])
 
@@ -121,10 +133,16 @@ export const SocialLoginList = () => {
 
   return (
     <div className="flex w-full flex-col gap-3 tab:gap-4">
+      {restoring && (
+        <p role="status" className="text-center text-sm">
+          로그인 상태를 확인하고 있어요.
+        </p>
+      )}
       {SOCIAL_BUTTONS.map(({ provider, label, Icon, className }) => (
         <Button
           key={provider}
           variant="fill"
+          disabled={restoring}
           className={cn(
             'h-10 w-full gap-0.5 px-4 py-2 transition-[color,background-color,filter] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500',
             className,

@@ -23,7 +23,6 @@ const useLogoutAndRedirect = () => {
       } catch {
         // 서버 로그아웃이 실패해도 로컬 세션 정리와 이동은 그대로 진행한다
       }
-      await fetch('/api/auth/clear-cookie', { method: 'POST' }).catch(() => {})
       window.location.assign('/')
     })()
   }, [logout])

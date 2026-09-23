@@ -4,14 +4,10 @@ import axios, {
   AxiosRequestConfig,
   InternalAxiosRequestConfig,
 } from 'axios'
-import { ApiError, normalizeApiError } from './unwrap'
+import { ApiError } from './unwrap'
 import { getAccessToken } from './token'
-import { notifyAuthStateChanged } from '@/shared/lib/authStateEvents'
-import {
-  getAuthSessionGeneration,
-  isAuthSessionCurrent,
-  trackAuthCookieWrite,
-} from '@/shared/lib/authSessionLifecycle'
+import { getAuthSessionGeneration, isAuthSessionCurrent } from '@/shared/lib/authSessionLifecycle'
+import { refreshAuthSession } from '@/shared/lib/authSessionRecovery'
 import { getApiBaseUrl } from '@/shared/config/apiBaseUrl'
 
 export interface ApiRequestConfig extends AxiosRequestConfig {
@@ -23,19 +19,8 @@ export interface ApiRequestConfig extends AxiosRequestConfig {
   skipAuthRefresh?: boolean
 }
 
-let isRefreshing = false
-let failedQueue: Array<{
-  resolve: (accessToken?: string) => void
-  reject: (reason?: unknown) => void
-}> = []
-
 const setAuthorizationHeader = (config: InternalAxiosRequestConfig, accessToken: string) => {
   config.headers['Authorization'] = `Bearer ${accessToken}`
-}
-
-const processQueue = (error: Error | null, accessToken?: string) => {
-  failedQueue.forEach((prom) => (error ? prom.reject(error) : prom.resolve(accessToken)))
-  failedQueue = []
 }
 
 function createApiClient(): AxiosInstance {
@@ -99,96 +84,26 @@ function createApiClient(): AxiosInstance {
           return Promise.reject(new ApiError('세션이 만료되었습니다. 다시 로그인해주세요.', 401))
         }
 
-        if (isRefreshing) {
-          return new Promise<string | undefined>((resolve, reject) => {
-            failedQueue.push({ resolve, reject })
-          })
-            .then((accessToken) => {
-              if (accessToken) setAuthorizationHeader(originalRequest, accessToken)
-              return instance(originalRequest)
-            })
-            .catch((err) => Promise.reject(err))
-        }
-
         originalRequest._retry = true
-        isRefreshing = true
-
         try {
-          const refreshResponse = await fetch('/api/auth/refresh', {
-            method: 'POST',
-            credentials: 'include',
-          })
-
-          const refreshData = (await refreshResponse.json()) as {
-            success: boolean
-            data?: { accessToken: string; refreshToken: string }
-          }
-
-          if (!refreshResponse.ok || !refreshData.success) {
-            throw new ApiError('토큰 갱신 실패', refreshResponse.status, undefined, refreshData)
-          }
-
+          const accessToken = await refreshAuthSession()
           if (!isAuthSessionCurrent(generation))
             throw new ApiError('인증 세션이 변경되었습니다.', 401)
-          const nextAccessToken = refreshData.data?.accessToken
-          const nextRefreshToken = refreshData.data?.refreshToken
-
-          if (nextAccessToken && nextRefreshToken) {
-            const saved = await trackAuthCookieWrite(
-              fetch('/api/auth/set-cookie', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  accessToken: nextAccessToken,
-                  refreshToken: nextRefreshToken,
-                }),
-              }),
-            )
-            if (!saved.ok) throw new ApiError('인증 쿠키 저장 실패', 401)
-          }
-
-          if (!isAuthSessionCurrent(generation))
-            throw new ApiError('인증 세션이 변경되었습니다.', 401)
-          if (!nextAccessToken || getAccessToken() !== nextAccessToken) {
-            throw new ApiError('인증 쿠키 저장 실패', 401)
-          }
-          notifyAuthStateChanged()
-          processQueue(null, nextAccessToken)
-          setAuthorizationHeader(originalRequest, nextAccessToken)
+          setAuthorizationHeader(originalRequest, accessToken)
           return instance(originalRequest)
         } catch (refreshError) {
-          processQueue(
-            normalizeApiError(refreshError, '세션이 만료되었습니다. 다시 로그인해주세요.'),
-          )
-
           if (!isAuthSessionCurrent(generation)) return Promise.reject(refreshError)
-          if (typeof window !== 'undefined') {
-            // 무효 토큰이 남아 재-401 → /login 무한 루프에 빠지지 않도록 클라이언트 쿠키를 즉시 동기 제거한다.
-            // (httpOnly=false 인 accessToken/userRole 은 JS 로 지울 수 있고, isLoggedIn 판정이 이 쿠키에 의존한다)
-            document.cookie = 'accessToken=; path=/; max-age=0'
-            document.cookie = 'userRole=; path=/; max-age=0'
-            // refreshToken(httpOnly)은 서버 라우트로만 제거 가능 — 네비게이션이 요청을 끊지 않도록 완료를 기다린다.
-            await fetch('/api/auth/clear-cookie', { method: 'POST' }).catch(() => {})
-            notifyAuthStateChanged()
-            try {
-              localStorage.removeItem('auth-storage')
-            } catch {
-              // ignore
-            }
-
-            if (!window.location.pathname.startsWith('/login')) {
-              // href 할당(=history push) 대신 replace 로 이동해 /login 이 히스토리에 중복 축적되는 것을 막는다.
-              // (여러 번 401 이 나도 뒤로가기가 /login 사이를 맴도는 트랩 방지 + 로그인 후 원래 위치로 복귀)
-              const returnUrl = encodeURIComponent(
-                window.location.pathname + window.location.search,
-              )
-              window.location.replace(`/login?returnUrl=${returnUrl}`)
-            }
+          // 오프라인·5xx에서는 세션을 보존한다. refresh가 401로 거절됐을 때만 로그인으로 간다.
+          if (
+            refreshError instanceof ApiError &&
+            refreshError.status === 401 &&
+            typeof window !== 'undefined' &&
+            !window.location.pathname.startsWith('/login')
+          ) {
+            const returnUrl = encodeURIComponent(window.location.pathname + window.location.search)
+            window.location.replace(`/login?returnUrl=${returnUrl}`)
           }
-
-          return Promise.reject(new ApiError('세션이 만료되었습니다. 다시 로그인해주세요.', 401))
-        } finally {
-          isRefreshing = false
+          return Promise.reject(refreshError)
         }
       }
 

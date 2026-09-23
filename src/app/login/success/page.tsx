@@ -25,6 +25,7 @@ const LoginSuccessContent = () => {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    let cancelled = false
     const run = async () => {
       const accessToken = searchParams.get('accessToken')
       const refreshToken = searchParams.get('refreshToken')
@@ -36,12 +37,15 @@ const LoginSuccessContent = () => {
       }
 
       try {
-        if (!(await saveAuthTokens({ accessToken, refreshToken }))) {
+        const saved = await saveAuthTokens({ accessToken, refreshToken })
+        if (cancelled) return
+        if (!saved) {
           throw new Error('인증 쿠키 저장 실패')
         }
 
         router.replace(returnUrl)
       } catch (err) {
+        if (cancelled) return
         console.error('로그인 처리 중 오류:', err)
         setError('로그인 처리 중 오류가 발생했습니다.')
         setTimeout(() => router.replace('/login'), 2000)
@@ -49,6 +53,9 @@ const LoginSuccessContent = () => {
     }
 
     run()
+    return () => {
+      cancelled = true
+    }
   }, [searchParams, router])
 
   return (
