@@ -102,6 +102,7 @@ const ChatPageContent = () => {
   if (!isPC) {
     return (
       <ChatRoomPanel
+        key={activeRoom.roomId}
         room={activeRoom}
         currentUserId={profileQuery.data.userId}
         onBack={handleBack}
@@ -120,6 +121,7 @@ const ChatPageContent = () => {
       />
       <div className="flex-1">
         <ChatRoomPanel
+          key={activeRoom.roomId}
           room={activeRoom}
           currentUserId={profileQuery.data.userId}
           onBack={handleBack}

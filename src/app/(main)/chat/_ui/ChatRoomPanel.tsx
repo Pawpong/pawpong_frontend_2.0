@@ -53,7 +53,16 @@ const ChatRoomPanel = ({ room, currentUserId, onBack, onRoomClosed }: ChatRoomPa
   // 상대가 보낸 안 읽은 메시지가 있을 때만 읽음 처리를 emit한다.
   const hasUnread = messages.some((message) => !message.isMine && !message.isRead)
   React.useEffect(() => {
-    if (isConnected && hasUnread) markAsRead()
+    const readVisibleMessages = () => {
+      if (document.visibilityState !== 'hidden' && isConnected && hasUnread) markAsRead()
+    }
+    readVisibleMessages()
+    document.addEventListener('visibilitychange', readVisibleMessages)
+    window.addEventListener('pawpong:app-active', readVisibleMessages)
+    return () => {
+      document.removeEventListener('visibilitychange', readVisibleMessages)
+      window.removeEventListener('pawpong:app-active', readVisibleMessages)
+    }
   }, [isConnected, hasUnread, markAsRead])
 
   return (

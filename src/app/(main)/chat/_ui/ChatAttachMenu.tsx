@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/ui'
 import { CameraIcon, FileIcon, LocationPinIcon, PlusIcon } from '@/shared/assets'
+import { PHOTO_ACCEPT } from '@/shared/lib/preparePhoto'
 
 const ATTACH_ITEMS = [
   { icon: CameraIcon, label: '이미지', type: 'image' },
@@ -66,7 +67,7 @@ const ChatAttachMenu = ({ disabled, onSelectFile, onSelectLocation }: ChatAttach
       <input
         ref={imageInputRef}
         type="file"
-        accept="image/jpeg,image/png,image/gif,image/webp,image/heif,image/heic"
+        accept={PHOTO_ACCEPT}
         className="hidden"
         onChange={(event) => handleChange(event, 'image')}
       />

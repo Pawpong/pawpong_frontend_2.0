@@ -29,6 +29,7 @@ export interface ChatRoomResponseDto {
 /** REST 채팅 메시지 응답 DTO */
 export interface ChatMessageResponseDto {
   messageId: string
+  clientMessageId?: string
   roomId: string
   senderRole: ChatParticipantRole
   isMine: boolean
@@ -41,6 +42,7 @@ export interface ChatMessageResponseDto {
 /** Socket.IO new_message 이벤트 페이로드 */
 export interface WsChatMessage {
   messageId: string
+  clientMessageId?: string
   roomId: string
   senderId: string
   senderRole: ChatParticipantRole

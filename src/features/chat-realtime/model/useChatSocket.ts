@@ -4,6 +4,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { io, type Socket } from 'socket.io-client'
 import type { WsChatMessage, WsMessagesRead } from '@/shared/types'
 import { getApiBaseUrl } from '@/shared/config/apiBaseUrl'
+import { getAccessToken } from '@/shared/api'
+import { restoreAuthSession } from '@/shared/lib/authSessionRecovery'
+import {
+  deliverChatMessage,
+  type OutgoingChatMessage,
+  type ChatDeliveryResult,
+} from './chatDelivery'
 
 const getSocketUrl = () => {
   const configuredUrl = getApiBaseUrl()
@@ -13,6 +20,7 @@ const getSocketUrl = () => {
 
 interface UseChatSocketOptions {
   roomId: string
+  currentUserId: string
   token: string | null
   onConnect?: () => void
   onDisconnect?: () => void
@@ -23,6 +31,7 @@ interface UseChatSocketOptions {
 
 const useChatSocket = ({
   roomId,
+  currentUserId,
   token,
   onConnect,
   onDisconnect,
@@ -31,6 +40,7 @@ const useChatSocket = ({
   onError,
 }: UseChatSocketOptions) => {
   const socketRef = useRef<Socket | null>(null)
+  const connectionAbort = useRef<AbortController | null>(null)
   const connectionKey = useMemo(
     () => Symbol(`chat-connection:${roomId}:${token ? 'authenticated' : 'anonymous'}`),
     [roomId, token],
@@ -48,6 +58,8 @@ const useChatSocket = ({
       timeout: 10_000,
     })
     socketRef.current = socket
+    const controller = new AbortController()
+    connectionAbort.current = controller
 
     const handleConnect = () => {
       setConnectedKey(connectionKey)
@@ -77,7 +89,28 @@ const useChatSocket = ({
     socket.on('error', handleServerError)
     socket.connect()
 
+    const resume = () => {
+      if (document.visibilityState === 'hidden') return
+      void restoreAuthSession()
+        .then(() => {
+          if (controller.signal.aborted || getAccessToken() !== token) return
+          // 인증 거절·서버 disconnect는 Socket.IO가 자동 재접속하지 않는 경우도 있다.
+          if (!socket.connected) socket.connect()
+          else onConnect?.()
+        })
+        .catch(() => {})
+    }
+    window.addEventListener('online', resume)
+    window.addEventListener('pageshow', resume)
+    window.addEventListener('pawpong:app-active', resume)
+    document.addEventListener('visibilitychange', resume)
+
     return () => {
+      controller.abort()
+      window.removeEventListener('online', resume)
+      window.removeEventListener('pageshow', resume)
+      window.removeEventListener('pawpong:app-active', resume)
+      document.removeEventListener('visibilitychange', resume)
       if (socket.connected) socket.emit('leave_room', { roomId })
       socket.removeAllListeners()
       socket.disconnect()
@@ -86,13 +119,14 @@ const useChatSocket = ({
   }, [connectionKey, roomId, token, onConnect, onDisconnect, onNewMessage, onMessagesRead, onError])
 
   const sendMessage = useCallback(
-    (content: string, messageType: WsChatMessage['messageType'] = 'text') => {
+    (payload: OutgoingChatMessage): Promise<ChatDeliveryResult> => {
       const socket = socketRef.current
-      if (!socket?.connected || connectedKey !== connectionKey) return false
-      socket.emit('send_message', { roomId, content, messageType })
-      return true
+      const controller = connectionAbort.current
+      if (!socket?.connected || connectedKey !== connectionKey || !controller)
+        return Promise.resolve({ status: 'failed' })
+      return deliverChatMessage(socket, payload, currentUserId, controller.signal)
     },
-    [connectedKey, connectionKey, roomId],
+    [connectedKey, connectionKey, currentUserId],
   )
 
   const markAsRead = useCallback(() => {

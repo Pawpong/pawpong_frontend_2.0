@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { chatQueries } from '@/entities/chat'
-import { getAccessToken } from '@/shared/api'
+import { useAccessToken } from '@/shared/lib/useAccessToken'
 import type {
   ChatMessageResponseDto,
   ChatMessageType,
@@ -11,15 +11,8 @@ import type {
   WsMessagesRead,
 } from '@/shared/types'
 import { useChatSocket } from './useChatSocket'
-
-const mergeMessages = (current: ChatMessageResponseDto[], incoming: ChatMessageResponseDto[]) => {
-  const byId = new Map(current.map((message) => [message.messageId, message]))
-  incoming.forEach((message) => byId.set(message.messageId, message))
-  return [...byId.values()].sort((a, b) => {
-    const timeDiff = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-    return timeDiff || a.messageId.localeCompare(b.messageId)
-  })
-}
+import { mergeChatMessages as mergeMessages } from './mergeChatMessages'
+import { createClientMessageId } from './chatDelivery'
 
 interface LiveMessageState {
   roomId: string
@@ -32,7 +25,7 @@ const useChatRoom = (roomId: string, currentUserId: string) => {
   const [usePolling, setUsePolling] = useState(false)
   const [socketError, setSocketError] = useState<string | null>(null)
   const [liveState, setLiveState] = useState<LiveMessageState>({ roomId, messages: [] })
-  const token = getAccessToken()
+  const token = useAccessToken()
 
   const messagesQuery = useQuery({
     ...chatQueries.messages(roomId),
@@ -62,6 +55,7 @@ const useChatRoom = (roomId: string, currentUserId: string) => {
 
       const normalized: ChatMessageResponseDto = {
         messageId: event.messageId,
+        clientMessageId: event.clientMessageId,
         roomId: event.roomId,
         senderRole: event.senderRole,
         isMine: event.senderId === currentUserId,
@@ -116,6 +110,7 @@ const useChatRoom = (roomId: string, currentUserId: string) => {
     markAsRead,
   } = useChatSocket({
     roomId,
+    currentUserId,
     token,
     onConnect: handleConnect,
     onDisconnect: handleDisconnect,
@@ -125,13 +120,35 @@ const useChatRoom = (roomId: string, currentUserId: string) => {
   })
 
   const sendMessage = useCallback(
-    (content: string, messageType: ChatMessageType = 'text') => {
+    async (
+      content: string,
+      messageType: ChatMessageType = 'text',
+      clientMessageId: string = createClientMessageId(),
+    ) => {
       setSocketError(null)
-      const sent = emitMessage(content, messageType)
-      if (!sent) setSocketError('실시간 연결을 확인한 뒤 다시 보내주세요.')
+      const payload = {
+        roomId,
+        content,
+        messageType,
+        clientMessageId,
+      }
+      const delivered = queryClient
+        .getQueryData<ChatMessageResponseDto[]>(queryKey)
+        ?.some((message) => message.clientMessageId === payload.clientMessageId)
+      const result = delivered ? { status: 'sent' as const } : await emitMessage(payload)
+      const sent = result.status === 'sent'
+      if (sent) {
+        void queryClient.invalidateQueries({ queryKey })
+        void queryClient.invalidateQueries({ queryKey: chatQueries.rooms().queryKey })
+      } else {
+        setSocketError(
+          result.message ?? '전송을 확인하지 못했어요. 대화 내역을 확인한 뒤 다시 보내주세요.',
+        )
+        void queryClient.invalidateQueries({ queryKey })
+      }
       return sent
     },
-    [emitMessage],
+    [emitMessage, queryClient, queryKey, roomId],
   )
 
   const messages = useMemo(
