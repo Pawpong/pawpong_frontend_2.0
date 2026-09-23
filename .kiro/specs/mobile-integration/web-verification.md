@@ -29,3 +29,11 @@
 ## 로컬 병렬 검증
 
 기존 웹 개발 서버와 함께 실행할 때 `PAWPONG_NEXT_DIST_DIR=.next-mobile-integration NEXT_PUBLIC_API_BASE_URL=http://localhost:8086 pnpm dev --hostname 0.0.0.0 --port 3017` 사용함. Next가 자동 추가하는 임시 dist 경로의 tsconfig 변경은 커밋하지 않음.
+
+## dev 배포·공개 연결 파일 확인
+
+- 2026-09-24 KST, 변경 커밋을 `dev`에 푸시한 뒤 `dev-api.pawpong.kr/api/v2/deep-links/{존재하지않는slug}`가 구현된 API의 404 메시지를 반환함을 확인함.
+- Vercel 기존 인증을 이용한 `vercel curl`로 dev 웹 `/l/{동일slug}`의 404 HTML과 JavaScript 없는 안내 페이지를 확인함. 배포 도중 관찰한 503은 재확인에서 정상화됨. 오류 재발 시 공유 내용·토큰 없이 오류 종류/응답 상태만 로그에 남김.
+- `pawpong.kr/.well-known/apple-app-site-association`과 `assetlinks.json`은 리다이렉트 없이 JSON 200을 반환함. iOS appID는 `BWRD8QZVDN.kr.pawpong.app`임.
+- dev 도메인의 연결 파일은 Vercel 인증으로 접근 가능하나 공개 OS 검증 요청에는 로그인 보호가 적용됨. 보호 설정은 해제하지 않음.
+- App Store `id6814126823`과 Google Play `kr.pawpong.app`의 공개 URL은 확인 시점 HTTP 404임. 실제 공개·설치·스토어 업데이트 완료는 릴리스 후 별도로 확인해야 함.
