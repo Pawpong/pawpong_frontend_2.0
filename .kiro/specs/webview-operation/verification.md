@@ -9,9 +9,11 @@
 | 저장소 | 지정 브랜치 | 기능·검증 반영 확인 |
 | --- | --- | --- |
 | RN | master | `e425785` |
-| 웹 | dev | `69f8ffb`까지 기능·개별 검증 반영, 이 문서에서 통합 결과 추가 |
+| 웹 | dev | 기능 `69f8ffb`·통합 기록 `f398f99` 및 아래 보안 후속 수정 |
 | 백엔드 | dev | `d11b935a` (버전 정책 `d04fcdd0`, 계정 접근 `13219541`, 채팅 `d11b935a`) |
 | 어드민 | dev·main | 양쪽 모두 `6dc30fb` |
+
+웹의 후속 보안 수정은 기존 3000 개발 서버와 설치된 의존성을 보존하기 위해 Orca `webview-security` 작업 공간에서 검증하고 원격 `dev`로 반영함. 원본 체크아웃의 실행 중인 서버는 기존 설치 상태를 사용하므로, 새 의존성 검증 결과는 격리 작업 공간 기준임.
 
 ## 스토어 업데이트를 줄이는 범위
 
@@ -71,6 +73,19 @@ Google 네이티브 인증은 다른 작업에서 갱신된 백엔드 `origin/ma
 - 앱 오류 경계와 WebView 복구는 있지만 운영 네이티브 크래시를 중앙 수집·알림하는 새 시스템은 이번에 추가하지 않음.
 - 정지·탈퇴 계정의 access JWT는 매 요청의 상태 확인으로 거절함. 계정을 다시 활성화하면 아직 만료되지 않은 과거 access JWT가 유효할 수 있으며 tokenVersion을 이용한 영구 취소 모델은 도입하지 않음. 제거한 refresh 세션은 재활성화해도 복구되지 않음.
 
+## 최종 푸시에서 발견한 웹 의존성 보안 수정
+
+GitHub의 보안 알림을 계기로 현재 웹 lockfile을 직접 `pnpm audit --prod`로 검사해 81건(critical 2·high 43·moderate 32·low 4)을 확인함. 이는 감사의 패키지 공지 건수이며 운영 서버가 실제 침해됐다는 의미가 아님. Next.js의 [AVIF 이미지 처리 공지](https://github.com/vercel/next.js/security/advisories/GHSA-2xp9-vwfh-vxw4)와 [Windows 서버 관련 공지](https://github.com/vercel/next.js/security/advisories/GHSA-p293-qw3h-jr36)가 포함돼 있었음. 두 번째 공지는 Windows 조건이 있으며 현재 운영에서 그 조건이 성립한다고 주장하지 않음.
+
+- 기존 major 안에서 Next.js/ESLint config 16.3.6, Axios 1.20.0, Sentry 10.75.3, PostCSS 8.5.28로 갱신함. React 19.2.4는 유지함. Next.js가 선언한 sharp 0.35.4와 Sentry 하위 의존성을 갱신했고 강제 major override는 추가하지 않음. Next 16 내부의 업데이트여서 적용할 major migration codemod는 없었음.
+- 최종 운영 의존성 감사는 모든 severity 0건, exit 0임. 일회성 감사 결과이며 이후 발표되는 취약점까지 없다고 보장하지 않음. [버전·lockfile 해시·감사 결과](evidence/dependency-audit.json)
+- 새 Sentry 버전의 설정 import 경로와 페이지 이동 추적 hook을 연결함. 기존 환경별 활성화 조건은 유지함.
+- 기존 테스트 73개와 실제 설치된 Axios를 사용하는 추가 HTTP 테스트 1개가 통과함. 추가 테스트는 실제 공용 API client의 401→토큰 갱신→요청 재시도, 로그아웃의 갱신 방지, multipart 파일 바이트/경계를 확인함.
+- Next 16.3.6 production build·타입 검사 및 변경 설정 파일 ESLint를 통과함. 별도 3022 서버에서 로그인 HTTP 200과 네 가지 로그인 버튼, 브라우저 콘솔 오류 0건을 확인함. 실제 PNG 이미지 최적화는 200 및 image/png, 허용되지 않은 외부 이미지 호스트는 400으로 거절됨. [로그인 화면](evidence/security-login.png)
+- 여기서 이미지 처리는 이 Mac의 sharp 네이티브 모듈로 확인함. 운영 플랫폼의 설치·실제 공급자 로그인·Sentry 외부 이벤트 수신을 이 결과로 대체하지 않음.
+
 ## 검증 환경 정리
 
 이번 작업의 전용 Next 3021·Nest 8088·Metro 8083·진단 페이지 3019를 종료했고 해당 포트의 LISTEN 프로세스가 없음을 확인함. 임시 인증 경로·격리 브라우저 프로필·로컬 계정 자격증명 파일을 제거함. 원래 실행 중이던 3000·8080·8081과 다른 작업자의 iPhone 17 Pro Max는 정리하지 않음.
+
+보안 후속 검증의 production 서버 3022, 격리 브라우저 프로필과 새 작업 공간의 설치/셸 터미널도 종료함.
