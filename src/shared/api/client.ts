@@ -7,6 +7,11 @@ import axios, {
 import { ApiError, normalizeApiError } from './unwrap'
 import { getAccessToken } from './token'
 import { notifyAuthStateChanged } from '@/shared/lib/authStateEvents'
+import {
+  getAuthSessionGeneration,
+  isAuthSessionCurrent,
+  trackAuthCookieWrite,
+} from '@/shared/lib/authSessionLifecycle'
 import { getApiBaseUrl } from '@/shared/config/apiBaseUrl'
 
 export interface ApiRequestConfig extends AxiosRequestConfig {
@@ -87,6 +92,9 @@ function createApiClient(): AxiosInstance {
       }
 
       if (error.response?.status === 401 && !originalRequest._retry) {
+        const generation = getAuthSessionGeneration()
+        if (!isAuthSessionCurrent(generation))
+          return Promise.reject(new ApiError('로그아웃 중입니다.', 401))
         if (originalRequest.url?.includes('/api/auth/refresh')) {
           return Promise.reject(new ApiError('세션이 만료되었습니다. 다시 로그인해주세요.', 401))
         }
@@ -120,21 +128,27 @@ function createApiClient(): AxiosInstance {
             throw new ApiError('토큰 갱신 실패', refreshResponse.status, undefined, refreshData)
           }
 
+          if (!isAuthSessionCurrent(generation))
+            throw new ApiError('인증 세션이 변경되었습니다.', 401)
           const nextAccessToken = refreshData.data?.accessToken
           const nextRefreshToken = refreshData.data?.refreshToken
 
           if (nextAccessToken && nextRefreshToken) {
-            const saved = await fetch('/api/auth/set-cookie', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                accessToken: nextAccessToken,
-                refreshToken: nextRefreshToken,
+            const saved = await trackAuthCookieWrite(
+              fetch('/api/auth/set-cookie', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  accessToken: nextAccessToken,
+                  refreshToken: nextRefreshToken,
+                }),
               }),
-            })
+            )
             if (!saved.ok) throw new ApiError('인증 쿠키 저장 실패', 401)
           }
 
+          if (!isAuthSessionCurrent(generation))
+            throw new ApiError('인증 세션이 변경되었습니다.', 401)
           if (!nextAccessToken || getAccessToken() !== nextAccessToken) {
             throw new ApiError('인증 쿠키 저장 실패', 401)
           }
@@ -147,6 +161,7 @@ function createApiClient(): AxiosInstance {
             normalizeApiError(refreshError, '세션이 만료되었습니다. 다시 로그인해주세요.'),
           )
 
+          if (!isAuthSessionCurrent(generation)) return Promise.reject(refreshError)
           if (typeof window !== 'undefined') {
             // 무효 토큰이 남아 재-401 → /login 무한 루프에 빠지지 않도록 클라이언트 쿠키를 즉시 동기 제거한다.
             // (httpOnly=false 인 accessToken/userRole 은 JS 로 지울 수 있고, isLoggedIn 판정이 이 쿠키에 의존한다)
