@@ -1,9 +1,9 @@
 'use client'
 
 import * as Sentry from '@sentry/nextjs'
-import Link from 'next/link'
 import { useEffect } from 'react'
-import { Button, buttonVariants } from './Button'
+import { needsDocumentReload, recoverPageError } from '@/shared/lib/pageErrorRecovery'
+import { Button } from './Button'
 import { FullPageMessage } from './FullPageMessage'
 
 interface ErrorBoundaryUIProps {
@@ -19,6 +19,8 @@ export function ErrorBoundaryUI({
   title = '문제가 발생했습니다',
   description = '페이지를 불러오는 중 오류가 발생했습니다.',
 }: ErrorBoundaryUIProps) {
+  const reloadRequired = needsDocumentReload(error)
+
   useEffect(() => {
     Sentry.captureException(error)
   }, [error])
@@ -36,19 +38,21 @@ export function ErrorBoundaryUI({
       }
       actions={
         <>
-          <Button onClick={reset} size="lg" className="w-full px-5">
-            다시 시도
+          <Button
+            onClick={() => recoverPageError(error, reset, () => window.location.reload())}
+            size="lg"
+            className="w-full px-5"
+          >
+            {reloadRequired ? '페이지 새로 불러오기' : '다시 시도'}
           </Button>
-          <Link
-            href="/"
-            className={buttonVariants({
-              variant: 'outline',
-              size: 'lg',
-              className: 'w-full px-5 hover:bg-neutral-50',
-            })}
+          <Button
+            onClick={() => window.location.assign('/')}
+            variant="outline"
+            size="lg"
+            className="w-full px-5 hover:bg-neutral-50"
           >
             홈으로 가기
-          </Link>
+          </Button>
         </>
       }
     />
