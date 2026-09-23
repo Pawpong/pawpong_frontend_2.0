@@ -1,0 +1,14 @@
+{
+  "verifiedAt": "2026-09-23T17:15:03.306Z",
+  "environment": "isolated Nest API and MongoMemoryReplSet on 8088",
+  "forced": true,
+  "recommended": true,
+  "invalidLegacyPolicyDoesNotForceUpdate": true,
+  "emergencyDisableHttpStatus": 200,
+  "disabledPersisted": true,
+  "invalidReactivationHttpStatus": 400,
+  "sourceHashes": {
+    "src/api/admin/app-version/application/use-cases/update-app-version.use-case.ts": "1ed2d2cda149ea60bc69f90025115d2a2dea7d138a4d00c5947f48ee46967990",
+    "src/api/service/app-version/domain/services/app-version-store-url.policy.ts": "046a0b9611f847ce64cc3dd419b86999bc63e122cd1e45c9bf3cbd719b4cb6c1"
+  }
+}

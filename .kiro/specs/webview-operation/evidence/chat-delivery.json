@@ -1,0 +1,9 @@
+{
+  "realSocketClients": 2,
+  "lostResponse": "unconfirmed",
+  "retrySameStorageId": true,
+  "storageRows": 1,
+  "counterpartEvents": 1,
+  "legacyPayloadAccepted": true,
+  "reconnectRestRecovered": true
+}
