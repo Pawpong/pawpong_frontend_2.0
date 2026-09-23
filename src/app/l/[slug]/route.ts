@@ -58,7 +58,12 @@ export async function GET(
     ])
     if (result.status === 404) return htmlResponse(renderUnavailable(false), 404)
     const link = parseDeepLink(result.data, slug)
-    if (!link) return htmlResponse(renderUnavailable(true), 503)
+    if (!link) {
+      console.warn('[deep-link] Public resolver returned an invalid response', {
+        status: result.status,
+      })
+      return htmlResponse(renderUnavailable(true), 503)
+    }
     return htmlResponse(
       renderLanding(
         link,
@@ -74,7 +79,13 @@ export async function GET(
         ),
       ),
     )
-  } catch {
+  } catch (error) {
+    // 운영 장애 분석에는 오류 종류만 남기고 공유 내용/토큰/응답 본문은 기록하지 않는다.
+    const cause = error instanceof Error ? error.cause : undefined
+    console.warn('[deep-link] Public resolver request failed', {
+      name: error instanceof Error ? error.name : 'UnknownError',
+      code: cause && typeof cause === 'object' && 'code' in cause ? cause.code : undefined,
+    })
     return htmlResponse(renderUnavailable(true), 503)
   }
 }
