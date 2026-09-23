@@ -1,6 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
-
-const AUTH_COOKIES = ['accessToken', 'refreshToken', 'userRole'] as const
+import { expireAuthCookies } from '@/shared/lib/server/authCookies'
 
 /**
  * [BFF] 로그아웃 — 인증 쿠키 전체 삭제
@@ -17,36 +16,10 @@ const AUTH_COOKIES = ['accessToken', 'refreshToken', 'userRole'] as const
  * host-only 만 지우면 .pawpong.kr 쿠키가 남아 로그아웃이 안 먹는 것처럼 보인다.
  * (같은 이름을 res.cookies.set 으로 두 번 설정하면 덮어써지므로 헤더를 직접 append)
  */
-/**
- * 프록시·CDN 뒤에서는 host 에 내부 호스트가 올 수 있다.
- * 그러면 운영에서 host-only 쿠키만 만료시켜 Domain=.pawpong.kr 쿠키가 살아남고,
- * 로그아웃했는데 로그인 상태가 유지되는 것처럼 보인다.
- * (set-cookie 의 운영 판정과 같은 이유로 x-forwarded-host 를 먼저 본다)
- */
-const resolveRequestHost = (request: NextRequest): string | null => {
-  const forwarded = request.headers.get('x-forwarded-host')
-  if (forwarded) return forwarded.split(',')[0].trim()
-  return request.headers.get('host')
-}
-
-function expireAuthCookies(res: NextResponse, host: string | null) {
-  const isPawpongHost = host !== null && /(^|\.)pawpong\.kr(:\d+)?$/.test(host)
-  for (const name of AUTH_COOKIES) {
-    res.headers.append('Set-Cookie', `${name}=; Path=/; Max-Age=0`)
-    if (isPawpongHost) {
-      res.headers.append(
-        'Set-Cookie',
-        `${name}=; Path=/; Max-Age=0; Domain=.pawpong.kr; Secure; SameSite=None`,
-      )
-    }
-  }
-}
-
 export async function POST(request: NextRequest) {
-  const host = resolveRequestHost(request)
   try {
     const res = NextResponse.json({ ok: true, message: '쿠키가 삭제되었습니다.' })
-    expireAuthCookies(res, host)
+    expireAuthCookies(res, request)
     return res
   } catch (error) {
     console.error('쿠키 삭제 실패:', error)
@@ -55,7 +28,7 @@ export async function POST(request: NextRequest) {
       { ok: false, message: '쿠키 삭제 중 오류가 발생했습니다.' },
       { status: 500 },
     )
-    expireAuthCookies(res, host)
+    expireAuthCookies(res, request)
     return res
   }
 }
