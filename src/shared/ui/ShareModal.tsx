@@ -1,11 +1,16 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import Image from 'next/image'
 import { CloseIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { getKakao, shareToKakao } from '@/shared/lib/kakao'
+import {
+  hasNativeCapability,
+  shareNatively,
+  subscribeNativeCapabilities,
+} from '@/shared/lib/nativeBridge'
 import { Dialog, DialogOverlay, DialogPortal } from './Dialog'
 
 /* 공유하기 모달 (Figma 1949-253368) — 카카오톡/페이스북/네이버 블로그/URL 복사.
@@ -25,7 +30,10 @@ interface ShareModalProps {
   className?: string
 }
 
-type ShareKey = 'kakao' | 'facebook' | 'naver' | 'copy'
+type ShareKey = 'kakao' | 'facebook' | 'naver' | 'copy' | 'native'
+const supportsDeviceShare = () =>
+  hasNativeCapability('nativeShare') || typeof navigator.share === 'function'
+const serverShareSnapshot = () => false
 
 interface ShareFeedback {
   tone: 'success' | 'error'
@@ -90,6 +98,11 @@ const ShareModal = ({
   // [refactored] 4-state enum -> boolean (로드 완료 여부만 쓰인다)
   const [kakaoReady, setKakaoReady] = useState(false)
   const [feedback, setFeedback] = useState<ShareFeedback | null>(null)
+  const deviceShare = useSyncExternalStore(
+    subscribeNativeCapabilities,
+    supportsDeviceShare,
+    serverShareSnapshot,
+  )
 
   // 닫을 때 상태 리셋은 이벤트에서 한다. effect 안에서 동기로 setState 하면
   // 렌더가 한 번 더 도는 데다(react-hooks/set-state-in-effect) 닫히는 순간 필요도 없다.
@@ -124,6 +137,14 @@ const ShareModal = ({
 
     try {
       switch (key) {
+        case 'native': {
+          if (hasNativeCapability('nativeShare')) {
+            await shareNatively({ url: shareUrl, title: shareTitle, message: description })
+          } else {
+            await navigator.share({ url: shareUrl, title: shareTitle, text: description })
+          }
+          break
+        }
         case 'copy': {
           await copyToClipboard(shareUrl)
           setFeedback({ tone: 'success', message: 'URL을 복사했습니다.' })
@@ -150,6 +171,7 @@ const ShareModal = ({
         }
       }
     } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') return
       setFeedback({
         tone: 'error',
         message:
@@ -188,7 +210,18 @@ const ShareModal = ({
 
           {/* 공유 옵션 행 (Figma 1945-136563) */}
           <div className="flex flex-wrap items-start justify-center gap-x-8 gap-y-6 px-3 py-5">
-            {OPTIONS.map((option) => {
+            {(deviceShare
+              ? [
+                  ...OPTIONS,
+                  {
+                    key: 'native' as const,
+                    label: '다른 앱',
+                    icon: '/images/share/link.svg',
+                    circle: 'bg-neutral-100',
+                  },
+                ]
+              : OPTIONS
+            ).map((option) => {
               const isKakao = option.key === 'kakao'
               return (
                 <button

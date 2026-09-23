@@ -4,6 +4,7 @@ import { NavigationGuardProvider } from '@/shared/lib/NavigationGuardContext'
 import { cafe24Proup, pretendard } from '@/shared/lib/fonts'
 import { NativePushSession } from '@/shared/lib/NativePushSessionBridge'
 import { SessionRecoveryBridge } from '@/shared/lib/SessionRecoveryBridge'
+import { NativePhotoPickerBridge } from '@/shared/lib/NativePhotoPickerBridge'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -16,6 +17,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
     <html lang="ko" className={`${pretendard.variable} ${cafe24Proup.variable}`}>
       <body className="min-w-0 bg-base-white text-neutral-850">
         <SessionRecoveryBridge />
+        <NativePhotoPickerBridge />
         <NativePushSession />
         <QueryProvider>
           <NavigationGuardProvider>{children}</NavigationGuardProvider>
