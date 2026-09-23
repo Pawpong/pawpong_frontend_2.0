@@ -43,3 +43,6 @@ next-env.d.ts
 .claude/*.local.*
 servers.local.md
 *.local.md
+
+# Isolated local mobile integration builds
+/.next-mobile-integration/
