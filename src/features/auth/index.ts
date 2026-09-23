@@ -1,6 +1,7 @@
 export * from './api/auth.mutations'
 export * from './ui/SocialLoginList'
 export * from './ui/ReactivateAccountPrompt'
+export * from './ui/ReviewLoginForm'
 export * from './ui/SocialSignupCapture'
 export * from './lib/useAuthStatus'
 export * from './lib/useLoginGuard'

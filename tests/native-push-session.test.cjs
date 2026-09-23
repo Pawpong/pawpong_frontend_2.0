@@ -121,6 +121,19 @@ test('old app without ACK eventually allows logout and browser has no native wor
   cleanup()
 })
 
+test('cancelled account deletion can rebind the same authenticated token after native unregistration', () => {
+  const app = setup()
+  const cleanup = app.subscribeNativePushSession()
+  app.beginLogout()
+  app.window.dispatchEvent(new Event('auth'))
+  assert.equal(app.messages.length, 1)
+  app.beginLogin()
+  app.window.dispatchEvent(new Event('auth'))
+  assert.deepEqual(app.messages.at(-1), { type: 'REQUEST_FCM_TOKEN', accessToken: 'session-a' })
+  assert.equal(app.messages.length, 2)
+  cleanup()
+})
+
 test('logout invalidates refresh generation and waits for in-flight cookie writes', async () => {
   const app = setup()
   const generation = app.getAuthSessionGeneration()

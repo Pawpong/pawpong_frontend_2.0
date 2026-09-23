@@ -1,10 +1,12 @@
 import { Suspense } from 'react'
+import Link from 'next/link'
 import { ReactivateAccountPrompt, SocialLoginList } from '@/features/auth'
 import { RESPONSIVE_SHELL_CLASS } from '@/shared/config'
 import { AlertMessage } from '@/shared/ui'
 import { CheckRoundedIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { cafe24Proup } from '@/shared/lib/fonts'
+import { normalizeReturnUrl } from '@/shared/lib/normalizeReturnUrl'
 import { LogoButton } from '@/widgets/gnb'
 
 /**
@@ -30,8 +32,15 @@ import { LogoButton } from '@/widgets/gnb'
  * 원본의 이메일·비밀번호 안내와 별도 회원가입 링크는 현재 소셜 전용 인증 계약에 맞게
  * 소셜 로그인 및 신규 사용자 온보딩 안내로 치환한다.
  */
-const LoginPage = async ({ searchParams }: { searchParams: Promise<{ signup?: string }> }) => {
-  const { signup } = await searchParams
+const LoginPage = async ({
+  searchParams,
+}: {
+  searchParams: Promise<{ signup?: string; returnUrl?: string }>
+}) => {
+  const { signup, returnUrl: requestedReturnUrl } = await searchParams
+  const returnUrl = normalizeReturnUrl(requestedReturnUrl)
+  const reviewHref =
+    returnUrl === '/' ? '/login/review' : `/login/review?returnUrl=${encodeURIComponent(returnUrl)}`
 
   return (
     <div className="flex min-h-dvh flex-col bg-base-white">
@@ -86,6 +95,12 @@ const LoginPage = async ({ searchParams }: { searchParams: Promise<{ signup?: st
             <p className="mt-3 text-center text-sm leading-[1.5] font-medium text-neutral-700 tab:text-base">
               처음이신가요? 소셜 로그인 후 회원가입이 이어져요.
             </p>
+            <Link
+              href={reviewHref}
+              className="mx-auto rounded px-2 py-2 text-xs text-neutral-700 underline underline-offset-4 hover:text-neutral-850 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+            >
+              심사용 계정 로그인
+            </Link>
           </div>
         </section>
       </main>

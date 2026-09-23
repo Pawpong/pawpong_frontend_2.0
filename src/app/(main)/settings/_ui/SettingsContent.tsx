@@ -42,12 +42,14 @@ const ADOPTER_LINKS: SettingsLink[] = [
   },
 ]
 
-// 탈퇴 모달 설명 (Figma 2145-193207) — 프로필 편집의 탈퇴 모달과 같은 문구
+// 기존 탈퇴는 복구 가능한 이용 중지다. 영구삭제는 별도 경로에서 명시적으로 요청한다.
 const LEAVE_DESCRIPTION = (
   <>
-    계정 삭제시 모든 개인정보가 삭제되며
+    계정 이용을 중지하고 로그아웃해요.
     <br />
-    복구되지 않습니다
+    이후 소셜 로그인으로 복구할 수 있으며,
+    <br />
+    개인정보 영구삭제는 별도로 요청할 수 있어요.
   </>
 )
 
@@ -136,9 +138,16 @@ const SettingsContent = ({ userRole }: SettingsContentProps) => {
               >
                 <span className="text-sm font-semibold text-error-600 tab:text-base">탈퇴</span>
                 <span className="text-xs leading-[1.5] font-medium text-neutral-500 tab:text-sm">
-                  계정을 삭제하고 포퐁을 떠나요.
+                  계정 이용을 중지해요. 소셜 로그인으로 복구할 수 있어요.
                 </span>
               </button>
+            </div>
+            <div className="border-t border-neutral-150">
+              <SettingsLinkRow
+                href="/account/delete"
+                label="계정 영구삭제"
+                description="계정과 연결된 데이터를 삭제해요. 영구삭제 후에는 복구할 수 없어요."
+              />
             </div>
           </section>
         </div>
