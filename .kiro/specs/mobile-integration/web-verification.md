@@ -18,6 +18,8 @@
 - Android User-Agent 요청의 intent package/fallback, iOS/공유 크롤러 요청의 custom scheme, JavaScript 없는 응답을 확인함.
 - Orca 내장 브라우저에서 seed 공유 링크 화면과 `웹에서 계속하기` 클릭 후 `/explore` 실제 렌더링을 확인함. [공유 링크 화면](evidence/web-managed-link.png)
 - 별도 worker가 로그아웃 중 refresh 토큰 교체 상황을 재현해 기존 재등록 결함과 수정 후 재등록 차단을 교차 확인함.
+- Android WebView에 격리 입양자 세션을 넣은 뒤 실제 웹 루트 브리지의 계정 토큰 등록을 확인함. 웹 메뉴에서 로그아웃한 뒤 실제 MongoDB의 계정 토큰 배열이 0개이고 기기 레코드의 `userId/userRole`이 null로 해제된 것을 백엔드 담당자가 확인함. OAuth 제공자 로그인 자체를 검증한 것은 아님.
+- 해당 세션 주입은 개발 모드·로컬 호스트·만료 키에만 제한한 임시 경로로 수행했고, 검증 직후 소스와 접근 키 파일을 삭제함. 임시 경로는 커밋하거나 배포하지 않음.
 - 기존 Sentry 테스트의 개발 호스트 입력을 현재 dev 도메인 허용 정책에 맞추고 localhost 차단도 검증함. 수집 정책 코드는 변경하지 않음.
 
 ## 검증 범위
