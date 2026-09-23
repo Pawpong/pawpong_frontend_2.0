@@ -15,16 +15,24 @@ test('프리뷰는 운영 DSN 사용하지 않음', () =>
   assert.equal(resolve({ ...base, environment: 'preview' }).enabled, false))
 test('개발 서버는 운영 설정이 복사돼도 보내지 않음', () =>
   assert.equal(resolve({ ...base, nodeEnv: 'development' }).enabled, false))
-test('개발 opt-in은 서로 다른 DSN일 때만 허용함', () => {
+test('개발 opt-in은 허용된 dev 호스트의 서로 다른 DSN일 때만 허용함', () => {
+  const deployedDev = { ...base, nodeEnv: 'development', hostname: 'dev.pawpong.kr' }
   assert.equal(
-    resolve({ ...base, nodeEnv: 'development', developmentDsn: 'prod', enableDevelopment: 'true' })
-      .enabled,
+    resolve({ ...deployedDev, developmentDsn: 'prod', enableDevelopment: 'true' }).enabled,
     false,
   )
   assert.equal(
-    resolve({ ...base, nodeEnv: 'development', developmentDsn: 'dev', enableDevelopment: 'true' })
-      .dsn,
+    resolve({ ...deployedDev, developmentDsn: 'dev', enableDevelopment: 'true' }).dsn,
     'dev',
+  )
+  assert.equal(
+    resolve({
+      ...deployedDev,
+      hostname: 'localhost',
+      developmentDsn: 'dev',
+      enableDevelopment: 'true',
+    }).enabled,
+    false,
   )
 })
 
