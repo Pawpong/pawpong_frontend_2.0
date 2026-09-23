@@ -3,9 +3,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { io, type Socket } from 'socket.io-client'
 import type { WsChatMessage, WsMessagesRead } from '@/shared/types'
+import { getApiBaseUrl } from '@/shared/config/apiBaseUrl'
 
 const getSocketUrl = () => {
-  const configuredUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/+$/, '')
+  const configuredUrl = getApiBaseUrl()
   if (configuredUrl) return `${configuredUrl}/chat`
   return 'http://localhost:8080/chat'
 }

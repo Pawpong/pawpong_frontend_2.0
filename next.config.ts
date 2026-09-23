@@ -2,6 +2,8 @@ import type { NextConfig } from 'next'
 import { withSentryConfig } from '@sentry/nextjs'
 
 const nextConfig: NextConfig = {
+  // Android 에뮬레이터가 호스트 Mac의 로컬 개발 서버에 접근하는 주소.
+  allowedDevOrigins: ['10.0.2.2'],
   env: {
     NEXT_PUBLIC_APP_ENV: process.env.VERCEL_ENV || process.env.NEXT_PUBLIC_APP_ENV || 'development',
   },

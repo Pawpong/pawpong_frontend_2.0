@@ -6,6 +6,7 @@ import { AppleIcon, GoogleIcon, KakaoIcon, NaverIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { normalizeReturnUrl } from '@/shared/lib/normalizeReturnUrl'
 import { Button } from '@/shared/ui/Button'
+import { getApiBaseUrl as getConfiguredApiBaseUrl } from '@/shared/config/apiBaseUrl'
 
 /**
  * 소셜 로그인 버튼 목록 (카카오 / 네이버 / 구글)
@@ -63,12 +64,7 @@ const SOCIAL_BUTTONS: {
   },
 ]
 
-const getApiBaseUrl = () => {
-  if (process.env.NEXT_PUBLIC_API_BASE_URL) {
-    return process.env.NEXT_PUBLIC_API_BASE_URL.replace(/\/+$/, '')
-  }
-  return 'http://localhost:8080'
-}
+const getApiBaseUrl = () => getConfiguredApiBaseUrl() || 'http://localhost:8080'
 
 export const SocialLoginList = () => {
   const router = useRouter()

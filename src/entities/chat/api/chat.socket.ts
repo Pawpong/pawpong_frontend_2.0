@@ -5,6 +5,7 @@ import { io, type Socket } from 'socket.io-client'
 import { useQueryClient } from '@tanstack/react-query'
 import type { ChatMessageResponseDto, WsChatMessage } from '@/shared/types'
 import { chatQueries } from './chat.queries'
+import { getApiBaseUrl } from '@/shared/config/apiBaseUrl'
 
 /** accessToken 쿠키 읽기 (WebSocket 핸드셰이크 인증용) */
 const getAccessToken = (): string | undefined => {
@@ -16,7 +17,7 @@ const getAccessToken = (): string | undefined => {
 }
 
 /** 소켓 접속 오리진 (axios baseURL 과 동일한 서버 오리진) */
-const getSocketBase = () => (process.env.NEXT_PUBLIC_API_BASE_URL ?? '').replace(/\/+$/, '')
+const getSocketBase = getApiBaseUrl
 
 /** 브로드캐스트 페이로드 → REST DTO 정규화 (isMine 은 현재 사용자 기준 계산) */
 const normalizeMessage = (

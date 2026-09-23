@@ -1,4 +1,5 @@
 import { apiClient, API_VERSION, unwrap } from '@/shared/api'
+import { getApiBaseUrl } from '@/shared/config/apiBaseUrl'
 import type { ApiResponseFull, FeedVideo, FeedComment, PaginationResponse } from '@/shared/types'
 
 /** 백엔드 원본 비디오 타입 */
@@ -36,7 +37,7 @@ interface BackendComment {
 }
 
 const transformVideo = (v: BackendFeedVideo): FeedVideo => {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8080'
+  const baseUrl = getApiBaseUrl('http://localhost:8080')
   const hlsUrl = `${baseUrl}${API_VERSION}/feed/videos/stream/${v.videoId}/master.m3u8`
   return {
     _id: v.videoId,
@@ -131,6 +132,6 @@ export const searchTags = (query: string) =>
 
 /** HLS 스트리밍 URL 생성 */
 export const getHlsStreamUrl = (videoId: string, filename: string): string => {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8080'
+  const baseUrl = getApiBaseUrl('http://localhost:8080')
   return `${baseUrl}${API_VERSION}/feed/videos/stream/${videoId}/${filename}`
 }

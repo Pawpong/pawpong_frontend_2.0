@@ -7,6 +7,7 @@ import axios, {
 import { ApiError, normalizeApiError } from './unwrap'
 import { getAccessToken } from './token'
 import { notifyAuthStateChanged } from '@/shared/lib/authStateEvents'
+import { getApiBaseUrl } from '@/shared/config/apiBaseUrl'
 
 export interface ApiRequestConfig extends AxiosRequestConfig {
   skipAuth?: boolean
@@ -16,8 +17,6 @@ export interface ApiRequestConfig extends AxiosRequestConfig {
    */
   skipAuthRefresh?: boolean
 }
-
-const getBaseURL = () => (process.env.NEXT_PUBLIC_API_BASE_URL ?? '').replace(/\/+$/, '')
 
 let isRefreshing = false
 let failedQueue: Array<{
@@ -36,7 +35,7 @@ const processQueue = (error: Error | null, accessToken?: string) => {
 
 function createApiClient(): AxiosInstance {
   const instance = axios.create({
-    baseURL: getBaseURL(),
+    baseURL: getApiBaseUrl(),
     withCredentials: true,
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
     timeout: 30000,
