@@ -53,6 +53,7 @@ const ActivityContent = ({
         value={initialTab}
         onValueChange={changeTab}
         ariaLabel="신청과 후기 내역"
+        triggerClassName="min-w-0 after:max-w-full focus-visible:outline-2 focus-visible:outline-primary-500"
       >
         <TabsContent value="applications" className="mt-0">
           {isBreeder ? <ReceivedApplicationList /> : <ApplicationList />}

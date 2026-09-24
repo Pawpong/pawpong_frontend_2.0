@@ -19,7 +19,12 @@ const ApplicationDetailPage = async ({ params, searchParams }: ApplicationDetail
   return isReceived ? (
     <ReceivedApplicationDetailContent applicationId={applicationId} />
   ) : (
-    <ApplicationDetailContent applicationId={applicationId} />
+    <ApplicationDetailContent
+      applicationId={applicationId}
+      backHref={
+        userRole === 'breeder' ? '/activity?tab=sent-applications' : '/activity?tab=applications'
+      }
+    />
   )
 }
 
