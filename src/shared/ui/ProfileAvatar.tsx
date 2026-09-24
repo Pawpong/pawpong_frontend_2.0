@@ -16,6 +16,7 @@ interface ProfileAvatarProps {
     | 'responsivePc'
     | 'responsiveProfile'
   className?: string
+  fallbackClassName?: string
 }
 
 export type ProfileAvatarSize = NonNullable<ProfileAvatarProps['size']>
@@ -40,12 +41,18 @@ const AVATAR_SIZE = {
  * 프로필 아바타 — 사진 있으면 이미지, 없으면 paw 글리프 placeholder.
  * 색: 배경 #ededed(bg/tertiary) · 글리프 #a6a6a6(icon/tertiary) — Figma 817-103336
  */
-const ProfileAvatar = ({ src, alt, size = 'small', className }: ProfileAvatarProps) => {
+const ProfileAvatar = ({
+  src,
+  alt,
+  size = 'small',
+  className,
+  fallbackClassName,
+}: ProfileAvatarProps) => {
   return (
     <Avatar className={cn(AVATAR_SIZE[size].box, className)}>
       {src && <AvatarImage src={src} alt={alt} />}
       {/* [refactored] PixelUserIcon → PawPrintIcon, 색 #ededed/#a6a6a6 (Figma) */}
-      <AvatarFallback className="bg-neutral-100 text-neutral-500">
+      <AvatarFallback className={cn('bg-neutral-100 text-neutral-500', fallbackClassName)}>
         <PawPrintIcon className={AVATAR_SIZE[size].glyph} />
       </AvatarFallback>
     </Avatar>

@@ -2,9 +2,9 @@
 
 import { Controller, type FieldErrors, type UseFormRegister } from 'react-hook-form'
 import { Dropdown, Input, InputField, TextareaField } from '@/shared/ui'
-import { PET_DESCRIPTION_MAX_LENGTH } from '../_lib/constants'
-import { GENDER_OPTIONS } from '../_lib/formOptions'
-import type { AdoptionCreateFormValues, AdoptionFormControl } from '../_lib/schema'
+import { PET_DESCRIPTION_MAX_LENGTH } from '../lib/constants'
+import { GENDER_OPTIONS } from '../lib/formOptions'
+import type { AdoptionCreateFormValues, AdoptionFormControl } from '../lib/schema'
 import { DateInput, PriceInput } from './MaskedInput'
 import { FormSection } from './FormSection'
 

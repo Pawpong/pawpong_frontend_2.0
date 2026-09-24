@@ -8,10 +8,10 @@ import {
   ComposerLayout,
   ComposerColumns,
   ComposerSectionHeading,
+  ImageUploadArea,
   TextareaField,
 } from '@/shared/ui'
 import type { PostFormState } from '../lib/usePostForm'
-import { ImageUploadArea } from './ImageUploadArea'
 import { PostFormCTA, type PostFormCTAProps } from './PostFormCTA'
 
 interface PostFormLayoutProps {

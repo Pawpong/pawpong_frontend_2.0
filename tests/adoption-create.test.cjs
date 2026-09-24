@@ -4,9 +4,16 @@ const fs = require('node:fs')
 const path = require('node:path')
 const ts = require('typescript')
 
-const root = path.resolve('src/app/(main)/adoption/create/_lib')
+// 공유 폼은 widgets/adoption-form 으로 옮겼고, 임시저장 변환만 작성 라우트에 남았다
+const roots = [
+  path.resolve('src/widgets/adoption-form/lib'),
+  path.resolve('src/app/(main)/adoption/create/_lib'),
+]
 const load = (file) => {
-  const filename = path.join(root, file + '.ts')
+  const filename = roots
+    .map((root) => path.join(root, file + '.ts'))
+    .find((candidate) => fs.existsSync(candidate))
+  if (!filename) throw new Error(`모듈을 찾지 못했습니다: ${file}`)
   const { outputText } = ts.transpileModule(fs.readFileSync(filename, 'utf8'), {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2021 },
   })

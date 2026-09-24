@@ -7,9 +7,9 @@ import { isApiError } from '@/shared/api'
 import { composeImageKeys } from '@/shared/lib/composeImageKeys'
 import type { ImageEntry } from '@/shared/lib/useImageUpload'
 import type { UpdatePetPostingRequest } from '@/shared/types'
-import { ADOPTION_UPLOAD_FOLDER } from '../../../create/_lib/constants'
-import { toCreatePetPostingRequest } from '../../../create/_lib/toCreatePetPostingRequest'
-import type { AdoptionCreateParsedValues } from '../../../create/_lib/schema'
+import { ADOPTION_UPLOAD_FOLDER } from '@/widgets/adoption-form'
+import { toCreatePetPostingRequest } from '@/widgets/adoption-form'
+import type { AdoptionCreateParsedValues } from '@/widgets/adoption-form'
 
 interface UpdatePostingSubmissionInput {
   petId: string

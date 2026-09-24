@@ -13,11 +13,11 @@ import {
   isParentRowTouched,
   type AdoptionCreateFormValues,
   type AdoptionCreateParsedValues,
-} from '../../../create/_lib/schema'
-import { BREEDING_ENV_IMAGE_MAX, PET_IMAGE_MAX } from '../../../create/_lib/constants'
-import { createAdoptionDefaultValues, createParentRow } from '../../../create/_lib/defaultValues'
-import { fromPetPostingDraft } from '../../../create/_lib/fromPetPostingDraft'
-import { useParentImages } from '../../../create/_lib/useParentImages'
+} from '@/widgets/adoption-form'
+import { BREEDING_ENV_IMAGE_MAX, PET_IMAGE_MAX } from '@/widgets/adoption-form'
+import { createAdoptionDefaultValues, createParentRow } from '@/widgets/adoption-form'
+import { fromPetPostingDraft } from '@/widgets/adoption-form'
+import { useParentImages } from '@/widgets/adoption-form'
 import { useUpdatePostingSubmission } from './useUpdatePostingSubmission'
 
 /**

@@ -5,8 +5,8 @@ import { useSavePetPostingDraft, useOverwritePetPostingDraft } from '@/features/
 import { useUploadMultipleFiles } from '@/features/upload'
 import { composeImageKeys } from '@/shared/lib/composeImageKeys'
 import type { ImageEntry } from '@/shared/lib/useImageUpload'
-import type { AdoptionCreateFormValues } from './schema'
-import { ADOPTION_UPLOAD_FOLDER } from './constants'
+import type { AdoptionCreateFormValues } from '@/widgets/adoption-form'
+import { ADOPTION_UPLOAD_FOLDER } from '@/widgets/adoption-form'
 import { toSavePetPostingDraftRequest } from './toSavePetPostingDraftRequest'
 
 interface SaveDraftInput {

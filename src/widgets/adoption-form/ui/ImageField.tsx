@@ -1,8 +1,7 @@
 'use client'
 
 import { cn } from '@/shared/lib/cn'
-import { TextLabel } from '@/shared/ui'
-import { ImageUploadArea } from '@/widgets/post-form'
+import { ImageUploadArea, TextLabel } from '@/shared/ui'
 
 interface ImageFieldProps {
   images: string[]

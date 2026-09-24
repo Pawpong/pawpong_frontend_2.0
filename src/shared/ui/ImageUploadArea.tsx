@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { tv, type VariantProps } from 'tailwind-variants'
 import { CameraIcon, ImageIcon, CloseIcon } from '@/shared/assets'
 import { BREAKPOINTS } from '@/shared/lib/useBreakpoint'
-import { ImageModal } from '@/shared/ui'
+import { ImageModal } from './ImageModal'
 import {
   Dialog,
   DialogClose,
@@ -13,7 +13,7 @@ import {
   DialogOverlay,
   DialogPortal,
   DialogTitle,
-} from '@/shared/ui'
+} from './Dialog'
 
 const MAX_IMAGES = 10
 
