@@ -1,5 +1,5 @@
 import type { NextConfig } from 'next'
-import { withSentryConfig } from '@sentry/nextjs'
+import { withSentryConfig } from '@sentry/nextjs/config'
 
 const nextConfig: NextConfig = {
   // 병렬 모바일 검증 서버가 기존 개발 서버의 빌드 잠금을 공유하지 않게 한다.
