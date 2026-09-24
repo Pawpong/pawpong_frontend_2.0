@@ -15,13 +15,13 @@ export function subscribeNativePushSession(): () => void {
   let lastToken: string | null | undefined
   const sync = () => {
     const bridge = getBridge()
-    if (!bridge || document.visibilityState === 'hidden') return
-    const accessToken = getAccessToken()
     if (!isAuthSessionCurrent()) {
       // 탈퇴 요청이 실패해 같은 인증 세션으로 돌아와도 네이티브 연결을 다시 등록한다.
       lastToken = undefined
       return
     }
+    if (!bridge || document.visibilityState === 'hidden') return
+    const accessToken = getAccessToken()
     if (accessToken === lastToken) return
     lastToken = accessToken
     if (accessToken) {

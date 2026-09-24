@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { isSameOriginRequest } from '@/shared/lib/server/sameOrigin'
 import {
   reviewLoginErrorMessage,
   reviewLoginRequestSchema,
@@ -45,11 +46,7 @@ async function readCredentials(request: NextRequest): Promise<unknown> {
 
 /** 심사 계정 인증만 중계한다. 쿠키 발급은 기존 saveAuthTokens 흐름을 사용한다. */
 export async function POST(request: NextRequest) {
-  const origin = request.headers.get('origin')
-  if (
-    (origin !== null && origin !== request.nextUrl.origin) ||
-    request.headers.get('sec-fetch-site') === 'cross-site'
-  ) {
+  if (!isSameOriginRequest(request)) {
     return failure(403)
   }
   if (request.headers.get('content-type')?.split(';')[0].trim() !== 'application/json') {

@@ -159,3 +159,27 @@ test('logout invalidates refresh generation and waits for in-flight cookie write
   assert.equal(app.isAuthSessionCurrent(generation), false)
   assert.equal(app.isAuthSessionCurrent(nextGeneration), true)
 })
+
+test('failed deletion while hidden rebinds the same token when the app becomes visible', async () => {
+  const app = setup()
+  const cleanup = app.subscribeNativePushSession()
+  app.document.visibilityState = 'hidden'
+  app.beginLogout()
+  app.window.dispatchEvent(new Event('auth'))
+  const pending = app.unregisterNativePushSession()
+  const unregister = app.messages.at(-1)
+  app.window.dispatchEvent(
+    new MessageEvent('message', {
+      data: JSON.stringify({ type: 'FCM_TOKEN_UNREGISTERED', requestId: unregister.requestId }),
+    }),
+  )
+  await pending
+  app.beginLogin()
+  app.window.dispatchEvent(new Event('auth'))
+  assert.equal(app.messages.length, 2)
+  app.document.visibilityState = 'visible'
+  app.document.dispatchEvent(new Event('visibilitychange'))
+  assert.deepEqual(app.messages.at(-1), { type: 'REQUEST_FCM_TOKEN', accessToken: 'session-a' })
+  assert.equal(app.messages.length, 3)
+  cleanup()
+})

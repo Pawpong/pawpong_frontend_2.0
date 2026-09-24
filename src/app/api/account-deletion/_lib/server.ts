@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { deletionErrorMessage, deletionReceiptSchema } from '@/shared/lib/accountDeletion'
 
+export { isSameOriginRequest as isSameOrigin } from '@/shared/lib/server/sameOrigin'
+
 export const NO_STORE = { 'Cache-Control': 'no-store, max-age=0', Pragma: 'no-cache' }
 export const RECEIPT_COOKIE = 'pawpongDeletionReceipt'
 export const RECEIPT_COOKIE_OPTIONS = {
@@ -9,14 +11,6 @@ export const RECEIPT_COOKIE_OPTIONS = {
   sameSite: 'strict' as const,
   path: '/api/account-deletion',
   maxAge: 60 * 60 * 24 * 365,
-}
-
-export function isSameOrigin(request: NextRequest): boolean {
-  const origin = request.headers.get('origin')
-  return (
-    (origin === null || origin === request.nextUrl.origin) &&
-    request.headers.get('sec-fetch-site') !== 'cross-site'
-  )
 }
 
 export function failure(status: number) {

@@ -38,6 +38,7 @@ function setupRoute(upstream = async () => Response.json(session)) {
     'src/app/api/auth/review-login/route.ts',
     {
       '@/shared/lib/reviewLogin': policy,
+      '@/shared/lib/server/sameOrigin': load('src/shared/lib/server/sameOrigin.ts'),
     },
     {
       process: { env: { NEXT_PUBLIC_API_BASE_URL: 'https://api.pawpong.kr/' } },

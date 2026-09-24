@@ -43,7 +43,10 @@ function setup(upstream = async () => Response.json(accepted)) {
   }
   const server = load(
     'src/app/api/account-deletion/_lib/server.ts',
-    { '@/shared/lib/accountDeletion': policy },
+    {
+      '@/shared/lib/accountDeletion': policy,
+      '@/shared/lib/server/sameOrigin': load('src/shared/lib/server/sameOrigin.ts'),
+    },
     globals,
   )
   const dependencies = {
