@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { normalizeApiError } from '@/shared/api'
+import { TEXT } from '@/shared/config'
 import { useCreateReview } from '@/features/adopter'
 import { AlertMessage, Button, TextareaField } from '@/shared/ui'
 
@@ -37,9 +38,9 @@ const ReviewComposer = ({ applicationId, breederName, reviewType }: ReviewCompos
     : null
 
   return (
-    <section className="rounded-xl border border-neutral-150 bg-white p-4 shadow-[0_7px_7px_rgba(55,55,55,0.06)] tab:p-6">
+    <section className="border-t border-neutral-150 pt-8 tab:pt-10">
       <div className="mb-4 flex flex-col gap-1">
-        <h2 className="font-cafe24 text-base text-primary-600 tab:text-lg">
+        <h2 className={TEXT.section}>
           {reviewType === 'adoption' ? '입양 후기 작성' : '상담 후기 작성'}
         </h2>
         <p className="text-sm leading-[1.5] font-medium text-neutral-700">

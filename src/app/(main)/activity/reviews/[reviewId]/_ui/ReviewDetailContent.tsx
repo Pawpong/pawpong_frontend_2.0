@@ -3,46 +3,62 @@
 import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import { adopterQueries } from '@/entities/adopter'
+import { ActivityDetailFlow, ActivitySummary } from '../../../_ui/ActivityDetailFlow'
+import { TEXT } from '@/shared/config'
+import { ActivityDetailLayout } from '../../../_ui/ActivityDetailLayout'
 import { formatDate } from '@/shared/lib/formatDate'
-import {
-  AsyncState,
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-  Badge,
-  Button,
-  Container,
-  NavigationBar,
-  buttonVariants,
-} from '@/shared/ui'
+import { Avatar, AvatarFallback, AvatarImage, Badge, buttonVariants } from '@/shared/ui'
 import { ReviewTypeBadge } from '../../../_ui/ActivityBadges'
 
-const ReviewDetailContent = ({ reviewId }: { reviewId: string }) => {
+const ReviewDetailContent = ({ reviewId, backHref }: { reviewId: string; backHref: string }) => {
   const { data, isPending, isError, refetch } = useQuery(adopterQueries.reviewDetail(reviewId))
 
   return (
-    <div className="flex w-full flex-1 flex-col bg-white pb-16">
-      <NavigationBar title="후기 상세" backHref="/activity?tab=reviews" />
-
-      <Container className="px-4 py-5 tab:py-8 pc:py-10">
-        <div className="mx-auto flex w-full max-w-168 flex-col gap-5 pc:max-w-[59.25rem]">
-          {isPending && <AsyncState status="loading" message="후기를 불러오는 중입니다." />}
-          {isError && !data && (
-            <AsyncState
-              status="error"
-              message="후기를 불러오지 못했습니다."
-              action={
-                <Button variant="fill" size="sm" className="px-4" onClick={() => void refetch()}>
-                  다시 시도
-                </Button>
-              }
-            />
-          )}
-
-          {data && (
-            <>
-              <article className="overflow-hidden rounded-xl border border-neutral-150 bg-white shadow-[0_7px_7px_rgba(55,55,55,0.06)]">
-                <header className="flex items-start gap-3 border-b border-neutral-150 px-4 py-4 tab:gap-4 tab:px-6 tab:py-5">
+    <ActivityDetailLayout
+      title="후기 상세"
+      backHref={backHref}
+      isPending={isPending}
+      isError={isError}
+      hasData={!!data}
+      onRetry={() => void refetch()}
+    >
+      {data && (
+        <>
+          <ActivityDetailFlow
+            summary={
+              <ActivitySummary
+                label="후기를 보낸 브리더"
+                name={data.breederNickname || '알 수 없는 브리더'}
+                actions={
+                  <section aria-label="후기 관련 페이지" className="flex flex-col gap-3">
+                    {data.breederId && (
+                      <Link
+                        href={`/home/${data.breederId}`}
+                        className={buttonVariants({
+                          variant: 'outline',
+                          size: 'lg',
+                          className: 'w-full px-6',
+                        })}
+                      >
+                        브리더 홈
+                      </Link>
+                    )}
+                    {data.applicationId && (
+                      <Link
+                        href={`/activity/applications/${data.applicationId}?view=sent`}
+                        className={buttonVariants({
+                          variant: 'primary',
+                          size: 'lg',
+                          className: 'w-full px-6',
+                        })}
+                      >
+                        신청 내역 보기
+                      </Link>
+                    )}
+                  </section>
+                }
+              >
+                <div className="flex items-start gap-3">
                   <Avatar size="md" className="size-12 bg-neutral-100 tab:size-14">
                     {data.breederProfileImage && (
                       <AvatarImage
@@ -55,9 +71,6 @@ const ReviewDetailContent = ({ reviewId }: { reviewId: string }) => {
 
                   <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h1 className="truncate font-cafe24 text-lg text-neutral-850 tab:text-xl">
-                        {data.breederNickname || '알 수 없는 브리더'}
-                      </h1>
                       <ReviewTypeBadge reviewType={data.reviewType} />
                       <Badge
                         variant={data.isVisible ? 'primaryOutline' : 'neutralFilled'}
@@ -66,52 +79,32 @@ const ReviewDetailContent = ({ reviewId }: { reviewId: string }) => {
                         {data.isVisible ? '공개 중' : '비공개'}
                       </Badge>
                     </div>
-                    <p className="text-xs font-medium text-neutral-500">
+                    <p className={TEXT.meta}>
                       {formatDate(data.writtenAt)}
                       {data.breedingPetType &&
                         ` · ${data.breedingPetType === 'cat' ? '고양이' : '강아지'} 브리더`}
                     </p>
                   </div>
-                </header>
-
-                <div className="min-h-48 px-4 py-5 tab:min-h-56 tab:px-6 tab:py-6">
-                  <p className="text-sm leading-[1.8] font-medium whitespace-pre-wrap text-neutral-850 tab:text-base">
-                    {data.content}
-                  </p>
                 </div>
-              </article>
+              </ActivitySummary>
+            }
+          >
+            <article className="min-w-0">
+              <header className="border-b border-neutral-150 pb-6">
+                <p className={TEXT.meta}>내가 남긴 이야기</p>
+                <h1 className={`${TEXT.display} mt-2`}>
+                  {data.reviewType === 'adoption' ? '입양 후기' : '상담 후기'}
+                </h1>
+              </header>
 
-              <section className="flex flex-col gap-3 rounded-xl border border-neutral-150 bg-white p-4 shadow-[0_7px_7px_rgba(55,55,55,0.06)] tab:flex-row tab:justify-end tab:p-6">
-                {data.breederId && (
-                  <Link
-                    href={`/home/${data.breederId}`}
-                    className={buttonVariants({
-                      variant: 'outline',
-                      size: 'lg',
-                      className: 'w-full px-6 tab:w-auto',
-                    })}
-                  >
-                    브리더 홈
-                  </Link>
-                )}
-                {data.applicationId && (
-                  <Link
-                    href={`/activity/applications/${data.applicationId}`}
-                    className={buttonVariants({
-                      variant: 'primary',
-                      size: 'lg',
-                      className: 'w-full px-6 tab:w-auto',
-                    })}
-                  >
-                    신청 내역 보기
-                  </Link>
-                )}
-              </section>
-            </>
-          )}
-        </div>
-      </Container>
-    </div>
+              <div className="py-8 tab:py-10">
+                <p className={`${TEXT.prose} text-neutral-850`}>{data.content}</p>
+              </div>
+            </article>
+          </ActivityDetailFlow>
+        </>
+      )}
+    </ActivityDetailLayout>
   )
 }
 
