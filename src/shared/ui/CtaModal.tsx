@@ -139,7 +139,7 @@ const CtaModal = ({
               {title}
             </DialogPrimitive.Title>
             {description && (
-              <DialogPrimitive.Description className="text-base leading-normal font-medium">
+              <DialogPrimitive.Description className="text-base leading-normal font-medium whitespace-pre-line">
                 {description}
               </DialogPrimitive.Description>
             )}

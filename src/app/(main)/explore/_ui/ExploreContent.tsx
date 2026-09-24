@@ -131,16 +131,17 @@ const ExploreContent = () => {
   )
 
   // 스크롤 인터랙션: 픽셀 카테고리+큰 검색바가 스크롤로 벗어나면 컴팩트 필터바를
-  // 탭바 아래에 fixed로 노출(레이아웃 점프 방지). 탭바는 tab+에서 상단 고정(sticky).
+  // 탭바와 같은 sticky 영역 안에 노출한다. absolute 배치로 레이아웃 점프를 막는다.
   const headerRef = useRef<HTMLDivElement>(null)
   const sentinelRef = useRef<HTMLDivElement>(null)
   // [refactored] GNB 높이는 공통 훅 재사용 (직접 querySelector 측정 제거)
   const gnbH = useGnbHeight()
   const [headerH, setHeaderH] = useState(0)
   const [isStuck, setIsStuck] = useState(false)
-  // 헤더는 tab+에서만 sticky(탭바가 남음) → 고정 칩바 top에 headerH 반영. 모바일은 탭바가 스크롤로 사라져 gnbH만.
+  // 모바일은 탭바 높이만큼 위로 보내 필터만 GNB 아래에 남긴다.
   const isTabUp = useBreakpoint('tab')
   const stickyBarTop = gnbH + (isTabUp ? headerH : 0)
+  const stickyHeaderTop = isTabUp ? gnbH : gnbH - headerH
 
   useEffect(() => {
     const el = headerRef.current
@@ -166,34 +167,28 @@ const ExploreContent = () => {
 
   return (
     <>
-      {/* ══════ 탭 바(+모바일·탭 필터바) — tab+ 상단 고정(sticky), GNB 아래에 스택 ══════
-          (모바일은 탭 바 비고정, GNB만 sticky) */}
-      <div ref={headerRef} className="bg-white tab:sticky tab:z-sticky" style={{ top: gnbH }}>
+      {/* 탭과 필터를 하나의 sticky 영역에 묶어 스크롤 중에도 서로 붙어 있게 한다. */}
+      <div ref={headerRef} className="sticky z-sticky bg-white" style={{ top: stickyHeaderTop }}>
         <TabBar
           items={EXPLORE_TABS.map((tab) => ({ value: tab.type, label: tab.label }))}
           value={selectedType}
           onValueChange={(value) => handleTypeChange(value as ExploreType)}
           ariaLabel="탐색 유형"
         />
-      </div>
-
-      {/* 스크롤 시 GNB(+tab: 탭바) 아래 고정 컴팩트 칩바 (fixed → 레이아웃 점프 없음, 구분선 없음) */}
-      <div
-        className={cn('fixed right-0 left-0 z-sticky hidden bg-white', isStuck && 'block')}
-        style={{ top: stickyBarTop }}
-      >
-        <Container>
-          <ExploreFilterBar
-            selected={selectedCategory}
-            onChange={handleCategoryChange}
-            keyword={keyword}
-            onSearch={handleSearch}
-          />
-        </Container>
+        <div className={cn('absolute top-full right-0 left-0 hidden bg-white', isStuck && 'block')}>
+          <Container>
+            <ExploreFilterBar
+              selected={selectedCategory}
+              onChange={handleCategoryChange}
+              keyword={keyword}
+              onSearch={handleSearch}
+            />
+          </Container>
+        </div>
       </div>
 
       {/* ══════ 콘텐츠 영역 — 섹션별로 각자 Container를 갖도록 분리 (전역 px 제거) ══════ */}
-      {/* //QA: 상단 카테고리 수정 — 모바일도 4개 한 줄 가운데 정렬, 스크롤 시 fixed 칩바로 전환한다. */}
+      {/* //QA: 상단 카테고리 수정 — 모바일도 4개 한 줄 가운데 정렬, 스크롤 시 컴팩트 칩바로 전환한다. */}
       <div>
         <CategorySection selected={selectedCategory} onChange={handleCategoryChange} />
         {/* 검색바: 홈과 동작 공유 — 화면별 placeholder와 스타일은 SearchSection variant로 분리한다. */}
