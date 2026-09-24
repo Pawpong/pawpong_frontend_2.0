@@ -172,12 +172,17 @@ const ReceivedApplicationDetailContent = ({ applicationId }: { applicationId: st
                       />
                     )}
                     {STATUS_ACTIONS[data.status] && (
-                      <a
-                        href="#application-decision"
+                      <button
+                        type="button"
+                        onClick={() =>
+                          document
+                            .getElementById('application-decision')
+                            ?.scrollIntoView({ behavior: 'smooth' })
+                        }
                         className="flex min-h-10 items-center text-sm font-semibold text-primary-500"
                       >
                         신청 처리로 이동 ↓
-                      </a>
+                      </button>
                     )}
                   </>
                 }
