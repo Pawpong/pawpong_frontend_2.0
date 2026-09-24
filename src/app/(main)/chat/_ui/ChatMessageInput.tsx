@@ -4,7 +4,7 @@ import * as React from 'react'
 import { useUploadSingleFile } from '@/features/upload'
 import { createClientMessageId } from '@/features/chat-realtime'
 import { normalizeApiError } from '@/shared/api'
-import { CtaModal, Input } from '@/shared/ui'
+import { Button, CtaModal } from '@/shared/ui'
 import { LocationPinIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { preparePhoto } from '@/shared/lib/preparePhoto'
@@ -178,7 +178,7 @@ const ChatMessageInput = ({ onSend, disabled }: ChatMessageInputProps) => {
   }
 
   return (
-    <div className={cn('bg-white py-3', CHAT_GUTTER_X)}>
+    <div className={cn('shrink-0 border-t border-neutral-150 bg-white py-3', CHAT_GUTTER_X)}>
       <div className={cn(CHAT_CONTENT_WIDTH, 'flex flex-col gap-2')}>
         {attachmentError && (
           <p role="alert" className="text-xs text-error-700">
@@ -186,14 +186,17 @@ const ChatMessageInput = ({ onSend, disabled }: ChatMessageInputProps) => {
           </p>
         )}
         {pendingAttachment && (
-          <div className="flex items-center gap-2 text-xs" role="status">
+          <div
+            className="flex items-center gap-2 rounded-lg bg-primary-50 px-3 py-2 text-xs text-neutral-700"
+            role="status"
+          >
             <span className="min-w-0 flex-1 truncate">
               {pendingAttachment.name} · {isSending ? '전송 확인 중' : '전송 대기'}
             </span>
             <button
               type="button"
               disabled={isDisabled}
-              className="shrink-0 underline disabled:opacity-50"
+              className="shrink-0 font-semibold text-primary-600 underline disabled:opacity-50"
               onClick={async () => {
                 if (
                   await send(
@@ -210,14 +213,14 @@ const ChatMessageInput = ({ onSend, disabled }: ChatMessageInputProps) => {
             <button
               type="button"
               disabled={isSending}
-              className="shrink-0 underline"
+              className="shrink-0 font-semibold text-neutral-600 underline"
               onClick={() => setPendingAttachment(null)}
             >
               닫기
             </button>
           </div>
         )}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {/* 첨부 메뉴 (+ 버튼 클릭 시 이미지/위치/파일) */}
           <ChatAttachMenu
             disabled={isDisabled || Boolean(pendingAttachment)}
@@ -225,28 +228,34 @@ const ChatMessageInput = ({ onSend, disabled }: ChatMessageInputProps) => {
             onSelectLocation={handleLocationRequest}
           />
 
-          {/* 입력 */}
-          <Input
-            value={value}
-            onChange={(e) => {
-              textDraftId.current = null
-              setValue(e.target.value)
-            }}
-            onKeyDown={handleKeyDown}
-            placeholder={uploadFile.isPending ? '파일을 업로드하는 중입니다.' : '입력해보세요'}
-            disabled={isDisabled}
-            className="flex-1"
-          />
-
-          {/* 보내기 버튼 */}
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={isDisabled || !value.trim()}
-            className="flex h-10 shrink-0 items-center justify-center rounded-lg bg-neutral-850 p-2 text-base leading-[1.5] font-semibold text-neutral-50 disabled:cursor-not-allowed"
-          >
-            {isSending ? '확인 중' : '보내기'}
-          </button>
+          {/* 입력 + 전송 — 댓글 입력창과 같은 필 모양 안에 함께 둔다 */}
+          <div className="flex h-12 min-w-0 flex-1 items-center gap-2 rounded-full border border-neutral-300 bg-base-white py-1 pr-1.5 pl-5 transition-[border-color,box-shadow] duration-150 focus-within:border-primary-500 focus-within:ring-4 focus-within:ring-point-500/45 motion-reduce:transition-none pc:h-14 pc:pl-6">
+            <input
+              type="text"
+              value={value}
+              onChange={(e) => {
+                textDraftId.current = null
+                setValue(e.target.value)
+              }}
+              onKeyDown={handleKeyDown}
+              placeholder={
+                uploadFile.isPending ? '파일을 업로드하는 중입니다.' : '메시지를 입력하세요'
+              }
+              disabled={isDisabled}
+              aria-label="메시지"
+              className="h-full min-w-0 flex-1 bg-transparent text-body-lg font-medium text-neutral-850 outline-none placeholder:text-neutral-500 disabled:cursor-not-allowed"
+            />
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={handleSubmit}
+              disabled={isDisabled || !value.trim()}
+              aria-busy={isSending}
+              className="h-10 min-w-14 shrink-0 px-3 whitespace-nowrap pc:h-11"
+            >
+              {isSending ? '확인 중' : '보내기'}
+            </Button>
+          </div>
         </div>
       </div>
 

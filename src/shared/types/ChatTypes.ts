@@ -18,6 +18,8 @@ export interface ChatRoomCounterpartResponseDto {
 export interface ChatRoomResponseDto {
   roomId: string
   applicationId?: string
+  /** 가장 최근에 연결된 분양 개체 id — 채팅방 상단 펫 정보 카드가 신청서 없이도 이 값으로 채워진다 */
+  petId?: string
   status: 'active' | 'closed'
   counterpart: ChatRoomCounterpartResponseDto
   lastMessage?: string
@@ -67,6 +69,8 @@ export interface CreateRoomRequestDto {
   breederId?: string
   /** 연결할 상담 신청 id — 채팅방 상단 펫 정보 카드가 이 값으로 채워진다 */
   applicationId?: string
+  /** 문의하는 분양 개체 id — 신청서 없이 분양글에서 바로 문의할 때 사용 */
+  petId?: string
 }
 
 /** 채팅 메시지 DTO (브리더 관리용 - 레거시) */

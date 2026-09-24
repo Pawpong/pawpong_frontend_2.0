@@ -6,8 +6,9 @@ interface ChatNoticeBannerProps {
   className?: string
 }
 
+// 역할(브리더/입양자)과 대화 목적(입양 문의/일반 상담) 어느 쪽도 특정하지 않는 중립 문구
 const NOTICE_MESSAGE =
-  '담당 브리더와 채팅을 통해 더 상세한 입양 계획을 세워보세요. 채팅 내용을 pawpong 팀이 검수 할 수 있습니다.'
+  '상대방과 채팅을 통해 더 자세한 이야기를 나눠보세요. 채팅 내용을 pawpong 팀이 검수 할 수 있습니다.'
 
 const ChatNoticeBanner = ({ onClose, className }: ChatNoticeBannerProps) => {
   return (
@@ -16,7 +17,6 @@ const ChatNoticeBanner = ({ onClose, className }: ChatNoticeBannerProps) => {
       size="responsive"
       icon={CheckRoundedIcon}
       message={NOTICE_MESSAGE}
-      actionLabel="자세히"
       onClose={onClose}
       className={className}
     />

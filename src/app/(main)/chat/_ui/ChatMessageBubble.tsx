@@ -9,6 +9,7 @@ interface ChatMessageBubbleProps {
   message: ChatMessageResponseDto
   isMine: boolean
   senderName: string
+  senderProfileImageUrl?: string
   showProfile?: boolean
 }
 
@@ -16,11 +17,11 @@ interface ChatMessageBubbleProps {
 const Bubble = ({ content, isMine }: { content: string; isMine: boolean }) => (
   <div
     className={cn(
-      'rounded-tl-2xl rounded-tr-2xl px-4 py-3 pc:p-5',
-      isMine ? 'rounded-bl-2xl bg-point-500' : 'rounded-br-2xl border border-neutral-500 bg-white',
+      'min-w-0 rounded-2xl px-3.5 py-2.5 pc:px-4 pc:py-3',
+      isMine ? 'rounded-br-md bg-point-500' : 'rounded-bl-md border border-neutral-150 bg-white',
     )}
   >
-    <p className="text-sm leading-[1.5] font-semibold break-words whitespace-pre-wrap text-neutral-850 pc:text-base">
+    <p className="text-sm leading-[1.5] font-medium break-words whitespace-pre-wrap text-neutral-850 pc:text-base">
       {content}
     </p>
   </div>
@@ -43,10 +44,10 @@ const AttachmentBubble = ({
         target="_blank"
         rel="noreferrer"
         className={cn(
-          'flex min-w-56 items-center gap-3 rounded-2xl border px-4 py-3 transition-colors pc:p-5',
+          'flex min-w-56 items-center gap-3 rounded-2xl border px-4 py-3 shadow-[0_1px_2px_rgba(55,55,55,0.04)] transition-colors',
           isMine
             ? 'border-point-500 bg-point-500 hover:bg-point-300'
-            : 'border-neutral-300 bg-white hover:bg-primary-50',
+            : 'border-neutral-150 bg-white hover:bg-primary-50',
         )}
         aria-label="공유한 위치를 지도에서 열기"
       >
@@ -70,8 +71,8 @@ const AttachmentBubble = ({
         target="_blank"
         rel="noreferrer"
         className={cn(
-          'block overflow-hidden rounded-2xl border',
-          isMine ? 'border-point-500 bg-point-500' : 'border-neutral-500 bg-white',
+          'block max-w-72 overflow-hidden rounded-2xl border shadow-[0_1px_2px_rgba(55,55,55,0.04)]',
+          isMine ? 'border-point-500 bg-point-500' : 'border-neutral-150 bg-white',
         )}
         aria-label={`${attachment.name} 원본 이미지 열기`}
       >
@@ -93,8 +94,8 @@ const AttachmentBubble = ({
       rel="noreferrer"
       download={attachment.name}
       className={cn(
-        'flex min-w-56 items-center gap-3 rounded-2xl border px-4 py-3 pc:p-5',
-        isMine ? 'border-point-500 bg-point-500' : 'border-neutral-500 bg-white',
+        'flex min-w-56 items-center gap-3 rounded-2xl border px-4 py-3 shadow-[0_1px_2px_rgba(55,55,55,0.04)]',
+        isMine ? 'border-point-500 bg-point-500' : 'border-neutral-150 bg-white',
       )}
     >
       <FileIcon className="size-8 shrink-0 text-neutral-850" />
@@ -114,16 +115,15 @@ const ChatMessageBubble = ({
   message,
   isMine,
   senderName,
+  senderProfileImageUrl,
   showProfile = false,
 }: ChatMessageBubbleProps) => {
-  const time = <RelativeTime dateStr={message.createdAt} />
-
   // 보낸 메시지 (오른쪽 정렬, 노란 말풍선)
   if (isMine) {
     return (
       <div className="flex w-full justify-end">
-        <div className="flex max-w-[85%] items-end gap-3 pc:max-w-[18.8125rem]">
-          {time}
+        <div className="flex max-w-[85%] items-end gap-2 pc:max-w-[26rem]">
+          <RelativeTime dateStr={message.createdAt} className="text-neutral-500" />
           <AttachmentBubble message={message} isMine />
         </div>
       </div>
@@ -132,16 +132,16 @@ const ChatMessageBubble = ({
 
   // 받은 메시지 (왼쪽 정렬, 회색 말풍선 + 프로필)
   return (
-    <div className="flex w-full flex-col items-start gap-3">
+    <div className="flex w-full flex-col items-start gap-1.5">
       {showProfile && (
         <div className="flex items-center gap-2">
-          <ProfileAvatar size="small" />
+          <ProfileAvatar src={senderProfileImageUrl} alt={`${senderName} 프로필`} size="small" />
           <span className="text-sm leading-[1.5] font-semibold text-neutral-850">{senderName}</span>
         </div>
       )}
-      <div className="flex max-w-[85%] items-end gap-3 pc:max-w-[21.9375rem]">
+      <div className="flex max-w-[85%] items-end gap-2 pc:max-w-[26rem]">
         <AttachmentBubble message={message} isMine={false} />
-        {time}
+        <RelativeTime dateStr={message.createdAt} className="text-neutral-500" />
       </div>
     </div>
   )

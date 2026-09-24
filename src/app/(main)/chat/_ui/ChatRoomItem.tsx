@@ -2,8 +2,9 @@
 
 import { cn } from '@/shared/lib/cn'
 import type { ChatRoomResponseDto } from '@/shared/types'
-import { ProfileAvatar } from '@/shared/ui'
+import { Badge, ProfileAvatar } from '@/shared/ui'
 import { getChatMessagePreview } from '../_lib/attachment'
+import { isAdoptionRoom } from '../_lib/constants'
 import { ChatRoomActionsMenu } from './ChatRoomActionsMenu'
 import { RelativeTime } from './RelativeTime'
 
@@ -25,45 +26,53 @@ const ChatRoomItem = ({
   return (
     <div
       className={cn(
-        'flex items-start justify-between p-2 hover:bg-neutral-100 tab:p-3',
-        isActive && 'bg-point-100 hover:bg-point-100',
+        'group relative flex min-h-[5.5rem] items-center justify-between gap-2 px-2 py-3 transition-colors hover:bg-primary-50 tab:px-3 tab:py-4',
+        isActive && 'bg-point-50 hover:bg-point-50',
+        unreadCount > 0 && !isActive && 'bg-primary-50/50',
       )}
     >
       <button
         type="button"
         onClick={onClick}
-        className="flex min-w-0 flex-1 items-center gap-4 text-left"
+        className="flex min-w-0 flex-1 items-center gap-3 rounded-lg text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
       >
-        {/* community-profile: 아바타 상단 정렬 (모바일 32 / PC 40) */}
-        <div className="flex min-w-0 items-start gap-2">
-          <ProfileAvatar
-            src={room.counterpart.profileImageUrl}
-            alt={`${room.counterpart.nickname} 프로필`}
-            size="responsive"
-          />
-          <div className="flex min-w-0 flex-col">
-            <div className="flex items-center gap-2">
-              <span className="truncate text-body-s font-semibold text-neutral-850">
-                {room.counterpart.nickname}
-              </span>
-              <RelativeTime dateStr={room.lastMessageAt} />
-            </div>
-            <p className="max-w-[21.625rem] truncate text-sm leading-[1.5] font-semibold text-neutral-850">
-              {getChatMessagePreview(room.lastMessage)}
-            </p>
+        <ProfileAvatar
+          src={room.counterpart.profileImageUrl}
+          alt={`${room.counterpart.nickname} 프로필`}
+          size="responsive"
+        />
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <div className="flex min-w-0 items-center gap-2">
+            <span className="truncate text-body-s font-semibold text-neutral-850">
+              {room.counterpart.nickname}
+            </span>
+            <Badge variant="primarySoft" className="shrink-0">
+              {isAdoptionRoom(room) ? '입양 문의' : '상담'}
+            </Badge>
           </div>
+          <p
+            className={cn(
+              'truncate text-sm leading-[1.5]',
+              unreadCount > 0 ? 'font-semibold text-neutral-850' : 'font-medium text-neutral-600',
+            )}
+          >
+            {getChatMessagePreview(room.lastMessage)}
+          </p>
+          <RelativeTime dateStr={room.lastMessageAt} className="text-neutral-500" />
         </div>
         {unreadCount > 0 && (
-          <span className="flex h-5 shrink-0 items-center justify-center rounded-full bg-error-500 px-2 text-sm leading-[1.5] font-normal text-white">
+          <Badge variant="pointCount" className="min-w-5 shrink-0 px-1.5">
             {unreadCount}
-          </span>
+          </Badge>
         )}
       </button>
-      <ChatRoomActionsMenu
-        roomId={room.roomId}
-        counterpartName={room.counterpart.nickname}
-        onClosed={onRoomClosed}
-      />
+      <div className="shrink-0">
+        <ChatRoomActionsMenu
+          roomId={room.roomId}
+          counterpartName={room.counterpart.nickname}
+          onClosed={onRoomClosed}
+        />
+      </div>
     </div>
   )
 }

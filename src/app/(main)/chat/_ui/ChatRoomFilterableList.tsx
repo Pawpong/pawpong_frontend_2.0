@@ -1,8 +1,9 @@
 'use client'
 
+import { useState } from 'react'
 import { cn } from '@/shared/lib/cn'
 import type { ChatRoomResponseDto } from '@/shared/types'
-import { EmptyState } from '@/shared/ui'
+import { Button, EmptyState, SearchBar } from '@/shared/ui'
 import { CHAT_GUTTER_X } from '../_lib/constants'
 import { useChatRoomFilter } from '../_lib/useChatRoomFilter'
 import { ChatFilterTabs } from './ChatFilterTabs'
@@ -27,16 +28,26 @@ const ChatRoomFilterableList = ({
   gutterClassName = CHAT_GUTTER_X,
 }: ChatRoomFilterableListProps) => {
   const { filter, setFilter, filteredRooms, isLoading, isError, refetch } = useChatRoomFilter()
+  const [search, setSearch] = useState('')
+  const visibleRooms = filteredRooms.filter((room) =>
+    room.counterpart.nickname.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase()),
+  )
 
   return (
     <>
       <div
         className={cn(
-          'flex flex-col items-end border-b border-neutral-300 py-3 pc:py-4',
+          'flex shrink-0 flex-col gap-3 border-b border-neutral-150 py-4',
           gutterClassName,
         )}
       >
-        <ChatFilterTabs value={filter} onChange={setFilter} className="justify-end" />
+        <SearchBar
+          placeholder={{ mobile: '대화 상대 검색', desktop: '대화 상대 검색' }}
+          defaultValue={search}
+          onChange={setSearch}
+          onSubmit={setSearch}
+        />
+        <ChatFilterTabs value={filter} onChange={setFilter} />
       </div>
 
       {isLoading ? (
@@ -46,19 +57,34 @@ const ChatRoomFilterableList = ({
       ) : isError ? (
         <div className="flex flex-col items-center justify-center gap-3 py-20">
           <p className="text-sm font-medium text-neutral-700">채팅방을 불러오지 못했습니다.</p>
-          <button
-            type="button"
+          <Button
+            variant="fill"
             onClick={() => void refetch()}
-            className="rounded-lg bg-neutral-850 px-3 py-2 text-sm font-semibold text-white"
+            className="rounded-lg bg-neutral-850 px-4 py-2 text-sm font-semibold text-neutral-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
           >
             다시 시도
-          </button>
+          </Button>
         </div>
-      ) : filteredRooms.length === 0 ? (
-        <EmptyState message="채팅방이 없습니다." className="py-20" />
+      ) : visibleRooms.length === 0 ? (
+        <EmptyState
+          message={
+            search.trim()
+              ? '검색한 상대와의 대화가 없어요.'
+              : filter === 'unread'
+                ? '읽지 않은 대화가 없어요.'
+                : '아직 대화가 없어요.'
+          }
+          className="py-20"
+        />
       ) : (
-        <div className={cn('flex flex-col gap-5 py-6 pc:py-10', gutterClassName, listClassName)}>
-          {filteredRooms.map((room) => (
+        <div
+          className={cn(
+            'divide-y divide-neutral-150 overflow-hidden bg-white py-2 pc:py-3',
+            gutterClassName,
+            listClassName,
+          )}
+        >
+          {visibleRooms.map((room) => (
             <ChatRoomItem
               key={room.roomId}
               room={room}

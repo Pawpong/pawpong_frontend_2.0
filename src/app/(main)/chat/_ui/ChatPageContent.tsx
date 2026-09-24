@@ -113,13 +113,13 @@ const ChatPageContent = () => {
 
   // PC + room selected: sidebar + chat panel
   return (
-    <div className="mx-auto flex h-[calc(100dvh-4rem)] w-full max-w-[90rem]">
+    <div className="mx-auto flex h-[calc(100dvh-4rem)] w-full max-w-[90rem] overflow-hidden border-x border-neutral-150 bg-white">
       <ChatSidebar
         activeRoomId={activeRoomId}
         onSelectRoom={handleSelectRoom}
         onRoomClosed={handleRoomClosed}
       />
-      <div className="flex-1">
+      <div className="min-w-0 flex-1">
         <ChatRoomPanel
           key={activeRoom.roomId}
           room={activeRoom}
