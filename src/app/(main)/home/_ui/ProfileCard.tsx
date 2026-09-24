@@ -14,12 +14,14 @@ import {
   LocationText,
   ProfileAvatar,
   FollowersModal,
+  LoginPromptModal,
+  CtaModal,
   type FollowUser,
 } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { formatBreederLocation } from '@/shared/lib/formatBreederLocation'
 import { profileQueries } from '@/entities/profile'
-import { useAuthStatus } from '@/features/auth'
+import { useAuthStatus, useLoginGuard } from '@/features/auth'
 import { ReportBreederAction } from '@/features/report'
 import { useFollowUser, useUnfollowUser, useRemoveFollower } from '@/features/profile'
 import { useCreateOrGetChatRoom } from '@/features/send-message'
@@ -125,25 +127,41 @@ const MineActions = () => <EditButton />
 // 누르면 채팅방 생성(또는 기존 방 조회) 후 /chat 으로 이동
 const MessageButton = ({ targetId }: { targetId: string }) => {
   const router = useRouter()
+  const { guard, isPromptOpen, setPromptOpen } = useLoginGuard()
+  const [isErrorOpen, setErrorOpen] = useState(false)
   const { mutate: startChat, isPending } = useCreateOrGetChatRoom()
 
   return (
-    <Button
-      variant="outline"
-      disabled={isPending}
-      onClick={() =>
-        startChat(
-          { breederId: targetId },
-          {
-            onSuccess: (room) => router.push(`/chat?roomId=${room.roomId}`),
-            onError: () => alert('채팅방을 열지 못했습니다. 잠시 후 다시 시도해주세요.'),
-          },
-        )
-      }
-      className={ACTION_SIZE}
-    >
-      메시지
-    </Button>
+    <>
+      <Button
+        variant="outline"
+        disabled={isPending}
+        onClick={guard(() =>
+          startChat(
+            { breederId: targetId },
+            {
+              onSuccess: (room) => router.push(`/chat?roomId=${room.roomId}`),
+              onError: () => setErrorOpen(true),
+            },
+          ),
+        )}
+        className={ACTION_SIZE}
+      >
+        메시지
+      </Button>
+      <LoginPromptModal
+        open={isPromptOpen}
+        onOpenChange={setPromptOpen}
+        description="로그인하고 메시지를 보내보세요."
+      />
+      <CtaModal
+        open={isErrorOpen}
+        onOpenChange={setErrorOpen}
+        title="채팅방을 열지 못했어요"
+        description="잠시 후 다시 시도해주세요."
+        actions={[{ label: '확인', variant: 'fill', onClick: () => setErrorOpen(false) }]}
+      />
+    </>
   )
 }
 
