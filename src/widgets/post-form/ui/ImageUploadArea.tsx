@@ -68,6 +68,7 @@ const imageUploadVariants = tv({
 
 interface ImageUploadAreaProps extends VariantProps<typeof imageUploadVariants> {
   disabled?: boolean
+  accept?: string
   images: string[]
   onAdd: (files: FileList) => void
   onRemove: (index: number) => void
@@ -90,6 +91,7 @@ const ImageUploadArea = ({
   maxImages = MAX_IMAGES,
   size,
   disabled = false,
+  accept = 'image/*',
 }: ImageUploadAreaProps) => {
   const styles = imageUploadVariants({ size })
   const isComposer = size === 'composer'
@@ -172,7 +174,7 @@ const ImageUploadArea = ({
         <input
           ref={inputRef}
           type="file"
-          accept="image/*"
+          accept={accept}
           multiple
           disabled={disabled}
           className="hidden"
@@ -235,7 +237,9 @@ const ImageUploadArea = ({
               }
               aria-label={`이미지 ${index + 1} 삭제`}
             >
-              <CloseIcon className={isComposer ? 'size-3 pc:size-3.5' : 'size-2.5 text-white tab:size-3.5'} />
+              <CloseIcon
+                className={isComposer ? 'size-3 pc:size-3.5' : 'size-2.5 text-white tab:size-3.5'}
+              />
             </button>
 
             {/* 순번 — desktop only. post 타일(100·180)에는 45px 배지가 과해 노출하지 않는다 */}

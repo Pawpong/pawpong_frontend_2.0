@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
+import { preparePhotoForPreview } from '@/shared/lib/preparePhoto'
 
 interface UsePostFormOptions {
   maxImages?: number
@@ -18,58 +19,101 @@ const usePostForm = ({
   const [initialImageValues] = useState(initialImages)
   // 이미 서버에 올라가 있는 사진(URL). 수정 화면에서 지우면 이 목록에서만 빠진다.
   const [uploadedImages, setUploadedImages] = useState<string[]>(initialImages)
-  // 이번에 고른 사진의 미리보기 URL — files 와 1:1 로 대응한다.
-  const [newImages, setNewImages] = useState<string[]>([])
-  const [files, setFiles] = useState<File[]>([])
+  const uploadedImagesRef = useRef(uploadedImages)
+  // Keep each file and its preview together so removing a photo cannot shift just one list.
+  const [newPhotos, setNewPhotos] = useState<{ file: File; url: string }[]>([])
+  const newPhotosRef = useRef(newPhotos)
   const [text, setText] = useState(initialText)
-  const newImagesRef = useRef(newImages)
+  const [isProcessingPhotos, setIsProcessingPhotos] = useState(false)
+  const [photoError, setPhotoError] = useState<string | null>(null)
+  const processingRef = useRef(false)
+  const selectionId = useRef(0)
+  const mountedRef = useRef(true)
 
   useEffect(() => {
-    newImagesRef.current = newImages
-  }, [newImages])
+    mountedRef.current = true
+    return () => {
+      mountedRef.current = false
+      selectionId.current += 1
+      processingRef.current = false
+      newPhotosRef.current.forEach(({ url }) => URL.revokeObjectURL(url))
+    }
+  }, [])
 
-  useEffect(
-    () => () => {
-      newImagesRef.current.forEach((image) => URL.revokeObjectURL(image))
-    },
-    [],
-  )
+  const images = [...uploadedImages, ...newPhotos.map(({ url }) => url)]
+  const files = newPhotos.map(({ file }) => file)
 
-  const images = [...uploadedImages, ...newImages]
   const hasChanges =
     text !== initialTextValue ||
     files.length > 0 ||
+    isProcessingPhotos ||
     uploadedImages.length !== initialImageValues.length ||
     uploadedImages.some((image, index) => image !== initialImageValues[index])
 
   const handleAddImages = useCallback(
-    (fileList: FileList) => {
-      const room = maxImages - uploadedImages.length - newImages.length
-      if (room <= 0) return
-      const added = Array.from(fileList).slice(0, room)
-      setNewImages((prev) => [...prev, ...added.map((file) => URL.createObjectURL(file))])
-      setFiles((prev) => [...prev, ...added])
+    async (fileList: FileList) => {
+      // The input is reset immediately after onAdd; copy FileList before any await.
+      const selected = Array.from(fileList)
+      if (processingRef.current || !mountedRef.current) return
+      const room = maxImages - uploadedImagesRef.current.length - newPhotosRef.current.length
+      const added = selected.slice(0, Math.max(0, room))
+      if (added.length === 0) return
+      const id = ++selectionId.current
+      processingRef.current = true
+      setIsProcessingPhotos(true)
+      setPhotoError(null)
+      const prepared: File[] = []
+      const failures: string[] = []
+      // Process in selection order and avoid decoding ten large photos simultaneously.
+      for (const file of added) {
+        try {
+          prepared.push(await preparePhotoForPreview(file))
+        } catch (error) {
+          failures.push(
+            `${file.name}: ${error instanceof Error ? error.message : '사진을 처리하지 못했습니다.'}`,
+          )
+        }
+        if (!mountedRef.current || id !== selectionId.current) return
+      }
+      const next = [
+        ...newPhotosRef.current,
+        ...prepared.map((file) => ({ file, url: URL.createObjectURL(file) })),
+      ]
+      newPhotosRef.current = next
+      setNewPhotos(next)
+      setPhotoError(failures.length ? failures.join('\n') : null)
+      processingRef.current = false
+      setIsProcessingPhotos(false)
     },
-    [maxImages, uploadedImages.length, newImages.length],
+    [maxImages],
   )
 
-  const handleRemoveImage = useCallback(
-    (index: number) => {
-      // 앞쪽은 기존 사진, 뒤쪽은 이번에 고른 사진
-      if (index < uploadedImages.length) {
-        setUploadedImages((prev) => prev.filter((_, i) => i !== index))
-        return
-      }
-      const newIndex = index - uploadedImages.length
-      setNewImages((prev) => {
-        const removed = prev[newIndex]
-        if (removed) URL.revokeObjectURL(removed)
-        return prev.filter((_, i) => i !== newIndex)
-      })
-      setFiles((prev) => prev.filter((_, i) => i !== newIndex))
-    },
-    [uploadedImages.length],
-  )
+  const cancelPhotoProcessing = useCallback(() => {
+    selectionId.current += 1
+    processingRef.current = false
+    setIsProcessingPhotos(false)
+  }, [])
+
+  // Also used inside save(), before React has rendered the disabled button.
+  const hasPendingPhotos = useCallback(() => processingRef.current, [])
+
+  const handleRemoveImage = useCallback((index: number) => {
+    if (processingRef.current) return
+    const uploaded = uploadedImagesRef.current
+    if (index < uploaded.length) {
+      const next = uploaded.filter((_, i) => i !== index)
+      uploadedImagesRef.current = next
+      setUploadedImages(next)
+      return
+    }
+    const newIndex = index - uploaded.length
+    const removed = newPhotosRef.current[newIndex]
+    if (!removed) return
+    URL.revokeObjectURL(removed.url)
+    const next = newPhotosRef.current.filter((_, i) => i !== newIndex)
+    newPhotosRef.current = next
+    setNewPhotos(next)
+  }, [])
 
   return {
     images,
@@ -83,6 +127,10 @@ const usePostForm = ({
     setText,
     handleAddImages,
     handleRemoveImage,
+    isProcessingPhotos,
+    photoError,
+    hasPendingPhotos,
+    cancelPhotoProcessing,
   }
 }
 

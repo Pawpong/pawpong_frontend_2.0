@@ -93,3 +93,32 @@ export async function preparePhoto(file: File): Promise<File> {
     image.src = ''
   }
 }
+
+// AVIF shares the generic mif1 HEIF brand. It is browser-displayable and must
+// retain its original alpha/animation rather than enter the HEIC conversion path.
+async function isAvifPhoto(blob: Blob): Promise<boolean> {
+  const text = String.fromCharCode(...new Uint8Array(await blob.slice(0, 64).arrayBuffer()))
+  if (text.slice(4, 8) !== 'ftyp') return false
+  for (let offset = 8; offset + 4 <= text.length; offset += 4) {
+    if (offset !== 12 && /^(avif|avis)$/.test(text.slice(offset, offset + 4))) return true
+  }
+  return false
+}
+
+/** Keep already displayable originals (including animated GIFs). Only HEIF files
+ * need the shared JPEG normalization before a cross-browser preview/upload. */
+export async function preparePhotoForPreview(file: File): Promise<File> {
+  validatePhoto(file)
+  const heifCandidate =
+    /\.(heic|heif)$/i.test(file.name) ||
+    /^image\/hei[cf]/i.test(file.type) ||
+    (await isHeifPhoto(file))
+  if (heifCandidate && !(await isAvifPhoto(file))) return preparePhoto(file)
+  try {
+    const image = await decodePhoto(file)
+    image.src = ''
+    return file
+  } catch {
+    throw new Error('사진을 읽을 수 없습니다. 파일이 손상되었거나 지원하지 않는 형식입니다.')
+  }
+}
