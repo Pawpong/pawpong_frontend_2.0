@@ -19,3 +19,14 @@ export const createOrGetChatRoom = (data: CreateRoomRequestDto) =>
 /** 채팅방 종료 */
 export const closeChatRoom = (roomId: string) =>
   apiClient.delete<ApiResponseFull<null>>(`${CHAT_BASE}/rooms/${roomId}`).then(unwrapVoid)
+
+/**
+ * 사용자 차단 — 차단하면 상대의 메시지가 더 이상 오지 않는다.
+ * 백엔드는 200 을 돌려준다 (@HttpCode(200)).
+ */
+export const blockChatUser = (userId: string) =>
+  apiClient.post<ApiResponseFull<null>>(`${CHAT_BASE}/blocks/${userId}`).then(unwrapVoid)
+
+/** 사용자 차단 해제 */
+export const unblockChatUser = (userId: string) =>
+  apiClient.delete<ApiResponseFull<null>>(`${CHAT_BASE}/blocks/${userId}`).then(unwrapVoid)

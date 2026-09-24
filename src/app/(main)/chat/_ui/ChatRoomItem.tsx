@@ -61,6 +61,7 @@ const ChatRoomItem = ({
       </button>
       <ChatRoomActionsMenu
         roomId={room.roomId}
+        counterpartUserId={room.counterpart.userId}
         counterpartName={room.counterpart.nickname}
         onClosed={onRoomClosed}
       />
