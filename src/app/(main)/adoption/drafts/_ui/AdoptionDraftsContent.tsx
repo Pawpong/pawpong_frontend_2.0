@@ -36,7 +36,7 @@ const AdoptionDraftsContent = () => {
 
   return (
     <div className="flex w-full flex-col">
-      <NavigationBar title="임시저장" backHref="/adoption/my-listings" />
+      <NavigationBar title="임시저장" backHref="/home" />
 
       <Container className="px-4 pb-10 tab:pb-16">
         <div className="mx-auto w-full pc:max-w-[59.25rem]">

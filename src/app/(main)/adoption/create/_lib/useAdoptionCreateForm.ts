@@ -156,7 +156,7 @@ const useAdoptionCreateForm = () => {
     hasChanges: () => isDirty || hasUnsavedImageChanges || hasUnsavedRepresentativeChange,
   })
 
-  const exitHref = draftId ? '/adoption/drafts' : '/adoption/my-listings'
+  const exitHref = draftId ? '/adoption/drafts' : '/home'
 
   const handleCloseClick = () => {
     if (requestExit()) {

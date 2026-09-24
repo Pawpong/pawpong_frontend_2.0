@@ -25,7 +25,6 @@ const BOTTOM_NAV_PATHS = new Set([
   '/faq',
   '/about',
   '/adoption/drafts',
-  '/adoption/my-listings',
   '/community/drafts',
 ])
 

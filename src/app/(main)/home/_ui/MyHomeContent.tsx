@@ -114,8 +114,8 @@ const MyHomeContent = () => {
         sideLinks={isBreeder ? BREEDER_MY_HOME_SIDE_LINKS : MY_HOME_SIDE_LINKS}
       >
         {/* 분양 목록 탭 (브리더만) — 시안 3170-790275: 라벨+필터 -> 카드 그리드.
-            '분양 페이지 바로가기' 배너 제거 — /adoption/my-listings 가 이 탭과 같은
-            목록 위젯을 그대로 보여줘 따로 링크할 이유가 없다 */}
+            standalone /adoption/my-listings 페이지는 이 탭과 완전히 중복이라 제거했다 —
+            분양 페이지 진입점은 전부 이 탭(/home)으로 온다 */}
         {isBreeder && (
           <TabsContent value="listings" className="mt-0">
             <BreederIntroduction
@@ -129,6 +129,7 @@ const MyHomeContent = () => {
             <Container className="py-5">
               <MyPetPostingList
                 pageSize={HOME_LISTING_PAGE_SIZE}
+                showTotalCount
                 action={
                   <Link
                     href="/adoption/create"

@@ -7,7 +7,7 @@ interface AdoptionCreateSuccessPageProps {
 
 const AdoptionCreateSuccessPage = async ({ searchParams }: AdoptionCreateSuccessPageProps) => {
   const { petId } = await searchParams
-  if (!petId) redirect('/adoption/my-listings')
+  if (!petId) redirect('/home')
   return <AdoptionCreateSuccessContent petId={petId} />
 }
 
