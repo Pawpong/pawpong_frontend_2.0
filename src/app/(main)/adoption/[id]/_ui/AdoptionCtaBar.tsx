@@ -6,6 +6,8 @@ import { cn } from '@/shared/lib/cn'
 
 interface AdoptionCtaBarProps {
   listingId: string
+  /** 이 개체를 등록한 브리더의 userId — 신청 전에도 "문의하기"로 바로 채팅을 시작할 때 쓴다 */
+  breederUserId: string
   isFavorite: boolean
   onToggleFavorite: () => void
   /**
@@ -34,6 +36,7 @@ interface AdoptionCtaBarProps {
    세 상태를 한 트리에서 반응형 클래스로만 분기 (중복 최소화) */
 const AdoptionCtaBar = ({
   listingId,
+  breederUserId,
   isFavorite,
   onToggleFavorite,
   applyBlockedReason,
@@ -112,13 +115,22 @@ const AdoptionCtaBar = ({
             {applyBlockedReason}
           </p>
         ) : (
-          <Link
-            href={`/adoption/${listingId}/apply`}
-            // hover: 글씨 #6b6b6b / press(active): 배경 #f3ec59 · 글씨 #3e3e3e (피그마 743-70327·743-70329)
-            className={`${ACTION_CLASS} bg-point-500 text-neutral-850 hover:text-neutral-700 active:bg-point-600 active:text-neutral-850`}
-          >
-            입양 신청하기
-          </Link>
+          // 신청 전에도 브리더에게 먼저 물어볼 수 있게, 신청 버튼 옆에 문의하기를 함께 둔다.
+          <div className="flex flex-1 items-center justify-end gap-[0.625rem] tab:gap-[0.75rem]">
+            <ApplicationChatButton
+              counterpartUserId={breederUserId}
+              petId={listingId}
+              label="문의하기"
+              className={`${ACTION_CLASS} border border-neutral-300 bg-white text-neutral-850 hover:text-neutral-700`}
+            />
+            <Link
+              href={`/adoption/${listingId}/apply`}
+              // hover: 글씨 #6b6b6b / press(active): 배경 #f3ec59 · 글씨 #3e3e3e (피그마 743-70327·743-70329)
+              className={`${ACTION_CLASS} bg-point-500 text-neutral-850 hover:text-neutral-700 active:bg-point-600 active:text-neutral-850`}
+            >
+              입양 신청하기
+            </Link>
+          </div>
         )}
       </div>
     </div>

@@ -83,6 +83,7 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
   // 레일(1024+)과 하단 고정 바(1024 미만)가 같은 값을 쓴다 — 한 곳에서 만든다
   const ctaProps = {
     listingId: detail.listingId,
+    breederUserId: detail.breeder.id,
     isFavorite,
     onToggleFavorite: toggleFavorite,
     applyBlockedReason,

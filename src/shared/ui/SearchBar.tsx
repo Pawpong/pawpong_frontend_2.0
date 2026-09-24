@@ -14,6 +14,8 @@ interface SearchBarProps {
   defaultValue?: string
   /** 제출 시 동작. 미지정이면 탐색 페이지로 이동한다 */
   onSubmit?: (keyword: string) => void
+  /** 타이핑마다 실시간으로 필요한 화면(채팅 목록 필터 등)에서만 넘긴다 */
+  onChange?: (keyword: string) => void
   className?: string
 }
 
@@ -25,7 +27,13 @@ const DEFAULT_PLACEHOLDER = {
 const INPUT_NAME = 'keyword'
 
 //QA: 검색 동작 공통화 — Enter와 아이콘 클릭이 같은 form submit/router 동작을 탄다.
-export const SearchBar = ({ placeholder, defaultValue, onSubmit, className }: SearchBarProps) => {
+export const SearchBar = ({
+  placeholder,
+  defaultValue,
+  onSubmit,
+  onChange,
+  className,
+}: SearchBarProps) => {
   const isTablet = useBreakpoint('tab')
   const router = useRouter()
   const resolvedPlaceholder = placeholder ?? DEFAULT_PLACEHOLDER
@@ -59,6 +67,7 @@ export const SearchBar = ({ placeholder, defaultValue, onSubmit, className }: Se
         type="text"
         name={INPUT_NAME}
         defaultValue={defaultValue}
+        onChange={onChange ? (event) => onChange(event.target.value) : undefined}
         placeholder={isTablet ? resolvedPlaceholder.desktop : resolvedPlaceholder.mobile}
         className="min-w-0 flex-1 bg-transparent text-base leading-[1.5] font-medium text-neutral-850 outline-none placeholder:text-neutral-500"
       />

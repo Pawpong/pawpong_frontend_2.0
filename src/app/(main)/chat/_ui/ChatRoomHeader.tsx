@@ -29,14 +29,14 @@ const ChatRoomHeader = ({
   onRoomClosed,
 }: ChatRoomHeaderProps) => {
   return (
-    <div className="bg-white px-4 py-1 shadow-[0px_7px_7px_rgba(55,55,55,0.1)] tab:px-12 pc:px-2.5 pc:py-2">
-      <div className={cn(CHAT_CONTENT_WIDTH, 'flex items-center justify-between')}>
+    <header className="shrink-0 border-b border-neutral-150 bg-white px-4 py-2 tab:px-12 pc:px-5 pc:py-3">
+      <div className={cn(CHAT_CONTENT_WIDTH, 'flex min-h-12 items-center justify-between')}>
         <div className="flex min-w-0 items-center gap-5 pc:gap-7">
           <div className="flex items-center gap-1">
             <button
               type="button"
               onClick={onBack}
-              className="-m-1 flex size-10 shrink-0 items-center justify-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+              className="-m-1 flex size-10 shrink-0 items-center justify-center rounded-lg transition-colors hover:bg-primary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 pc:hidden"
               aria-label="뒤로 가기"
             >
               <ArrowBackIcon className="size-6 text-neutral-700" />
@@ -47,15 +47,18 @@ const ChatRoomHeader = ({
             <Link
               href={`/home/${counterpartUserId}`}
               aria-label={`${displayName} 프로필 보기`}
-              className="flex min-w-0 items-center gap-2 rounded-lg transition-colors hover:bg-primary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+              className="flex min-w-0 items-center gap-3 rounded-lg px-1 py-0.5 transition-colors hover:bg-primary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
             >
               <ProfileAvatar
                 src={profileImageUrl}
                 alt={`${displayName} 프로필`}
                 size="responsive"
               />
-              <span className="max-w-36 truncate text-body-s font-semibold text-neutral-850 pc:max-w-[21.625rem]">
-                {displayName}
+              <span className="flex min-w-0 flex-col">
+                <span className="max-w-36 truncate text-body-s font-semibold text-neutral-850 pc:max-w-[21.625rem]">
+                  {displayName}
+                </span>
+                <span className="text-xs font-medium text-neutral-500">프로필 보기</span>
               </span>
             </Link>
           </div>
@@ -68,7 +71,7 @@ const ChatRoomHeader = ({
           onClosed={onRoomClosed}
         />
       </div>
-    </div>
+    </header>
   )
 }
 

@@ -10,11 +10,15 @@ const FILTER_TABS: { value: FilterTab; label: string }[] = [
   { value: 'counsel', label: '상담' },
 ]
 
+// 신청서(applicationId) 기반이든, 신청서 없이 분양글에서 바로 문의(petId)한 방이든
+// 특정 개체와 연결돼 있으면 모두 "입양" 문의로 본다.
+const isAdoptionRoom = (room: ChatRoomResponseDto) => !!room.applicationId || !!room.petId
+
 const filterRooms = (rooms: ChatRoomResponseDto[], filter: FilterTab): ChatRoomResponseDto[] => {
   if (filter === 'all') return rooms
   if (filter === 'unread') return rooms.filter((room) => room.unreadCount > 0)
-  if (filter === 'adoption') return rooms.filter((room) => !!room.applicationId)
-  return rooms.filter((room) => !room.applicationId)
+  if (filter === 'adoption') return rooms.filter(isAdoptionRoom)
+  return rooms.filter((room) => !isAdoptionRoom(room))
 }
 
 // [refactored] 채팅방 콘텐츠 반응형 가로 마진 (모바일 16 / 태블릿 48 / PC 80) — 섹션 4곳 공유.
@@ -24,5 +28,5 @@ const CHAT_GUTTER_X = `${RESPONSIVE_SHELL_CLASS} px-4 tab:px-12 pc:px-20`
 // [refactored] 콘텐츠 폭 — 태블릿 이하는 꽉 채우고, PC에서만 880px 가운데 정렬
 const CHAT_CONTENT_WIDTH = 'mx-auto w-full pc:max-w-[55rem]'
 
-export { FILTER_TABS, filterRooms, CHAT_GUTTER_X, CHAT_CONTENT_WIDTH }
+export { FILTER_TABS, filterRooms, isAdoptionRoom, CHAT_GUTTER_X, CHAT_CONTENT_WIDTH }
 export type { FilterTab }

@@ -40,9 +40,9 @@ const ChatAttachMenu = ({ disabled, onSelectFile, onSelectLocation }: ChatAttach
             type="button"
             aria-label="첨부"
             disabled={disabled}
-            className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-neutral-850 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-600 transition-colors hover:bg-primary-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 disabled:cursor-not-allowed disabled:bg-neutral-100 disabled:text-neutral-400"
           >
-            <PlusIcon className="text-white" />
+            <PlusIcon className="size-5" />
           </button>
         </DropdownMenuTrigger>
 

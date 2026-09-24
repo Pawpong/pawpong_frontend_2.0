@@ -40,7 +40,8 @@ const alertMessage = tv({
         base: 'gap-2 px-2 py-1 tab:gap-3 tab:p-2',
         group: 'items-start gap-1 tab:items-center tab:gap-0',
         icon: 'size-5 tab:size-6',
-        message: 'text-xs tab:text-sm tab:whitespace-nowrap',
+        // 모바일은 한 줄로 넘치게 두지 않고 2줄로 고정, 탭+ 는 그대로 한 줄 말줄임
+        message: 'text-xs line-clamp-2 tab:line-clamp-none tab:text-sm tab:whitespace-nowrap',
         action: 'text-xs tab:text-sm',
       },
     },

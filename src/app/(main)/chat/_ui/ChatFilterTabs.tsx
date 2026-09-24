@@ -10,15 +10,25 @@ interface ChatFilterTabsProps {
 
 const ChatFilterTabs = ({ value, onChange, className }: ChatFilterTabsProps) => {
   return (
-    <div className={cn('flex flex-wrap items-center gap-2', className)}>
+    <div
+      className={cn('flex flex-wrap items-center gap-1.5', className)}
+      role="group"
+      aria-label="대화 필터"
+    >
       {FILTER_TABS.map((tab) => (
-        <button key={tab.value} type="button" onClick={() => onChange(tab.value)}>
+        <button
+          key={tab.value}
+          type="button"
+          aria-pressed={value === tab.value}
+          onClick={() => onChange(tab.value)}
+          className="rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+        >
           <Badge
-            variant={value === tab.value ? 'primaryFilled' : 'primaryOutline'}
-            size="md"
+            variant={value === tab.value ? 'pointFilled' : 'default'}
+            size="lg"
             className={cn(
-              'cursor-pointer pc:px-2 pc:py-1 pc:text-sm',
-              value === tab.value ? 'pc:h-[1.8125rem]' : 'pc:h-8',
+              'h-8 cursor-pointer px-3 text-sm transition-colors',
+              value !== tab.value && 'border-neutral-150 text-neutral-700 hover:bg-neutral-50',
             )}
           >
             {tab.label}
