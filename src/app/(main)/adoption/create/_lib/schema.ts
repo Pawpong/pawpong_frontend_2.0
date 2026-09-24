@@ -220,3 +220,9 @@ export type AdoptionFormControl = Control<
   unknown,
   AdoptionCreateParsedValues
 >
+
+/** 한 칸이라도 채운 행 — 위 superRefine 의 '건드린 행' 판정과 같은 기준.
+ *  작성·수정 폼이 같은 규칙을 써야 해서 스키마 옆에 둔다 */
+export type ParentRow = AdoptionCreateParsedValues['parents'][number]
+export const isParentRowTouched = (parent: ParentRow) =>
+  Boolean(parent.relationship || parent.name || parent.breed || parent.birthDate)
