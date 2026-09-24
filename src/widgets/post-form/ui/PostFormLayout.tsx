@@ -2,7 +2,14 @@
 
 import { useId, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
-import { ComposerLayout, ComposerColumns, ComposerSectionHeading, TextareaField } from '@/shared/ui'
+import { PHOTO_ACCEPT } from '@/shared/lib/preparePhoto'
+import {
+  Button,
+  ComposerLayout,
+  ComposerColumns,
+  ComposerSectionHeading,
+  TextareaField,
+} from '@/shared/ui'
 import type { PostFormState } from '../lib/usePostForm'
 import { ImageUploadArea } from './ImageUploadArea'
 import { PostFormCTA, type PostFormCTAProps } from './PostFormCTA'
@@ -62,8 +69,24 @@ const PostFormLayout = ({
             onAdd={form.handleAddImages}
             onRemove={form.handleRemoveImage}
             maxImages={form.maxImages}
-            disabled={cta.isSubmitting}
+            accept={PHOTO_ACCEPT}
+            disabled={cta.isSubmitting || form.isProcessingPhotos}
           />
+          {form.isProcessingPhotos && (
+            <div className="mt-3 flex items-center gap-2">
+              <p role="status" className="text-sm text-neutral-700">
+                사진을 준비하고 있어요…
+              </p>
+              <Button type="button" variant="ghost" onClick={form.cancelPhotoProcessing}>
+                사진 처리 취소
+              </Button>
+            </div>
+          )}
+          {form.photoError && (
+            <p role="alert" className="mt-3 text-sm whitespace-pre-line text-error-500">
+              {form.photoError}
+            </p>
+          )}
           <p className="mt-3 text-xs leading-relaxed text-neutral-700">
             사진은 최대 {form.maxImages}장까지 올릴 수 있어요. 사진 없이 글만 작성해도 좋아요.
           </p>

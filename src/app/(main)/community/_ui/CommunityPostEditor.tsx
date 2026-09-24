@@ -53,12 +53,13 @@ const PostForm = ({ postId, post }: PostFormProps) => {
 
   // 발행(published)은 본문이 필수, 임시저장(draft)은 본문 없이 사진만으로도 가능 (백엔드 계약)
   const hasBody = form.text.trim().length > 0
-  const canPublish = hasBody && !isSubmitting
-  const canSaveDraft = (hasBody || form.images.length > 0) && !isSubmitting
+  const canPublish = hasBody && !isSubmitting && !form.isProcessingPhotos
+  const canSaveDraft =
+    (hasBody || form.images.length > 0) && !isSubmitting && !form.isProcessingPhotos
 
   // 발행/임시저장 모두 저장 후 마이홈으로 이동 (status 만 다름)
   const save = async (status: CommunityPostStatus) => {
-    if (status === 'published' ? !canPublish : !canSaveDraft) return
+    if (form.hasPendingPhotos() || (status === 'published' ? !canPublish : !canSaveDraft)) return
     const savedId = await submit({
       text: form.text,
       files: form.files,
