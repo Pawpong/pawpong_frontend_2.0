@@ -7,14 +7,20 @@ import { communityQueries } from '@/entities/community'
 import { profileQueries } from '@/entities/profile'
 import { useSubmitCommunityPostForm } from '@/features/community'
 import { useExitGuard } from '@/shared/lib/useExitGuard'
-import { Button, Container, CtaModal, NavigationBar } from '@/shared/ui'
+import { Button, Container, CtaModal, FilterChip, NavigationBar } from '@/shared/ui'
 import {
   usePostForm,
   PostFormLayout,
   VisibilitySelect,
   type VisibilityType,
 } from '@/widgets/post-form'
-import type { CommunityPostDetail, CommunityPostStatus } from '@/shared/types'
+import type { CommunityPetType, CommunityPostDetail, CommunityPostStatus } from '@/shared/types'
+
+const PET_TYPE_OPTIONS: { value: CommunityPetType; label: string }[] = [
+  { value: 'dog', label: '강아지' },
+  { value: 'cat', label: '고양이' },
+  { value: 'reptile', label: '파충류' },
+]
 
 interface CommunityPostEditorProps {
   /** 전달하면 수정 모드 — 기존 게시글로 폼을 채운다 */
@@ -45,8 +51,10 @@ const PostForm = ({ postId, post }: PostFormProps) => {
 
   const initialVisibility = post?.visibility ?? 'public'
   const [visibility, setVisibility] = useState<VisibilityType>(initialVisibility)
+  const initialPetType = post?.petType ?? ''
+  const [petType, setPetType] = useState<CommunityPetType | ''>(initialPetType)
   const { submit, isSubmitting, error } = useSubmitCommunityPostForm(postId)
-  const hasChanges = form.hasChanges || visibility !== initialVisibility
+  const hasChanges = form.hasChanges || visibility !== initialVisibility || petType !== initialPetType
   const { showGuard, requestExit, confirmExit, cancelExit } = useExitGuard({
     hasChanges,
   })
@@ -65,6 +73,7 @@ const PostForm = ({ postId, post }: PostFormProps) => {
       files: form.files,
       visibility,
       status,
+      petType: petType || undefined,
       keptImageUrls: form.uploadedImages,
     })
     if (savedId) {
@@ -102,16 +111,36 @@ const PostForm = ({ postId, post }: PostFormProps) => {
           isSubmitting,
         }}
         belowContent={
-          <div className="rounded-xl bg-neutral-50 p-5">
-            <h3 className="mb-2 text-sm font-semibold">누구와 나눌까요?</h3>
-            <p className="mb-3 text-xs leading-relaxed text-neutral-700">
-              {visibility === 'followers'
-                ? '나를 팔로우하는 사람들에게만 보여요.'
-                : visibility === 'private'
-                  ? '이 글은 나에게만 보여요.'
-                  : '포퐁을 방문하는 누구나 볼 수 있어요.'}
-            </p>
-            <VisibilitySelect value={visibility} onChange={setVisibility} disabled={isSubmitting} />
+          <div className="flex flex-col gap-4">
+            <div className="rounded-xl bg-neutral-50 p-5">
+              <h3 className="mb-3 text-sm font-semibold">어떤 아이 이야기인가요?</h3>
+              <div className="flex flex-wrap gap-2">
+                {PET_TYPE_OPTIONS.map((option) => (
+                  <FilterChip
+                    key={option.value}
+                    selected={petType === option.value}
+                    onClick={() => setPetType(petType === option.value ? '' : option.value)}
+                  >
+                    {option.label}
+                  </FilterChip>
+                ))}
+              </div>
+            </div>
+            <div className="rounded-xl bg-neutral-50 p-5">
+              <h3 className="mb-2 text-sm font-semibold">누구와 나눌까요?</h3>
+              <p className="mb-3 text-xs leading-relaxed text-neutral-700">
+                {visibility === 'followers'
+                  ? '나를 팔로우하는 사람들에게만 보여요.'
+                  : visibility === 'private'
+                    ? '이 글은 나에게만 보여요.'
+                    : '포퐁을 방문하는 누구나 볼 수 있어요.'}
+              </p>
+              <VisibilitySelect
+                value={visibility}
+                onChange={setVisibility}
+                disabled={isSubmitting}
+              />
+            </div>
           </div>
         }
       />
