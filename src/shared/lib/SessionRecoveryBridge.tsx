@@ -2,14 +2,14 @@
 
 import { useEffect } from 'react'
 import { clearAuthCookies, restoreAuthSession } from './authSessionRecovery'
-import { hasPendingLogout } from './authSessionLifecycle'
+import { canResumeAuthCookieClear, hasPendingLogout } from './authSessionLifecycle'
 
 export function SessionRecoveryBridge() {
   useEffect(() => {
     const recover = () => {
       if (document.visibilityState === 'hidden') return
       if (hasPendingLogout()) {
-        void clearAuthCookies()
+        if (canResumeAuthCookieClear()) void clearAuthCookies()
         return
       }
       // OAuth 콜백과 가입 화면은 자신의 새 인증 결과를 저장한다.

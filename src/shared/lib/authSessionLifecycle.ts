@@ -1,5 +1,6 @@
 let sessionGeneration = 0
 let signingOut = false
+let logoutRequestInProgress = false
 const cookieWrites = new Set<Promise<unknown>>()
 const LOGOUT_PENDING_KEY = 'pawpong:logout-pending'
 
@@ -20,9 +21,19 @@ export function finishAuthCookieClear(): void {
   }
 }
 
+/** 현재 문서의 보호된 로그아웃·탈퇴 요청이 쿠키를 사용한 뒤에만 복귀 시 삭제한다. */
+export function canResumeAuthCookieClear(): boolean {
+  return hasPendingLogout() && !logoutRequestInProgress
+}
+
+export function finishLogoutRequest(): void {
+  logoutRequestInProgress = false
+}
+
 /** 로그아웃 의도 이후 도착한 이전 refresh 응답은 세션을 되살릴 수 없다. */
 export function beginLogout(): void {
   signingOut = true
+  logoutRequestInProgress = true
   sessionGeneration += 1
   try {
     if (typeof localStorage !== 'undefined') localStorage.setItem(LOGOUT_PENDING_KEY, '1')
@@ -34,6 +45,7 @@ export function beginLogout(): void {
 /** 가입·소셜 로그인처럼 사용자가 새로 인증한 경우에만 세션을 다시 연다. */
 export function beginLogin(): number {
   signingOut = false
+  logoutRequestInProgress = false
   finishAuthCookieClear()
   return ++sessionGeneration
 }

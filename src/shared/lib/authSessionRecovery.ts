@@ -4,6 +4,7 @@ import { notifyAuthStateChanged } from './authStateEvents'
 import {
   getAuthSessionGeneration,
   finishAuthCookieClear,
+  finishLogoutRequest,
   isAuthSessionCurrent,
   trackAuthCookieWrite,
 } from './authSessionLifecycle'
@@ -34,6 +35,7 @@ async function authFetch<T>(
 /** 서버 통신이 실패해도 JS가 읽는 로그인 상태는 즉시 제거한다. */
 export async function clearAuthCookies(): Promise<void> {
   const generation = getAuthSessionGeneration()
+  finishLogoutRequest()
   document.cookie = 'accessToken=; path=/; max-age=0'
   document.cookie = 'userRole=; path=/; max-age=0'
   // 이전 운영 Domain 쿠키도 남아 있으면 getAccessToken이 다시 읽을 수 있다.
