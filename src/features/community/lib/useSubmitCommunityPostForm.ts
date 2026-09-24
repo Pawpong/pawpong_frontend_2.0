@@ -3,7 +3,11 @@
 import { useCallback, useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { uploadMultipleFiles } from '@/shared/api'
-import type { CommunityPostStatus, CommunityPostVisibility } from '@/shared/types'
+import type {
+  CommunityPetType,
+  CommunityPostStatus,
+  CommunityPostVisibility,
+} from '@/shared/types'
 import { useCreateCommunityPost, useUpdateCommunityPost } from '../api/community.mutations'
 import { COMMUNITY_UPLOAD_FOLDER, toCommunityPhotoFileName } from './communityPhotoFileName'
 
@@ -12,6 +16,7 @@ interface SubmitPostFormInput {
   files: File[]
   visibility: CommunityPostVisibility
   status: CommunityPostStatus
+  petType?: CommunityPetType
   /** 수정 시 그대로 두는 기존 사진 URL (지운 사진은 빠진 상태로 전달) */
   keptImageUrls?: string[]
 }
@@ -42,6 +47,7 @@ export const useSubmitCommunityPostForm = (postId?: string) => {
       files,
       visibility,
       status,
+      petType,
       keptImageUrls = [],
     }: SubmitPostFormInput): Promise<string | null> => {
       setError(null)
@@ -66,8 +72,8 @@ export const useSubmitCommunityPostForm = (postId?: string) => {
         // 발행은 서버가 빈 본문을 거부하지만 폼에서 먼저 막는다.
         const body = text.trim()
         const post = postId
-          ? await updateMutation.mutateAsync({ body, photos, visibility, status })
-          : await createMutation.mutateAsync({ body, photos, visibility, status })
+          ? await updateMutation.mutateAsync({ body, photos, visibility, status, petType })
+          : await createMutation.mutateAsync({ body, photos, visibility, status, petType })
         return post.postId
       } catch (err) {
         const message =
