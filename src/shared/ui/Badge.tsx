@@ -25,6 +25,10 @@ const badgeVariants = tv({
       pointFilled: 'border border-primary-500 bg-point-500 text-primary-500',
       // primaryFilled와 동일 사이즈의 회색 채움 (분양완료 등 비활성 상태)
       neutralFilled: 'bg-neutral-150 text-neutral-400',
+      // 목록 개수 카운트 (임시저장 등) — point 채움 + neutral-850 텍스트
+      pointCount: 'bg-point-500 px-2 py-0.5 text-xs font-semibold text-neutral-850',
+      // 진행 중 상태 표시 (작성 중 등) — VerificationContent 상태 뱃지와 동일 톤
+      primarySoft: 'bg-primary-50 px-2 py-0.5 text-xs font-semibold text-primary-700',
     },
     size: {
       lg: '',
