@@ -86,6 +86,7 @@ const NavMyHomeIcon = ({ className, src, active }: NavIconProps) => (
       src={src}
       size="xsmall"
       className={cn('size-full', active && 'border-2 border-primary-500')}
+      fallbackClassName="text-inherit"
     />
   </span>
 )
