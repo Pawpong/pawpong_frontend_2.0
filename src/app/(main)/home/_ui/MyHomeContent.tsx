@@ -141,6 +141,17 @@ const MyHomeContent = () => {
                     분양글 작성하기
                   </Link>
                 }
+                secondaryAction={
+                  <Link
+                    href="/adoption/drafts"
+                    className={cn(
+                      buttonVariants({ variant: 'text' }),
+                      'text-neutral-700 hover:text-neutral-850',
+                    )}
+                  >
+                    임시저장 →
+                  </Link>
+                }
                 gridClassName={`${CARD_GRID} pc:gap-x-[1.375rem]`}
               />
             </Container>
@@ -149,7 +160,22 @@ const MyHomeContent = () => {
 
         {/* Figma 4145:721426 — 모바일·태블릿 3열, PC 4열의 정사각 미디어 그리드 */}
         <TabsContent value="posts" className="mt-0">
-          <InputUpload text="작성하기" href="/community/write" className="px-4" />
+          <InputUpload
+            text="작성하기"
+            href="/community/write"
+            className="px-4"
+            left={
+              <Link
+                href="/community/drafts"
+                className={cn(
+                  buttonVariants({ variant: 'text' }),
+                  'text-neutral-700 hover:text-neutral-850',
+                )}
+              >
+                임시저장 →
+              </Link>
+            }
+          />
 
           <HomePostGrid
             posts={posts}

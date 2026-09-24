@@ -17,6 +17,8 @@ interface MyPetPostingListProps {
   pageSize: number
   /** 라벨 줄 오른쪽 액션(분양글 작성 등) — 있으면 필터 칩은 다음 줄로 내려간다 */
   action?: ReactNode
+  /** 필터 줄 오른쪽의 낮은 위계 관리 액션(임시저장 목록 등). */
+  secondaryAction?: ReactNode
   /** 라벨 옆에 필터 적용 후 전체 개수 표시 (분양 페이지 시안의 '분양 목록 109') */
   showTotalCount?: boolean
   /** 그리드 간격 오버라이드 — 화면마다 시안 값이 다르다 */
@@ -30,6 +32,7 @@ interface MyPetPostingListProps {
 const MyPetPostingList = ({
   pageSize,
   action,
+  secondaryAction,
   showTotalCount = false,
   gridClassName,
 }: MyPetPostingListProps) => {
@@ -52,7 +55,10 @@ const MyPetPostingList = ({
           {action}
         </div>
 
-        <PetStatusFilter value={status} onChange={setStatus} />
+        <div className="flex items-center justify-between gap-3">
+          <PetStatusFilter value={status} onChange={setStatus} />
+          {secondaryAction && <div className="shrink-0">{secondaryAction}</div>}
+        </div>
       </div>
 
       <ListState
