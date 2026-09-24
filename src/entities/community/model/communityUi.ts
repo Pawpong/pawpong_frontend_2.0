@@ -10,6 +10,6 @@ export const COMMUNITY_CAROUSEL_STYLE = {
 
 // [refactored] 목록·상세에 같은 문자열이 두 번 있던 것을 상수로
 export const COMMUNITY_LOGIN_PROMPT = {
-  reaction: '로그인하고 마음에 드는 글에 좋아요와 저장을 남겨보세요.',
+  reaction: '로그인하고 마음에 드는 글에\n좋아요와 저장을 남겨보세요.',
   comment: '로그인하고 이 글에 댓글을 남겨보세요.',
 } as const

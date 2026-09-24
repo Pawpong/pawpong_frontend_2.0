@@ -6,6 +6,7 @@ import { contestQueries } from '@/entities/contest'
 import type { ContestEntry } from '@/shared/types'
 import { Container, DetailLink, ImageDetailModal, ListState } from '@/shared/ui'
 import { flattenPages } from '@/shared/lib/infiniteList'
+import { cn } from '@/shared/lib/cn'
 import { HallOfFamePodium } from './HallOfFamePodium'
 
 const CARD_COUNT = 3
@@ -27,11 +28,19 @@ const HallOfFame = () => {
   const winners = flattenPages(data)
     .slice(0, CARD_COUNT)
     .map((item) => item.winner)
+  const hasWinners = winners.length > 0
 
   return (
     <section className="w-full bg-white">
-      <Container className="px-4 py-4 tab:py-[0.625rem] pc:h-[36rem] pc:py-20">
-        <div className="flex w-full flex-col items-start gap-[0.625rem] tab:gap-4 pc:flex-row pc:gap-9">
+      <Container
+        className={cn('px-4 py-4 tab:py-[0.625rem] pc:py-20', hasWinners && 'pc:h-[36rem]')}
+      >
+        <div
+          className={cn(
+            'flex w-full flex-col items-start gap-[0.625rem] tab:gap-4',
+            hasWinners && 'pc:flex-row pc:gap-9',
+          )}
+        >
           <div className="flex h-[2.625rem] w-full shrink-0 flex-row items-center justify-between gap-2 tab:h-[1.875rem] pc:h-auto pc:w-[12.75rem] pc:flex-col pc:items-start pc:justify-start">
             <h2 className="max-w-[12.9375rem] font-cafe24 text-lg leading-[1.5] font-normal text-neutral-850 tab:max-w-none tab:whitespace-nowrap pc:text-xl pc:whitespace-normal">
               <span className="block tab:inline pc:block">
@@ -51,7 +60,7 @@ const HallOfFame = () => {
             <ListState
               isPending={isPending}
               isError={isError}
-              isEmpty={winners.length === 0}
+              isEmpty={!hasWinners}
               loadingText="명예의 동물을 불러오는 중입니다."
               errorText="명예의 동물을 불러오지 못했습니다."
               emptyText="아직 선정된 명예의 동물이 없습니다."
