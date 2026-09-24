@@ -2,14 +2,16 @@
 
 import { Button, Container, CtaModal, NavigationBar } from '@/shared/ui'
 import { PostFormCTA } from '@/widgets/post-form'
+import {
+  BasicInfoSection,
+  BreedingEnvSection,
+  FormSection,
+  HealthInfoSection,
+  ImageField,
+  ParentInfoSection,
+  PET_IMAGE_MAX,
+} from '@/widgets/adoption-form'
 import { useAdoptionCreateForm } from '../_lib/useAdoptionCreateForm'
-import { PET_IMAGE_MAX } from '../_lib/constants'
-import { BasicInfoSection } from './BasicInfoSection'
-import { HealthInfoSection } from './HealthInfoSection'
-import { ParentInfoSection } from './ParentInfoSection'
-import { BreedingEnvSection } from './BreedingEnvSection'
-import { ImageField } from './ImageField'
-import { FormSection } from './FormSection'
 
 const AdoptionCreateContent = () => {
   const {

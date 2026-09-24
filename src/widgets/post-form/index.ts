@@ -1,5 +1,4 @@
 export { usePostForm } from './lib/usePostForm'
 export { PostFormLayout } from './ui/PostFormLayout'
 export { PostFormCTA } from './ui/PostFormCTA'
-export { ImageUploadArea } from './ui/ImageUploadArea'
 export { VisibilitySelect, type VisibilityType } from './ui/VisibilitySelect'

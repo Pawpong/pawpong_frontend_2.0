@@ -6,9 +6,9 @@ import { useDeleteFile, useUploadMultipleFiles } from '@/features/upload'
 import { isApiError } from '@/shared/api'
 import { composeImageKeys } from '@/shared/lib/composeImageKeys'
 import type { ImageEntry } from '@/shared/lib/useImageUpload'
-import type { AdoptionCreateParsedValues } from './schema'
-import { ADOPTION_UPLOAD_FOLDER } from './constants'
-import { toCreatePetPostingRequest } from './toCreatePetPostingRequest'
+import type { AdoptionCreateParsedValues } from '@/widgets/adoption-form'
+import { ADOPTION_UPLOAD_FOLDER } from '@/widgets/adoption-form'
+import { toCreatePetPostingRequest } from '@/widgets/adoption-form'
 
 interface CreatePostingSubmissionInput {
   /** 임시저장에서 이어 쓴 경우 그 초안 ID */

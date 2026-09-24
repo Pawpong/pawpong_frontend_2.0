@@ -2,8 +2,8 @@
 
 import type { UseFormRegister } from 'react-hook-form'
 import { Textarea } from '@/shared/ui'
-import { BREEDING_ENV_DESCRIPTION_MAX_LENGTH, BREEDING_ENV_IMAGE_MAX } from '../_lib/constants'
-import type { AdoptionCreateFormValues } from '../_lib/schema'
+import { BREEDING_ENV_DESCRIPTION_MAX_LENGTH, BREEDING_ENV_IMAGE_MAX } from '../lib/constants'
+import type { AdoptionCreateFormValues } from '../lib/schema'
 import { FormSection } from './FormSection'
 import { ImageField } from './ImageField'
 

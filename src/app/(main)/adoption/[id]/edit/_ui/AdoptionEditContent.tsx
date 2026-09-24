@@ -2,12 +2,14 @@
 
 import { Button, Container, CtaModal, NavigationBar } from '@/shared/ui'
 import { PostFormCTA } from '@/widgets/post-form'
-import { PET_IMAGE_MAX } from '../../../create/_lib/constants'
-import { BasicInfoSection } from '../../../create/_ui/BasicInfoSection'
-import { HealthInfoSection } from '../../../create/_ui/HealthInfoSection'
-import { ParentInfoSection } from '../../../create/_ui/ParentInfoSection'
-import { BreedingEnvSection } from '../../../create/_ui/BreedingEnvSection'
-import { ImageField } from '../../../create/_ui/ImageField'
+import {
+  BasicInfoSection,
+  BreedingEnvSection,
+  HealthInfoSection,
+  ImageField,
+  ParentInfoSection,
+  PET_IMAGE_MAX,
+} from '@/widgets/adoption-form'
 import { useAdoptionEditForm } from '../_lib/useAdoptionEditForm'
 
 interface AdoptionEditContentProps {

@@ -3,8 +3,8 @@ import type {
   PetBreedingEnvironment,
   SavePetPostingDraftRequest,
 } from '@/shared/types'
-import type { AdoptionCreateFormValues } from './schema'
-import type { PhotoFileNames } from './toCreatePetPostingRequest'
+import type { AdoptionCreateFormValues } from '@/widgets/adoption-form'
+import type { PhotoFileNames } from '@/widgets/adoption-form'
 
 /** 공백만 있는 값은 저장하지 않는다 — 복원 시 '입력한 척'이 되지 않게 */
 const trimmed = (value?: string) => {

@@ -4,9 +4,9 @@ import type { ReactNode } from 'react'
 import { Controller, useWatch, type UseFormRegister } from 'react-hook-form'
 import { TextareaField } from '@/shared/ui'
 import { RadioCardGroup } from '@/shared/ui/RadioCardGroup'
-import { HEALTH_REASON_MAX_LENGTH } from '../_lib/constants'
+import { HEALTH_REASON_MAX_LENGTH } from '../lib/constants'
 import { AddRowButton } from './AddRowButton'
-import type { AdoptionCreateFormValues, AdoptionFormControl } from '../_lib/schema'
+import type { AdoptionCreateFormValues, AdoptionFormControl } from '../lib/schema'
 
 /** 현재 상태와 실제 기록은 독립적으로 입력한다. 상태 전환으로 기록을 지우지 않는다. */
 const INCOMPLETE_REASON_PLACEHOLDER = '현재 상태와 미완료 사유, 예정된 일정이 있다면 알려주세요'

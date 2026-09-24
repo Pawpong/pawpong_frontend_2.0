@@ -13,13 +13,13 @@ import {
   isParentRowTouched,
   type AdoptionCreateFormValues,
   type AdoptionCreateParsedValues,
-} from './schema'
-import { BREEDING_ENV_IMAGE_MAX, PET_IMAGE_MAX } from './constants'
-import { createAdoptionDefaultValues, createParentRow } from './defaultValues'
+} from '@/widgets/adoption-form'
+import { BREEDING_ENV_IMAGE_MAX, PET_IMAGE_MAX } from '@/widgets/adoption-form'
+import { createAdoptionDefaultValues, createParentRow } from '@/widgets/adoption-form'
 import { useCreatePostingSubmission } from './useCreatePostingSubmission'
 import { useSaveDraftSubmission } from './useSaveDraftSubmission'
-import { fromPetPostingDraft } from './fromPetPostingDraft'
-import { useParentImages } from './useParentImages'
+import { fromPetPostingDraft } from '@/widgets/adoption-form'
+import { useParentImages } from '@/widgets/adoption-form'
 
 const useAdoptionCreateForm = () => {
   const router = useRouter()
@@ -266,11 +266,5 @@ const useAdoptionCreateForm = () => {
     handleSaveDraft,
   }
 }
-
-/**
- * 부모 행 목록 + 행별 사진 번들 — ParentInfoSection 이 그대로 소비한다.
- * 훅이 만드는 실제 형태에서 파생시켜, 여기서 필드를 늘려도 소비처 타입이 조용히 어긋나지 않게 한다.
- */
-export type ParentRows = ReturnType<typeof useAdoptionCreateForm>['parentRows']
 
 export { useAdoptionCreateForm }

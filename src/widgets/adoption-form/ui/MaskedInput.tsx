@@ -2,7 +2,7 @@
 
 import type { UseFormRegisterReturn } from 'react-hook-form'
 import { Input, type InputProps } from '@/shared/ui'
-import { formatDateInput, formatPriceInput, restoreCaret } from '../_lib/maskFormat'
+import { formatDateInput, formatPriceInput, restoreCaret } from '../lib/maskFormat'
 
 interface MaskedInputProps extends Omit<InputProps, 'onChange' | 'type' | 'inputMode'> {
   registration: UseFormRegisterReturn
