@@ -37,10 +37,7 @@ const ParentInfoSection = ({ control, register, errors, parentRows }: ParentInfo
             const rowErrors = errors.parents?.[index]
             return (
               // Figma 3137-390591: PC는 이미지 372 + 입력 컬럼 2단(gap 20), 모바일은 세로 스택
-              <div
-                key={row.id}
-                className="flex min-w-0 flex-col gap-5 rounded-xl border border-neutral-150 p-4 tab:p-5"
-              >
+              <div key={row.id} className="flex min-w-0 flex-col gap-5 rounded-xl p-4 tab:p-5">
                 <ImageField
                   images={imagesOf(row.id)}
                   onAdd={(files) => addImage(row.id, files)}

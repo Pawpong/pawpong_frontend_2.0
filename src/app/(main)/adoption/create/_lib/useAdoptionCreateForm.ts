@@ -10,6 +10,7 @@ import { useImageUpload } from '@/shared/lib/useImageUpload'
 import { useExitGuard } from '@/shared/lib/useExitGuard'
 import {
   adoptionCreateSchema,
+  isParentRowTouched,
   type AdoptionCreateFormValues,
   type AdoptionCreateParsedValues,
 } from './schema'
@@ -19,12 +20,6 @@ import { useCreatePostingSubmission } from './useCreatePostingSubmission'
 import { useSaveDraftSubmission } from './useSaveDraftSubmission'
 import { fromPetPostingDraft } from './fromPetPostingDraft'
 import { useParentImages } from './useParentImages'
-
-type ParentRow = AdoptionCreateParsedValues['parents'][number]
-
-/** 한 칸이라도 채운 행 — 스키마 superRefine 의 '건드린 행' 판정과 같은 기준 */
-const isParentRowTouched = (parent: ParentRow) =>
-  Boolean(parent.relationship || parent.name || parent.breed || parent.birthDate)
 
 const useAdoptionCreateForm = () => {
   const router = useRouter()

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { MenuIcon } from '@/shared/assets'
 import { RESPONSIVE_SHELL_CLASS } from '@/shared/config'
 import { cn } from '@/shared/lib/cn'
@@ -10,8 +11,13 @@ import { NavBar } from './NavBar'
 import { NotificationBell } from './NotificationBell'
 import { MobileMenu } from './MobileMenu'
 
+// 배경이 흰색이 아닌 화면에서는 헤더도 그 배경을 따라간다 (흰 띠가 떠 보이지 않게).
+// BottomNav 의 경로 목록과 같은 방식 — 페이지가 <main> 안에 있어 props 나 CSS 변수로는 닿지 않는다.
+const TINTED_HEADER_PATHS = new Set(['/adoption/create'])
+
 const Gnb = () => {
   const [menuOpen, setMenuOpen] = useState(false)
+  const pathname = usePathname()
 
   return (
     <>
@@ -19,7 +25,10 @@ const Gnb = () => {
           (mo-375 h48/px16 · tab-768 py8/px48 · pc-1440 h64/py8/px80) */}
       <header
         data-gnb
-        className="sticky top-0 z-header flex h-12 w-full items-center justify-center bg-white tab:py-2 pc:h-16"
+        className={cn(
+          'sticky top-0 z-header flex h-12 w-full items-center justify-center tab:py-2 pc:h-16',
+          TINTED_HEADER_PATHS.has(pathname) ? 'bg-point-50' : 'bg-white',
+        )}
       >
         <div
           className={cn(

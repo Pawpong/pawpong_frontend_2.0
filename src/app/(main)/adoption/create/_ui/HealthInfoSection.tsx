@@ -51,10 +51,7 @@ const HealthInfoSection = ({ control, register, errors }: HealthInfoSectionProps
           {vaccinationFields.map((row, index) => {
             const rowErrors = errors.vaccinations?.[index]
             return (
-              <div
-                key={row.id}
-                className="flex flex-col gap-4 rounded-xl border border-neutral-150 bg-white p-4 tab:p-5"
-              >
+              <div key={row.id} className="flex flex-col gap-4 rounded-xl bg-point-50 p-4 tab:p-5">
                 <div className="flex items-center justify-between gap-3">
                   <h4 className="text-sm font-semibold text-neutral-850">접종 기록 {index + 1}</h4>
                   <RemoveRowButton
@@ -113,10 +110,7 @@ const HealthInfoSection = ({ control, register, errors }: HealthInfoSectionProps
           {geneticTestFields.map((row, index) => {
             const rowErrors = errors.geneticTests?.[index]
             return (
-              <div
-                key={row.id}
-                className="flex flex-col gap-4 rounded-xl border border-neutral-150 bg-white p-4 tab:p-5"
-              >
+              <div key={row.id} className="flex flex-col gap-4 rounded-xl bg-point-50 p-4 tab:p-5">
                 <div className="flex items-center justify-between gap-3">
                   <h4 className="text-sm font-semibold text-neutral-850">검사 기록 {index + 1}</h4>
                   <RemoveRowButton

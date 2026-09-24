@@ -17,6 +17,8 @@ interface PostFormCTAProps {
   isSubmitting?: boolean
   /** 바 왼쪽 슬롯 (Figma 1054-36832 — 공개범위 드롭다운) */
   leftSlot?: React.ReactNode
+  /** 고정 바 배경 등 — 페이지 배경이 흰색이 아닌 화면에서 톤을 맞출 때 쓴다 */
+  className?: string
 }
 
 /** 글 작성/수정 하단 CTA — 공통 FooterCtaBar 에 임시저장/업로드 액션만 얹는다 */
@@ -29,6 +31,7 @@ const PostFormCTA = ({
   isSubmitting = false,
   leftSlot,
   placement = 'fixed',
+  className,
 }: PostFormCTAProps) =>
   placement === 'inline' ? (
     <div className="flex flex-wrap gap-3">
@@ -54,6 +57,7 @@ const PostFormCTA = ({
     </div>
   ) : (
     <FooterCtaBar
+      className={className}
       leftSlot={leftSlot}
       secondary={
         onSaveDraft && {
