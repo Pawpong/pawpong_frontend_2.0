@@ -14,10 +14,7 @@ interface FormSectionProps {
 const FormSection = ({ title, description, step = 1, required, children }: FormSectionProps) => {
   const id = useId()
   return (
-    <section
-      aria-labelledby={id}
-      className="min-w-0 rounded-2xl border border-neutral-150 bg-white p-5 tab:p-8"
-    >
+    <section aria-labelledby={id} className="min-w-0 rounded-2xl bg-white p-5 tab:p-8">
       <ComposerSectionHeading id={id} step={step} required={required}>
         {title}
       </ComposerSectionHeading>

@@ -43,7 +43,12 @@ const AdoptionCreateContent = () => {
   if (isLoadingDraft || isDraftLoadError) {
     return (
       <div className="flex min-h-screen w-full flex-col bg-point-50">
-        <NavigationBar title="분양글 작성" icon="close" onBack={handleCloseClick} />
+        <NavigationBar
+          title="분양글 작성"
+          icon="close"
+          onBack={handleCloseClick}
+          className="bg-transparent"
+        />
         <Container className="flex flex-1 items-center justify-center px-4 py-12">
           <div className="flex flex-col items-center gap-4 text-center">
             <p
@@ -70,12 +75,21 @@ const AdoptionCreateContent = () => {
     )
   }
 
+  // 사이드바 CTA 와 하단 고정 바가 같은 문구·조건을 쓰도록 한 곳에서 만든다
+  const isBusy = isSubmitting || isSavingDraft
+  const submitLabel = isSubmitting ? '등록 중…' : isSavingDraft ? '저장 중…' : '분양글 등록'
+
   return (
     <div className="flex min-h-screen w-full flex-col bg-point-50 text-neutral-850">
-      <NavigationBar title="분양글 작성" icon="close" onBack={handleCloseClick} />
+      <NavigationBar
+        title="분양글 작성"
+        icon="close"
+        onBack={handleCloseClick}
+        className="bg-transparent"
+      />
 
-      {/* 고정 하단 버튼에 마지막 입력란이 가려지지 않도록 여백을 유지한다. */}
-      <Container className="flex-1 py-6 pb-36 tab:pt-10">
+      {/* 고정 하단 버튼에 마지막 입력란이 가려지지 않도록 여백을 둔다. lap+ 는 고정 바가 없어 되돌린다 */}
+      <Container className="flex-1 py-6 pb-36 tab:pt-10 lap:pb-6">
         {/* CTA 바가 fixed 라 폼 밖에 있다. 폼 경계를 만들어 Enter 제출과 보조기기 인식을 살린다 */}
         <div className="mx-auto max-w-264">
           <header className="mb-8">
@@ -137,30 +151,15 @@ const AdoptionCreateContent = () => {
                 </div>
               </fieldset>
 
-              {/* 암묵적 제출(Enter)은 폼에 submit 버튼이 있어야 동작한다. 실제 버튼은 fixed CTA 바에 있다 */}
+              {/* 암묵적 제출(Enter)은 폼에 submit 버튼이 있어야 동작한다.
+                  실제 버튼은 lap+ 사이드바, 그 미만은 하단 고정 바에 있다 */}
               <button type="submit" className="hidden" aria-hidden tabIndex={-1} />
             </form>
             <aside
               className="sticky top-24 hidden space-y-6 lap:block"
               aria-label="분양글 작성 안내"
             >
-              <div className="rounded-2xl border border-neutral-150 bg-white p-5">
-                <h2 className="font-semibold">작성할 내용</h2>
-                <ol className="mt-5 space-y-4 text-sm text-neutral-700">
-                  {['아이 사진', '기본 정보', '건강 정보', '부모 정보', '생활 환경'].map(
-                    (title, index) => (
-                      <li key={title} className="flex items-center gap-3">
-                        <span className="flex size-6 items-center justify-center rounded-full bg-neutral-50 text-xs font-semibold text-primary-600">
-                          {index + 1}
-                        </span>
-                        {title}
-                        <span className="ml-auto text-xs">{index < 3 ? '필수' : '선택'}</span>
-                      </li>
-                    ),
-                  )}
-                </ol>
-              </div>
-              <div className="rounded-2xl bg-point-100 p-5 text-sm leading-relaxed">
+              <div className="rounded-2xl bg-secondary-200 p-5 text-sm leading-relaxed">
                 <h2 className="font-semibold text-primary-700">솔직한 정보가 신뢰의 시작이에요</h2>
                 <p className="mt-3 text-neutral-700">
                   성격과 생활 습관뿐 아니라 건강 상태와 돌봄 시 주의할 점도 알려주세요.
@@ -168,6 +167,27 @@ const AdoptionCreateContent = () => {
                 <p className="mt-3 text-neutral-700">
                   확인되지 않은 정보는 임의로 입력하지 말고, 확인 후 등록해주세요.
                 </p>
+              </div>
+
+              {/* 사이드바가 좁아 한 줄에 하나씩 둔다 */}
+              <div className="flex flex-col gap-3">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={handleSaveDraft}
+                  disabled={isBusy}
+                  className="w-full"
+                >
+                  임시저장
+                </Button>
+                <Button
+                  size="lg"
+                  onClick={handleUpload}
+                  disabled={!canSubmit || isBusy}
+                  className="w-full"
+                >
+                  {submitLabel}
+                </Button>
               </div>
             </aside>
           </div>
@@ -179,13 +199,17 @@ const AdoptionCreateContent = () => {
         </div>
       </Container>
 
-      <PostFormCTA
-        submitLabel={isSubmitting ? '등록 중…' : isSavingDraft ? '저장 중…' : '분양글 등록'}
-        onSaveDraft={handleSaveDraft}
-        onSubmit={handleUpload}
-        isValid={canSubmit}
-        isSubmitting={isSubmitting || isSavingDraft}
-      />
+      {/* lap 부터는 사이드바 버튼이 대신하므로 숨긴다 */}
+      <div className="lap:hidden">
+        <PostFormCTA
+          className="bg-point-50"
+          submitLabel={submitLabel}
+          onSaveDraft={handleSaveDraft}
+          onSubmit={handleUpload}
+          isValid={canSubmit}
+          isSubmitting={isBusy}
+        />
+      </div>
 
       <CtaModal
         open={showGuard}

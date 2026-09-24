@@ -1,6 +1,7 @@
 'use client'
 
 import type { ReactNode } from 'react'
+import { cn } from '@/shared/lib/cn'
 import { Container } from './Container'
 import { Button } from './Button'
 
@@ -19,6 +20,8 @@ interface FooterCtaBarProps {
   primary: FooterCtaAction
   /** 바 위에 겹쳐 띄우는 요소 (예: 완료 토스트) */
   children?: ReactNode
+  /** 바 배경 등 — 페이지 배경이 흰색이 아닌 화면에서 톤을 맞출 때 쓴다 */
+  className?: string
 }
 
 /**
@@ -26,11 +29,11 @@ interface FooterCtaBarProps {
  * - 바: 높이 94(tab+), 좌우 여백은 Container 기본(mo16 / tab48 / pc80)
  * - 버튼: 모바일 h-48 풀 너비(보조 117 고정), tab+ h-40 · 170 · gap 20 (그룹 360)
  */
-const FooterCtaBar = ({ leftSlot, secondary, primary, children }: FooterCtaBarProps) => (
-  <div className="fixed inset-x-0 bottom-0 z-sticky bg-white">
+const FooterCtaBar = ({ leftSlot, secondary, primary, children, className }: FooterCtaBarProps) => (
+  <div className={cn('fixed inset-x-0 bottom-0 z-sticky bg-white', className)}>
     {children}
 
-    <Container className="flex items-center bg-white py-4 tab:h-[5.875rem] tab:justify-between tab:py-0">
+    <Container className="flex items-center py-4 tab:h-[5.875rem] tab:justify-between tab:py-0">
       {/* 좌측 슬롯 자리는 비어 있어도 유지해 버튼 그룹이 우측에 붙게 한다 */}
       <div className="hidden tab:block">{leftSlot}</div>
 
