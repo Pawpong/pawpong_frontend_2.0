@@ -39,7 +39,7 @@ const AVATAR_SIZE = {
 
 /**
  * 프로필 아바타 — 사진 있으면 이미지, 없으면 paw 글리프 placeholder.
- * 색: 배경 #ededed(bg/tertiary) · 글리프 #a6a6a6(icon/tertiary) — Figma 817-103336
+ * 색: 배경 primary-50(#f5eadf) · 글리프 primary-500(#ad651d, 메뉴바와 동일)
  */
 const ProfileAvatar = ({
   src,
@@ -51,8 +51,7 @@ const ProfileAvatar = ({
   return (
     <Avatar className={cn(AVATAR_SIZE[size].box, className)}>
       {src && <AvatarImage src={src} alt={alt} />}
-      {/* [refactored] PixelUserIcon → PawPrintIcon, 색 #ededed/#a6a6a6 (Figma) */}
-      <AvatarFallback className={cn('bg-neutral-100 text-neutral-500', fallbackClassName)}>
+      <AvatarFallback className={cn('bg-primary-50 text-primary-500', fallbackClassName)}>
         <PawPrintIcon className={AVATAR_SIZE[size].glyph} />
       </AvatarFallback>
     </Avatar>

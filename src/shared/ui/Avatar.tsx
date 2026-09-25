@@ -53,13 +53,13 @@ export const AvatarFallback = React.forwardRef<
   <AvatarPrimitive.Fallback
     ref={ref}
     className={cn(
-      'flex size-full items-center justify-center rounded-full bg-neutral-100 text-sm font-medium text-neutral-500',
+      'flex size-full items-center justify-center rounded-full bg-primary-50 text-sm font-medium text-primary-500',
       className,
     )}
     {...props}
   >
     {/* 이니셜 등을 넘기지 않으면 기본 아바타(발바닥) */}
-    {children ?? <PawPrintIcon className="size-[58%] text-neutral-500" />}
+    {children ?? <PawPrintIcon className="size-[58%] text-primary-500" />}
   </AvatarPrimitive.Fallback>
 ))
 AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName
