@@ -7,12 +7,15 @@ interface UsePostFormOptions {
   initialText?: string
   /** 수정 화면 초기값 — 이미 업로드된 사진 URL (남긴 것만 제출 시 파일명으로 변환) */
   initialImages?: string[]
+  /** 작성 화면 초기값 — 다른 화면(AI 필터 등)에서 넘겨받은 새 사진. 제출 때 함께 업로드된다 */
+  initialFiles?: File[]
 }
 
 const usePostForm = ({
   maxImages = 10,
   initialText = '',
   initialImages = [],
+  initialFiles,
 }: UsePostFormOptions = {}) => {
   // 수정 기준값은 이 폼 인스턴스가 처음 열린 시점으로 고정한다.
   const [initialTextValue] = useState(initialText)
@@ -21,7 +24,9 @@ const usePostForm = ({
   const [uploadedImages, setUploadedImages] = useState<string[]>(initialImages)
   const uploadedImagesRef = useRef(uploadedImages)
   // Keep each file and its preview together so removing a photo cannot shift just one list.
-  const [newPhotos, setNewPhotos] = useState<{ file: File; url: string }[]>([])
+  const [newPhotos, setNewPhotos] = useState<{ file: File; url: string }[]>(() =>
+    (initialFiles ?? []).map((file) => ({ file, url: URL.createObjectURL(file) })),
+  )
   const newPhotosRef = useRef(newPhotos)
   const [text, setText] = useState(initialText)
   const [isProcessingPhotos, setIsProcessingPhotos] = useState(false)
@@ -115,30 +120,8 @@ const usePostForm = ({
     setNewPhotos(next)
   }, [])
 
-  /**
-   * 새로 고른 사진 한 장을 다른 파일로 바꾼다 (자리·순서 유지). 바뀐 미리보기 URL 을 돌려준다.
-   * AI 도트 변환 결과를 원본 자리에 넣고, 다시 원본으로 되돌릴 때 쓴다.
-   * 대상이 이미 지워졌으면 null.
-   */
-  const replaceNewPhoto = useCallback((url: string, file: File): string | null => {
-    if (processingRef.current) return null
-    const index = newPhotosRef.current.findIndex((photo) => photo.url === url)
-    if (index < 0) return null
-    const nextUrl = URL.createObjectURL(file)
-    URL.revokeObjectURL(url)
-    const next = newPhotosRef.current.map((photo, i) =>
-      i === index ? { file, url: nextUrl } : photo,
-    )
-    newPhotosRef.current = next
-    setNewPhotos(next)
-    return nextUrl
-  }, [])
-
   return {
     images,
-    /** 새로 고른 사진(아직 업로드 전) — 파일과 미리보기 URL 쌍 */
-    newPhotos,
-    replaceNewPhoto,
     /** ImageUploadArea 에도 같은 상한을 넘겨야 해서 함께 돌려준다 */
     maxImages,
     /** 지우지 않고 남긴 기존 사진 URL — 수정 제출 시 파일명으로 변환해 함께 보낸다 */
