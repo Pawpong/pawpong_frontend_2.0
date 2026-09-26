@@ -72,7 +72,7 @@ export function RepresentativePhotosField({
         onChange={handlePhotosChange}
       />
       {/* 기존 사진은 유지하고 선택한 빈 슬롯부터 채운다. */}
-      <div className="mb-2 grid grid-cols-3 gap-2">
+      <div className="mb-2 grid grid-cols-4 gap-2">
         {Array.from({ length: MAX_REPRESENTATIVE_PHOTOS }, (_, index) => {
           const photo = photoSlots[index]
 
