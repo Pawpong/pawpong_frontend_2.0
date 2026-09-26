@@ -1,6 +1,6 @@
 'use client'
 
-import { useId, useRef, useState } from 'react'
+import { useId, useRef, useState, type ReactNode } from 'react'
 import Image from 'next/image'
 import { CloseIcon } from '@/shared/assets'
 import { PHOTO_ACCEPT } from '@/shared/lib/preparePhoto'
@@ -14,6 +14,10 @@ interface PhotoUploadFieldProps {
   processing?: boolean
   onSelect: (files: FileList) => void
   onRemove: () => void
+  /** 미리보기 좌상단 표시 (예: AI 도트 버전 표시) */
+  badge?: ReactNode
+  /** processing 중 문구 (기본: 사진 준비) */
+  processingLabel?: string
 }
 
 /** Single-photo selection with replacement, keyboard access and desktop drop support. */
@@ -23,6 +27,8 @@ export function PhotoUploadField({
   processing,
   onSelect,
   onRemove,
+  badge,
+  processingLabel = '사진을 준비하고 있어요…',
 }: PhotoUploadFieldProps) {
   const input = useRef<HTMLInputElement>(null)
   const hintId = useId()
@@ -81,12 +87,15 @@ export function PhotoUploadField({
             <CloseIcon className="size-5" />
           </button>
         )}
+        {preview && badge && !processing && (
+          <span className="pointer-events-none absolute top-3 left-3">{badge}</span>
+        )}
         {processing && (
           <div
             role="status"
             className="absolute inset-0 flex items-center justify-center bg-white/90 text-sm font-semibold text-primary-700"
           >
-            사진을 준비하고 있어요…
+            {processingLabel}
           </div>
         )}
       </div>
