@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { communityQueries } from '@/entities/community'
 import { profileQueries } from '@/entities/profile'
+import { AiPixelPhotoPanel } from '@/features/ai-image'
 import { useSubmitCommunityPostForm } from '@/features/community'
 import { useExitGuard } from '@/shared/lib/useExitGuard'
 import { Button, Container, CtaModal, FilterChip, NavigationBar } from '@/shared/ui'
@@ -54,7 +55,8 @@ const PostForm = ({ postId, post }: PostFormProps) => {
   const initialPetType = post?.petType ?? ''
   const [petType, setPetType] = useState<CommunityPetType | ''>(initialPetType)
   const { submit, isSubmitting, error } = useSubmitCommunityPostForm(postId)
-  const hasChanges = form.hasChanges || visibility !== initialVisibility || petType !== initialPetType
+  const hasChanges =
+    form.hasChanges || visibility !== initialVisibility || petType !== initialPetType
   const { showGuard, requestExit, confirmExit, cancelExit } = useExitGuard({
     hasChanges,
   })
@@ -112,6 +114,11 @@ const PostForm = ({ postId, post }: PostFormProps) => {
         }}
         belowContent={
           <div className="flex flex-col gap-4">
+            <AiPixelPhotoPanel
+              photos={form.newPhotos}
+              onReplace={form.replaceNewPhoto}
+              disabled={isSubmitting || form.isProcessingPhotos}
+            />
             <div className="rounded-xl bg-neutral-50 p-5">
               <h3 className="mb-3 text-sm font-semibold">어떤 아이 이야기인가요?</h3>
               <div className="flex flex-wrap gap-2">

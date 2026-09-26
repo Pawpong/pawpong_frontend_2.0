@@ -1,2 +1,1 @@
-export { useAiPixelFilter } from './lib/useAiPixelFilter'
-export { AiPixelFilterPanel } from './ui/AiPixelFilterPanel'
+export { AiPixelPhotoPanel } from './ui/AiPixelPhotoPanel'

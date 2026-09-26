@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   getAiImageGeneration,
+  getAiImageGenerationImage,
   requestAiImageGeneration,
   uploadAiImageSource,
 } from '@/entities/ai-image'
@@ -14,15 +15,19 @@ const POLL_TIMEOUT_MS = 4 * 60 * 1000
 export type AiPixelTransformPhase = 'idle' | 'uploading' | 'generating' | 'done' | 'failed'
 
 export interface AiPixelTransformResult {
+  jobId: string
   imageUrl: string
-  /** 콘테스트 출품 API 의 photoFileName 으로 그대로 넘기는 파일키 */
+  /** 결과 파일키 (ai-image/result/...) */
   objectKey: string
+  /** 결과 PNG 를 사진 파일로 받은 것 — 글쓰기 사진 목록에 그대로 넣는다 */
+  file: File
 }
 
 /** 서버 errorCode → 사용자 문구. 운영 사정(키 미설정 등)은 뭉뚱그려 안내한다 */
 const ERROR_MESSAGES: Record<string, string> = {
   INPUT_TOO_LARGE: '사진이 너무 커요. 10MB 이하 사진으로 다시 시도해 주세요.',
   INPUT_DOWNLOAD_FAILED: '사진을 읽지 못했어요. 다른 사진으로 다시 시도해 주세요.',
+  OPENAI_NOT_CONFIGURED: '지금은 도트 변환을 쓸 수 없어요. 잠시 후 다시 시도해 주세요.',
   QUEUE_UNAVAILABLE: '지금은 변환을 시작할 수 없어요. 잠시 후 다시 시도해 주세요.',
 }
 const DEFAULT_ERROR = '도트 변환에 실패했어요. 잠시 후 다시 시도해 주세요.'
@@ -56,7 +61,13 @@ export const useAiPixelTransform = () => {
   }, [])
 
   const transform = useCallback(
-    async ({ file, filterId, contestId }: { file: File; filterId: string; contestId?: string }) => {
+    async ({
+      file,
+      filterId,
+    }: {
+      file: File
+      filterId: string
+    }): Promise<AiPixelTransformResult | null> => {
       const current = ++operation.current
       const isCurrent = () => current === operation.current
       setResult(null)
@@ -65,31 +76,43 @@ export const useAiPixelTransform = () => {
 
       try {
         const { inputObjectKey } = await uploadAiImageSource(file)
-        if (!isCurrent()) return
+        if (!isCurrent()) return null
         setPhase('generating')
 
-        let job = await requestAiImageGeneration({ filterId, inputObjectKey, contestId })
+        let job = await requestAiImageGeneration({ filterId, inputObjectKey })
         const deadline = Date.now() + POLL_TIMEOUT_MS
         while (job.status !== 'succeeded' && job.status !== 'failed') {
           if (Date.now() > deadline)
             throw new Error('변환이 오래 걸리고 있어요. 잠시 후 다시 시도해 주세요.')
           await wait(POLL_INTERVAL_MS)
-          if (!isCurrent()) return
+          if (!isCurrent()) return null
           job = await getAiImageGeneration(job.jobId)
         }
-        if (!isCurrent()) return
+        if (!isCurrent()) return null
 
-        if (job.status === 'succeeded' && job.resultImageUrl && job.resultObjectKey) {
-          setResult({ imageUrl: job.resultImageUrl, objectKey: job.resultObjectKey })
-          setPhase('done')
-        } else {
+        if (job.status !== 'succeeded' || !job.resultImageUrl || !job.resultObjectKey) {
           setError(ERROR_MESSAGES[job.errorCode ?? ''] ?? DEFAULT_ERROR)
           setPhase('failed')
+          return null
         }
+
+        // 결과를 일반 사진 파일로 받아 둔다 — 글에는 기존 업로드 흐름으로 올라간다
+        const blob = await getAiImageGenerationImage(job.jobId)
+        if (!isCurrent()) return null
+        const next: AiPixelTransformResult = {
+          jobId: job.jobId,
+          imageUrl: job.resultImageUrl,
+          objectKey: job.resultObjectKey,
+          file: new File([blob], `pawpong-dot-${job.jobId}.png`, { type: 'image/png' }),
+        }
+        setResult(next)
+        setPhase('done')
+        return next
       } catch (err) {
-        if (!isCurrent()) return
+        if (!isCurrent()) return null
         setError(err instanceof Error && err.message ? err.message : DEFAULT_ERROR)
         setPhase('failed')
+        return null
       }
     },
     [],
