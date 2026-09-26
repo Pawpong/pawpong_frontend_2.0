@@ -1,15 +1,13 @@
 'use client'
 
+import Link from 'next/link'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import type { CommunityHallOfFame } from '@/shared/types'
-import { FavoriteIcon } from '@/shared/assets'
+import { ArrowRightIcon, FavoriteIcon } from '@/shared/assets'
 import { Container, InfiniteScrollTrigger, ListState, NavigationBar } from '@/shared/ui'
 import { flattenPages } from '@/shared/lib/infiniteList'
-import {
-  CommunityMediaCard,
-  communityQueries,
-  formatHallOfFamePeriod,
-} from '@/entities/community'
+import { CommunityMediaCard, communityQueries, formatHallOfFamePeriod } from '@/entities/community'
+import { contestQueries } from '@/entities/contest'
 import { HallOfFamePodium } from '@/widgets/hall-of-fame'
 
 const HISTORY_PAGE_SIZE = 10
@@ -60,6 +58,8 @@ const PastPeriod = ({ hallOfFame }: { hallOfFame: CommunityHallOfFame }) => {
 
 const HallOfFameContent = () => {
   const current = useQuery({ ...communityQueries.hallOfFameCurrent(), throwOnError: false })
+  // 콘테스트 참여 화면은 유지한다 — 진행 중인 콘테스트가 있을 때만 진입점을 노출
+  const { data: currentContest } = useQuery({ ...contestQueries.current(), throwOnError: false })
   const history = useInfiniteQuery({
     ...communityQueries.hallOfFameHistory(HISTORY_PAGE_SIZE),
     throwOnError: false,
@@ -89,6 +89,15 @@ const HallOfFameContent = () => {
               <p className="text-xs leading-[1.5] text-neutral-500">
                 커뮤니티에서 좋아요를 가장 많이 받은 글이 선정돼요. 매시 정각 갱신
               </p>
+              {currentContest && (
+                <Link
+                  href="/hall-of-fame/participate"
+                  className="mt-1 flex items-center text-xs leading-[1.5] font-semibold text-[#c75a00]"
+                >
+                  콘테스트 참여하기
+                  <ArrowRightIcon className="size-4" />
+                </Link>
+              )}
             </div>
 
             <div className="w-full min-w-0 pc:flex-1">

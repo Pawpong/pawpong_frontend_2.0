@@ -1,0 +1,58 @@
+import { apiClient, API_VERSION, unwrap, unwrapNullable } from '@/shared/api'
+import type {
+  ApiResponseFull,
+  ContestCurrent,
+  ContestEntry,
+  ContestPreviousRanking,
+  ContestRandomEntry,
+  ContestWeeklyTop,
+  ContestYesterdayTop,
+} from '@/shared/types'
+
+/** 현재 콘테스트 조회 */
+export const getCurrentContest = async (): Promise<ContestCurrent | null> => {
+  const response = await apiClient.get<ApiResponseFull<ContestCurrent | null>>(
+    `${API_VERSION}/contest/current`,
+  )
+  return unwrapNullable(response, '현재 콘테스트 조회에 실패했습니다.')
+}
+
+/** 나의 참여 항목 조회 */
+export const getMyContestEntry = async (): Promise<ContestEntry | null> => {
+  const response = await apiClient.get<ApiResponseFull<ContestEntry | null>>(
+    `${API_VERSION}/contest/me/entry`,
+  )
+  return unwrapNullable(response, '나의 참여 항목 조회에 실패했습니다.')
+}
+
+/** 저번 콘테스트 랭킹 */
+export const getPreviousRanking = async (): Promise<ContestPreviousRanking | null> => {
+  const response = await apiClient.get<ApiResponseFull<ContestPreviousRanking | null>>(
+    `${API_VERSION}/contest/previous-ranking`,
+  )
+  return unwrapNullable(response, '저번 콘테스트 랭킹 조회에 실패했습니다.')
+}
+
+/** 랜덤 투표 후보 조회 */
+export const getRandomContestEntry = async (): Promise<ContestRandomEntry> => {
+  const response = await apiClient.get<ApiResponseFull<ContestRandomEntry>>(
+    `${API_VERSION}/contest/random-entry`,
+  )
+  return unwrap(response, '랜덤 투표 후보 조회에 실패했습니다.')
+}
+
+/** 지난주 TOP 3 조회 */
+export const getContestWeeklyTop = async (): Promise<ContestWeeklyTop> => {
+  const response = await apiClient.get<ApiResponseFull<ContestWeeklyTop>>(
+    `${API_VERSION}/contest/weekly-top`,
+  )
+  return unwrap(response, '지난주 TOP 3 조회에 실패했습니다.')
+}
+
+/** 어제 기준 TOP 3 조회 */
+export const getContestYesterdayTop = async (): Promise<ContestYesterdayTop> => {
+  const response = await apiClient.get<ApiResponseFull<ContestYesterdayTop>>(
+    `${API_VERSION}/contest/yesterday-top`,
+  )
+  return unwrap(response, '어제 기준 TOP 3 조회에 실패했습니다.')
+}
