@@ -23,6 +23,11 @@ interface SettingsLink {
 
 const COMMON_LINKS: SettingsLink[] = [
   {
+    href: '/account/content-rights',
+    label: '게시물 앱 표시 동의',
+    description: '내 사진과 게시물을 포퐁 앱에도 표시할지 선택해요.',
+  },
+  {
     href: '/profile/edit',
     label: '프로필 수정',
     description: '닉네임, 소개와 프로필 사진을 관리해요.',
