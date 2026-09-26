@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { AiPixelFilterPanel, useAiPixelFilter } from '@/features/ai-image'
 import { useSubmitContestEntryForm } from '@/features/contest'
 import { CheckIcon } from '@/shared/assets'
 import {
@@ -30,9 +29,8 @@ const ContestEntryContent = () => {
   const preparingRef = useRef(false)
   const submittingRef = useRef(false)
   const { submit, isSubmitting, error } = useSubmitContestEntryForm()
-  const aiPixel = useAiPixelFilter()
   const { showGuard, requestExit, confirmExit, cancelExit } = useExitGuard({
-    hasChanges: !!photo || text.length > 0 || preparing || aiPixel.isWorking,
+    hasChanges: !!photo || text.length > 0 || preparing,
     enabled: !completed,
   })
   useEffect(
@@ -60,11 +58,7 @@ const ContestEntryContent = () => {
     setPhotoError(null)
     try {
       const file = await preparePhoto(files[0])
-      if (current === operation.current) {
-        // 사진이 바뀌면 이전 사진으로 만든 도트 결과는 더 이상 맞지 않는다
-        aiPixel.reset()
-        setPhoto({ file, url: URL.createObjectURL(file) })
-      }
+      if (current === operation.current) setPhoto({ file, url: URL.createObjectURL(file) })
     } catch (err) {
       if (current === operation.current)
         setPhotoError(
@@ -82,18 +76,13 @@ const ContestEntryContent = () => {
     text.trim().length > 0 &&
     text.length <= MAX_DESCRIPTION &&
     !preparing &&
-    !aiPixel.isWorking &&
     !isSubmitting &&
     !completed
   const handleSubmit = async () => {
     if (!isValid || !photo || submittingRef.current || preparingRef.current) return
     submittingRef.current = true
     try {
-      const entryId = await submit(
-        aiPixel.useAiVersion && aiPixel.aiResult
-          ? { photoFileName: aiPixel.aiResult.objectKey, description: text }
-          : { file: photo.file, description: text },
-      )
+      const entryId = await submit({ file: photo.file, description: text })
       if (entryId) {
         setCompleted(true)
         router.replace('/hall-of-fame')
@@ -133,24 +122,11 @@ const ContestEntryContent = () => {
                 대표 사진
               </ComposerSectionHeading>
               <PhotoUploadField
-                preview={
-                  aiPixel.useAiVersion && aiPixel.aiResult ? aiPixel.aiResult.imageUrl : photo?.url
-                }
-                processing={preparing || aiPixel.isWorking}
-                processingLabel={
-                  aiPixel.isWorking ? '도트 그림을 그리고 있어요…' : '사진을 준비하고 있어요…'
-                }
-                badge={
-                  aiPixel.useAiVersion ? (
-                    <span className="rounded-full bg-primary-500 px-2.5 py-1 text-xs font-semibold text-white">
-                      AI 도트 그림
-                    </span>
-                  ) : undefined
-                }
+                preview={photo?.url}
+                processing={preparing}
                 disabled={isSubmitting || completed}
                 onSelect={(files) => void selectPhoto(files)}
                 onRemove={() => {
-                  aiPixel.reset()
                   setPhoto(undefined)
                   setPhotoError(null)
                 }}
@@ -163,11 +139,6 @@ const ContestEntryContent = () => {
               <p className="mt-3 text-xs leading-relaxed text-neutral-700">
                 사진 비율은 그대로 유지돼요. GIF와 Live Photo는 정지 사진으로 등록돼요.
               </p>
-              <AiPixelFilterPanel
-                state={aiPixel}
-                photo={photo}
-                disabled={isSubmitting || completed || preparing}
-              />
             </section>
             <section aria-labelledby="description-heading" className="flex min-w-0 flex-col">
               <ComposerSectionHeading
@@ -211,11 +182,9 @@ const ContestEntryContent = () => {
                     ? '사진을 업로드하고 참여를 등록하고 있어요…'
                     : preparing
                       ? '사진을 준비하고 있어요…'
-                      : aiPixel.isWorking
-                        ? '도트 그림이 완성되면 참여할 수 있어요…'
-                        : photo && text.trim()
-                          ? '준비됐어요! 우리 아이의 순간을 공유해 보세요.'
-                          : '사진 1장과 소개를 작성하면 참여할 수 있어요.'}
+                      : photo && text.trim()
+                        ? '준비됐어요! 우리 아이의 순간을 공유해 보세요.'
+                        : '사진 1장과 소개를 작성하면 참여할 수 있어요.'}
                 </p>
                 {error && (
                   <p role="alert" className="mb-3 text-sm text-error-500">
