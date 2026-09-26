@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { communityQueries } from '@/entities/community'
 import { profileQueries } from '@/entities/profile'
-import { AiPixelPhotoPanel } from '@/features/ai-image'
+import Link from 'next/link'
+import { takePendingCommunityPhoto } from '@/features/ai-image'
 import { useSubmitCommunityPostForm } from '@/features/community'
 import { useExitGuard } from '@/shared/lib/useExitGuard'
 import { Button, Container, CtaModal, FilterChip, NavigationBar } from '@/shared/ui'
@@ -45,9 +46,12 @@ const PostForm = ({ postId, post }: PostFormProps) => {
   const isDraft = post?.status === 'draft'
   const isEdit = !!postId && !isDraft
   const formText = FORM_TEXT[isEdit ? 'edit' : 'create']
+  // AI 필터에서 '커뮤니티에 자랑하기'로 넘어온 사진은 새 글의 첫 사진으로 채운다 (한 번만 꺼낸다)
+  const [handoffPhoto] = useState(() => (post ? null : takePendingCommunityPhoto()))
   const form = usePostForm({
     initialText: post?.body ?? '',
     initialImages: post?.photoUrls ?? [],
+    initialFiles: handoffPhoto ? [handoffPhoto] : undefined,
   })
 
   const initialVisibility = post?.visibility ?? 'public'
@@ -114,11 +118,22 @@ const PostForm = ({ postId, post }: PostFormProps) => {
         }}
         belowContent={
           <div className="flex flex-col gap-4">
-            <AiPixelPhotoPanel
-              photos={form.newPhotos}
-              onReplace={form.replaceNewPhoto}
-              disabled={isSubmitting || form.isProcessingPhotos}
-            />
+            <Link
+              href="/ai-filter"
+              className="flex items-center justify-between gap-3 rounded-xl border border-primary-200 bg-point-50 p-4 transition-colors hover:bg-point-100 focus-visible:outline-2 focus-visible:outline-primary-500"
+            >
+              <span>
+                <span className="block text-sm font-bold text-primary-700">
+                  {handoffPhoto ? 'AI 필터로 만든 사진을 담았어요' : 'AI 필터로 사진 꾸미기'}
+                </span>
+                <span className="mt-0.5 block text-xs text-neutral-700">
+                  도트 그림·스티커·수채화로 바꿔 올리면 좋아요를 더 받을지도 몰라요
+                </span>
+              </span>
+              <span aria-hidden className="text-lg text-primary-700">
+                →
+              </span>
+            </Link>
             <div className="rounded-xl bg-neutral-50 p-5">
               <h3 className="mb-3 text-sm font-semibold">어떤 아이 이야기인가요?</h3>
               <div className="flex flex-wrap gap-2">

@@ -64,3 +64,19 @@ export const getAiImageGenerationImage = async (jobId: string): Promise<Blob> =>
   })
   return response.data
 }
+
+/** 내 AI 사진 보관함 (최신순, 최대 60건 — 진행 중·실패 포함) */
+export const getMyAiImageGenerations = async (): Promise<AiImageGeneration[]> => {
+  const response = await apiClient.get<ApiResponseFull<AiImageGeneration[]>>(
+    `${API_VERSION}/ai-image/generations`,
+  )
+  return unwrap(response, 'AI 사진 보관함을 불러오지 못했습니다.')
+}
+
+/** 보관함에서 지우기 (기록은 남아 하루 횟수에는 포함된다) */
+export const hideAiImageGeneration = async (jobId: string): Promise<void> => {
+  const response = await apiClient.delete<ApiResponseFull<{ jobId: string; hidden: boolean }>>(
+    `${API_VERSION}/ai-image/generation/${jobId}`,
+  )
+  unwrap(response, '보관함에서 지우지 못했습니다.')
+}
