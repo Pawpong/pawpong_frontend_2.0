@@ -1,17 +1,17 @@
 'use client'
 
+import { useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import type { ContestEntry } from '@/shared/types'
-import { ArrowRightIcon } from '@/shared/assets'
+import type { CommunityHallOfFameWinner } from '@/shared/types'
+import { FavoriteIcon, PawPrintIcon } from '@/shared/assets'
 import { ProfileAvatar } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
-import { ContestEntryImage, isContestImageSourceSupported } from '@/entities/contest'
 import 'swiper/css'
 
 interface HallOfFamePodiumProps {
-  entries: (ContestEntry | undefined)[]
-  onEntryClick?: (entry: ContestEntry) => void
+  winners: CommunityHallOfFameWinner[]
   className?: string
 }
 
@@ -104,28 +104,28 @@ const PawPattern = ({ variant, className }: { variant: PawPatternSize; className
   )
 }
 
-const PixelFrame = ({
-  entry,
-  rank,
-  onClick,
-}: {
-  entry?: ContestEntry
-  rank: 1 | 2 | 3
-  onClick?: () => void
-}) => {
-  const photo = (
-    <>
-      {entry && (
-        <ContestEntryImage
-          src={entry.photoUrl}
-          alt={entry.description || `${entry.userDisplayName}의 명예의 전당 사진`}
-          sizes="(min-width: 1440px) 211px, 122px"
-          loading="eager"
-          fetchPriority={rank === 1 ? 'high' : 'auto'}
-          fallbackIconClassName="size-12 pc:size-16"
-        />
-      )}
-    </>
+const PixelFrame = ({ winner, rank }: { winner?: CommunityHallOfFameWinner; rank: 1 | 2 | 3 }) => {
+  const [failedPhotoUrl, setFailedPhotoUrl] = useState<string>()
+  const photoUrl = winner?.photoUrl
+  const showPhoto = Boolean(photoUrl) && failedPhotoUrl !== photoUrl
+
+  const photo = showPhoto ? (
+    <Image
+      src={photoUrl!}
+      alt={winner?.bodyExcerpt || `${winner?.author.nickname}의 명예의 전당 사진`}
+      fill
+      sizes="(min-width: 1440px) 211px, 122px"
+      loading="eager"
+      fetchPriority={rank === 1 ? 'high' : 'auto'}
+      onError={() => setFailedPhotoUrl(photoUrl!)}
+      className="object-cover"
+    />
+  ) : (
+    winner && (
+      <span className="absolute inset-0 flex items-center justify-center text-primary-400">
+        <PawPrintIcon className="size-12 opacity-70 pc:size-16" aria-hidden="true" />
+      </span>
+    )
   )
 
   return (
@@ -134,19 +134,16 @@ const PixelFrame = ({
         <CrownIcon rank={rank} />
       </div>
 
-      {entry && onClick && isContestImageSourceSupported(entry.photoUrl) ? (
-        <button
-          type="button"
-          onClick={onClick}
-          aria-label={`${entry.userDisplayName} 사진 자세히 보기`}
+      {winner ? (
+        <Link
+          href={`/community/post/${winner.postId}`}
+          aria-label={`${winner.author.nickname}의 ${rank}위 게시글 보기`}
           className="absolute inset-[4.6%_4%_5.55%_4%] overflow-hidden rounded-lg bg-secondary-100"
         >
           {photo}
-        </button>
+        </Link>
       ) : (
-        <div className="absolute inset-[4.6%_4%_5.55%_4%] overflow-hidden rounded-lg bg-secondary-100">
-          {photo}
-        </div>
+        <div className="absolute inset-[4.6%_4%_5.55%_4%] overflow-hidden rounded-lg bg-secondary-100" />
       )}
 
       <svg
@@ -175,49 +172,54 @@ const PixelFrame = ({
   )
 }
 
-const PodiumCard = ({
-  entry,
-  rank,
-  onClick,
-}: {
-  entry?: ContestEntry
-  rank: 1 | 2 | 3
-  onClick?: () => void
-}) => {
+const PodiumCard = ({ winner, rank }: { winner?: CommunityHallOfFameWinner; rank: 1 | 2 | 3 }) => {
+  const author = (
+    <>
+      <ProfileAvatar
+        size="responsivePc"
+        src={winner?.author.profileImageUrl ?? undefined}
+        alt={winner?.author.nickname}
+        className="shrink-0"
+      />
+      <span className="min-w-0 truncate text-xs leading-[1.5] font-semibold text-neutral-850 pc:text-base">
+        {winner?.author.nickname ?? '수상자 없음'}
+      </span>
+    </>
+  )
+
   return (
     <article className="relative z-10 flex w-[9.25rem] shrink-0 flex-col items-center gap-2 rounded-xl bg-white p-2 shadow-[0_7px_7px_rgba(55,55,55,0.1)] pc:w-[16.3125rem] pc:px-4 pc:py-2">
-      <PixelFrame entry={entry} rank={rank} onClick={onClick} />
+      <PixelFrame winner={winner} rank={rank} />
 
       <div className="flex w-full items-center p-0.5 pc:p-1">
-        <div className="flex min-w-0 flex-1 items-center gap-1 pc:gap-2">
-          {/* [refactored] CardAvatar 제거 — ProfileAvatar 폴백(paw)으로 통일 */}
-          <ProfileAvatar
-            size="responsivePc"
-            src={entry?.userProfileImageUrl ?? undefined}
-            alt={entry?.userDisplayName}
-            className="shrink-0"
-          />
-          <span className="min-w-0 truncate text-xs leading-[1.5] font-semibold text-neutral-850 pc:text-base">
-            {entry?.userDisplayName ?? '수상자 없음'}
-          </span>
-        </div>
-
-        {entry && (
+        {winner?.author.authorModel === 'Breeder' ? (
           <Link
-            href={`/home/${entry.userId}`}
-            className="hidden shrink-0 items-center px-1 text-sm leading-[1.5] font-semibold whitespace-nowrap text-neutral-850 pc:flex"
+            href={`/home/${winner.author.userId}`}
+            className="flex min-w-0 flex-1 items-center gap-1 pc:gap-2"
           >
-            브리더홈
-            <ArrowRightIcon className="size-5" />
+            {author}
           </Link>
+        ) : (
+          <div className="flex min-w-0 flex-1 items-center gap-1 pc:gap-2">{author}</div>
+        )}
+
+        {winner && (
+          <span className="flex shrink-0 items-center gap-0.5 text-xs leading-[1.5] font-semibold text-neutral-600 pc:text-sm">
+            <FavoriteIcon className="size-4 pc:size-5" aria-hidden="true" />
+            <span className="sr-only">좋아요</span>
+            {winner.likeCount}
+          </span>
         )}
       </div>
     </article>
   )
 }
 
-const HallOfFamePodium = ({ entries, onEntryClick, className }: HallOfFamePodiumProps) => {
-  const ranked = ([1, 2, 3] as const).map((rank, index) => ({ rank, entry: entries[index] }))
+const HallOfFamePodium = ({ winners, className }: HallOfFamePodiumProps) => {
+  const ranked = ([1, 2, 3] as const).map((rank) => ({
+    rank,
+    winner: winners.find((winner) => winner.rank === rank),
+  }))
 
   return (
     <div
@@ -237,32 +239,24 @@ const HallOfFamePodium = ({ entries, onEntryClick, className }: HallOfFamePodium
         watchOverflow
         className="relative z-10 !m-0 !h-[11.8125rem] !w-[calc(100%+1rem)] !shrink-0 tab:!hidden"
       >
-        {ranked.map(({ rank, entry }) => (
-          <SwiperSlide key={entry?.id ?? rank} className="!flex !h-full !w-[9.25rem] !items-center">
-            <PodiumCard
-              entry={entry}
-              rank={rank}
-              onClick={entry && onEntryClick ? () => onEntryClick(entry) : undefined}
-            />
+        {ranked.map(({ rank, winner }) => (
+          <SwiperSlide key={rank} className="!flex !h-full !w-[9.25rem] !items-center">
+            <PodiumCard winner={winner} rank={rank} />
           </SwiperSlide>
         ))}
       </Swiper>
 
       <div className="relative z-10 hidden h-full shrink-0 items-start gap-5 tab:flex pc:gap-[1.9375rem]">
-        {ranked.map(({ rank, entry }) => (
+        {ranked.map(({ rank, winner }) => (
           <div
-            key={entry?.id ?? rank}
+            key={rank}
             className={cn(
               'shrink-0',
               rank === 1 ? 'order-2' : rank === 2 ? 'order-1' : 'order-3',
               rank !== 1 && 'flex h-full items-end',
             )}
           >
-            <PodiumCard
-              entry={entry}
-              rank={rank}
-              onClick={entry && onEntryClick ? () => onEntryClick(entry) : undefined}
-            />
+            <PodiumCard winner={winner} rank={rank} />
           </div>
         ))}
       </div>

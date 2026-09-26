@@ -169,3 +169,36 @@ export interface CreateCommunityCommentRequest {
   /** 답글 대상 댓글 ID (없으면 최상위 댓글) */
   parentCommentId?: string
 }
+
+/** 명예의 전당 수상작 (회차 확정 시점의 스냅샷) */
+export interface CommunityHallOfFameWinner {
+  /** 1~3 */
+  rank: number
+  postId: string
+  likeCount: number
+  commentCount: number
+  saveCount: number
+  /** 사진 없는 글이면 null */
+  photoUrl: string | null
+  /** 본문 발췌 (최대 120자) */
+  bodyExcerpt: string
+  author: {
+    userId: string
+    authorModel: CommunityAuthorModel
+    nickname: string
+    profileImageUrl: string | null
+  }
+}
+
+/** 명예의 전당 회차 — 한 달을 1~10일 / 11~20일 / 21~말일(KST) 3회차로 나눈다 */
+export interface CommunityHallOfFame {
+  /** 'YYYY-M-N' (N = 1|2|3) */
+  periodKey: string
+  startDate: string
+  /** 다음 회차 시작 시각 (배타적) */
+  endDate: string
+  state: 'open' | 'final'
+  refreshedAt: string
+  /** 0~3건. 회차에 글이 없으면 빈 배열 (서버가 폴백하지 않는다) */
+  winners: CommunityHallOfFameWinner[]
+}
