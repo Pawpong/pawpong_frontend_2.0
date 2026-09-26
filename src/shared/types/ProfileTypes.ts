@@ -27,7 +27,7 @@ export interface MyProfile {
   businessLocation?: BusinessLocation
   /** Breeder only */
   longDescription?: string
-  /** Breeder only — 대표 사진 (최대 3장) */
+  /** Breeder only — 대표 사진 (최대 4장) */
   representativePhotos?: string[]
 }
 

@@ -9,7 +9,7 @@ import { cn } from '@/shared/lib/cn'
 interface BreederIntroductionProps {
   nickname: string
   description?: string
-  /** 대표 사진 (최대 3장) — 구분선 아래, 소개글 위 */
+  /** 대표 사진 (최대 4장) — 구분선 아래, 소개글 위 */
   photos?: string[]
   /** 마이홈에서만 — 수정 링크와 빈 상태 안내를 노출 */
   editHref?: string
@@ -34,7 +34,7 @@ const BreederIntroduction = ({
 }: BreederIntroductionProps) => {
   const [expanded, setExpanded] = useState(false)
   const hasDescription = Boolean(description?.trim())
-  const shownPhotos = photos?.slice(0, 3) ?? []
+  const shownPhotos = photos?.slice(0, 4) ?? []
 
   // 공개 홈에서 보여줄 게 하나도 없으면 섹션 자체를 그리지 않는다
   if (!hasDescription && !editHref && shownPhotos.length === 0) return null
@@ -67,16 +67,16 @@ const BreederIntroduction = ({
             </div>
 
             {shownPhotos.length > 0 && (
-              <div className="mt-3 grid grid-cols-3 gap-2 tab:flex tab:flex-wrap">
+              <div className="mt-3 grid grid-cols-4 gap-2">
                 {shownPhotos.map((url, index) => (
                   <div
                     key={`${url}-${index}`}
-                    className="relative aspect-square shrink-0 overflow-hidden rounded bg-neutral-100 tab:size-56"
+                    className="relative aspect-square shrink-0 overflow-hidden rounded bg-neutral-100"
                   >
                     <RepresentativePhoto
                       src={url}
                       alt={`${nickname} 대표 사진 ${index + 1}`}
-                      sizes="(max-width: 767px) 33vw, 14rem"
+                      sizes="(max-width: 767px) 25vw, 15rem"
                     />
                   </div>
                 ))}

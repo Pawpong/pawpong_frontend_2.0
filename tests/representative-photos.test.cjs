@@ -30,19 +30,27 @@ const photo = (name) => new File(['photo'], name, { type: 'image/png' })
 test('successive selections retain saved photo and both new files', () => {
   const second = photo('second.png'),
     third = photo('third.png')
-  assert.deepEqual(add(add(['saved-url'], [second], 1), [third], 2), ['saved-url', second, third])
+  assert.deepEqual(add(add(['saved-url'], [second], 1), [third], 2), [
+    'saved-url',
+    second,
+    third,
+    null,
+  ])
 })
 test('fills the clicked slot and reuses a deleted middle slot without shifting others', () => {
   const third = photo('third.png'),
     second = photo('second.png')
   const slots = add(['saved-url'], [third], 2)
-  assert.deepEqual(slots, ['saved-url', null, third])
-  assert.deepEqual(add(slots, [second], 1), ['saved-url', second, third])
+  assert.deepEqual(slots, ['saved-url', null, third, null])
+  assert.deepEqual(add(slots, [second], 1), ['saved-url', second, third, null])
 })
 test('cancelling retains slots; exceeding capacity rejects without losing current photos', () => {
-  const slots = ['saved-url', photo('second.png'), null]
+  const slots = ['saved-url', photo('second.png'), null, null]
   assert.deepEqual(add(slots, []), slots)
-  assert.throws(() => add(slots, [photo('third.png'), photo('fourth.png')]), /최대 3장/)
+  assert.throws(
+    () => add(slots, [photo('third.png'), photo('fourth.png'), photo('fifth.png')]),
+    /최대 4장/,
+  )
   assert.equal(slots[2], null)
 })
 test('rejects oversized, empty and non-image files', () => {
