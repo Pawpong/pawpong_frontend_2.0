@@ -11,6 +11,7 @@ import type {
   CommunityPetType,
   CommunityPostVisibility,
   CommunityPostStatus,
+  CommunityHallOfFame,
 } from '@/shared/types'
 
 /**
@@ -211,4 +212,26 @@ export const getCommunityComments = async (
 
   const page = unwrap(response, '댓글 목록 조회에 실패했습니다.')
   return { ...page, items: page.items.map(mapComment) }
+}
+
+/** 명예의 전당 현재 회차 */
+export const getCurrentCommunityHallOfFame = async (): Promise<CommunityHallOfFame> => {
+  const response = await apiClient.get<ApiResponseFull<CommunityHallOfFame>>(
+    `${API_VERSION}/community/hall-of-fame/current`,
+  )
+  return unwrap(response, '명예의 전당 조회에 실패했습니다.')
+}
+
+/** 명예의 전당 지난 회차 목록 (확정분만, 최신순) */
+export const getCommunityHallOfFameHistory = async (
+  params: { page?: number; pageSize?: number } = {},
+): Promise<PaginationResponse<CommunityHallOfFame>> => {
+  const query = new URLSearchParams()
+  if (params.page) query.set('page', String(params.page))
+  if (params.pageSize) query.set('pageSize', String(params.pageSize))
+
+  const response = await apiClient.get<ApiResponseFull<PaginationResponse<CommunityHallOfFame>>>(
+    `${API_VERSION}/community/hall-of-fame?${query.toString()}`,
+  )
+  return unwrap(response, '지난 명예의 전당 조회에 실패했습니다.')
 }
