@@ -115,8 +115,30 @@ const usePostForm = ({
     setNewPhotos(next)
   }, [])
 
+  /**
+   * 새로 고른 사진 한 장을 다른 파일로 바꾼다 (자리·순서 유지). 바뀐 미리보기 URL 을 돌려준다.
+   * AI 도트 변환 결과를 원본 자리에 넣고, 다시 원본으로 되돌릴 때 쓴다.
+   * 대상이 이미 지워졌으면 null.
+   */
+  const replaceNewPhoto = useCallback((url: string, file: File): string | null => {
+    if (processingRef.current) return null
+    const index = newPhotosRef.current.findIndex((photo) => photo.url === url)
+    if (index < 0) return null
+    const nextUrl = URL.createObjectURL(file)
+    URL.revokeObjectURL(url)
+    const next = newPhotosRef.current.map((photo, i) =>
+      i === index ? { file, url: nextUrl } : photo,
+    )
+    newPhotosRef.current = next
+    setNewPhotos(next)
+    return nextUrl
+  }, [])
+
   return {
     images,
+    /** 새로 고른 사진(아직 업로드 전) — 파일과 미리보기 URL 쌍 */
+    newPhotos,
+    replaceNewPhoto,
     /** ImageUploadArea 에도 같은 상한을 넘겨야 해서 함께 돌려준다 */
     maxImages,
     /** 지우지 않고 남긴 기존 사진 URL — 수정 제출 시 파일명으로 변환해 함께 보낸다 */

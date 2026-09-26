@@ -51,3 +51,16 @@ export const getAiImageGeneration = async (jobId: string): Promise<AiImageGenera
   )
   return unwrap(response, 'AI 변환 상태를 확인하지 못했습니다.')
 }
+
+/**
+ * 내 완성 결과 이미지(PNG) 바이트.
+ * 버킷에 CORS 가 없어 결과 URL 을 fetch 로 읽을 수 없으므로 API 로 받는다.
+ * 커뮤니티 글쓰기는 이걸 일반 사진 파일로 만들어 기존 업로드 흐름에 태운다.
+ */
+export const getAiImageGenerationImage = async (jobId: string): Promise<Blob> => {
+  const response = await apiClient.get<Blob>(`${API_VERSION}/ai-image/generation/${jobId}/image`, {
+    responseType: 'blob',
+    timeout: UPLOAD_TIMEOUT,
+  })
+  return response.data
+}
