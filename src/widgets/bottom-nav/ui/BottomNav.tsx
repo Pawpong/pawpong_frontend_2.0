@@ -15,6 +15,7 @@ const BOTTOM_NAV_PATHS = new Set([
   '/explore',
   '/chat',
   '/community',
+  '/ai-filter',
   '/home',
   '/settings',
   '/activity',
