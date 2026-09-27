@@ -33,9 +33,9 @@ const HallOfFame = () => {
             hasWinners && 'pc:flex-row pc:gap-9',
           )}
         >
-          <div className="flex w-full shrink-0 flex-row items-center justify-between gap-2 pc:h-auto pc:w-[12.75rem] pc:flex-col pc:items-start pc:justify-start">
+          <div className="flex w-full shrink-0 flex-row items-end justify-between gap-2 pc:h-auto pc:w-auto pc:min-w-[12.75rem] pc:flex-col pc:items-start pc:justify-start">
             <div className="flex flex-col gap-1">
-              <h2 className="max-w-[12.9375rem] font-cafe24 text-lg leading-[1.5] font-normal text-neutral-850 tab:max-w-none tab:whitespace-nowrap pc:text-xl pc:whitespace-normal">
+              <h2 className="max-w-[12.9375rem] font-cafe24 text-lg leading-[1.5] font-normal text-neutral-850 tab:max-w-none tab:whitespace-nowrap pc:text-xl">
                 <span className="block tab:inline pc:block">
                   {isCurrentEmpty ? '지난 회차 명예의 동물들을 ' : '이번 회차 명예의 동물들을 '}
                 </span>
@@ -43,7 +43,7 @@ const HallOfFame = () => {
               </h2>
               {period && hasWinners && (
                 <p className="text-xs leading-[1.5] font-medium text-neutral-500 pc:text-sm">
-                  {period.title} · {period.range}
+                  {period.summary}
                 </p>
               )}
             </div>
@@ -51,7 +51,7 @@ const HallOfFame = () => {
               href="/hall-of-fame"
               label="명예의 전당 둘러보기"
               size="sm"
-              className="shrink-0 text-neutral-850 pc:text-sm"
+              className="shrink-0 pl-0 text-neutral-850 pc:text-sm"
             />
           </div>
 
