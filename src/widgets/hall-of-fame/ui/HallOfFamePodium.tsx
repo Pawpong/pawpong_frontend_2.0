@@ -5,8 +5,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import type { CommunityHallOfFameWinner } from '@/shared/types'
-import { FavoriteIcon, PawPrintIcon } from '@/shared/assets'
-import { ProfileAvatar } from '@/shared/ui'
+import { PawPrintIcon } from '@/shared/assets'
+import { FavoriteHeart, ProfileAvatar } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import 'swiper/css'
 
@@ -205,7 +205,7 @@ const PodiumCard = ({ winner, rank }: { winner?: CommunityHallOfFameWinner; rank
 
         {winner && (
           <span className="flex shrink-0 items-center gap-0.5 text-xs leading-[1.5] font-semibold text-neutral-600 pc:text-sm">
-            <FavoriteIcon className="size-4 pc:size-5" aria-hidden="true" />
+            <FavoriteHeart isFavorite className="size-4 pc:size-5" aria-hidden="true" />
             <span className="sr-only">좋아요</span>
             {winner.likeCount}
           </span>
@@ -215,11 +215,15 @@ const PodiumCard = ({ winner, rank }: { winner?: CommunityHallOfFameWinner; rank
   )
 }
 
-const HallOfFamePodium = ({ winners, className }: HallOfFamePodiumProps) => {
-  const ranked = ([1, 2, 3] as const).map((rank) => ({
+/** 1~3위 슬롯 — 빈 순위는 winner 없이 '수상자 없음' 카드로 채운다. */
+const toRankSlots = (winners: CommunityHallOfFameWinner[]) =>
+  ([1, 2, 3] as const).map((rank) => ({
     rank,
     winner: winners.find((winner) => winner.rank === rank),
   }))
+
+const HallOfFamePodium = ({ winners, className }: HallOfFamePodiumProps) => {
+  const ranked = toRankSlots(winners)
 
   return (
     <div
@@ -264,4 +268,4 @@ const HallOfFamePodium = ({ winners, className }: HallOfFamePodiumProps) => {
   )
 }
 
-export { HallOfFamePodium }
+export { HallOfFamePodium, PodiumCard, toRankSlots }
