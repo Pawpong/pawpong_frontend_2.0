@@ -26,19 +26,23 @@ const SUPPORT_EMAIL = 'coldingcontact@gmail.com'
 /**
  * 직접 문의 작성 모달 (Figma 4161:889794 · Q&A modal, exit-confirm 4161:889796).
  *
- * 기존 Agent의 FAQ 안내와 담당자 이메일 문의를 제공한다.
- * AI 안내는 접수·계정 처리로 표시하지 않고, 메일 작성 후에도 원문을 보존한다.
+ * AI 안내 전에 운영팀 확인용 문의를 저장한다.
+ * 개별 회신 경로는 이메일로 제공하고, 메일 작성 후에도 원문을 보존한다.
  */
 const InquiryModal = ({ open, onOpenChange, audience }: InquiryModalProps) => {
   const [text, setText] = useState('')
   const [showExitConfirm, setShowExitConfirm] = useState(false)
-  const answer = useMutation({
-    mutationFn: () => askSupport(text.trim(), audience),
+  const feedback = useMutation({
+    mutationFn: () => submitSupportFeedback(text.trim(), audience),
     retry: false,
     throwOnError: false,
   })
-  const feedback = useMutation({
-    mutationFn: () => submitSupportFeedback(text.trim(), audience),
+  const answer = useMutation({
+    mutationFn: async () => {
+      // AI 안내가 실패해도 운영팀에는 접수 내용이 남는다. 재시도는 중복 접수를 만들지 않는다.
+      if (!feedback.isSuccess) await feedback.mutateAsync()
+      return askSupport(text.trim(), audience)
+    },
     retry: false,
     throwOnError: false,
   })
@@ -100,8 +104,8 @@ const InquiryModal = ({ open, onOpenChange, audience }: InquiryModalProps) => {
 
             <div className="px-3 pb-3 tab:px-6 tab:pb-4">
               <p className="mb-3 text-sm text-neutral-700">
-                AI가 자주 묻는 질문에서 안내를 찾아드려요. 피드백을 보내면 내용이 저장되어 운영팀에
-                전달됩니다. 개인정보는 입력하지 마세요. 개별 답변은 이메일로 문의해 주세요.
+                AI가 먼저 안내하고, 문의 내용은 운영팀도 확인합니다. 추가 확인이나 개별 답변이
+                필요하면 아래 이메일 문의로 연락해 주세요. 비밀번호 등 민감한 정보는 입력하지 마세요.
               </p>
               <Textarea
                 aria-label="서비스 이용 질문"
@@ -120,18 +124,18 @@ const InquiryModal = ({ open, onOpenChange, audience }: InquiryModalProps) => {
               <span className="text-xs text-neutral-500">{text.length}/2000</span>
               {feedback.isPending && (
                 <p role="status" className="mt-3 text-sm">
-                  피드백을 접수하고 있어요…
+                  문의를 접수하고 있어요…
                 </p>
               )}
               {feedback.isError && (
                 <p role="alert" className="mt-3 text-sm text-error-500">
-                  피드백을 접수하지 못했습니다. 작성 내용은 유지됩니다. 잠시 후 다시 시도하거나
+                  문의를 접수하지 못했습니다. 작성 내용은 유지됩니다. 잠시 후 다시 시도하거나
                   이메일로 문의해 주세요.
                 </p>
               )}
               {feedback.data && (
                 <p role="status" className="mt-3 text-sm text-neutral-700">
-                  피드백이 접수되었습니다. 운영팀이 확인할게요.
+                  문의가 접수되었습니다. 운영팀이 내용을 확인할게요.
                   <br />
                   <span className="text-xs break-all">접수번호: {feedback.data.receiptId}</span>
                 </p>
@@ -162,12 +166,12 @@ const InquiryModal = ({ open, onOpenChange, audience }: InquiryModalProps) => {
                   ))}
                   {answer.data.needsHumanSupport && (
                     <p className="text-sm">
-                      등록된 FAQ만으로는 안내하기 어려워요. 아래 이메일 문의로 담당자에게 내용을
-                      보내주세요.
+                      AI만으로는 안내하기 어려워요. 접수한 내용을 운영팀이 확인합니다. 개별 회신이
+                      필요하면 아래 이메일 문의로 연락해 주세요.
                     </p>
                   )}
                   <p className="text-xs text-neutral-700">
-                    FAQ를 바탕으로 한 자동 안내이며 담당자에게 접수된 문의는 아닙니다.
+                    FAQ를 바탕으로 한 AI 안내입니다. 운영팀은 접수된 문의를 별도로 확인합니다.
                   </p>
                 </div>
               )}
@@ -179,14 +183,14 @@ const InquiryModal = ({ open, onOpenChange, audience }: InquiryModalProps) => {
                 onClick={() => answer.mutate()}
                 disabled={!text.trim() || isPending}
               >
-                AI 안내 받기
+                AI에게 문의하기
               </Button>
               <Button
                 variant="primary"
                 onClick={() => feedback.mutate()}
                 disabled={!text.trim() || isPending || feedback.isSuccess}
               >
-                피드백 보내기
+                운영팀에 문의 접수
               </Button>
               <Button
                 variant="primary"

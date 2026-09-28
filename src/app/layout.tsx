@@ -5,6 +5,7 @@ import { cafe24Proup, pretendard } from '@/shared/lib/fonts'
 import { NativePushSession } from '@/shared/lib/NativePushSessionBridge'
 import { SessionRecoveryBridge } from '@/shared/lib/SessionRecoveryBridge'
 import { NativePhotoPickerBridge } from '@/shared/lib/NativePhotoPickerBridge'
+import { NativeViewportBridge } from '@/shared/lib/NativeViewportBridge'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -16,6 +17,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="ko" className={`${pretendard.variable} ${cafe24Proup.variable}`}>
       <body className="min-w-0 bg-base-white text-neutral-850">
+        <NativeViewportBridge />
         <SessionRecoveryBridge />
         <NativePhotoPickerBridge />
         <NativePushSession />
