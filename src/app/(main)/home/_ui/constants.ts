@@ -10,10 +10,15 @@ const HOME_TAB = {
   reviews: { id: 'reviews', label: '후기' },
   myPosts: { id: 'posts', label: '내가 쓴 글' },
   favoriteBreeders: { id: 'breeders', label: '즐겨찾는 브리더' },
+  aiPhotos: { id: 'ai-photos', label: 'AI 사진' },
 } satisfies Record<string, HomeTabConfig>
 
 // [refactored] 배열은 항목 조합만 담당
-const MY_HOME_TABS: HomeTabConfig[] = [HOME_TAB.myPosts, HOME_TAB.favoriteBreeders]
+const MY_HOME_TABS: HomeTabConfig[] = [
+  HOME_TAB.myPosts,
+  HOME_TAB.aiPhotos,
+  HOME_TAB.favoriteBreeders,
+]
 
 const BREEDER_HOME_TABS: HomeTabConfig[] = [
   HOME_TAB.publicListings,
@@ -25,6 +30,7 @@ const BREEDER_HOME_TABS: HomeTabConfig[] = [
 const BREEDER_MY_HOME_TABS: HomeTabConfig[] = [
   HOME_TAB.listings,
   HOME_TAB.posts,
+  HOME_TAB.aiPhotos,
   HOME_TAB.favoriteBreeders,
 ]
 

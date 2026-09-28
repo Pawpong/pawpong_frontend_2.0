@@ -1,2 +1,2 @@
 export { HallOfFame } from './ui/HallOfFame'
-export { HallOfFamePodium } from './ui/HallOfFamePodium'
+export { HallOfFamePodium, PodiumCard, toRankSlots } from './ui/HallOfFamePodium'

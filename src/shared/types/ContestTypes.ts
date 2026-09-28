@@ -44,25 +44,10 @@ export interface SubmitContestEntryResponse {
   entryId: string
 }
 
-/** 투표 응답 */
-export interface ContestVoteResponse {
-  entryId: string
-  newVoteCount: number
-}
-
 /** 이전 콘테스트 랭킹 응답 */
 export interface ContestPreviousRanking {
   contest: ContestInfo
   ranking: ContestEntry[]
-}
-
-/** 명예의 전당 항목 */
-export interface HallOfFameItem {
-  contestId: string
-  contestTitle: string
-  startDate: string
-  endDate: string
-  winner: ContestEntry
 }
 
 /** 랜덤 투표 후보 조회 응답 */
@@ -92,16 +77,4 @@ export interface YesterdayTopEntry {
 export interface ContestYesterdayTop {
   contestId: string
   ranking: YesterdayTopEntry[]
-}
-
-/** 엔트리 목록 조회 파라미터 */
-export interface ContestEntriesParams {
-  limit?: number
-  page?: number
-}
-
-/** 명예의 전당 목록 조회 파라미터 */
-export interface HallOfFameParams {
-  limit?: number
-  page?: number
 }

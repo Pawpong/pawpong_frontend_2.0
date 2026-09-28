@@ -11,3 +11,4 @@ export { getFirstPhotoPostId, toCommunityPreviewProps } from './model/communityP
 export { toPlaceholderPostDetail } from './model/placeholderPostDetail'
 export { COMMUNITY_CAROUSEL_STYLE, COMMUNITY_LOGIN_PROMPT } from './model/communityUi'
 export type { CommunityPreviewAuthor, CommunityPreviewProps } from './model/communityPreview'
+export { formatHallOfFamePeriod } from './model/hallOfFamePeriod'
