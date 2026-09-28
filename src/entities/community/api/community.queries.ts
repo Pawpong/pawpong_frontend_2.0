@@ -6,6 +6,8 @@ import {
   getCommunityComments,
   getMyBookmarkedPosts,
   getMyDraftPosts,
+  getCurrentCommunityHallOfFame,
+  getCommunityHallOfFameHistory,
 } from './community.api'
 
 export const communityQueries = {
@@ -90,5 +92,22 @@ export const communityQueries = {
       queryKey: [...communityQueries.myBookmarksAll(), pageSize],
       queryFn: (page) => getMyBookmarkedPosts({ page, pageSize }),
       staleTime: STALE_TIME.DEFAULT,
+    }),
+
+  hallOfFameAll: () => [...communityQueries.all(), 'hallOfFame'] as const,
+
+  // 서버가 매시 정각에 재집계하므로 짧게 잡을 이유가 없다.
+  hallOfFameCurrent: () =>
+    createQuery({
+      queryKey: [...communityQueries.hallOfFameAll(), 'current'],
+      queryFn: () => getCurrentCommunityHallOfFame(),
+      staleTime: STALE_TIME.LONG,
+    }),
+
+  hallOfFameHistory: (pageSize = 10) =>
+    createInfiniteQuery({
+      queryKey: [...communityQueries.hallOfFameAll(), 'history', pageSize],
+      queryFn: (page) => getCommunityHallOfFameHistory({ page, pageSize }),
+      staleTime: STALE_TIME.LONG,
     }),
 }

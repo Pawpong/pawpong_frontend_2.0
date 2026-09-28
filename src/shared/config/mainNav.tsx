@@ -46,6 +46,15 @@ const NavChatIcon = ({ className }: NavIconProps) => (
   </svg>
 )
 
+/** AI 필터 — 픽셀 반짝이. 활성 투톤은 public/images/nav/nav-ai-active.svg */
+const NavSparkleIcon = ({ className }: NavIconProps) => (
+  <svg viewBox="0 0 30 30" fill="currentColor" className={className} aria-hidden>
+    <path d="M15 7V12H17V14H22V17H17V19H15V25H12V19H10V17H5V14H10V12H12V7H15ZM12 17H15V14H12V17Z" />
+    <path d="M24 4V6H26V8H24V10H22V8H20V6H22V4H24Z" />
+    <rect x="24" y="17" width="2" height="2" />
+  </svg>
+)
+
 /**
  * 비활성 글리프는 다른 nav 아이콘과 같이 인라인 SVG 로 그린다.
  *
@@ -136,6 +145,12 @@ export const MAIN_NAV: MainNavItem[] = [
     label: '커뮤니티',
     Icon: NavCommunityIcon,
     isActive: (p) => p.startsWith('/community'),
+  },
+  {
+    href: '/ai-filter',
+    label: 'AI 필터',
+    Icon: withActiveIcon(NavSparkleIcon, '/images/nav/nav-ai-active.svg'),
+    isActive: (p) => p.startsWith('/ai-filter'),
   },
   { href: '/home', label: '마이홈', Icon: NavMyHomeIcon, isActive: (p) => p.startsWith('/home') },
 ]

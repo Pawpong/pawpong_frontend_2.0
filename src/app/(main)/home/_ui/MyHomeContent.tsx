@@ -2,12 +2,14 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { BookmarkIcon } from '@/shared/assets'
 import { Button, buttonVariants, Container, InputUpload, NavigationBar } from '@/shared/ui'
 import { transientQueryRecoveryOptions } from '@/shared/api'
 import { cn } from '@/shared/lib/cn'
 import { profileQueries } from '@/entities/profile'
+import { AiPhotoArchive } from '@/features/ai-image'
 import { communityQueries } from '@/entities/community'
 // [refactored] 분양 페이지와 동일한 목록 블록 — 위젯으로 공유
 import { MyPetPostingList } from '@/widgets/my-pet-postings'
@@ -53,7 +55,9 @@ const MyHomeContent = () => {
   const defaultTab = isBreeder ? 'listings' : 'posts'
   // 프로필 조회 전에는 역할을 모르므로 선택값을 비워두고, 조회 후 역할별 기본 탭을 사용한다.
   // useState(defaultTab)로 바로 시드하면 최초 adopter 기본값('posts')이 브리더에게도 고정된다.
-  const [selectedTab, setSelectedTab] = useState<string | null>(null)
+  // AI 필터 화면의 '보관함 →' 처럼 특정 탭으로 바로 들어오는 링크(?tab=ai-photos)를 받는다
+  const requestedTab = useSearchParams().get('tab')
+  const [selectedTab, setSelectedTab] = useState<string | null>(requestedTab)
   const activeTab = tabs.find((tab) => tab.id === selectedTab)?.id ?? defaultTab
   const posts = myPostsData?.items ?? []
   const profileCardProps = myProfile ? toMyProfileCardProps(myProfile) : null
@@ -187,6 +191,13 @@ const MyHomeContent = () => {
             emptyText="내가 쓴 글이 없습니다."
             gridClassName={PHOTO_GRID}
           />
+        </TabsContent>
+
+        <TabsContent value="ai-photos" className="mt-0">
+          <InputUpload text="AI 필터로 만들기" href="/ai-filter" className="px-4" />
+          <div className="px-4 pt-4 tab:px-0">
+            <AiPhotoArchive enabled={!!myProfile} />
+          </div>
         </TabsContent>
 
         <TabsContent value="breeders" className="mt-0">

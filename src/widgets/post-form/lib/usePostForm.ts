@@ -7,12 +7,15 @@ interface UsePostFormOptions {
   initialText?: string
   /** 수정 화면 초기값 — 이미 업로드된 사진 URL (남긴 것만 제출 시 파일명으로 변환) */
   initialImages?: string[]
+  /** 작성 화면 초기값 — 다른 화면(AI 필터 등)에서 넘겨받은 새 사진. 제출 때 함께 업로드된다 */
+  initialFiles?: File[]
 }
 
 const usePostForm = ({
   maxImages = 10,
   initialText = '',
   initialImages = [],
+  initialFiles,
 }: UsePostFormOptions = {}) => {
   // 수정 기준값은 이 폼 인스턴스가 처음 열린 시점으로 고정한다.
   const [initialTextValue] = useState(initialText)
@@ -21,7 +24,9 @@ const usePostForm = ({
   const [uploadedImages, setUploadedImages] = useState<string[]>(initialImages)
   const uploadedImagesRef = useRef(uploadedImages)
   // Keep each file and its preview together so removing a photo cannot shift just one list.
-  const [newPhotos, setNewPhotos] = useState<{ file: File; url: string }[]>([])
+  const [newPhotos, setNewPhotos] = useState<{ file: File; url: string }[]>(() =>
+    (initialFiles ?? []).map((file) => ({ file, url: URL.createObjectURL(file) })),
+  )
   const newPhotosRef = useRef(newPhotos)
   const [text, setText] = useState(initialText)
   const [isProcessingPhotos, setIsProcessingPhotos] = useState(false)
