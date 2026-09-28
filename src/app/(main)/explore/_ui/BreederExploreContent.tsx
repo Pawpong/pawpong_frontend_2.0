@@ -75,6 +75,7 @@ const BreederExploreContent = ({ category, keyword }: BreederExploreContentProps
         }
       >
         <ListState
+          appPublicContent
           isPending={isPending}
           isError={isError}
           isEmpty={breeders.length === 0}
