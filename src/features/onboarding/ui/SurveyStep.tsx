@@ -99,8 +99,12 @@ const SurveyStep = () => {
           <TextLabel as="ul" size="16" weight="medium" className="list-disc ps-6">
             <li>수집하는 개인정보 항목 : 이름, 연락처, 이메일주소 등</li>
             <li>수집 및 이용 목적 : 입양자 상담 및 검토</li>
-            <li>보유 및 이용기간 : 상담 또는 입양 직후 폐기</li>
+            <li>보유 및 이용기간 : 상담 종료 또는 입양 확정 후 1년 보관 후 파기</li>
           </TextLabel>
+          <p className="text-sm leading-relaxed text-neutral-700">
+            기간 만료 시 책임자 김승찬이 확인하여 수동 파기합니다. 기존에 더 짧은 기간으로 동의한
+            정보에는 기존 기준을 적용하며, 계정 영구삭제 요청은 별도로 처리합니다.
+          </p>
 
           <Controller
             name="privacyAgreed"
