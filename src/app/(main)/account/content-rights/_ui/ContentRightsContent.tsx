@@ -1,5 +1,6 @@
 'use client'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { apiClient, API_VERSION, normalizeApiError, unwrap } from '@/shared/api'
 import { Button } from '@/shared/ui/Button'
@@ -8,6 +9,7 @@ import { Checkbox } from '@/shared/ui/Checkbox'
 type ConsentStatus = { version: string; accepted: boolean; consentedAt: string | null }
 
 export function ContentRightsContent() {
+  const queryClient = useQueryClient()
   const [status, setStatus] = useState<ConsentStatus | null>(null)
   const [checked, setChecked] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -32,7 +34,11 @@ export function ContentRightsContent() {
         version: status.version,
         accepted: true,
       })
-      setStatus(unwrap<ConsentStatus>(response))
+      const saved = unwrap<ConsentStatus>(response)
+      if (!saved.accepted) throw new Error('동의 저장 결과를 확인하지 못했어요. 다시 시도해 주세요.')
+      setStatus(saved)
+      // 작성자 동의로 공개 콘텐츠가 달라지므로 이전 앱 목록 캐시를 다시 조회한다.
+      await queryClient.invalidateQueries()
       window.dispatchEvent(new Event('pawpong:content-rights-updated'))
     } catch (cause) {
       setError(normalizeApiError(cause, '동의를 저장하지 못했어요.').message)
@@ -46,7 +52,7 @@ export function ContentRightsContent() {
       <div className="rounded-xl border border-secondary-400 bg-secondary-50 p-5 tab:p-7">
         <h1 className="font-cafe24 text-xl text-neutral-850 tab:text-2xl">내 게시물을 앱에서도 보여주세요</h1>
         <p className="mt-3 text-sm leading-6 text-neutral-700">
-          기존 게시물과 사진은 작성자가 허락하기 전까지 포퐁 iOS 앱의 공개 목록과 상세 화면에 표시하지 않아요.
+          기존 게시물과 사진은 작성자가 허락하기 전까지 포퐁 앱의 공개 목록과 상세 화면에 표시하지 않아요.
           동의하지 않아도 계정 조회와 삭제 요청은 계속 이용할 수 있어요.
         </p>
       </div>
