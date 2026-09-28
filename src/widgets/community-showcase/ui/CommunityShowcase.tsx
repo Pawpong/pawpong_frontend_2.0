@@ -31,6 +31,7 @@ const CommunityShowcase = () => {
       titleClassName="tab:text-xl"
     >
       <ListState
+        appPublicContent
         isPending={isPending}
         isError={isError}
         isEmpty={fetched.length === 0}

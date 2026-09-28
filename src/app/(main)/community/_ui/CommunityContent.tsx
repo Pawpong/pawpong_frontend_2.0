@@ -176,6 +176,7 @@ const CommunityContent = () => {
               </div>
             )}
             <ListState
+              appPublicContent={!appliedSearch}
               isPending={false}
               isError={isError}
               isEmpty={!isPending && posts.length === 0}
