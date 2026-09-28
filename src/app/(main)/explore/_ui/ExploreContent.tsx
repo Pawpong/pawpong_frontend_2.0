@@ -219,6 +219,7 @@ const ExploreContent = () => {
               }
             >
               <ListState
+                appPublicContent
                 isPending={isPending}
                 isError={isError}
                 isEmpty={listings.length === 0}

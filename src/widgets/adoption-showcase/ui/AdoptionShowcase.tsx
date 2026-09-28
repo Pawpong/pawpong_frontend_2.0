@@ -20,6 +20,7 @@ const AdoptionShowcase = () => {
   return (
     <ShowcaseSection title="분양중인 동물" linkText="탐색 바로가기" linkHref="/explore">
       <ListState
+        appPublicContent
         isPending={isPending}
         isError={isError}
         isEmpty={pets.length === 0}
