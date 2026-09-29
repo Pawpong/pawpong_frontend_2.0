@@ -1,9 +1,10 @@
 'use client'
 
 import type { ComponentType, ReactNode } from 'react'
-import { tv } from 'tailwind-variants'
+import { tv } from '@/shared/lib/tv'
 import { cn } from '@/shared/lib/cn'
 import { CloseIcon } from '@/shared/assets'
+import { IconButton } from './IconButton'
 
 const alertMessage = tv({
   slots: {
@@ -11,7 +12,9 @@ const alertMessage = tv({
     group: 'flex min-w-0 flex-1',
     icon: 'shrink-0',
     message: 'min-w-0 flex-1 overflow-hidden text-ellipsis leading-[1.5] font-semibold',
-    action: 'shrink-0 leading-[1.5] font-medium underline decoration-1 underline-offset-2',
+    // 배너 상태색을 그대로 물려받는 문장 속 액션이라 Button 대신 글자만 둔다
+    action:
+      'focus-ring shrink-0 rounded leading-[1.5] font-medium underline decoration-1 underline-offset-2',
     close: 'size-6 shrink-0',
   },
   variants: {
@@ -87,9 +90,9 @@ const AlertMessage = ({
       )}
 
       {onClose && (
-        <button type="button" onClick={onClose} aria-label="닫기" className="shrink-0">
+        <IconButton size="xs" onClick={onClose} aria-label="닫기">
           <CloseIcon className={styles.close()} />
-        </button>
+        </IconButton>
       )}
     </div>
   )

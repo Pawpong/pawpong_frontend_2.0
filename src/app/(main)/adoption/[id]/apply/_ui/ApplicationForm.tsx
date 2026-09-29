@@ -96,7 +96,7 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
           }
           action={
             isProfileError ? (
-              <Button variant="fill" size="sm" onClick={() => void retryProfile()}>
+              <Button intent="dark" size="sm" onClick={() => void retryProfile()}>
                 다시 시도
               </Button>
             ) : undefined
@@ -211,8 +211,8 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
         title={CONSULT_CONFIRM_TITLE}
         direction="row"
         actions={[
-          { label: '그만두기', variant: 'outline', onClick: giveUpFromConsult },
-          { label: '상담하기', variant: 'fill', onClick: confirmConsult },
+          { label: '그만두기', intent: 'secondary', onClick: giveUpFromConsult },
+          { label: '상담하기', intent: 'primary', onClick: confirmConsult },
         ]}
       />
     </div>

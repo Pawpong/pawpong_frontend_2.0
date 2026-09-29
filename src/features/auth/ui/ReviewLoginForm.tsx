@@ -96,9 +96,11 @@ export function ReviewLoginForm({ returnUrl }: { returnUrl: string }) {
           {error}
         </p>
       )}
-      <Button type="submit" size="lg" disabled={submitting} className="mt-1 w-full">
-        {submitting ? '로그인 중…' : '심사용 계정으로 로그인'}
-      </Button>
+      <div className="mt-1 flex w-full">
+        <Button type="submit" size="lg" disabled={submitting} width="full">
+          {submitting ? '로그인 중…' : '심사용 계정으로 로그인'}
+        </Button>
+      </div>
     </form>
   )
 }

@@ -71,7 +71,7 @@ const PetInfoCard = ({ detail }: PetInfoCardProps) => {
 
           <Link
             href={`/adoption/${detail.petId}`}
-            className="flex shrink-0 items-center rounded-lg px-2 py-1 text-primary-600 transition-colors hover:bg-primary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+            className="flex shrink-0 items-center rounded-lg px-2 py-1 text-primary-600 focus-ring transition-colors hover:bg-primary-50"
           >
             <span className="text-sm leading-[1.5] font-semibold">입양 상세보기</span>
             <ArrowRightIcon className="size-5" />

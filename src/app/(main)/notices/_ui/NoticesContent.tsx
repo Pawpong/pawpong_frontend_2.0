@@ -22,7 +22,7 @@ import type { Notice } from '@/shared/types'
 // 그 자리에서 펼쳐진다 — 목록 응답에 content가 이미 실려오므로 별도 상세 조회가 필요 없다.
 const NoticeRow = ({ notice }: { notice: Notice }) => (
   <details className="group border-b border-neutral-300 last:border-b-0">
-    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-left focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-500 [&::-webkit-details-marker]:hidden">
+    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-left focus-ring-inset [&::-webkit-details-marker]:hidden">
       <span className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
         {notice.isPinned && (
           <Badge variant="primaryFilled" size="md">
@@ -65,7 +65,7 @@ const NoticesContent = () => {
             errorText="공지사항을 불러오지 못했습니다."
             emptyText="등록된 공지사항이 없습니다."
             errorAction={
-              <Button variant="fill" size="sm" className="px-4" onClick={() => void refetch()}>
+              <Button intent="dark" size="sm" onClick={() => void refetch()}>
                 다시 시도
               </Button>
             }

@@ -10,6 +10,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  IconButton,
 } from '@/shared/ui'
 
 interface ChatRoomActionsMenuProps {
@@ -47,13 +48,9 @@ const ChatRoomActionsMenu = ({ roomId, counterpartName, onClosed }: ChatRoomActi
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button
-            type="button"
-            aria-label={`${counterpartName} 채팅방 더보기`}
-            className="-m-2 flex size-10 shrink-0 items-center justify-center text-neutral-850 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
-          >
+          <IconButton edge="both" aria-label={`${counterpartName} 채팅방 더보기`}>
             <MoreVertIcon className="size-6" />
-          </button>
+          </IconButton>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem
@@ -81,16 +78,15 @@ const ChatRoomActionsMenu = ({ roomId, counterpartName, onClosed }: ChatRoomActi
         actions={[
           {
             label: '취소',
-            variant: 'outline',
+            intent: 'secondary',
             onClick: () => handleOpenChange(false),
             disabled: closeRoom.isPending,
           },
           {
             label: closeRoom.isPending ? '나가는 중' : '나가기',
-            variant: 'fill',
+            intent: 'danger',
             onClick: handleConfirm,
             disabled: closeRoom.isPending,
-            className: 'bg-error-500 text-white hover:bg-error-600 active:bg-error-600',
           },
         ]}
       />

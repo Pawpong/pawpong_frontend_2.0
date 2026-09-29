@@ -45,7 +45,7 @@ const DocumentFilePicker = ({
         onClick={() => inputRef.current?.click()}
         className={cn(
           'flex min-h-14 w-full items-center gap-3 rounded-lg border bg-white px-4 py-3 text-left transition-colors',
-          'hover:border-primary-300 hover:bg-primary-50/30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500',
+          'focus-ring hover:border-primary-300 hover:bg-primary-50/30',
           'disabled:cursor-not-allowed disabled:bg-neutral-50 disabled:opacity-60',
           error
             ? 'border-error-500'

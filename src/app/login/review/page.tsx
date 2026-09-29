@@ -44,7 +44,7 @@ export default async function ReviewLoginPage({
         <ReviewLoginForm returnUrl={returnUrl} />
         <Link
           href={loginHref}
-          className="mx-auto mt-6 rounded px-2 py-2 text-sm text-neutral-700 underline underline-offset-4 hover:text-neutral-850 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+          className="mx-auto mt-6 rounded px-2 py-2 text-sm text-neutral-700 underline underline-offset-4 focus-ring hover:text-neutral-850"
         >
           소셜 로그인으로 돌아가기
         </Link>

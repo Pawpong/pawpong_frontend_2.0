@@ -29,7 +29,7 @@ const NotificationListItem = ({
       <button
         type="button"
         onClick={() => onSelect(item)}
-        className="flex min-w-0 flex-1 items-start gap-3 text-left focus-visible:rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+        className="flex min-w-0 flex-1 items-start gap-3 text-left focus-ring focus-visible:rounded-lg"
       >
         <span
           className={cn(
@@ -51,11 +51,7 @@ const NotificationListItem = ({
       </button>
 
       {onDelete && (
-        <OwnerActionsMenu
-          onDelete={() => onDelete(item)}
-          ariaLabel={`${item.title} 알림 더보기`}
-          className="shrink-0 rounded-full p-1 text-neutral-500 transition-colors hover:bg-white hover:text-neutral-850"
-        />
+        <OwnerActionsMenu onDelete={() => onDelete(item)} ariaLabel={`${item.title} 알림 더보기`} />
       )}
     </article>
   )

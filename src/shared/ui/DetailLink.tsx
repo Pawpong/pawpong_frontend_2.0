@@ -1,10 +1,10 @@
 import Link from 'next/link'
-import { tv, type VariantProps } from 'tailwind-variants'
+import { tv, type VariantProps } from '@/shared/lib/tv'
 import { ArrowRightIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 
 const detailLinkVariants = tv({
-  base: 'flex shrink-0 items-center text-text-primary whitespace-nowrap',
+  base: 'focus-ring flex shrink-0 items-center text-text-primary whitespace-nowrap',
   variants: {
     variant: {
       // Figma txt btn: 좌우 padding 4px, gap 0

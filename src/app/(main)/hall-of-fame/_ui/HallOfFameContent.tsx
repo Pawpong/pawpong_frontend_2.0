@@ -45,7 +45,7 @@ const PastPeriod = ({ hallOfFame }: { hallOfFame: CommunityHallOfFame }) => {
           <ol
             aria-label={`${year}년 ${title} 수상 동물`}
             tabIndex={0}
-            className="flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pt-9 pb-6 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-500 tab:justify-center tab:gap-6 tab:px-6 tab:pt-10 tab:pb-8 pc:gap-8 pc:py-10"
+            className="flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pt-9 pb-6 focus-ring tab:justify-center tab:gap-6 tab:px-6 tab:pt-10 tab:pb-8 pc:gap-8 pc:py-10"
           >
             {toRankSlots(hallOfFame.winners).map(({ rank, winner }) => (
               <li key={rank} className="shrink-0 snap-center">

@@ -229,7 +229,7 @@ const ShareModal = ({
                   type="button"
                   onClick={() => void share(option.key)}
                   aria-busy={isKakao && !kakaoReady}
-                  className="flex flex-col items-center gap-0.5 rounded-md focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:outline-none"
+                  className="flex flex-col items-center gap-0.5 rounded-md focus-ring"
                 >
                   <span
                     className={cn(

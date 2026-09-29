@@ -65,7 +65,7 @@ const BottomNavView = ({ pathname }: { pathname: string }) => {
               key={href}
               href={href}
               className={cn(
-                'relative flex h-12 min-w-0 flex-1 flex-col items-center justify-center text-neutral-500 transition-colors hover:text-primary-500 focus-visible:rounded focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-primary-500',
+                'relative flex h-12 min-w-0 flex-1 flex-col items-center justify-center text-neutral-500 focus-ring-inset transition-colors hover:text-primary-500 focus-visible:rounded',
                 isActive(pathname) && 'font-bold text-primary-500',
               )}
               aria-current={isActive(pathname) ? 'page' : undefined}

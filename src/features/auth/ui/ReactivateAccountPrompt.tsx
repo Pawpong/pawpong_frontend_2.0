@@ -154,10 +154,10 @@ const ReactivateAccountPrompt = () => {
           </span>
         }
         actions={[
-          { label: '취소', variant: 'outline', onClick: handleCancel },
+          { label: '취소', intent: 'secondary', onClick: handleCancel },
           {
             label: reactivate.isPending ? '복구 중...' : '복구하기',
-            variant: 'fill',
+            intent: 'primary',
             onClick: handleConfirm,
             disabled: reactivate.isPending,
           },

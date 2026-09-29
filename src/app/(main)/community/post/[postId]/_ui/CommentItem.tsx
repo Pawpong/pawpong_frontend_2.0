@@ -54,16 +54,14 @@ const CommentItem = ({ comment, currentUserId, onReply, isReply }: CommentItemPr
                 />
                 <div className="flex gap-2">
                   <Button
-                    variant="primary"
                     size="sm"
                     onClick={handleSaveEdit}
                     disabled={!editValue.trim() || updateComment.isPending}
-                    className="px-3"
                   >
                     {updateComment.isPending ? '저장 중' : '저장'}
                   </Button>
                   <Button
-                    variant="outline"
+                    intent="secondary"
                     size="sm"
                     onClick={() => {
                       setIsEditing(false)
@@ -71,7 +69,6 @@ const CommentItem = ({ comment, currentUserId, onReply, isReply }: CommentItemPr
                       updateComment.reset()
                     }}
                     disabled={updateComment.isPending}
-                    className="px-3 text-text-secondary"
                   >
                     취소
                   </Button>
@@ -88,13 +85,9 @@ const CommentItem = ({ comment, currentUserId, onReply, isReply }: CommentItemPr
               </p>
             )}
             {!isEditing && onReply && (
-              <button
-                type="button"
-                onClick={() => onReply(comment)}
-                className="inline-flex min-h-6 items-center rounded px-1 text-body-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 hover:text-primary-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
-              >
+              <Button intent="ghost" size="inline" onClick={() => onReply(comment)}>
                 답글 달기
-              </button>
+              </Button>
             )}
           </>
         }
@@ -103,7 +96,6 @@ const CommentItem = ({ comment, currentUserId, onReply, isReply }: CommentItemPr
       {/* 본인 댓글에서만 ⋮ → 수정/삭제 메뉴 노출 */}
       {isOwner && !isEditing && (
         <OwnerActionsMenu
-          className="shrink-0 pt-1"
           onEdit={() => {
             setEditValue(comment.body)
             updateComment.reset()

@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { AppleIcon, GoogleIcon, KakaoIcon, NaverIcon } from '@/shared/assets'
-import { cn } from '@/shared/lib/cn'
 import { normalizeReturnUrl } from '@/shared/lib/normalizeReturnUrl'
 import { Button } from '@/shared/ui/Button'
 import { getApiBaseUrl as getConfiguredApiBaseUrl } from '@/shared/config/apiBaseUrl'
@@ -32,27 +31,23 @@ const SOCIAL_BUTTONS: {
   provider: SocialProvider
   label: string
   Icon: typeof KakaoIcon
-  className: string
 }[] = [
   {
     provider: 'google',
     label: '구글 로그인',
     Icon: GoogleIcon,
     // Figma FillButton(2609:258329)의 neutral 표면. 구글의 밝은 버튼 규격 안에서 유지한다.
-    className: 'bg-[#F0F0F0] text-neutral-850 hover:bg-neutral-150 active:bg-neutral-300',
   },
   {
     provider: 'kakao',
     label: '카카오 로그인',
     Icon: KakaoIcon,
     // Figma FillButton(2609:258347)의 브랜드 배경.
-    className: 'bg-[#FFE812] text-neutral-850 hover:brightness-[0.98] active:brightness-95',
   },
   {
     provider: 'naver',
     label: '네이버 로그인',
     Icon: NaverIcon,
-    className: 'bg-[#03C75A] text-white hover:brightness-[0.98] active:brightness-95',
   },
   {
     // App Store 심사 4.8 — 제3자 소셜 로그인만 제공하면 Apple 로그인도 함께 제공해야 한다.
@@ -61,7 +56,6 @@ const SOCIAL_BUTTONS: {
     provider: 'apple',
     label: 'Apple로 로그인',
     Icon: AppleIcon,
-    className: 'bg-black text-white hover:brightness-[1.15] active:brightness-125',
   },
 ]
 
@@ -138,15 +132,13 @@ export const SocialLoginList = () => {
           로그인 상태를 확인하고 있어요.
         </p>
       )}
-      {SOCIAL_BUTTONS.map(({ provider, label, Icon, className }) => (
+      {SOCIAL_BUTTONS.map(({ provider, label, Icon }) => (
         <Button
+          size="md"
           key={provider}
-          variant="fill"
+          intent={provider}
+          width="full"
           disabled={restoring}
-          className={cn(
-            'h-10 w-full gap-0.5 px-4 py-2 transition-[color,background-color,filter] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500',
-            className,
-          )}
           onClick={() => startSocialLogin(provider)}
         >
           <Icon className="size-4" />

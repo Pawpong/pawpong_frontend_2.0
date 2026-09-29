@@ -7,6 +7,7 @@ import { PHOTO_ACCEPT } from '@/shared/lib/preparePhoto'
 import { cn } from '@/shared/lib/cn'
 import { Button } from './Button'
 import { PhotoSelectPrompt } from './PhotoSelectPrompt'
+import { IconButton } from './IconButton'
 
 interface PhotoUploadFieldProps {
   preview?: string
@@ -53,7 +54,7 @@ export function PhotoUploadField({
           onClick={() => input.current?.click()}
           aria-label={preview ? '사진 바꾸기' : '참여 사진 선택'}
           aria-describedby={hintId}
-          className="relative flex aspect-square w-full flex-col items-center justify-center gap-4 p-6 text-center focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-primary-500 disabled:cursor-wait"
+          className="relative flex aspect-square w-full flex-col items-center justify-center gap-4 p-6 text-center focus-ring-inset disabled:cursor-wait"
         >
           {preview ? (
             <Image
@@ -72,14 +73,11 @@ export function PhotoUploadField({
           )}
         </button>
         {preview && !busy && (
-          <button
-            type="button"
-            onClick={onRemove}
-            aria-label="선택한 사진 삭제"
-            className="absolute top-3 right-3 flex size-11 items-center justify-center rounded-full border border-neutral-150 bg-white text-neutral-850 focus-visible:outline-2 focus-visible:outline-primary-500"
-          >
-            <CloseIcon className="size-5" />
-          </button>
+          <span className="absolute top-3 right-3 flex">
+            <IconButton tone="surface" onClick={onRemove} aria-label="선택한 사진 삭제">
+              <CloseIcon className="size-5" />
+            </IconButton>
+          </span>
         )}
         {processing && (
           <div
@@ -110,12 +108,7 @@ export function PhotoUploadField({
           JPG, PNG, WEBP, GIF, AVIF, HEIC·HEIF
         </p>
         {preview && (
-          <Button
-            variant="text"
-            disabled={busy}
-            onClick={() => input.current?.click()}
-            className="min-h-11 shrink-0 px-3"
-          >
+          <Button size="md" intent="ghost" disabled={busy} onClick={() => input.current?.click()}>
             사진 바꾸기
           </Button>
         )}

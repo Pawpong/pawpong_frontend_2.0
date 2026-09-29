@@ -53,13 +53,9 @@ const CommentComposer = ({
   const banner = replyingToNickname && (
     <div className="flex items-center justify-between gap-2 rounded-xl bg-primary-50 px-3 py-2 text-body-md text-primary-700">
       <span className="min-w-0 font-semibold break-words">@{replyingToNickname}에게 답글</span>
-      <button
-        type="button"
-        onClick={onCancelReply}
-        className="shrink-0 rounded-full px-2 py-1 text-primary-700 transition-colors hover:bg-primary-100 focus-visible:outline-2 focus-visible:outline-primary-500"
-      >
+      <Button intent="link" size="inline" onClick={onCancelReply}>
         취소
-      </button>
+      </Button>
     </div>
   )
 
@@ -91,16 +87,17 @@ const CommentComposer = ({
           maxLength={1000}
           className="h-full min-w-0 flex-1 bg-transparent text-body-lg font-medium text-neutral-850 outline-none placeholder:text-neutral-500"
         />
-        <Button
-          variant="primary"
-          size="sm"
-          onClick={handleSubmit}
-          disabled={!trimmed || isSubmitting}
-          aria-busy={isSubmitting}
-          className="h-10 min-w-14 shrink-0 px-3 whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 motion-reduce:transition-none pc:h-11"
-        >
-          게시
-        </Button>
+        <div className="flex min-w-14">
+          <Button
+            size="md"
+            onClick={handleSubmit}
+            disabled={!trimmed || isSubmitting}
+            aria-busy={isSubmitting}
+            width="full"
+          >
+            게시
+          </Button>
+        </div>
       </div>
     </CommentComposerShell>
   )

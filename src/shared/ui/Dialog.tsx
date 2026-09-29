@@ -3,6 +3,7 @@
 import * as React from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { cn } from '@/shared/lib/cn'
+import { iconButtonVariants } from './IconButton'
 
 export const Dialog = DialogPrimitive.Root
 
@@ -45,23 +46,25 @@ export const DialogContent = React.forwardRef<
       {...props}
     >
       {children}
-      <DialogPrimitive.Close
-        disabled={closeDisabled}
-        className="absolute top-4 right-4 rounded-lg p-1 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-850 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          className="size-4"
-          aria-hidden
+      <div className="absolute top-4 right-4">
+        <DialogPrimitive.Close
+          disabled={closeDisabled}
+          className={iconButtonVariants({ tone: 'muted', size: 'sm' })}
         >
-          <path d="M18 6 6 18M6 6l12 12" />
-        </svg>
-        <span className="sr-only">닫기</span>
-      </DialogPrimitive.Close>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            className="size-4"
+            aria-hidden
+          >
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
+          <span className="sr-only">닫기</span>
+        </DialogPrimitive.Close>
+      </div>
     </DialogPrimitive.Content>
   </DialogPortal>
 ))

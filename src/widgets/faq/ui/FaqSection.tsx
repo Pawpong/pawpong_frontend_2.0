@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import { cn } from '@/shared/lib/cn'
 import { cafe24Proup } from '@/shared/lib/fonts'
-import { Container, SectionHeader } from '@/shared/ui'
+import { Container, SectionHeader, buttonVariants } from '@/shared/ui'
 import { homeQueries } from '@/entities/home'
 import type { HomeUserType } from '@/shared/types'
 
@@ -44,14 +44,11 @@ const FaqSection = ({ userType = 'adopter' }: FaqSectionProps) => {
               포퐁에서 만나요 !
             </p>
           </div>
-          <Link
-            href={cta.href}
-            className="group flex h-[3rem] w-full items-center justify-center rounded-full bg-[#fffa94] px-[2rem] transition-colors active:bg-[#f3ec59] pc:w-[12.3125rem] pc:self-end"
-          >
-            <span className="text-[1rem] font-semibold whitespace-nowrap text-neutral-850 group-hover:text-neutral-700 group-active:text-neutral-850">
+          <div className="flex pc:w-[12.3125rem] pc:self-end">
+            <Link href={cta.href} className={buttonVariants({ width: 'full' })}>
               {cta.action}
-            </span>
-          </Link>
+            </Link>
+          </div>
         </div>
       </div>
 

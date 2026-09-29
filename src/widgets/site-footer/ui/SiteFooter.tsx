@@ -34,11 +34,7 @@ const SiteFooter = () => {
       <Container className="py-8 tab:py-10 pc:py-12">
         <div className="flex flex-col gap-8 pc:flex-row pc:items-start pc:justify-between">
           <div className="flex max-w-md flex-col gap-3">
-            <Link
-              href="/"
-              aria-label="Pawpong 서비스 홈"
-              className="w-fit rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
-            >
+            <Link href="/" aria-label="Pawpong 서비스 홈" className="w-fit rounded focus-ring">
               <Image src="/logo.svg" alt="Pawpong" width={108} height={36} className="h-9 w-auto" />
             </Link>
             <p className="text-sm leading-[1.6] font-medium text-neutral-700">
@@ -51,7 +47,7 @@ const SiteFooter = () => {
               <Link
                 key={link.href}
                 href={link.href}
-                className="rounded text-sm font-semibold text-neutral-850 transition-colors hover:text-primary-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+                className="rounded text-sm font-semibold text-neutral-850 focus-ring transition-colors hover:text-primary-600"
               >
                 {link.label}
               </Link>
@@ -69,7 +65,7 @@ const SiteFooter = () => {
             <p>경기도 김포시 김포한강9로75번길 66, 5층 (구래동, 국제프라자)</p>
             <a
               href="mailto:coldingcontact@gmail.com"
-              className="w-fit rounded transition-colors hover:text-primary-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+              className="w-fit rounded focus-ring transition-colors hover:text-primary-600"
             >
               coldingcontact@gmail.com
             </a>
@@ -86,7 +82,7 @@ const SiteFooter = () => {
                   href={link.href}
                   target="_blank"
                   rel="noreferrer"
-                  className="rounded text-xs font-semibold text-neutral-700 transition-colors hover:text-primary-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+                  className="rounded text-xs font-semibold text-neutral-700 focus-ring transition-colors hover:text-primary-600"
                 >
                   {link.label}
                 </a>

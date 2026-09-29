@@ -29,11 +29,11 @@ const DeleteConfirmModal = ({
     actions={[
       {
         label: '취소',
-        variant: 'outline',
+        intent: 'secondary',
         onClick: () => onOpenChange(false),
         disabled: isPending,
       },
-      { label: '삭제', variant: 'fill', onClick: onConfirm, disabled: isPending },
+      { label: '삭제', intent: 'primary', onClick: onConfirm, disabled: isPending },
     ]}
   />
 )

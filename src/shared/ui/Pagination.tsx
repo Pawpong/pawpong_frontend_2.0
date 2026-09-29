@@ -36,7 +36,7 @@ export const PaginationLink = React.forwardRef<HTMLAnchorElement, PaginationLink
       aria-current={isActive ? 'page' : undefined}
       className={cn(
         'inline-flex items-center justify-center rounded-lg text-sm font-medium text-neutral-700 transition-colors',
-        'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white focus-visible:outline-none',
+        'focus-ring',
         size === 'default' && 'h-9 min-w-9 px-4 py-2',
         size === 'sm' && 'h-8 min-w-8 gap-1 px-3 text-xs',
         size === 'lg' && 'h-10 min-w-10 px-6',

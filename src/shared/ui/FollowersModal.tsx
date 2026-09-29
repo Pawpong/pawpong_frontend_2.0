@@ -154,7 +154,7 @@ const FollowersModal = ({
                     onClick={() => setTab(key)}
                     className={cn(
                       // 모바일·탭: 한 줄(라벨 개수) / pc: 라벨 위, 개수 아래
-                      'flex flex-1 items-center justify-center gap-1 p-3 pc:flex-col pc:gap-0 pc:py-2',
+                      'flex flex-1 items-center justify-center gap-1 p-3 focus-ring-inset pc:flex-col pc:gap-0 pc:py-2',
                       active && 'border-b border-neutral-850',
                     )}
                   >
@@ -182,19 +182,21 @@ const FollowersModal = ({
                   {!isMutual &&
                     (activeTab === 'followers' ? (
                       <Button
-                        variant="text"
+                        intent="ghost"
                         onClick={() => setPending({ user, mode: 'remove' })}
-                        className="shrink-0 font-medium text-neutral-500"
+                        size="inline"
                       >
                         삭제
                       </Button>
                     ) : (
-                      <FollowButton
-                        status={user.mutual ? 'mutual' : 'following'}
-                        size="sm"
-                        onClick={() => setPending({ user, mode: 'unfollow' })}
-                        className="w-[4.5625rem] shrink-0"
-                      />
+                      <div className="flex w-[4.5625rem] shrink-0">
+                        <FollowButton
+                          status={user.mutual ? 'mutual' : 'following'}
+                          size="sm"
+                          onClick={() => setPending({ user, mode: 'unfollow' })}
+                          width="full"
+                        />
+                      </div>
                     ))}
                 </div>
               ))}
@@ -237,8 +239,7 @@ const FollowersModal = ({
         actions={[
           {
             label: pending ? CONFIRM[pending.mode].actionLabel : '',
-            variant: 'outline',
-            className: 'text-error-500',
+            intent: 'danger',
             onClick: () => {
               if (!pending) return
               const confirmAction = pending.mode === 'unfollow' ? onUnfollow : onRemoveFollower
@@ -248,8 +249,7 @@ const FollowersModal = ({
           },
           {
             label: '취소',
-            variant: 'outline',
-            className: 'border-transparent bg-neutral-100',
+            intent: 'secondary',
             onClick: () => setPending(null),
           },
         ]}

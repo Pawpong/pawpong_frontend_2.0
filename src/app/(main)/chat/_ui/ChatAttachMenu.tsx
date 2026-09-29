@@ -6,6 +6,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  IconButton,
 } from '@/shared/ui'
 import { CameraIcon, FileIcon, LocationPinIcon, PlusIcon } from '@/shared/assets'
 import { PHOTO_ACCEPT } from '@/shared/lib/preparePhoto'
@@ -36,14 +37,9 @@ const ChatAttachMenu = ({ disabled, onSelectFile, onSelectLocation }: ChatAttach
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button
-            type="button"
-            aria-label="첨부"
-            disabled={disabled}
-            className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-600 transition-colors hover:bg-primary-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 disabled:cursor-not-allowed disabled:bg-neutral-100 disabled:text-neutral-400"
-          >
+          <IconButton tone="brandSoft" aria-label="첨부" disabled={disabled}>
             <PlusIcon className="size-5" />
-          </button>
+          </IconButton>
         </DropdownMenuTrigger>
 
         <DropdownMenuContent side="top" align="start" sideOffset={8} className="min-w-[11rem]">

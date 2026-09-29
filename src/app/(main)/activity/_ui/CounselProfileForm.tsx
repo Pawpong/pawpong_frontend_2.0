@@ -79,7 +79,7 @@ const CounselProfileFields = ({ initialValues }: { initialValues: CounselValues 
             저장했습니다
           </span>
         )}
-        <Button type="submit" size="lg" disabled={updateProfile.isPending} className="px-6">
+        <Button type="submit" size="lg" disabled={updateProfile.isPending}>
           {updateProfile.isPending ? '저장 중' : '저장'}
         </Button>
       </div>
@@ -104,7 +104,7 @@ const CounselProfileForm = () => {
         errorText="신청서를 불러오지 못했습니다."
         emptyText=""
         errorAction={
-          <Button variant="outline" size="sm" onClick={() => void refetch()}>
+          <Button intent="secondary" size="sm" onClick={() => void refetch()}>
             다시 시도
           </Button>
         }

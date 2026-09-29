@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { cn } from '@/shared/lib/cn'
+import { IconButton } from './IconButton'
 
 interface ImageCarouselProps {
   images: string[]
@@ -11,8 +12,6 @@ interface ImageCarouselProps {
   className?: string
   /** 이미지 로딩 전·레터박스 여백 배경 */
   bgClassName?: string
-  /** 좌우 화살표 버튼 크기·배경 (내부 4px 패딩 고정, 아이콘이 나머지를 채운다) */
-  buttonClassName?: string
   /** 점 인디케이터 — 활성/비활성 각각 크기·모양·색 */
   activeDotClassName?: string
   inactiveDotClassName?: string
@@ -24,13 +23,7 @@ interface ImageCarouselProps {
 }
 
 const ArrowIcon = ({ direction }: { direction: 'left' | 'right' }) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    className="size-full"
-  >
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="size-6">
     <path
       d={direction === 'left' ? 'M15 6l-6 6 6 6' : 'M9 6l6 6-6 6'}
       strokeLinecap="round"
@@ -49,7 +42,6 @@ const ImageCarousel = ({
   alt,
   className,
   bgClassName = 'bg-black',
-  buttonClassName = 'size-9 bg-black/40 hover:bg-black/60',
   activeDotClassName = 'size-1.5 rounded-full bg-white',
   inactiveDotClassName = 'size-1.5 rounded-full bg-white/40',
   imageClassName = 'object-contain',
@@ -106,28 +98,16 @@ const ImageCarousel = ({
       {hasMultiple && (
         <>
           {/* 화살표는 포인터 기기 보조 수단 — 터치에서는 스와이프가 주 조작이라 숨긴다 */}
-          <button
-            type="button"
-            aria-label="이전 사진"
-            onClick={goPrev}
-            className={cn(
-              'absolute top-1/2 left-3 hidden -translate-y-1/2 items-center justify-center rounded-full p-1 text-white transition tab:flex',
-              buttonClassName,
-            )}
-          >
-            <ArrowIcon direction="left" />
-          </button>
-          <button
-            type="button"
-            aria-label="다음 사진"
-            onClick={goNext}
-            className={cn(
-              'absolute top-1/2 right-3 hidden -translate-y-1/2 items-center justify-center rounded-full p-1 text-white transition tab:flex',
-              buttonClassName,
-            )}
-          >
-            <ArrowIcon direction="right" />
-          </button>
+          <span className="absolute top-1/2 left-3 hidden -translate-y-1/2 tab:flex">
+            <IconButton tone="overlay" aria-label="이전 사진" onClick={goPrev}>
+              <ArrowIcon direction="left" />
+            </IconButton>
+          </span>
+          <span className="absolute top-1/2 right-3 hidden -translate-y-1/2 tab:flex">
+            <IconButton tone="overlay" aria-label="다음 사진" onClick={goNext}>
+              <ArrowIcon direction="right" />
+            </IconButton>
+          </span>
 
           <div
             role="tablist"
@@ -144,7 +124,7 @@ const ImageCarousel = ({
                 onClick={() => scrollTo(dotIndex)}
                 // 점 자체는 작아도 터치 영역은 24px 확보 (before 가상요소로 확장)
                 className={cn(
-                  'relative transition-all before:absolute before:top-1/2 before:left-1/2 before:size-6 before:-translate-x-1/2 before:-translate-y-1/2 before:content-[""]',
+                  'relative focus-ring transition-all before:absolute before:top-1/2 before:left-1/2 before:size-6 before:-translate-x-1/2 before:-translate-y-1/2 before:content-[""]',
                   dotIndex === index ? activeDotClassName : inactiveDotClassName,
                 )}
               />

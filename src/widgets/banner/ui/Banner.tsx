@@ -126,7 +126,7 @@ const Banner = () => {
               aria-current={index === activeIndex ? 'true' : undefined}
               onClick={() => swiperRef.current?.slideTo(index)}
               className={cn(
-                'h-2 rounded-full transition-[width,background-color]',
+                'h-2 rounded-full focus-ring transition-[width,background-color]',
                 index === activeIndex ? 'w-5 bg-point-500' : 'w-2 bg-[rgba(173,101,29,0.3)]',
               )}
             />
@@ -144,7 +144,7 @@ const Banner = () => {
             type="button"
             aria-label={label}
             className={cn(
-              'absolute top-1/2 z-10 hidden -translate-y-1/2 items-center justify-center text-primary-500 transition-[color,transform] hover:text-primary-700 focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 tab:flex tab:size-[min(3rem,3.333vw)] [&.swiper-button-disabled]:cursor-default [&.swiper-button-disabled]:text-neutral-400 [&.swiper-button-disabled]:hover:text-neutral-400',
+              'absolute top-1/2 z-10 hidden -translate-y-1/2 items-center justify-center text-primary-500 focus-ring transition-[color,transform] hover:text-primary-700 focus-visible:rounded-sm tab:flex tab:size-[min(3rem,3.333vw)] [&.swiper-button-disabled]:cursor-default [&.swiper-button-disabled]:text-neutral-400 [&.swiper-button-disabled]:hover:text-neutral-400',
               position,
               className,
             )}

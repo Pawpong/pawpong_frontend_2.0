@@ -87,7 +87,7 @@ const TONE_CLASS = {
  */
 const CtaBanner = ({ text, href, onClick, tone = 'secondary' }: CtaBannerProps) => {
   const barClass = cn(
-    'relative mx-auto flex h-[2.3125rem] w-full max-w-[70.875rem] items-center justify-between overflow-hidden rounded-xl px-4 pc:h-[2.8125rem] pc:px-8',
+    'focus-ring relative mx-auto flex h-[2.3125rem] w-full max-w-[70.875rem] items-center justify-between overflow-hidden rounded-xl px-4 pc:h-[2.8125rem] pc:px-8',
     TONE_CLASS[tone],
   )
   // point 톤의 발자국 색(secondary-500)이 기본 톤과 같아져 동일 에셋을 재사용한다.

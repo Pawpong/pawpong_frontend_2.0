@@ -12,6 +12,7 @@ import {
   DialogPortal,
   ExitConfirmModal,
   Textarea,
+  IconButton,
 } from '@/shared/ui'
 
 interface InquiryModalProps {
@@ -87,15 +88,15 @@ const InquiryModal = ({ open, onOpenChange, audience }: InquiryModalProps) => {
             </DialogPrimitive.Title>
 
             <div className="flex items-center justify-end px-3 py-2 tab:px-6 tab:py-3">
-              <button
-                type="button"
+              <IconButton
+                tone="muted"
+                size="sm"
                 onClick={requestClose}
                 aria-label="닫기"
                 disabled={isPending}
-                className="rounded-lg p-1 text-neutral-700 transition-colors hover:bg-neutral-50 hover:text-neutral-850 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
               >
                 <CloseIcon className="size-5 tab:size-6" />
-              </button>
+              </IconButton>
             </div>
 
             <div className="px-3 pb-3 tab:px-6 tab:pb-4">
@@ -175,27 +176,29 @@ const InquiryModal = ({ open, onOpenChange, audience }: InquiryModalProps) => {
 
             <div className="flex flex-wrap justify-end gap-2 px-6 py-3">
               <Button
-                variant="primary"
+                size="md"
                 onClick={() => answer.mutate()}
                 disabled={!text.trim() || isPending}
               >
                 AI 안내 받기
               </Button>
               <Button
-                variant="primary"
+                size="md"
                 onClick={() => feedback.mutate()}
                 disabled={!text.trim() || isPending || feedback.isSuccess}
               >
                 피드백 보내기
               </Button>
-              <Button
-                variant="primary"
-                onClick={handleSend}
-                disabled={!text.trim() || isPending}
-                className="h-10 w-full max-w-[16.125rem]"
-              >
-                담당자에게 이메일 문의
-              </Button>
+              <div className="flex w-full max-w-[16.125rem]">
+                <Button
+                  size="md"
+                  onClick={handleSend}
+                  disabled={!text.trim() || isPending}
+                  width="full"
+                >
+                  담당자에게 이메일 문의
+                </Button>
+              </div>
             </div>
           </DialogPrimitive.Content>
         </DialogPortal>

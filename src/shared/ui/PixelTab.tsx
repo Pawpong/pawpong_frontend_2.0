@@ -1,6 +1,6 @@
 'use client'
 
-import { tv } from 'tailwind-variants'
+import { tv } from '@/shared/lib/tv'
 import { PawPrintIcon } from '@/shared/assets'
 import { cafe24Proup } from '@/shared/lib/fonts'
 import { cn } from '@/shared/lib/cn'

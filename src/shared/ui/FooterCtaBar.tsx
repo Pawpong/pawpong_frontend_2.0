@@ -41,25 +41,22 @@ const FooterCtaBar = ({ leftSlot, secondary, primary, children, className }: Foo
           왼쪽으로 뜨므로 오른쪽으로 붙인다 (2개일 땐 딱 맞아 영향 없음) */}
       <div className="flex w-full gap-2.5 tab:w-[22.5rem] tab:justify-end tab:gap-5">
         {secondary && (
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={secondary.onClick}
-            disabled={secondary.disabled}
-            className="w-[7.3125rem] shrink-0 tab:h-10 tab:w-auto tab:max-w-[10.625rem] tab:flex-1"
-          >
-            {secondary.label}
-          </Button>
+          <div className="w-[7.3125rem] shrink-0 tab:w-auto tab:max-w-[10.625rem] tab:flex-1">
+            <Button
+              intent="secondary"
+              onClick={secondary.onClick}
+              disabled={secondary.disabled}
+              width="full"
+            >
+              {secondary.label}
+            </Button>
+          </div>
         )}
-        <Button
-          variant="primary"
-          size="lg"
-          onClick={primary.onClick}
-          disabled={primary.disabled}
-          className="max-w-[18.5625rem] flex-1 tab:h-10 tab:max-w-[10.625rem]"
-        >
-          {primary.label}
-        </Button>
+        <div className="max-w-[18.5625rem] flex-1 tab:max-w-[10.625rem]">
+          <Button onClick={primary.onClick} disabled={primary.disabled} width="full">
+            {primary.label}
+          </Button>
+        </div>
       </div>
     </Container>
   </div>

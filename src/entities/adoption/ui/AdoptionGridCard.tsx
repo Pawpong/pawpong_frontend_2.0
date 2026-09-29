@@ -1,9 +1,8 @@
 'use client'
 
-import { GenderIcon } from '@/shared/assets'
-import { cn } from '@/shared/lib/cn'
+import { FavoriteIcon, GenderIcon } from '@/shared/assets'
 import type { AdoptionListingCard } from '@/shared/types'
-import { FavoriteToggle, MediaCard, PopularBadge } from '@/shared/ui'
+import { MediaCard, PopularBadge, ToggleIconButton } from '@/shared/ui'
 import { AdoptionStatusBadge } from './AdoptionStatusBadge'
 
 /** 이 카드가 실제로 그리는 필드만 (분양글 목록처럼 다른 응답 타입도 그대로 넘길 수 있게) */
@@ -58,12 +57,17 @@ const AdoptionGridCard = ({
 
           {/* 하트는 클릭을 가로채므로(preventDefault) 토글이 없는 화면에선 아예 그리지 않는다 */}
           {showFavorite && (
-            <FavoriteToggle
-              isFavorite={isFavorite}
-              onToggle={onToggle}
-              className="absolute right-2 bottom-1 pc:right-3 pc:bottom-2"
-              iconClassName={cn('size-8 pc:size-12', !isFavorite && '!text-white/60')}
-            />
+            <span className="absolute right-2 bottom-1 flex pc:right-3 pc:bottom-2">
+              <ToggleIconButton
+                icon={FavoriteIcon}
+                hasFillState
+                size="responsive"
+                tone="onImage"
+                aria-label="관심 등록"
+                pressed={isFavorite}
+                onClick={onToggle}
+              />
+            </span>
           )}
         </>
       }

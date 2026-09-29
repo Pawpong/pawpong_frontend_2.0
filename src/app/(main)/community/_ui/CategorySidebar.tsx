@@ -26,7 +26,7 @@ const CategorySidebar = ({ categories, selected, onSelect }: CategorySidebarProp
               type="button"
               onClick={() => onSelect(cat.value)}
               className={cn(
-                'text-sm leading-[1.375rem] text-text-primary',
+                'text-sm leading-[1.375rem] text-text-primary focus-ring',
                 selected === cat.value ? 'font-bold' : 'font-medium',
               )}
             >

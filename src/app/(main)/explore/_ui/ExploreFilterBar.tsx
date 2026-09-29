@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { FilterChip, SearchButton } from '@/shared/ui'
+import { Chip, SearchButton } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { ANIMAL_CATEGORIES, CATEGORY_LABEL } from '@/shared/types'
 import type { AnimalCategory } from '@/shared/types'
@@ -15,8 +15,6 @@ interface ExploreFilterBarProps {
   onSearch: (keyword: string) => void
   className?: string
 }
-
-const PILL_BASE = 'flex h-8 items-center rounded-full border bg-white'
 
 /* ═══════════════════════════════════════════════
    탭/모바일 카테고리 + 검색 한 줄 (Figma 1652-75035 / 1652-81824)
@@ -39,14 +37,7 @@ const ExploreFilterBar = ({
     <div className={cn('flex items-center justify-between gap-3 py-3', className)}>
       {searchExpanded ? (
         /* 필터 버튼 — 클릭 시 칩(뱃지) 형태로 복귀 */
-        <button
-          type="button"
-          onClick={() => setSearchExpanded(false)}
-          className={cn(
-            PILL_BASE,
-            'shrink-0 gap-1 border-neutral-300 px-2 text-[0.875rem] font-semibold whitespace-nowrap text-neutral-850',
-          )}
-        >
+        <Chip onClick={() => setSearchExpanded(false)}>
           <Image
             src="/images/category/filter.svg"
             alt=""
@@ -55,18 +46,18 @@ const ExploreFilterBar = ({
             className="size-5"
           />
           필터
-        </button>
+        </Chip>
       ) : (
         /* 카테고리 칩 — 공통 Badge(primary 채움/아웃라인, Figma 1652-81786) */
         <div className="flex flex-wrap items-center gap-2">
           {ANIMAL_CATEGORIES.map((category) => (
-            <FilterChip
+            <Chip
               key={category}
               selected={selected === category}
               onClick={() => onChange(category)}
             >
               {CATEGORY_LABEL[category]}
-            </FilterChip>
+            </Chip>
           ))}
         </div>
       )}

@@ -1,8 +1,7 @@
 'use client'
 
 import type { UseFormRegisterReturn } from 'react-hook-form'
-import { Input, InputField, HelpMessage } from '@/shared/ui'
-import { StepActionButton } from './StepInput'
+import { Input, InputField, HelpMessage, Button } from '@/shared/ui'
 import type { useDuplicateCheck } from '../model/useDuplicateCheck'
 
 // [refactored] InfoStep 별명 · KennelInfoStep 브리더명의 판박이 필드
@@ -47,9 +46,17 @@ const DuplicateCheckField = ({
           }}
           className="flex-1"
         />
-        <StepActionButton onClick={() => check.check(value)} disabled={check.isPending}>
-          {check.isPending ? pendingLabel : checkLabel}
-        </StepActionButton>
+        <div className="flex w-[6.25rem] shrink-0">
+          <Button
+            size="md"
+            intent="dark"
+            width="full"
+            onClick={() => check.check(value)}
+            disabled={check.isPending}
+          >
+            {check.isPending ? pendingLabel : checkLabel}
+          </Button>
+        </div>
       </div>
       {check.message && (
         <HelpMessage status={check.message.status} className="mt-1">

@@ -35,7 +35,7 @@ const AdoptionApplyPage = () => {
         status="error"
         message="분양글을 불러오지 못했습니다."
         action={
-          <Button variant="fill" size="sm" onClick={() => void detailQuery.refetch()}>
+          <Button intent="dark" size="sm" onClick={() => void detailQuery.refetch()}>
             다시 시도
           </Button>
         }

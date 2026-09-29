@@ -78,7 +78,7 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
           }
           action={
             isError ? (
-              <Button variant="fill" size="sm" onClick={() => void refetch()}>
+              <Button intent="dark" size="sm" onClick={() => void refetch()}>
                 다시 시도
               </Button>
             ) : undefined
@@ -118,7 +118,6 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
         <OwnerActionsMenu
           onEdit={() => router.push(`/community/post/${postId}/edit`)}
           onDelete={() => setConfirmDeletePost(true)}
-          className="shrink-0 text-neutral-850"
         />
       )}
     </div>

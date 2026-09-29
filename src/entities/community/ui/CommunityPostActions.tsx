@@ -1,7 +1,7 @@
 'use client'
 
 import { FavoriteIcon, PixelBookmarkIcon, PixelMessageIcon } from '@/shared/assets'
-import { BOOKMARK_ACTIVE, PostActionButton } from '@/shared/ui'
+import { ToggleIconButton } from '@/shared/ui'
 
 interface CommunityPostActionsProps {
   likeCount: number
@@ -26,28 +26,28 @@ const CommunityPostActions = ({
 }: CommunityPostActionsProps) => {
   return (
     <div className="flex items-center gap-2">
-      <PostActionButton
+      <ToggleIconButton
         icon={FavoriteIcon}
+        hasFillState
+        size="md"
         count={likeCount}
-        iconClassName="size-8"
-        ariaLabel="좋아요"
-        active={liked}
-        iconStatus={liked ? 'fill' : 'default'}
+        aria-label="좋아요"
+        pressed={liked}
         onClick={onToggleLike}
       />
-      <PostActionButton
+      <ToggleIconButton
         icon={PixelMessageIcon}
+        size="md"
         count={commentCount}
-        iconClassName="size-8"
-        ariaLabel="댓글 보기"
+        aria-label="댓글 보기"
         href={detailHref}
       />
-      <PostActionButton
+      <ToggleIconButton
         icon={PixelBookmarkIcon}
-        iconClassName="size-8"
-        ariaLabel="북마크"
-        active={saved}
-        activeClassName={BOOKMARK_ACTIVE}
+        size="md"
+        aria-label="북마크"
+        pressed={saved}
+        pressedTone="bookmark"
         onClick={onToggleSave}
       />
     </div>

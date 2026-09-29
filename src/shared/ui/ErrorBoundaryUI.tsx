@@ -41,15 +41,15 @@ export function ErrorBoundaryUI({
           <Button
             onClick={() => recoverPageError(error, reset, () => window.location.reload())}
             size="lg"
-            className="w-full px-5"
+            width="full"
           >
             {reloadRequired ? '페이지 새로 불러오기' : '다시 시도'}
           </Button>
           <Button
             onClick={() => window.location.assign('/')}
-            variant="outline"
+            intent="secondary"
             size="lg"
-            className="w-full px-5 hover:bg-neutral-50"
+            width="full"
           >
             홈으로 가기
           </Button>

@@ -2,7 +2,6 @@
 
 import type { ReactNode } from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
-import { tv, type VariantProps } from 'tailwind-variants'
 import { CloseIcon, InfoIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { Dialog, DialogOverlay, DialogPortal } from './Dialog'
@@ -12,27 +11,6 @@ import { Button } from './Button'
    - 틀(레이아웃·색상·radius·아이콘 영역·버튼 높이)은 고정 공통
    - 가변: 제목/설명/아이콘/버튼 라벨·동작·배치
    - direction: row(가로, typeA) / column(세로, typeB) / responsive·responsive-reverse(모바일·탭 세로 → pc 가로) */ // [refactored]
-
-// 버튼 스타일 — 공통 Button(BaseButton) variant로 위임.
-// (variant 타입 소스로만 유지, 렌더는 아래 CTA_BUTTON 매핑으로 Button 사용)
-const ctaModalButton = tv({
-  base: 'flex h-10 w-full items-center justify-center rounded-full p-2 text-base leading-normal font-semibold text-neutral-850 transition-colors',
-  variants: {
-    variant: {
-      fill: 'bg-[#fffa94] hover:text-neutral-700 active:bg-[#f3ec59] active:text-neutral-850',
-      outline: 'border border-neutral-300 bg-white hover:bg-[#f5f5f5] active:bg-neutral-100',
-      ghost: 'text-neutral-700 hover:text-neutral-850',
-    },
-  },
-  defaultVariants: { variant: 'outline' },
-})
-
-// CtaModal 액션 variant → 공통 Button variant + 보정 클래스
-const CTA_BUTTON = {
-  fill: { variant: 'primary', className: '' },
-  outline: { variant: 'outline', className: 'hover:bg-[#f5f5f5] active:bg-neutral-100' },
-  ghost: { variant: 'ghost', className: '' },
-} as const
 
 // [refactored] direction 분기를 cn 조건 객체 → 룩업 테이블로
 type CtaModalDirection = 'row' | 'column' | 'responsive' | 'responsive-reverse'
@@ -46,13 +24,13 @@ const DIRECTION_CLASS: Record<CtaModalDirection, string> = {
   'responsive-reverse': 'flex-col-reverse gap-2 pc:flex-row pc:gap-4',
 }
 
-export interface CtaModalAction extends VariantProps<typeof ctaModalButton> {
+export interface CtaModalAction {
   label: string
   onClick: () => void
+  /** 공통 Button intent — 주요 액션 primary / 취소 secondary / 보조 ghost / 되돌릴 수 없는 액션 danger */
+  intent?: 'primary' | 'secondary' | 'ghost' | 'danger'
   /** 요청 진행 중 등으로 비활성화 (중복 클릭 방지) */
   disabled?: boolean
-  /** 버튼 색 등 개별 오버라이드 (예: 삭제 빨강, 취소 회색) */
-  className?: string
 }
 
 interface CtaModalProps {
@@ -148,28 +126,22 @@ const CtaModal = ({
 
         {/* 하단: 버튼 영역 */}
         <div className={cn('flex rounded-b-xl px-3 py-5', DIRECTION_CLASS[direction])}>
-          {actions.map((action) => {
-            const map = CTA_BUTTON[action.variant ?? 'outline']
-            return (
-              <Button
-                key={action.label}
-                variant={map.variant}
-                onClick={action.onClick}
-                disabled={action.disabled}
-                className={cn(
-                  'h-10 w-full text-base leading-normal transition-colors',
-                  map.className,
-                  action.className,
-                )}
-              >
-                {action.label}
-              </Button>
-            )
-          })}
+          {actions.map((action) => (
+            <Button
+              size="md"
+              key={action.label}
+              intent={action.intent ?? 'secondary'}
+              width="full"
+              onClick={action.onClick}
+              disabled={action.disabled}
+            >
+              {action.label}
+            </Button>
+          ))}
         </div>
       </DialogPrimitive.Content>
     </DialogPortal>
   </Dialog>
 )
 
-export { CtaModal, ctaModalButton }
+export { CtaModal }

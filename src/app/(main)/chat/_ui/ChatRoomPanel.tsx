@@ -13,6 +13,7 @@ import { PetInfoCard } from './PetInfoCard'
 import { ChatNoticeBanner } from './ChatNoticeBanner'
 import { ChatMessageBubble } from './ChatMessageBubble'
 import { ChatMessageInput } from './ChatMessageInput'
+import { Button } from '@/shared/ui'
 
 interface ChatRoomPanelProps {
   room: ChatRoomResponseDto
@@ -108,13 +109,9 @@ const ChatRoomPanel = ({ room, currentUserId, onBack, onRoomClosed }: ChatRoomPa
             ) : isError ? (
               <div className="flex flex-col items-center gap-3 py-10">
                 <p className="text-sm text-neutral-700">메시지를 불러오지 못했습니다.</p>
-                <button
-                  type="button"
-                  onClick={() => void refetch()}
-                  className="rounded-lg bg-neutral-850 px-3 py-2 text-sm font-semibold text-white"
-                >
+                <Button intent="dark" size="sm" onClick={() => void refetch()}>
                   다시 시도
-                </button>
+                </Button>
               </div>
             ) : (
               messages.map((msg, idx) => (
