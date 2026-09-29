@@ -11,6 +11,9 @@ export function NativeViewportBridge() {
     let cleanup: (() => void) | undefined
     const activate = () => {
       if (cleanup || !(window as AppWindow).ReactNativeWebView) return
+      const root = document.documentElement
+      const previousNativeViewport = root.getAttribute('data-native-viewport')
+      root.setAttribute('data-native-viewport', '')
       const existing = document.querySelector<HTMLMetaElement>('meta[name="viewport"]')
       const originalContent = existing?.getAttribute('content') ?? null
       let meta = existing ?? document.createElement('meta')
@@ -34,6 +37,8 @@ export function NativeViewportBridge() {
       document.addEventListener('gesturechange', preventPinch, { passive: false })
       document.addEventListener('touchmove', preventMultiTouch, { passive: false })
       cleanup = () => {
+        if (previousNativeViewport === null) root.removeAttribute('data-native-viewport')
+        else root.setAttribute('data-native-viewport', previousNativeViewport)
         observer.disconnect()
         document.removeEventListener('gesturestart', preventPinch)
         document.removeEventListener('gesturechange', preventPinch)

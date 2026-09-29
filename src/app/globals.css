@@ -225,6 +225,16 @@
   }
 }
 
+/* iOS 앱의 14px 입력칸은 포커스 시 확대되어 인증 버튼을 화면 밖으로 밀어낸다.
+   viewport의 확대 제한만으로는 막히지 않으므로 앱 안의 작은 화면 입력 글자를 16px로 둔다. */
+@supports (-webkit-touch-callout: none) {
+  @media (width < 48rem) {
+    html[data-native-viewport] :is(input, textarea, select) {
+      font-size: 16px;
+    }
+  }
+}
+
 /* Shared discovery-card feedback; preserve geometry and avoid sticky touch hover. */
 @utility card-interactive {
   transition: box-shadow 160ms ease-out;
