@@ -24,6 +24,14 @@ const DIRECTION_CLASS: Record<CtaModalDirection, string> = {
   'responsive-reverse': 'flex-col-reverse gap-2 pc:flex-row pc:gap-4',
 }
 
+// 가로 배치에서는 슬롯끼리 폭을 나눠야 한다. 버튼 자체의 full 폭은 슬롯 안에서만 적용한다.
+const ACTION_SLOT_CLASS: Record<CtaModalDirection, string> = {
+  row: 'min-w-0 flex-1',
+  column: 'w-full',
+  responsive: 'w-full pc:min-w-0 pc:flex-1',
+  'responsive-reverse': 'w-full pc:min-w-0 pc:flex-1',
+}
+
 export interface CtaModalAction {
   label: string
   onClick: () => void
@@ -127,16 +135,17 @@ const CtaModal = ({
         {/* 하단: 버튼 영역 */}
         <div className={cn('flex rounded-b-xl px-3 py-5', DIRECTION_CLASS[direction])}>
           {actions.map((action) => (
-            <Button
-              size="md"
-              key={action.label}
-              intent={action.intent ?? 'secondary'}
-              width="full"
-              onClick={action.onClick}
-              disabled={action.disabled}
-            >
-              {action.label}
-            </Button>
+            <div key={action.label} className={ACTION_SLOT_CLASS[direction]}>
+              <Button
+                size="md"
+                intent={action.intent ?? 'secondary'}
+                width="full"
+                onClick={action.onClick}
+                disabled={action.disabled}
+              >
+                {action.label}
+              </Button>
+            </div>
           ))}
         </div>
       </DialogPrimitive.Content>
