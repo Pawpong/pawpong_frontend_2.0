@@ -27,10 +27,10 @@ const LoginPromptModal = ({ open, onOpenChange, description }: LoginPromptModalP
       actions={[
         {
           label: '로그인하러 가기',
-          variant: 'fill',
+          intent: 'primary',
           onClick: () => router.push(`/login?returnUrl=${encodeURIComponent(pathname)}`),
         },
-        { label: '닫기', variant: 'ghost', onClick: () => onOpenChange(false) },
+        { label: '닫기', intent: 'ghost', onClick: () => onOpenChange(false) },
       ]}
     />
   )

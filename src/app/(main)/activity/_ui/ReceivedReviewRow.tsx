@@ -56,15 +56,14 @@ export const ReceivedReviewRow = ({
       <p className={`${TEXT.prose} [overflow-wrap:anywhere] break-words`}>{review.content}</p>
 
       {!detail && (
-        <Link
-          href={`/activity/received-reviews/${review.reviewId}`}
-          className={buttonVariants({
-            variant: 'text',
-            className: 'min-h-10 self-start text-primary-600',
-          })}
-        >
-          후기 자세히 보기 →
-        </Link>
+        <div className="flex self-start">
+          <Link
+            href={`/activity/received-reviews/${review.reviewId}`}
+            className={buttonVariants({ intent: 'link', size: 'md' })}
+          >
+            후기 자세히 보기 →
+          </Link>
+        </div>
       )}
       {detail && (
         <div className="border-t border-neutral-150 pt-8">
@@ -93,14 +92,11 @@ export const ReceivedReviewRow = ({
           </p>
         </div>
       ) : (
-        <Button
-          variant="outline"
-          size="sm"
-          className="self-start px-4"
-          onClick={() => setIsEditing(true)}
-        >
-          답글 달기
-        </Button>
+        <div className="flex self-start">
+          <Button intent="secondary" size="sm" onClick={() => setIsEditing(true)}>
+            답글 달기
+          </Button>
+        </div>
       )}
 
       {deleteReply.isError && (

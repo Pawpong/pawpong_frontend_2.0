@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import * as AvatarPrimitive from '@radix-ui/react-avatar'
-import { tv, type VariantProps } from 'tailwind-variants'
+import { tv, type VariantProps } from '@/shared/lib/tv'
 import { cn } from '@/shared/lib/cn'
 import { PawPrintIcon } from '@/shared/assets'
 

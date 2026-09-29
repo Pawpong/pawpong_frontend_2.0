@@ -1,4 +1,5 @@
 import { CameraIcon } from '@/shared/assets'
+import { buttonVariants } from './Button'
 
 /** Content inside a photo-picker button; the parent owns the interaction. */
 export function PhotoSelectPrompt({ title, description }: { title: string; description: string }) {
@@ -9,9 +10,7 @@ export function PhotoSelectPrompt({ title, description }: { title: string; descr
       </span>
       <span className="text-base font-semibold text-primary-700">{title}</span>
       <span className="text-sm font-normal text-neutral-700">{description}</span>
-      <span className="rounded-full bg-point-500 px-6 py-2.5 text-sm font-semibold text-neutral-850">
-        사진 선택하기
-      </span>
+      <span className={buttonVariants()}>사진 선택하기</span>
     </>
   )
 }

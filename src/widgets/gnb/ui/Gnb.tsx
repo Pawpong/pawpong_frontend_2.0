@@ -10,6 +10,7 @@ import { LogoButton } from './LogoButton'
 import { NavBar } from './NavBar'
 import { NotificationBell } from './NotificationBell'
 import { MobileMenu } from './MobileMenu'
+import { IconButton } from '@/shared/ui'
 
 // 배경이 흰색이 아닌 화면에서는 헤더도 그 배경을 따라간다 (흰 띠가 떠 보이지 않게).
 // BottomNav 의 경로 목록과 같은 방식 — 페이지가 <main> 안에 있어 props 나 CSS 변수로는 닿지 않는다.
@@ -48,15 +49,15 @@ const Gnb = () => {
                 pc 는 NavBar 안 마이홈 옆에서 렌더하므로 여기는 pc 미만 전용 (AuthActions 와 같은 방식) */}
             <NotificationBell className="pc:hidden" />
             {/* 햄버거 메뉴 — 탭·모바일은 nav 대체, 데스크탑은 보조 메뉴 (전 브레이크포인트) */}
-            <button
-              type="button"
+            <IconButton
+              tone="brand"
+              edge="both"
               onClick={() => setMenuOpen(true)}
-              className="-m-2 flex size-10 shrink-0 items-center justify-center rounded-lg text-primary-500 transition-colors hover:bg-primary-50 hover:text-primary-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
               aria-label="메뉴 열기"
             >
               {/* Figma icon/menu — colors/icon/interactive/main color/Primary (#ad651d) */}
               <MenuIcon className="size-6" />
-            </button>
+            </IconButton>
           </div>
         </div>
       </header>

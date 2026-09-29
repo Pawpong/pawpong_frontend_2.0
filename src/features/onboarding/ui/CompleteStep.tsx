@@ -52,7 +52,7 @@ const CompleteStep = () => {
         }}
         nextLabel="홈으로"
         extraButtons={
-          <Button variant="text" className="text-base font-medium tab:text-sm">
+          <Button intent="ghost" size="inline">
             문의하기
           </Button>
         }

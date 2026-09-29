@@ -6,6 +6,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import type { Swiper as SwiperClass } from 'swiper'
 import { PawPrintIcon, PixelArrowRightIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
+import { IconButton } from '@/shared/ui'
 import 'swiper/css'
 
 // [refactored] 히어로 이미지 캐러셀 — Swiper 기반(모바일/탭 스와이프) + 커스텀 화살표·인디케이터
@@ -59,7 +60,7 @@ const HeroImageCarousel = ({
             <button
               type="button"
               onClick={() => onImageClick(index)}
-              className="relative block size-full"
+              className="relative block size-full focus-ring-inset"
             >
               {/* draggable=false: 네이티브 이미지 드래그가 Swiper 스와이프를 가로채는 것 방지 */}
               <Image
@@ -120,14 +121,11 @@ const SlideNavButton = ({
   onClick: () => void
   className: string
 }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    aria-label={label}
-    className={`absolute top-1/2 z-10 hidden -translate-y-1/2 pc:block ${className}`}
-  >
-    <PixelArrowRightIcon className="size-[3rem] text-neutral-50" />
-  </button>
+  <span className={`absolute top-1/2 z-10 hidden -translate-y-1/2 pc:flex ${className}`}>
+    <IconButton size="lg" onClick={onClick} aria-label={label}>
+      <PixelArrowRightIcon className="size-12 text-neutral-50" />
+    </IconButton>
+  </span>
 )
 
 export { HeroImageCarousel }

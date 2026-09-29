@@ -36,7 +36,7 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
         }
         action={
           profileQuery.isError ? (
-            <Button variant="fill" size="sm" onClick={() => void profileQuery.refetch()}>
+            <Button intent="dark" size="sm" onClick={() => void profileQuery.refetch()}>
               다시 시도
             </Button>
           ) : undefined

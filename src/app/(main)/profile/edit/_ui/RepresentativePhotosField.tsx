@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { PHOTO_ACCEPT } from '@/shared/lib/preparePhoto'
-import { Button, InputField, RepresentativePhoto } from '@/shared/ui'
+import { Button, InputField, RepresentativePhoto, IconButton } from '@/shared/ui'
 import {
   MAX_REPRESENTATIVE_PHOTOS,
   addRepresentativePhotos,
@@ -84,7 +84,7 @@ export function RepresentativePhotosField({
                 onClick={() => choosePhotos(index)}
                 disabled={disabled}
                 aria-label="대표사진 추가"
-                className="flex aspect-square items-center justify-center rounded-lg border border-dashed border-neutral-300 bg-white text-2xl font-medium text-neutral-500 transition-colors hover:border-primary-500 hover:text-primary-500"
+                className="flex aspect-square items-center justify-center rounded-lg border border-dashed border-neutral-300 bg-white text-2xl font-medium text-neutral-500 focus-ring transition-colors hover:border-primary-500 hover:text-primary-500"
               >
                 +
               </button>
@@ -97,27 +97,30 @@ export function RepresentativePhotosField({
               className="relative aspect-square overflow-hidden rounded-lg bg-point-50"
             >
               <PhotoPreview photo={photo} index={index} />
-              <button
-                type="button"
-                aria-label={`대표사진 ${index + 1} 빼기`}
-                disabled={disabled}
-                onClick={() =>
-                  onChange(
-                    Array.from({ length: MAX_REPRESENTATIVE_PHOTOS }, (_, i) =>
-                      i === index ? null : (photoSlots[i] ?? null),
-                    ),
-                  )
-                }
-                className="absolute top-1 right-1 flex size-6 items-center justify-center rounded-full bg-neutral-850/60 text-sm font-semibold text-white"
-              >
-                ×
-              </button>
+              <span className="absolute top-1 right-1 flex">
+                <IconButton
+                  tone="overlay"
+                  size="xs"
+                  aria-label={`대표사진 ${index + 1} 빼기`}
+                  disabled={disabled}
+                  onClick={() =>
+                    onChange(
+                      Array.from({ length: MAX_REPRESENTATIVE_PHOTOS }, (_, i) =>
+                        i === index ? null : (photoSlots[i] ?? null),
+                      ),
+                    )
+                  }
+                >
+                  ×
+                </IconButton>
+              </span>
             </div>
           )
         })}
       </div>
       <Button
-        variant="outline"
+        size="md"
+        intent="secondary"
         onClick={() => choosePhotos()}
         disabled={disabled || photoSlots.filter(Boolean).length >= MAX_REPRESENTATIVE_PHOTOS}
       >

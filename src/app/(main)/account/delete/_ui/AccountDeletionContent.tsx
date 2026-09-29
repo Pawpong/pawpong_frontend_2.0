@@ -9,6 +9,7 @@ import { Checkbox } from '@/shared/ui/Checkbox'
 import { Label } from '@/shared/ui/Label'
 import { deletionErrorMessage, type DeletionStatus } from '@/shared/lib/accountDeletion'
 import { getDeletionStatus, requestAccountDeletion } from '@/features/account-deletion'
+import { buttonVariants } from '@/shared/ui'
 
 const STATUS_TEXT = {
   pending: {
@@ -171,19 +172,17 @@ export function AccountDeletionContent() {
               </a>
             </p>
           )}
-          <Button
-            variant="outline"
-            size="sm"
-            className="mt-4 px-4"
-            onClick={refreshStatus}
-            disabled={checking}
-          >
-            처리 상태 확인
-          </Button>
-          {receipt.status === 'completed' && (
-            <Button variant="text" className="mt-3" onClick={closeReceipt}>
-              완료 내역 닫기
+          <div className="mt-4 flex">
+            <Button intent="secondary" size="sm" onClick={refreshStatus} disabled={checking}>
+              처리 상태 확인
             </Button>
+          </div>
+          {receipt.status === 'completed' && (
+            <div className="mt-3 flex">
+              <Button intent="ghost" onClick={closeReceipt} size="inline">
+                완료 내역 닫기
+              </Button>
+            </div>
           )}
         </section>
       ) : (
@@ -251,12 +250,11 @@ export function AccountDeletionContent() {
                 삭제할 계정으로 로그인해 주세요. 앱을 설치하지 않아도 이 웹페이지에서 요청할 수
                 있어요.
               </p>
-              <Link
-                href="/login?returnUrl=%2Faccount%2Fdelete"
-                className="mt-4 inline-block rounded-full bg-point-500 px-5 py-3 font-semibold text-neutral-850 hover:bg-point-300"
-              >
-                로그인하고 계속하기
-              </Link>
+              <div className="mt-4 flex">
+                <Link href="/login?returnUrl=%2Faccount%2Fdelete" className={buttonVariants()}>
+                  로그인하고 계속하기
+                </Link>
+              </div>
             </div>
           )}
         </>
@@ -264,9 +262,11 @@ export function AccountDeletionContent() {
       {error && (
         <div role="alert" className="text-sm leading-relaxed text-error-500">
           <p>{error}</p>
-          <Button variant="text" className="mt-2" disabled={checking} onClick={refreshStatus}>
-            접수 내역 다시 확인
-          </Button>
+          <div className="mt-2 flex">
+            <Button intent="ghost" disabled={checking} onClick={refreshStatus} size="inline">
+              접수 내역 다시 확인
+            </Button>
+          </div>
         </div>
       )}
       <p className="text-xs leading-relaxed text-neutral-500">

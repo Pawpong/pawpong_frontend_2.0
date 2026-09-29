@@ -47,7 +47,7 @@ const DraftsContent = () => {
             errorText="임시저장한 글을 불러오지 못했습니다."
             emptyText="임시저장한 글이 없습니다."
             errorAction={
-              <Button variant="fill" size="sm" onClick={() => void refetch()} className="px-4">
+              <Button intent="dark" size="sm" onClick={() => void refetch()}>
                 다시 시도
               </Button>
             }

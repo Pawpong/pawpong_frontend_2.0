@@ -56,7 +56,7 @@ const HomePostGrid = ({
           errorText={errorText}
           emptyText={emptyText}
           errorAction={
-            <Button variant="fill" size="sm" onClick={onRetry} className="px-4">
+            <Button intent="dark" size="sm" onClick={onRetry}>
               다시 시도
             </Button>
           }

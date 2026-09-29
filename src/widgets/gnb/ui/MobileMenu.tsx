@@ -6,7 +6,7 @@ import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { RESPONSIVE_SHELL_CLASS } from '@/shared/config'
 import { useAuthStatus } from '@/features/auth'
 import { cn } from '@/shared/lib/cn'
-import { Dialog, DialogOverlay, DialogPortal } from '@/shared/ui'
+import { Dialog, DialogOverlay, DialogPortal, iconButtonVariants } from '@/shared/ui'
 import { LogoButton } from './LogoButton'
 import { AuthActions } from './AuthActions'
 import { MOBILE_MENU_ITEMS } from './NavItems'
@@ -55,7 +55,7 @@ const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
               <div className="flex items-center gap-2">
                 <AuthActions placement="menu-header" />
                 <DialogPrimitive.Close
-                  className="flex size-10 items-center justify-center rounded-lg text-neutral-700 transition-colors hover:bg-neutral-50 hover:text-neutral-850 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+                  className={iconButtonVariants({ tone: 'muted' })}
                   aria-label="메뉴 닫기"
                 >
                   <Image src="/images/nav/menu-close.svg" alt="" width={24} height={24} />
@@ -77,7 +77,7 @@ const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
                   key={item.href}
                   href={hrefFor(item)}
                   onClick={close}
-                  className="text-base leading-[1.5] font-semibold text-neutral-700 transition-colors hover:text-primary-500 focus-visible:rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-500"
+                  className="text-base leading-[1.5] font-semibold text-neutral-700 focus-ring transition-colors hover:text-primary-500 focus-visible:rounded"
                 >
                   {item.name}
                 </Link>

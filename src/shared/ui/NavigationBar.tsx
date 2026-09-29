@@ -1,10 +1,11 @@
 import type { ReactNode } from 'react'
-import { tv, type VariantProps } from 'tailwind-variants'
+import { tv, type VariantProps } from '@/shared/lib/tv'
 import Link from 'next/link'
 import { cn } from '@/shared/lib/cn'
 import { ArrowBackIcon, CloseIcon } from '@/shared/assets'
 import { Container } from './Container'
 import { TextLabel } from './TextLabel'
+import { IconButton } from './IconButton'
 
 interface NavigationBarProps {
   title: string
@@ -53,7 +54,7 @@ const NavigationBar = ({
 }: NavigationBarProps) => {
   const isClose = icon === 'close'
   const Icon = isClose ? CloseIcon : ArrowBackIcon
-  const backIcon = <Icon className="size-6 text-neutral-850" />
+  const backIcon = <Icon className="size-6" />
   const backLabel = isClose ? '닫기' : '뒤로 가기'
   // [refactored] 중첩 삼항/중복 조건을 명명 조건으로
   const hasBack = Boolean(onBack || backHref)
@@ -63,20 +64,15 @@ const NavigationBar = ({
     <Container className={cn('flex items-center bg-white px-4 py-1 tab:py-2', className)}>
       <div className="flex min-w-0 flex-1 items-center">
         {onBack && (
-          <button
-            type="button"
-            onClick={onBack}
-            aria-label={backLabel}
-            className="-m-2 flex size-10 shrink-0 items-center justify-center rounded-lg transition-colors hover:bg-primary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
-          >
+          <IconButton edge="both" onClick={onBack} aria-label={backLabel}>
             {backIcon}
-          </button>
+          </IconButton>
         )}
         {!onBack && backHref && (
           <Link
             href={backHref}
             aria-label={backLabel}
-            className="-m-2 flex size-10 shrink-0 items-center justify-center rounded-lg transition-colors hover:bg-primary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+            className="-m-2 flex size-10 shrink-0 items-center justify-center rounded-lg focus-ring transition-colors hover:bg-primary-50"
           >
             {backIcon}
           </Link>

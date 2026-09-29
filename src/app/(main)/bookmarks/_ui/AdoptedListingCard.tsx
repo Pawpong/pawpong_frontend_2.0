@@ -86,7 +86,7 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
       <button
         type="button"
         onClick={() => setModalOpen(true)}
-        className="mx-auto flex w-full max-w-[37.5rem] items-center gap-4 rounded-lg bg-neutral-50 p-2 text-left pc:hidden"
+        className="mx-auto flex w-full max-w-[37.5rem] items-center gap-4 rounded-lg bg-neutral-50 p-2 text-left focus-ring pc:hidden"
       >
         {/* [refactored] CardImage — 110×110 rounded-4 */}
         <CardImage
@@ -142,13 +142,11 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
               listing={listing}
               className="flex-1 text-sm leading-[1.5] text-neutral-700"
             />
-            <Button
-              variant="primary"
-              onClick={() => router.push('/chat')}
-              className="h-10 w-[11.4375rem] shrink-0 text-base"
-            >
-              대화중인 채팅
-            </Button>
+            <div className="flex w-[11.4375rem] shrink-0">
+              <Button size="md" onClick={() => router.push('/chat')} width="full">
+                대화중인 채팅
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -162,10 +160,10 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
         actions={[
           {
             label: '입양 상세 보기',
-            variant: 'fill',
+            intent: 'primary',
             onClick: () => router.push(`/adoption/${listing.listingId}`),
           },
-          { label: '대화중인채팅', variant: 'outline', onClick: () => router.push('/chat') },
+          { label: '대화중인채팅', intent: 'secondary', onClick: () => router.push('/chat') },
         ]}
       />
     </>

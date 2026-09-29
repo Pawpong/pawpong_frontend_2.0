@@ -33,8 +33,8 @@ const ExitConfirmModal = ({
     description={description}
     direction="responsive-reverse"
     actions={[
-      { label: closeLabel, variant: 'outline', onClick: onClose },
-      { label: confirmLabel, variant: 'fill', onClick: onConfirm },
+      { label: closeLabel, intent: 'secondary', onClick: onClose },
+      { label: confirmLabel, intent: 'primary', onClick: onConfirm },
     ]}
   />
 )

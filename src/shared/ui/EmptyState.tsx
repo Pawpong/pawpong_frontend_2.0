@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { tv } from 'tailwind-variants'
+import { tv } from '@/shared/lib/tv'
 import { EmptyIllustration } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 

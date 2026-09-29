@@ -10,6 +10,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  IconButton,
 } from '@/shared/ui'
 
 interface ChatRoomActionsMenuProps {
@@ -66,13 +67,9 @@ const ChatRoomActionsMenu = ({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button
-            type="button"
-            aria-label={`${counterpartName} 채팅방 더보기`}
-            className="-m-2 flex size-10 shrink-0 items-center justify-center text-neutral-850 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
-          >
+          <IconButton edge="both" aria-label={`${counterpartName} 채팅방 더보기`}>
             <MoreVertIcon className="size-6" />
-          </button>
+          </IconButton>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem onSelect={() => openBlockDialog('block')}>사용자 차단</DropdownMenuItem>
@@ -121,11 +118,11 @@ const ChatRoomActionsMenu = ({
         direction="row"
         actions={
           changeBlock.isSuccess
-            ? [{ label: '확인', variant: 'fill', onClick: closeBlockDialog }]
+            ? [{ label: '확인', intent: 'primary', onClick: closeBlockDialog }]
             : [
                 {
                   label: '취소',
-                  variant: 'outline',
+                  intent: 'secondary',
                   onClick: closeBlockDialog,
                   disabled: changeBlock.isPending,
                 },
@@ -135,7 +132,7 @@ const ChatRoomActionsMenu = ({
                     : blockAction === 'block'
                       ? '차단'
                       : '차단 해제',
-                  variant: 'fill',
+                  intent: 'primary',
                   disabled: changeBlock.isPending,
                   onClick: () => {
                     if (changeBlock.isPending || !blockAction) return
@@ -162,16 +159,15 @@ const ChatRoomActionsMenu = ({
         actions={[
           {
             label: '취소',
-            variant: 'outline',
+            intent: 'secondary',
             onClick: () => handleOpenChange(false),
             disabled: closeRoom.isPending,
           },
           {
             label: closeRoom.isPending ? '나가는 중' : '나가기',
-            variant: 'fill',
+            intent: 'danger',
             onClick: handleConfirm,
             disabled: closeRoom.isPending,
-            className: 'bg-error-500 text-white hover:bg-error-600 active:bg-error-600',
           },
         ]}
       />

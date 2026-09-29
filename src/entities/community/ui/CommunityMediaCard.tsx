@@ -49,7 +49,7 @@ const CommunityMediaCard = ({
       onClick={onClick}
       aria-label={`${alt} 게시글 보기`}
       className={cn(
-        'group relative block shrink-0 overflow-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500',
+        'group relative block shrink-0 overflow-hidden focus-ring',
         isProfileGrid
           ? 'aspect-square w-full bg-neutral-700 pc:rounded-lg pc:border pc:border-neutral-300'
           : 'size-[7.625rem] rounded-lg border border-neutral-300 bg-point-50 card-interactive transition-shadow duration-200 tab:aspect-square tab:size-auto tab:w-full',

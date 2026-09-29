@@ -75,7 +75,7 @@ const UserHomeRouter = ({ userId }: UserHomeRouterProps) => {
         status="error"
         message="프로필을 불러오지 못했습니다."
         action={
-          <Button variant="fill" size="sm" onClick={() => void adopterProfileQuery.refetch()}>
+          <Button intent="dark" size="sm" onClick={() => void adopterProfileQuery.refetch()}>
             다시 시도
           </Button>
         }

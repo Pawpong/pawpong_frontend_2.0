@@ -9,7 +9,7 @@ import { NotificationListItem, notificationQueries } from '@/entities/notificati
 import { uniqueBy } from '@/shared/lib/uniqueBy'
 import { useMarkAsRead, useMarkAllAsRead } from '@/features/notification'
 import type { NotificationResponseDto } from '@/shared/types'
-import { Button, EmptyState } from '@/shared/ui'
+import { Button, EmptyState, ActionSheetItem } from '@/shared/ui'
 
 // Figma icon/ bell (1596:77455 세트, 1596:97271) — nav 아이콘과 같은 픽셀 글리프라 currentColor 로 그린다.
 // Figma 원본은 속이 찬 실루엣 하나뿐이라, nav 아이콘들처럼 비활성은 외곽선만 남기고
@@ -85,7 +85,7 @@ const NotificationBell = ({ className }: { className?: string }) => {
         aria-expanded={open}
         className={cn(
           // 헤더 nav 항목(NavBar)과 동일한 톤·아이콘 크기·간격을 쓴다
-          'flex items-center rounded pr-1 text-sm leading-[1.5] font-medium whitespace-nowrap text-primary-500 transition-colors hover:text-primary-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500',
+          'flex items-center rounded pr-1 text-sm leading-[1.5] font-medium whitespace-nowrap text-primary-500 focus-ring transition-colors hover:text-primary-700',
           open && 'font-semibold',
         )}
       >
@@ -113,11 +113,7 @@ const NotificationBell = ({ className }: { className?: string }) => {
           <div className="flex items-center justify-between border-b border-neutral-150 bg-primary-50/60 px-4 py-3">
             <span className="text-base font-semibold text-neutral-850">알림</span>
             {unreadCount > 0 && (
-              <Button
-                variant="text"
-                onClick={() => markAllAsRead()}
-                className="h-7 px-2 text-xs text-primary-600 hover:bg-white"
-              >
+              <Button intent="link" onClick={() => markAllAsRead()} size="inline">
                 모두 읽기
               </Button>
             )}
@@ -143,30 +139,26 @@ const NotificationBell = ({ className }: { className?: string }) => {
                   />
                 ))}
                 {hasNextPage && (
-                  <button
-                    type="button"
-                    onClick={() => fetchNextPage()}
-                    disabled={isFetchingNextPage}
-                    className="py-3 text-center text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 disabled:opacity-50"
-                  >
+                  <ActionSheetItem onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
                     {isFetchingNextPage ? '불러오는 중...' : '더 보기'}
-                  </button>
+                  </ActionSheetItem>
                 )}
               </div>
             )}
           </div>
 
           <div className="border-t border-neutral-150 p-2">
-            <button
-              type="button"
+            <Button
+              intent="link"
+              size="sm"
+              width="full"
               onClick={() => {
                 setOpen(false)
                 router.push('/notifications')
               }}
-              className="flex h-9 w-full items-center justify-center rounded-lg text-sm font-semibold text-primary-600 transition-colors hover:bg-primary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
             >
               알림 전체 보기
-            </button>
+            </Button>
           </div>
         </div>
       )}

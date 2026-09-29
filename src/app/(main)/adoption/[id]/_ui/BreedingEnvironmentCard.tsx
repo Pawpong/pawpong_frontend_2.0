@@ -29,7 +29,10 @@ const EnvImageButton = ({
   <button
     type="button"
     onClick={onClick}
-    className={cn('relative shrink-0 overflow-hidden rounded-[0.5rem] bg-[#c6c6c6]', className)}
+    className={cn(
+      'relative shrink-0 overflow-hidden rounded-[0.5rem] bg-[#c6c6c6] focus-ring-inset',
+      className,
+    )}
   >
     <Image
       src={src}

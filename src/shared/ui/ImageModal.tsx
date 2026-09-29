@@ -57,7 +57,7 @@ const ImageModal = ({
                 aria-label={`${index + 1}번째 이미지`}
                 onClick={() => setCurrentIndex(index)}
                 className={cn(
-                  'relative size-12 shrink-0 overflow-hidden rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500',
+                  'relative size-12 shrink-0 overflow-hidden rounded-lg focus-ring',
                   index === currentIndex
                     ? 'ring-2 ring-primary-500 ring-offset-2'
                     : 'opacity-60 hover:opacity-100',
@@ -71,8 +71,8 @@ const ImageModal = ({
           <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
             {onDelete && (
               <Button
-                variant="ghost"
-                className="h-10 px-4 text-body-md text-error-500 hover:text-error-600"
+                size="md"
+                intent="danger"
                 onClick={() => {
                   onDelete(currentIndex)
                   onOpenChange(false)
@@ -83,8 +83,7 @@ const ImageModal = ({
             )}
             {onSetRepresentative && (
               <Button
-                variant="primary"
-                className="h-10 px-5 text-body-md"
+                size="md"
                 disabled={representativeIndex === currentIndex}
                 onClick={() => {
                   onSetRepresentative(currentIndex)

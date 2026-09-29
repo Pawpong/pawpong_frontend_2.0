@@ -100,20 +100,22 @@ const ImageDetailModal = ({
           {(voteCount !== undefined || showVoteStatus) && (
             <div className="flex flex-col gap-3 tab:flex-row tab:items-center tab:justify-between">
               {voteCount !== undefined && (
-                <Button
-                  variant={onVote ? 'primary' : 'outline'}
-                  size="lg"
-                  onClick={() => onVote?.(currentIndex)}
-                  disabled={!onVote || !images.length}
-                  aria-label={
-                    onVote ? `사진에 투표하기, 현재 ${voteCount}표` : `현재 ${voteCount}표`
-                  }
-                  className="w-full gap-2 px-6 text-body-lg disabled:cursor-default disabled:opacity-100 tab:w-64"
-                >
-                  <VoteIcon className="size-6" />
-                  {onVote ? '투표하기' : '받은 투표'}
-                  <span className="text-body-md font-medium">{voteCount}표</span>
-                </Button>
+                <div className="flex w-full tab:w-64">
+                  <Button
+                    intent={onVote ? 'primary' : 'secondary'}
+                    size="lg"
+                    onClick={() => onVote?.(currentIndex)}
+                    disabled={!onVote || !images.length}
+                    aria-label={
+                      onVote ? `사진에 투표하기, 현재 ${voteCount}표` : `현재 ${voteCount}표`
+                    }
+                    width="full"
+                  >
+                    <VoteIcon className="size-6" />
+                    {onVote ? '투표하기' : '받은 투표'}
+                    <span className="text-body-md font-medium">{voteCount}표</span>
+                  </Button>
+                </div>
               )}
               {showVoteStatus && (
                 <p role="status" className="text-body-md font-medium text-primary-500">

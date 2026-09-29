@@ -36,24 +36,23 @@ const PostFormCTA = ({
   placement === 'inline' ? (
     <div className="flex flex-wrap gap-3">
       {onSaveDraft && (
-        <Button
-          variant="outline"
-          size="lg"
-          onClick={onSaveDraft}
-          disabled={!isSaveDraftValid || isSubmitting}
-          className="min-w-28 flex-1 focus-visible:outline-2 focus-visible:outline-primary-500"
-        >
-          임시저장
-        </Button>
+        <div className="min-w-28 flex-1">
+          <Button
+            intent="secondary"
+            size="lg"
+            onClick={onSaveDraft}
+            disabled={!isSaveDraftValid || isSubmitting}
+            width="full"
+          >
+            임시저장
+          </Button>
+        </div>
       )}
-      <Button
-        size="lg"
-        onClick={onSubmit}
-        disabled={!isValid || isSubmitting}
-        className="min-w-36 flex-[2] focus-visible:outline-2 focus-visible:outline-primary-500"
-      >
-        {isSubmitting ? '저장 중…' : submitLabel}
-      </Button>
+      <div className="min-w-36 flex-[2]">
+        <Button size="lg" onClick={onSubmit} disabled={!isValid || isSubmitting} width="full">
+          {isSubmitting ? '저장 중…' : submitLabel}
+        </Button>
+      </div>
     </div>
   ) : (
     <FooterCtaBar

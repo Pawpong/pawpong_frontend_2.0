@@ -38,7 +38,7 @@ const NavBar = ({ className }: NavBarProps) => {
           href={href}
           onClick={(e) => handleLinkClick(e, href)}
           className={cn(
-            'flex items-center rounded pr-1 text-sm leading-[1.5] font-medium whitespace-nowrap text-primary-500 transition-colors hover:text-primary-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500',
+            'flex items-center rounded pr-1 text-sm leading-[1.5] font-medium whitespace-nowrap text-primary-500 focus-ring transition-colors hover:text-primary-700',
             // 활성: point-500 배경 칩 + semibold, 글자색은 primary-500 유지 (Figma 4042:722106)
             isActive(pathname) && 'bg-point-500 font-semibold',
           )}

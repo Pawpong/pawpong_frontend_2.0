@@ -193,10 +193,10 @@ const ChatMessageInput = ({ onSend, disabled }: ChatMessageInputProps) => {
             <span className="min-w-0 flex-1 truncate">
               {pendingAttachment.name} · {isSending ? '전송 확인 중' : '전송 대기'}
             </span>
-            <button
-              type="button"
+            <Button
+              intent="link"
+              size="inline"
               disabled={isDisabled}
-              className="shrink-0 font-semibold text-primary-600 underline disabled:opacity-50"
               onClick={async () => {
                 if (
                   await send(
@@ -209,15 +209,15 @@ const ChatMessageInput = ({ onSend, disabled }: ChatMessageInputProps) => {
               }}
             >
               다시 보내기
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
+              intent="ghost"
+              size="inline"
               disabled={isSending}
-              className="shrink-0 font-semibold text-neutral-600 underline"
               onClick={() => setPendingAttachment(null)}
             >
               닫기
-            </button>
+            </Button>
           </div>
         )}
         <div className="flex items-center gap-2">
@@ -245,16 +245,17 @@ const ChatMessageInput = ({ onSend, disabled }: ChatMessageInputProps) => {
               aria-label="메시지"
               className="h-full min-w-0 flex-1 bg-transparent text-body-lg font-medium text-neutral-850 outline-none placeholder:text-neutral-500 disabled:cursor-not-allowed"
             />
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={handleSubmit}
-              disabled={isDisabled || !value.trim()}
-              aria-busy={isSending}
-              className="h-10 min-w-14 shrink-0 px-3 whitespace-nowrap pc:h-11"
-            >
-              {isSending ? '확인 중' : '보내기'}
-            </Button>
+            <div className="flex min-w-14">
+              <Button
+                size="md"
+                onClick={handleSubmit}
+                disabled={isDisabled || !value.trim()}
+                aria-busy={isSending}
+                width="full"
+              >
+                {isSending ? '확인 중' : '보내기'}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -283,13 +284,13 @@ const ChatMessageInput = ({ onSend, disabled }: ChatMessageInputProps) => {
         actions={[
           {
             label: '취소',
-            variant: 'outline',
+            intent: 'secondary',
             disabled: isLocating,
             onClick: () => setLocationModalOpen(false),
           },
           {
             label: isLocating ? '위치 확인 중' : '위치 공유',
-            variant: 'fill',
+            intent: 'primary',
             disabled: isLocating,
             onClick: handleLocationShare,
           },

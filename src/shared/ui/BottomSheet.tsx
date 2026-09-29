@@ -4,6 +4,8 @@ import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { CloseIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { Dialog, DialogOverlay, DialogPortal } from './Dialog'
+import { ActionSheetItem } from './ActionSheetItem'
+import { IconButton } from './IconButton'
 
 /* 공통 바텀시트 (Figma 2147-196483)
    - 하단에서 올라오는 액션 시트. 주로 모바일·탭에서 사용
@@ -29,9 +31,6 @@ interface BottomSheetProps {
 }
 
 // 시트 안 액션 텍스트 버튼 — 라벨/동작만 가변
-const sheetItemClass =
-  'flex w-full items-center justify-center px-2.5 py-4 text-base leading-[1.5] font-semibold text-neutral-850 transition-colors hover:bg-neutral-100 active:bg-neutral-150'
-
 const BottomSheet = ({
   open,
   onOpenChange,
@@ -55,33 +54,29 @@ const BottomSheet = ({
           <DialogPrimitive.Title className="flex-1 text-base leading-[1.5] font-semibold text-neutral-850">
             {title}
           </DialogPrimitive.Title>
-          <DialogPrimitive.Close
-            aria-label="닫기"
-            className="flex size-6 items-center justify-center text-neutral-850"
-          >
-            <CloseIcon className="size-[1.125rem]" />
+          <DialogPrimitive.Close asChild>
+            <IconButton size="xs" aria-label="닫기">
+              <CloseIcon className="size-[1.125rem]" />
+            </IconButton>
           </DialogPrimitive.Close>
         </div>
 
         {/* 본문: 묶음 액션 박스 + 취소 박스 */}
         <div className="flex flex-col gap-3 px-4 py-3">
           <div className="flex flex-col overflow-hidden rounded-lg bg-neutral-50">
-            {actions.map((action, index) => (
-              <button
-                key={action.label}
-                type="button"
-                onClick={action.onClick}
-                className={cn(sheetItemClass, index > 0 && 'border-t border-neutral-150')}
-              >
+            {actions.map((action) => (
+              <ActionSheetItem key={action.label} onClick={action.onClick}>
                 {action.label}
-              </button>
+              </ActionSheetItem>
             ))}
           </div>
 
           {cancelLabel && (
-            <DialogPrimitive.Close className={cn(sheetItemClass, 'rounded-lg bg-neutral-50')}>
-              {cancelLabel}
-            </DialogPrimitive.Close>
+            <div className="overflow-hidden rounded-lg bg-neutral-50">
+              <DialogPrimitive.Close asChild>
+                <ActionSheetItem>{cancelLabel}</ActionSheetItem>
+              </DialogPrimitive.Close>
+            </div>
           )}
         </div>
       </DialogPrimitive.Content>

@@ -21,7 +21,7 @@ const NoticeDetailContent = ({ noticeId }: { noticeId: string }) => {
               status="error"
               message="공지사항을 불러오지 못했습니다."
               action={
-                <Button variant="fill" size="sm" className="px-4" onClick={() => void refetch()}>
+                <Button intent="dark" size="sm" onClick={() => void refetch()}>
                   다시 시도
                 </Button>
               }

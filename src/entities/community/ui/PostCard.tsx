@@ -118,17 +118,7 @@ const PostCard = ({
           profileImageUrl={author.profileImageUrl}
           detailHref={detailHref}
           showMore={showMore}
-          action={
-            onDelete ? (
-              <OwnerActionsMenu
-                onEdit={onEdit}
-                onDelete={onDelete}
-                className="shrink-0 text-neutral-850"
-              />
-            ) : (
-              moreAction
-            )
-          }
+          action={onDelete ? <OwnerActionsMenu onEdit={onEdit} onDelete={onDelete} /> : moreAction}
           className="p-2 pc:px-0"
         />
       ) : (
@@ -140,15 +130,7 @@ const PostCard = ({
           ) : (
             profileCluster
           )}
-          {onDelete ? (
-            <OwnerActionsMenu
-              onEdit={onEdit}
-              onDelete={onDelete}
-              className="shrink-0 text-neutral-850"
-            />
-          ) : (
-            moreAction
-          )}
+          {onDelete ? <OwnerActionsMenu onEdit={onEdit} onDelete={onDelete} /> : moreAction}
         </div>
       )}
 

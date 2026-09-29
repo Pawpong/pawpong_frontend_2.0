@@ -109,23 +109,11 @@ const CommunityFeedCard = ({
             </span>
           </div>
         </Link>
-        {onDelete ? (
-          <OwnerActionsMenu
-            onEdit={onEdit}
-            onDelete={onDelete}
-            className="shrink-0 text-neutral-850"
-          />
-        ) : (
-          moreAction
-        )}
+        {onDelete ? <OwnerActionsMenu onEdit={onEdit} onDelete={onDelete} /> : moreAction}
       </div>
 
       {wide && text && (
-        <Link
-          href={href}
-          prefetch={false}
-          className="mb-4 block rounded focus-visible:outline-2 focus-visible:outline-primary-500"
-        >
+        <Link href={href} prefetch={false} className="mb-4 block rounded focus-ring">
           <p className="line-clamp-4 text-[0.9375rem] leading-7 font-normal whitespace-pre-line text-neutral-850">
             {text}
           </p>

@@ -53,10 +53,10 @@ export function NativePhotoPickerBridge() {
           : '카메라 권한 없이도 보관함의 사진은 선택할 수 있어요.'
       }
       actions={[
-        { label: '취소', variant: 'outline', onClick: () => setPicker(null) },
+        { label: '취소', intent: 'secondary', onClick: () => setPicker(null) },
         {
           label: '사진 선택',
-          variant: 'fill',
+          intent: 'primary',
           onClick: () => {
             const input = picker?.input
             setPicker(null)

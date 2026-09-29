@@ -37,7 +37,7 @@ const VisibilitySelect = ({ value, onChange, disabled }: VisibilitySelectProps) 
           type="button"
           aria-label="게시글 공개 범위"
           disabled={disabled}
-          className="flex h-[2.8125rem] w-full items-center justify-between rounded-lg border border-neutral-300 bg-white p-3 focus-visible:outline-2 focus-visible:outline-primary-500 disabled:opacity-50"
+          className="flex h-[2.8125rem] w-full items-center justify-between rounded-lg border border-neutral-300 bg-white p-3 focus-ring disabled:opacity-50"
         >
           <span className="flex-1 text-left text-sm leading-[1.5] font-medium whitespace-nowrap text-neutral-850">
             {activeLabel}

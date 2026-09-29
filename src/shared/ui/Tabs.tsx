@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import * as TabsPrimitive from '@radix-ui/react-tabs'
-import { tv, type VariantProps } from 'tailwind-variants'
+import { tv, type VariantProps } from '@/shared/lib/tv'
 import { cn } from '@/shared/lib/cn'
 import { cafe24Proup } from '@/shared/lib/fonts'
 

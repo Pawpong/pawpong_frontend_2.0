@@ -91,32 +91,29 @@ const FollowCounts = ({
   followingCount: number
   onClick: () => void
 }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className="flex items-center gap-1 text-sm leading-[1.5] font-medium whitespace-nowrap text-neutral-700 hover:text-neutral-850"
-  >
-    <span>팔로워</span>
+  <Button intent="ghost" size="inline" onClick={onClick}>
+    <span className="font-medium text-neutral-700">팔로워</span>
     <span className="font-semibold text-neutral-850">{followerCount}</span>
     <span aria-hidden className="px-0.5 text-neutral-300">
       ·
     </span>
-    <span>팔로잉</span>
+    <span className="font-medium text-neutral-700">팔로잉</span>
     <span className="font-semibold text-neutral-850">{followingCount}</span>
-  </button>
+  </Button>
 )
 
 /* ── mode별 하단 액션 (디자인: pill border 버튼) ── */
 
-// 프로필 편집·팔로우·메시지 공통 크기 — 모바일 32, PC 40
-// [refactored] flex-1 + min-w 로 두어 컨테이너가 폭을 정한다.
-// (strip 은 w-auto 라 min-w 만큼, sidebar 는 w-full 이라 컬럼을 채운다 — max-w 캡 두 개 제거)
-const ACTION_SIZE = 'h-8 flex-1 text-sm whitespace-nowrap pc:h-10 pc:min-w-30 pc:px-6 pc:text-base'
+// 프로필 편집·팔로우·메시지 공통 폭 — flex-1 + min-w 로 두어 컨테이너가 폭을 정한다.
+// (strip 은 w-auto 라 min-w 만큼, sidebar 는 w-full 이라 컬럼을 채운다)
+const ACTION_LAYOUT = 'flex min-w-0 flex-1 pc:min-w-30'
 
 const EditButton = () => (
-  <Link href="/profile/edit" className={cn(buttonVariants({ variant: 'outline' }), ACTION_SIZE)}>
-    프로필 편집
-  </Link>
+  <div className={ACTION_LAYOUT}>
+    <Link href="/profile/edit" className={buttonVariants({ intent: 'secondary', width: 'full' })}>
+      프로필 편집
+    </Link>
+  </div>
 )
 
 const MineActions = () => <EditButton />
@@ -133,22 +130,24 @@ const MessageButton = ({ targetId }: { targetId: string }) => {
 
   return (
     <>
-      <Button
-        variant="outline"
-        disabled={isPending}
-        onClick={guard(() =>
-          startChat(
-            { breederId: targetId },
-            {
-              onSuccess: (room) => router.push(`/chat?roomId=${room.roomId}`),
-              onError: () => setErrorOpen(true),
-            },
-          ),
-        )}
-        className={ACTION_SIZE}
-      >
-        메시지
-      </Button>
+      <div className={ACTION_LAYOUT}>
+        <Button
+          intent="secondary"
+          disabled={isPending}
+          onClick={guard(() =>
+            startChat(
+              { breederId: targetId },
+              {
+                onSuccess: (room) => router.push(`/chat?roomId=${room.roomId}`),
+                onError: () => setErrorOpen(true),
+              },
+            ),
+          )}
+          width="full"
+        >
+          메시지
+        </Button>
+      </div>
       <LoginPromptModal
         open={isPromptOpen}
         onOpenChange={setPromptOpen}
@@ -159,7 +158,7 @@ const MessageButton = ({ targetId }: { targetId: string }) => {
         onOpenChange={setErrorOpen}
         title="채팅방을 열지 못했어요"
         description="잠시 후 다시 시도해주세요."
-        actions={[{ label: '확인', variant: 'fill', onClick: () => setErrorOpen(false) }]}
+        actions={[{ label: '확인', intent: 'primary', onClick: () => setErrorOpen(false) }]}
       />
     </>
   )
@@ -179,14 +178,16 @@ const FollowActionButton = ({ targetId, isFollowing }: VisitorActionsProps) => {
   const isPending = follow.isPending || unfollow.isPending
 
   return (
-    <Button
-      variant={isFollowing ? 'outline' : 'primary'}
-      disabled={isPending}
-      onClick={() => (isFollowing ? unfollow : follow).mutate(targetId)}
-      className={ACTION_SIZE}
-    >
-      {isFollowing ? '팔로우 취소' : '팔로우'}
-    </Button>
+    <div className={ACTION_LAYOUT}>
+      <Button
+        intent={isFollowing ? 'secondary' : 'primary'}
+        disabled={isPending}
+        onClick={() => (isFollowing ? unfollow : follow).mutate(targetId)}
+        width="full"
+      >
+        {isFollowing ? '팔로우 취소' : '팔로우'}
+      </Button>
+    </div>
   )
 }
 
@@ -308,11 +309,13 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip' }: ProfileCardPr
             </div>
             {/* 위치 → 카운트 순으로 이름 아래에 각각 한 줄씩 (같은 줄에 묶지 않는다) */}
             {locationText && <LocationText location={locationText} />}
-            <FollowCounts
-              followerCount={profile.followerCount}
-              followingCount={profile.followingCount}
-              onClick={() => setFollowOpen(true)}
-            />
+            <div className="flex">
+              <FollowCounts
+                followerCount={profile.followerCount}
+                followingCount={profile.followingCount}
+                onClick={() => setFollowOpen(true)}
+              />
+            </div>
             {/* 스트립은 한 줄, 사이드바는 폭이 좁으니 세 줄까지 편다 */}
             <p
               className={cn(

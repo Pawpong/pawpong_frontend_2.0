@@ -2,9 +2,10 @@
 
 import { useRouter } from 'next/navigation'
 import { useCreateOrGetChatRoom } from '@/features/send-message'
-import { AlertMessage, Button } from '@/shared/ui'
+import { AlertMessage, Button, type ButtonVariantProps } from '@/shared/ui'
+import { tv } from '@/shared/lib/tv'
+import { BUTTON_WIDTH_CLASSES } from '@/shared/ui/Button'
 import { normalizeApiError } from '@/shared/api'
-import { cn } from '@/shared/lib/cn'
 
 interface ApplicationChatButtonProps {
   /** 대화 상대의 userId — 브리더 화면이면 입양자, 입양자 화면이면 브리더 */
@@ -14,8 +15,16 @@ interface ApplicationChatButtonProps {
   /** 신청서 없이 분양글에서 바로 문의할 때 연결할 분양 개체 id (채팅방 상단 펫 카드가 이 값을 쓴다) */
   petId?: string
   label?: string
-  className?: string
+  intent?: ButtonVariantProps['intent']
+  size?: ButtonVariantProps['size']
+  width?: ButtonVariantProps['width']
 }
+
+// width는 바깥 가로 레이아웃의 슬롯에 적용한다. 내부 버튼에는 flex-1을 넘기지 않는다.
+const chatSlot = tv({
+  base: 'flex min-w-0 flex-col gap-2',
+  variants: { width: BUTTON_WIDTH_CLASSES },
+})
 
 /**
  * 신청 상세·분양글 상세에서 바로 채팅으로 진입하는 버튼.
@@ -28,16 +37,19 @@ const ApplicationChatButton = ({
   applicationId,
   petId,
   label = '채팅하기',
-  className,
+  intent = 'secondary',
+  size = 'sm',
+  width = 'auto',
 }: ApplicationChatButtonProps) => {
   const router = useRouter()
   const { mutate: startChat, isPending, isError, error } = useCreateOrGetChatRoom()
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className={chatSlot({ width })}>
       <Button
-        variant="outline"
-        size="sm"
+        width="full"
+        intent={intent}
+        size={size}
         disabled={isPending}
         onClick={() =>
           startChat(
@@ -45,7 +57,6 @@ const ApplicationChatButton = ({
             { onSuccess: (room) => router.push(`/chat?roomId=${room.roomId}`) },
           )
         }
-        className={cn('gap-1.5 px-4', className)}
       >
         {label}
       </Button>

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { PixelArrowRightIcon } from '@/shared/assets'
-import { Container, RepresentativePhoto } from '@/shared/ui'
+import { Container, RepresentativePhoto, Button } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 
 interface BreederIntroductionProps {
@@ -59,7 +59,7 @@ const BreederIntroduction = ({
               {editHref && (
                 <Link
                   href={editHref}
-                  className="shrink-0 rounded text-xs font-semibold text-primary-500 hover:text-primary-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+                  className="shrink-0 rounded text-xs font-semibold text-primary-500 focus-ring hover:text-primary-700"
                 >
                   수정
                 </Link>
@@ -96,17 +96,19 @@ const BreederIntroduction = ({
                 {/* 줄 수를 세지 않고 문단 길이로 판단 — 짧은 소개엔 버튼이 안 뜬다 */}
                 {(description?.split('\n').length ?? 0) > CLAMP_LINES ||
                 (description?.length ?? 0) > 160 ? (
-                  <button
-                    type="button"
-                    onClick={() => setExpanded((prev) => !prev)}
-                    aria-expanded={expanded}
-                    className="mt-2 flex items-center gap-1 rounded text-xs font-semibold text-primary-500 hover:text-primary-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
-                  >
-                    {expanded ? '접기' : '더 보기'}
-                    <PixelArrowRightIcon
-                      className={cn('size-4 transition-transform', expanded && 'rotate-90')}
-                    />
-                  </button>
+                  <div className="mt-2 flex">
+                    <Button
+                      intent="link"
+                      size="inline"
+                      onClick={() => setExpanded((prev) => !prev)}
+                      aria-expanded={expanded}
+                    >
+                      {expanded ? '접기' : '더 보기'}
+                      <PixelArrowRightIcon
+                        className={cn('size-4 transition-transform', expanded && 'rotate-90')}
+                      />
+                    </Button>
+                  </div>
                 ) : null}
               </>
             ) : (

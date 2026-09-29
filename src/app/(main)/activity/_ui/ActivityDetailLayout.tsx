@@ -37,7 +37,7 @@ export const ActivityDetailLayout = ({
           status="error"
           message="상세 내용을 불러오지 못했습니다."
           action={
-            <Button variant="fill" size="sm" className="px-4" onClick={onRetry}>
+            <Button intent="dark" size="sm" onClick={onRetry}>
               다시 시도
             </Button>
           }
@@ -46,7 +46,7 @@ export const ActivityDetailLayout = ({
       {isError && hasData && (
         <div className="mb-6 flex flex-wrap items-center gap-3">
           <AlertMessage status="error" message="최신 정보를 불러오지 못했어요." />
-          <Button variant="outline" size="sm" className="px-4" onClick={onRetry}>
+          <Button intent="secondary" size="sm" onClick={onRetry}>
             다시 시도
           </Button>
         </div>

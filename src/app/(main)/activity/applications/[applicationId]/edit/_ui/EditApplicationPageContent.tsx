@@ -25,7 +25,7 @@ const EditApplicationPageContent = ({ applicationId }: { applicationId: string }
         status="error"
         message="신청서를 불러오지 못했습니다."
         action={
-          <Button variant="fill" size="sm" onClick={() => void refetch()}>
+          <Button intent="dark" size="sm" onClick={() => void refetch()}>
             다시 시도
           </Button>
         }
@@ -43,7 +43,7 @@ const EditApplicationPageContent = ({ applicationId }: { applicationId: string }
         action={
           <Link
             href={`/activity/applications/${applicationId}`}
-            className={buttonVariants({ variant: 'fill', size: 'sm' })}
+            className={buttonVariants({ intent: 'dark', size: 'sm' })}
           >
             신청 상세로 돌아가기
           </Link>

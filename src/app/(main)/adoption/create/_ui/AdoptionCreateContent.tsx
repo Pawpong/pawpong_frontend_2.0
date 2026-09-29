@@ -63,10 +63,10 @@ const AdoptionCreateContent = () => {
             </p>
             {isDraftLoadError && (
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={handleCloseClick} className="px-4">
+                <Button intent="secondary" size="sm" onClick={handleCloseClick}>
                   목록으로
                 </Button>
-                <Button variant="fill" size="sm" onClick={() => void retryDraft()} className="px-4">
+                <Button intent="dark" size="sm" onClick={() => void retryDraft()}>
                   다시 시도
                 </Button>
               </div>
@@ -174,11 +174,11 @@ const AdoptionCreateContent = () => {
               {/* 사이드바가 좁아 한 줄에 하나씩 둔다 */}
               <div className="flex flex-col gap-3">
                 <Button
-                  variant="outline"
+                  intent="secondary"
                   size="lg"
                   onClick={handleSaveDraft}
                   disabled={isBusy}
-                  className="w-full"
+                  width="full"
                 >
                   임시저장
                 </Button>
@@ -186,7 +186,7 @@ const AdoptionCreateContent = () => {
                   size="lg"
                   onClick={handleUpload}
                   disabled={!canSubmit || isBusy}
-                  className="w-full"
+                  width="full"
                 >
                   {submitLabel}
                 </Button>
@@ -221,19 +221,19 @@ const AdoptionCreateContent = () => {
         actions={[
           {
             label: '임시저장',
-            variant: 'fill',
+            intent: 'primary',
             onClick: handleSaveDraft,
             disabled: isSavingDraft || isSubmitting,
           },
           {
             label: '분양글 작성 그만하기',
-            variant: 'outline',
+            intent: 'secondary',
             onClick: handleExitConfirm,
             disabled: isSavingDraft || isSubmitting,
           },
           {
             label: '닫기',
-            variant: 'ghost',
+            intent: 'ghost',
             onClick: cancelExit,
             disabled: isSavingDraft || isSubmitting,
           },

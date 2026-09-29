@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { cn } from '@/shared/lib/cn'
 import { useBreakpoint } from '@/shared/lib/useBreakpoint'
 import { SearchIcon } from './SearchIcon'
+import { IconButton } from './IconButton'
 
 interface SearchBarProps {
   placeholder?: {
@@ -71,17 +72,14 @@ export const SearchBar = ({
         placeholder={isTablet ? resolvedPlaceholder.desktop : resolvedPlaceholder.mobile}
         className="min-w-0 flex-1 bg-transparent text-base leading-[1.5] font-medium text-neutral-850 outline-none placeholder:text-neutral-500"
       />
-      <button
+      <IconButton
+        tone="muted"
         type="submit"
         aria-label="검색"
         //QA: 검색 아이콘 상태 — 평소에는 회색, 포커스 시 브랜드 색으로 함께 바뀐다.
-        className={cn(
-          'flex size-10 shrink-0 items-center justify-center rounded-full text-neutral-700 pc:size-11',
-          'transition-colors group-focus-within:text-primary-500 hover:bg-primary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500',
-        )}
       >
         <SearchIcon className="size-7 pc:size-8" />
-      </button>
+      </IconButton>
     </form>
   )
 }
