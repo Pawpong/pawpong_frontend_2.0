@@ -9,7 +9,7 @@ import Link from 'next/link'
 import { takePendingCommunityPhoto } from '@/features/ai-image'
 import { useSubmitCommunityPostForm } from '@/features/community'
 import { useExitGuard } from '@/shared/lib/useExitGuard'
-import { Button, Container, CtaModal, FilterChip, NavigationBar } from '@/shared/ui'
+import { Button, Container, CtaModal, Chip, NavigationBar } from '@/shared/ui'
 import {
   usePostForm,
   PostFormLayout,
@@ -120,7 +120,7 @@ const PostForm = ({ postId, post }: PostFormProps) => {
           <div className="flex flex-col gap-4">
             <Link
               href="/ai-filter"
-              className="flex items-center justify-between gap-3 rounded-xl border border-primary-200 bg-point-50 p-4 transition-colors hover:bg-point-100 focus-visible:outline-2 focus-visible:outline-primary-500"
+              className="flex items-center justify-between gap-3 rounded-xl border border-primary-200 bg-point-50 p-4 focus-ring transition-colors hover:bg-point-100"
             >
               <span>
                 <span className="block text-sm font-bold text-primary-700">
@@ -138,13 +138,13 @@ const PostForm = ({ postId, post }: PostFormProps) => {
               <h3 className="mb-3 text-sm font-semibold">어떤 아이 이야기인가요?</h3>
               <div className="flex flex-wrap gap-2">
                 {PET_TYPE_OPTIONS.map((option) => (
-                  <FilterChip
+                  <Chip
                     key={option.value}
                     selected={petType === option.value}
                     onClick={() => setPetType(petType === option.value ? '' : option.value)}
                   >
                     {option.label}
-                  </FilterChip>
+                  </Chip>
                 ))}
               </div>
             </div>
@@ -179,7 +179,7 @@ const PostForm = ({ postId, post }: PostFormProps) => {
             ? [
                 {
                   label: '임시저장',
-                  variant: 'fill' as const,
+                  intent: 'primary' as const,
                   onClick: handleSaveDraft,
                   disabled: !canSaveDraft || isSubmitting,
                 },
@@ -187,11 +187,11 @@ const PostForm = ({ postId, post }: PostFormProps) => {
             : []),
           {
             label: isEdit ? '수정 그만하기' : '게시글 작성 그만하기',
-            variant: 'outline',
+            intent: 'secondary',
             onClick: handleExitConfirm,
             disabled: isSubmitting,
           },
-          { label: '닫기', variant: 'ghost', onClick: cancelExit, disabled: isSubmitting },
+          { label: '닫기', intent: 'ghost', onClick: cancelExit, disabled: isSubmitting },
         ]}
       />
     </>
@@ -250,13 +250,12 @@ const CommunityPostEditor = ({ postId }: CommunityPostEditorProps) => {
           <div role="alert" className="flex flex-col items-center gap-3 text-center">
             <p className="text-sm font-medium text-neutral-700">게시글을 불러오지 못했습니다.</p>
             <Button
-              variant="fill"
+              intent="dark"
               size="sm"
               onClick={() => {
                 void postQuery.refetch()
                 void meQuery.refetch()
               }}
-              className="px-4"
             >
               다시 시도
             </Button>

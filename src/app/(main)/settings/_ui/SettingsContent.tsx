@@ -61,7 +61,7 @@ const LEAVE_DESCRIPTION = (
 const SettingsLinkRow = ({ href, label, description }: SettingsLink) => (
   <Link
     href={href}
-    className="group flex min-h-18 items-center justify-between gap-4 px-4 py-3 transition-colors hover:bg-primary-50/60 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-500 tab:px-5"
+    className="group flex min-h-18 items-center justify-between gap-4 px-4 py-3 focus-ring-inset transition-colors hover:bg-primary-50/60 tab:px-5"
   >
     <span className="flex min-w-0 flex-col gap-0.5">
       <span className="text-sm font-semibold text-neutral-850 tab:text-base">{label}</span>
@@ -125,7 +125,7 @@ const SettingsContent = ({ userRole }: SettingsContentProps) => {
               type="button"
               onClick={logoutAndRedirect}
               disabled={isPending}
-              className="flex min-h-18 w-full flex-col items-start justify-center gap-0.5 px-4 py-3 text-left transition-colors hover:bg-error-50/40 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-500 disabled:cursor-not-allowed disabled:opacity-50 tab:px-5"
+              className="flex min-h-18 w-full flex-col items-start justify-center gap-0.5 px-4 py-3 text-left focus-ring-inset transition-colors hover:bg-error-50/40 disabled:cursor-not-allowed disabled:opacity-50 tab:px-5"
             >
               <span className="text-sm font-semibold text-error-600 tab:text-base">
                 {isPending ? '로그아웃하는 중' : '로그아웃'}
@@ -139,7 +139,7 @@ const SettingsContent = ({ userRole }: SettingsContentProps) => {
                 type="button"
                 onClick={() => setShowLeave(true)}
                 disabled={isLeavePending}
-                className="flex min-h-18 w-full flex-col items-start justify-center gap-0.5 px-4 py-3 text-left transition-colors hover:bg-error-50/40 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-500 disabled:cursor-not-allowed disabled:opacity-50 tab:px-5"
+                className="flex min-h-18 w-full flex-col items-start justify-center gap-0.5 px-4 py-3 text-left focus-ring-inset transition-colors hover:bg-error-50/40 disabled:cursor-not-allowed disabled:opacity-50 tab:px-5"
               >
                 <span className="text-sm font-semibold text-error-600 tab:text-base">탈퇴</span>
                 <span className="text-xs leading-[1.5] font-medium text-neutral-500 tab:text-sm">
@@ -180,8 +180,8 @@ const SettingsContent = ({ userRole }: SettingsContentProps) => {
         title="포퐁을 떠나실 건가요?"
         description={LEAVE_DESCRIPTION}
         actions={[
-          { label: '계정 탈퇴', variant: 'outline', onClick: handleLeave },
-          { label: '다시 생각해볼게요', variant: 'fill', onClick: () => setShowLeave(false) },
+          { label: '계정 탈퇴', intent: 'secondary', onClick: handleLeave },
+          { label: '다시 생각해볼게요', intent: 'primary', onClick: () => setShowLeave(false) },
         ]}
       />
     </div>

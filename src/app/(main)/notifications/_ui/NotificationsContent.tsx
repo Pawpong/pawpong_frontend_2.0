@@ -77,19 +77,15 @@ const NotificationsContent = () => {
               </p>
             </div>
             {unreadCountQuery.isError ? (
-              <Button
-                variant="text"
-                onClick={() => void unreadCountQuery.refetch()}
-                className="h-8 shrink-0 px-3 text-xs text-primary-600 hover:bg-white tab:text-sm"
-              >
+              <Button intent="link" onClick={() => void unreadCountQuery.refetch()} size="sm">
                 다시 시도
               </Button>
             ) : unreadCount > 0 ? (
               <Button
-                variant="text"
+                intent="link"
                 onClick={() => markAllAsRead()}
                 disabled={isMarkingAll}
-                className="h-8 shrink-0 px-3 text-xs text-primary-600 hover:bg-white tab:text-sm"
+                size="sm"
               >
                 모두 읽기
               </Button>
@@ -104,7 +100,7 @@ const NotificationsContent = () => {
             errorText="알림을 불러오지 못했습니다."
             emptyText="아직 도착한 알림이 없습니다."
             errorAction={
-              <Button variant="fill" size="sm" onClick={() => void refetch()}>
+              <Button intent="dark" size="sm" onClick={() => void refetch()}>
                 다시 시도
               </Button>
             }

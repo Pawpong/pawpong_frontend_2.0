@@ -1,13 +1,14 @@
 'use client'
 
-import { tv } from 'tailwind-variants'
+import { tv } from '@/shared/lib/tv'
 import { cn } from '@/shared/lib/cn'
 import { SearchIcon } from './SearchIcon'
+import { IconButton } from './IconButton'
 
 // Figma 1652-72893 search-btn
 // default: 컴팩트 트리거(내용 너비, 회색) / active: 눌렀을 때 확장 입력(최대 300px, 파란 테두리)
 const pill = tv({
-  base: 'flex h-8 items-center gap-1 rounded-full border bg-white px-3 py-2 whitespace-nowrap',
+  base: 'focus-ring flex h-8 items-center gap-1 rounded-full border bg-white px-3 py-2 whitespace-nowrap',
   variants: {
     active: {
       false: 'w-auto justify-center border-neutral-500',
@@ -51,9 +52,9 @@ const SearchButton = ({
           placeholder="검색"
           className="min-w-0 flex-1 bg-transparent text-sm leading-[1.5] font-semibold text-neutral-850 outline-none placeholder:text-neutral-700"
         />
-        <button type="button" onClick={() => onSubmit?.()} aria-label="검색">
-          <SearchIcon className="size-5 shrink-0 text-neutral-700" />
-        </button>
+        <IconButton tone="muted" size="xs" onClick={() => onSubmit?.()} aria-label="검색">
+          <SearchIcon className="size-5" />
+        </IconButton>
       </div>
     )
   }

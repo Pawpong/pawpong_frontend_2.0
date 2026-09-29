@@ -5,8 +5,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import type { CommunityHallOfFameWinner } from '@/shared/types'
-import { PawPrintIcon } from '@/shared/assets'
-import { FavoriteHeart, ProfileAvatar } from '@/shared/ui'
+import { FavoriteIcon, PawPrintIcon } from '@/shared/assets'
+import { ProfileAvatar } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import 'swiper/css'
 
@@ -205,7 +205,11 @@ const PodiumCard = ({ winner, rank }: { winner?: CommunityHallOfFameWinner; rank
 
         {winner && (
           <span className="flex shrink-0 items-center gap-0.5 text-xs leading-[1.5] font-semibold text-neutral-600 pc:text-sm">
-            <FavoriteHeart isFavorite className="size-4 pc:size-5" aria-hidden="true" />
+            <FavoriteIcon
+              status="fill"
+              className="size-4 text-pressed-favorite pc:size-5"
+              aria-hidden="true"
+            />
             <span className="sr-only">좋아요</span>
             {winner.likeCount}
           </span>

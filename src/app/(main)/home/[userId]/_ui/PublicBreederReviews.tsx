@@ -76,7 +76,7 @@ const PublicBreederReviews = ({ breederId }: PublicBreederReviewsProps) => {
           errorText="후기를 불러오지 못했습니다."
           emptyText="아직 등록된 후기가 없습니다."
           errorAction={
-            <Button variant="fill" size="sm" onClick={() => void query.refetch()}>
+            <Button intent="dark" size="sm" onClick={() => void query.refetch()}>
               다시 시도
             </Button>
           }

@@ -40,13 +40,14 @@ const BreederCard = ({ breeder, showPopularBadge, preload = false }: BreederCard
 
           {/* 즐겨찾기 토글 — 프로필 카드와 같은 공용 버튼 (박스 mo 32 / pc 48, 글리프 24 / 40).
               이미지 위라 미등록 색만 흰색 60% 로 덮는다 */}
-          <FavoriteBreederIconButton
-            breederId={breeder.id}
-            isFavorited={!!breeder.isFavorited}
-            size="card"
-            iconClassName={breeder.isFavorited ? undefined : 'text-white/60'}
-            className="absolute right-2 bottom-1 tab:right-3 tab:bottom-2"
-          />
+          <span className="absolute right-2 bottom-1 flex tab:right-3 tab:bottom-2">
+            <FavoriteBreederIconButton
+              breederId={breeder.id}
+              isFavorited={!!breeder.isFavorited}
+              size="card"
+              iconClassName={breeder.isFavorited ? undefined : 'text-white/60'}
+            />
+          </span>
         </>
       }
     >

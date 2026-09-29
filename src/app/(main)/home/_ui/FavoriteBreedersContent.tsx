@@ -45,7 +45,7 @@ const FavoriteBreedersContent = ({
         errorText="즐겨찾는 브리더를 불러오지 못했습니다."
         emptyText="즐겨찾는 브리더가 없습니다."
         errorAction={
-          <Button variant="fill" size="sm" onClick={() => void refetch()} className="px-4">
+          <Button intent="dark" size="sm" onClick={() => void refetch()}>
             다시 시도
           </Button>
         }

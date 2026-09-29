@@ -14,6 +14,7 @@ import {
 } from './DropdownMenu'
 import { LoginPromptModal } from './LoginPromptModal'
 import { TextareaField } from './TextareaField'
+import { IconButton } from './IconButton'
 
 interface ReportActionProps<Reason extends string> {
   triggerVariant?: 'menu' | 'flag'
@@ -87,26 +88,21 @@ export const ReportAction = <Reason extends string>({
   return (
     <>
       {triggerVariant === 'flag' ? (
-        <button
-          type="button"
+        <IconButton
+          tone="brand"
           aria-label={`${targetLabel} 신고`}
           title="신고하기"
           aria-haspopup="dialog"
           onClick={() => (getAccessToken() ? changeOpen(true) : setLoginOpen(true))}
-          className="flex size-10 shrink-0 items-center justify-center rounded-lg text-primary-500 transition-colors hover:bg-primary-50 hover:text-primary-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
         >
           <ReportFlagIcon className="size-6" />
-        </button>
+        </IconButton>
       ) : (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button
-              type="button"
-              aria-label={`${targetLabel} 더보기`}
-              className="flex size-10 shrink-0 items-center justify-center rounded-lg text-neutral-850 hover:bg-neutral-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
-            >
+            <IconButton aria-label={`${targetLabel} 더보기`}>
               <MoreVertIcon className="size-6" />
-            </button>
+            </IconButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem
@@ -153,7 +149,7 @@ export const ReportAction = <Reason extends string>({
                         setReason(option.value)
                         setError(null)
                       }}
-                      className="size-5 shrink-0 appearance-none rounded-full border border-neutral-400 bg-white checked:border-primary-500 checked:bg-primary-500 checked:shadow-[inset_0_0_0_0.25rem_white] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+                      className="size-5 shrink-0 appearance-none rounded-full border border-neutral-400 bg-white focus-ring checked:border-primary-500 checked:bg-primary-500 checked:shadow-[inset_0_0_0_0.25rem_white]"
                     />
                     {option.label}
                   </label>
@@ -187,14 +183,15 @@ export const ReportAction = <Reason extends string>({
             )}
             <div className="flex gap-4 pt-1">
               <Button
-                variant="outline"
-                className="h-10 flex-1"
+                size="md"
+                intent="secondary"
+                width="fill"
                 disabled={pending}
                 onClick={() => changeOpen(false)}
               >
                 취소
               </Button>
-              <Button type="submit" variant="primary" className="h-10 flex-1" disabled={pending}>
+              <Button size="md" type="submit" width="fill" disabled={pending}>
                 {pending ? '접수 중' : '신고하기'}
               </Button>
             </div>
@@ -211,7 +208,7 @@ export const ReportAction = <Reason extends string>({
         onOpenChange={(next) => !next && setResult(null)}
         title="신고 접수 완료"
         description={result ?? undefined}
-        actions={[{ label: '확인', variant: 'fill', onClick: () => setResult(null) }]}
+        actions={[{ label: '확인', intent: 'primary', onClick: () => setResult(null) }]}
       />
     </>
   )

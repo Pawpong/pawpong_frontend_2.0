@@ -157,8 +157,11 @@ Use the breakpoints Figma specifies, identically in CSS and JS.
 
 ### Actions and Selection
 
-- `Button`: primary, outline, text, fill, ghost. Extend these variants first for any new CTA.
-- `FavoriteButton`, `FavoriteToggle`, `FollowButton`, `PostActionButton`: own the icon, label, and pending state of domain actions.
+- `Button`: owns intent, size, and width. `width="auto"` uses content width, `full` fills its parent, `fill` shares a **horizontal flex row**, and `responsive` fills mobile width then uses 192px from tablet. Never use `fill` in a vertical flex container.
+- `Button`, `IconButton`, `ToggleIconButton`, `Chip`, and `ActionSheetItem` reject caller `className` and `style` in their public types. `buttonVariants`, `iconButtonVariants`, and `chipVariants` only accept named component variants; do not concatenate classes onto their results. Max-width, fixed widths, margins, alignment, positioning, and visibility belong to parent layout slots.
+- `IconButton.edge` (`start`, `end`, `both`) aligns the glyph to a container edge without reducing the selected touch area (`md`: 40px). Social login uses Button intents `kakao`, `naver`, `google`, and `apple`; their brand colors are defined only inside Button.
+- `tests/button-contracts.typecheck.tsx` guards against reintroducing style overrides, including through prop spreads.
+- `ToggleIconButton` owns favorite/bookmark pressed states, icon sizes, labels, and counts; `FollowButton` maps follow state to shared Button variants. Domain wrappers use width props and keep pending/error behavior.
 - The adoption-interest action is exposed to a regular visitor in exactly one place: Mobile CTA, Tablet hero, or PC hero. It is not shown on the owner's own listing, and the server also blocks self-registration with 403 to protect popularity ranking signals.
 - `FilterChip`, `Badge`, `PixelTab`, `PixelSelectCard`: used for selection, categorization, and status display.
 - `Checkbox`, `Switch`, `Select`, `Dropdown`, `DropdownMenu`: own form selection and menus.

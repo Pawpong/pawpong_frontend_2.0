@@ -62,10 +62,10 @@ const AdoptionEditContent = ({ petId }: AdoptionEditContentProps) => {
             </p>
             {isLoadError && (
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={handleCloseClick} className="px-4">
+                <Button intent="secondary" size="sm" onClick={handleCloseClick}>
                   돌아가기
                 </Button>
-                <Button variant="fill" size="sm" onClick={() => void retry()} className="px-4">
+                <Button intent="dark" size="sm" onClick={() => void retry()}>
                   다시 시도
                 </Button>
               </div>
@@ -135,11 +135,11 @@ const AdoptionEditContent = ({ petId }: AdoptionEditContentProps) => {
         actions={[
           {
             label: '수정 그만하기',
-            variant: 'outline',
+            intent: 'secondary',
             onClick: handleExitConfirm,
             disabled: isSubmitting,
           },
-          { label: '계속 수정하기', variant: 'ghost', onClick: cancelExit, disabled: isSubmitting },
+          { label: '계속 수정하기', intent: 'ghost', onClick: cancelExit, disabled: isSubmitting },
         ]}
       />
     </div>

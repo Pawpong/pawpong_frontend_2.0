@@ -2,10 +2,10 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { PawPrintIcon } from '@/shared/assets'
+import { FavoriteIcon, PawPrintIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 
-import { FavoriteButton, FavoriteToggle, ListingStats, PopularBadge } from '@/shared/ui'
+import { ListingStats, PopularBadge, ToggleIconButton } from '@/shared/ui'
 import type { AdoptionListingCard } from '@/shared/types'
 import { GENDER_LABEL } from '@/shared/types'
 import { AdoptionStatusBadge } from './AdoptionStatusBadge'
@@ -105,12 +105,16 @@ const AdoptionCard = ({ listing, className, isFavorite, onToggle, preload }: Ado
             preload={preload}
             className="rounded-[0.25rem]"
           />
-          <FavoriteToggle
-            isFavorite={isFavorite}
-            onToggle={onToggle}
-            className="absolute right-0 bottom-0"
-            iconClassName="size-12"
-          />
+          <span className="absolute right-0 bottom-0 flex">
+            <ToggleIconButton
+              icon={FavoriteIcon}
+              hasFillState
+              size="lg"
+              aria-label="관심 등록"
+              pressed={isFavorite}
+              onClick={onToggle}
+            />
+          </span>
         </div>
 
         {/* 정보: p-8 — 상단(제목 2줄/입양가능 배지) · 하단(stats) (Figma 796-81620) */}
@@ -157,12 +161,13 @@ const AdoptionCard = ({ listing, className, isFavorite, onToggle, preload }: Ado
           {/* 우측: 상태배지(상단, 다크) + 관심있어요(하단, 하트+텍스트) */}
           <div className="flex shrink-0 flex-col items-end justify-between">
             <AdoptionStatusBadge status={listing.status} className="shrink-0" />
-            <FavoriteButton
+            <ToggleIconButton
+              icon={FavoriteIcon}
+              hasFillState
               size="md"
-              isFavorite={isFavorite}
-              onToggle={onToggle}
-              className="p-0 text-[0.75rem] font-semibold text-neutral-850"
-              iconClassName="size-8"
+              label="관심있어요"
+              pressed={isFavorite}
+              onClick={onToggle}
             />
           </div>
         </div>
@@ -231,7 +236,13 @@ const AdoptionCardHorizontal = ({
         {/* 문의/관심/조회 + 관심있어요 */}
         <div className="flex flex-col items-end">
           <CardStats listing={listing} size="sm" className="w-full justify-end" />
-          <FavoriteButton size="sm" isFavorite={isFavorite} onToggle={onToggle} />
+          <ToggleIconButton
+            icon={FavoriteIcon}
+            hasFillState
+            label="관심있어요"
+            pressed={isFavorite}
+            onClick={onToggle}
+          />
         </div>
       </div>
 

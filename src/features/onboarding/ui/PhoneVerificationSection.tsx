@@ -4,11 +4,10 @@ import { useEffect, useSyncExternalStore } from 'react'
 import { useWatch, type Control, type UseFormRegister, type UseFormSetValue } from 'react-hook-form'
 import { loadSocialSignupSession } from '@/shared/lib/socialSignupSession'
 import { cn } from '@/shared/lib/cn'
-import { Input, InputField, HelpMessage } from '@/shared/ui'
+import { Input, InputField, HelpMessage, Button } from '@/shared/ui'
 import type { ProfileFormData } from '../model/schema'
 import { usePhoneVerification } from '../model/usePhoneVerification'
 import { STEP_LAYOUT } from '../model/stepLayout'
-import { StepActionButton } from './StepInput'
 
 const subscribeToStaticSession = () => () => undefined
 
@@ -72,12 +71,17 @@ const PhoneVerificationSection = ({
             className="flex-1"
             disabled={verification.isVerified}
           />
-          <StepActionButton
-            onClick={() => verification.sendCode(phone)}
-            disabled={verification.isSending || verification.isVerified}
-          >
-            {verification.isSending ? '발송 중' : verification.isCodeSent ? '재전송' : '인증번호'}
-          </StepActionButton>
+          <div className="flex w-[6.25rem] shrink-0">
+            <Button
+              size="md"
+              intent="dark"
+              width="full"
+              onClick={() => verification.sendCode(phone)}
+              disabled={verification.isSending || verification.isVerified}
+            >
+              {verification.isSending ? '발송 중' : verification.isCodeSent ? '재전송' : '인증번호'}
+            </Button>
+          </div>
         </div>
         {verification.phoneMessage && (
           <HelpMessage
@@ -107,17 +111,22 @@ const PhoneVerificationSection = ({
               </span>
             )}
           </div>
-          <StepActionButton
-            onClick={() => verification.verifyCode(phone, verificationCode)}
-            disabled={
-              !verification.isCodeSent ||
-              verification.isExpired ||
-              verification.isVerified ||
-              verification.isVerifying
-            }
-          >
-            {verification.isVerified ? '완료' : verification.isVerifying ? '확인 중' : '확인'}
-          </StepActionButton>
+          <div className="flex w-[6.25rem] shrink-0">
+            <Button
+              size="md"
+              intent="dark"
+              width="full"
+              onClick={() => verification.verifyCode(phone, verificationCode)}
+              disabled={
+                !verification.isCodeSent ||
+                verification.isExpired ||
+                verification.isVerified ||
+                verification.isVerifying
+              }
+            >
+              {verification.isVerified ? '완료' : verification.isVerifying ? '확인 중' : '확인'}
+            </Button>
+          </div>
         </div>
         {verification.codeMessage && (
           <HelpMessage status={verification.codeMessage.status} className="mt-1">

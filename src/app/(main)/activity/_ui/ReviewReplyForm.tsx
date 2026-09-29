@@ -43,21 +43,10 @@ export const ReviewReplyForm = ({
       />
       {errorMessage && <AlertMessage status="error" size="responsive" message={errorMessage} />}
       <div className="flex justify-end gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          className="px-4"
-          onClick={onDone}
-          disabled={mutation.isPending}
-        >
+        <Button intent="secondary" size="sm" onClick={onDone} disabled={mutation.isPending}>
           취소
         </Button>
-        <Button
-          size="sm"
-          className="px-4"
-          disabled={!trimmed || mutation.isPending}
-          onClick={submit}
-        >
+        <Button size="sm" disabled={!trimmed || mutation.isPending} onClick={submit}>
           {mutation.isPending ? '저장하는 중' : '저장'}
         </Button>
       </div>

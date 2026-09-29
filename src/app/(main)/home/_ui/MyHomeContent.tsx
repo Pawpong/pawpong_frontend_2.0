@@ -5,9 +5,15 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { BookmarkIcon } from '@/shared/assets'
-import { Button, buttonVariants, Container, InputUpload, NavigationBar } from '@/shared/ui'
+import {
+  Button,
+  buttonVariants,
+  Container,
+  InputUpload,
+  NavigationBar,
+  iconButtonVariants,
+} from '@/shared/ui'
 import { transientQueryRecoveryOptions } from '@/shared/api'
-import { cn } from '@/shared/lib/cn'
 import { profileQueries } from '@/entities/profile'
 import { AiPhotoArchive } from '@/features/ai-image'
 import { communityQueries } from '@/entities/community'
@@ -74,12 +80,7 @@ const MyHomeContent = () => {
           ) : (
             <div role="alert" className="flex flex-col items-center gap-3 text-center">
               <p className="text-sm font-medium text-neutral-700">프로필을 불러오지 못했습니다.</p>
-              <Button
-                variant="fill"
-                size="sm"
-                onClick={() => void profileQuery.refetch()}
-                className="px-4"
-              >
+              <Button intent="dark" size="sm" onClick={() => void profileQuery.refetch()}>
                 다시 시도
               </Button>
             </div>
@@ -102,9 +103,9 @@ const MyHomeContent = () => {
             <Link
               href="/bookmarks"
               aria-label="저장목록"
-              className="-m-2 flex size-10 items-center justify-center rounded-lg transition-colors hover:bg-primary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+              className={iconButtonVariants({ edge: 'both' })}
             >
-              <BookmarkIcon className="size-6 text-neutral-700" />
+              <BookmarkIcon className="size-6" />
             </Link>
           }
         />
@@ -135,23 +136,14 @@ const MyHomeContent = () => {
                 pageSize={HOME_LISTING_PAGE_SIZE}
                 showTotalCount
                 action={
-                  <Link
-                    href="/adoption/create"
-                    className={cn(
-                      buttonVariants({ variant: 'primary', size: 'sm' }),
-                      'shrink-0 px-4',
-                    )}
-                  >
+                  <Link href="/adoption/create" className={buttonVariants()}>
                     분양글 작성하기
                   </Link>
                 }
                 secondaryAction={
                   <Link
                     href="/adoption/drafts"
-                    className={cn(
-                      buttonVariants({ variant: 'text' }),
-                      'text-neutral-700 hover:text-neutral-850',
-                    )}
+                    className={buttonVariants({ intent: 'ghost', size: 'inline' })}
                   >
                     임시저장 →
                   </Link>
@@ -171,10 +163,7 @@ const MyHomeContent = () => {
             left={
               <Link
                 href="/community/drafts"
-                className={cn(
-                  buttonVariants({ variant: 'text' }),
-                  'text-neutral-700 hover:text-neutral-850',
-                )}
+                className={buttonVariants({ intent: 'ghost', size: 'inline' })}
               >
                 임시저장 →
               </Link>

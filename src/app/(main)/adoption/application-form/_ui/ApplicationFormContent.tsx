@@ -9,7 +9,7 @@ import { TEXT } from '@/shared/config'
 import { cn } from '@/shared/lib/cn'
 import { useToast } from '@/shared/lib/useToast'
 import { AlertCircleIcon, CheckIcon, CloseIcon, PlusIcon } from '@/shared/assets'
-import { AlertMessage, AsyncState, Button, Container, Textarea } from '@/shared/ui'
+import { AlertMessage, AsyncState, Button, Container, Textarea, IconButton } from '@/shared/ui'
 
 const MAX_QUESTIONS = 5
 const MIN_LENGTH = 2
@@ -96,7 +96,7 @@ const ApplicationFormContent = () => {
           }
           action={
             formQuery.isError ? (
-              <Button variant="fill" size="sm" onClick={() => void formQuery.refetch()}>
+              <Button intent="dark" size="sm" onClick={() => void formQuery.refetch()}>
                 다시 시도
               </Button>
             ) : undefined
@@ -157,15 +157,15 @@ const ApplicationFormContent = () => {
                     </span>
                     질문 내용
                   </label>
-                  <button
-                    type="button"
+                  <IconButton
+                    tone="danger"
+                    edge="end"
                     onClick={() => handleRemove(row.key)}
                     aria-label={`추가 질문 ${index + 1} 삭제`}
                     disabled={updateForm.isPending}
-                    className="-mr-2 flex size-10 items-center justify-center rounded-full text-neutral-500 hover:bg-neutral-50 hover:text-error-500 focus-visible:outline-2 focus-visible:outline-primary-500 disabled:opacity-50"
                   >
                     <CloseIcon className="size-4" />
-                  </button>
+                  </IconButton>
                 </div>
                 <Textarea
                   id={`question-${row.key}`}
@@ -189,11 +189,11 @@ const ApplicationFormContent = () => {
 
           <div className="mt-4 flex flex-col items-center gap-3">
             <Button
-              variant="outline"
+              intent="secondary"
               size="lg"
               onClick={handleAdd}
               disabled={isMaxReached || updateForm.isPending}
-              className="w-full gap-2 rounded-xl border-dashed text-body-md"
+              width="full"
             >
               <PlusIcon className="size-5" />
               질문 추가하기
@@ -220,11 +220,10 @@ const ApplicationFormContent = () => {
                 : '저장된 내용과 같아요.'}
           </p>
           <Button
-            variant="primary"
             size="lg"
             onClick={() => void handleSave()}
             disabled={!isDirty || updateForm.isPending}
-            className="w-full tab:w-48"
+            width="responsive"
           >
             {updateForm.isPending ? '저장 중…' : '질문 저장하기'}
           </Button>

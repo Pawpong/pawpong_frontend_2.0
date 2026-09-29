@@ -11,7 +11,7 @@ interface AuthActionsProps {
 }
 
 const AUTH_ITEM =
-  'inline-flex h-10 shrink-0 items-center gap-1.5 rounded-lg px-1.5 text-sm leading-[1.5] font-semibold whitespace-nowrap text-primary-500 transition-colors hover:bg-primary-50 hover:text-primary-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 tab:gap-2 tab:px-2 tab:text-base'
+  'focus-ring inline-flex h-10 shrink-0 items-center gap-1.5 rounded-lg px-1.5 text-sm leading-[1.5] font-semibold whitespace-nowrap text-primary-500 transition-colors hover:bg-primary-50 hover:text-primary-700 focus-ring tab:gap-2 tab:px-2 tab:text-base'
 
 const HEADER_AUTH_ITEM =
   'gap-0 rounded pr-1 pl-0 text-sm font-medium hover:bg-transparent tab:gap-0 tab:pr-1 tab:pl-0 tab:text-sm'

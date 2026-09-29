@@ -5,6 +5,7 @@ import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { CloseIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { Dialog, DialogClose, DialogOverlay, DialogPortal } from './Dialog'
+import { iconButtonVariants } from './IconButton'
 
 interface MediaDialogProps {
   open: boolean
@@ -46,7 +47,7 @@ export const MediaDialog = ({
           </DialogPrimitive.Title>
           <DialogClose
             aria-label="닫기"
-            className="-mr-2 flex size-10 items-center justify-center rounded-full text-neutral-700 transition-colors hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-primary-500"
+            className={iconButtonVariants({ tone: 'muted', edge: 'end' })}
           >
             <CloseIcon className="size-5" />
           </DialogClose>

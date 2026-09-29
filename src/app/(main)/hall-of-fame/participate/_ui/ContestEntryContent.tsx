@@ -191,12 +191,7 @@ const ContestEntryContent = () => {
                     {error}
                   </p>
                 )}
-                <Button
-                  type="submit"
-                  size="lg"
-                  disabled={!isValid}
-                  className="w-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
-                >
+                <Button type="submit" size="lg" disabled={!isValid} width="full">
                   {isSubmitting ? '참여 등록 중…' : '콘테스트 참여하기'}
                 </Button>
               </div>
@@ -212,11 +207,11 @@ const ContestEntryContent = () => {
         title="작성을 그만둘까요?"
         description="선택한 사진과 소개는 저장되지 않아요."
         actions={[
-          { label: '계속 작성하기', onClick: cancelExit, variant: 'fill' },
+          { label: '계속 작성하기', onClick: cancelExit, intent: 'primary' },
           {
             label: '나가기',
             onClick: () => confirmExit(() => router.push('/hall-of-fame')),
-            variant: 'outline',
+            intent: 'secondary',
           },
         ]}
       />

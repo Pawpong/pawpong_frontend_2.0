@@ -44,7 +44,7 @@ export const ActivityListLayout = ({
         errorText={`${title}을 불러오지 못했습니다.`}
         emptyText={emptyText}
         errorAction={
-          <Button variant="fill" size="sm" className="px-4" onClick={onRetry}>
+          <Button intent="dark" size="sm" onClick={onRetry}>
             다시 시도
           </Button>
         }
@@ -54,7 +54,7 @@ export const ActivityListLayout = ({
       {isError && !isEmpty && (
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
           <AlertMessage status="error" message="목록을 갱신하지 못했어요. 다시 시도해 주세요." />
-          <Button variant="outline" size="sm" className="px-4" onClick={onRetry}>
+          <Button intent="secondary" size="sm" onClick={onRetry}>
             다시 시도
           </Button>
         </div>

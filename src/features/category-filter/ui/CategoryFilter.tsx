@@ -61,7 +61,11 @@ const CategoryFilter = ({ selected, onChange, className }: CategoryFilterProps) 
             aria-pressed={active}
             aria-label={CATEGORY_LABEL[category]}
             onClick={() => onChange(category)}
-            className={cn('relative w-full min-w-0 shrink-0 tab:w-auto', chip.height, chip.ratio)}
+            className={cn(
+              'relative w-full min-w-0 shrink-0 focus-ring tab:w-auto',
+              chip.height,
+              chip.ratio,
+            )}
           >
             {/* 라벨은 button의 aria-label이 담당 — 이미지는 장식 */}
             <Image

@@ -1,34 +1,31 @@
-import { Button } from './Button'
-import { cn } from '@/shared/lib/cn'
+import { Button, type ButtonVariantProps } from './Button'
 
-// 팔로우 토글 버튼 — 공통 Button(BaseButton) 기반 알약형
-// following은 outline 그대로, follow/mutual만 fill을 덮어씀
+// 팔로우 토글 버튼 — 상태를 공통 Button intent 로만 표현한다
 type FollowStatus = 'follow' | 'following' | 'mutual'
 
-const STATUS: Record<FollowStatus, { className: string; label: string }> = {
-  follow: { className: 'border-transparent bg-fill-muted font-medium text-white', label: '팔로우' },
-  following: { className: '', label: '팔로잉' },
-  mutual: { className: 'border-transparent bg-neutral-850 text-neutral-50', label: '맞팔로잉' },
+const STATUS: Record<FollowStatus, { intent: ButtonVariantProps['intent']; label: string }> = {
+  follow: { intent: 'neutral', label: '팔로우' },
+  following: { intent: 'secondary', label: '팔로잉' },
+  mutual: { intent: 'dark', label: '맞팔로잉' },
 }
-
-// sm: 팔로워 모달 pill(h-32) / lg: 프로필 카드(h-40)
-const SIZE = { sm: 'h-8 px-2 text-sm', lg: 'h-10 p-2.5 text-sm' } as const
 
 interface FollowButtonProps {
   status: FollowStatus
-  size?: keyof typeof SIZE
+  /** sm: 팔로워 모달 pill(h-32) / md: 프로필 카드(h-40) */
+  size?: 'sm' | 'md'
   onClick?: () => void
-  /** mutation 진행 중 중복 클릭 방지 (Button의 disabled 스타일 그대로 사용) */
+  /** mutation 진행 중 중복 클릭 방지 */
   disabled?: boolean
-  className?: string
+  width?: ButtonVariantProps['width']
 }
 
-const FollowButton = ({ status, size = 'lg', onClick, disabled, className }: FollowButtonProps) => (
+const FollowButton = ({ status, size = 'md', onClick, disabled, width }: FollowButtonProps) => (
   <Button
-    variant="outline"
+    intent={STATUS[status].intent}
+    size={size}
     onClick={onClick}
     disabled={disabled}
-    className={cn(SIZE[size], STATUS[status].className, className)}
+    width={width}
   >
     {STATUS[status].label}
   </Button>

@@ -35,9 +35,9 @@ const ReviewDetailContent = ({ reviewId, backHref }: { reviewId: string; backHre
                       <Link
                         href={`/home/${data.breederId}`}
                         className={buttonVariants({
-                          variant: 'outline',
+                          intent: 'secondary',
                           size: 'lg',
-                          className: 'w-full px-6',
+                          width: 'full',
                         })}
                       >
                         브리더 홈
@@ -47,9 +47,9 @@ const ReviewDetailContent = ({ reviewId, backHref }: { reviewId: string; backHre
                       <Link
                         href={`/activity/applications/${data.applicationId}?view=sent`}
                         className={buttonVariants({
-                          variant: 'primary',
+                          intent: 'primary',
                           size: 'lg',
-                          className: 'w-full px-6',
+                          width: 'full',
                         })}
                       >
                         신청 내역 보기

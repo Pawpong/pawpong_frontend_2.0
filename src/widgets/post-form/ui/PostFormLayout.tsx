@@ -77,7 +77,12 @@ const PostFormLayout = ({
               <p role="status" className="text-sm text-neutral-700">
                 사진을 준비하고 있어요…
               </p>
-              <Button type="button" variant="ghost" onClick={form.cancelPhotoProcessing}>
+              <Button
+                type="button"
+                intent="ghost"
+                onClick={form.cancelPhotoProcessing}
+                size="inline"
+              >
                 사진 처리 취소
               </Button>
             </div>

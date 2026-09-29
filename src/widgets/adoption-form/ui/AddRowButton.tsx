@@ -9,7 +9,7 @@ interface AddRowButtonProps {
 
 /** 작성란/부모정보 추가 버튼 (Figma FillButton 3137-387118) — h-32 radius 8, 아이콘 16 + 14/bold */
 const AddRowButton = ({ label, onClick, disabled }: AddRowButtonProps) => (
-  <Button variant="fill" size="sm" onClick={onClick} disabled={disabled} className="w-full">
+  <Button intent="dark" size="sm" onClick={onClick} disabled={disabled} width="full">
     <PlusIcon className="size-4" />
     {label}
   </Button>
@@ -25,14 +25,11 @@ interface RemoveRowButtonProps {
 // [refactored] 접종·유전병·부모 세 곳에서 같던 행 삭제 버튼
 const RemoveRowButton = ({ label, onClick, visible }: RemoveRowButtonProps) =>
   visible ? (
-    <Button
-      variant="text"
-      onClick={onClick}
-      aria-label={label}
-      className="min-h-11 self-end px-2 text-error-500 hover:bg-error-50 active:bg-error-50"
-    >
-      삭제
-    </Button>
+    <div className="flex self-end">
+      <Button size="sm" intent="danger" onClick={onClick} aria-label={label}>
+        삭제
+      </Button>
+    </div>
   ) : null
 
 export { AddRowButton, RemoveRowButton }

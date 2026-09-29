@@ -34,7 +34,7 @@ const ChatRoomItem = ({
       <button
         type="button"
         onClick={onClick}
-        className="flex min-w-0 flex-1 items-center gap-3 rounded-lg text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+        className="flex min-w-0 flex-1 items-center gap-3 rounded-lg text-left focus-ring"
       >
         <ProfileAvatar
           src={room.counterpart.profileImageUrl}

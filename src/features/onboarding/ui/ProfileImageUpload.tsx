@@ -75,21 +75,22 @@ const ProfileImageUpload = ({ value, onChange, className }: ProfileImageUploadPr
       {/* 사진 선택 / 기본 프로필 — 버튼 사이 spacing/12 */}
       <div className="flex w-full flex-col items-center gap-3">
         <Button
-          variant="fill"
+          size="md"
+          intent="dark"
           onClick={() => inputRef.current?.click()}
           disabled={isPending}
-          className="w-full"
+          width="full"
         >
           사진 선택
         </Button>
         <Button
-          variant="text"
+          intent="ghost"
           onClick={() => {
             setPreviewUrl(null)
             setError(null)
             onChange?.(undefined)
           }}
-          className="text-base"
+          size="inline"
         >
           기본 프로필
         </Button>

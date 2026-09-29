@@ -22,7 +22,7 @@ const PetPostingDraftCard = ({ draft, onDelete }: PetPostingDraftCardProps) => {
       <Link
         href={editHref}
         aria-label={`${name} 임시저장 글 이어서 작성`}
-        className="absolute inset-0 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+        className="absolute inset-0 rounded-lg focus-ring"
       />
 
       <div className="relative size-[4.5rem] shrink-0 overflow-hidden rounded-lg bg-point-50 tab:size-24">
@@ -59,11 +59,7 @@ const PetPostingDraftCard = ({ draft, onDelete }: PetPostingDraftCardProps) => {
       </div>
 
       <div className="relative z-10 shrink-0 self-start pt-1">
-        <OwnerActionsMenu
-          onDelete={onDelete}
-          ariaLabel={`${name} 임시저장 글 더보기`}
-          className="rounded-full text-neutral-700 transition-colors hover:bg-primary-50"
-        />
+        <OwnerActionsMenu onDelete={onDelete} ariaLabel={`${name} 임시저장 글 더보기`} />
       </div>
     </article>
   )

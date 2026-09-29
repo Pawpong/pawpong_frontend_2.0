@@ -10,7 +10,7 @@ import { PawPrintIcon } from '@/shared/assets'
 import { cafe24Proup } from '@/shared/lib/fonts'
 import { cn } from '@/shared/lib/cn'
 import { preparePhoto } from '@/shared/lib/preparePhoto'
-import { Button, ComposerSectionHeading } from '@/shared/ui'
+import { Button, ComposerSectionHeading, buttonVariants } from '@/shared/ui'
 import { PhotoUploadField } from '@/shared/ui/PhotoUploadField'
 import type { AiImageGeneration } from '@/shared/types'
 import { saveAiImageFile } from '../lib/aiImageFile'
@@ -199,7 +199,7 @@ export function AiFilterStudio({ isLoggedIn }: AiFilterStudioProps) {
               </p>
               <Link
                 href={`/login?returnUrl=${encodeURIComponent('/ai-filter')}`}
-                className="rounded-full bg-point-500 px-6 py-3 text-sm font-semibold text-neutral-850 hover:bg-point-300"
+                className={buttonVariants()}
               >
                 로그인하고 시작하기
               </Link>
@@ -228,7 +228,7 @@ export function AiFilterStudio({ isLoggedIn }: AiFilterStudioProps) {
                       disabled={ai.isWorking}
                       onClick={() => ai.selectFilter(filter.filterId)}
                       className={cn(
-                        'relative flex w-full flex-col overflow-hidden rounded-xl border-2 bg-white text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 disabled:cursor-not-allowed',
+                        'relative flex w-full flex-col overflow-hidden rounded-xl border-2 bg-white text-left focus-ring transition-colors disabled:cursor-not-allowed',
                         selected
                           ? 'border-primary-500'
                           : 'border-neutral-150 hover:border-primary-200',
@@ -320,26 +320,28 @@ export function AiFilterStudio({ isLoggedIn }: AiFilterStudioProps) {
                 가운데 손잡이를 끌어 원본과 비교해 보세요. 보관함에도 저장됐어요.
               </p>
               <div className="mt-4 grid grid-cols-2 gap-2">
-                <Button variant="outline" size="lg" disabled={saving} onClick={() => void save()}>
+                <Button intent="secondary" size="lg" disabled={saving} onClick={() => void save()}>
                   {saving ? '준비 중…' : '저장하기'}
                 </Button>
                 <Button size="lg" onClick={postToCommunity}>
                   커뮤니티에 자랑하기
                 </Button>
               </div>
-              <Button
-                variant="text"
-                disabled={remaining === 0}
-                onClick={() => {
-                  ai.reset()
-                  document
-                    .getElementById('ai-filter-heading')
-                    ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                }}
-                className="mx-auto mt-3 min-h-11 px-3 text-primary-700 underline underline-offset-4"
-              >
-                다른 필터로 또 만들기
-              </Button>
+              <div className="mt-3 flex justify-center">
+                <Button
+                  size="md"
+                  intent="link"
+                  disabled={remaining === 0}
+                  onClick={() => {
+                    ai.reset()
+                    document
+                      .getElementById('ai-filter-heading')
+                      ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                  }}
+                >
+                  다른 필터로 또 만들기
+                </Button>
+              </div>
             </div>
           ) : (
             <>
@@ -347,7 +349,7 @@ export function AiFilterStudio({ isLoggedIn }: AiFilterStudioProps) {
                 size="lg"
                 disabled={!photo || !selectedFilter || remaining === 0 || preparing}
                 onClick={() => void convert()}
-                className="w-full"
+                width="full"
               >
                 {remaining === 0
                   ? '오늘은 다 만들었어요 · 내일 다시 만나요'

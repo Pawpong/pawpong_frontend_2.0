@@ -57,11 +57,7 @@ const ChatRoomFilterableList = ({
       ) : isError ? (
         <div className="flex flex-col items-center justify-center gap-3 py-20">
           <p className="text-sm font-medium text-neutral-700">채팅방을 불러오지 못했습니다.</p>
-          <Button
-            variant="fill"
-            onClick={() => void refetch()}
-            className="rounded-lg bg-neutral-850 px-4 py-2 text-sm font-semibold text-neutral-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
-          >
+          <Button size="sm" intent="dark" onClick={() => void refetch()}>
             다시 시도
           </Button>
         </div>

@@ -161,7 +161,7 @@ const VerificationContent = () => {
         status="error"
         message="인증 정보를 불러오지 못했습니다."
         action={
-          <Button variant="fill" size="sm" onClick={() => void profileQuery.refetch()}>
+          <Button intent="dark" size="sm" onClick={() => void profileQuery.refetch()}>
             다시 시도
           </Button>
         }
@@ -285,9 +285,8 @@ const VerificationContent = () => {
               {isSubmitting ? '서류를 제출하고 있어요.' : '등록한 서류를 확인하고 제출해주세요.'}
             </p>
             <Button
-              variant="primary"
               size="lg"
-              className="w-full tab:w-48"
+              width="responsive"
               onClick={() => void handleSubmit()}
               disabled={isSubmitting || !hasAnyDocument}
             >

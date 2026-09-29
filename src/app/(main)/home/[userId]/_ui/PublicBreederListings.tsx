@@ -59,7 +59,7 @@ const PublicBreederListings = ({ breederId, gridClassName }: PublicBreederListin
           errorText="분양글을 불러오지 못했습니다."
           emptyText={status ? '해당 상태의 분양글이 없습니다.' : '등록된 분양글이 없습니다.'}
           errorAction={
-            <Button variant="fill" size="sm" onClick={() => void query.refetch()}>
+            <Button intent="dark" size="sm" onClick={() => void query.refetch()}>
               다시 시도
             </Button>
           }

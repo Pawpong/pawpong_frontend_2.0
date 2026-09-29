@@ -272,7 +272,7 @@ const ProfileEditContent = () => {
           action={
             profileError ? (
               <Button
-                variant="fill"
+                intent="dark"
                 size="sm"
                 onClick={() => {
                   void myProfileQuery.refetch()
@@ -309,8 +309,9 @@ const ProfileEditContent = () => {
                 onChange={handleFileChange}
               />
               <Button
-                variant="fill"
-                className="w-full"
+                size="md"
+                intent="dark"
+                width="full"
                 onClick={() => fileInputRef.current?.click()}
               >
                 사진 변경
@@ -432,8 +433,8 @@ const ProfileEditContent = () => {
         onOpenChange={setShowApply}
         title="프로필을 적용하시겠습니까?"
         actions={[
-          { label: '취소', variant: 'outline', onClick: () => setShowApply(false) },
-          { label: '적용하기', variant: 'fill', onClick: handleApply },
+          { label: '취소', intent: 'secondary', onClick: () => setShowApply(false) },
+          { label: '적용하기', intent: 'primary', onClick: handleApply },
         ]}
       />
 

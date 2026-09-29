@@ -175,6 +175,45 @@
   /* base */
   --color-base-white: #ffffff;
   --color-base-black: #121212;
+
+  /* action — 버튼류(Button·IconButton·ToggleIconButton·Chip·ActionSheetItem) 전용 시맨틱 토큰.
+     새 색을 만들지 않고 팔레트를 역할 이름으로 다시 부른다. 버튼 스타일은 이 토큰만 쓴다. */
+  --color-action-primary: var(--color-point-500);
+  --color-action-primary-hover: var(--color-point-300);
+  --color-action-primary-press: var(--color-point-600);
+  --color-action-dark: var(--color-neutral-850);
+  --color-action-dark-hover: var(--color-neutral-950);
+  --color-action-neutral: var(--color-fill-muted);
+  --color-action-border: var(--color-neutral-300);
+  --color-action-subtle: var(--color-neutral-50);
+  --color-action-subtle-press: var(--color-neutral-100);
+  --color-action-disabled: var(--color-neutral-150);
+  --color-action-disabled-fg: var(--color-neutral-400);
+  --color-action-muted-fg: var(--color-neutral-500);
+  --color-brand: var(--color-primary-500);
+  --color-brand-hover: var(--color-primary-700);
+  --color-brand-subtle: var(--color-primary-50);
+  --color-danger: var(--color-error-500);
+  --color-danger-hover: var(--color-error-600);
+  --color-pressed-favorite: #ff8181;
+  --color-pressed-bookmark: #a9835a;
+  --color-focus: var(--color-primary-500);
+}
+
+/* 키보드 포커스 링 — 버튼류와 클릭 가능한 카드/행이 공통으로 쓴다 */
+@utility focus-ring {
+  &:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+}
+
+/* 썸네일·업로드 영역처럼 overflow-hidden 안쪽에 링을 그려야 할 때 */
+@utility focus-ring-inset {
+  &:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: -2px;
+  }
 }
 
 /* 반응형 타이포 토큰 브레이크포인트 오버라이드 (tab = 768px) */

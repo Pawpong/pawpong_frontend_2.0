@@ -97,12 +97,7 @@ export function AiPhotoArchive({ enabled, limit, moreHref, gridClassName }: AiPh
         size="compact"
         message="보관함을 불러오지 못했어요."
         action={
-          <Button
-            variant="outline"
-            size="sm"
-            className="px-4"
-            onClick={() => void generationsQuery.refetch()}
-          >
+          <Button intent="secondary" size="sm" onClick={() => void generationsQuery.refetch()}>
             다시 시도
           </Button>
         }
@@ -140,7 +135,7 @@ export function AiPhotoArchive({ enabled, limit, moreHref, gridClassName }: AiPh
                 disabled={!done}
                 onClick={() => setOpenJobId(job.jobId)}
                 aria-label={`${filterName(job.filterId)} 사진 ${done ? '크게 보기' : '만드는 중'}`}
-                className="relative block aspect-square w-full overflow-hidden rounded-lg bg-point-50 focus-visible:outline-2 focus-visible:outline-primary-500"
+                className="relative block aspect-square w-full overflow-hidden rounded-lg bg-point-50 focus-ring"
               >
                 {done ? (
                   <Image
@@ -203,7 +198,7 @@ export function AiPhotoArchive({ enabled, limit, moreHref, gridClassName }: AiPh
             )}
             <div className="grid grid-cols-2 gap-2">
               <Button
-                variant="outline"
+                intent="secondary"
                 size="lg"
                 disabled={!!busyAction}
                 onClick={() => void runAction('save', opened)}
@@ -218,14 +213,16 @@ export function AiPhotoArchive({ enabled, limit, moreHref, gridClassName }: AiPh
                 {busyAction === 'post' ? '준비 중…' : '커뮤니티에 올리기'}
               </Button>
             </div>
-            <Button
-              variant="text"
-              disabled={hideMutation.isPending}
-              onClick={() => hideMutation.mutate(opened.jobId)}
-              className="min-h-11 justify-self-center text-neutral-700"
-            >
-              {hideMutation.isPending ? '지우는 중…' : '보관함에서 지우기'}
-            </Button>
+            <div className="flex justify-self-center">
+              <Button
+                size="md"
+                intent="ghost"
+                disabled={hideMutation.isPending}
+                onClick={() => hideMutation.mutate(opened.jobId)}
+              >
+                {hideMutation.isPending ? '지우는 중…' : '보관함에서 지우기'}
+              </Button>
+            </div>
           </DialogContent>
         )}
       </Dialog>

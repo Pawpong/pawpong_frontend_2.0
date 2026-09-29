@@ -63,14 +63,16 @@ const ReviewComposer = ({ applicationId, breederName, reviewType }: ReviewCompos
 
         {errorMessage && <AlertMessage status="error" size="responsive" message={errorMessage} />}
 
-        <Button
-          type="submit"
-          size="lg"
-          disabled={!trimmedContent || createReview.isPending}
-          className="w-full tab:w-48 tab:self-end"
-        >
-          {createReview.isPending ? '등록하는 중' : '후기 등록'}
-        </Button>
+        <div className="flex w-full tab:w-auto tab:self-end">
+          <Button
+            type="submit"
+            size="lg"
+            disabled={!trimmedContent || createReview.isPending}
+            width="responsive"
+          >
+            {createReview.isPending ? '등록하는 중' : '후기 등록'}
+          </Button>
+        </div>
       </form>
     </section>
   )

@@ -2,6 +2,7 @@ import { ArrowRightIcon } from '@/shared/assets'
 import { DetailLink } from './DetailLink'
 import { textLabelVariants } from './TextLabel'
 import { cn } from '@/shared/lib/cn'
+import { IconButton } from './IconButton'
 
 // Figma: label txt btn (922-17441) — 라벨 + 우측 텍스트버튼(화살표).
 // 타이틀 사이즈 램프: mo 14(medium) -> tab 16(large) -> pc 20(xlarge).
@@ -62,14 +63,22 @@ const SectionHeader = ({
         {/* 부제가 없으면 우측 슬롯을 타이틀 줄(링크 자리)에 붙인다 */}
         {!subtitle && rightSlot}
         {collapsible && (
-          <button type="button" onClick={onToggle} className="tab:hidden">
-            <ArrowRightIcon
-              className={cn(
-                'size-[1.25rem] text-[#5d5d5d] transition-transform',
-                collapsed ? 'rotate-90' : '-rotate-90',
-              )}
-            />
-          </button>
+          <span className="tab:hidden">
+            <IconButton
+              tone="muted"
+              size="sm"
+              aria-label={collapsed ? '펼치기' : '접기'}
+              aria-expanded={!collapsed}
+              onClick={onToggle}
+            >
+              <ArrowRightIcon
+                className={cn(
+                  'size-5 transition-transform',
+                  collapsed ? 'rotate-90' : '-rotate-90',
+                )}
+              />
+            </IconButton>
+          </span>
         )}
       </div>
       {subtitle && (

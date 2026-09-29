@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react'
 import Image from 'next/image'
-import { tv, type VariantProps } from 'tailwind-variants'
+import { tv, type VariantProps } from '@/shared/lib/tv'
 import { CameraIcon, ImageIcon, CloseIcon } from '@/shared/assets'
 import { BREAKPOINTS } from '@/shared/lib/useBreakpoint'
 import { ImageModal } from './ImageModal'
@@ -14,6 +14,8 @@ import {
   DialogPortal,
   DialogTitle,
 } from './Dialog'
+import { IconButton } from './IconButton'
+import { ActionSheetItem } from './ActionSheetItem'
 
 const MAX_IMAGES = 10
 
@@ -26,7 +28,7 @@ const imageUploadVariants = tv({
   slots: {
     root: 'flex flex-col',
     tiles: 'flex',
-    addButton: 'flex shrink-0 flex-col items-center',
+    addButton: 'focus-ring flex shrink-0 flex-col items-center',
     addIcon: '',
     addCounter: '',
     preview: 'relative shrink-0 overflow-hidden',
@@ -47,7 +49,7 @@ const imageUploadVariants = tv({
         root: 'gap-3',
         tiles: 'flex-wrap gap-3',
         addButton:
-          'size-25 items-center justify-center gap-0.5 rounded border border-neutral-500 bg-white p-2 text-neutral-700 transition-colors hover:bg-neutral-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 disabled:opacity-50 pc:size-45 pc:gap-2 pc:rounded-lg',
+          'size-25 items-center justify-center gap-0.5 rounded border border-neutral-500 bg-white p-2 text-neutral-700 transition-colors hover:bg-neutral-50 focus-ring disabled:opacity-50 pc:size-45 pc:gap-2 pc:rounded-lg',
         addIcon: 'size-8 text-neutral-700',
         addCounter: 'text-body-md font-semibold text-neutral-700 pc:text-body-lg',
         preview: 'size-25 rounded border border-neutral-150 bg-point-50 pc:size-45 pc:rounded-lg',
@@ -187,7 +189,7 @@ const ImageUploadArea = ({
             <button
               type="button"
               disabled={disabled}
-              className="size-full focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-500"
+              className="size-full focus-ring-inset"
               onClick={() => handleImageClick(index)}
               aria-label={`이미지 ${index + 1} ${isComposer && index === 0 ? '대표 이미지' : isRepresentative(index) ? '대표사진' : '미리보기'}`}
             >
@@ -223,24 +225,28 @@ const ImageUploadArea = ({
             )}
 
             {/* 삭제 버튼 (X) */}
-            <button
-              type="button"
-              disabled={disabled}
-              onClick={(e) => {
-                e.stopPropagation()
-                onRemove(index)
-              }}
+            <span
               className={
                 isComposer
-                  ? 'absolute top-1 right-1 flex size-5 items-center justify-center rounded-full border border-neutral-150 bg-white text-neutral-850 focus-visible:outline-2 focus-visible:outline-primary-500 disabled:opacity-50 pc:size-6'
-                  : 'absolute top-1 right-1 flex size-4 items-center justify-center rounded-full bg-text-primary/60 tab:top-[0.323rem] tab:right-[0.323rem] tab:size-6'
+                  ? 'absolute top-1 right-1'
+                  : 'absolute top-1 right-1 tab:top-[0.323rem] tab:right-[0.323rem]'
               }
-              aria-label={`이미지 ${index + 1} 삭제`}
             >
-              <CloseIcon
-                className={isComposer ? 'size-3 pc:size-3.5' : 'size-2.5 text-white tab:size-3.5'}
-              />
-            </button>
+              <IconButton
+                tone={isComposer ? 'surface' : 'overlay'}
+                size="xs"
+                disabled={disabled}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onRemove(index)
+                }}
+                aria-label={`이미지 ${index + 1} 삭제`}
+              >
+                <CloseIcon
+                  className={isComposer ? 'size-3 pc:size-3.5' : 'size-2.5 text-white tab:size-3.5'}
+                />
+              </IconButton>
+            </span>
 
             {/* 순번 — desktop only. post 타일(100·180)에는 45px 배지가 과해 노출하지 않는다 */}
             {!hasRepresentative && size !== 'post' && !isComposer && (
@@ -275,31 +281,18 @@ const ImageUploadArea = ({
               <div className="flex flex-col">
                 {!isRepresentative(actionIndex) && (
                   <DialogClose asChild>
-                    <button
-                      type="button"
-                      className="w-full py-3.5 text-center text-sm font-medium text-text-primary"
-                      onClick={() => onSetRepresentative?.(actionIndex)}
-                    >
+                    <ActionSheetItem onClick={() => onSetRepresentative?.(actionIndex)}>
                       대표사진으로 변경
-                    </button>
+                    </ActionSheetItem>
                   </DialogClose>
                 )}
                 <DialogClose asChild>
-                  <button
-                    type="button"
-                    className="w-full border-t border-neutral-150 py-3.5 text-center text-sm font-medium text-error-500"
-                    onClick={() => onRemove(actionIndex)}
-                  >
+                  <ActionSheetItem tone="danger" onClick={() => onRemove(actionIndex)}>
                     이미지 삭제
-                  </button>
+                  </ActionSheetItem>
                 </DialogClose>
                 <DialogClose asChild>
-                  <button
-                    type="button"
-                    className="w-full border-t border-[#e7e7e7] py-3.5 text-center text-sm font-medium text-text-primary"
-                  >
-                    취소
-                  </button>
+                  <ActionSheetItem>취소</ActionSheetItem>
                 </DialogClose>
               </div>
             </DialogContent>

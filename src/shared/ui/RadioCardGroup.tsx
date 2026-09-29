@@ -1,7 +1,7 @@
 'use client'
 
 import { useId } from 'react'
-import { tv } from 'tailwind-variants'
+import { tv } from '@/shared/lib/tv'
 
 const card = tv({
   base: 'flex min-h-20 cursor-pointer items-start gap-3 rounded-xl border p-4 transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary-500 has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-50',

@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox'
-import { tv, type VariantProps } from 'tailwind-variants'
+import { tv, type VariantProps } from '@/shared/lib/tv'
 import { PixelCheckIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 
@@ -12,7 +12,7 @@ import { cn } from '@/shared/lib/cn'
 // Root는 패딩 포함 클릭영역, 안쪽 box가 실제 24/16 테두리 박스. checked 스타일은 group-data로 box에 전달
 const checkbox = tv({
   slots: {
-    root: 'group peer shrink-0 rounded-sm p-1 focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50',
+    root: 'group peer shrink-0 rounded-sm p-1 focus-ring disabled:cursor-not-allowed disabled:opacity-50',
     box: 'flex size-full items-center justify-center rounded-sm border-2 border-neutral-500 bg-white shadow-none group-data-[state=checked]:border-point-500 group-data-[state=checked]:bg-point-500 group-data-[state=checked]:text-neutral-850',
     icon: '',
   },

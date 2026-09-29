@@ -1,4 +1,4 @@
-import { tv, type VariantProps } from 'tailwind-variants'
+import { tv, type VariantProps } from '@/shared/lib/tv'
 import { LocationOnIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 

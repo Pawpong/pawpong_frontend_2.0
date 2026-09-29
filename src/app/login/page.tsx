@@ -97,7 +97,7 @@ const LoginPage = async ({
             </p>
             <Link
               href={reviewHref}
-              className="mx-auto rounded px-2 py-2 text-xs text-neutral-700 underline underline-offset-4 hover:text-neutral-850 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+              className="mx-auto rounded px-2 py-2 text-xs text-neutral-700 underline underline-offset-4 focus-ring hover:text-neutral-850"
             >
               심사용 계정 로그인
             </Link>

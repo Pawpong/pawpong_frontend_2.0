@@ -17,7 +17,7 @@ export const ActivityLinkCard = ({
   <li>
     <Link
       href={href}
-      className="group block rounded-xl border border-neutral-150 bg-white p-5 transition-colors hover:border-primary-200 hover:bg-primary-50/30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 tab:p-6"
+      className="group block rounded-xl border border-neutral-150 bg-white p-5 focus-ring transition-colors hover:border-primary-200 hover:bg-primary-50/30 tab:p-6"
     >
       {identity}
       <div className="mt-4 min-w-0 [overflow-wrap:anywhere] break-words">{children}</div>
