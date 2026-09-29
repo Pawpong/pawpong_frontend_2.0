@@ -28,10 +28,20 @@ export interface BreederLocationDto {
   detailAddress?: string
 }
 
+/** 분양 가격 표시 방식 — 서버 PriceDisplayType */
+export type BreederPriceDisplay = 'not_set' | 'consultation' | 'range'
+
 export interface BreederPriceRangeDto {
   minPrice: number
   maxPrice: number
-  display?: string
+  display?: BreederPriceDisplay
+}
+
+/** 가격대 수정 요청 — 조회(minPrice/maxPrice)와 필드명이 다르다 (서버 PriceRangeUpdateDto) */
+export interface BreederPriceRangeUpdateDto {
+  minimumPrice: number
+  maximumPrice: number
+  display?: BreederPriceDisplay
 }
 
 export interface BreederDocumentDto {
@@ -168,8 +178,15 @@ export interface BreederProfileResponseDto {
   breederId: string
   breederName: string
   breederEmail: string
+  breederPhone?: string
   authProvider?: AuthProvider
+  /** 가입 때 고른 분양 동물 (가입 DTO animal) — 수정 API 없음 */
+  petType?: BreederPetType
   marketingAgreed?: boolean
+  /** 상담 신청 알림톡 수신 동의 (서버 기본 true) */
+  consultationAgreed?: boolean
+  /** 케어하는 품종 (최대 5개) — profileInfo 가 아닌 루트에 온다 */
+  breeds?: string[]
   profileImageFileName?: string
   profileInfo: BreederProfileInfoDto
   parentPetInfo: ParentPetSummaryDto[]
@@ -204,14 +221,19 @@ export interface BreederPublicProfile {
 }
 
 /** 브리더 프로필 수정 요청 — Partial<BreederProfileInfoDto> 기반 */
-export type ProfileUpdateRequestDto = Partial<
-  Omit<BreederProfileInfoDto, 'specializationAreas'> & {
-    specializationTypes: string[]
-    breeds: string[]
-    marketingAgreed: boolean
-    profileImage: string | null
-  }
->
+/** 브리더 프로필 수정 요청 (PATCH /breeder-management/profile) — 넘긴 필드만 바뀐다 */
+export interface ProfileUpdateRequestDto {
+  profileDescription?: string
+  locationInfo?: BreederLocationDto
+  profilePhotos?: string[]
+  priceRangeInfo?: BreederPriceRangeUpdateDto
+  specializationTypes?: BreederPetType[]
+  breeds?: string[]
+  experienceYears?: number
+  profileImage?: string
+  marketingAgreed?: boolean
+  consultationAgreed?: boolean
+}
 
 /** 브리더 프로필 수정 응답 */
 export interface BreederProfileUpdateResponseDto {
