@@ -19,3 +19,10 @@ export const createOrGetChatRoom = (data: CreateRoomRequestDto) =>
 /** 채팅방 종료 */
 export const closeChatRoom = (roomId: string) =>
   apiClient.delete<ApiResponseFull<null>>(`${CHAT_BASE}/rooms/${roomId}`).then(unwrapVoid)
+
+/** 차단은 대화 기록을 보존하고 양방향 새 대화·메시지를 제한한다. */
+export const blockChatUser = (userId: string) =>
+  apiClient.post<ApiResponseFull<null>>(`${CHAT_BASE}/blocks/${userId}`).then(unwrapVoid)
+
+export const unblockChatUser = (userId: string) =>
+  apiClient.delete<ApiResponseFull<null>>(`${CHAT_BASE}/blocks/${userId}`).then(unwrapVoid)

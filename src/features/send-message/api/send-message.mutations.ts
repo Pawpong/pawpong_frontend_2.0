@@ -3,7 +3,12 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { chatQueries } from '@/entities/chat'
 import type { ChatRoomResponseDto, CreateRoomRequestDto } from '@/shared/types'
-import { createOrGetChatRoom, closeChatRoom } from './send-message.api'
+import {
+  createOrGetChatRoom,
+  closeChatRoom,
+  blockChatUser,
+  unblockChatUser,
+} from './send-message.api'
 
 // 메시지 전송은 WebSocket(useChatRoomSocket) 담당. 여기서는 방 생성/종료 뮤테이션만 제공한다.
 
@@ -28,6 +33,17 @@ export const useCloseChatRoom = () => {
         rooms?.filter((room) => room.roomId !== roomId),
       )
       qc.removeQueries({ queryKey: [...chatQueries.all(), 'messages', roomId] })
+      void qc.invalidateQueries({ queryKey: chatQueries.rooms().queryKey })
+    },
+  })
+}
+
+export const useChangeChatUserBlock = () => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ userId, blocked }: { userId: string; blocked: boolean }) =>
+      blocked ? blockChatUser(userId) : unblockChatUser(userId),
+    onSuccess: () => {
       void qc.invalidateQueries({ queryKey: chatQueries.rooms().queryKey })
     },
   })
