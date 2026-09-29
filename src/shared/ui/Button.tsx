@@ -4,7 +4,8 @@ import { tv, type VariantProps } from '@/shared/lib/tv'
 // 도메인 버튼 래퍼의 바깥 슬롯에도 같은 폭 규칙을 적용한다.
 export const BUTTON_WIDTH_CLASSES = {
   auto: '',
-  full: 'w-full',
+  // 세로 배치는 꽉 채우고, 가로로 여러 개 놓이면 base 의 shrink-0 을 풀어 나눠 갖는다 (CtaModal 가로 버튼)
+  full: 'w-full shrink',
   // 가로 flex 안에서 같은 줄 버튼끼리 나눠 채움. 세로 flex에서는 full을 사용한다.
   fill: 'min-w-0 flex-1',
   responsive: 'w-full tab:w-48',
