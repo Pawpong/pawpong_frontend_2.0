@@ -7,7 +7,8 @@ export const mapMyPetPostingCard = (posting: MyPetPostingCard): AdoptionGridCard
   listingId: posting.petId,
   name: posting.name,
   gender: posting.gender,
-  birthDateText: formatBirthDate(posting.birthDate),
+  birthDateText:
+    posting.ageDescription || (posting.birthDate ? formatBirthDate(posting.birthDate) : ''),
   thumbnailUrl: posting.primaryPhotoUrl,
   status: posting.status,
 })

@@ -2,16 +2,22 @@
 
 import { useState, type ReactNode } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { InfiniteScrollTrigger, ListState, TextLabel } from '@/shared/ui'
+import { Button, SortOptions, InfiniteScrollTrigger, ListState } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
+import { TEXT } from '@/shared/config'
 import { flattenPages, getTotalItems } from '@/shared/lib/infiniteList'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
-import type { PetStatus } from '@/shared/types'
-import { AdoptionGridCard, PetStatusFilter } from '@/entities/adoption'
+import type { PetStatus, MyPetPostingSort } from '@/shared/types'
+import { PetStatusFilter } from '@/entities/adoption'
 import { petPostingQueries } from '@/entities/pet-posting'
-import { mapMyPetPostingCard } from '../model/mapMyPetPostingCard'
+import { MyPetPostingCard } from './MyPetPostingCard'
 
-const DEFAULT_GRID = 'grid grid-cols-2 gap-x-3 gap-y-6 tab:grid-cols-3 pc:grid-cols-4'
+const SORT_OPTIONS = [
+  { value: 'latest', label: '최근 등록순' },
+  { value: 'popular', label: '관심 많은순' },
+] satisfies Array<{ value: MyPetPostingSort; label: string }>
+
+const DEFAULT_GRID = 'flex flex-col'
 
 interface MyPetPostingListProps {
   pageSize: number
@@ -36,28 +42,50 @@ const MyPetPostingList = ({
   showTotalCount = false,
   gridClassName,
 }: MyPetPostingListProps) => {
+  const [sort, setSort] = useState<MyPetPostingSort>('latest')
   // 같은 칩을 다시 누르면 해제 -> 전체
   const [status, setStatus] = useState<PetStatus | null>(null)
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending, isError } =
-    useInfiniteQuery(petPostingQueries.myList(status ?? undefined, pageSize))
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isPending,
+    isError,
+    refetch,
+    isFetchNextPageError,
+  } = useInfiniteQuery(petPostingQueries.myList(status ?? undefined, pageSize, sort))
 
   // 무한스크롤 페이지 병합 시 petId 중복 제거 (React key 중복 방어)
   const postings = dedupeBy(flattenPages(data), (posting) => posting.petId)
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className={cn('flex gap-2', action ? 'flex-col' : 'items-center justify-between')}>
-        <div className="flex items-center justify-between gap-2">
-          <TextLabel size="16">
-            분양 목록{showTotalCount ? ` ${getTotalItems(data)}` : ''}
-          </TextLabel>
-          {action}
+    <section aria-label="내 분양 목록" className="flex flex-col">
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className={TEXT.section}>분양 목록</h2>
+              {showTotalCount && data && (
+                <span className={TEXT.sub}>{getTotalItems(data).toLocaleString('ko-KR')}건</span>
+              )}
+            </div>
+            <p className={`${TEXT.meta} mt-2`}>등록한 아이들의 분양 현황을 확인하고 관리하세요.</p>
+          </div>
+          <div className="flex items-center gap-1">
+            {secondaryAction}
+            {action}
+          </div>
         </div>
-
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-neutral-200 pb-4">
           <PetStatusFilter value={status} onChange={setStatus} />
-          {secondaryAction && <div className="shrink-0">{secondaryAction}</div>}
+          <SortOptions
+            ariaLabel="내 분양 목록 정렬"
+            options={SORT_OPTIONS}
+            value={sort}
+            onValueChange={setSort}
+          />
         </div>
       </div>
 
@@ -67,25 +95,55 @@ const MyPetPostingList = ({
         isEmpty={postings.length === 0}
         loadingText="분양 목록을 불러오는 중입니다."
         errorText="분양 목록을 불러오지 못했습니다."
-        emptyText="등록한 분양글이 없습니다."
+        emptyText={
+          <div className="flex flex-col items-center gap-3">
+            <span>
+              {status ? '해당 상태의 분양글이 없습니다.' : '아직 등록한 분양글이 없어요.'}
+            </span>
+            <span className={TEXT.sub}>
+              {status
+                ? '다른 상태의 아이들도 확인해 보세요.'
+                : '첫 분양글을 작성하고 아이의 가족을 만나보세요.'}
+            </span>
+            {status ? (
+              <Button intent="secondary" size="md" onClick={() => setStatus(null)}>
+                전체 보기
+              </Button>
+            ) : (
+              action
+            )}
+          </div>
+        }
+        errorAction={
+          <Button intent="secondary" size="md" onClick={() => void refetch()}>
+            다시 시도
+          </Button>
+        }
       >
         <div className={cn(DEFAULT_GRID, gridClassName)}>
           {postings.map((posting) => (
-            <AdoptionGridCard
-              key={posting.petId}
-              listing={mapMyPetPostingCard(posting)}
-              showFavorite={false}
-            />
+            <MyPetPostingCard key={posting.petId} posting={posting} />
           ))}
         </div>
       </ListState>
 
+      {isFetchNextPageError && (
+        <div
+          role="alert"
+          className="flex flex-wrap items-center justify-center gap-3 text-body-md text-neutral-700"
+        >
+          다음 분양글을 불러오지 못했습니다.
+          <Button intent="secondary" size="sm" onClick={() => void fetchNextPage()}>
+            다시 시도
+          </Button>
+        </div>
+      )}
       <InfiniteScrollTrigger
         onIntersect={() => void fetchNextPage()}
-        hasNextPage={hasNextPage ?? false}
+        hasNextPage={Boolean(hasNextPage) && !isFetchNextPageError}
         isFetchingNextPage={isFetchingNextPage}
       />
-    </div>
+    </section>
   )
 }
 

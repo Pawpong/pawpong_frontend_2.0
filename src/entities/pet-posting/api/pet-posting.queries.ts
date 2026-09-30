@@ -1,5 +1,5 @@
 import { createInfiniteQuery, STALE_TIME } from '@/shared/api'
-import type { PetStatus } from '@/shared/types'
+import type { PetStatus, MyPetPostingSort } from '@/shared/types'
 import {
   getMyPetPostings,
   getMyPetPostingDrafts,
@@ -10,10 +10,10 @@ import {
 export const petPostingQueries = {
   all: () => ['petPosting'] as const,
 
-  myList: (status?: PetStatus, pageSize = 15) =>
+  myList: (status?: PetStatus, pageSize = 15, sort: MyPetPostingSort = 'latest') =>
     createInfiniteQuery({
-      queryKey: [...petPostingQueries.all(), 'myList', status, pageSize],
-      queryFn: (page) => getMyPetPostings({ status, page, pageSize }),
+      queryKey: [...petPostingQueries.all(), 'myList', status, pageSize, sort],
+      queryFn: (page) => getMyPetPostings({ status, page, pageSize, sort }),
       staleTime: STALE_TIME.DEFAULT,
     }),
 

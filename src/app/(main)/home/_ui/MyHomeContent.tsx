@@ -131,24 +131,23 @@ const MyHomeContent = () => {
             />
 
             {/* 작성 버튼은 목록 라벨 줄에 붙인다 — 소개 카드와 목록 사이에 혼자 떠 있지 않게 */}
-            <Container className="py-5">
+            <Container className="py-8 tab:py-10">
               <MyPetPostingList
                 pageSize={HOME_LISTING_PAGE_SIZE}
                 showTotalCount
                 action={
-                  <Link href="/adoption/create" className={buttonVariants()}>
+                  <Link href="/adoption/create" className={buttonVariants({ size: 'md' })}>
                     분양글 작성하기
                   </Link>
                 }
                 secondaryAction={
                   <Link
                     href="/adoption/drafts"
-                    className={buttonVariants({ intent: 'ghost', size: 'inline' })}
+                    className={buttonVariants({ intent: 'ghost', size: 'md' })}
                   >
-                    임시저장 →
+                    임시저장
                   </Link>
                 }
-                gridClassName={`${CARD_GRID} pc:gap-x-[1.375rem]`}
               />
             </Container>
           </TabsContent>
