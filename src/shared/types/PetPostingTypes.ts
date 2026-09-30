@@ -115,7 +115,10 @@ export interface MyPetPostingCard {
   breed: string
   petType: CommunityPetType
   gender: PetGender
-  birthDate: string
+  /** 서버 목록 응답의 한국어 나이 표현 */
+  ageDescription?: string
+  /** 일부 응답에서만 제공되는 생년월일 */
+  birthDate?: string
   price: number
   status: PetStatus
   primaryPhotoUrl: string
@@ -129,8 +132,11 @@ export interface MyPetPostingCard {
   createdAt: string
 }
 
+export type MyPetPostingSort = 'latest' | 'popular'
+
 /** 내 분양글 목록 파라미터 */
 export interface MyPetPostingListParams {
+  sort?: MyPetPostingSort
   status?: PetStatus
   page?: number
   pageSize?: number

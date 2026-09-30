@@ -110,7 +110,10 @@ const ACTION_LAYOUT = 'flex min-w-0 flex-1 pc:min-w-30'
 
 const EditButton = () => (
   <div className={ACTION_LAYOUT}>
-    <Link href="/profile/edit" className={buttonVariants({ intent: 'secondary', width: 'full' })}>
+    <Link
+      href="/profile/edit"
+      className={buttonVariants({ intent: 'secondary', size: 'md', width: 'full' })}
+    >
       프로필 편집
     </Link>
   </div>
@@ -133,6 +136,7 @@ const MessageButton = ({ targetId }: { targetId: string }) => {
       <div className={ACTION_LAYOUT}>
         <Button
           intent="secondary"
+          size="md"
           disabled={isPending}
           onClick={guard(() =>
             startChat(
@@ -181,6 +185,7 @@ const FollowActionButton = ({ targetId, isFollowing }: VisitorActionsProps) => {
     <div className={ACTION_LAYOUT}>
       <Button
         intent={isFollowing ? 'secondary' : 'primary'}
+        size="md"
         disabled={isPending}
         onClick={() => (isFollowing ? unfollow : follow).mutate(targetId)}
         width="full"

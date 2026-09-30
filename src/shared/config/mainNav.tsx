@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import Image from 'next/image'
 import { cn } from '@/shared/lib/cn'
 import { ProfileAvatar } from '@/shared/ui'
+import { PixelPencilIcon } from '@/shared/assets'
 
 // Figma nav icon 세트 (1019:38520) — status=Default / hover-press 두 변형.
 // Default 는 단색이라 currentColor 로 그린다 (하단 내비 회색 / PC 헤더 브라운).
@@ -62,11 +63,7 @@ const NavSparkleIcon = ({ className }: NavIconProps) => (
  * `-webkit-mask` 없이는 적용하지 않아 마스크가 통째로 무시됐다. 그러면 아래 깔린
  * `bg-current` 만 남아 아이콘이 글자색 사각형 덩어리로 보인다. (경로는 bottom-community.svg 원본)
  */
-const NavCommunityGlyph = ({ className }: NavIconProps) => (
-  <svg viewBox="0 0 22 30" fill="currentColor" className={className} aria-hidden>
-    <path d="M3.7998 18.5996H5.59961V20.3994H7.40039V22.2002H9.2002V24H2V16.7998H3.7998V18.5996ZM11 22.2002H9.2002V20.3994H11V22.2002ZM12.7998 20.3994H11V18.5996H12.7998V20.3994ZM9.2002 18.5996H7.40039V16.7998H9.2002V18.5996ZM14.5996 18.5996H12.7998V16.7998H14.5996V18.5996ZM5.59961 16.7998H3.7998V15H5.59961V16.7998ZM11 16.7998H9.2002V15H11V16.7998ZM16.3994 16.7998H14.5996V15H16.3994V16.7998ZM7.40039 15H5.59961V13.2002H7.40039V15ZM12.7998 15H11V13.2002H12.7998V15ZM18.2002 15H16.3994V13.2002H18.2002V15ZM9.2002 13.2002H7.40039V11.4004H9.2002V13.2002ZM16.3994 13.2002H14.5996V11.4004H16.3994V13.2002ZM20 13.2002H18.2002V11.4004H20V13.2002ZM11 11.4004H9.2002V9.59961H11V11.4004ZM14.5996 11.4004H12.7998V9.59961H14.5996V11.4004ZM18.2002 11.4004H16.3994V9.59961H18.2002V11.4004ZM12.7998 9.59961H11V7.7998H12.7998V9.59961ZM16.3994 9.59961H14.5996V7.7998H16.3994V9.59961ZM14.5996 7.7998H12.7998V6H14.5996V7.7998Z" />
-  </svg>
-)
+const NavCommunityGlyph = ({ className }: NavIconProps) => <PixelPencilIcon className={className} />
 
 const NavCommunityIcon = ({ className, active }: NavIconProps) => (
   <span className={cn('flex items-center justify-center', className)} aria-hidden>

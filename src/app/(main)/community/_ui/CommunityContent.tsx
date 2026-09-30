@@ -12,6 +12,7 @@ import {
   LoginPromptModal,
   NavigationBar,
   SearchBar,
+  SortOptions,
 } from '@/shared/ui'
 import { PlusIcon } from '@/shared/assets'
 import {
@@ -134,24 +135,12 @@ const CommunityContent = () => {
               <h2 className="text-base font-semibold text-neutral-850">
                 {appliedSearch ? '검색 결과' : selectedLabel}
               </h2>
-              <div className="flex items-center gap-3" aria-label="게시글 정렬">
-                {COMMUNITY_SORT_OPTIONS.map((option) => (
-                  <button
-                    key={option.value}
-                    type="button"
-                    aria-pressed={sort === option.value}
-                    onClick={() => setSort(option.value)}
-                    className={cn(
-                      'min-h-10 rounded px-1 text-sm focus-ring',
-                      sort === option.value
-                        ? 'font-semibold text-neutral-850'
-                        : 'text-neutral-500 hover:text-neutral-850',
-                    )}
-                  >
-                    {option.label}
-                  </button>
-                ))}
-              </div>
+              <SortOptions
+                ariaLabel="게시글 정렬"
+                options={COMMUNITY_SORT_OPTIONS}
+                value={sort}
+                onValueChange={setSort}
+              />
             </div>
             {appliedSearch && (
               <div className="flex items-center justify-between gap-3 border-b border-neutral-100 py-3 text-sm">
