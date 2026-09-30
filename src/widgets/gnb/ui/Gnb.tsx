@@ -14,7 +14,8 @@ import { IconButton } from '@/shared/ui'
 
 // 배경이 흰색이 아닌 화면에서는 헤더도 그 배경을 따라간다 (흰 띠가 떠 보이지 않게).
 // BottomNav 의 경로 목록과 같은 방식 — 페이지가 <main> 안에 있어 props 나 CSS 변수로는 닿지 않는다.
-const TINTED_HEADER_PATHS = new Set(['/adoption/create'])
+// 분양글 작성(/adoption/create)과 수정(/adoption/:id/edit)은 같은 폼 화면이라 함께 칠한다.
+const TINTED_HEADER_PATTERN = /^\/adoption\/(create|[^/]+\/edit)$/
 
 const Gnb = () => {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -28,7 +29,7 @@ const Gnb = () => {
         data-gnb
         className={cn(
           'sticky top-0 z-header flex h-12 w-full items-center justify-center tab:py-2 pc:h-16',
-          TINTED_HEADER_PATHS.has(pathname) ? 'bg-point-50' : 'bg-white',
+          TINTED_HEADER_PATTERN.test(pathname) ? 'bg-point-50' : 'bg-white',
         )}
       >
         <div
