@@ -4,9 +4,6 @@
  *
  */
 
-/** 홈 화면 사용자 유형 */
-export type HomeUserType = 'adopter' | 'breeder'
-
 /** 배너 DTO */
 export interface BannerDto {
   bannerId: string
@@ -54,21 +51,5 @@ export interface AvailablePetDto {
     city: string
     district: string
   }
-  isAd?: boolean
-}
-
-/** 홈 화면 동물 카드 (프론트엔드 표시용)
- * @출처 - home-animal.types.ts의 HomeAnimalData
- */
-export interface HomeAnimalData {
-  id: string
-  breederId: string
-  avatarUrl: string
-  name: string
-  sex: 'male' | 'female'
-  birth: string
-  price: string | null
-  breed: string
-  status: 'available' | 'reserved' | 'adopted'
   isAd?: boolean
 }
