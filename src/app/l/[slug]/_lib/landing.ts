@@ -52,7 +52,7 @@ export function isSafeTargetPath(value: unknown): value is string {
     )
       return false
     // 백엔드 deep-link-policy의 공개 앱 경로 목록과 맞춘다.
-    return /^(?:\/|\/(?:about|activity|adoption|bookmarks|chat|community|explore|faq|grade-policy|hall-of-fame|home|notices|notifications|profile|settings|terms-of-privacy|terms-of-service)(?:\/[A-Za-z0-9_-]+)*)$/.test(
+    return /^(?:\/|\/(?:about|activity|adoption|bookmarks|chat|community|explore|faq|hall-of-fame|home|notices|notifications|profile|settings|terms-of-privacy|terms-of-service)(?:\/[A-Za-z0-9_-]+)*)$/.test(
       decoded.split(/[?#]/, 1)[0],
     )
   } catch {
