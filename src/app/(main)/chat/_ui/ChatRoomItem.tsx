@@ -71,6 +71,7 @@ const ChatRoomItem = ({
           roomId={room.roomId}
           counterpartUserId={room.counterpart.userId}
           counterpartName={room.counterpart.nickname}
+          blockedByMe={room.blockedByMe}
           onClosed={onRoomClosed}
         />
       </div>
