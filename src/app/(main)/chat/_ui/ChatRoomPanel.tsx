@@ -75,6 +75,7 @@ const ChatRoomPanel = ({ room, currentUserId, onBack, onRoomClosed }: ChatRoomPa
         displayName={displayName}
         profileImageUrl={room.counterpart.profileImageUrl}
         counterpartUserId={room.counterpart.userId}
+        blockedByMe={room.blockedByMe}
         // 애정도 뱃지 보류로 미전달
         // hasApplication={!!room.applicationId}
         onBack={onBack}
@@ -136,7 +137,17 @@ const ChatRoomPanel = ({ room, currentUserId, onBack, onRoomClosed }: ChatRoomPa
       )}
 
       {/* Input */}
-      <ChatMessageInput onSend={sendMessage} disabled={room.status === 'closed' || !isConnected} />
+      <ChatMessageInput
+        onSend={sendMessage}
+        disabled={room.status === 'closed' || !isConnected}
+        unavailableMessage={
+          room.canMessage !== false
+            ? undefined
+            : room.blockedByMe
+              ? '차단한 사용자예요. 더보기 메뉴에서 차단을 해제하면 다시 대화할 수 있어요.'
+              : '지금은 메시지를 보낼 수 없는 대화예요.'
+        }
+      />
     </div>
   )
 }

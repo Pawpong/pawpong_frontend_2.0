@@ -17,6 +17,8 @@ interface ChatRoomActionsMenuProps {
   roomId: string
   counterpartUserId: string
   counterpartName: string
+  /** 채팅방 응답의 blockedByMe — 없으면(구버전 서버) 차단·해제를 모두 노출한다 */
+  blockedByMe?: boolean
   onClosed?: () => void
 }
 
@@ -25,6 +27,7 @@ const ChatRoomActionsMenu = ({
   roomId,
   counterpartUserId,
   counterpartName,
+  blockedByMe,
   onClosed,
 }: ChatRoomActionsMenuProps) => {
   const closeRoom = useCloseChatRoom()
@@ -72,12 +75,18 @@ const ChatRoomActionsMenu = ({
           </IconButton>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onSelect={() => openBlockDialog('block')}>사용자 차단</DropdownMenuItem>
-          {/* 서버가 차단 상태 조회를 제공하지 않으므로 로컬 상태를 실제 상태처럼 표시하지 않는다.
-              차단·해제 명령은 멱등적이며 재실행하거나 재설치한 뒤에도 해제할 수 있다. */}
-          <DropdownMenuItem onSelect={() => openBlockDialog('unblock')}>
-            사용자 차단 해제
-          </DropdownMenuItem>
+          {/* 서버의 blockedByMe 로 둘 중 하나만 보인다. 값이 없으면 상태를 모르니 둘 다 둔다
+              (차단·해제 명령은 멱등이라 잘못 눌러도 상태가 꼬이지 않는다). */}
+          {blockedByMe !== true && (
+            <DropdownMenuItem onSelect={() => openBlockDialog('block')}>
+              사용자 차단
+            </DropdownMenuItem>
+          )}
+          {blockedByMe !== false && (
+            <DropdownMenuItem onSelect={() => openBlockDialog('unblock')}>
+              사용자 차단 해제
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem
             onSelect={() => {
               closeRoom.reset()

@@ -20,6 +20,8 @@ interface ChatMessageInputProps {
     clientMessageId?: string,
   ) => Promise<boolean>
   disabled?: boolean
+  /** 있으면 입력창 대신 이 안내를 보여준다 (차단·탈퇴 등으로 대화할 수 없는 방) */
+  unavailableMessage?: string
 }
 
 const MAX_ATTACHMENT_SIZE = 100 * 1024 * 1024
@@ -42,7 +44,7 @@ const getLocationErrorMessage = (error: GeolocationPositionError) => {
   return '위치 확인 시간이 초과되었습니다. 네트워크 상태를 확인하고 다시 시도해주세요.'
 }
 
-const ChatMessageInput = ({ onSend, disabled }: ChatMessageInputProps) => {
+const ChatMessageInput = ({ onSend, disabled, unavailableMessage }: ChatMessageInputProps) => {
   const [value, setValue] = React.useState('')
   const [attachmentError, setAttachmentError] = React.useState<string | null>(null)
   const [locationModalOpen, setLocationModalOpen] = React.useState(false)
@@ -174,6 +176,22 @@ const ChatMessageInput = ({ onSend, disabled }: ChatMessageInputProps) => {
         setLocationError(getLocationErrorMessage(error))
       },
       GEOLOCATION_OPTIONS,
+    )
+  }
+
+  if (unavailableMessage) {
+    return (
+      <div className={cn('shrink-0 border-t border-neutral-150 bg-white py-4', CHAT_GUTTER_X)}>
+        <p
+          role="status"
+          className={cn(
+            CHAT_CONTENT_WIDTH,
+            'text-center text-body-md font-medium text-neutral-500',
+          )}
+        >
+          {unavailableMessage}
+        </p>
+      </div>
     )
   }
 
