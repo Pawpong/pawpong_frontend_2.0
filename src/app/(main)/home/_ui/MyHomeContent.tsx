@@ -4,15 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { BookmarkIcon } from '@/shared/assets'
-import {
-  Button,
-  buttonVariants,
-  Container,
-  InputUpload,
-  NavigationBar,
-  iconButtonVariants,
-} from '@/shared/ui'
+import { Button, buttonVariants, Container, InputUpload, NavigationBar } from '@/shared/ui'
 import { transientQueryRecoveryOptions } from '@/shared/api'
 import { profileQueries } from '@/entities/profile'
 import { AiPhotoArchive } from '@/features/ai-image'
@@ -95,20 +87,7 @@ const MyHomeContent = () => {
       {/* 스크롤 시 GNB 아래 고정(sticky) — tab+만. PC는 사이드바가 프로필/현재 위치를 이미 보여줘
           타이틀 바가 GNB의 '마이홈' 활성 표시와 겹쳐 위계가 흐트러지므로 숨긴다 */}
       <div className="bg-white tab:hidden">
-        <NavigationBar
-          title="마이홈"
-          titleVariant="page"
-          className="px-4 tab:px-12"
-          right={
-            <Link
-              href="/bookmarks"
-              aria-label="저장목록"
-              className={iconButtonVariants({ edge: 'both' })}
-            >
-              <BookmarkIcon className="size-6" />
-            </Link>
-          }
-        />
+        <NavigationBar title="마이홈" titleVariant="page" className="px-4 tab:px-12" />
       </div>
 
       <HomeTabs
