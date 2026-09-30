@@ -25,6 +25,10 @@ export interface ChatRoomResponseDto {
   lastMessage?: string
   lastMessageAt?: string
   unreadCount: number
+  /** 내가 상대를 차단했는지 (상대가 나를 차단한 경우는 포함하지 않음). 구버전 서버는 내려주지 않는다 */
+  blockedByMe?: boolean
+  /** 지금 메시지를 보낼 수 있는지 — 양방향 차단·상대 탈퇴·정지면 false (누가 차단했는지는 알 수 없다). 구버전 서버는 내려주지 않는다 */
+  canMessage?: boolean
   createdAt: string
 }
 

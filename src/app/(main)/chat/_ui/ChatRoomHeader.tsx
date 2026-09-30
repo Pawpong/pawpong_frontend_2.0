@@ -14,6 +14,8 @@ interface ChatRoomHeaderProps {
   profileImageUrl?: string
   /** 상대 userId — 프로필(브리더홈/입양자홈)로 넘어가는 링크에 쓴다 */
   counterpartUserId: string
+  /** 채팅방 응답의 blockedByMe — 더보기 메뉴의 차단/해제 노출에 쓴다 */
+  blockedByMe?: boolean
   /** 애정도 뱃지 노출 조건 — 뱃지 보류로 현재 미사용
   hasApplication: boolean */
   onBack: () => void
@@ -25,6 +27,7 @@ const ChatRoomHeader = ({
   displayName,
   profileImageUrl,
   counterpartUserId,
+  blockedByMe,
   onBack,
   onRoomClosed,
 }: ChatRoomHeaderProps) => {
@@ -66,6 +69,7 @@ const ChatRoomHeader = ({
           roomId={roomId}
           counterpartUserId={counterpartUserId}
           counterpartName={displayName}
+          blockedByMe={blockedByMe}
           onClosed={onRoomClosed}
         />
       </div>
