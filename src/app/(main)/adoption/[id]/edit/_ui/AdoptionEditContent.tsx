@@ -1,15 +1,7 @@
 'use client'
 
 import { Button, Container, CtaModal, NavigationBar } from '@/shared/ui'
-import { PostFormCTA } from '@/widgets/post-form'
-import {
-  BasicInfoSection,
-  BreedingEnvSection,
-  HealthInfoSection,
-  ImageField,
-  ParentInfoSection,
-  PET_IMAGE_MAX,
-} from '@/widgets/adoption-form'
+import { AdoptionPostingForm } from '../../../_ui/AdoptionPostingForm'
 import { useAdoptionEditForm } from '../_lib/useAdoptionEditForm'
 
 interface AdoptionEditContentProps {
@@ -18,7 +10,7 @@ interface AdoptionEditContentProps {
 
 /**
  * 분양글 수정 화면.
- * 작성 화면과 같은 섹션·같은 스키마를 쓰고, 임시저장 버튼만 빼고 제출을 PATCH 로 바꾼다.
+ * 작성 화면과 같은 화면 틀(AdoptionFormLayout)·섹션·스키마를 쓰고, 임시저장만 빼고 제출을 PATCH 로 바꾼다.
  */
 const AdoptionEditContent = ({ petId }: AdoptionEditContentProps) => {
   const {
@@ -41,17 +33,16 @@ const AdoptionEditContent = ({ petId }: AdoptionEditContentProps) => {
     handleSubmit,
   } = useAdoptionEditForm(petId)
 
-  const {
-    register,
-    control,
-    formState: { errors },
-  } = form
-
   // 남의 글이면 서버가 막으므로 여기서도 '불러오지 못했습니다' 로 수렴한다
   if (isLoading || isLoadError) {
     return (
-      <div className="flex min-h-screen w-full flex-col bg-white">
-        <NavigationBar title="분양글 수정" icon="close" onBack={handleCloseClick} />
+      <div className="flex min-h-screen w-full flex-col bg-point-50">
+        <NavigationBar
+          title="분양글 수정"
+          icon="close"
+          onBack={handleCloseClick}
+          className="bg-transparent"
+        />
         <Container className="flex flex-1 items-center justify-center px-4 py-12">
           <div className="flex flex-col items-center gap-4 text-center">
             <p
@@ -77,72 +68,51 @@ const AdoptionEditContent = ({ petId }: AdoptionEditContentProps) => {
   }
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-white">
-      <NavigationBar title="분양글 수정" icon="close" onBack={handleCloseClick} />
-
-      <Container className="flex-1 py-5 pb-30 pc:pt-12">
-        <form onSubmit={handleSubmit} className="mx-auto w-full pc:max-w-320">
-          <div className="flex flex-col gap-[1.1875rem] pc:flex-row pc:gap-25">
-            <ImageField
-              className="pc:w-93 pc:shrink-0"
-              images={petImages.images}
-              onAdd={petImages.handleAddImages}
-              onRemove={petImages.handleRemoveImage}
-              maxImages={PET_IMAGE_MAX}
-              requirement="필수"
-              representativeIndex={representativeIndex}
-              onSetRepresentative={setRepresentativeIndex}
-            />
-
-            <div className="flex flex-1 flex-col gap-4">
-              <BasicInfoSection control={control} register={register} errors={errors} />
-              <HealthInfoSection control={control} register={register} errors={errors} />
-              <ParentInfoSection
-                control={control}
-                register={register}
-                errors={errors}
-                parentRows={parentRows}
-              />
-              <BreedingEnvSection
-                register={register}
-                images={breedingEnvImages.images}
-                onAddImages={breedingEnvImages.handleAddImages}
-                onRemoveImage={breedingEnvImages.handleRemoveImage}
-              />
-
-              {submitError && <p className="text-sm text-error-500">{submitError}</p>}
-            </div>
-          </div>
-
-          {/* 암묵적 제출(Enter)은 폼에 submit 버튼이 있어야 동작한다. 실제 버튼은 fixed CTA 바에 있다 */}
-          <button type="submit" className="hidden" aria-hidden tabIndex={-1} />
-        </form>
-      </Container>
-
-      {/* 발행된 글이라 임시저장이 없다 — onSaveDraft 를 넘기지 않으면 그 버튼이 숨는다 */}
-      <PostFormCTA
-        onSubmit={handleSubmit}
-        submitLabel="수정 완료"
-        isValid={canSubmit}
-        isSubmitting={isSubmitting}
-      />
-
-      <CtaModal
-        open={showGuard}
-        onOpenChange={(isOpen) => !isOpen && cancelExit()}
-        title="수정을 그만하시겠어요?"
-        description="지금 나가면 고친 내용이 사라져요."
-        actions={[
-          {
-            label: '수정 그만하기',
-            intent: 'secondary',
-            onClick: handleExitConfirm,
-            disabled: isSubmitting,
-          },
-          { label: '계속 수정하기', intent: 'ghost', onClick: cancelExit, disabled: isSubmitting },
-        ]}
-      />
-    </div>
+    <AdoptionPostingForm
+      form={form}
+      petImages={petImages}
+      breedingEnvImages={breedingEnvImages}
+      parentRows={parentRows}
+      representativeIndex={representativeIndex}
+      setRepresentativeIndex={setRepresentativeIndex}
+      navTitle="분양글 수정"
+      onClose={handleCloseClick}
+      eyebrow="등록한 분양글 수정"
+      title="바뀐 정보를 알려주세요"
+      description="사진과 정보를 최신으로 유지하면 입양자가 더 정확하게 판단할 수 있어요."
+      onSubmit={handleSubmit}
+      submitLabel={isSubmitting ? '수정 중…' : '수정 완료'}
+      canSubmit={canSubmit}
+      isBusy={isSubmitting}
+      submitError={submitError}
+      statusText={
+        canSubmit
+          ? '필수 정보를 확인했어요. 바뀐 내용을 확인한 뒤 수정을 완료해주세요.'
+          : '필수 항목을 모두 입력하면 수정을 완료할 수 있어요.'
+      }
+      overlay={
+        <CtaModal
+          open={showGuard}
+          onOpenChange={(isOpen) => !isOpen && cancelExit()}
+          title="수정을 그만하시겠어요?"
+          description="지금 나가면 고친 내용이 사라져요."
+          actions={[
+            {
+              label: '수정 그만하기',
+              intent: 'secondary',
+              onClick: handleExitConfirm,
+              disabled: isSubmitting,
+            },
+            {
+              label: '계속 수정하기',
+              intent: 'ghost',
+              onClick: cancelExit,
+              disabled: isSubmitting,
+            },
+          ]}
+        />
+      }
+    />
   )
 }
 
