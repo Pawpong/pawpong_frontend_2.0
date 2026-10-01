@@ -15,8 +15,8 @@ export const EXPLORE_SECTION_TITLE_CLASS = cn(
 export const EXPLORE_SECTION_CONTAINER = 'px-4 py-5 tab:py-10'
 
 export const EXPLORE_TABS: Array<{ type: ExploreType; label: string }> = [
-  { type: 'adoption', label: '입양 탐색' },
   { type: 'breeder', label: '브리더 탐색' },
+  { type: 'adoption', label: '입양 탐색' },
 ]
 
 export const SEARCH_PLACEHOLDERS: Record<ExploreType, { mobile: string; desktop: string }> = {
