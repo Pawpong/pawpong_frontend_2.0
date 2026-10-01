@@ -1,10 +1,13 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { NotificationListItem, notificationQueries } from '@/entities/notification'
-import { useDeleteNotification, useMarkAllAsRead, useMarkAsRead } from '@/features/notification'
+import {
+  useDeleteNotification,
+  useMarkAllAsRead,
+  useOpenNotification,
+} from '@/features/notification'
 import { PawPrintIcon } from '@/shared/assets'
 import type { NotificationResponseDto } from '@/shared/types'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
@@ -19,7 +22,7 @@ import {
 } from '@/shared/ui'
 
 const NotificationsContent = () => {
-  const router = useRouter()
+  const openNotification = useOpenNotification()
   const unreadCountQuery = useQuery({
     ...notificationQueries.unreadCount(),
     refetchOnMount: 'always',
@@ -32,7 +35,6 @@ const NotificationsContent = () => {
       refetchOnMount: 'always',
       throwOnError: false,
     })
-  const { mutate: markAsRead } = useMarkAsRead()
   const { mutate: markAllAsRead, isPending: isMarkingAll } = useMarkAllAsRead()
   const { mutate: deleteNotification, isPending: isDeleting } = useDeleteNotification()
   const [deleteTarget, setDeleteTarget] = useState<NotificationResponseDto | null>(null)
@@ -43,8 +45,7 @@ const NotificationsContent = () => {
   )
 
   const handleSelect = (item: NotificationResponseDto) => {
-    if (!item.isRead) markAsRead(item.notificationId)
-    if (item.targetUrl?.startsWith('/')) router.push(item.targetUrl)
+    void openNotification(item)
   }
 
   const handleConfirmDelete = () => {

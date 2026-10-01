@@ -6,7 +6,7 @@ export const markAsRead = async (notificationId: string) => {
   return apiClient
     .patch<
       ApiResponseFull<{ notificationId: string; isRead: boolean; readAt: string }>
-    >(`${API_VERSION}/notification/${notificationId}/read`)
+    >(`${API_VERSION}/notification/${notificationId}/read`, undefined, { timeout: 5000 })
     .then((res) => unwrap(res, '알림 읽음 처리에 실패했습니다.'))
 }
 

@@ -9,6 +9,17 @@ const nextConfig: NextConfig = {
   env: {
     NEXT_PUBLIC_APP_ENV: process.env.VERCEL_ENV || process.env.NEXT_PUBLIC_APP_ENV || 'development',
   },
+  // 과거에 발송된 푸시·공유 링크와 구버전 앱의 신청 주소도 유지한다.
+  async redirects() {
+    return [
+      { source: '/applications', destination: '/activity', permanent: false },
+      {
+        source: '/applications/:path*',
+        destination: '/activity/applications/:path*',
+        permanent: false,
+      },
+    ]
+  },
   // 앱 딥링크 검증 파일.
   // apple-app-site-association 은 확장자가 없어 기본적으로 JSON 으로 서빙되지 않는데,
   // Apple 은 application/json 이 아니면 Universal Links 검증을 실패 처리한다.

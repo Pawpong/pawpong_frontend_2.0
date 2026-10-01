@@ -7,7 +7,7 @@ import { cn } from '@/shared/lib/cn'
 import { useAuthStatus } from '@/features/auth'
 import { NotificationListItem, notificationQueries } from '@/entities/notification'
 import { uniqueBy } from '@/shared/lib/uniqueBy'
-import { useMarkAsRead, useMarkAllAsRead } from '@/features/notification'
+import { useOpenNotification, useMarkAllAsRead } from '@/features/notification'
 import type { NotificationResponseDto } from '@/shared/types'
 import { Button, EmptyState, ActionSheetItem } from '@/shared/ui'
 
@@ -43,7 +43,7 @@ const NotificationBell = ({ className }: { className?: string }) => {
       enabled: isLoggedIn && open,
     })
 
-  const { mutate: markAsRead } = useMarkAsRead()
+  const openNotification = useOpenNotification()
   const { mutate: markAllAsRead } = useMarkAllAsRead()
 
   const notifications = uniqueBy(
@@ -71,9 +71,8 @@ const NotificationBell = ({ className }: { className?: string }) => {
   if (!isLoggedIn) return null
 
   const handleSelect = (item: NotificationResponseDto) => {
-    if (!item.isRead) markAsRead(item.notificationId)
     setOpen(false)
-    if (item.targetUrl?.startsWith('/')) router.push(item.targetUrl)
+    void openNotification(item)
   }
 
   return (
