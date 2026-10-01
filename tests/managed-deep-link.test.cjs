@@ -50,7 +50,7 @@ test('rejects external, encoded, recursive and privileged link destinations', ()
   ]) {
     assert.equal(helpers.isSafeTargetPath(unsafe), false, unsafe)
   }
-  for (const safe of ['/', '/explore?animal=dog', '/notices/123', '/community/post/abc#comments'])
+  for (const safe of ['/', '/ai-filter', '/explore?animal=dog', '/notices/123', '/community/post/abc#comments'])
     assert.equal(helpers.isSafeTargetPath(safe), true, safe)
 })
 
@@ -139,7 +139,7 @@ test('backend outage and invalid destination are 503; store outage retains link 
     throw new Error('store unavailable')
   })(request(), params)
   assert.equal(response.status, 200)
-  assert.match(await response.text(), /웹에서 계속하기/)
+  assert.match(await response.text(), /웹으로 보기/)
 })
 
 test('store links reject credentials, non HTTPS URLs and unrelated Android packages', () => {

@@ -52,7 +52,7 @@ export function isSafeTargetPath(value: unknown): value is string {
     )
       return false
     // 백엔드 deep-link-policy의 공개 앱 경로 목록과 맞춘다.
-    return /^(?:\/|\/(?:about|activity|adoption|bookmarks|chat|community|explore|faq|hall-of-fame|home|notices|notifications|profile|settings|terms-of-privacy|terms-of-service)(?:\/[A-Za-z0-9_-]+)*)$/.test(
+    return /^(?:\/|\/(?:about|activity|adoption|ai-filter|bookmarks|chat|community|explore|faq|grade-policy|hall-of-fame|home|notices|notifications|profile|settings|terms-of-privacy|terms-of-service)(?:\/[A-Za-z0-9_-]+)*)$/.test(
       decoded.split(/[?#]/, 1)[0],
     )
   } catch {
@@ -118,17 +118,13 @@ function escapeHtml(value: string): string {
   )
 }
 
-function documentHtml(
-  title: string,
-  description: string,
-  metadata: string,
-  content: string,
-): string {
+function documentHtml(title: string, description: string, metadata: string, content: string): string {
   return `<!doctype html>
-<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f5eadf"><title>${escapeHtml(title)} | 포퐁</title><meta name="description" content="${escapeHtml(description)}">${metadata}
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#fef9ef"><title>${escapeHtml(title)} | 포퐁</title><meta name="description" content="${escapeHtml(description)}">${metadata}
 <style>
-*{box-sizing:border-box}body{margin:0;background:#faf7f3;color:#231406;font-family:system-ui,-apple-system,sans-serif;line-height:1.6}main{max-width:480px;margin:clamp(24px,8vh,96px) auto;padding:32px 24px;background:white;border:1px solid #eddbca;border-radius:24px}header{display:flex;align-items:center;gap:10px;margin-bottom:32px}header img{width:94px;height:40px;object-fit:contain}header span{font-size:13px;color:#776859}.cover{width:100%;max-height:280px;object-fit:cover;border-radius:16px;margin-bottom:16px}h1{font-size:26px;line-height:1.4;overflow-wrap:anywhere}p{color:#776859;white-space:pre-wrap;overflow-wrap:anywhere}.actions{display:grid;gap:12px;margin-top:28px}a{color:#8a5117}a.button{display:block;border:1px solid #ddbe9f;border-radius:12px;text-decoration:none;text-align:center;padding:14px 16px;font-weight:650}a.primary{background:#ad651d;border-color:#ad651d;color:white}a:focus-visible{outline:3px solid #ad651d;outline-offset:4px}.stores{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin-top:20px;font-size:14px}.hint{font-size:13px;text-align:center;margin-top:20px}@media(max-width:520px){main{margin:16px;border-radius:20px}}
-</style></head><body><main><header><img src="/images/logo/logo.svg" alt="포퐁"><span>새로운 가족을 만나는 곳</span></header>${content}</main></body></html>`
+*{box-sizing:border-box}html{min-height:100%;background:#fef9ef}body{margin:0;min-height:100vh;color:#3e3e3e;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;line-height:1.55;background:radial-gradient(circle at 12% 12%,#ffe6b3 0,transparent 28%),radial-gradient(circle at 85% 88%,#ffffc7 0,transparent 24%),#fef9ef}a{color:inherit}a:focus-visible{outline:3px solid #ad651d;outline-offset:3px}.shell{width:min(100% - 32px,520px);margin:0 auto;padding:clamp(24px,5vh,52px) 0 32px}.brand{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 22px;padding:0 4px}.brand img{width:132px;height:48px;object-fit:contain;object-position:left center}.brand span{font-size:12px;font-weight:800;letter-spacing:.1em;color:#8a5117}.card{overflow:hidden;background:#fff;border:1px solid #f8d17d;border-radius:28px;box-shadow:0 12px 0 #fdf4df,0 22px 50px rgba(104,61,17,.1)}.hero{position:relative;display:grid;place-items:center;min-height:224px;padding:28px;background:#ffe6b3;isolation:isolate}.hero:before,.hero:after{content:"✦";position:absolute;color:#f6c65d;font-size:30px}.hero:before{top:25px;left:10%}.hero:after{right:11%;bottom:20px;font-size:22px}.hero img{position:relative;z-index:1;display:block;width:100%;max-width:210px;max-height:176px;object-fit:contain}.hero img.cover{max-width:min(100%,340px);max-height:220px;border-radius:18px}.copy{padding:30px clamp(22px,6vw,38px) 34px}.eyebrow{display:inline-flex;align-items:center;gap:7px;margin:0 0 10px;color:#ad651d;font-size:12px;font-weight:800;letter-spacing:.04em}.eyebrow:before{content:"";width:7px;height:7px;border-radius:50%;background:#f6c65d}h1{margin:0;font-size:clamp(25px,6vw,32px);line-height:1.35;letter-spacing:-.035em;overflow-wrap:anywhere}.description{margin:12px 0 0;color:#686868;font-size:15px;white-space:pre-wrap;overflow-wrap:anywhere}.actions{display:grid;gap:10px;margin-top:30px}.button{display:flex;align-items:center;justify-content:center;min-height:54px;padding:13px 18px;border:1px solid #d9d9d9;border-radius:16px;background:#fff;text-align:center;text-decoration:none;font-size:15px;font-weight:800;transition:transform .15s,background .15s,border-color .15s}.button:hover{transform:translateY(-2px);border-color:#f8d17d;background:#fef9ef}.button.primary{border-color:#fffe72;background:#fffe72;color:#3e3e3e;box-shadow:0 4px 0 #dbda5b}.button.primary:hover{background:#fffeaa}.stores{margin-top:28px;padding-top:23px;border-top:1px solid #eee}.stores-title{margin:0 0 12px;font-size:14px;font-weight:800}.store-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}.store-link{display:flex;align-items:center;justify-content:center;min-height:44px;border:1px solid #e7e7e7;border-radius:12px;text-decoration:none;font-size:13px;font-weight:700}.store-link:hover{background:#fef9ef;border-color:#f8d17d}.hint{margin:18px 0 0;color:#777;font-size:12px;text-align:center}.foot{margin:30px 0 0;text-align:center;font-size:12px;color:#8c7a67}.unavailable{padding:42px 30px}.unavailable h1{font-size:25px}.unavailable p{color:#686868;margin:12px 0 24px}@media(max-width:520px){.shell{width:min(100% - 24px,520px);padding-top:18px}.brand{margin-bottom:14px}.card{border-radius:22px}.hero{min-height:190px}.copy{padding:26px 22px 28px}}@media(prefers-reduced-motion:reduce){.button{transition:none}.button:hover{transform:none}}
+.store-pending{margin:0;color:#777;font-size:13px}
+</style></head><body><div class="shell"><header class="brand"><a href="/" aria-label="포퐁 홈"><img src="/images/logo/logo.svg" alt="포퐁"></a><span>PAWPONG LINK</span></header><main class="card">${content}</main><p class="foot">좋은 만남의 시작, 포퐁</p></div></body></html>`
 }
 
 export function renderLanding(
@@ -148,17 +144,23 @@ export function renderLanding(
   const metadata = `<link rel="canonical" href="${escapeHtml(canonical)}"><meta property="og:type" content="website"><meta property="og:site_name" content="포퐁"><meta property="og:title" content="${escapeHtml(link.title)}"><meta property="og:description" content="${escapeHtml(description)}"><meta property="og:url" content="${escapeHtml(canonical)}"><meta property="og:image" content="${escapeHtml(image)}"><meta name="twitter:card" content="summary_large_image">`
   const storeLinks = [
     stores.ios &&
-      `<a href="${escapeHtml(stores.ios)}" rel="noopener noreferrer">App Store에서 받기</a>`,
+      `<a class="store-link" href="${escapeHtml(stores.ios)}" rel="noopener noreferrer">App Store에서 받기 ↗</a>`,
     stores.android &&
-      `<a href="${escapeHtml(stores.android)}" rel="noopener noreferrer">Google Play에서 받기</a>`,
+      `<a class="store-link" href="${escapeHtml(stores.android)}" rel="noopener noreferrer">Google Play에서 받기 ↗</a>`,
   ]
     .filter(Boolean)
     .join('')
+  const heroImage = link.imageUrl || (link.targetPath.startsWith('/ai-filter')
+    ? '/images/category/dog-default-md.svg'
+    : '/images/category/cta-paw.svg')
+  const downloadSection = storeLinks
+    ? `<section class="stores" aria-label="앱 다운로드"><p class="stores-title">포퐁 앱이 아직 없나요?</p><div class="store-links">${storeLinks}</div></section>`
+    : '<section class="stores" aria-label="앱 다운로드"><p class="stores-title">포퐁 앱이 아직 없나요?</p><p class="store-pending">앱 다운로드를 준비 중이에요. 지금은 웹에서 먼저 만나보세요.</p></section>'
   return documentHtml(
     link.title,
     description,
     metadata,
-    `${link.imageUrl ? `<img class="cover" src="${escapeHtml(link.imageUrl)}" alt="" referrerpolicy="no-referrer">` : ''}<h1>${escapeHtml(link.title)}</h1><p>${escapeHtml(description)}</p><div class="actions"><a class="button primary" href="${escapeHtml(appUrl)}">포퐁 앱에서 열기</a><a class="button" href="${escapeHtml(link.targetPath)}">웹에서 계속하기</a></div>${storeLinks ? `<nav class="stores" aria-label="앱 다운로드">${storeLinks}</nav>` : ''}<p class="hint">앱이 열리지 않으면 웹에서 계속 이용할 수 있어요.</p>`,
+    `<div class="hero"><img class="${link.imageUrl ? 'cover' : ''}" src="${escapeHtml(heroImage)}" alt=""${link.imageUrl ? ' referrerpolicy="no-referrer"' : ''}></div><div class="copy"><p class="eyebrow">포퐁에서 만나요</p><h1>${escapeHtml(link.title)}</h1><p class="description">${escapeHtml(description)}</p><div class="actions"><a class="button primary" href="${escapeHtml(appUrl)}">포퐁 앱에서 열기 ↗</a><a class="button" href="${escapeHtml(link.targetPath)}">웹으로 보기</a></div>${downloadSection}<p class="hint">앱이 열리지 않으면 웹에서도 바로 볼 수 있어요.</p></div>`,
   )
 }
 
@@ -171,6 +173,6 @@ export function renderUnavailable(unavailable: boolean): string {
     title,
     description,
     '<meta name="robots" content="noindex">',
-    `<h1>${title}</h1><p>${description}</p><a class="button" href="/">포퐁 홈으로</a>`,
+    `<div class="unavailable"><h1>${title}</h1><p>${description}</p><a class="button" href="/">포퐁 홈으로</a></div>`,
   )
 }
