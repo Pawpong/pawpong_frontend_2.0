@@ -8,7 +8,7 @@ import { Checkbox } from '@/shared/ui/Checkbox'
 
 type ConsentStatus = { version: string; accepted: boolean; consentedAt: string | null }
 
-export function ContentRightsContent() {
+export function ContentRightsContent({ onConsented }: { onConsented?: () => void } = {}) {
   const queryClient = useQueryClient()
   const [status, setStatus] = useState<ConsentStatus | null>(null)
   const [checked, setChecked] = useState(false)
@@ -48,8 +48,9 @@ export function ContentRightsContent() {
         throw new Error('동의 저장 결과를 확인하지 못했어요. 다시 시도해 주세요.')
       setStatus(saved)
       // 작성자 동의로 공개 콘텐츠가 달라지므로 이전 앱 목록 캐시를 다시 조회한다.
-      await queryClient.invalidateQueries()
+      void queryClient.invalidateQueries()
       window.dispatchEvent(new Event('pawpong:content-rights-updated'))
+      onConsented?.()
     } catch (cause) {
       setError(normalizeApiError(cause, '동의를 저장하지 못했어요.').message)
     } finally {

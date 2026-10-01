@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import Link from 'next/link'
+import { isApiError } from '@/shared/api'
 import { Button } from '@/shared/ui'
 import { CommentComposerShell } from './CommentComposerShell'
 
@@ -9,6 +11,7 @@ interface CommentComposerProps {
   isSubmitting?: boolean
   hasSubmitError: boolean
   onClearSubmitError: () => void
+  submitError?: unknown
   /** 작성자(나) 아바타 */
   profileImageUrl?: string
   /** 답글 대상 닉네임 — 있으면 답글 모드 배너 표시 */
@@ -25,6 +28,7 @@ const CommentComposer = ({
   isSubmitting = false,
   hasSubmitError,
   onClearSubmitError,
+  submitError,
   profileImageUrl,
   replyingToNickname,
   onCancelReply,
@@ -32,6 +36,11 @@ const CommentComposer = ({
   const [value, setValue] = useState('')
   const trimmed = value.trim()
   const inputRef = useRef<HTMLInputElement>(null)
+  const submittingRef = useRef(false)
+  const composingRef = useRef(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [localError, setLocalError] = useState(false)
+  const busy = isSubmitting || submitting
 
   // 답글 대상이 잡히면 인풋에 바로 포커스 — 답글달기 클릭 후 곧장 타이핑할 수 있게
   useEffect(() => {
@@ -40,12 +49,20 @@ const CommentComposer = ({
 
   // 실패해도 입력값은 남기고 재시도할 수 있게 — 오류 상태는 호출부 mutation을 단일 출처로 쓴다
   const handleSubmit = async () => {
-    if (!trimmed || isSubmitting) return
+    const body = inputRef.current?.value.trim() ?? trimmed
+    if (!body || isSubmitting || submittingRef.current) return
+    submittingRef.current = true
+    setSubmitting(true)
+    setLocalError(false)
     try {
-      await onSubmit(trimmed)
+      await onSubmit(body)
       setValue('')
     } catch {
-      // mutation의 isError로 안내하고, 이벤트 핸들러의 unhandled rejection만 막는다
+      // mutation 전에 실패해도 아무 반응 없는 상태가 되지 않도록 입력값과 오류를 남긴다.
+      setLocalError(true)
+    } finally {
+      submittingRef.current = false
+      setSubmitting(false)
     }
   }
 
@@ -59,27 +76,62 @@ const CommentComposer = ({
     </div>
   )
 
-  const error = hasSubmitError && (
-    <p role="alert" className="text-body-sm text-error-700">
-      댓글 등록에 실패했습니다. 다시 시도해주세요.
-    </p>
+  const needsConsent =
+    isApiError(submitError) &&
+    submitError.status === 403 &&
+    typeof submitError.message === 'string' &&
+    submitError.message.includes('앱 표시 동의')
+  const error = (hasSubmitError || localError) && (
+    <div role="alert" className="text-body-sm text-error-700">
+      <p>
+        {needsConsent
+          ? '앱에서 댓글을 남기려면 게시물 표시 동의가 필요해요.'
+          : isApiError(submitError) && submitError.status === 401
+            ? '로그인이 만료됐어요. 다시 로그인해 주세요.'
+            : '댓글 등록에 실패했습니다. 입력한 글은 남아 있으니 다시 시도해주세요.'}
+      </p>
+      {needsConsent && (
+        <Link href="/account/content-rights" className="font-semibold underline">
+          앱 표시 동의하기
+        </Link>
+      )}
+    </div>
   )
 
   return (
     <CommentComposerShell profileImageUrl={profileImageUrl} banner={banner} footer={error}>
-      <div className="flex h-12 min-w-0 flex-1 items-center gap-2 rounded-full border border-neutral-300 bg-base-white py-1 pr-1.5 pl-5 transition-[border-color,box-shadow] duration-150 focus-within:border-primary-500 focus-within:ring-4 focus-within:ring-point-500/45 motion-reduce:transition-none pc:h-14 pc:pl-6">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          void handleSubmit()
+        }}
+        aria-busy={busy}
+        className="flex h-12 min-w-0 flex-1 items-center gap-2 rounded-full border border-neutral-300 bg-base-white py-1 pr-1.5 pl-5 transition-[border-color,box-shadow] duration-150 focus-within:border-primary-500 focus-within:ring-4 focus-within:ring-point-500/45 motion-reduce:transition-none pc:h-14 pc:pl-6"
+      >
         <input
           ref={inputRef}
           type="text"
           value={value}
+          readOnly={busy}
+          enterKeyHint="send"
           onChange={(e) => {
             setValue(e.target.value)
+            setLocalError(false)
             if (hasSubmitError) onClearSubmitError()
           }}
+          onCompositionStart={() => {
+            composingRef.current = true
+          }}
+          onCompositionEnd={(e) => {
+            composingRef.current = false
+            setValue(e.currentTarget.value)
+          }}
           onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
+            if (
+              e.key === 'Enter' &&
+              (composingRef.current || e.nativeEvent.isComposing || e.keyCode === 229)
+            ) {
               e.preventDefault()
-              void handleSubmit()
             }
           }}
           aria-label={replyingToNickname ? '답글 입력' : '댓글 입력'}
@@ -90,15 +142,19 @@ const CommentComposer = ({
         <div className="flex min-w-14">
           <Button
             size="md"
-            onClick={handleSubmit}
-            disabled={!trimmed || isSubmitting}
-            aria-busy={isSubmitting}
+            type="submit"
+            // iOS에서 키보드가 먼저 닫히며 버튼 위치가 바뀌어 터치가 취소되지 않게 한다.
+            onPointerDown={(e) => {
+              if (e.pointerType === 'touch') e.preventDefault()
+            }}
+            disabled={!trimmed || busy}
+            aria-busy={busy}
             width="full"
           >
-            게시
+            {busy ? '게시 중…' : '게시'}
           </Button>
         </div>
-      </div>
+      </form>
     </CommentComposerShell>
   )
 }

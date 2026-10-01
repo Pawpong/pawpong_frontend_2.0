@@ -27,6 +27,7 @@ const CommentComposerBar = ({ thread, className }: CommentComposerBarProps) => {
           onSubmit={handleSubmitComment}
           isSubmitting={createComment.isPending}
           hasSubmitError={createComment.isError}
+          submitError={createComment.error}
           onClearSubmitError={createComment.reset}
           profileImageUrl={me?.profileImageUrl}
           replyingToNickname={replyTarget?.nickname}

@@ -64,6 +64,7 @@ export const createCommunityComment = async (
   const response = await apiClient.post<ApiResponseFull<{ commentId: string }>>(
     `${API_VERSION}/community/posts/${postId}/comments`,
     data,
+    { timeout: 15_000 },
   )
   return unwrap(response, '댓글 작성에 실패했습니다.')
 }

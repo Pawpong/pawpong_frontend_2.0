@@ -1,5 +1,6 @@
 'use client'
 
+import { ChatUserSearch } from './ChatUserSearch'
 import { NavigationBar } from '@/shared/ui'
 import type { ChatRoomResponseDto } from '@/shared/types'
 import { ChatRoomFilterableList } from './ChatRoomFilterableList'
@@ -15,6 +16,9 @@ const ChatRoomList = ({ activeRoomId, onSelectRoom }: ChatRoomListProps) => {
     <div className="mx-auto flex h-[calc(100dvh-4rem)] w-full max-w-[90rem] flex-col bg-white">
       {/* Header — 채팅 전용 상단바 (고정) */}
       <NavigationBar title="채팅" backHref="/" titleVariant="page" />
+      <div className="flex shrink-0 justify-end px-4 py-2">
+        <ChatUserSearch onSelectRoom={onSelectRoom} />
+      </div>
 
       {/* 필터 탭(고정) + 방 목록(스크롤) */}
       <ChatRoomFilterableList

@@ -1,5 +1,6 @@
 'use client'
 
+import { ChatPrivacySetting } from '@/features/chat-directory'
 import { useState } from 'react'
 import Link from 'next/link'
 import { AlertCircleIcon, ArrowRightIcon, CheckIcon } from '@/shared/assets'
@@ -106,6 +107,13 @@ const SettingsContent = ({ userRole }: SettingsContentProps) => {
 
       <Container className="py-5 tab:py-8 pc:py-10">
         <div className="mx-auto flex w-full max-w-168 flex-col gap-5 pc:max-w-[59.25rem]">
+          <section className="overflow-hidden rounded-xl border border-neutral-150 bg-white shadow-[0_7px_7px_rgba(55,55,55,0.06)]">
+            <h2 className="px-4 pt-4 pb-2 font-cafe24 text-sm text-primary-600 tab:px-5 tab:text-base">
+              개인 설정
+            </h2>
+            <ChatPrivacySetting />
+          </section>
+
           <section className="overflow-hidden rounded-xl border border-neutral-150 bg-white shadow-[0_7px_7px_rgba(55,55,55,0.06)]">
             <h2 className="px-4 pt-4 pb-2 font-cafe24 text-sm text-primary-600 tab:px-5 tab:text-base">
               내 정보

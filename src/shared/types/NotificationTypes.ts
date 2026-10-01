@@ -19,6 +19,7 @@ export type NotificationType =
   | 'COMMUNITY_POST_LIKED'
   | 'COMMUNITY_POST_COMMENTED'
   | 'COMMUNITY_COMMENT_REPLIED'
+  | 'CHAT_MESSAGE_RECEIVED'
 
 export interface NotificationResponseDto {
   notificationId: string
