@@ -65,6 +65,22 @@ export const getAiImageGenerationImage = async (jobId: string): Promise<Blob> =>
   return response.data
 }
 
+/** 원본은 소유자 인증 후 조회한다. 모달이 닫히면 요청도 취소할 수 있다. */
+export const getAiImageGenerationSourceImage = async (
+  jobId: string,
+  signal?: AbortSignal,
+): Promise<Blob> => {
+  const response = await apiClient.get<Blob>(
+    `${API_VERSION}/ai-image/generation/${jobId}/source-image`,
+    {
+      responseType: 'blob',
+      timeout: UPLOAD_TIMEOUT,
+      signal,
+    },
+  )
+  return response.data
+}
+
 /** 내 AI 사진 보관함 (최신순, 최대 60건 — 진행 중·실패 포함) */
 export const getMyAiImageGenerations = async (): Promise<AiImageGeneration[]> => {
   const response = await apiClient.get<ApiResponseFull<AiImageGeneration[]>>(

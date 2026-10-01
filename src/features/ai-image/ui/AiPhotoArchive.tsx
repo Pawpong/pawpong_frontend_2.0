@@ -18,6 +18,7 @@ import {
 } from '@/shared/ui'
 import { fetchAiImageFile, saveAiImageFile } from '../lib/aiImageFile'
 import { setPendingCommunityPhoto } from '../lib/pendingCommunityPhoto'
+import { ArchivePhotoCompare } from './ArchivePhotoCompare'
 
 interface AiPhotoArchiveProps {
   /** 비로그인이면 조회하지 않는다 */
@@ -181,16 +182,12 @@ export function AiPhotoArchive({ enabled, limit, moreHref, gridClassName }: AiPh
           <DialogContent className="max-w-md">
             <DialogTitle>{filterName(opened.filterId)}</DialogTitle>
             <DialogDescription>{formatDate(opened.createdAt)}에 만들었어요</DialogDescription>
-            <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-neutral-50">
-              <Image
-                src={opened.resultImageUrl}
-                alt={`${filterName(opened.filterId)} 결과`}
-                fill
-                unoptimized
-                sizes="(min-width: 768px) 448px, 100vw"
-                className="object-contain"
-              />
-            </div>
+            <ArchivePhotoCompare
+              key={opened.jobId}
+              jobId={opened.jobId}
+              resultImageUrl={opened.resultImageUrl}
+              filterName={filterName(opened.filterId)}
+            />
             {actionError && (
               <p role="alert" className="text-sm text-error-500">
                 {actionError}
