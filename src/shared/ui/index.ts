@@ -77,3 +77,5 @@ export * from './RepresentativePhoto'
 export * from './ImageUploadArea'
 
 export * from './SortOptions'
+
+export { BeforeAfterSlider } from './BeforeAfterSlider'

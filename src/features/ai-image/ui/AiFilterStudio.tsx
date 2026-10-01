@@ -15,6 +15,7 @@ import { PhotoUploadField } from '@/shared/ui/PhotoUploadField'
 import type { AiImageGeneration } from '@/shared/types'
 import { saveAiImageFile } from '../lib/aiImageFile'
 import { setPendingCommunityPhoto } from '../lib/pendingCommunityPhoto'
+import { AiPostShareChoice } from './AiPostShareChoice'
 import { useAiPixelFilter } from '../lib/useAiPixelFilter'
 import { AiPhotoArchive } from './AiPhotoArchive'
 import { BeforeAfterCompare } from './BeforeAfterCompare'
@@ -77,6 +78,7 @@ export function AiFilterStudio({ isLoggedIn }: AiFilterStudioProps) {
   const [preparing, setPreparing] = useState(false)
   const [photoError, setPhotoError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+  const [shareComparison, setShareComparison] = useState(false)
   const resultRef = useRef<HTMLDivElement>(null)
 
   useEffect(
@@ -98,6 +100,7 @@ export function AiFilterStudio({ isLoggedIn }: AiFilterStudioProps) {
     try {
       const file = await preparePhoto(files[0])
       ai.reset()
+      setShareComparison(false)
       setPhoto({ file, url: URL.createObjectURL(file) })
     } catch (error) {
       setPhotoError(error instanceof Error ? error.message : '사진을 준비하지 못했어요.')
@@ -125,12 +128,12 @@ export function AiFilterStudio({ isLoggedIn }: AiFilterStudioProps) {
 
   const postToCommunity = () => {
     if (!result) return
-    setPendingCommunityPhoto(result.file)
+    setPendingCommunityPhoto(result.file, shareComparison ? photo?.file : undefined)
     router.push('/community/write')
   }
 
   const filledBlocks =
-    ai.phase === 'uploading'
+    ai.phase === 'uploading' || ai.phase === 'checking'
       ? 1
       : Math.max(2, Math.round(Math.min(0.9, elapsed / EXPECTED_SECONDS) * PROGRESS_BLOCKS))
 
@@ -301,9 +304,15 @@ export function AiFilterStudio({ isLoggedIn }: AiFilterStudioProps) {
               <p className="mt-3 text-sm font-semibold text-neutral-850">
                 {ai.phase === 'uploading'
                   ? '사진을 올리고 있어요…'
-                  : `${WAITING_TIPS[Math.min(WAITING_TIPS.length - 1, Math.floor(elapsed / 12))]}… ${elapsed}초`}
+                  : ai.phase === 'checking'
+                    ? '귀여운 우리 아이가 잘 보이는지 확인하고 있어요…'
+                    : `${WAITING_TIPS[Math.min(WAITING_TIPS.length - 1, Math.floor(elapsed / 12))]}… ${elapsed}초`}
               </p>
-              <p className="mt-0.5 text-xs text-neutral-700">보통 30초~1분 걸려요.</p>
+              <p className="mt-0.5 text-xs text-neutral-700">
+                {ai.phase === 'checking'
+                  ? '사진 확인에는 생성 횟수를 쓰지 않아요.'
+                  : '보통 30초~1분 걸려요.'}
+              </p>
             </div>
           ) : result && photo ? (
             <div>
@@ -316,6 +325,11 @@ export function AiFilterStudio({ isLoggedIn }: AiFilterStudioProps) {
                 짜잔! {selectedFilter?.name ?? 'AI 필터'} 완성
               </h2>
               <BeforeAfterCompare beforeSrc={photo.url} afterSrc={result.imageUrl} />
+              <AiPostShareChoice
+                checked={shareComparison}
+                onChange={setShareComparison}
+                disabled={saving}
+              />
               <p className="mt-2 text-center text-xs text-neutral-700">
                 가운데 손잡이를 끌어 원본과 비교해 보세요. 보관함에도 저장됐어요.
               </p>
@@ -362,6 +376,10 @@ export function AiFilterStudio({ isLoggedIn }: AiFilterStudioProps) {
                   먼저 우리 아이 사진을 올려 주세요.
                 </p>
               )}
+              <p className="mt-3 text-center text-xs leading-relaxed text-neutral-700">
+                필터를 씌우면 OpenAI가 사진 속 동물을 확인한 뒤 변환해요. 동물이 잘 보이지 않는
+                사진은 생성 횟수를 사용하지 않아요.
+              </p>
               {ai.error && (
                 <p
                   role="alert"

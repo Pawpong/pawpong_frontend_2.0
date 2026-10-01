@@ -5,6 +5,7 @@ import { useMutation } from '@tanstack/react-query'
 import { uploadMultipleFiles } from '@/shared/api'
 import type {
   CommunityPetType,
+  CommunityAiComparison,
   CommunityPostStatus,
   CommunityPostVisibility,
 } from '@/shared/types'
@@ -12,6 +13,7 @@ import { useCreateCommunityPost, useUpdateCommunityPost } from '../api/community
 import { COMMUNITY_UPLOAD_FOLDER, toCommunityPhotoFileName } from './communityPhotoFileName'
 
 interface SubmitPostFormInput {
+  aiComparison?: CommunityAiComparison | null
   text: string
   files: File[]
   visibility: CommunityPostVisibility
@@ -48,6 +50,7 @@ export const useSubmitCommunityPostForm = (postId?: string) => {
       visibility,
       status,
       petType,
+      aiComparison,
       keptImageUrls = [],
     }: SubmitPostFormInput): Promise<string | null> => {
       setError(null)
@@ -67,13 +70,31 @@ export const useSubmitCommunityPostForm = (postId?: string) => {
         const photos =
           resolvedKept.length === kept.length ? [...resolvedKept, ...uploaded] : undefined
 
+        if (photos === undefined && aiComparison) {
+          throw new Error('비교 사진을 확인할 수 없습니다. 사진을 다시 첨부해 주세요.')
+        }
+
         // 2) 게시글 생성 or 수정
         // 임시저장은 빈 본문 저장이 정상 값이라 그대로 보낸다(본문 지우고 사진만 남기는 경우).
         // 발행은 서버가 빈 본문을 거부하지만 폼에서 먼저 막는다.
         const body = text.trim()
         const post = postId
-          ? await updateMutation.mutateAsync({ body, photos, visibility, status, petType })
-          : await createMutation.mutateAsync({ body, photos, visibility, status, petType })
+          ? await updateMutation.mutateAsync({
+              body,
+              photos,
+              visibility,
+              status,
+              petType,
+              aiComparison,
+            })
+          : await createMutation.mutateAsync({
+              body,
+              photos,
+              visibility,
+              status,
+              petType,
+              aiComparison,
+            })
         return post.postId
       } catch (err) {
         const message =

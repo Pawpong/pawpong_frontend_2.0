@@ -1,4 +1,4 @@
-import { getAiImageGenerationImage } from '@/entities/ai-image'
+import { getAiImageGenerationImage, getAiImageGenerationSourceImage } from '@/entities/ai-image'
 
 /** 결과 PNG 를 사진 파일로 받는다 (버킷 CORS 가 없어 API 로 받는다) */
 export const fetchAiImageFile = async (jobId: string, name = `pawpong-${jobId}.png`) =>
@@ -24,4 +24,11 @@ export const saveAiImageFile = async (file: File) => {
   anchor.download = file.name
   anchor.click()
   setTimeout(() => URL.revokeObjectURL(url), 1000)
+}
+
+/** 본인이 비교 공개를 선택했을 때만 인증한 원본을 받는다. */
+export const fetchAiSourceFile = async (jobId: string) => {
+  const blob = await getAiImageGenerationSourceImage(jobId)
+  const ext = blob.type === 'image/webp' ? 'webp' : blob.type === 'image/jpeg' ? 'jpg' : 'png'
+  return new File([blob], `pawpong-${jobId}-original.${ext}`, { type: blob.type || 'image/png' })
 }
