@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 
 import Image from 'next/image'
 import Link from 'next/link'
+import { BeforeAfterSlider } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import type { CommunityPreviewAuthor, CommunityPreviewProps } from '../model/communityPreview'
 import { CommunityPostActions } from './CommunityPostActions'
@@ -29,6 +30,7 @@ const CommunityBox = ({
   createdAt,
   text,
   images = [],
+  aiComparison,
   likeCount,
   commentCount,
   isLiked,
@@ -40,12 +42,22 @@ const CommunityBox = ({
   className,
 }: CommunityBoxProps) => {
   const primaryImage = images[0]
+  const comparison =
+    aiComparison && images[aiComparison.beforePhotoIndex] && images[aiComparison.afterPhotoIndex]
+      ? aiComparison
+      : null
 
   const profile = (
     <CommunityPostProfile author={author} createdAt={createdAt} text={text} variant="showcase" />
   )
 
-  const image = (
+  const image = comparison ? (
+    <BeforeAfterSlider
+      beforeSrc={images[comparison.beforePhotoIndex]}
+      afterSrc={images[comparison.afterPhotoIndex]}
+      className="h-full"
+    />
+  ) : (
     <div className="relative size-full overflow-hidden rounded-lg bg-neutral-100 pc:rounded-xl">
       {primaryImage && (
         <Image
@@ -81,7 +93,7 @@ const CommunityBox = ({
       </header>
 
       <div className="min-h-0 w-full flex-1">
-        {detailHref ? (
+        {detailHref && !comparison ? (
           <Link href={detailHref} className="block size-full">
             {image}
           </Link>
