@@ -1,5 +1,4 @@
 import { apiClient, API_VERSION, unwrap } from '@/shared/api'
-import type { ApiRequestConfig } from '@/shared/api'
 import type {
   AdopterProfileDto,
   AdopterPublicProfile,
@@ -10,11 +9,11 @@ import type {
 } from '@/shared/types'
 
 /** 입양자 공개 프로필 조회 (유저홈) */
+// 선택 인증을 유지해야 조회자의 isFollowing이 실제 관계로 채워진다.
+// 비로그인 요청은 토큰이 없어 자연스럽게 익명으로 조회한다.
 export const getAdopterPublicProfile = (userId: string) =>
   apiClient
-    .get<
-      ApiResponseFull<AdopterPublicProfile>
-    >(`${API_VERSION}/profile/users/${userId}`, { skipAuth: true } as ApiRequestConfig)
+    .get<ApiResponseFull<AdopterPublicProfile>>(`${API_VERSION}/profile/users/${userId}`)
     .then((res) => unwrap(res, '입양자 프로필 조회에 실패했습니다.'))
 
 /** 내 프로필 조회 */

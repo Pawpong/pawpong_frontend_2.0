@@ -19,6 +19,7 @@ import {
   type FollowUser,
 } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
+import { normalizeApiError } from '@/shared/api'
 import { formatBreederLocation } from '@/shared/lib/formatBreederLocation'
 import { profileQueries } from '@/entities/profile'
 import { useAuthStatus, useLoginGuard } from '@/features/auth'
@@ -140,7 +141,7 @@ const MessageButton = ({ targetId }: { targetId: string }) => {
           disabled={isPending}
           onClick={guard(() =>
             startChat(
-              { breederId: targetId },
+              { counterpartUserId: targetId },
               {
                 onSuccess: (room) => router.push(`/chat?roomId=${room.roomId}`),
                 onError: () => setErrorOpen(true),
@@ -180,18 +181,30 @@ const FollowActionButton = ({ targetId, isFollowing }: VisitorActionsProps) => {
   const follow = useFollowUser()
   const unfollow = useUnfollowUser()
   const isPending = follow.isPending || unfollow.isPending
+  const { guard, isPromptOpen, setPromptOpen } = useLoginGuard()
+  const error = follow.error ?? unfollow.error
 
   return (
-    <div className={ACTION_LAYOUT}>
+    <div className={cn(ACTION_LAYOUT, 'flex-col gap-1')}>
       <Button
         intent={isFollowing ? 'secondary' : 'primary'}
         size="md"
         disabled={isPending}
-        onClick={() => (isFollowing ? unfollow : follow).mutate(targetId)}
+        onClick={guard(() => (isFollowing ? unfollow : follow).mutate(targetId))}
         width="full"
       >
-        {isFollowing ? '팔로우 취소' : '팔로우'}
+        {isPending ? '처리 중…' : isFollowing ? '팔로잉' : '팔로우'}
       </Button>
+      {error && (
+        <p role="alert" className="text-xs text-error-600">
+          {normalizeApiError(error, '팔로우를 변경하지 못했어요.').message}
+        </p>
+      )}
+      <LoginPromptModal
+        open={isPromptOpen}
+        onOpenChange={setPromptOpen}
+        description="로그인하고 팔로우해보세요."
+      />
     </div>
   )
 }

@@ -2,6 +2,7 @@
 
 import { useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query'
 import { breederQueries } from '@/entities/breeder'
+import { adopterQueries } from '@/entities/adopter'
 import { profileQueries, updateMyProfile } from '@/entities/profile'
 import type { UpdateMyProfileRequest } from '@/shared/types'
 import { followUser, unfollowUser, removeFollower } from './profile.api'
@@ -24,6 +25,7 @@ const invalidateFollowCaches = (qc: QueryClient) =>
   Promise.all([
     qc.invalidateQueries({ queryKey: profileQueries.all() }),
     qc.invalidateQueries({ queryKey: breederQueries.all() }),
+    qc.invalidateQueries({ queryKey: adopterQueries.all() }),
   ])
 
 export const useFollowUser = () => {
