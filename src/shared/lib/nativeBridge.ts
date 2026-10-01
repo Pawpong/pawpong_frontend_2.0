@@ -1,4 +1,8 @@
-type NativeCapability = 'cameraPermission' | 'nativeShare'
+type NativeCapability =
+  | 'cameraPermission'
+  | 'nativeShare'
+  | 'notificationPermission'
+  | 'notificationSettings'
 type NativeWindow = Window & {
   ReactNativeWebView?: { postMessage: (message: string) => void }
   __PAWPONG_APP__?: { capabilities?: Partial<Record<NativeCapability, boolean>> }
@@ -79,4 +83,29 @@ export async function shareNatively(payload: {
 export function subscribeNativeCapabilities(onChange: () => void): () => void {
   window.addEventListener('pawpong:app-ready', onChange)
   return () => window.removeEventListener('pawpong:app-ready', onChange)
+}
+
+/** 새 앱에서만 OS 권한을 읽는다. 조회 오류를 알림 거부로 처리하지 않는다. */
+export async function getNativeNotificationPermission(): Promise<boolean> {
+  const response = await requestNative(
+    'notificationPermission',
+    'GET_NOTIFICATION_PERMISSION',
+    'NOTIFICATION_PERMISSION_RESULT',
+    {},
+    5_000,
+  )
+  if (typeof response.granted !== 'boolean') throw new Error('알림 권한을 확인하지 못했습니다.')
+  return response.granted
+}
+
+/** 지원하는 앱에서만 포퐁의 OS 설정 화면을 연다. */
+export async function openNativeNotificationSettings(): Promise<void> {
+  const response = await requestNative(
+    'notificationSettings',
+    'OPEN_NOTIFICATION_SETTINGS',
+    'OPEN_NOTIFICATION_SETTINGS_RESULT',
+    {},
+    5_000,
+  )
+  if (response.status !== 'opened') throw new Error('기기 설정을 열지 못했습니다.')
 }
