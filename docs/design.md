@@ -199,7 +199,7 @@ Use the breakpoints Figma specifies, identically in CSS and JS.
 
 - `MediaCard`: provides image, body, and meta slots for image cards. It does not nest the image detail link and the favorite button, and it preserves the aspect ratio with a `point-50` and paw-glyph fallback when the image is missing or fails to load.
 - `CommunityMediaCard`: the square media tile in the home "동물 자랑하기" section. Body text and reaction actions stay on the community feed card; home shows only the representative image and the multi-image badge. Mobile uses 122px horizontal scrolling, Tablet 122px with 5 items, PC 300px with 4 items, and image failures keep the same-ratio brand fallback.
-- `ProfileAvatar`, `ProfileHeader`, `AuthorInfo`, `Avatar`, `AvatarGroup`: unify profile image fallbacks and name/grade alignment.
+- `ProfileAvatar`, `ProfileHeader`, `AuthorInfo`, `Avatar`: unify profile image fallbacks and name/grade alignment. The empty-profile fallback color comes only from `AvatarFallback`'s default (primary-50 surface + primary-500 paw); callers never override it.
 - `ListingStats`, `ListingCardGrid`, `PostedDate`, `DetailLink`: provide list metadata and navigation affordances.
 - `ImageCarousel`, `ImageModal`, `ImageDetailModal`: own image browsing, zoom, and the detail modal.
 - `Pagination`, `InfiniteScrollTrigger`: own loading more items in paged and infinite lists.

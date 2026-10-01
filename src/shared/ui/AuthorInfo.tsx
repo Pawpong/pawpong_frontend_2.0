@@ -27,13 +27,10 @@ const AuthorInfo = ({
   // ISO 시간은 상대 시간("N시간 전")으로 표시. 목업 문자열은 그대로 통과.
   const displayTime = formatRelativeTime(createdAt)
   const nameSize = size === 'md' ? 'text-base' : 'text-sm'
+  // 빈 프로필은 Avatar 기본값(primary-50 배경 + 발바닥) — 내비·다른 아바타와 같은 색
   const avatar = (
     <Avatar size={size === 'md' ? 'md' : 'sm'}>
-      {profileImageUrl ? (
-        <AvatarImage src={profileImageUrl} alt={nickname} />
-      ) : (
-        <AvatarFallback className="bg-fill-muted" />
-      )}
+      {profileImageUrl ? <AvatarImage src={profileImageUrl} alt={nickname} /> : <AvatarFallback />}
     </Avatar>
   )
 
