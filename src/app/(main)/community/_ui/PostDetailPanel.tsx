@@ -1,5 +1,7 @@
 'use client'
 
+import { BeforeAfterSlider } from '@/shared/ui'
+
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import {
@@ -155,17 +157,45 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
   )
 
   // 브랜드 옐로우 점·불투명 진회색 화살표 — 피드 카드와 동일한 톤
-  const imageCarousel = hasImages && (
-    <ImageCarousel
-      images={post.photoUrls}
-      alt={post.authorNickname}
-      preloadFirstImage
-      bgClassName="bg-white"
-      imageClassName="object-contain"
-      className={isSideBySide ? 'h-full w-[60%] shrink-0' : 'aspect-square w-full shrink-0'}
-      {...COMMUNITY_CAROUSEL_STYLE} // [refactored] 피드 카드와 공유하는 상수로
-    />
-  )
+  const comparison = post.aiComparison
+  const extraImages = comparison
+    ? post.photoUrls.filter(
+        (_, index) => index !== comparison.beforePhotoIndex && index !== comparison.afterPhotoIndex,
+      )
+    : []
+  const imageCarousel =
+    hasImages &&
+    (comparison &&
+    post.photoUrls[comparison.beforePhotoIndex] &&
+    post.photoUrls[comparison.afterPhotoIndex] ? (
+      <div className={isSideBySide ? 'h-full w-[60%] shrink-0 overflow-y-auto' : 'w-full shrink-0'}>
+        <BeforeAfterSlider
+          beforeSrc={post.photoUrls[comparison.beforePhotoIndex]}
+          afterSrc={post.photoUrls[comparison.afterPhotoIndex]}
+          className="rounded-none"
+        />
+        {extraImages.length > 0 && (
+          <ImageCarousel
+            images={extraImages}
+            alt={post.authorNickname}
+            bgClassName="bg-white"
+            imageClassName="object-contain"
+            className="aspect-square w-full"
+            {...COMMUNITY_CAROUSEL_STYLE}
+          />
+        )}
+      </div>
+    ) : (
+      <ImageCarousel
+        images={post.photoUrls}
+        alt={post.authorNickname}
+        preloadFirstImage
+        bgClassName="bg-white"
+        imageClassName="object-contain"
+        className={isSideBySide ? 'h-full w-[60%] shrink-0' : 'aspect-square w-full shrink-0'}
+        {...COMMUNITY_CAROUSEL_STYLE}
+      />
+    ))
 
   if (isSideBySide) {
     return (

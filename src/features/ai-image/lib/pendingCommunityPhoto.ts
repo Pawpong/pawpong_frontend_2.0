@@ -1,17 +1,26 @@
-/**
- * AI 필터 결과를 커뮤니티 글쓰기로 넘기는 한 번짜리 전달함.
- *
- * File 은 URL·쿼리로 넘길 수 없어 클라이언트 메모리에 잠깐 둔다. 글쓰기 화면이 꺼내 가면 비운다.
- * 새로고침하면 사라지는데, 그때는 글쓰기에서 사진을 다시 고르면 되므로 따로 저장하지 않는다.
- */
-let pending: File | null = null
+import type { CommunityAiComparison } from '@/shared/types'
 
-export const setPendingCommunityPhoto = (file: File) => {
-  pending = file
+export interface PendingCommunityPost {
+  files: File[]
+  aiComparison: CommunityAiComparison | null
 }
 
-export const takePendingCommunityPhoto = (): File | null => {
-  const file = pending
+/** 새 글로 넘기는 한 번짜리 메모리 전달함. 원본은 명시적 비교 공개 선택 때만 포함한다. */
+let pending: PendingCommunityPost | null = null
+
+export const setPendingCommunityPhoto = (result: File, original?: File) => {
+  pending = {
+    files: original ? [result, original] : [result],
+    aiComparison: original ? { beforePhotoIndex: 1, afterPhotoIndex: 0 } : null,
+  }
+}
+
+export const takePendingCommunityPost = (): PendingCommunityPost | null => {
+  const post = pending
   pending = null
-  return file
+  return post
 }
+
+/** 기존 결과 사진 전달 호출과 호환한다. */
+export const takePendingCommunityPhoto = (): File | null =>
+  takePendingCommunityPost()?.files[0] ?? null

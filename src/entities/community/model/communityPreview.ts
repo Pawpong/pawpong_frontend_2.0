@@ -12,6 +12,7 @@ interface CommunityPreviewProps {
   createdAt: string
   text: string
   images?: string[]
+  aiComparison?: CommunityPostCard['aiComparison']
   likeCount: number
   commentCount: number
   isLiked: boolean
@@ -30,6 +31,7 @@ const toCommunityPreviewProps = (post: CommunityPostCard): CommunityPreviewProps
   createdAt: post.createdAt,
   text: post.bodyExcerpt,
   images: post.photoUrls,
+  aiComparison: post.aiComparison,
   likeCount: post.likeCount,
   commentCount: post.commentCount,
   isLiked: post.isLiked,

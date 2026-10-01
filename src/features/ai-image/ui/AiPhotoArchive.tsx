@@ -16,9 +16,10 @@ import {
   DialogTitle,
   EmptyState,
 } from '@/shared/ui'
-import { fetchAiImageFile, saveAiImageFile } from '../lib/aiImageFile'
+import { fetchAiImageFile, fetchAiSourceFile, saveAiImageFile } from '../lib/aiImageFile'
 import { setPendingCommunityPhoto } from '../lib/pendingCommunityPhoto'
 import { ArchivePhotoCompare } from './ArchivePhotoCompare'
+import { AiPostShareChoice } from './AiPostShareChoice'
 
 interface AiPhotoArchiveProps {
   /** 비로그인이면 조회하지 않는다 */
@@ -50,6 +51,7 @@ export function AiPhotoArchive({ enabled, limit, moreHref, gridClassName }: AiPh
   const generationsQuery = useQuery(aiImageQueries.myGenerations(enabled))
   const filtersQuery = useQuery(aiImageQueries.filters())
   const [openJobId, setOpenJobId] = useState<string | null>(null)
+  const [shareComparison, setShareComparison] = useState(false)
   const [busyAction, setBusyAction] = useState<'save' | 'post' | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
 
@@ -76,7 +78,10 @@ export function AiPhotoArchive({ enabled, limit, moreHref, gridClassName }: AiPh
       if (action === 'save') {
         await saveAiImageFile(file)
       } else {
-        setPendingCommunityPhoto(file)
+        setPendingCommunityPhoto(
+          file,
+          shareComparison ? await fetchAiSourceFile(job.jobId) : undefined,
+        )
         router.push('/community/write')
       }
     } catch {
@@ -134,7 +139,10 @@ export function AiPhotoArchive({ enabled, limit, moreHref, gridClassName }: AiPh
               <button
                 type="button"
                 disabled={!done}
-                onClick={() => setOpenJobId(job.jobId)}
+                onClick={() => {
+                  setShareComparison(false)
+                  setOpenJobId(job.jobId)
+                }}
                 aria-label={`${filterName(job.filterId)} 사진 ${done ? '크게 보기' : '만드는 중'}`}
                 className="relative block aspect-square w-full overflow-hidden rounded-lg bg-point-50 focus-ring"
               >
@@ -187,6 +195,11 @@ export function AiPhotoArchive({ enabled, limit, moreHref, gridClassName }: AiPh
               jobId={opened.jobId}
               resultImageUrl={opened.resultImageUrl}
               filterName={filterName(opened.filterId)}
+            />
+            <AiPostShareChoice
+              checked={shareComparison}
+              onChange={setShareComparison}
+              disabled={!!busyAction}
             />
             {actionError && (
               <p role="alert" className="text-sm text-error-500">

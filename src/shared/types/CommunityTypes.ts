@@ -1,3 +1,9 @@
+/** 작성자가 공개한 두 사진의 비포·애프터 비교 인덱스 */
+export interface CommunityAiComparison {
+  beforePhotoIndex: number
+  afterPhotoIndex: number
+}
+
 /** 동물 종류 */
 export type CommunityPetType = 'dog' | 'cat' | 'reptile'
 
@@ -15,6 +21,7 @@ export type CommunityPostStatus = 'draft' | 'published'
 
 /** 커뮤니티 게시글 카드 (목록용) */
 export interface CommunityPostCard {
+  aiComparison?: CommunityAiComparison | null
   postId: string
   authorId: string
   authorModel: CommunityAuthorModel
@@ -54,6 +61,7 @@ export interface CommunityComment {
 
 /** 커뮤니티 게시글 상세 */
 export interface CommunityPostDetail {
+  aiComparison?: CommunityAiComparison | null
   postId: string
   authorId: string
   authorModel: CommunityAuthorModel
@@ -92,6 +100,7 @@ export interface CommunityPostListParams {
 
 /** 게시글 작성 요청 */
 export interface CreateCommunityPostRequest {
+  aiComparison?: CommunityAiComparison | null
   /** 발행(published) 시 필수, 임시저장(draft) 시 비어 있어도 됨 */
   body?: string
   title?: string
@@ -106,6 +115,7 @@ export interface CreateCommunityPostRequest {
 
 /** 게시글 수정 요청 */
 export interface UpdateCommunityPostRequest {
+  aiComparison?: CommunityAiComparison | null
   title?: string
   body?: string
   photos?: string[]
