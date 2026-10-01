@@ -6,10 +6,10 @@ import { useQuery } from '@tanstack/react-query'
 import { communityQueries } from '@/entities/community'
 import { profileQueries } from '@/entities/profile'
 import Link from 'next/link'
-import { takePendingCommunityPhoto } from '@/features/ai-image'
-import { useSubmitCommunityPostForm } from '@/features/community'
+import { takePendingCommunityPost } from '@/features/ai-image'
+import { PetCategorySuggestion, useSubmitCommunityPostForm } from '@/features/community'
 import { useExitGuard } from '@/shared/lib/useExitGuard'
-import { Button, Container, CtaModal, Chip, NavigationBar } from '@/shared/ui'
+import { Button, Container, CtaModal, NavigationBar } from '@/shared/ui'
 import {
   usePostForm,
   PostFormLayout,
@@ -17,12 +17,6 @@ import {
   type VisibilityType,
 } from '@/widgets/post-form'
 import type { CommunityPetType, CommunityPostDetail, CommunityPostStatus } from '@/shared/types'
-
-const PET_TYPE_OPTIONS: { value: CommunityPetType; label: string }[] = [
-  { value: 'dog', label: '강아지' },
-  { value: 'cat', label: '고양이' },
-  { value: 'reptile', label: '파충류' },
-]
 
 interface CommunityPostEditorProps {
   /** 전달하면 수정 모드 — 기존 게시글로 폼을 채운다 */
@@ -47,12 +41,27 @@ const PostForm = ({ postId, post }: PostFormProps) => {
   const isEdit = !!postId && !isDraft
   const formText = FORM_TEXT[isEdit ? 'edit' : 'create']
   // AI 필터에서 '커뮤니티에 자랑하기'로 넘어온 사진은 새 글의 첫 사진으로 채운다 (한 번만 꺼낸다)
-  const [handoffPhoto] = useState(() => (post ? null : takePendingCommunityPhoto()))
+  const [handoff] = useState(() => (post ? null : takePendingCommunityPost()))
   const form = usePostForm({
     initialText: post?.body ?? '',
     initialImages: post?.photoUrls ?? [],
-    initialFiles: handoffPhoto ? [handoffPhoto] : undefined,
+    initialFiles: handoff?.files,
   })
+  // 공개하기로 선택한 두 사진 자체를 기억해 삭제 뒤 인덱스가 바뀌어도 다른 사진과 비교하지 않는다.
+  const [comparisonPhotos] = useState(() => {
+    const comparison = post?.aiComparison ?? handoff?.aiComparison
+    const photos: (string | File)[] = post?.photoUrls ?? handoff?.files ?? []
+    return comparison
+      ? [photos[comparison.beforePhotoIndex], photos[comparison.afterPhotoIndex]]
+      : null
+  })
+  const currentPhotos: (string | File)[] = [...form.uploadedImages, ...form.files]
+  const beforePhotoIndex = comparisonPhotos ? currentPhotos.indexOf(comparisonPhotos[0]) : -1
+  const afterPhotoIndex = comparisonPhotos ? currentPhotos.indexOf(comparisonPhotos[1]) : -1
+  const aiComparison =
+    beforePhotoIndex >= 0 && afterPhotoIndex >= 0 && beforePhotoIndex !== afterPhotoIndex
+      ? { beforePhotoIndex, afterPhotoIndex }
+      : null
 
   const initialVisibility = post?.visibility ?? 'public'
   const [visibility, setVisibility] = useState<VisibilityType>(initialVisibility)
@@ -80,6 +89,7 @@ const PostForm = ({ postId, post }: PostFormProps) => {
       visibility,
       status,
       petType: petType || undefined,
+      aiComparison,
       keptImageUrls: form.uploadedImages,
     })
     if (savedId) {
@@ -124,7 +134,7 @@ const PostForm = ({ postId, post }: PostFormProps) => {
             >
               <span>
                 <span className="block text-sm font-bold text-primary-700">
-                  {handoffPhoto ? 'AI 필터로 만든 사진을 담았어요' : 'AI 필터로 사진 꾸미기'}
+                  {handoff ? 'AI 필터로 만든 사진을 담았어요' : 'AI 필터로 사진 꾸미기'}
                 </span>
                 <span className="mt-0.5 block text-xs text-neutral-700">
                   도트 그림·스티커·수채화로 바꿔 올리면 좋아요를 더 받을지도 몰라요
@@ -134,20 +144,19 @@ const PostForm = ({ postId, post }: PostFormProps) => {
                 →
               </span>
             </Link>
-            <div className="rounded-xl bg-neutral-50 p-5">
-              <h3 className="mb-3 text-sm font-semibold">어떤 아이 이야기인가요?</h3>
-              <div className="flex flex-wrap gap-2">
-                {PET_TYPE_OPTIONS.map((option) => (
-                  <Chip
-                    key={option.value}
-                    selected={petType === option.value}
-                    onClick={() => setPetType(petType === option.value ? '' : option.value)}
-                  >
-                    {option.label}
-                  </Chip>
-                ))}
-              </div>
-            </div>
+            {aiComparison && (
+              <p className="rounded-xl bg-point-50 p-4 text-sm leading-relaxed text-neutral-700">
+                원본과 AI 사진을 함께 공개해요. 독자는 두 사진을 비교해 볼 수 있어요. 둘 중 한
+                사진을 지우면 비교 없이 남은 사진만 올라가요.
+              </p>
+            )}
+            <PetCategorySuggestion
+              text={form.text}
+              photo={form.files[0]}
+              value={petType}
+              onChange={setPetType}
+              disabled={isSubmitting || form.isProcessingPhotos}
+            />
             <div className="rounded-xl bg-neutral-50 p-5">
               <h3 className="mb-2 text-sm font-semibold">누구와 나눌까요?</h3>
               <p className="mb-3 text-xs leading-relaxed text-neutral-700">

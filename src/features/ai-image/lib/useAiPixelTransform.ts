@@ -12,7 +12,13 @@ import {
 const POLL_INTERVAL_MS = 3000
 const POLL_TIMEOUT_MS = 4 * 60 * 1000
 
-export type AiPixelTransformPhase = 'idle' | 'uploading' | 'generating' | 'done' | 'failed'
+export type AiPixelTransformPhase =
+  | 'idle'
+  | 'uploading'
+  | 'checking'
+  | 'generating'
+  | 'done'
+  | 'failed'
 
 export interface AiPixelTransformResult {
   jobId: string
@@ -77,9 +83,11 @@ export const useAiPixelTransform = () => {
       try {
         const { inputObjectKey } = await uploadAiImageSource(file)
         if (!isCurrent()) return null
-        setPhase('generating')
+        setPhase('checking')
 
         let job = await requestAiImageGeneration({ filterId, inputObjectKey })
+        if (!isCurrent()) return null
+        setPhase('generating')
         const deadline = Date.now() + POLL_TIMEOUT_MS
         while (job.status !== 'succeeded' && job.status !== 'failed') {
           if (Date.now() > deadline)
@@ -122,7 +130,7 @@ export const useAiPixelTransform = () => {
     phase,
     result,
     error,
-    isWorking: phase === 'uploading' || phase === 'generating',
+    isWorking: phase === 'uploading' || phase === 'checking' || phase === 'generating',
     transform,
     reset,
   }
