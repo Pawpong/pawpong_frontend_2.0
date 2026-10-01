@@ -25,7 +25,8 @@ export const SEARCH_PLACEHOLDERS: Record<ExploreType, { mobile: string; desktop:
     desktop: '검색해서 원하는 아이 찾기',
   },
   breeder: {
-    mobile: '아무거나 검색해보세요',
+    // 검색어 하나로 브리더 이름·품종·지역(시/도·시/군구)을 함께 찾는다 (백엔드 breeder-explore-criteria)
+    mobile: '브리더·품종·지역으로 검색',
     desktop: '브리더를 통해 알고싶은게 있나요?',
   },
 }
