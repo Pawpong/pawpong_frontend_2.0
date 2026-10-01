@@ -4,7 +4,7 @@ import { useRef, type ReactNode } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ImageCarousel, OwnerActionsMenu, ProfileAvatar } from '@/shared/ui'
+import { BeforeAfterSlider, ImageCarousel, OwnerActionsMenu, ProfileAvatar } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { formatRelativeTime } from '@/shared/lib/formatRelativeTime'
 import type { CommunityPreviewProps } from '../model/communityPreview'
@@ -40,6 +40,7 @@ const CommunityFeedCard = ({
   createdAt,
   text,
   images = [],
+  aiComparison,
   likeCount,
   commentCount,
   isLiked,
@@ -57,6 +58,15 @@ const CommunityFeedCard = ({
 }: CommunityFeedCardProps) => {
   const href = detailHref ?? `/community/post/${postId}`
   const hasImages = images.length > 0
+  const comparison =
+    aiComparison && images[aiComparison.beforePhotoIndex] && images[aiComparison.afterPhotoIndex]
+      ? aiComparison
+      : null
+  const mediaImages = comparison
+    ? images.filter(
+        (_, index) => index !== comparison.beforePhotoIndex && index !== comparison.afterPhotoIndex,
+      )
+    : images
   const router = useRouter()
   // 사진 한 번 탭으로 상세 진입. Link로 감싸면 캐러셀 스와이프와 화살표·점 조작이 막히므로,
   // 포인터 이동 거리로 드래그(스와이프)를 걸러내고 캐러셀 컨트롤 클릭은 무시한다.
@@ -122,10 +132,16 @@ const CommunityFeedCard = ({
 
       {/* 미디어 — 기본은 카드 폭을 채우는 1:1 캐러셀 (여러 장이면 우상단에 장수 배지),
           row 는 사진을 원래 비율 그대로 가로로 늘어놓고 넘치면 스크롤한다 */}
-      {hasImages && mediaLayout === 'row' && (
+      {comparison && (
+        <BeforeAfterSlider
+          beforeSrc={images[comparison.beforePhotoIndex]}
+          afterSrc={images[comparison.afterPhotoIndex]}
+        />
+      )}
+      {mediaImages.length > 0 && mediaLayout === 'row' && (
         <Link href={href} prefetch={false} className="block px-3 pt-1">
           <div className="flex gap-3 overflow-x-auto">
-            {images.map((src, index) => (
+            {mediaImages.map((src, index) => (
               <div
                 key={index}
                 className="relative h-[13.1875rem] w-[17.5625rem] shrink-0 overflow-hidden rounded-lg bg-neutral-700 tab:h-60 tab:w-80"
@@ -146,7 +162,7 @@ const CommunityFeedCard = ({
         </Link>
       )}
 
-      {hasImages && mediaLayout === 'carousel' && (
+      {mediaImages.length > 0 && mediaLayout === 'carousel' && (
         <div
           className={cn(
             'relative aspect-square w-full cursor-pointer overflow-hidden rounded-lg',
@@ -156,7 +172,7 @@ const CommunityFeedCard = ({
           onPointerUp={handleImagePointerUp}
         >
           <ImageCarousel
-            images={images}
+            images={mediaImages}
             alt={author.nickname}
             className="absolute inset-0"
             bgClassName={wide ? 'bg-neutral-50' : 'bg-neutral-700'}
@@ -164,9 +180,9 @@ const CommunityFeedCard = ({
             preloadFirstImage={preload}
             {...COMMUNITY_CAROUSEL_STYLE} // [refactored] 상세와 공유하는 상수로
           />
-          {images.length > 1 && (
+          {mediaImages.length > 1 && (
             <span className="pointer-events-none absolute top-2.5 right-3 flex h-6 w-10 items-center justify-center rounded-full bg-neutral-850/90 text-[0.625rem] font-semibold text-white">
-              {images.length}장
+              {mediaImages.length}장
             </span>
           )}
         </div>
