@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import { requireAuth } from '@/features/auth/server'
 import { ChatPageContent } from './_ui/ChatPageContent'
+import { ChatPushNotice } from './_ui/ChatPushNotice'
 
 interface ChatPageProps {
   searchParams: Promise<{ roomId?: string | string[] }>
@@ -17,6 +18,7 @@ const ChatPage = async ({ searchParams }: ChatPageProps) => {
   return (
     <Suspense fallback={null}>
       <ChatPageContent />
+      <ChatPushNotice />
     </Suspense>
   )
 }
