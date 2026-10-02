@@ -4,7 +4,7 @@ import { Button, type ButtonVariantProps } from './Button'
 type FollowStatus = 'follow' | 'following' | 'mutual'
 
 const STATUS: Record<FollowStatus, { intent: ButtonVariantProps['intent']; label: string }> = {
-  follow: { intent: 'neutral', label: '팔로우' },
+  follow: { intent: 'primary', label: '팔로우' },
   following: { intent: 'secondary', label: '팔로잉' },
   mutual: { intent: 'dark', label: '맞팔로잉' },
 }
