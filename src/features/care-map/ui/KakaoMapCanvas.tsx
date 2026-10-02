@@ -15,6 +15,13 @@ interface Props {
 
 const INITIAL_CENTER = { latitude: 37.5665, longitude: 126.978 }
 
+function fitPlaces(maps: KakaoMaps, map: KakaoMapInstance, places: CarePlace[]) {
+  const bounds = new maps.LatLngBounds()
+  places.forEach((place) => bounds.extend(new maps.LatLng(place.latitude, place.longitude)))
+  map.setBounds(bounds, 65, 45, 80, 45)
+  if (places.length === 1) map.setLevel(5)
+}
+
 export default function KakaoMapCanvas({
   javascriptKey,
   places,
@@ -28,6 +35,7 @@ export default function KakaoMapCanvas({
   const sdkRef = useRef<KakaoMaps | null>(null)
   const selectRef = useRef(onSelect)
   const centerRef = useRef(onCenterChange)
+  const viewRef = useRef({ places, selectedId })
   const [ready, setReady] = useState(false)
   const [error, setError] = useState(false)
   const [attempt, setAttempt] = useState(0)
@@ -35,7 +43,8 @@ export default function KakaoMapCanvas({
   useEffect(() => {
     selectRef.current = onSelect
     centerRef.current = onCenterChange
-  }, [onSelect, onCenterChange])
+    viewRef.current = { places, selectedId }
+  }, [onSelect, onCenterChange, places, selectedId])
 
   useEffect(() => {
     let disposed = false
@@ -56,13 +65,22 @@ export default function KakaoMapCanvas({
           centerRef.current({ latitude: center.getLat(), longitude: center.getLng() })
         }
         maps.event.addListener(map, 'idle', updateCenter)
-        const observer = new ResizeObserver(() => {
+        const relayout = () => {
           map.relayout()
-          map.setCenter(lastCenter)
-        })
+          // SDK가 크기 변경 중 계산한 중심 대신 선택/검색 좌표로 다시 맞춘다.
+          // 화면 회전/반응형 전환 시 이전 컨테이너의 픽셀 좌표를 재사용하지 않는다.
+          const current = viewRef.current
+          const selected = current.places.find((place) => place.id === current.selectedId)
+          if (selected) map.setCenter(new maps.LatLng(selected.latitude, selected.longitude))
+          else if (current.places.length) fitPlaces(maps, map, current.places)
+          else map.setCenter(lastCenter)
+        }
+        const observer = new ResizeObserver(relayout)
         observer.observe(element.current)
+        window.addEventListener('resize', relayout)
         cleanup = () => {
           observer.disconnect()
+          window.removeEventListener('resize', relayout)
           maps.event.removeListener(map, 'idle', updateCenter)
         }
         setReady(true)
@@ -107,10 +125,7 @@ export default function KakaoMapCanvas({
     const map = mapRef.current,
       maps = sdkRef.current
     if (!ready || !map || !maps || places.length === 0) return
-    const bounds = new maps.LatLngBounds()
-    places.forEach((place) => bounds.extend(new maps.LatLng(place.latitude, place.longitude)))
-    map.setBounds(bounds, 65, 45, 80, 45)
-    if (places.length === 1) map.setLevel(5)
+    fitPlaces(maps, map, places)
   }, [places, ready])
 
   useEffect(() => {
@@ -126,7 +141,8 @@ export default function KakaoMapCanvas({
     const map = mapRef.current,
       maps = sdkRef.current
     const place = places.find((item) => item.id === selectedId)
-    if (ready && map && maps && place) map.panTo(new maps.LatLng(place.latitude, place.longitude))
+    if (ready && map && maps && place)
+      map.setCenter(new maps.LatLng(place.latitude, place.longitude))
   }, [selectedId, places, ready])
 
   return (
