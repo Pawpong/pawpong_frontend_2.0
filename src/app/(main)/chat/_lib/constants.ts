@@ -1,24 +1,34 @@
 import type { ChatRoomResponseDto } from '@/shared/types'
 import { RESPONSIVE_SHELL_CLASS } from '@/shared/config'
 
-type FilterTab = 'all' | 'unread' | 'adoption' | 'counsel'
+type FilterTab = 'all' | 'unread' | 'adoption' | 'counsel' | 'general'
 
 const FILTER_TABS: { value: FilterTab; label: string }[] = [
   { value: 'all', label: '전체' },
   { value: 'unread', label: '안읽음' },
   { value: 'adoption', label: '입양' },
   { value: 'counsel', label: '상담' },
+  { value: 'general', label: '일반' },
 ]
 
 // 신청서(applicationId) 기반이든, 신청서 없이 분양글에서 바로 문의(petId)한 방이든
 // 특정 개체와 연결돼 있으면 모두 "입양" 문의로 본다.
 const isAdoptionRoom = (room: ChatRoomResponseDto) => !!room.applicationId || !!room.petId
 
-const filterRooms = (rooms: ChatRoomResponseDto[], filter: FilterTab): ChatRoomResponseDto[] => {
+// 입양자끼리의 대화는 입양/상담 어느 쪽도 아닌 "일반" 대화로 본다
+const isGeneralRoom = (room: ChatRoomResponseDto, userRole: string | null) =>
+  userRole === 'adopter' && room.counterpart.role === 'adopter'
+
+const filterRooms = (
+  rooms: ChatRoomResponseDto[],
+  filter: FilterTab,
+  userRole: string | null,
+): ChatRoomResponseDto[] => {
   if (filter === 'all') return rooms
   if (filter === 'unread') return rooms.filter((room) => room.unreadCount > 0)
   if (filter === 'adoption') return rooms.filter(isAdoptionRoom)
-  return rooms.filter((room) => !isAdoptionRoom(room))
+  if (filter === 'general') return rooms.filter((room) => isGeneralRoom(room, userRole))
+  return rooms.filter((room) => !isAdoptionRoom(room) && !isGeneralRoom(room, userRole))
 }
 
 // [refactored] 채팅방 콘텐츠 반응형 가로 마진 (모바일 16 / 태블릿 48 / PC 80) — 섹션 4곳 공유.
@@ -28,5 +38,12 @@ const CHAT_GUTTER_X = `${RESPONSIVE_SHELL_CLASS} px-4 tab:px-12 pc:px-20`
 // [refactored] 콘텐츠 폭 — 태블릿 이하는 꽉 채우고, PC에서만 880px 가운데 정렬
 const CHAT_CONTENT_WIDTH = 'mx-auto w-full pc:max-w-[55rem]'
 
-export { FILTER_TABS, filterRooms, isAdoptionRoom, CHAT_GUTTER_X, CHAT_CONTENT_WIDTH }
+export {
+  FILTER_TABS,
+  filterRooms,
+  isAdoptionRoom,
+  isGeneralRoom,
+  CHAT_GUTTER_X,
+  CHAT_CONTENT_WIDTH,
+}
 export type { FilterTab }
