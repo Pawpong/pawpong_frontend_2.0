@@ -39,8 +39,10 @@ export const useAiPixelFilter = () => {
     phase: transform.phase,
     error: transform.error,
     isWorking: transform.isWorking,
+    canResume: transform.canResume,
     result: transform.phase === 'done' ? transform.result : null,
     start,
+    resume: transform.resume,
     reset: transform.reset,
   }
 }

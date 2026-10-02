@@ -7,16 +7,27 @@ import {
   requestAiImageGeneration,
   uploadAiImageSource,
 } from '@/entities/ai-image'
+import type { AiImageGeneration } from '@/shared/types'
+import {
+  AI_IMAGE_RETRY_INTERVAL_MS,
+  AiImagePendingError,
+  aiImageErrorMessage,
+  isRetryableAiImageError,
+  readAiImageWithRetry,
+  waitForAiImage,
+} from './aiImageRecovery'
 
 /** 에이전트가 한 건씩 처리해 보통 30~60초, 대기열이 있으면 더 걸린다 */
-const POLL_INTERVAL_MS = 3000
 const POLL_TIMEOUT_MS = 4 * 60 * 1000
+const DOWNLOAD_TIMEOUT_MS = 2 * 60 * 1000
 
 export type AiPixelTransformPhase =
   | 'idle'
   | 'uploading'
   | 'checking'
   | 'generating'
+  | 'reconnecting'
+  | 'pending'
   | 'done'
   | 'failed'
 
@@ -38,8 +49,6 @@ const ERROR_MESSAGES: Record<string, string> = {
 }
 const DEFAULT_ERROR = '도트 변환에 실패했어요. 잠시 후 다시 시도해 주세요.'
 
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
-
 /**
  * 사진 한 장을 AI 필터로 변환한다: 원본 업로드 → 생성 요청 → 상태 폴링.
  *
@@ -50,88 +59,170 @@ export const useAiPixelTransform = () => {
   const [phase, setPhase] = useState<AiPixelTransformPhase>('idle')
   const [result, setResult] = useState<AiPixelTransformResult | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [canResume, setCanResume] = useState(false)
   const operation = useRef(0)
+  const controller = useRef<AbortController | null>(null)
+  const inFlight = useRef<Promise<AiPixelTransformResult | null> | null>(null)
+  const pendingJob = useRef<AiImageGeneration | null>(null)
 
   useEffect(
     () => () => {
       operation.current += 1
+      controller.current?.abort()
     },
     [],
   )
 
   const reset = useCallback(() => {
     operation.current += 1
+    controller.current?.abort()
+    controller.current = null
+    inFlight.current = null
+    pendingJob.current = null
+    setCanResume(false)
     setPhase('idle')
     setResult(null)
     setError(null)
   }, [])
 
-  const transform = useCallback(
-    async ({
-      file,
-      filterId,
-    }: {
-      file: File
-      filterId: string
-    }): Promise<AiPixelTransformResult | null> => {
+  const perform = useCallback(
+    (input?: { file: File; filterId: string }): Promise<AiPixelTransformResult | null> => {
+      if (inFlight.current) return inFlight.current
+      if (!input && !pendingJob.current) return Promise.resolve(null)
       const current = ++operation.current
       const isCurrent = () => current === operation.current
+      const requestController = new AbortController()
+      controller.current = requestController
+      const { signal } = requestController
+      if (input) {
+        pendingJob.current = null
+        setCanResume(false)
+      }
       setResult(null)
       setError(null)
-      setPhase('uploading')
+      setPhase(input ? 'uploading' : 'generating')
 
-      try {
-        const { inputObjectKey } = await uploadAiImageSource(file)
-        if (!isCurrent()) return null
-        setPhase('checking')
+      const run = async (): Promise<AiPixelTransformResult | null> => {
+        let generationRequested = !input
+        try {
+          if (input) {
+            const { inputObjectKey } = await uploadAiImageSource(input.file, { signal })
+            if (!isCurrent()) return null
+            setPhase('checking')
+            generationRequested = true
+            // Never replay this POST: a lost response does not mean the job was rejected.
+            const accepted = await requestAiImageGeneration(
+              { filterId: input.filterId, inputObjectKey },
+              { signal },
+            )
+            if (!isCurrent()) return null
+            pendingJob.current = accepted
+            setCanResume(true)
+          }
 
-        let job = await requestAiImageGeneration({ filterId, inputObjectKey })
-        if (!isCurrent()) return null
-        setPhase('generating')
-        const deadline = Date.now() + POLL_TIMEOUT_MS
-        while (job.status !== 'succeeded' && job.status !== 'failed') {
-          if (Date.now() > deadline)
-            throw new Error('변환이 오래 걸리고 있어요. 잠시 후 다시 시도해 주세요.')
-          await wait(POLL_INTERVAL_MS)
+          const acceptedJob = pendingJob.current
+          if (!acceptedJob) return null
+          let job = acceptedJob
+          setPhase('generating')
+          const deadline = Date.now() + POLL_TIMEOUT_MS
+          const onRetry = () => {
+            if (isCurrent()) setPhase('reconnecting')
+          }
+          while (job.status !== 'succeeded' && job.status !== 'failed') {
+            await waitForAiImage(
+              Math.max(0, Math.min(AI_IMAGE_RETRY_INTERVAL_MS, deadline - Date.now())),
+              signal,
+            )
+            job = await readAiImageWithRetry(
+              (remainingMs) =>
+                getAiImageGeneration(job.jobId, {
+                  signal,
+                  timeout: Math.min(10000, remainingMs),
+                }),
+              { signal, deadline, onRetry },
+            )
+            if (!isCurrent()) return null
+            pendingJob.current = job
+            setPhase('generating')
+          }
           if (!isCurrent()) return null
-          job = await getAiImageGeneration(job.jobId)
-        }
-        if (!isCurrent()) return null
 
-        if (job.status !== 'succeeded' || !job.resultImageUrl || !job.resultObjectKey) {
-          setError(ERROR_MESSAGES[job.errorCode ?? ''] ?? DEFAULT_ERROR)
-          setPhase('failed')
+          if (job.status !== 'succeeded' || !job.resultImageUrl || !job.resultObjectKey) {
+            pendingJob.current = null
+            setCanResume(false)
+            setError(ERROR_MESSAGES[job.errorCode ?? ''] ?? DEFAULT_ERROR)
+            setPhase('failed')
+            return null
+          }
+
+          const blob = await readAiImageWithRetry(
+            (remainingMs) =>
+              getAiImageGenerationImage(job.jobId, {
+                signal,
+                timeout: Math.min(60000, remainingMs),
+              }),
+            { signal, deadline: Date.now() + DOWNLOAD_TIMEOUT_MS, onRetry },
+          )
+          if (!isCurrent()) return null
+          const next: AiPixelTransformResult = {
+            jobId: job.jobId,
+            imageUrl: job.resultImageUrl,
+            objectKey: job.resultObjectKey,
+            file: new File([blob], `pawpong-dot-${job.jobId}.png`, { type: 'image/png' }),
+          }
+          pendingJob.current = null
+          setCanResume(false)
+          setResult(next)
+          setPhase('done')
+          return next
+        } catch (err) {
+          if (!isCurrent()) return null
+          if (
+            err instanceof AiImagePendingError ||
+            (generationRequested && isRetryableAiImageError(err))
+          ) {
+            setError(
+              pendingJob.current?.status === 'succeeded'
+                ? '사진은 완성돼 보관함에 저장됐어요. 결과 다시 확인을 눌러 사진을 가져와 주세요.'
+                : pendingJob.current
+                  ? new AiImagePendingError().message
+                  : '생성 요청의 접수 여부를 확인하지 못했어요. 다시 만들기 전에 보관함부터 확인해 주세요.',
+            )
+            setPhase('pending')
+          } else {
+            pendingJob.current = null
+            setCanResume(false)
+            setError(aiImageErrorMessage(err))
+            setPhase('failed')
+          }
           return null
+        } finally {
+          if (isCurrent()) {
+            inFlight.current = null
+            controller.current = null
+          }
         }
-
-        // 결과를 일반 사진 파일로 받아 둔다 — 글에는 기존 업로드 흐름으로 올라간다
-        const blob = await getAiImageGenerationImage(job.jobId)
-        if (!isCurrent()) return null
-        const next: AiPixelTransformResult = {
-          jobId: job.jobId,
-          imageUrl: job.resultImageUrl,
-          objectKey: job.resultObjectKey,
-          file: new File([blob], `pawpong-dot-${job.jobId}.png`, { type: 'image/png' }),
-        }
-        setResult(next)
-        setPhase('done')
-        return next
-      } catch (err) {
-        if (!isCurrent()) return null
-        setError(err instanceof Error && err.message ? err.message : DEFAULT_ERROR)
-        setPhase('failed')
-        return null
       }
+      const promise = run()
+      inFlight.current = promise
+      return promise
     },
     [],
   )
+  const resume = useCallback(() => perform(), [perform])
 
   return {
     phase,
     result,
     error,
-    isWorking: phase === 'uploading' || phase === 'checking' || phase === 'generating',
-    transform,
+    isWorking:
+      phase === 'uploading' ||
+      phase === 'checking' ||
+      phase === 'generating' ||
+      phase === 'reconnecting',
+    canResume,
+    transform: perform,
+    resume,
     reset,
   }
 }

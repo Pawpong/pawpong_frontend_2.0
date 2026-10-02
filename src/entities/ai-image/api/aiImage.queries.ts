@@ -1,3 +1,4 @@
+import { queryOptions } from '@tanstack/react-query'
 import { createQuery, STALE_TIME } from '@/shared/api'
 import { getAiImageFilters, getMyAiImageGenerations } from './aiImage.api'
 
@@ -15,11 +16,17 @@ export const aiImageQueries = {
 
   /** 내 AI 사진 보관함 — 로그인 상태에서만 켠다 */
   myGenerations: (enabled = true) =>
-    createQuery({
-      queryKey: [...aiImageQueries.all(), 'my-generations'],
-      queryFn: () => getMyAiImageGenerations(),
-      staleTime: STALE_TIME.REALTIME,
-      enabled,
-      throwOnError: false,
+    queryOptions({
+      ...createQuery({
+        queryKey: [...aiImageQueries.all(), 'my-generations'],
+        queryFn: () => getMyAiImageGenerations(),
+        staleTime: STALE_TIME.REALTIME,
+        enabled,
+        throwOnError: false,
+      }),
+      refetchInterval: (query) =>
+        query.state.data?.some((job) => ['pending', 'queued', 'processing'].includes(job.status))
+          ? 5000
+          : false,
     }),
 }

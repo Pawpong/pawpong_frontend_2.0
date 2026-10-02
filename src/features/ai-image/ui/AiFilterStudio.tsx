@@ -92,6 +92,7 @@ export function AiFilterStudio({ isLoggedIn }: AiFilterStudioProps) {
   const remaining = Math.max(0, DAILY_LIMIT - usedToday)
   const selectedFilter = ai.filters.find((filter) => filter.filterId === ai.selectedFilterId)
   const result = ai.result
+  const awaitingResult = ai.phase === 'pending'
 
   const selectPhoto = async (files: FileList) => {
     if (!files.length || preparing || ai.isWorking) return
@@ -112,6 +113,12 @@ export function AiFilterStudio({ isLoggedIn }: AiFilterStudioProps) {
   const convert = async () => {
     if (!photo || ai.isWorking) return
     const done = await ai.start(photo.file)
+    void queryClient.invalidateQueries({ queryKey: aiImageQueries.myGenerations().queryKey })
+    if (done) resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
+
+  const checkResult = async () => {
+    const done = await ai.resume()
     void queryClient.invalidateQueries({ queryKey: aiImageQueries.myGenerations().queryKey })
     if (done) resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }
@@ -179,7 +186,7 @@ export function AiFilterStudio({ isLoggedIn }: AiFilterStudioProps) {
               <PhotoUploadField
                 preview={photo?.url}
                 processing={preparing}
-                disabled={ai.isWorking}
+                disabled={ai.isWorking || awaitingResult}
                 onSelect={(files) => void selectPhoto(files)}
                 onRemove={() => {
                   ai.reset()
@@ -228,7 +235,7 @@ export function AiFilterStudio({ isLoggedIn }: AiFilterStudioProps) {
                     <button
                       type="button"
                       aria-pressed={selected}
-                      disabled={ai.isWorking}
+                      disabled={ai.isWorking || awaitingResult}
                       onClick={() => ai.selectFilter(filter.filterId)}
                       className={cn(
                         'relative flex w-full flex-col overflow-hidden rounded-xl border-2 bg-white text-left focus-ring transition-colors disabled:cursor-not-allowed',
@@ -306,13 +313,43 @@ export function AiFilterStudio({ isLoggedIn }: AiFilterStudioProps) {
                   ? '사진을 올리고 있어요…'
                   : ai.phase === 'checking'
                     ? '귀여운 우리 아이가 잘 보이는지 확인하고 있어요…'
-                    : `${WAITING_TIPS[Math.min(WAITING_TIPS.length - 1, Math.floor(elapsed / 12))]}… ${elapsed}초`}
+                    : ai.phase === 'reconnecting'
+                      ? '연결이 잠시 불안정해요. 같은 사진의 결과를 다시 확인하고 있어요…'
+                      : `${WAITING_TIPS[Math.min(WAITING_TIPS.length - 1, Math.floor(elapsed / 12))]}… ${elapsed}초`}
               </p>
               <p className="mt-0.5 text-xs text-neutral-700">
                 {ai.phase === 'checking'
                   ? '사진 확인에는 생성 횟수를 쓰지 않아요.'
-                  : '보통 30초~1분 걸려요.'}
+                  : ai.phase === 'reconnecting'
+                    ? '사진을 새로 만들지 않으므로 생성 횟수를 추가로 쓰지 않아요.'
+                    : '보통 30초~1분 걸려요.'}
               </p>
+            </div>
+          ) : awaitingResult ? (
+            <div role="status" className="rounded-2xl border border-primary-200 bg-point-50 p-5">
+              <p className="text-sm font-semibold text-neutral-850">결과 확인이 필요해요</p>
+              <p className="mt-2 text-sm leading-relaxed text-neutral-700">{ai.error}</p>
+              <p className="mt-2 text-xs text-neutral-700">
+                접수된 작업은 화면 연결이 끊겨도 계속 진행돼요. 완성되면 보관함에 저장돼요.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {ai.canResume && <Button onClick={() => void checkResult()}>결과 다시 확인</Button>}
+                <Link
+                  href="/home?tab=ai-photos"
+                  className={buttonVariants({ intent: 'secondary' })}
+                >
+                  보관함 확인
+                </Link>
+                <Button
+                  intent="link"
+                  onClick={() => {
+                    ai.reset()
+                    setPhoto(undefined)
+                  }}
+                >
+                  새 사진 선택
+                </Button>
+              </div>
             </div>
           ) : result && photo ? (
             <div>
