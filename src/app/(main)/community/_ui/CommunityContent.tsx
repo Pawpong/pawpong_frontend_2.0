@@ -24,6 +24,7 @@ import {
 } from '@/entities/community'
 import { ConnectedFeedCard, useDeletePostConfirm } from '@/features/community'
 import { useLoginGuard, useMe } from '@/features/auth'
+import { FeedFollowButton } from './FeedFollowButton'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import { cn } from '@/shared/lib/cn'
 import type { CommunityPetType, CommunitySortType } from '@/shared/types'
@@ -191,6 +192,13 @@ const CommunityContent = () => {
                           : undefined
                       }
                       onDelete={isMyPost ? () => requestDelete(post.postId) : undefined}
+                      followAction={
+                        <FeedFollowButton
+                          userId={post.authorId}
+                          isFollowing={post.isFollowingAuthor ?? false}
+                          guard={guard}
+                        />
+                      }
                     />
                   )
                 })}

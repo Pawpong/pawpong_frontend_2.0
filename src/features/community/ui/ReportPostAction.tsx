@@ -12,10 +12,18 @@ const REPORT_REASON_OPTIONS = [
   { value: 'other', label: '기타' },
 ] satisfies { value: CommunityReportReason; label: string }[]
 
-export const ReportPostAction = ({ postId }: { postId: string }) => {
+export const ReportPostAction = ({
+  postId,
+  triggerVariant,
+}: {
+  postId: string
+  /** menu: 더보기(⋮) 메뉴 안 / flag: 신고 깃발 아이콘 버튼 */
+  triggerVariant?: 'menu' | 'flag'
+}) => {
   const reportPost = useReportCommunityPost(postId)
   return (
     <ReportAction
+      triggerVariant={triggerVariant}
       targetLabel="게시글"
       options={REPORT_REASON_OPTIONS}
       onSubmit={async (data) => {
