@@ -16,7 +16,7 @@
 
 ## 검증
 
-- 전체 Node 테스트 194개, 타입체크, production build 통과.
+- 최신 dev(케어맵·AI 비교 편집 포함) 통합 후 전체 Node 테스트 207개, 타입체크, production build 통과.
 - 변경 파일 ESLint 통과. 전체 FSD 검사에는 기존 cross-import/public API 규칙 위반과 slice 수 경고가 남아 있으며 결제 슬라이스 cross-import는 없다.
 - Orca 브라우저에서 `iap.localhost:3023` → 실제 Nest API → 격리 MongoMemoryReplSet으로 카탈로그·계정·구매·원장 흐름을 확인했다. 외부 스토어와 RN 응답 경계만 테스트 fixture로 대체했으며 실제 청구는 없다.
 - 취소/승인 대기는 지급 및 finish 없이 유지된다. 충전 5 + 구독 3 = 잔액 8, 중복 복원 후 잔액 8 유지, 관리자 회수 후 3, 재지급 후 8과 감사 이벤트를 확인했다.
