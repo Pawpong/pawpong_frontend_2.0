@@ -49,7 +49,11 @@ export const SearchBar = ({
       onSubmit(keyword)
       return
     }
-    router.push(keyword ? `/explore?keyword=${encodeURIComponent(keyword)}` : '/explore')
+    router.push(
+      keyword
+        ? `/explore?type=adoption&keyword=${encodeURIComponent(keyword)}`
+        : '/explore?type=adoption',
+    )
   }
 
   return (

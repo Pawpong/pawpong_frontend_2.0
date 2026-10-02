@@ -24,7 +24,7 @@ const PopularKeywords = ({ onSelect }: PopularKeywordsProps) => {
       onSelect(keyword)
       return
     }
-    router.push(`/explore?keyword=${encodeURIComponent(keyword)}`)
+    router.push(`/explore?type=adoption&keyword=${encodeURIComponent(keyword)}`)
   }
 
   return (
