@@ -81,6 +81,7 @@ export function AiPhotoArchive({ enabled, limit, moreHref, gridClassName }: AiPh
         setPendingCommunityPhoto(
           file,
           shareComparison ? await fetchAiSourceFile(job.jobId) : undefined,
+          job.jobId,
         )
         router.push('/community/write')
       }
