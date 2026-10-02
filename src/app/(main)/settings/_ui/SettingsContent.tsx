@@ -48,6 +48,18 @@ const ADOPTER_LINKS: SettingsLink[] = [
   },
 ]
 
+// 웹은 푸터에 같은 링크가 있고, 푸터를 숨기는 앱에서만 이 섹션을 보여준다
+const INFO_LINKS: SettingsLink[] = [
+  { href: '/about', label: '서비스 소개', description: '포퐁이 어떤 서비스인지 알아봐요.' },
+  { href: '/faq', label: '자주 묻는 질문', description: '궁금한 점을 확인하고 문의해요.' },
+  { href: '/terms-of-service', label: '이용약관', description: '포퐁 서비스 이용약관을 확인해요.' },
+  {
+    href: '/terms-of-privacy',
+    label: '개인정보처리방침',
+    description: '개인정보를 어떻게 처리하는지 확인해요.',
+  },
+]
+
 // 기존 탈퇴는 복구 가능한 이용 중지다. 영구삭제는 별도 경로에서 명시적으로 요청한다.
 const LEAVE_DESCRIPTION = (
   <>
@@ -120,6 +132,17 @@ const SettingsContent = ({ userRole }: SettingsContentProps) => {
             </h2>
             <div className="divide-y divide-neutral-150">
               {links.map((item) => (
+                <SettingsLinkRow key={item.href} {...item} />
+              ))}
+            </div>
+          </section>
+
+          <section className="hidden overflow-hidden rounded-xl border border-neutral-150 bg-white shadow-[0_7px_7px_rgba(55,55,55,0.06)] in-data-app:block">
+            <h2 className="px-4 pt-4 pb-2 font-cafe24 text-sm text-primary-600 tab:px-5 tab:text-base">
+              정보
+            </h2>
+            <div className="divide-y divide-neutral-150">
+              {INFO_LINKS.map((item) => (
                 <SettingsLinkRow key={item.href} {...item} />
               ))}
             </div>
