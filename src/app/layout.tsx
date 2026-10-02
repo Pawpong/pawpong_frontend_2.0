@@ -13,9 +13,19 @@ export const metadata: Metadata = {
   description: 'Pawpong',
 }
 
+// RN 웹뷰는 UA 에 PawpongApp/ 을 붙인다. 첫 페인트 전에 표시해 앱 전용 숨김(in-data-app:hidden)이 깜빡이지 않게 한다
+const APP_DETECT_SCRIPT = `if(/PawpongApp\\//.test(navigator.userAgent))document.documentElement.dataset.app=''`
+
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <html lang="ko" className={`${pretendard.variable} ${cafe24Proup.variable}`}>
+    <html
+      lang="ko"
+      className={`${pretendard.variable} ${cafe24Proup.variable}`}
+      suppressHydrationWarning
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: APP_DETECT_SCRIPT }} />
+      </head>
       <body className="min-w-0 bg-base-white text-neutral-850">
         <NativeViewportBridge />
         <SessionRecoveryBridge />
