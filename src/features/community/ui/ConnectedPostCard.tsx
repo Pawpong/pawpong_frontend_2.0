@@ -50,7 +50,7 @@ const ConnectedCommunityBox = (
 
 interface ConnectedFeedCardProps extends Omit<
   ComponentProps<typeof CommunityFeedCard>,
-  InjectedActions
+  'onToggleLike' | 'onToggleSave' | 'reportAction'
 > {
   /**
    * 로그인이 필요한 동작을 감싸는 가드 (features/auth의 useLoginGuard).
@@ -67,7 +67,11 @@ const ConnectedFeedCard = ({ guard, ...props }: ConnectedFeedCardProps) => {
       {...props}
       onToggleLike={guard ? guard(reactions.onToggleLike) : reactions.onToggleLike}
       onToggleSave={guard ? guard(reactions.onToggleSave) : reactions.onToggleSave}
-      moreAction={props.onDelete ? undefined : <ReportPostAction postId={props.postId} />}
+      reportAction={
+        props.onDelete ? undefined : (
+          <ReportPostAction postId={props.postId} triggerVariant="flag" />
+        )
+      }
     />
   )
 }
