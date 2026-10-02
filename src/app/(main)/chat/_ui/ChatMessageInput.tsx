@@ -25,6 +25,12 @@ interface ChatMessageInputProps {
 }
 
 const MAX_ATTACHMENT_SIZE = 100 * 1024 * 1024
+/** 입력창이 늘어나는 최대 높이 — 넘으면 입력창 안에서 스크롤한다 (약 4줄) */
+const MAX_INPUT_HEIGHT = 112
+
+/** 터치 키보드 기기(모바일 웹·앱 WebView)에서는 Enter 를 줄바꿈으로 쓰고 전송은 버튼으로만 한다 */
+const isTouchKeyboard = () =>
+  typeof window !== 'undefined' && window.matchMedia('(hover: none) and (pointer: coarse)').matches
 
 const GEOLOCATION_OPTIONS: PositionOptions = {
   enableHighAccuracy: false,
@@ -55,6 +61,15 @@ const ChatMessageInput = ({ onSend, disabled, unavailableMessage }: ChatMessageI
   const sending = React.useRef(false)
   const preparingAttachment = React.useRef(false)
   const textDraftId = React.useRef<string | null>(null)
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null)
+
+  // 줄 수에 맞춰 높이를 다시 잰다 — 전송 후 값이 비면 한 줄 높이로 돌아온다
+  React.useLayoutEffect(() => {
+    const el = textareaRef.current
+    if (!el) return
+    el.style.height = 'auto'
+    el.style.height = `${Math.min(el.scrollHeight, MAX_INPUT_HEIGHT)}px`
+  }, [value])
   const [pendingAttachment, setPendingAttachment] = React.useState<{
     content: string
     type: 'image' | 'file' | 'location'
@@ -90,8 +105,9 @@ const ChatMessageInput = ({ onSend, disabled, unavailableMessage }: ChatMessageI
     }
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
+  // PC: Enter 전송, Shift+Enter 줄바꿈 / 터치 키보드: Enter 는 기본 동작(줄바꿈)
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing && !isTouchKeyboard()) {
       e.preventDefault()
       void handleSubmit()
     }
@@ -247,9 +263,10 @@ const ChatMessageInput = ({ onSend, disabled, unavailableMessage }: ChatMessageI
           />
 
           {/* 입력 + 전송 — 댓글 입력창과 같은 필 모양 안에 함께 둔다 */}
-          <div className="flex h-12 min-w-0 flex-1 items-center gap-2 rounded-full border border-neutral-300 bg-base-white py-1 pr-1.5 pl-5 transition-[border-color,box-shadow] duration-150 focus-within:border-primary-500 focus-within:ring-4 focus-within:ring-point-500/45 motion-reduce:transition-none pc:h-14 pc:pl-6">
-            <input
-              type="text"
+          <div className="flex min-h-12 min-w-0 flex-1 items-end gap-2 rounded-3xl border border-neutral-300 bg-base-white py-1 pr-1.5 pl-5 transition-[border-color,box-shadow] duration-150 focus-within:border-primary-500 focus-within:ring-4 focus-within:ring-point-500/45 motion-reduce:transition-none pc:min-h-14 pc:pl-6">
+            <textarea
+              ref={textareaRef}
+              rows={1}
               value={value}
               onChange={(e) => {
                 textDraftId.current = null
@@ -261,7 +278,7 @@ const ChatMessageInput = ({ onSend, disabled, unavailableMessage }: ChatMessageI
               }
               disabled={isDisabled}
               aria-label="메시지"
-              className="h-full min-w-0 flex-1 bg-transparent text-body-lg font-medium text-neutral-850 outline-none placeholder:text-neutral-500 disabled:cursor-not-allowed"
+              className="block min-w-0 flex-1 resize-none self-center bg-transparent py-1.5 text-body-lg font-medium text-neutral-850 outline-none placeholder:text-neutral-500 disabled:cursor-not-allowed"
             />
             <div className="flex min-w-14">
               <Button
