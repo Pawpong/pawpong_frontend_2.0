@@ -43,6 +43,7 @@ interface RawCommunityPostCard {
   saveCount: number
   isLiked: boolean
   isSaved: boolean
+  isFollowingAuthor?: boolean
   createdAt: string
   commentPreview?: RawCommunityComment[]
 }
@@ -104,6 +105,7 @@ const mapCard = (raw: RawCommunityPostCard): CommunityPostCard => ({
   saveCount: raw.saveCount,
   isLiked: raw.isLiked,
   isSaved: raw.isSaved,
+  isFollowingAuthor: raw.isFollowingAuthor,
   createdAt: raw.createdAt,
   commentPreview: raw.commentPreview?.map(mapComment),
 })
