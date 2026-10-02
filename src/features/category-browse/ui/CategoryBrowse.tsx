@@ -5,9 +5,9 @@ import { Container } from '@/shared/ui'
 // Figma 2752-269487 — 카테고리 버튼(동물+pill+라벨)은 통짜 SVG. default/hover 2상태.
 // 벡터라 모바일부터 PC까지 한 파일로 CSS 확대가 매끄러워, PNG처럼 sm/md 파일을 따로 두지 않는다.
 const CATEGORIES = [
-  { label: '고양이 찾기', href: '/explore?category=cat', src: 'cat' },
-  { label: '강아지 찾기', href: '/explore?category=dog', src: 'dog' },
-  { label: '도마뱀 찾기', href: '/explore?category=lizard', src: 'lizard' },
+  { label: '고양이 찾기', href: '/explore?type=adoption&category=cat', src: 'cat' },
+  { label: '강아지 찾기', href: '/explore?type=adoption&category=dog', src: 'dog' },
+  { label: '도마뱀 찾기', href: '/explore?type=adoption&category=lizard', src: 'lizard' },
   { label: '브리더 탐색', href: '/explore?type=breeder', src: 'explore' },
 ] as const
 
