@@ -40,6 +40,7 @@ const CommentComposer = ({
   const composingRef = useRef(false)
   const [submitting, setSubmitting] = useState(false)
   const [localError, setLocalError] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
   const busy = isSubmitting || submitting
 
   // 답글 대상이 잡히면 인풋에 바로 포커스 — 답글달기 클릭 후 곧장 타이핑할 수 있게
@@ -54,9 +55,12 @@ const CommentComposer = ({
     submittingRef.current = true
     setSubmitting(true)
     setLocalError(false)
+    setSubmitted(false)
+    if (hasSubmitError) onClearSubmitError()
     try {
       await onSubmit(body)
       setValue('')
+      setSubmitted(true)
     } catch {
       // mutation 전에 실패해도 아무 반응 없는 상태가 되지 않도록 입력값과 오류를 남긴다.
       setLocalError(true)
@@ -98,8 +102,18 @@ const CommentComposer = ({
     </div>
   )
 
+  const feedback = error || (
+    <p
+      role="status"
+      aria-live="polite"
+      className={submitted || busy ? 'text-body-sm text-neutral-700' : 'sr-only'}
+    >
+      {submitted ? '댓글을 게시했어요.' : busy ? '댓글을 게시하고 있어요…' : ''}
+    </p>
+  )
+
   return (
-    <CommentComposerShell profileImageUrl={profileImageUrl} banner={banner} footer={error}>
+    <CommentComposerShell profileImageUrl={profileImageUrl} banner={banner} footer={feedback}>
       <form
         onSubmit={(e) => {
           e.preventDefault()
@@ -117,6 +131,7 @@ const CommentComposer = ({
           onChange={(e) => {
             setValue(e.target.value)
             setLocalError(false)
+            setSubmitted(false)
             if (hasSubmitError) onClearSubmitError()
           }}
           onCompositionStart={() => {
@@ -139,14 +154,13 @@ const CommentComposer = ({
           maxLength={1000}
           className="h-full min-w-0 flex-1 bg-transparent text-body-lg font-medium text-neutral-850 outline-none placeholder:text-neutral-500"
         />
-        <div className="flex min-w-14">
+        <div className="flex w-24 shrink-0">
           <Button
             size="md"
             type="submit"
-            // iOS에서 키보드가 먼저 닫히며 버튼 위치가 바뀌어 터치가 취소되지 않게 한다.
-            onPointerDown={(e) => {
-              if (e.pointerType === 'touch') e.preventDefault()
-            }}
+            // iOS 26은 pointerdown 취소 후에도 입력 포커스를 해제한다(WebKit #322721).
+            // 호환 mousedown에서 포커스 이동만 막고, click → form 제출은 그대로 유지한다.
+            onMouseDown={(e) => e.preventDefault()}
             disabled={!trimmed || busy}
             aria-busy={busy}
             width="full"
