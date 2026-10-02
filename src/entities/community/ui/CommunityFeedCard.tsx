@@ -18,8 +18,10 @@ interface CommunityFeedCardProps extends CommunityPreviewProps {
   /** 좋아요·북마크 토글 — features의 ConnectedFeedCard에서 주입 */
   onToggleLike?: () => void
   onToggleSave?: () => void
-  /** 남의 글에 표시할 기능 레이어 액션(예: 신고 메뉴) */
-  moreAction?: ReactNode
+  /** 남의 글 헤더 오른쪽에 둘 기능 레이어 액션(팔로우) */
+  followAction?: ReactNode
+  /** 남의 글 액션 줄 오른쪽 끝에 둘 기능 레이어 액션(신고 깃발) */
+  reportAction?: ReactNode
   /** 이미지 표현 — 커뮤니티 피드는 1:1 캐러셀, 마이홈처럼 카드가 넓은 곳은 가로 스크롤 썸네일 */
   mediaLayout?: 'carousel' | 'row'
   /** 목록의 첫 카드처럼 LCP 후보인 첫 이미지만 선로딩 */
@@ -49,7 +51,8 @@ const CommunityFeedCard = ({
   onDelete,
   onToggleLike,
   onToggleSave,
-  moreAction,
+  followAction,
+  reportAction,
   mediaLayout = 'carousel',
   preload = false,
   wide = false,
@@ -88,9 +91,14 @@ const CommunityFeedCard = ({
         className,
       )}
     >
-      {/* 헤더 — 아바타·닉네임·작성시각 */}
+      {/* 헤더 — 아바타·닉네임·작성시각. 작성자 영역은 그 사람의 홈으로 간다 (/home/[userId] 가 입양자·브리더를 가른다) */}
       <div className={cn('flex items-center justify-between gap-2 p-3', wide && 'p-0 pb-4')}>
-        <Link href={href} prefetch={false} className="flex min-w-0 flex-1 items-center gap-2">
+        <Link
+          href={`/home/${author.id}`}
+          prefetch={false}
+          aria-label={`${author.nickname} 홈으로 가기`}
+          className="flex min-w-0 flex-1 items-center gap-2 rounded-lg focus-ring"
+        >
           <ProfileAvatar
             size="medium"
             src={author.profileImageUrl}
@@ -109,7 +117,7 @@ const CommunityFeedCard = ({
             </span>
           </div>
         </Link>
-        {onDelete ? <OwnerActionsMenu onEdit={onEdit} onDelete={onDelete} /> : moreAction}
+        {onDelete ? <OwnerActionsMenu onEdit={onEdit} onDelete={onDelete} /> : followAction}
       </div>
 
       {wide && text && (
@@ -182,7 +190,12 @@ const CommunityFeedCard = ({
       )}
 
       {/* 액션 — 댓글 아이콘은 상세 링크 (community/@modal 인터셉트가 이 이동을 모달로 가로챈다) */}
-      <div className={cn('px-3 py-2', wide && 'px-0 pt-4 pb-0')}>
+      <div
+        className={cn(
+          'flex items-center justify-between gap-2 px-3 py-2',
+          wide && 'px-0 pt-4 pb-0',
+        )}
+      >
         <CommunityPostActions
           likeCount={likeCount}
           commentCount={commentCount}
@@ -192,6 +205,7 @@ const CommunityFeedCard = ({
           onToggleSave={onToggleSave}
           detailHref={href}
         />
+        {reportAction}
       </div>
 
       {/* 캡션 — 이미지가 있을 때만 (없으면 위에서 본문을 이미 보여줬다) */}
