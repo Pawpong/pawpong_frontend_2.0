@@ -4,17 +4,20 @@ import { useMemo, useState } from 'react'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { NotificationListItem, notificationQueries } from '@/entities/notification'
 import {
+  useDeleteAllNotifications,
   useDeleteNotification,
   useMarkAllAsRead,
   useOpenNotification,
 } from '@/features/notification'
 import { PawPrintIcon } from '@/shared/assets'
+import { normalizeApiError } from '@/shared/api'
 import type { NotificationResponseDto } from '@/shared/types'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import {
   Button,
   Container,
+  CtaModal,
   DeleteConfirmModal,
   InfiniteScrollTrigger,
   ListState,
@@ -37,7 +40,10 @@ const NotificationsContent = () => {
     })
   const { mutate: markAllAsRead, isPending: isMarkingAll } = useMarkAllAsRead()
   const { mutate: deleteNotification, isPending: isDeleting } = useDeleteNotification()
+  const { mutate: deleteAllNotifications, isPending: isDeletingAll } = useDeleteAllNotifications()
   const [deleteTarget, setDeleteTarget] = useState<NotificationResponseDto | null>(null)
+  const [showDeleteAll, setShowDeleteAll] = useState(false)
+  const [deleteAllError, setDeleteAllError] = useState<string | null>(null)
 
   const notifications = useMemo(
     () => dedupeBy(flattenPages(data), (item) => item.notificationId),
@@ -55,9 +61,19 @@ const NotificationsContent = () => {
     })
   }
 
+  const handleDeleteAll = () => {
+    if (isDeletingAll) return
+    setDeleteAllError(null)
+    deleteAllNotifications(undefined, {
+      onSuccess: () => setShowDeleteAll(false),
+      onError: (error) =>
+        setDeleteAllError(normalizeApiError(error, '알림 전체 삭제에 실패했습니다.').message),
+    })
+  }
+
   return (
     <div className="flex w-full flex-1 flex-col bg-white pb-16">
-      <NavigationBar title="알림" backHref="/home" />
+      <NavigationBar title="알림센터" backHref="/home" />
 
       <Container className="py-5 tab:py-8 pc:py-10">
         <div className="mx-auto w-full tab:max-w-[59.25rem]">
@@ -85,13 +101,29 @@ const NotificationsContent = () => {
               <Button
                 intent="link"
                 onClick={() => markAllAsRead()}
-                disabled={isMarkingAll}
+                disabled={isMarkingAll || isDeletingAll}
                 size="sm"
               >
                 모두 읽기
               </Button>
             ) : null}
           </div>
+
+          {notifications.length > 0 && (
+            <div className="mb-3 flex justify-end">
+              <Button
+                intent="link"
+                size="sm"
+                disabled={isDeleting || isDeletingAll || isMarkingAll}
+                onClick={() => {
+                  setDeleteAllError(null)
+                  setShowDeleteAll(true)
+                }}
+              >
+                전체 삭제
+              </Button>
+            </div>
+          )}
 
           <ListState
             isPending={isPending}
@@ -122,6 +154,18 @@ const NotificationsContent = () => {
                 isFetchingNextPage={isFetchingNextPage}
                 onIntersect={() => void fetchNextPage()}
               />
+              {hasNextPage && (
+                <div className="flex justify-center border-t border-neutral-150 py-3">
+                  <Button
+                    intent="link"
+                    size="sm"
+                    disabled={isFetchingNextPage}
+                    onClick={() => void fetchNextPage()}
+                  >
+                    {isFetchingNextPage ? '불러오는 중' : '알림 더 보기'}
+                  </Button>
+                </div>
+              )}
             </div>
           </ListState>
         </div>
@@ -133,6 +177,37 @@ const NotificationsContent = () => {
         target="알림"
         onConfirm={handleConfirmDelete}
         isPending={isDeleting}
+      />
+      <CtaModal
+        open={showDeleteAll}
+        onOpenChange={(open) => !isDeletingAll && setShowDeleteAll(open)}
+        title="알림을 모두 삭제할까요?"
+        description={
+          <>
+            모든 알림이 삭제돼요.
+            <br />
+            삭제한 알림은 다시 볼 수 없어요.
+            {deleteAllError && (
+              <span role="alert" className="mt-2 block text-sm text-error-600">
+                {deleteAllError}
+              </span>
+            )}
+          </>
+        }
+        actions={[
+          {
+            label: '취소',
+            intent: 'secondary',
+            disabled: isDeletingAll,
+            onClick: () => setShowDeleteAll(false),
+          },
+          {
+            label: isDeletingAll ? '삭제하는 중' : '전체 삭제',
+            intent: 'danger',
+            disabled: isDeletingAll,
+            onClick: handleDeleteAll,
+          },
+        ]}
       />
     </div>
   )

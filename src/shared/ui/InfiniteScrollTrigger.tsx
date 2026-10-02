@@ -34,7 +34,8 @@ const InfiniteScrollTrigger = ({
 
   if (!hasNextPage) return null
 
-  return <div ref={ref} aria-hidden="true" />
+  // 높이가 0이면 overflow-hidden 목록의 끝에서 교차 영역이 사라져 다음 페이지가 멈출 수 있다.
+  return <div ref={ref} className="h-px" aria-hidden="true" />
 }
 
 export { InfiniteScrollTrigger }

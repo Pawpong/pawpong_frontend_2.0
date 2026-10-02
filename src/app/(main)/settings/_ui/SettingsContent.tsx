@@ -24,6 +24,11 @@ interface SettingsLink {
 
 const COMMON_LINKS: SettingsLink[] = [
   {
+    href: '/notifications',
+    label: '알림센터',
+    description: '채팅과 댓글 등 새 소식을 확인하고 알림을 정리해요.',
+  },
+  {
     href: '/account/content-rights',
     label: '게시물 앱 표시 동의',
     description: '내 사진과 게시물을 포퐁 앱에도 표시할지 선택해요.',
@@ -32,11 +37,6 @@ const COMMON_LINKS: SettingsLink[] = [
     href: '/profile/edit',
     label: '프로필 수정',
     description: '닉네임, 소개와 프로필 사진을 관리해요.',
-  },
-  {
-    href: '/notifications',
-    label: '알림',
-    description: '새 소식과 읽지 않은 알림을 확인해요.',
   },
 ]
 

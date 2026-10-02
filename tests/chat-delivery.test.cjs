@@ -159,3 +159,48 @@ test('generated request IDs are distinct UUIDs accepted by the optional server f
   for (const id of ids)
     assert.match(id, /^[\da-f]{8}-[\da-f]{4}-4[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/)
 })
+
+test('only my confirmed room read resets notification inbox and badge', () => {
+  let callbacks
+  const reset = []
+  const { useChatRoom } = load('src/features/chat-realtime/model/useChatRoom.ts', {
+    react: {
+      useCallback: (fn) => fn,
+      useMemo: (fn) => fn(),
+      useState: (initial) => [initial, () => {}],
+    },
+    '@tanstack/react-query': {
+      useQuery: () => ({ data: [] }),
+      useQueryClient: () => ({
+        setQueryData: () => {},
+        invalidateQueries: () => Promise.resolve(),
+        resetQueries: (query) => {
+          reset.push(query.queryKey)
+          return Promise.resolve()
+        },
+      }),
+    },
+    '@/entities/chat': {
+      chatQueries: {
+        messages: () => ({ queryKey: ['messages'] }),
+        rooms: () => ({ queryKey: ['rooms'] }),
+      },
+    },
+    '@/entities/notification': { notificationQueries: { all: () => ['notification'] } },
+    '@/shared/lib/useAccessToken': { useAccessToken: () => 'session' },
+    './chatDelivery': { createClientMessageId },
+    './mergeChatMessages': { mergeChatMessages },
+    './useChatSocket': {
+      useChatSocket: (options) => {
+        callbacks = options
+        return {}
+      },
+    },
+  })
+  useChatRoom('room', 'me')
+  callbacks.onMessagesRead({ roomId: 'another', readBy: 'me' })
+  callbacks.onMessagesRead({ roomId: 'room', readBy: 'other' })
+  assert.equal(reset.length, 0)
+  callbacks.onMessagesRead({ roomId: 'room', readBy: 'me' })
+  assert.deepEqual(reset, [['notification']])
+})
