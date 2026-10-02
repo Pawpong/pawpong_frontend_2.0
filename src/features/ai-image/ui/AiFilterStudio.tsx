@@ -120,12 +120,6 @@ export function AiFilterStudio({
     if (done) resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }
 
-  const checkResult = async () => {
-    const done = await ai.resume()
-    void queryClient.invalidateQueries({ queryKey: aiImageQueries.myGenerations().queryKey })
-    if (done) resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-  }
-
   const save = async () => {
     if (!result) return
     setSaving(true)

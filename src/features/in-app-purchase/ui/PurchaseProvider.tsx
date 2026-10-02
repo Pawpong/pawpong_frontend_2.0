@@ -5,6 +5,8 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
+  useMemo,
   useRef,
   useState,
   useSyncExternalStore,
@@ -51,45 +53,88 @@ function usePurchaseController(memberId: string | null, generation: number) {
     throwOnError: false,
     refetchOnWindowFocus: true,
   })
-  const [busy, setBusy] = useState(false)
-  const [notice, setNotice] = useState('')
+  const scope = useMemo(() => ({ memberId, generation }), [memberId, generation])
+  const [view, setView] = useState({ scope, busy: false, notice: '' })
+  const busy = view.scope === scope && view.busy
+  const notice = view.scope === scope ? view.notice : ''
+  const setBusy = useCallback(
+    (value: boolean) =>
+      setView((previous) => ({
+        scope,
+        busy: value,
+        notice: previous.scope === scope ? previous.notice : '',
+      })),
+    [scope],
+  )
+  const setNotice = useCallback(
+    (value: string) =>
+      setView((previous) => ({
+        scope,
+        busy: previous.scope === scope && previous.busy,
+        notice: value,
+      })),
+    [scope],
+  )
   const busyRef = useRef(false)
-  const lifetime = useRef<AbortController | null>(null)
-  useEffect(() => {
+  const lifetime = useRef<{ controller: AbortController; scope: typeof scope } | null>(null)
+  useLayoutEffect(() => {
     const controller = new AbortController()
-    lifetime.current = controller
+    lifetime.current = { controller, scope }
+    busyRef.current = false
     return () => controller.abort()
-  }, [])
+  }, [scope])
 
   const refresh = useCallback(async () => {
     await client.invalidateQueries({ queryKey: ['iap', 'member', memberId, generation] })
   }, [client, memberId, generation])
 
-  const session = useCallback(() => {
-    const signal = lifetime.current?.signal
-    const token = getAccessToken()
-    const isCurrent = () =>
-      Boolean(memberId && token && signal && !signal.aborted && isAuthSessionCurrent(generation))
-    if (!isCurrent() || !token) throw new Error('로그인 후 다시 확인해 주세요.')
-    return {
-      signal,
-      isCurrent,
-      verify: (purchase: NativeIapPurchase) => {
-        if (!isCurrent() || purchase.platform !== platform)
-          throw new Error('결제 계정과 기기 정보를 다시 확인해 주세요.')
-        return iapApi.verify(purchase, token, signal)
-      },
-      finish: (id: string, consumable: boolean) => nativeIap.finish(id, consumable, signal),
-    }
-  }, [memberId, generation, platform])
+  const isScopeCurrent = useCallback(() => {
+    const owner = lifetime.current
+    return Boolean(
+      owner?.scope === scope &&
+      !owner.controller.signal.aborted &&
+      isAuthSessionCurrent(generation),
+    )
+  }, [scope, generation])
+
+  const session = useCallback(
+    (requireToken = true) => {
+      const owner = lifetime.current
+      const signal = owner?.controller.signal
+      const token = getAccessToken()
+      const isCurrent = () =>
+        Boolean(
+          memberId &&
+          owner &&
+          owner.scope === scope &&
+          lifetime.current === owner &&
+          signal &&
+          !signal.aborted &&
+          isAuthSessionCurrent(generation),
+        )
+      if (!isCurrent() || (requireToken && !token)) throw new Error('로그인 후 다시 확인해 주세요.')
+      return {
+        signal,
+        isCurrent,
+        verify: (purchase: NativeIapPurchase) => {
+          if (!isCurrent() || !token || purchase.platform !== platform)
+            throw new Error('결제 계정과 기기 정보를 다시 확인해 주세요.')
+          return iapApi.verify(purchase, token, signal)
+        },
+        finish: (id: string, consumable: boolean) => nativeIap.finish(id, consumable, signal),
+      }
+    },
+    [memberId, generation, platform, scope],
+  )
 
   const recover = useCallback(
     async (restore = false) => {
       if (!memberId || !platform || !account.data?.accountToken || busyRef.current) return
-      busyRef.current = true
-      setBusy(true)
+      let current: ReturnType<typeof session> | undefined
       try {
-        const current = session()
+        current = session()
+        busyRef.current = true
+        setBusy(true)
         const purchases = await nativeIap.purchases(restore, current.signal)
         let checked = 0
         let waiting = 0
@@ -127,21 +172,32 @@ function usePurchaseController(memberId: string | null, generation: number) {
           await refresh()
         }
       } catch (error) {
-        if (!lifetime.current?.signal.aborted && isAuthSessionCurrent(generation))
-          setNotice(failureMessage(error))
+        if (current ? current.isCurrent() : isScopeCurrent()) setNotice(failureMessage(error))
       } finally {
-        busyRef.current = false
-        if (!lifetime.current?.signal.aborted) setBusy(false)
+        if (current?.isCurrent()) {
+          busyRef.current = false
+          setBusy(false)
+        }
       }
     },
-    [memberId, platform, account.data?.accountToken, session, refresh, generation],
+    [
+      memberId,
+      platform,
+      account.data?.accountToken,
+      session,
+      refresh,
+      setBusy,
+      setNotice,
+      isScopeCurrent,
+    ],
   )
 
   useEffect(() => {
-    if (!account.data?.accountToken || !platform) return
+    if (!memberId) return
     // 예약을 취소할 수 있게 해 StrictMode 재마운트에서 네이티브 복구를 중복 시작하지 않는다.
     const initialRecovery = setTimeout(() => void recover(), 0)
     const onActive = () => {
+      void refresh()
       void recover()
     }
     window.addEventListener('pawpong:app-active', onActive)
@@ -149,19 +205,23 @@ function usePurchaseController(memberId: string | null, generation: number) {
       clearTimeout(initialRecovery)
       window.removeEventListener('pawpong:app-active', onActive)
     }
-  }, [account.data?.accountToken, platform, recover])
+  }, [memberId, recover, refresh])
 
   const purchase = async (product: IapProduct, offerToken?: string) => {
     if (busyRef.current || !platform || !memberId) return
-    busyRef.current = true
-    setBusy(true)
-    setNotice('')
+    let current: ReturnType<typeof session> | undefined
     try {
+      current = session(false)
+      busyRef.current = true
+      setBusy(true)
+      setNotice('')
       // 결제 직전에 회원 토큰과 판매 상태를 다시 읽어 오래 열린 화면의 변경도 반영한다.
       const fresh = await account.refetch()
+      if (!current.isCurrent()) return
       if (fresh.error || !fresh.data)
         throw new Error('이용권 계정을 확인하지 못했어요. 잠시 후 다시 시도해 주세요.')
-      const current = session()
+      // 계정 재조회가 만료된 토큰을 갱신할 수 있다. 같은 세션인지 확인한 후 새 토큰을 고정한다.
+      current = session()
       const catalog = await iapApi.products(platform, current.signal)
       const available = catalog.find(
         (p) =>
@@ -201,11 +261,12 @@ function usePurchaseController(memberId: string | null, generation: number) {
       )
       await refresh()
     } catch (error) {
-      if (!lifetime.current?.signal.aborted && isAuthSessionCurrent(generation))
-        setNotice(failureMessage(error))
+      if (current ? current.isCurrent() : isScopeCurrent()) setNotice(failureMessage(error))
     } finally {
-      busyRef.current = false
-      if (!lifetime.current?.signal.aborted) setBusy(false)
+      if (current?.isCurrent()) {
+        busyRef.current = false
+        setBusy(false)
+      }
     }
   }
 
@@ -221,26 +282,8 @@ export function PurchaseProvider({
   children: ReactNode
 }) {
   const generation = getAuthSessionGeneration()
-  return (
-    <SessionPurchaseProvider
-      key={`${memberId}:${generation}`}
-      memberId={memberId}
-      generation={generation}
-    >
-      {children}
-    </SessionPurchaseProvider>
-  )
-}
-function SessionPurchaseProvider({
-  memberId,
-  generation,
-  children,
-}: {
-  memberId: string | null
-  generation: number
-  children: ReactNode
-}) {
   const value = usePurchaseController(memberId, generation)
+  // 결제 작업만 세션별로 취소한다. 프로필 재조회가 작성 중인 페이지를 언마운트하면 안 된다.
   return <PurchaseContext value={value}>{children}</PurchaseContext>
 }
 export function usePurchases() {

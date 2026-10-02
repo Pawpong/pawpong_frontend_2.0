@@ -105,11 +105,12 @@ function ProductCard({
 
 export function PlaygroundBilling() {
   const billing = usePurchases()
-  const { platform, memberId, account, busy, notice, recover } = billing
+  const { platform, memberId, account, busy, notice, recover, refresh } = billing
   useEffect(() => {
+    void refresh()
     const recovery = setTimeout(() => void recover(), 0)
     return () => clearTimeout(recovery)
-  }, [recover])
+  }, [recover, refresh])
   const [page, setPage] = useState(1)
   const [managementError, setManagementError] = useState('')
   const catalog = useQuery({
@@ -144,7 +145,9 @@ export function PlaygroundBilling() {
     retry: 1,
     throwOnError: false,
   })
-  const aiPolicy = policy.data?.features.find((item) => item.featureKey === 'ai_image')
+  const aiPolicy =
+    account.data?.features.find((item) => item.featureKey === 'ai_image') ??
+    policy.data?.features.find((item) => item.featureKey === 'ai_image')
   const refreshProducts = () => {
     void catalog.refetch()
     void store.refetch()

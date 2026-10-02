@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import { AiFilterStudio } from '@/features/ai-image'
 import { useMe } from '@/features/auth'
 import { usePurchases } from '@/features/in-app-purchase'
@@ -9,6 +10,10 @@ import { featureAllowance } from '@/entities/iap'
 export const AiFilterContent = () => {
   const { isLoggedIn } = useMe()
   const billing = usePurchases()
+  const { refresh } = billing
+  useEffect(() => {
+    void refresh()
+  }, [refresh])
   return (
     <AiFilterStudio
       isLoggedIn={isLoggedIn}
