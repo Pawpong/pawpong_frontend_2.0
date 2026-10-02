@@ -24,3 +24,11 @@ export const deleteNotification = async (notificationId: string): Promise<void> 
   )
   unwrapVoid(response, '알림 삭제에 실패했습니다.')
 }
+
+/** 페이지에 아직 불러오지 않은 알림까지 본인 알림함 전체를 비운다. */
+export const deleteAllNotifications = async () => {
+  const response = await apiClient.delete<ApiResponseFull<{ deletedCount: number }>>(
+    `${API_VERSION}/notification`,
+  )
+  return unwrap(response, '알림 전체 삭제에 실패했습니다.')
+}

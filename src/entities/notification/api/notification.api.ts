@@ -7,7 +7,7 @@ export const getNotifications = async (
   limit = 20,
   isRead?: boolean,
 ): Promise<PaginationResponse<NotificationResponseDto>> => {
-  const params: Record<string, unknown> = { page, limit }
+  const params: Record<string, unknown> = { pageNumber: page, itemsPerPage: limit }
   if (isRead !== undefined) params.isRead = isRead
   return apiClient
     .get<

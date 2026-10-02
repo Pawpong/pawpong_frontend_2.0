@@ -52,11 +52,11 @@ const ChatRoomPanel = ({ room, currentUserId, onBack, onRoomClosed }: ChatRoomPa
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages.length])
 
-  // 상대가 보낸 안 읽은 메시지가 있을 때만 읽음 처리를 emit한다.
+  // 방을 다시 열 때 기존 채팅 알림도 정리하고, 보이는 동안 새 메시지를 읽음 처리한다.
   const hasUnread = messages.some((message) => !message.isMine && !message.isRead)
   React.useEffect(() => {
     const readVisibleMessages = () => {
-      if (document.visibilityState !== 'hidden' && isConnected && hasUnread) markAsRead()
+      if (document.visibilityState !== 'hidden' && isConnected) markAsRead()
     }
     readVisibleMessages()
     document.addEventListener('visibilitychange', readVisibleMessages)
