@@ -143,10 +143,10 @@ export const MAIN_NAV: MainNavItem[] = [
     isActive: (p) => p.startsWith('/community'),
   },
   {
-    href: '/ai-filter',
-    label: 'AI 필터',
+    href: '/playground',
+    label: '놀이터',
     Icon: withActiveIcon(NavSparkleIcon, '/images/nav/nav-ai-active.svg'),
-    isActive: (p) => p.startsWith('/ai-filter'),
+    isActive: (p) => p.startsWith('/playground') || p.startsWith('/ai-filter'),
   },
   { href: '/home', label: '마이홈', Icon: NavMyHomeIcon, isActive: (p) => p.startsWith('/home') },
 ]

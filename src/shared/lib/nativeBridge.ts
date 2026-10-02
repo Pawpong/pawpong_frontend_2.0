@@ -3,9 +3,10 @@ type NativeCapability =
   | 'nativeShare'
   | 'notificationPermission'
   | 'notificationSettings'
+  | 'inAppPurchase'
 type NativeWindow = Window & {
   ReactNativeWebView?: { postMessage: (message: string) => void }
-  __PAWPONG_APP__?: { capabilities?: Partial<Record<NativeCapability, boolean>> }
+  __PAWPONG_APP__?: { platform?: string; capabilities?: Partial<Record<NativeCapability, boolean>> }
 }
 let requestSequence = 0
 
@@ -16,13 +17,15 @@ export function hasNativeCapability(capability: NativeCapability): boolean {
 }
 
 /** 응답 없는 구버전에는 메시지를 보내지 않는다. iOS/Android의 두 수신 경로를 모두 지원한다. */
-function requestNative(
+export function requestNative(
   capability: NativeCapability,
   type: string,
   responseType: string,
   payload: Record<string, unknown>,
   timeoutMs: number,
+  signal?: AbortSignal,
 ): Promise<Record<string, unknown>> {
+  if (signal?.aborted) return Promise.reject(new DOMException('Aborted', 'AbortError'))
   if (!hasNativeCapability(capability))
     return Promise.reject(new Error('지원하지 않는 기능입니다.'))
   const requestId = `web-${Date.now()}-${++requestSequence}`
@@ -31,8 +34,15 @@ function requestNative(
       clearTimeout(timer)
       window.removeEventListener('message', onMessage)
       document.removeEventListener('message', onMessage as EventListener)
+      signal?.removeEventListener('abort', onAbort)
+    }
+    const onAbort = () => {
+      cleanup()
+      reject(new DOMException('Aborted', 'AbortError'))
     }
     const onMessage = (event: MessageEvent) => {
+      if (event.source && event.source !== window) return
+      if (event.origin && event.origin !== window.location?.origin) return
       try {
         const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data
         if (!data || data.type !== responseType || data.requestId !== requestId) return
@@ -48,6 +58,7 @@ function requestNative(
     }, timeoutMs)
     window.addEventListener('message', onMessage)
     document.addEventListener('message', onMessage as EventListener)
+    signal?.addEventListener('abort', onAbort, { once: true })
     try {
       ;(window as NativeWindow).ReactNativeWebView!.postMessage(
         JSON.stringify({ ...payload, type, requestId }),
@@ -57,6 +68,12 @@ function requestNative(
       reject(new Error('앱에 요청을 전달하지 못했습니다.'))
     }
   })
+}
+
+export function getNativePlatform(): 'ios' | 'android' | null {
+  if (typeof window === 'undefined') return null
+  const platform = (window as NativeWindow).__PAWPONG_APP__?.platform
+  return platform === 'ios' || platform === 'android' ? platform : null
 }
 
 export async function requestCameraPermission(): Promise<boolean> {

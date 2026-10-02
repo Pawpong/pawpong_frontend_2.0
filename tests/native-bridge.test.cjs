@@ -114,3 +114,31 @@ test('notification settings report errors and release listeners after successful
   await assert.rejects(failed)
   assert.equal(app.timers.size, 0)
 })
+
+test('aborted payment requests release listeners and cannot accept late receipts', async () => {
+  const app = setup({ inAppPurchase: true })
+  const controller = new AbortController()
+  const pending = app.requestNative(
+    'inAppPurchase',
+    'IAP_PURCHASE',
+    'IAP_PURCHASE_RESULT',
+    {},
+    1000,
+    controller.signal,
+  )
+  controller.abort()
+  await assert.rejects(pending, { name: 'AbortError' })
+  assert.equal(app.timers.size, 0)
+  await assert.rejects(
+    app.requestNative(
+      'inAppPurchase',
+      'IAP_PURCHASE',
+      'IAP_PURCHASE_RESULT',
+      {},
+      1000,
+      controller.signal,
+    ),
+    { name: 'AbortError' },
+  )
+  assert.equal(app.messages.length, 1)
+})
