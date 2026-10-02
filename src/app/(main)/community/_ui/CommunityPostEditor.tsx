@@ -6,7 +6,11 @@ import { useQuery } from '@tanstack/react-query'
 import { communityQueries } from '@/entities/community'
 import { profileQueries } from '@/entities/profile'
 import Link from 'next/link'
-import { takePendingCommunityPost } from '@/features/ai-image'
+import {
+  takePendingCommunityPost,
+  PostAiComparisonEditor,
+  usePostAiComparison,
+} from '@/features/ai-image'
 import { PetCategorySuggestion, useSubmitCommunityPostForm } from '@/features/community'
 import { useExitGuard } from '@/shared/lib/useExitGuard'
 import { Button, Container, CtaModal, NavigationBar } from '@/shared/ui'
@@ -42,26 +46,25 @@ const PostForm = ({ postId, post }: PostFormProps) => {
   const formText = FORM_TEXT[isEdit ? 'edit' : 'create']
   // AI 필터에서 '커뮤니티에 자랑하기'로 넘어온 사진은 새 글의 첫 사진으로 채운다 (한 번만 꺼낸다)
   const [handoff] = useState(() => (post ? null : takePendingCommunityPost()))
+  const initialComparison = post?.aiComparison ?? handoff?.aiComparison
   const form = usePostForm({
+    maxImages: initialComparison ? 11 : 10,
     initialText: post?.body ?? '',
     initialImages: post?.photoUrls ?? [],
     initialFiles: handoff?.files,
   })
-  // 공개하기로 선택한 두 사진 자체를 기억해 삭제 뒤 인덱스가 바뀌어도 다른 사진과 비교하지 않는다.
-  const [comparisonPhotos] = useState(() => {
-    const comparison = post?.aiComparison ?? handoff?.aiComparison
-    const photos: (string | File)[] = post?.photoUrls ?? handoff?.files ?? []
-    return comparison
-      ? [photos[comparison.beforePhotoIndex], photos[comparison.afterPhotoIndex]]
-      : null
-  })
   const currentPhotos: (string | File)[] = [...form.uploadedImages, ...form.files]
-  const beforePhotoIndex = comparisonPhotos ? currentPhotos.indexOf(comparisonPhotos[0]) : -1
-  const afterPhotoIndex = comparisonPhotos ? currentPhotos.indexOf(comparisonPhotos[1]) : -1
-  const aiComparison =
-    beforePhotoIndex >= 0 && afterPhotoIndex >= 0 && beforePhotoIndex !== afterPhotoIndex
-      ? { beforePhotoIndex, afterPhotoIndex }
-      : null
+  const comparison = usePostAiComparison(currentPhotos, initialComparison, handoff?.jobId)
+
+  const visiblePhotoIndexes = currentPhotos.flatMap((photo, index) =>
+    comparison.choice.sources.includes(photo) ? [] : [index],
+  )
+  const visibleForm = {
+    ...form,
+    images: visiblePhotoIndexes.map((index) => form.images[index]),
+    maxImages: comparison.choice.enabled ? 9 : 10,
+    handleRemoveImage: (index: number) => form.handleRemoveImage(visiblePhotoIndexes[index]),
+  }
 
   const initialVisibility = post?.visibility ?? 'public'
   const [visibility, setVisibility] = useState<VisibilityType>(initialVisibility)
@@ -69,28 +72,45 @@ const PostForm = ({ postId, post }: PostFormProps) => {
   const [petType, setPetType] = useState<CommunityPetType | ''>(initialPetType)
   const { submit, isSubmitting, error } = useSubmitCommunityPostForm(postId)
   const hasChanges =
-    form.hasChanges || visibility !== initialVisibility || petType !== initialPetType
+    form.hasChanges ||
+    comparison.hasChanges ||
+    visibility !== initialVisibility ||
+    petType !== initialPetType
   const { showGuard, requestExit, confirmExit, cancelExit } = useExitGuard({
     hasChanges,
   })
 
   // 발행(published)은 본문이 필수, 임시저장(draft)은 본문 없이 사진만으로도 가능 (백엔드 계약)
   const hasBody = form.text.trim().length > 0
-  const canPublish = hasBody && !isSubmitting && !form.isProcessingPhotos
+  const canPublish =
+    hasBody &&
+    !isSubmitting &&
+    !form.isProcessingPhotos &&
+    !comparison.busy &&
+    !comparison.submission.error
   const canSaveDraft =
-    (hasBody || form.images.length > 0) && !isSubmitting && !form.isProcessingPhotos
+    (hasBody || form.images.length > 0) &&
+    !isSubmitting &&
+    !form.isProcessingPhotos &&
+    !comparison.busy &&
+    !comparison.submission.error
 
   // 발행/임시저장 모두 저장 후 마이홈으로 이동 (status 만 다름)
   const save = async (status: CommunityPostStatus) => {
-    if (form.hasPendingPhotos() || (status === 'published' ? !canPublish : !canSaveDraft)) return
+    if (
+      form.hasPendingPhotos() ||
+      comparison.hasPending() ||
+      (status === 'published' ? !canPublish : !canSaveDraft)
+    )
+      return
     const savedId = await submit({
       text: form.text,
-      files: form.files,
+      files: comparison.submission.files,
       visibility,
       status,
-      petType: petType || undefined,
-      aiComparison,
-      keptImageUrls: form.uploadedImages,
+      petType: petType || (postId ? null : undefined),
+      aiComparison: comparison.submission.aiComparison,
+      keptImageUrls: comparison.submission.keptImageUrls,
     })
     if (savedId) {
       cancelExit()
@@ -111,7 +131,7 @@ const PostForm = ({ postId, post }: PostFormProps) => {
       <PostFormLayout
         title={formText.title}
         mobileTitle={formText.mobileTitle}
-        form={form}
+        form={visibleForm}
         introTitle={isEdit ? '우리 아이의 이야기를 다듬어주세요' : '우리 아이의 일상을 나눠주세요'}
         introDescription="함께 웃고, 궁금한 것을 묻고, 반려동물과의 소중한 순간을 기록해요."
         placeholder="오늘 우리 아이는 어떤 하루를 보냈나요?"
@@ -144,12 +164,11 @@ const PostForm = ({ postId, post }: PostFormProps) => {
                 →
               </span>
             </Link>
-            {aiComparison && (
-              <p className="rounded-xl bg-point-50 p-4 text-sm leading-relaxed text-neutral-700">
-                원본과 AI 사진을 함께 공개해요. 독자는 두 사진을 비교해 볼 수 있어요. 둘 중 한
-                사진을 지우면 비교 없이 남은 사진만 올라가요.
-              </p>
-            )}
+            <PostAiComparisonEditor
+              editor={comparison}
+              photos={currentPhotos}
+              disabled={isSubmitting || form.isProcessingPhotos}
+            />
             <PetCategorySuggestion
               text={form.text}
               photo={form.files[0]}

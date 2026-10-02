@@ -121,7 +121,7 @@ export interface UpdateCommunityPostRequest {
   title?: string
   body?: string
   photos?: string[]
-  petType?: CommunityPetType
+  petType?: CommunityPetType | null
   category?: string
   visibility?: CommunityPostVisibility
   status?: CommunityPostStatus

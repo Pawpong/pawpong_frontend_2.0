@@ -4,6 +4,7 @@ import { AdoptionShowcase } from '@/widgets/adoption-showcase'
 import { CommunityShowcase } from '@/widgets/community-showcase'
 import { CategoryBrowse } from '@/features/category-browse'
 import { HomeCta } from '@/widgets/home-cta'
+import { CareMapEntry } from '@/widgets/care-map-entry'
 
 const HomePage = () => {
   return (
@@ -12,6 +13,7 @@ const HomePage = () => {
       <HomeCta />
 
       <CategoryBrowse />
+      <CareMapEntry />
 
       <HallOfFame />
       <AdoptionShowcase />

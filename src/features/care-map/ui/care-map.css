@@ -1,0 +1,125 @@
+.care-map-page button,
+.care-map-page a,
+.care-map-page select {
+  -webkit-tap-highlight-color: transparent;
+}
+.care-map-page button:focus-visible,
+.care-map-page a:focus-visible,
+.care-map-page select:focus-visible {
+  outline: 2px solid #ad651d;
+  outline-offset: 3px;
+}
+.care-map-page button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+.care-map-button {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid #eadccc;
+  border-radius: 12px;
+  padding: 9px 13px;
+  color: #683d11;
+  font-size: 13px;
+  font-weight: 600;
+  background: white;
+  cursor: pointer;
+}
+.care-map-button:hover {
+  background: #fef9ef;
+}
+.care-map-button-primary {
+  background: #ad651d;
+  color: white;
+  border-color: #ad651d;
+}
+.care-map-button-primary:hover {
+  background: #683d11;
+}
+.care-map-icon-button {
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #683d11;
+  cursor: pointer;
+}
+.care-map-icon-button:hover {
+  background: #fef9ef;
+}
+.care-map-category {
+  display: inline-flex;
+  flex: 1;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 12px;
+  padding: 10px 18px;
+  white-space: nowrap;
+  color: #683d11;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.care-map-category-active {
+  background: #ad651d;
+  color: white;
+  box-shadow: 0 2px 6px #683d1114;
+}
+.care-map-category-shelter {
+  background: #047857;
+}
+.care-map-chip {
+  min-height: 36px;
+  border: 1px solid #eadccc;
+  border-radius: 999px;
+  padding: 7px 12px;
+  color: #683d11;
+  font-size: 12px;
+  cursor: pointer;
+}
+.care-map-chip-active {
+  background: #fef9ef;
+  border-color: #ad651d;
+  font-weight: 700;
+}
+.care-map-marker {
+  position: relative;
+  width: 34px;
+  height: 39px;
+  border: 2px solid white;
+  border-radius: 18px 18px 18px 4px;
+  background: #ad651d;
+  color: white;
+  font:
+    700 13px Pretendard,
+    sans-serif;
+  box-shadow: 0 2px 7px #23140640;
+  cursor: pointer;
+}
+.care-map-marker-shelter {
+  background: #047857;
+}
+.care-map-marker-selected {
+  background: #fffe72;
+  color: #683d11;
+  border-color: #683d11;
+  transform: scale(1.18);
+}
+.care-map-marker:focus-visible {
+  outline: 3px solid #683d11;
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .care-map-page * {
+    scroll-behavior: auto !important;
+    transition: none !important;
+    animation: none !important;
+  }
+}

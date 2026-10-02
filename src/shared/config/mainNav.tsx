@@ -127,7 +127,7 @@ export const MAIN_NAV: MainNavItem[] = [
     href: '/explore',
     label: '탐색',
     Icon: withActiveIcon(NavSearchIcon, '/images/nav/nav-search-active.svg'),
-    isActive: (p) => p.startsWith('/explore'),
+    isActive: (p) => p.startsWith('/explore') || p.startsWith('/care-map'),
   },
   {
     href: '/chat',

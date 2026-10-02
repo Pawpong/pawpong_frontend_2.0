@@ -132,7 +132,7 @@ export function AiFilterStudio({
 
   const postToCommunity = () => {
     if (!result) return
-    setPendingCommunityPhoto(result.file, shareComparison ? photo?.file : undefined)
+    setPendingCommunityPhoto(result.file, shareComparison ? photo?.file : undefined, result.jobId)
     router.push('/community/write')
   }
 
@@ -429,7 +429,7 @@ export function AiFilterStudio({
                 </p>
               )}
               <p className="mt-3 text-center text-xs leading-relaxed text-neutral-700">
-                필터를 씌우면 OpenAI가 사진 속 동물을 확인한 뒤 변환해요. 동물이 잘 보이지 않는
+                필터를 씌우면 포퐁 AI가 사진 속 동물을 확인한 뒤 변환해요. 동물이 잘 보이지 않는
                 사진은 생성 횟수를 사용하지 않아요.
               </p>
               {ai.error && (

@@ -18,7 +18,7 @@ interface SubmitPostFormInput {
   files: File[]
   visibility: CommunityPostVisibility
   status: CommunityPostStatus
-  petType?: CommunityPetType
+  petType?: CommunityPetType | null
   /** 수정 시 그대로 두는 기존 사진 URL (지운 사진은 빠진 상태로 전달) */
   keptImageUrls?: string[]
 }
@@ -70,7 +70,7 @@ export const useSubmitCommunityPostForm = (postId?: string) => {
         const photos =
           resolvedKept.length === kept.length ? [...resolvedKept, ...uploaded] : undefined
 
-        if (photos === undefined && aiComparison) {
+        if (photos === undefined) {
           throw new Error('비교 사진을 확인할 수 없습니다. 사진을 다시 첨부해 주세요.')
         }
 
@@ -92,7 +92,7 @@ export const useSubmitCommunityPostForm = (postId?: string) => {
               photos,
               visibility,
               status,
-              petType,
+              petType: petType ?? undefined,
               aiComparison,
             })
         return post.postId
