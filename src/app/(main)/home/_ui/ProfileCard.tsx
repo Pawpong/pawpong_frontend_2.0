@@ -175,8 +175,7 @@ interface VisitorActionsProps {
   isFollowing: boolean
 }
 
-// 시안의 팔로우는 point 색 BaseButton(최대 258).
-// 공통 FollowButton 은 팔로워 모달용 muted pill 이라 여기서는 쓰지 않는다
+// 시안의 팔로우는 point 색 BaseButton(최대 258). 처리 중 문구·에러 안내가 있어 공통 FollowButton 대신 직접 쓴다
 const FollowActionButton = ({ targetId, isFollowing }: VisitorActionsProps) => {
   const follow = useFollowUser()
   const unfollow = useUnfollowUser()
