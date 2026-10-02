@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { homeQueries } from '@/entities/home'
+import { SupportInquiryModal } from '@/features/inquiry'
 import { ChevronDownIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { cafe24Proup } from '@/shared/lib/fonts'
@@ -17,7 +18,6 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/shared/ui'
-import { InquiryModal } from './InquiryModal'
 
 type FaqAudience = 'adopter' | 'breeder'
 
@@ -156,7 +156,7 @@ const FaqContent = () => {
         </div>
       </Container>
 
-      <InquiryModal
+      <SupportInquiryModal
         key={audience}
         audience={audience}
         open={inquiryOpen}
