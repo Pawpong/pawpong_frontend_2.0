@@ -1,10 +1,11 @@
 'use client'
 
+import { useAuthStatus } from '@/features/auth'
 import { cn } from '@/shared/lib/cn'
 import type { ChatRoomResponseDto } from '@/shared/types'
 import { Badge, ProfileAvatar } from '@/shared/ui'
 import { getChatMessagePreview } from '../_lib/attachment'
-import { isAdoptionRoom } from '../_lib/constants'
+import { isAdoptionRoom, isGeneralRoom } from '../_lib/constants'
 import { ChatRoomActionsMenu } from './ChatRoomActionsMenu'
 import { RelativeTime } from './RelativeTime'
 
@@ -23,6 +24,10 @@ const ChatRoomItem = ({
   onClick,
   onRoomClosed,
 }: ChatRoomItemProps) => {
+  const { userRole } = useAuthStatus()
+  // 일반(입양자끼리) 대화는 입양 문의/상담 구분이 의미 없어 뱃지를 숨긴다
+  const showRoomTypeBadge = !isGeneralRoom(room, userRole)
+
   return (
     <div
       className={cn(
@@ -46,9 +51,11 @@ const ChatRoomItem = ({
             <span className="truncate text-body-s font-semibold text-neutral-850">
               {room.counterpart.nickname}
             </span>
-            <Badge variant="primarySoft" className="shrink-0">
-              {isAdoptionRoom(room) ? '입양 문의' : '상담'}
-            </Badge>
+            {showRoomTypeBadge && (
+              <Badge variant="primarySoft" className="shrink-0">
+                {isAdoptionRoom(room) ? '입양 문의' : '상담'}
+              </Badge>
+            )}
           </div>
           <p
             className={cn(
