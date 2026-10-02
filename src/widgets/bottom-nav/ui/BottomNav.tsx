@@ -16,6 +16,7 @@ const BOTTOM_NAV_PATHS = new Set([
   '/chat',
   '/community',
   '/ai-filter',
+  '/playground',
   '/home',
   '/settings',
   '/activity',

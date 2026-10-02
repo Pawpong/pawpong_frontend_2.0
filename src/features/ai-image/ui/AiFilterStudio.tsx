@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { aiImageQueries } from '@/entities/ai-image'
 import { PawPrintIcon } from '@/shared/assets'
 import { cafe24Proup } from '@/shared/lib/fonts'
@@ -12,7 +12,6 @@ import { cn } from '@/shared/lib/cn'
 import { preparePhoto } from '@/shared/lib/preparePhoto'
 import { Button, ComposerSectionHeading, buttonVariants } from '@/shared/ui'
 import { PhotoUploadField } from '@/shared/ui/PhotoUploadField'
-import type { AiImageGeneration } from '@/shared/types'
 import { saveAiImageFile } from '../lib/aiImageFile'
 import { setPendingCommunityPhoto } from '../lib/pendingCommunityPhoto'
 import { AiPostShareChoice } from './AiPostShareChoice'
@@ -20,12 +19,9 @@ import { useAiPixelFilter } from '../lib/useAiPixelFilter'
 import { AiPhotoArchive } from './AiPhotoArchive'
 import { BeforeAfterCompare } from './BeforeAfterCompare'
 
-/** 서버 일일 쿼터와 같은 값 (콘테스트 없이 쓰는 생성은 하루 3회) */
-const DAILY_LIMIT = 3
 const PROGRESS_BLOCKS = 12
 /** 보통 30~60초. 이 시간 동안 막대를 90%까지만 채우고 결과가 오면 끝낸다 */
 const EXPECTED_SECONDS = 50
-const KST_OFFSET_MS = 9 * 60 * 60 * 1000
 
 /** 기다리는 동안 번갈아 보여줄 문구 */
 const WAITING_TIPS = [
@@ -34,16 +30,6 @@ const WAITING_TIPS = [
   '한 칸 한 칸 그려 넣고 있어요',
   '마지막으로 다듬고 있어요',
 ]
-
-const kstDay = (instant: number) => Math.floor((instant + KST_OFFSET_MS) / 86_400_000)
-
-/** 오늘(KST) 만든 것 중 실패하지 않은 건수 — 서버 쿼터 계산과 같은 기준 */
-const countToday = (jobs: AiImageGeneration[]) => {
-  const today = kstDay(Date.now())
-  return jobs.filter(
-    (job) => job.status !== 'failed' && kstDay(Date.parse(job.createdAt)) === today,
-  ).length
-}
 
 const useElapsedSeconds = (running: boolean) => {
   const [elapsed, setElapsed] = useState(0)
@@ -61,6 +47,10 @@ const useElapsedSeconds = (running: boolean) => {
 
 interface AiFilterStudioProps {
   isLoggedIn: boolean
+  allowance?: { remaining: number; freeRemaining: number; dailyFreeLimit: number; enabled: boolean }
+  quotaError?: boolean
+  onRefreshQuota?: () => void
+  onGenerationSettled?: () => void
 }
 
 /**
@@ -68,11 +58,16 @@ interface AiFilterStudioProps {
  * 사진 한 장 → 어드민이 등록한 필터 중 하나 고르기 → 변환 → 원본과 비교 → 저장·커뮤니티에 올리기.
  * 만든 사진은 보관함에 쌓이고, 마이홈 'AI 사진' 탭에서도 볼 수 있다.
  */
-export function AiFilterStudio({ isLoggedIn }: AiFilterStudioProps) {
+export function AiFilterStudio({
+  isLoggedIn,
+  allowance,
+  quotaError,
+  onRefreshQuota,
+  onGenerationSettled,
+}: AiFilterStudioProps) {
   const router = useRouter()
   const queryClient = useQueryClient()
   const ai = useAiPixelFilter()
-  const generationsQuery = useQuery(aiImageQueries.myGenerations(isLoggedIn))
   const elapsed = useElapsedSeconds(ai.isWorking)
   const [photo, setPhoto] = useState<{ file: File; url: string }>()
   const [preparing, setPreparing] = useState(false)
@@ -88,8 +83,8 @@ export function AiFilterStudio({ isLoggedIn }: AiFilterStudioProps) {
     [photo],
   )
 
-  const usedToday = countToday(generationsQuery.data ?? [])
-  const remaining = Math.max(0, DAILY_LIMIT - usedToday)
+  const remaining = allowance?.remaining
+  const canGenerate = Boolean(allowance?.enabled && remaining && remaining > 0)
   const selectedFilter = ai.filters.find((filter) => filter.filterId === ai.selectedFilterId)
   const result = ai.result
   const awaitingResult = ai.phase === 'pending'
@@ -111,15 +106,17 @@ export function AiFilterStudio({ isLoggedIn }: AiFilterStudioProps) {
   }
 
   const convert = async () => {
-    if (!photo || ai.isWorking) return
+    if (!photo || ai.isWorking || !canGenerate) return
     const done = await ai.start(photo.file)
     void queryClient.invalidateQueries({ queryKey: aiImageQueries.myGenerations().queryKey })
+    onGenerationSettled?.()
     if (done) resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }
 
   const checkResult = async () => {
     const done = await ai.resume()
     void queryClient.invalidateQueries({ queryKey: aiImageQueries.myGenerations().queryKey })
+    onGenerationSettled?.()
     if (done) resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }
 
@@ -168,9 +165,23 @@ export function AiFilterStudio({ isLoggedIn }: AiFilterStudioProps) {
             </p>
           </div>
           {isLoggedIn && (
-            <span className="shrink-0 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-neutral-850">
-              오늘 남은 횟수 <strong className="text-primary-700">{remaining}</strong>/{DAILY_LIMIT}
-            </span>
+            <div className="flex flex-col items-start gap-2">
+              <span className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-neutral-850">
+                {allowance
+                  ? `이용 가능 ${remaining}회 · 오늘 무료 ${allowance.freeRemaining}/${allowance.dailyFreeLimit}회`
+                  : quotaError
+                    ? '이용권을 확인하지 못했어요'
+                    : '이용 가능 횟수를 확인하고 있어요…'}
+              </span>
+              {quotaError && (
+                <Button intent="link" size="sm" onClick={onRefreshQuota}>
+                  다시 확인
+                </Button>
+              )}
+              <Link href="/playground" className="text-sm font-semibold text-primary-700 underline">
+                놀이터 이용권 확인하기
+              </Link>
+            </div>
           )}
         </div>
       </section>
@@ -382,7 +393,7 @@ export function AiFilterStudio({ isLoggedIn }: AiFilterStudioProps) {
                 <Button
                   size="md"
                   intent="link"
-                  disabled={remaining === 0}
+                  disabled={!canGenerate}
                   onClick={() => {
                     ai.reset()
                     document
@@ -398,15 +409,19 @@ export function AiFilterStudio({ isLoggedIn }: AiFilterStudioProps) {
             <>
               <Button
                 size="lg"
-                disabled={!photo || !selectedFilter || remaining === 0 || preparing}
+                disabled={!photo || !selectedFilter || !canGenerate || preparing}
                 onClick={() => void convert()}
                 width="full"
               >
-                {remaining === 0
-                  ? '오늘은 다 만들었어요 · 내일 다시 만나요'
-                  : selectedFilter
-                    ? `${selectedFilter.name} 씌우기`
-                    : '필터를 골라 주세요'}
+                {!allowance
+                  ? '이용 가능 횟수를 확인해 주세요'
+                  : !allowance.enabled
+                    ? '지금은 AI 사진 만들기가 쉬고 있어요'
+                    : remaining === 0
+                      ? '이용권이 부족해요 · 놀이터에서 확인해 주세요'
+                      : selectedFilter
+                        ? `${selectedFilter.name} 씌우기`
+                        : '필터를 골라 주세요'}
               </Button>
               {!photo && (
                 <p className="mt-2 text-center text-xs text-neutral-700">
