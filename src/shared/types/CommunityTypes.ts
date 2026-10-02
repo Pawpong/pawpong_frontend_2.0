@@ -40,6 +40,8 @@ export interface CommunityPostCard {
   saveCount: number
   isLiked: boolean
   isSaved: boolean
+  /** 현재 요청 사용자가 작성자를 팔로우 중인지 (비인증·본인 글이면 false) */
+  isFollowingAuthor?: boolean
   createdAt: string
   /** 카드에 노출할 최신 댓글 (없으면 빈 배열) */
   commentPreview?: CommunityComment[]
