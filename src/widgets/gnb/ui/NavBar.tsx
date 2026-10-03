@@ -39,8 +39,11 @@ const NavBar = ({ className }: NavBarProps) => {
           onClick={(e) => handleLinkClick(e, href)}
           className={cn(
             'flex items-center rounded pr-1 text-sm leading-[1.5] font-medium whitespace-nowrap text-primary-500 focus-ring transition-colors hover:text-primary-700',
-            // 활성: point-500 배경 칩 + semibold, 글자색은 primary-500 유지 (Figma 4042:722106)
-            isActive(pathname) && 'bg-point-500 font-semibold',
+            // 활성: 하단 밑줄 + semibold (Figma 4042:722106 의 point-500 배경 칩에서 변경)
+            // 배경 칩은 글쓰기 CTA 와 같은 point-500 톤이라 주요 동작과 현재 위치가 서로 경쟁했다.
+            // 밑줄은 배경을 비워 노란색 강조를 CTA 한 곳으로 몰아준다.
+            isActive(pathname) &&
+              'relative font-semibold text-primary-700 after:absolute after:inset-x-0 after:-bottom-1 after:h-[0.1875rem] after:bg-primary-500',
           )}
           aria-current={isActive(pathname) ? 'page' : undefined}
         >
