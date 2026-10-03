@@ -154,14 +154,14 @@ export default function KakaoMapCanvas({
       />
       {ready && (
         <div
-          className="absolute right-4 bottom-20 z-20 flex flex-col overflow-hidden rounded-xl border border-primary-100 bg-white shadow-sm"
+          className="absolute right-4 bottom-20 z-20 flex flex-col overflow-hidden rounded-xl border border-secondary-200 bg-white shadow-sm"
           role="group"
           aria-label="지도 확대 축소"
         >
           <button
             type="button"
             aria-label="지도 확대"
-            className="size-10 text-xl font-semibold text-primary-700 hover:bg-secondary-50"
+            className="size-10 text-xl font-semibold text-primary-700 hover:bg-point-50"
             onClick={() => {
               const map = mapRef.current
               if (map) map.setLevel(Math.max(1, map.getLevel() - 1))
@@ -172,7 +172,7 @@ export default function KakaoMapCanvas({
           <button
             type="button"
             aria-label="지도 축소"
-            className="size-10 border-t border-primary-100 text-xl font-semibold text-primary-700 hover:bg-secondary-50"
+            className="size-10 border-t border-secondary-200 text-xl font-semibold text-primary-700 hover:bg-point-50"
             onClick={() => {
               const map = mapRef.current
               if (map) map.setLevel(Math.min(14, map.getLevel() + 1))

@@ -3,6 +3,8 @@
 import dynamic from 'next/dynamic'
 import { useCallback, useMemo, useRef, useState, type FormEvent } from 'react'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import { Button } from '@/shared/ui/Button'
+import { FeatureIntro } from '@/shared/ui/FeatureIntro'
 import {
   getCareMapConfig,
   searchCarePlaces,
@@ -161,28 +163,20 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
   }
 
   return (
-    <div className="care-map-page mx-auto w-full max-w-[1440px] px-4 pt-6 pb-10 tab:px-8 tab:pt-9 pc:px-20">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="mb-2 flex items-center gap-1.5 text-xs font-bold tracking-widest text-primary-500">
-            <CareMapIcon name="pin" className="size-4" /> PAWPONG CARE MAP
-          </p>
-          <h1 className="text-2xl font-bold tracking-tight text-primary-900 tab:text-3xl">
-            우리 동네 돌봄 지도
-          </h1>
-          <p className="mt-2 text-sm leading-6 text-gray-600">
-            아플 때도, 새로운 가족을 기다릴 때도.
-            <br className="tab:hidden" /> 우리 곁의 병원과 보호시설을 찾아보세요.
-          </p>
-        </div>
-        <span className="rounded-full bg-secondary-50 px-3 py-1.5 text-xs font-medium text-primary-700">
-          카카오맵과 함께해요
-        </span>
+    <div className="care-map-page mx-auto w-full max-w-[68rem] px-5 pt-6 pb-16 tab:px-8 tab:pt-10 pc:px-10">
+      <FeatureIntro eyebrow="우리 아이 곁에" title="우리 동네 돌봄 지도">
+        아플 때도, 새로운 가족을 기다릴 때도.
+        <br className="tab:hidden" /> 우리 곁의 병원과 보호시설을 찾아보세요.
+      </FeatureIntro>
+
+      <div className="mt-8 mb-3 flex items-center gap-2 text-sm font-semibold text-neutral-850">
+        <CareMapIcon name="pin" className="size-4 text-primary-500" />
+        어떤 곳을 찾고 있나요?
       </div>
 
       <div className="mb-4 grid gap-3 lap:grid-cols-[auto_1fr]">
         <div
-          className="flex gap-1 rounded-2xl bg-secondary-50 p-1"
+          className="flex min-w-0 gap-1 rounded-xl bg-point-50 p-1"
           role="group"
           aria-label="시설 종류"
         >
@@ -199,7 +193,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
             type="button"
             aria-pressed={isShelter}
             onClick={() => changeKind('shelter')}
-            className={`care-map-category ${isShelter ? 'care-map-category-active care-map-category-shelter' : ''}`}
+            className={`care-map-category ${isShelter ? 'care-map-category-active' : ''}`}
           >
             <CareMapIcon name="shelter" />
             보호·입양시설
@@ -207,7 +201,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
         </div>
         <form
           onSubmit={submitSearch}
-          className="flex min-w-0 items-center gap-2 rounded-2xl border border-primary-200 bg-white px-3 focus-within:ring-2 focus-within:ring-primary-500"
+          className="flex min-w-0 items-center gap-2 rounded-xl border border-neutral-200 bg-base-white px-3 py-1.5 focus-within:border-primary-500 focus-within:ring-1 focus-within:ring-primary-500"
         >
           <CareMapIcon name="search" className="size-5 shrink-0 text-primary-500" />
           <label htmlFor="care-place-search" className="sr-only">
@@ -219,7 +213,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
             onChange={(event) => setInput(event.target.value)}
             maxLength={80}
             placeholder={isShelter ? '지역·보호시설 이름 검색' : '지역·동물병원 이름 검색'}
-            className="min-h-12 min-w-0 flex-1 bg-transparent text-sm outline-none"
+            className="min-h-10 min-w-0 flex-1 bg-transparent text-base text-neutral-850 outline-none placeholder:text-neutral-600 tab:text-sm"
             enterKeyHint="search"
           />
           {input && (
@@ -232,16 +226,13 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
               <CareMapIcon name="close" className="size-4" />
             </button>
           )}
-          <button
-            type="submit"
-            className="rounded-xl bg-primary-500 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700"
-          >
+          <Button type="submit" size="md">
             검색
-          </button>
+          </Button>
         </form>
       </div>
 
-      <div className="mb-4 flex flex-wrap items-center gap-2">
+      <div className="mb-5 flex flex-wrap items-center gap-x-2 gap-y-3">
         {!isShelter && (
           <>
             <button
@@ -273,12 +264,12 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
             </button>
           </>
         )}
-        <label className="ml-auto flex items-center gap-2 text-xs text-gray-600">
+        <label className="ml-auto flex items-center gap-2 text-xs text-neutral-700">
           주변 검색 반경
           <select
             aria-label="주변 검색 반경"
             value={search.radius}
-            className="rounded-lg border border-gray-200 bg-white px-2 py-2 text-primary-900"
+            className="rounded-lg border border-neutral-200 bg-white px-2 py-2 text-neutral-850"
             onChange={(event) => {
               setInput('')
               updateSearch({
@@ -304,23 +295,23 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
         </p>
       )}
 
-      <div className="grid gap-4 lap:grid-cols-[360px_minmax(0,1fr)] lap:items-start">
+      <div className="grid gap-5 lap:grid-cols-[300px_minmax(0,1fr)] lap:items-start">
         <div className="order-2 flex min-w-0 flex-col gap-3 lap:order-1">
           <div ref={detailRef}>
             {selected && <CarePlaceDetails place={selected} onClose={() => setSelectedId(null)} />}
           </div>
           <section
-            className="overflow-hidden rounded-2xl border border-primary-100 bg-white"
+            className="overflow-hidden rounded-2xl border border-secondary-200 bg-white"
             aria-label="시설 검색 결과"
             aria-busy={result.isFetching}
           >
-            <div className="border-b border-primary-100 px-4 py-4">
+            <div className="border-b border-secondary-200 px-4 py-4">
               <div className="flex items-center justify-between gap-2">
-                <h2 className="text-sm font-bold text-primary-900">
+                <h2 className="text-sm font-bold text-neutral-850">
                   {isShelter ? '보호·입양시설' : '동물병원'}{' '}
                   <span className="text-primary-500">{places.length}</span>
                 </h2>
-                <span className="text-xs text-gray-600">
+                <span className="text-xs text-neutral-700">
                   {search.scope === 'nearby'
                     ? `중심 반경 ${search.radius / 1000}km`
                     : search.query
@@ -328,7 +319,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
                       : '전국 확인된 병원'}
                 </span>
               </div>
-              <p className="mt-1 text-xs leading-5 text-gray-600">
+              <p className="mt-1 text-xs leading-5 text-neutral-700">
                 {search.scope === 'nearby'
                   ? '검색 중심에서 가까운 순 · 직선 거리'
                   : '지역·시설 이름 검색 결과'}
@@ -336,12 +327,12 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
             </div>
             <div className="max-h-[480px] overflow-y-auto overscroll-contain lap:max-h-[540px]">
               {result.isPending ? (
-                <p className="px-5 py-12 text-center text-sm text-gray-600" role="status">
+                <p className="px-5 py-12 text-center text-sm text-neutral-700" role="status">
                   주변 시설을 찾고 있어요…
                 </p>
               ) : result.isError && !places.length ? (
                 <div className="space-y-3 px-5 py-10 text-center" role="alert">
-                  <p className="text-sm text-gray-700">시설 정보를 불러오지 못했어요.</p>
+                  <p className="text-sm text-neutral-850">시설 정보를 불러오지 못했어요.</p>
                   <button
                     type="button"
                     className="care-map-button"
@@ -353,30 +344,28 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
               ) : places.length === 0 ? (
                 <div className="px-5 py-10 text-center">
                   <CareMapIcon name="pin" className="mx-auto mb-3 size-8 text-primary-300" />
-                  <p className="text-sm font-semibold text-primary-900">
+                  <p className="text-sm font-semibold text-neutral-850">
                     조건에 맞는 시설을 찾지 못했어요.
                   </p>
-                  <p className="mt-2 text-xs leading-5 text-gray-600">
+                  <p className="mt-2 text-xs leading-5 text-neutral-700">
                     검색 반경을 넓히거나 다른 지역명을 검색해 보세요.
                   </p>
                 </div>
               ) : (
-                <ol ref={listRef} className="divide-y divide-primary-100">
+                <ol ref={listRef} className="divide-y divide-neutral-100">
                   {places.map((place, index) => (
                     <li key={place.id} data-place-id={place.id}>
                       <button
                         type="button"
                         onClick={() => onSelect(place.id)}
                         aria-pressed={selectedId === place.id}
-                        className={`flex w-full gap-3 px-4 py-4 text-left transition-colors hover:bg-secondary-50 ${selectedId === place.id ? 'bg-secondary-50' : ''}`}
+                        className={`flex w-full gap-3 px-4 py-4 text-left transition-colors hover:bg-point-50 ${selectedId === place.id ? 'bg-point-50' : ''}`}
                       >
-                        <span
-                          className={`mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white ${isShelter ? 'bg-emerald-700' : 'bg-primary-500'}`}
-                        >
+                        <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-secondary-200 text-xs font-bold text-primary-700">
                           {index + 1}
                         </span>
                         <span className="min-w-0 flex-1">
-                          <span className="block text-sm leading-6 font-semibold text-primary-900">
+                          <span className="block text-sm leading-6 font-semibold text-neutral-850">
                             {place.name}
                           </span>
                           {place.referral && (
@@ -384,7 +373,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
                               2차·의뢰 진료
                             </span>
                           )}
-                          <span className="mt-1 block text-xs leading-5 text-gray-600">
+                          <span className="mt-1 block text-xs leading-5 text-neutral-700">
                             {place.roadAddress || place.address}
                           </span>
                           {search.scope === 'nearby' && (
@@ -423,7 +412,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
               )}
             </div>
             {limited && (
-              <p className="border-t border-primary-100 px-4 py-3 text-[11px] leading-5 text-gray-600">
+              <p className="border-t border-secondary-200 px-4 py-3 text-[11px] leading-5 text-neutral-700">
                 결과가 많은 지역은 일부만 표시돼요. 지도를 옮기거나 검색어를 구체적으로 입력해
                 주세요.
               </p>
@@ -432,7 +421,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
         </div>
 
         <div className="order-1 min-w-0 lap:sticky lap:top-20 lap:order-2">
-          <div className="relative h-[350px] overflow-hidden rounded-2xl border border-primary-100 bg-secondary-50 tab:h-[460px] lap:h-[640px]">
+          <div className="relative h-[350px] overflow-hidden rounded-2xl border border-secondary-200 bg-secondary-50 tab:h-[460px] lap:h-[640px]">
             {config.data ? (
               <KakaoMapCanvas
                 javascriptKey={config.data.javascriptKey}
@@ -490,13 +479,13 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
               </span>
             </div>
           </div>
-          <p className="mt-2 text-xs leading-5 text-gray-600" role="status">
+          <p className="mt-2 text-xs leading-5 text-neutral-700" role="status">
             {locationMessage}
           </p>
           <div className="mt-4">
             <CareMapGuide kind={search.kind} />
           </div>
-          <p className="mt-3 text-[11px] leading-5 text-gray-600">
+          <p className="mt-3 text-[11px] leading-5 text-neutral-700">
             지도·장소 정보 제공: 카카오맵 · 영업시간과 진료·입양 가능 여부는 시설에 직접 확인해
             주세요.
           </p>
