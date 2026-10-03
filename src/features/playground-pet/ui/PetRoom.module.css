@@ -1,0 +1,61 @@
+.room {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 1rem;
+  background-color: var(--color-point-50);
+  background-image: linear-gradient(0deg, var(--color-secondary-100) 24%, transparent 24%);
+}
+
+.room::before {
+  position: absolute;
+  content: '';
+  inset: 1.5rem auto auto 1.5rem;
+  width: 4rem;
+  height: 4rem;
+  border: 0.4rem solid var(--color-secondary-300);
+  background: var(--color-base-white);
+  z-index: -1;
+}
+
+.meadow {
+  background-color: var(--color-success-50, var(--color-point-50));
+  background-image: linear-gradient(
+    0deg,
+    var(--color-success-100, var(--color-secondary-100)) 24%,
+    transparent 24%
+  );
+}
+
+.starry {
+  background-color: var(--color-primary-100);
+  background-image:
+    radial-gradient(var(--color-point-500) 2px, transparent 2px),
+    linear-gradient(0deg, var(--color-primary-200) 24%, transparent 24%);
+  background-size:
+    40px 40px,
+    100% 100%;
+}
+
+.reaction {
+  animation: pet-greeting 440ms ease-out 1;
+}
+
+@keyframes pet-greeting {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  35% {
+    transform: translateY(-0.5rem) rotate(-3deg);
+  }
+  70% {
+    transform: translateY(-0.2rem) rotate(3deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reaction {
+    animation: none;
+  }
+}

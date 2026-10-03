@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useQueryClient } from '@tanstack/react-query'
 import { aiImageQueries } from '@/entities/ai-image'
+import { PetResultLink } from '@/features/playground-pet/ui/PetResultLink'
 import { PawPrintIcon } from '@/shared/assets'
 import { PLAYGROUND_BILLING_ENABLED } from '@/shared/config/playground'
 import { cafe24Proup } from '@/shared/lib/fonts'
@@ -381,6 +382,7 @@ export function AiFilterStudio({
                 짜잔! {selectedFilter?.name ?? 'AI 필터'} 완성
               </h2>
               <BeforeAfterCompare beforeSrc={photo.url} afterSrc={result.imageUrl} />
+              <PetResultLink sourceJobId={result.jobId} />
               <AiPostShareChoice
                 checked={shareComparison}
                 onChange={setShareComparison}
