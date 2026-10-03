@@ -1,12 +1,12 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import type { CareCoordinates, CarePlace } from '@/entities/care-place'
+import type { CareCoordinates, MappedCarePlace } from '@/entities/care-place'
 import { loadKakaoMaps, type KakaoMapInstance, type KakaoMaps } from '../lib/kakao-map'
 
 interface Props {
   javascriptKey: string
-  places: CarePlace[]
+  places: MappedCarePlace[]
   selectedId: string | null
   centerRequest: CareCoordinates | null
   onSelect(id: string): void
@@ -15,7 +15,7 @@ interface Props {
 
 const INITIAL_CENTER = { latitude: 37.5665, longitude: 126.978 }
 
-function fitPlaces(maps: KakaoMaps, map: KakaoMapInstance, places: CarePlace[]) {
+function fitPlaces(maps: KakaoMaps, map: KakaoMapInstance, places: MappedCarePlace[]) {
   const bounds = new maps.LatLngBounds()
   places.forEach((place) => bounds.extend(new maps.LatLng(place.latitude, place.longitude)))
   map.setBounds(bounds, 65, 45, 80, 45)
@@ -100,10 +100,10 @@ export default function KakaoMapCanvas({
     const map = mapRef.current,
       maps = sdkRef.current
     if (!ready || !map || !maps) return
-    const overlays = places.map((place, index) => {
+    const overlays = places.map((place) => {
       const marker = document.createElement('button')
       marker.type = 'button'
-      marker.textContent = String(index + 1)
+      marker.textContent = String(place.markerNumber)
       marker.title = place.name
       marker.setAttribute('aria-label', `${place.name} 선택`)
       marker.setAttribute('aria-pressed', String(place.id === selectedId))
