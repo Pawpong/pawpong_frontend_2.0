@@ -1,9 +1,7 @@
 'use client'
 
-import { useEffect, useState, useSyncExternalStore } from 'react'
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
-import Image from 'next/image'
-import { CloseIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { SHARE_IMAGE } from '@/shared/config/site'
 import { summarizeShareText } from '@/shared/lib/metadata'
@@ -14,9 +12,10 @@ import {
   subscribeNativeCapabilities,
 } from '@/shared/lib/nativeBridge'
 import { Dialog, DialogOverlay, DialogPortal } from './Dialog'
+import { ShareModalIcon } from './ShareModalIcon'
+import styles from './ShareModal.module.css'
 
-/* 공유하기 모달 (Figma 1949-253368) — 카카오톡/페이스북/네이버 블로그/URL 복사.
-   인스타그램은 웹 공유 인텐트를 제공하지 않아 URL 복사로만 폴백돼서 제외했다 */
+// 공유 제공자와 native bridge의 동작은 유지하고, 팝업 안의 표현만 전용 스타일로 구성한다.
 
 interface ShareModalProps {
   open: boolean
@@ -42,22 +41,11 @@ interface ShareFeedback {
   message: string
 }
 
-const OPTIONS: { key: ShareKey; label: string; icon: string; circle: string }[] = [
-  { key: 'kakao', label: '카카오톡', icon: '/images/share/kakaotalk.svg', circle: 'bg-[#ffe812]' },
-  {
-    key: 'facebook',
-    label: '페이스북',
-    icon: '/images/share/facebook.png',
-    circle: 'bg-[#0866ff]',
-  },
-  {
-    key: 'naver',
-    label: '블로그',
-    icon: '/images/share/naver.svg',
-    circle: 'bg-[#03c75a]',
-  },
-  { key: 'copy', label: 'URL 복사', icon: '/images/share/link.svg', circle: 'bg-neutral-100' },
-]
+const SOCIAL_OPTIONS = [
+  { key: 'kakao', label: '카카오톡' },
+  { key: 'facebook', label: '페이스북' },
+  { key: 'naver', label: '네이버 블로그' },
+] as const
 
 /** 외부 공유 페이지를 팝업으로 연다. 차단되면 호출부에서 에러 피드백으로 이어진다. */
 const openSharePopup = (shareUrl: string) => {
@@ -97,24 +85,40 @@ const ShareModal = ({
   imageUrl,
   className,
 }: ShareModalProps) => {
-  // [refactored] 4-state enum -> boolean (로드 완료 여부만 쓰인다)
   const [kakaoReady, setKakaoReady] = useState(false)
   const [kakaoError, setKakaoError] = useState<string | null>(null)
   const [kakaoAttempt, setKakaoAttempt] = useState(0)
   const [feedback, setFeedback] = useState<ShareFeedback | null>(null)
+  const [pending, setPending] = useState<ShareKey | null>(null)
+  const [previousOpen, setPreviousOpen] = useState(open)
+  const inFlight = useRef(false)
+  const feedbackVersion = useRef(0)
   const deviceShare = useSyncExternalStore(
     subscribeNativeCapabilities,
     supportsDeviceShare,
     serverShareSnapshot,
   )
 
-  // 닫을 때 상태 리셋은 이벤트에서 한다. effect 안에서 동기로 setState 하면
-  // 렌더가 한 번 더 도는 데다(react-hooks/set-state-in-effect) 닫히는 순간 필요도 없다.
-  const handleOpenChange = (next: boolean) => {
-    if (!next) {
+  // 부모가 open=false로 닫아도 다음 열림에 이전 안내/대기 상태를 가져오지 않는다.
+  // 조건부 상태 조정으로 effect 뒤의 추가 렌더 없이 닫힌 렌더에서 정리한다.
+  if (previousOpen !== open) {
+    setPreviousOpen(open)
+    if (!open) {
       setKakaoReady(false)
       setKakaoError(null)
       setFeedback(null)
+      setPending(null)
+    }
+  }
+
+  const handleOpenChange = (next: boolean) => {
+    if (!next) {
+      feedbackVersion.current += 1
+      inFlight.current = false
+      setKakaoReady(false)
+      setKakaoError(null)
+      setFeedback(null)
+      setPending(null)
     }
     onOpenChange(next)
   }
@@ -137,16 +141,26 @@ const ShareModal = ({
 
     return () => {
       cancelled = true
+      feedbackVersion.current += 1
+      inFlight.current = false
     }
   }, [open, kakaoAttempt])
 
   const share = async (key: ShareKey) => {
-    const shareUrl = new URL(url ?? window.location.pathname, window.location.origin).href
-    const shareTitle = summarizeShareText(title ?? document.title, 200)
-    const shareDescription = description ? summarizeShareText(description, 200) : undefined
+    // React 렌더 전에 들어오는 연속 클릭도 한 요청으로 묶는다. 제공자 팝업은 await 전에 연다.
+    if (inFlight.current) return
+    inFlight.current = true
+    const version = feedbackVersion.current
+    setPending(key)
     setFeedback(null)
+    const report = (next: ShareFeedback) => {
+      if (version === feedbackVersion.current) setFeedback(next)
+    }
 
     try {
+      const shareUrl = new URL(url ?? window.location.pathname, window.location.origin).href
+      const shareTitle = summarizeShareText(title ?? document.title, 200)
+      const shareDescription = description ? summarizeShareText(description, 200) : undefined
       switch (key) {
         case 'native': {
           if (hasNativeCapability('nativeShare')) {
@@ -158,21 +172,21 @@ const ShareModal = ({
         }
         case 'copy': {
           await copyToClipboard(shareUrl)
-          setFeedback({ tone: 'success', message: 'URL을 복사했습니다.' })
+          report({ tone: 'success', message: 'URL을 복사했습니다.' })
           break
         }
         case 'facebook': {
           openSharePopup(
             `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
           )
-          setFeedback({ tone: 'success', message: '페이스북 공유 창을 열었습니다.' })
+          report({ tone: 'success', message: '페이스북 공유 창을 열었습니다.' })
           break
         }
         case 'naver': {
           openSharePopup(
             `https://share.naver.com/web/shareView?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(shareTitle)}`,
           )
-          setFeedback({ tone: 'success', message: '네이버 공유 창을 열었습니다.' })
+          report({ tone: 'success', message: '네이버 공유 창을 열었습니다.' })
           break
         }
         // [refactored] SDK 페이로드 조립은 shared/lib/kakao로 이동. await 없이 동기 호출해야 팝업이 안 막힌다.
@@ -188,13 +202,19 @@ const ShareModal = ({
       }
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') return
-      setFeedback({
+      report({
         tone: 'error',
         message:
           error instanceof Error && error.message
             ? error.message
             : '공유하지 못했습니다. 잠시 후 다시 시도해주세요.',
       })
+    } finally {
+      // 닫힌 팝업의 늦은 완료가 재열린 팝업의 새 요청을 풀지 않도록 한다.
+      if (version === feedbackVersion.current) {
+        inFlight.current = false
+        setPending(null)
+      }
     }
   }
 
@@ -203,101 +223,102 @@ const ShareModal = ({
       <DialogPortal>
         <DialogOverlay />
         <DialogPrimitive.Content
-          aria-describedby="share-modal-description"
           className={cn(
-            'fixed top-1/2 left-1/2 z-modal w-[22.5rem] max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 rounded-[0.75rem] bg-white data-[state=closed]:opacity-0 data-[state=open]:opacity-100',
+            'fixed top-1/2 left-1/2 z-modal -translate-x-1/2 -translate-y-1/2',
+            styles.content,
             className,
           )}
         >
-          {/* 헤더: X + 공유하기 */}
-          <div className="flex flex-col items-center gap-2 p-3">
-            <div className="flex h-6 w-full items-center justify-end">
-              <DialogPrimitive.Close aria-label="닫기">
-                <CloseIcon className="size-6 text-neutral-850" />
-              </DialogPrimitive.Close>
+          <DialogPrimitive.Close type="button" aria-label="닫기" className={styles.close}>
+            <ShareModalIcon kind="close" />
+          </DialogPrimitive.Close>
+          <div className={styles.body}>
+            <div className={styles.header}>
+              <DialogPrimitive.Title className={cn('font-cafe24', styles.title)}>
+                공유하기
+              </DialogPrimitive.Title>
+              <DialogPrimitive.Description className={styles.description}>
+                함께 보고 싶은 소식을 나눠요.
+              </DialogPrimitive.Description>
             </div>
-            <DialogPrimitive.Title className="text-xl leading-[1.5] font-semibold text-neutral-850">
-              공유하기
-            </DialogPrimitive.Title>
-            <DialogPrimitive.Description id="share-modal-description" className="sr-only">
-              공유할 서비스를 선택하세요.
-            </DialogPrimitive.Description>
-          </div>
 
-          {/* 공유 옵션 행 (Figma 1945-136563) */}
-          <div className="flex flex-wrap items-start justify-center gap-x-8 gap-y-6 px-3 py-5">
-            {(deviceShare
-              ? [
-                  ...OPTIONS,
-                  {
-                    key: 'native' as const,
-                    label: '다른 앱',
-                    icon: '/images/share/link.svg',
-                    circle: 'bg-neutral-100',
-                  },
-                ]
-              : OPTIONS
-            ).map((option) => {
-              const isKakao = option.key === 'kakao'
-              return (
-                <button
-                  key={option.key}
-                  type="button"
-                  onClick={() => void share(option.key)}
-                  disabled={isKakao && !kakaoReady}
-                  aria-busy={isKakao && !kakaoReady && !kakaoError}
-                  className="flex flex-col items-center gap-0.5 rounded-md focus-ring disabled:cursor-wait disabled:opacity-50"
-                >
-                  <span
-                    className={cn(
-                      'flex size-11 items-center justify-center rounded-full',
-                      option.circle,
-                    )}
+            <div className={styles.socialOptions}>
+              {SOCIAL_OPTIONS.map((option) => {
+                const isKakao = option.key === 'kakao'
+                return (
+                  <button
+                    key={option.key}
+                    type="button"
+                    onClick={() => void share(option.key)}
+                    disabled={isKakao && !kakaoReady}
+                    aria-disabled={pending !== null}
+                    aria-busy={pending === option.key || (isKakao && !kakaoReady && !kakaoError)}
+                    className={styles.socialOption}
                   >
-                    <Image
-                      src={option.icon}
-                      alt=""
-                      width={24}
-                      height={24}
-                      className="size-6 object-contain"
-                    />
-                  </span>
-                  <span className="text-sm leading-[1.5] font-medium text-neutral-850">
-                    {option.label}
-                  </span>
-                </button>
-              )
-            })}
-          </div>
+                    <ShareModalIcon kind={option.key} className={styles.socialIcon} />
+                    <span className={styles.optionLabel}>{option.label}</span>
+                  </button>
+                )
+              })}
+            </div>
 
-          {kakaoError && (
-            <div role="status" className="px-5 pb-4 text-center text-sm text-error-600">
-              <p>{kakaoError}</p>
+            <div className={styles.utilityOptions}>
               <button
                 type="button"
-                className="mt-2 rounded px-2 py-1 font-semibold underline focus-ring"
-                onClick={() => {
-                  setKakaoError(null)
-                  setKakaoReady(false)
-                  setKakaoAttempt((attempt) => attempt + 1)
-                }}
+                onClick={() => void share('copy')}
+                aria-disabled={pending !== null}
+                aria-busy={pending === 'copy'}
+                className={styles.utilityOption}
               >
-                카카오 공유 다시 불러오기
+                <ShareModalIcon kind="copy" className={styles.utilityIcon} />
+                <span className={styles.optionLabel}>URL 복사</span>
               </button>
+              {deviceShare && (
+                <button
+                  type="button"
+                  onClick={() => void share('native')}
+                  aria-disabled={pending !== null}
+                  aria-busy={pending === 'native'}
+                  className={styles.utilityOption}
+                >
+                  <ShareModalIcon kind="native" className={styles.utilityIcon} />
+                  <span className={styles.optionLabel}>다른 앱</span>
+                </button>
+              )}
             </div>
-          )}
-          {feedback && (
+
+            {kakaoError && (
+              <div role="status" className={styles.sdkError}>
+                <p>{kakaoError}</p>
+                <button
+                  type="button"
+                  className={styles.retry}
+                  disabled={pending !== null}
+                  onClick={() => {
+                    setKakaoError(null)
+                    setKakaoReady(false)
+                    setKakaoAttempt((attempt) => attempt + 1)
+                  }}
+                >
+                  카카오 공유 다시 불러오기
+                </button>
+              </div>
+            )}
             <p
               role="status"
               aria-live="polite"
-              className={cn(
-                'px-5 pb-5 text-center text-sm leading-[1.5] font-medium',
-                feedback.tone === 'error' ? 'text-error-600' : 'text-neutral-700',
-              )}
+              aria-atomic="true"
+              className={styles.feedback}
+              data-active={!!(pending || feedback)}
+              data-tone={feedback?.tone}
             >
-              {feedback.message}
+              {pending
+                ? pending === 'copy'
+                  ? 'URL을 복사하고 있어요.'
+                  : '공유 창을 여는 중이에요.'
+                : feedback?.message}
             </p>
-          )}
+          </div>
         </DialogPrimitive.Content>
       </DialogPortal>
     </Dialog>
