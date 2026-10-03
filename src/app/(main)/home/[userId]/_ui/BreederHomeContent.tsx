@@ -41,6 +41,12 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
     )
   }
 
+  const introProps = {
+    nickname: profile.nickname,
+    description: profile.longDescription,
+    photos: profile.representativePhotos,
+  }
+
   return (
     <div className="flex w-full flex-col">
       <PublicHomeProfileSection kind="breeder" profile={profile} />
@@ -49,14 +55,15 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
         tabs={BREEDER_HOME_TABS}
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        sidebar={<ProfileCard profile={profile} mode="breeder" layout="sidebar" />}
+        sidebar={
+          <>
+            <ProfileCard profile={profile} mode="breeder" layout="sidebar" />
+            <BreederIntroduction {...introProps} placement="profile" />
+          </>
+        }
       >
         <TabsContent value="listings" className="mt-0">
-          <BreederIntroduction
-            nickname={profile.nickname}
-            description={profile.longDescription}
-            photos={profile.representativePhotos}
-          />
+          <BreederIntroduction {...introProps} placement="tab" />
           <PublicBreederListings breederId={profile.breederId} gridClassName={CARD_GRID} />
         </TabsContent>
 
