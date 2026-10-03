@@ -5,7 +5,6 @@ import { BeforeAfterSlider } from '@/shared/ui'
 import type { ReactNode } from 'react'
 import {
   AsyncState,
-  Button,
   DeleteConfirmModal,
   ImageCarousel,
   LoginPromptModal,
@@ -58,6 +57,7 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
     setConfirmDeletePost,
     handleDeletePost,
     isDeletePending,
+    isFetching: isRetrying,
   } = usePostDetail(postId)
   // 좋아요·북마크는 비로그인 요청이 401로 떨어지므로 먼저 로그인으로 유도한다
   const { guard, isPromptOpen, setPromptOpen } = useLoginGuard()
@@ -78,13 +78,8 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
                 ? '게시글을 불러오는 중입니다.'
                 : '삭제되었거나 볼 수 없는 게시글입니다.'
           }
-          action={
-            isError ? (
-              <Button intent="dark" size="sm" onClick={() => void refetch()}>
-                다시 시도
-              </Button>
-            ) : undefined
-          }
+          onRetry={isError ? () => void refetch() : undefined}
+          isRetrying={isRetrying}
           className="min-h-0 flex-1"
         />
       </div>

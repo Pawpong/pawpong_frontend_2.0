@@ -1,5 +1,6 @@
 'use client'
 
+import { RetryButton } from '@/shared/ui'
 import * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { cn } from '@/shared/lib/cn'
@@ -13,7 +14,6 @@ import { PetInfoCard } from './PetInfoCard'
 import { ChatNoticeBanner } from './ChatNoticeBanner'
 import { ChatMessageBubble } from './ChatMessageBubble'
 import { ChatMessageInput } from './ChatMessageInput'
-import { Button } from '@/shared/ui'
 
 interface ChatRoomPanelProps {
   room: ChatRoomResponseDto
@@ -32,6 +32,7 @@ const ChatRoomPanel = ({ room, currentUserId, onBack, onRoomClosed }: ChatRoomPa
     sendMessage,
     markAsRead,
     refetch,
+    isFetching: isRetrying,
   } = useChatRoom(room.roomId, currentUserId)
   const messagesEndRef = React.useRef<HTMLDivElement>(null)
   const displayName = room.counterpart.nickname
@@ -110,9 +111,7 @@ const ChatRoomPanel = ({ room, currentUserId, onBack, onRoomClosed }: ChatRoomPa
             ) : isError ? (
               <div className="flex flex-col items-center gap-3 py-10">
                 <p className="text-sm text-neutral-700">메시지를 불러오지 못했습니다.</p>
-                <Button intent="dark" size="sm" onClick={() => void refetch()}>
-                  다시 시도
-                </Button>
+                <RetryButton onRetry={() => void refetch()} isRetrying={isRetrying} />
               </div>
             ) : (
               messages.map((msg, idx) => (

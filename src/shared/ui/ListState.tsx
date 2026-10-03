@@ -12,6 +12,8 @@ interface ListStateProps {
   emptyText: ReactNode
   /** 오류 상태에서 같은 자리에서 재시도할 수 있는 액션. */
   errorAction?: ReactNode
+  onRetry?: () => void
+  isRetrying?: boolean
   /** 작성자별 앱 공개 동의가 적용되는 공개 목록에만 사용한다. */
   appPublicContent?: boolean
 }
@@ -26,11 +28,21 @@ const ListState = ({
   errorText,
   emptyText,
   errorAction,
+  onRetry,
+  isRetrying,
   appPublicContent = false,
 }: ListStateProps) => {
   if (isPending) return <AsyncState status="loading" message={loadingText} />
   if (isError && isEmpty)
-    return <AsyncState status="error" message={errorText} action={errorAction} />
+    return (
+      <AsyncState
+        status="error"
+        message={errorText}
+        action={errorAction}
+        onRetry={onRetry}
+        isRetrying={isRetrying}
+      />
+    )
   if (isEmpty)
     return (
       <AsyncState

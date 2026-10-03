@@ -9,7 +9,13 @@ import { DraftSection } from './DraftSection'
 
 /** 임시저장 카드를 누르면 작성 화면에서 이어서 쓴다 */
 const AdoptionDraftSection = () => {
-  const { data, isPending, isError, refetch } = useQuery({
+  const {
+    data,
+    isPending,
+    isError,
+    refetch,
+    isFetching: isRetrying,
+  } = useQuery({
     ...petPostingQueries.drafts(),
     refetchOnMount: 'always',
     throwOnError: false,
@@ -34,6 +40,7 @@ const AdoptionDraftSection = () => {
         isPending={isPending}
         isError={isError}
         onRetry={() => void refetch()}
+        isRetrying={isRetrying}
         loadingText="임시저장한 분양글을 불러오는 중입니다."
         errorText="임시저장한 분양글을 불러오지 못했습니다."
         emptyText="임시저장한 분양글이 없습니다."

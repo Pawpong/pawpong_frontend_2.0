@@ -71,6 +71,7 @@ const usePostDetail = (postId: string) => {
     isPending,
     isError,
     refetch: postQuery.refetch,
+    isFetching: postQuery.isFetching,
     isOwner,
     toggleLike,
     isLikePending,
