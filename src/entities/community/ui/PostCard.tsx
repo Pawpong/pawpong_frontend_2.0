@@ -85,6 +85,7 @@ const PostCard = ({
   isLiked,
   isSaved,
   detailHref,
+  shareable,
   profileType,
   showMore,
   commentPreview,
@@ -180,6 +181,16 @@ const PostCard = ({
             saved={isSaved}
             onToggleLike={onToggleLike}
             onToggleSave={onToggleSave}
+            share={
+              shareable && detailHref
+                ? {
+                    url: detailHref,
+                    title: `${author.nickname}님의 게시글`,
+                    description: text,
+                    imageUrl: images[0],
+                  }
+                : undefined
+            }
             detailHref={detailHref}
           />
 

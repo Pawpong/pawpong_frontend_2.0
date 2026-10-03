@@ -17,12 +17,14 @@ interface CommunityPreviewProps {
   commentCount: number
   isLiked: boolean
   isSaved: boolean
+  shareable?: boolean
   detailHref?: string
   commentPreview?: { nickname: string; body: string }
 }
 
 const toCommunityPreviewProps = (post: CommunityPostCard): CommunityPreviewProps => ({
   postId: post.postId,
+  shareable: post.visibility === 'public' && post.status === 'published',
   author: {
     id: post.authorId,
     nickname: post.authorNickname,

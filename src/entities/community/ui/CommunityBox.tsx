@@ -36,6 +36,7 @@ const CommunityBox = ({
   isLiked,
   isSaved,
   detailHref,
+  shareable,
   onToggleLike,
   onToggleSave,
   moreAction,
@@ -109,6 +110,16 @@ const CommunityBox = ({
         saved={isSaved}
         onToggleLike={onToggleLike}
         onToggleSave={onToggleSave}
+        share={
+          shareable && detailHref
+            ? {
+                url: detailHref,
+                title: `${author.nickname}님의 게시글`,
+                description: text,
+                imageUrl: images[0],
+              }
+            : undefined
+        }
         detailHref={detailHref}
       />
     </article>

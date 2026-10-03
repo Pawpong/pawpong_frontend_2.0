@@ -9,6 +9,7 @@ import {
 } from '@tanstack/react-query'
 import {
   Button,
+  ShareButton,
   LocationText,
   ProfileAvatar,
   FollowersModal,
@@ -252,7 +253,24 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip', menu }: Profile
     </div>
   ) : null
   // [refactored] 2단 아바타 줄 우상단 — 남의 홈은 즐겨찾기·신고, 내 홈은 작성·수정 메뉴
-  const cornerActions = favoriteActions ?? menu
+  const profileActions = (
+    <div className="flex shrink-0 items-center gap-1">
+      <ShareButton
+        url={`/home/${profileUserId}`}
+        title={`${profile.nickname}님의 홈`}
+        description={profile.bio}
+        imageUrl={profile.profileImageUrl}
+        ariaLabel="프로필 공유하기"
+      />
+      {favoriteActions}
+    </div>
+  )
+  const cornerActions = (
+    <div className="flex items-center gap-1">
+      {profileActions}
+      {menu}
+    </div>
+  )
 
   return (
     <>
@@ -299,9 +317,7 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip', menu }: Profile
               <p className="min-w-0 flex-1 truncate text-lg leading-[1.5] font-semibold text-neutral-850 pc:text-xl">
                 {profile.nickname}
               </p>
-              {favoriteActions && (
-                <div className={cn(isSidebar && 'tab:hidden')}>{favoriteActions}</div>
-              )}
+              <div className={cn(isSidebar && 'tab:hidden')}>{profileActions}</div>
             </div>
             {/* 위치 → 카운트 순으로 이름 아래에 각각 한 줄씩 (같은 줄에 묶지 않는다) */}
             {locationText && <LocationText location={locationText} />}
