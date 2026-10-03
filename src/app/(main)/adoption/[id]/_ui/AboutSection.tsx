@@ -21,7 +21,8 @@ const Row = ({ label, value }: { label: string; value: ReactNode }) => (
 const AboutSection = ({ detail }: { detail: AdoptionDetailDto }) => (
   <DetailSection title="이 아이에 대해">
     <div className="flex flex-col">
-      <Row label="품종" value={CATEGORY_LABEL[detail.category]} />
+      {/* 품종은 브리더가 입력한 값을 그대로 쓴다. 비어 있을 때만 축종으로 대신한다 */}
+      <Row label="품종" value={detail.breed?.trim() || CATEGORY_LABEL[detail.category]} />
       <Row label="태어난 날" value={detail.birthDate} />
       <Row
         label="성별"
