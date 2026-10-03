@@ -60,6 +60,7 @@ export function PlaygroundContent() {
                       src={filter.thumbnailUrl!}
                       alt={`${filter.name} 예시`}
                       fill
+                      loading="eager"
                       sizes="(max-width: 767px) 28vw, (max-width: 1023px) 26vw, 150px"
                       className="object-contain p-1.5"
                     />
