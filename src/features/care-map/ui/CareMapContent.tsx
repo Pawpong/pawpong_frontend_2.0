@@ -1,7 +1,15 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+  type FormEvent,
+} from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { cafe24Proup } from '@/shared/lib/fonts'
 import { FeatureIntro } from '@/shared/ui/FeatureIntro'
@@ -11,13 +19,18 @@ import {
   searchCarePlaces,
   type CareCoordinates,
   type CarePlaceKind,
-  type CarePlaceSearch,
   type MappedCarePlace,
 } from '@/entities/care-place'
 import { CareMapIcon } from './CareMapIcon'
 import { CarePlaceDetails } from './CarePlaceDetails'
 import { CareMapGuide } from './CareMapGuide'
 import { careLocationFailureMessage, startCareLocation } from '../lib/care-location'
+import {
+  careSearchReducer,
+  createCareSearchState,
+  DEFAULT_CARE_CENTER,
+  type CareSearchAction,
+} from '../lib/care-search-state'
 import './care-map.css'
 
 const KakaoMapCanvas = dynamic(() => import('./KakaoMapCanvas'), {
@@ -28,27 +41,17 @@ const KakaoMapCanvas = dynamic(() => import('./KakaoMapCanvas'), {
     </div>
   ),
 })
-const DEFAULT_CENTER = { latitude: 37.5665, longitude: 126.978 }
-
 export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: CarePlaceKind }) {
-  const [search, setSearch] = useState<CarePlaceSearch>({
-    ...DEFAULT_CENTER,
-    kind: initialKind,
-    query: '',
-    radius: initialKind === 'shelter' ? 20000 : 5000,
-    scope: 'directory',
-    region: 'all',
-    referralOnly: false,
-  })
-  const [page, setPage] = useState(1)
+  const [{ search, page, selectedId, nearbyOrigin }, dispatch] = useReducer(
+    careSearchReducer,
+    initialKind,
+    createCareSearchState,
+  )
   const [input, setInput] = useState('')
-  const [selectedId, setSelectedId] = useState<string | null>(null)
   const [centerRequest, setCenterRequest] = useState<CareCoordinates | null>(null)
   const [locating, setLocating] = useState(false)
-  const [locationMessage, setLocationMessage] = useState(
-    '전국 등록 시설을 보여드려요. 지역을 선택하면 더 쉽게 찾을 수 있어요.',
-  )
-  const viewportCenter = useRef<CareCoordinates>(DEFAULT_CENTER)
+  const [locationMessage, setLocationMessage] = useState<string | null>(null)
+  const viewportCenter = useRef<CareCoordinates>(DEFAULT_CARE_CENTER)
   const cancelLocation = useRef<() => void>(() => {})
   const cancelPendingLocation = useCallback(() => {
     cancelLocation.current()
@@ -60,9 +63,9 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
       onLocated: (center) => {
         setLocating(false)
         viewportCenter.current = center
-        setSearch((current) => ({ ...current, ...center, scope: 'nearby', referralOnly: false }))
+        dispatch({ type: 'nearby', center, origin: 'location' })
         setCenterRequest(center)
-        setLocationMessage('내 위치에서 가까운 시설이에요. 방문 전 전화로 확인해 주세요.')
+        setLocationMessage(null)
       },
       onFailure: (reason) => {
         setLocating(false)
@@ -117,34 +120,23 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
   const isDirectory = search.scope === 'directory'
   const regionLabel =
     summary.data?.regions.find((region) => region.id === search.region)?.label ?? '전국'
+  const nearbyLabel = nearbyOrigin === 'location' ? '내 위치 주변' : '지도 중심 주변'
+  const hasFilters =
+    !isDirectory || search.region !== 'all' || !!search.query || search.referralOnly
 
-  const updateSearch = (next: CarePlaceSearch) => {
+  const updateSearch = (action: CareSearchAction) => {
     cancelPendingLocation()
-    setSelectedId(null)
     setCenterRequest(null)
-    setPage(1)
-    setSearch(next)
+    setLocationMessage(null)
+    dispatch(action)
   }
   const changeKind = (kind: CarePlaceKind) => {
-    setInput('')
-    updateSearch({
-      ...search,
-      kind,
-      query: '',
-      referralOnly: false,
-      radius: kind === 'shelter' ? 20000 : 5000,
-      scope: 'directory',
-    })
-    setLocationMessage(
-      kind === 'shelter'
-        ? '지역을 고르면 해당 지자체가 등록한 보호센터를 볼 수 있어요.'
-        : '일반 진료는 가까운 병원부터, 전문 진료는 의뢰 안내를 확인해 보세요.',
-    )
+    updateSearch({ type: 'kind', kind })
   }
   const onSelect = useCallback(
     (id: string) => {
       cancelPendingLocation()
-      setSelectedId(id)
+      dispatch({ type: 'select', id })
       requestAnimationFrame(() => {
         const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches
           ? 'auto'
@@ -164,30 +156,23 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
   }, [])
   const submitSearch = (event: FormEvent) => {
     event.preventDefault()
-    updateSearch({ ...search, query: input.trim(), scope: 'directory' })
-    setLocationMessage('등록된 이름·주소·보호센터 관할 지역에서 검색해요.')
+    setInput(input.trim())
+    updateSearch({ type: 'query', query: input })
   }
   const searchHere = () => {
-    setInput('')
-    updateSearch({
-      ...search,
-      ...viewportCenter.current,
-      query: '',
-      scope: 'nearby',
-      referralOnly: false,
-    })
-    setLocationMessage('지도 중심에서 가까운 카카오 등록 시설이에요. 거리는 직선 거리예요.')
+    updateSearch({ type: 'nearby', center: viewportCenter.current, origin: 'map' })
   }
   const locate = () => {
     cancelPendingLocation()
     cancelLocation.current = startCareLocation(navigator, 'manual', {
-      onChecking: () => setLocating(true),
+      onChecking: () => {
+        setLocating(true)
+        setLocationMessage(null)
+      },
       onLocated: (center) => {
         viewportCenter.current = center
-        setInput('')
-        updateSearch({ ...search, ...center, query: '', scope: 'nearby', referralOnly: false })
+        updateSearch({ type: 'nearby', center, origin: 'location' })
         setCenterRequest(center)
-        setLocationMessage('내 위치에서 가까운 시설이에요. 방문 전 전화로 확인해 주세요.')
       },
       onFailure: (reason) => {
         setLocating(false)
@@ -248,16 +233,16 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
             <CareMapIcon name="pin" className="size-4" />
             <select
               aria-label={isShelter ? '보호센터 관할 지역' : '병원 지역'}
-              value={search.region}
+              value={isDirectory ? search.region : 'nearby'}
               onChange={(event) => {
-                updateSearch({ ...search, region: event.target.value, scope: 'directory' })
-                setLocationMessage(
-                  isShelter
-                    ? '선택한 지자체의 등록 보호센터예요. 실제 시설은 다른 지역에 있을 수 있어요.'
-                    : '선택한 지역의 등록 병원을 보여드려요.',
-                )
+                updateSearch({ type: 'region', region: event.target.value })
               }}
             >
+              {!isDirectory && (
+                <option value="nearby" disabled>
+                  {nearbyLabel}
+                </option>
+              )}
               <option value="all">전국</option>
               {summary.data?.regions.map((region) => (
                 <option key={region.id} value={region.id}>
@@ -281,12 +266,12 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
               placeholder={isShelter ? '보호센터 이름 또는 지역 검색' : '병원 이름 또는 지역 검색'}
               enterKeyHint="search"
             />
-            {input && (
+            {(input || search.query) && (
               <button
                 type="button"
                 onClick={() => {
-                  cancelPendingLocation()
                   setInput('')
+                  updateSearch({ type: 'query', query: '' })
                 }}
                 className="care-map-icon-button"
                 aria-label="검색어 지우기"
@@ -299,54 +284,36 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
             </button>
           </form>
         </div>
-        <div className="care-map-filters">
+        <div className="care-map-filters" role="group" aria-label="검색 범위">
+          <span className="care-map-filter-label">검색 범위</span>
           <button
             type="button"
-            className={`care-map-chip ${isDirectory && !search.referralOnly ? 'care-map-chip-active' : ''}`}
-            aria-pressed={isDirectory && !search.referralOnly}
-            onClick={() => updateSearch({ ...search, scope: 'directory', referralOnly: false })}
+            className={`care-map-chip ${isDirectory ? 'care-map-chip-active' : ''}`}
+            aria-pressed={isDirectory}
+            onClick={() => updateSearch({ type: 'directory' })}
           >
-            전국 등록 {isShelter ? '보호센터' : '병원'}
+            {regionLabel} 등록
           </button>
-          {!isShelter && (
-            <button
-              type="button"
-              className={`care-map-chip ${search.referralOnly ? 'care-map-chip-active' : ''}`}
-              aria-pressed={search.referralOnly}
-              onClick={() => {
-                setInput('')
-                updateSearch({
-                  ...search,
-                  query: '',
-                  region: 'all',
-                  referralOnly: true,
-                  scope: 'directory',
-                })
-              }}
-            >
-              2차·의뢰 진료{summary.data ? ` ${summary.data.referralCount}` : ''}
-            </button>
-          )}
           <button
             type="button"
             onClick={locate}
             disabled={locating}
-            className={`care-map-chip inline-flex items-center gap-1 ${search.scope === 'nearby' ? 'care-map-chip-active' : ''}`}
+            aria-pressed={!isDirectory && nearbyOrigin === 'location'}
+            className={`care-map-chip ${!isDirectory && nearbyOrigin === 'location' ? 'care-map-chip-active' : ''}`}
           >
             <CareMapIcon name="locate" className="size-4" />
             {locating ? '위치 확인 중…' : '내 주변 찾기'}
           </button>
+          {!isDirectory && nearbyOrigin === 'map' && (
+            <span className="care-map-scope-status">지도 중심 주변</span>
+          )}
           {search.scope === 'nearby' && (
             <select
               aria-label="주변 검색 반경"
               value={search.radius}
               className="care-map-radius"
               onChange={(event) =>
-                updateSearch({
-                  ...search,
-                  radius: Number(event.target.value),
-                  ...viewportCenter.current,
-                })
+                updateSearch({ type: 'radius', radius: Number(event.target.value) })
               }
             >
               <option value={3000}>3km</option>
@@ -355,15 +322,53 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
               <option value={20000}>20km</option>
             </select>
           )}
-          <span className="ml-auto hidden text-xs text-neutral-600 tab:inline">
-            {isDirectory ? '공식 등록자료로 찾아요' : '카카오 장소 검색'}
-          </span>
         </div>
+        {!isShelter && (
+          <div className="care-map-filters" role="group" aria-label="진료 조건">
+            <span className="care-map-filter-label">진료 조건</span>
+            <button
+              type="button"
+              className={`care-map-chip ${!search.referralOnly ? 'care-map-chip-active' : ''}`}
+              aria-pressed={!search.referralOnly}
+              onClick={() => updateSearch({ type: 'referral', enabled: false })}
+            >
+              전체 병원
+            </button>
+            <button
+              type="button"
+              className={`care-map-chip ${search.referralOnly ? 'care-map-chip-active' : ''}`}
+              aria-pressed={search.referralOnly}
+              onClick={() => updateSearch({ type: 'referral', enabled: true })}
+            >
+              2차·의뢰 진료 확인
+            </button>
+          </div>
+        )}
+        {hasFilters && (
+          <div className="care-map-applied-filters">
+            <p role="status">
+              {isDirectory ? regionLabel : `${nearbyLabel} ${search.radius / 1000}km`}
+              {search.referralOnly ? ' · 2차·의뢰 진료 확인' : ''}
+              {search.query ? ` · “${search.query}”` : ''}
+            </p>
+            <button
+              type="button"
+              className="care-map-chip"
+              onClick={() => {
+                setInput('')
+                updateSearch({ type: 'reset' })
+              }}
+            >
+              조건 초기화
+            </button>
+          </div>
+        )}
       </div>
-      {search.referralOnly && (
+      {!isShelter && (
         <p className="mb-3 text-xs leading-5 text-primary-700">
-          병원 공식 의뢰 안내를 확인한 곳이에요. 전국 모든 2차 병원 목록은 아니며, 표시가 없는
-          병원을 1차로 단정하지 않아요.
+          {search.referralOnly
+            ? `공식 의뢰 안내를 확인한 ${summary.data ? `전국 ${summary.data.referralCount}곳 중 ` : '병원 중 '}선택한 조건에 맞는 곳이에요. 전체 2차 병원 목록은 아니에요.`
+            : '전체 병원에는 일반·전문 진료 병원이 함께 있어요. 의뢰 표시가 없는 병원을 1차로 단정하지 않아요.'}
         </p>
       )}
 
@@ -376,7 +381,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
           <div className="border-b border-neutral-150 px-4 py-4">
             <div className="flex items-center justify-between gap-2">
               <h2 className="text-sm font-semibold text-neutral-850">
-                {isDirectory ? regionLabel : '지도 주변'} {isShelter ? '보호센터' : '동물병원'}{' '}
+                {isDirectory ? regionLabel : nearbyLabel} {isShelter ? '보호센터' : '동물병원'}{' '}
                 <span className="text-primary-500">
                   {(result.data?.totalCount ?? places?.length ?? 0).toLocaleString()}
                 </span>
@@ -389,7 +394,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
               {isShelter && isDirectory
                 ? '관할 지자체 기준 · 공동 보호센터는 한 곳으로 표시'
                 : search.scope === 'nearby'
-                  ? '지도 중심에서 직선 거리순'
+                  ? `${nearbyOrigin === 'location' ? '확인한 내 위치' : '검색한 지도 중심'}에서 직선 거리순`
                   : '반려동물 진료 가능 여부는 병원에 확인해 주세요'}
             </p>
           </div>
@@ -434,11 +439,10 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
                   type="button"
                   className="care-map-button mt-4"
                   onClick={() => {
-                    setInput('')
-                    updateSearch({ ...search, region: 'all', query: '', scope: 'directory' })
+                    updateSearch({ type: 'region', region: 'all' })
                   }}
                 >
-                  전국에서 찾기
+                  전국에서 같은 조건 찾기
                 </button>
               </div>
             ) : (
@@ -491,8 +495,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
                 disabled={page === 1 || result.isFetching}
                 onClick={() => {
                   cancelPendingLocation()
-                  setSelectedId(null)
-                  setPage(page - 1)
+                  dispatch({ type: 'page', page: page - 1 })
                 }}
               >
                 이전
@@ -507,8 +510,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
                 disabled={!result.data?.hasMore || result.isFetching}
                 onClick={() => {
                   cancelPendingLocation()
-                  setSelectedId(null)
-                  setPage(page + 1)
+                  dispatch({ type: 'page', page: page + 1 })
                 }}
               >
                 다음
@@ -591,7 +593,12 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
             </div>
           </div>
           <p className="mt-2 text-xs leading-5 text-neutral-600" role="status">
-            {locationMessage}
+            {locationMessage ??
+              (isDirectory
+                ? isShelter
+                  ? '선택한 지자체의 등록 보호센터예요. 실제 시설은 다른 지역에 있을 수 있어요.'
+                  : '선택한 지역의 등록 병원이에요. 방문 전 전화로 확인해 주세요.'
+                : `${nearbyLabel} 반경 ${search.radius / 1000}km에서 찾아요. 거리는 직선 거리예요.`)}
           </p>
           {result.data?.locationUnavailable && (
             <div
@@ -611,7 +618,12 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
             </div>
           )}
           <div ref={detailRef} className="mt-3">
-            {selected && <CarePlaceDetails place={selected} onClose={() => setSelectedId(null)} />}
+            {selected && (
+              <CarePlaceDetails
+                place={selected}
+                onClose={() => dispatch({ type: 'select', id: null })}
+              />
+            )}
           </div>
           <div className="mt-4">
             <CareMapGuide kind={search.kind} />
