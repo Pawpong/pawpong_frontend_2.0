@@ -22,7 +22,7 @@ const STAT_LABELS = { fullness: '배부름', mood: '기분', energy: '에너지'
 const RECORD_LABELS = {
   adopted: '처음 만난 날',
   first_meal: '첫 식사를 함께했어요',
-  level_up: '친구가 자랐어요',
+  level_up: '우리 아이가 자랐어요',
   unlock: '새로운 추억이 열렸어요',
   seven_days: '일곱 날을 함께했어요',
 }
@@ -67,6 +67,10 @@ export function PetRoom({
       ? 'background_meadow'
       : 'room_basic'
   const progress = petLevelProgress(pet)
+  const primaryAction =
+    (Object.keys(PET_ACTION_LABELS) as PetAction[]).find(
+      (action) => view.actions![action].allowed && view.actions![action].rewardAvailable,
+    ) ?? 'greet'
   return (
     <div className="space-y-6">
       <section
@@ -83,7 +87,7 @@ export function PetRoom({
             </h2>
           </div>
           <span className="rounded-lg bg-action-primary px-3 py-2 font-cafe24 text-lg text-brand">
-            친구 레벨 {pet.level}
+            레벨 {pet.level}
           </span>
         </div>
         <div className="px-5 pt-4 tab:px-8">
@@ -97,7 +101,7 @@ export function PetRoom({
           </div>
           <div
             role="progressbar"
-            aria-label="친구 레벨 경험치"
+            aria-label="반려동물 성장 경험치"
             aria-valuemin={0}
             aria-valuemax={100}
             aria-valuenow={Math.round(progress)}
@@ -126,7 +130,7 @@ export function PetRoom({
                 <PetImage
                   key={pet.imageUrl}
                   src={pet.imageUrl}
-                  alt={`${pet.name}, 내가 입양한 도트 친구`}
+                  alt={`${pet.name}, 내가 키우는 도트 반려동물`}
                 />
               </div>
               {view.unlocks.includes('pixel_decoration') && (
@@ -162,18 +166,18 @@ export function PetRoom({
               })}
             </dl>
             <h3 className="mt-6 text-base font-semibold text-neutral-850">
-              오늘은 어떻게 함께할까요?
+              오늘도 우리 아이를 돌봐 주세요
             </h3>
             <div
               className="mt-3 grid grid-cols-2 gap-x-3 gap-y-5"
-              aria-label="친구 돌봄"
+              aria-label="반려동물 돌보기"
               aria-busy={disabled}
             >
               {(Object.keys(PET_ACTION_LABELS) as PetAction[]).map((action) => (
                 <div key={action}>
                   <Button
                     width="full"
-                    intent={action === 'rest' ? 'secondary' : 'primary'}
+                    intent={action === primaryAction ? 'primary' : 'secondary'}
                     disabled={disabled || !view.actions![action].allowed}
                     onClick={() => onAction(action)}
                     aria-describedby={`pet-${action}-hint`}
@@ -192,9 +196,9 @@ export function PetRoom({
               ))}
             </div>
             <p className="mt-3 text-xs leading-5 text-neutral-700">
-              오래 쉬었다 돌아와도 친구는 사라지지 않아요.
+              오래 쉬었다 돌아와도 우리 아이는 사라지지 않아요.
               <br />
-              친구 경험치는 계정 등급이나 AI 이용 횟수와 별개예요.
+              반려동물의 성장 경험치는 계정 등급이나 AI 이용 횟수와 별개예요.
             </p>
           </div>
         </div>

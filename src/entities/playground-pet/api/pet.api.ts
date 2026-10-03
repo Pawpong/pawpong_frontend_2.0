@@ -14,7 +14,7 @@ const BASE = `${API_VERSION}/playground/pet`
 /** 같은 호스트의 서버 gate를 먼저 거친다. 운영 빌드/호스트에서는 백엔드 조회도 하지 않는다. */
 export async function getPetConfig(signal?: AbortSignal): Promise<PetConfig> {
   const response = await fetch('/api/playground/pet/config', { cache: 'no-store', signal })
-  if (!response.ok) throw new Error('도트 친구 이용 여부를 확인하지 못했어요.')
+  if (!response.ok) throw new Error('반려동물 키우기 이용 여부를 확인하지 못했어요.')
   return response.json()
 }
 

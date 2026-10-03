@@ -75,7 +75,7 @@ export function usePetController(session: PetSession) {
         const { action, xpAwarded } = result.data.outcome
         setNotice(
           action === 'adopt'
-            ? '새 친구와 함께하는 첫날이에요!'
+            ? '함께하는 첫날이에요! 인사부터 나눠 볼까요?'
             : action === 'rest'
               ? '포근하게 쉬기 시작했어요. 15분 뒤 에너지를 채워요.'
               : xpAwarded > 0

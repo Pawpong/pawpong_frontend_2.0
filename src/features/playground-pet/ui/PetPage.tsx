@@ -25,7 +25,7 @@ function PetSessionContent({
     if (query.isPending)
       return (
         <p role="status" className="rounded-2xl bg-point-50 p-10 text-center text-neutral-700">
-          친구의 방을 준비하고 있어요…
+          우리 아이의 방을 준비하고 있어요…
         </p>
       )
     const unavailable = query.error instanceof ApiError && query.error.status === 404
@@ -33,8 +33,8 @@ function PetSessionContent({
       <div role="alert" className="space-y-4 rounded-2xl border border-secondary-200 p-6">
         <p>
           {unavailable
-            ? '도트 친구가 잠시 쉬고 있어요. 놀이터에서 다른 놀이를 만나 보세요.'
-            : '친구의 방을 불러오지 못했어요. 저장된 친구는 그대로 있어요.'}
+            ? '반려동물 키우기를 잠시 이용할 수 없어요. 놀이터에서 다시 만나요.'
+            : '우리 아이의 방을 불러오지 못했어요. 저장된 돌봄 기록은 그대로 있어요.'}
         </p>
         {!unavailable && (
           <Button intent="secondary" onClick={() => void query.refetch()}>
@@ -60,7 +60,7 @@ function PetSessionContent({
         >
           <p>
             {busy
-              ? '친구에게 마음을 전하고 있어요…'
+              ? '우리 아이에게 마음을 전하고 있어요…'
               : notice || '최신 상태를 확인하지 못했어요. 연결을 확인한 뒤 다시 불러와 주세요.'}
           </p>
           {uncertain && (
@@ -128,43 +128,43 @@ export function PetPage({ initialSourceJobId }: { initialSourceJobId?: string })
       >
         ← 놀이터
       </Link>
-      <FeatureIntro eyebrow="함께 자라는 작은 일상" title="내 도트 친구">
-        내 사진에서 태어난 친구와 오늘도 반가운 인사를 나눠요.
+      <FeatureIntro eyebrow="함께 자라는 작은 일상" title="내 반려동물 키우기">
+        사진으로 나만의 도트 반려동물을 만들고 함께 성장해요.
       </FeatureIntro>
       {config.isPending ? (
         <p role="status" className="py-10 text-center text-neutral-700">
-          도트 친구를 만나러 가는 중…
+          우리 아이를 만나러 가는 중…
         </p>
       ) : config.isError ? (
         <div role="alert" className="space-y-4 rounded-xl bg-point-50 p-6">
-          <p>도트 친구를 불러오지 못했어요.</p>
+          <p>반려동물 키우기를 불러오지 못했어요.</p>
           <Button intent="secondary" onClick={() => void config.refetch()}>
             다시 확인하기
           </Button>
         </div>
       ) : !config.data?.enabled ? (
         <p role="status" className="rounded-xl bg-point-50 p-6 text-neutral-700">
-          도트 친구가 잠시 쉬고 있어요. 놀이터에서 다시 만나요.
+          반려동물 키우기를 잠시 이용할 수 없어요. 놀이터에서 다시 만나요.
         </p>
       ) : !session ? (
         <section className="rounded-2xl border border-secondary-200 bg-point-50 px-5 py-10 text-center">
           <PawPrintIcon aria-hidden className="mx-auto size-16 text-secondary-500" />
           <h2 className="mt-5 font-cafe24 text-xl text-neutral-850">
-            우리 아이를 닮은 친구를 만나 보세요
+            우리 아이와 새로운 일상을 시작해요
           </h2>
           <p className="mt-3 text-sm leading-6 text-neutral-700">
-            완성한 AI 도트 그림에 이름을 짓고
+            완성된 도트 그림을 고르고 이름을 지어 주세요.
             <br />
-            밥도 먹고, 놀고, 쉬며 함께 자라요.
+            인사하고, 밥 주고, 함께 놀며 조금씩 자라요.
             <br />
-            로그인하면 내 친구를 계속 만날 수 있어요.
+            로그인하면 키우던 반려동물을 언제든 다시 만날 수 있어요.
           </p>
           <div className="mt-6">
             <Link
               href={`/login?returnUrl=${encodeURIComponent(returnTo)}`}
               className={buttonVariants()}
             >
-              로그인하고 친구 만나기
+              로그인하고 시작하기
             </Link>
           </div>
         </section>
