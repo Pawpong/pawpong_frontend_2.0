@@ -11,7 +11,13 @@ import { Avatar, AvatarFallback, AvatarImage, Badge, buttonVariants } from '@/sh
 import { ReviewTypeBadge } from '../../../_ui/ActivityBadges'
 
 const ReviewDetailContent = ({ reviewId, backHref }: { reviewId: string; backHref: string }) => {
-  const { data, isPending, isError, refetch } = useQuery(adopterQueries.reviewDetail(reviewId))
+  const {
+    data,
+    isPending,
+    isError,
+    refetch,
+    isFetching: isRetrying,
+  } = useQuery(adopterQueries.reviewDetail(reviewId))
 
   return (
     <ActivityDetailLayout
@@ -21,6 +27,7 @@ const ReviewDetailContent = ({ reviewId, backHref }: { reviewId: string; backHre
       isError={isError}
       hasData={!!data}
       onRetry={() => void refetch()}
+      isRetrying={isRetrying}
     >
       {data && (
         <>

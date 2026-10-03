@@ -305,20 +305,15 @@ const ProfileEditContent = () => {
                 ? '프로필을 불러오는 중입니다.'
                 : '프로필을 확인할 수 없습니다.'
           }
-          action={
-            profileError ? (
-              <Button
-                intent="dark"
-                size="sm"
-                onClick={() => {
+          onRetry={
+            profileError
+              ? () => {
                   void myProfileQuery.refetch()
                   if (myProfile?.role === 'adopter') void adopterProfileQuery.refetch()
-                }}
-              >
-                다시 시도
-              </Button>
-            ) : undefined
+                }
+              : undefined
           }
+          isRetrying={myProfileQuery.isFetching || adopterProfileQuery.isFetching}
           className="min-h-[calc(100dvh-7rem)]"
         />
       </div>

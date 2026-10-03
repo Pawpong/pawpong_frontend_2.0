@@ -7,14 +7,7 @@ import { ChevronDownIcon } from '@/shared/assets'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import { formatDate } from '@/shared/lib/formatDate'
-import {
-  Badge,
-  Button,
-  Container,
-  InfiniteScrollTrigger,
-  ListState,
-  NavigationBar,
-} from '@/shared/ui'
+import { Badge, Container, InfiniteScrollTrigger, ListState, NavigationBar } from '@/shared/ui'
 import type { Notice } from '@/shared/types'
 
 // 공지 행 — FAQ 목록(FaqItem)과 완전히 같은 규격.
@@ -46,8 +39,16 @@ const NoticeRow = ({ notice }: { notice: Notice }) => (
 
 /** 공지사항 목록 (Figma 전체 메뉴 3555:416834). GET /api/v2/notice */
 const NoticesContent = () => {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending, isError, refetch } =
-    useInfiniteQuery(noticeQueries.list())
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isPending,
+    isError,
+    refetch,
+    isFetching: isRetrying,
+  } = useInfiniteQuery(noticeQueries.list())
   const notices = useMemo(() => dedupeBy(flattenPages(data), (notice) => notice.noticeId), [data])
 
   return (
@@ -64,11 +65,8 @@ const NoticesContent = () => {
             loadingText="공지사항을 불러오는 중입니다."
             errorText="공지사항을 불러오지 못했습니다."
             emptyText="등록된 공지사항이 없습니다."
-            errorAction={
-              <Button intent="dark" size="sm" onClick={() => void refetch()}>
-                다시 시도
-              </Button>
-            }
+            onRetry={() => void refetch()}
+            isRetrying={isRetrying}
           >
             <div>
               {notices.map((notice) => (
