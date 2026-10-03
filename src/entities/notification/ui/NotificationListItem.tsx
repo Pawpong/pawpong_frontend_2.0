@@ -4,12 +4,17 @@ import { cn } from '@/shared/lib/cn'
 import { formatRelativeTime } from '@/shared/lib/formatRelativeTime'
 import type { NotificationResponseDto } from '@/shared/types'
 import { OwnerActionsMenu } from '@/shared/ui/OwnerActionsMenu'
+import { IconButton } from '@/shared/ui/IconButton'
+import { CloseIcon } from '@/shared/assets'
+import { notificationCategoryLabel, notificationCategoryOf } from '../model/notificationCategory'
 
 interface NotificationListItemProps {
   item: NotificationResponseDto
   onSelect: (item: NotificationResponseDto) => void
   onDelete?: (item: NotificationResponseDto) => void
   compact?: boolean
+  /** 삭제 중인 항목은 버튼을 잠근다 */
+  deleting?: boolean
 }
 
 const NotificationListItem = ({
@@ -17,7 +22,9 @@ const NotificationListItem = ({
   onSelect,
   onDelete,
   compact = false,
+  deleting = false,
 }: NotificationListItemProps) => {
+  const category = notificationCategoryOf(item.type)
   return (
     <article
       className={cn(
@@ -44,15 +51,36 @@ const NotificationListItem = ({
           <span className="line-clamp-2 text-sm leading-[1.5] font-medium text-neutral-700">
             {item.body}
           </span>
-          <time className="text-xs font-medium text-neutral-500" dateTime={item.createdAt}>
-            {formatRelativeTime(item.createdAt)}
-          </time>
+          <span className="flex items-center gap-1.5 text-xs font-medium text-neutral-500">
+            {category && !compact && (
+              <span className="rounded bg-neutral-100 px-1.5 py-0.5 text-neutral-700">
+                {notificationCategoryLabel(category)}
+              </span>
+            )}
+            <time dateTime={item.createdAt}>{formatRelativeTime(item.createdAt)}</time>
+          </span>
         </span>
       </button>
 
-      {onDelete && (
-        <OwnerActionsMenu onDelete={() => onDelete(item)} ariaLabel={`${item.title} 알림 더보기`} />
-      )}
+      {/* 드롭다운은 바로 지우는 X 버튼, 알림 화면은 확인을 거치는 더보기 메뉴 */}
+      {onDelete &&
+        (compact ? (
+          <IconButton
+            tone="danger"
+            size="xs"
+            edge="end"
+            aria-label={`${item.title} 알림 삭제`}
+            disabled={deleting}
+            onClick={() => onDelete(item)}
+          >
+            <CloseIcon className="size-4" />
+          </IconButton>
+        ) : (
+          <OwnerActionsMenu
+            onDelete={() => onDelete(item)}
+            ariaLabel={`${item.title} 알림 더보기`}
+          />
+        ))}
     </article>
   )
 }
