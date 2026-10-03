@@ -113,7 +113,7 @@ const NotificationBell = ({ className }: { className?: string }) => {
         aria-expanded={open}
         className={cn(
           // 헤더 nav 항목(NavBar)과 동일한 톤·아이콘 크기·간격을 쓴다
-          'flex items-center rounded pr-1 text-sm leading-[1.5] font-medium whitespace-nowrap text-primary-500 focus-ring transition-colors hover:text-primary-700',
+          'flex min-h-11 min-w-11 items-center justify-center rounded text-sm leading-[1.5] font-medium whitespace-nowrap text-primary-500 focus-ring transition-colors hover:text-primary-700',
           open && 'font-semibold',
         )}
       >
