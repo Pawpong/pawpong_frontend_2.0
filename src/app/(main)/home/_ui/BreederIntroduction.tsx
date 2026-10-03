@@ -59,7 +59,7 @@ const BreederIntroduction = ({
               {editHref && (
                 <Link
                   href={editHref}
-                  className="shrink-0 rounded text-xs font-semibold text-primary-500 focus-ring hover:text-primary-700"
+                  className="hidden shrink-0 rounded text-xs font-semibold text-primary-500 focus-ring hover:text-primary-700 tab:inline-flex"
                 >
                   수정
                 </Link>
