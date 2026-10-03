@@ -112,7 +112,8 @@ function bellHarness(api, records) {
   return { render, requestedFilters, mutations, paths, flush: () => Promise.all(pending.splice(0)) }
 }
 
-async function fixture(t, { failRead = false } = {}) {
+async function fixture(t, { failRead = false, failDelete = false } = {}) {
+  const control = { failRead, failDelete }
   const records = Array.from({ length: 26 }, (_, index) => ({
     notificationId: `notification-${index}`,
     title: `알림 ${index}`,
@@ -122,7 +123,10 @@ async function fixture(t, { failRead = false } = {}) {
   const server = http.createServer((req, res) => {
     requests.push({ method: req.method, path: req.url })
     res.setHeader('Content-Type', 'application/json')
-    if (failRead && req.method === 'PATCH') {
+    if (
+      (control.failRead && req.method === 'PATCH') ||
+      (control.failDelete && req.method === 'DELETE')
+    ) {
       res.writeHead(503)
       return res.end(JSON.stringify({ success: false, error: '다시 시도해 주세요.' }))
     }
@@ -165,7 +169,7 @@ async function fixture(t, { failRead = false } = {}) {
       }),
     },
   })
-  return { records, requests, api }
+  return { records, requests, api, control }
 }
 
 test('popup clear marks one unread notification read and preserves the center record', async (t) => {
@@ -269,4 +273,110 @@ test('compact rows expose only non-destructive clearing; center retains its dele
   const center = nodes(NotificationListItem({ ...props, compact: false }))
   center.find((node) => node.type === 'OwnerActionsMenu').props.onDelete()
   assert.equal(deleted, 1)
+})
+
+test('center deletion reports failure in the confirmation dialog and succeeds on retry', async (t) => {
+  const f = await fixture(t, { failDelete: true })
+  const states = []
+  let cursor = 0
+  let pending
+  const deleteMutation = {
+    isPending: false,
+    mutate(id, callbacks) {
+      deleteMutation.isPending = true
+      pending = f.api
+        .deleteNotification(id)
+        .then(() => callbacks.onSuccess())
+        .catch((error) => callbacks.onError(error))
+        .finally(() => {
+          deleteMutation.isPending = false
+        })
+    },
+  }
+  const { NotificationsContent } = load(
+    'src/app/(main)/notifications/_ui/NotificationsContent.tsx',
+    {
+      'react/jsx-runtime': jsxRuntime,
+      react: {
+        useState(initial) {
+          const index = cursor++
+          if (!(index in states)) states[index] = initial
+          return [
+            states[index],
+            (value) => {
+              states[index] = value
+            },
+          ]
+        },
+        useMemo: (fn) => fn(),
+      },
+      '@tanstack/react-query': {
+        useQuery: () => ({ data: 25 }),
+        useInfiniteQuery: () => ({ data: { pages: [{ items: f.records }] }, isPending: false }),
+      },
+      '@/entities/notification': {
+        NOTIFICATION_CATEGORY_OPTIONS: [],
+        NotificationListItem: 'NotificationListItem',
+        notificationCategoryLabel: () => '',
+        notificationQueries: { unreadCount: () => ({}), list: () => ({}) },
+      },
+      '@/features/notification': {
+        useOpenNotification: () => () => {},
+        useMarkAllAsRead: () => ({}),
+        useDeleteNotification: () => deleteMutation,
+        useDeleteAllNotifications: () => ({}),
+      },
+      '@/shared/assets': { PawPrintIcon: 'PawPrintIcon' },
+      '@/shared/api': { normalizeApiError: (error) => error },
+      '@/shared/lib/dedupeBy': { dedupeBy: (items) => items },
+      '@/shared/lib/infiniteList': {
+        flattenPages: (data) => data.pages.flatMap((page) => page.items),
+      },
+      '@/shared/ui': Object.fromEntries(
+        [
+          'Button',
+          'Chip',
+          'Container',
+          'CtaModal',
+          'DeleteConfirmModal',
+          'InfiniteScrollTrigger',
+          'ListState',
+          'NavigationBar',
+        ].map((name) => [name, name]),
+      ),
+    },
+  )
+  const { DeleteConfirmModal } = load('src/shared/ui/DeleteConfirmModal.tsx', {
+    'react/jsx-runtime': jsxRuntime,
+    './CtaModal': { CtaModal: 'CtaModal' },
+  })
+  const render = () => {
+    cursor = 0
+    return nodes(NotificationsContent())
+  }
+  const modal = () => render().find((node) => node.type === 'DeleteConfirmModal').props
+  render()
+    .find((node) => node.type === 'NotificationListItem')
+    .props.onDelete(f.records[0])
+  assert.equal(modal().open, true)
+  modal().onConfirm()
+  assert.equal(modal().isPending, true)
+  await pending
+  assert.equal(f.records.length, 26)
+  assert.equal(modal().open, true)
+  const dialog = DeleteConfirmModal(modal())
+  assert.equal(
+    nodes(dialog.props.description).find((node) => node.props?.role === 'alert').props.children,
+    '알림을 삭제하지 못했어요. 다시 시도해 주세요.',
+  )
+  f.control.failDelete = false
+  modal().onConfirm()
+  assert.equal(modal().errorMessage, null)
+  await pending
+  assert.equal(f.records.length, 25)
+  assert.equal(modal().open, false)
+  assert.deepEqual(
+    f.requests,
+    Array(2).fill({ method: 'DELETE', path: '/api/v2/notification/notification-0' }),
+  )
 })
