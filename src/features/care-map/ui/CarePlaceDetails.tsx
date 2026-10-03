@@ -1,5 +1,6 @@
 import type { CarePlace } from '@/entities/care-place'
 import { CareMapIcon } from './CareMapIcon'
+import { CareDirectionsDialog } from './CareDirectionsDialog'
 
 export function CarePlaceDetails({ place, onClose }: { place: CarePlace; onClose(): void }) {
   return (
@@ -78,17 +79,7 @@ export function CarePlaceDetails({ place, onClose }: { place: CarePlace; onClose
             전화
           </a>
         )}
-        {place.directionsUrl && (
-          <a
-            href={place.directionsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="care-map-button care-map-button-primary flex-1"
-          >
-            <CareMapIcon name="arrow" className="size-4" />
-            길찾기
-          </a>
-        )}
+        <CareDirectionsDialog key={place.id} place={place} />
       </div>
       <a
         href={place.placeUrl}
