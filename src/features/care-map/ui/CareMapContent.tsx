@@ -377,12 +377,26 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
                   : '반려동물 진료 가능 여부는 병원에 확인해 주세요'}
             </p>
           </div>
+          {result.isError && result.data && (
+            <div className="border-b border-neutral-150 bg-point-50 px-4 py-3" role="alert">
+              <p className="text-xs leading-5 text-neutral-700">
+                새 시설 정보를 불러오지 못했어요. 이전 조회 결과를 표시하고 있어요.
+              </p>
+              <button
+                type="button"
+                className="mt-1 text-xs font-semibold text-primary-700 underline underline-offset-4"
+                onClick={() => void result.refetch()}
+              >
+                다시 확인
+              </button>
+            </div>
+          )}
           <div className="max-h-[540px] overflow-y-auto overscroll-contain">
             {result.isPending ? (
               <p className="px-4 py-16 text-center text-sm text-neutral-600" role="status">
                 시설 정보와 지도 위치를 찾고 있어요…
               </p>
-            ) : result.isError ? (
+            ) : result.isError && !result.data ? (
               <div className="px-5 py-12 text-center" role="alert">
                 <p className="mb-3 text-sm">시설 정보를 불러오지 못했어요.</p>
                 <button
