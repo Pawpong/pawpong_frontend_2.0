@@ -65,6 +65,14 @@ function renderer(getResult) {
     '@/shared/ui/FeatureIntro': {
       FeatureIntro: ({ children }) => React.createElement('header', null, children),
     },
+    '@/shared/ui': {
+      RetryButton: ({ onRetry, isRetrying }) =>
+        React.createElement(
+          'button',
+          { type: 'button', onClick: onRetry, disabled: isRetrying },
+          isRetrying ? '재시도 중' : '다시 시도',
+        ),
+    },
     './CareMapIcon': { CareMapIcon: () => null },
     './CarePlaceDetails': { CarePlaceDetails: () => null },
     './CareMapGuide': { CareMapGuide: () => null },
