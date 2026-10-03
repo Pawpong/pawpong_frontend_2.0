@@ -1,5 +1,6 @@
 'use client'
 
+import { useRef } from 'react'
 import {
   useMutation,
   useQueryClient,
@@ -253,11 +254,21 @@ const useToggleFavoriteMutation = () => {
  * 낙관적 반영/롤백은 mutation의 캐시 패치가 담당하고, isFavorite은 호출부가 넘긴 쿼리 값이 그대로 흐른다.
  */
 export const useToggleAdoptionFavorite = (petId: string, isFavorite: boolean) => {
-  const { mutate } = useToggleFavoriteMutation()
+  const { mutateAsync } = useToggleFavoriteMutation()
+  const requestPending = useRef(false)
 
   return {
     isFavorite,
-    toggleFavorite: () => mutate({ petId, nextFavorited: !isFavorite }),
+    toggleFavorite: () => {
+      if (requestPending.current) return
+      requestPending.current = true
+      // mutation별 콜백은 화면이 숨겨지면 실행되지 않을 수 있어 Promise에서 해제한다.
+      void mutateAsync({ petId, nextFavorited: !isFavorite })
+        .catch(() => undefined)
+        .finally(() => {
+          requestPending.current = false
+        })
+    },
   }
 }
 
