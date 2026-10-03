@@ -18,7 +18,7 @@ const SIZE = {
   card: 'touch',
 } as const
 
-/** 브리더 즐겨찾기 — 빈 픽셀 별을 누르면 별 안쪽이 노란색으로 채워진다. */
+/** 브리더 즐겨찾기 — 빈 픽셀 별을 누르면 별 안쪽이 브랜드 색으로 채워진다. */
 const FavoriteBreederIconButton = ({
   breederId,
   isFavorited,
@@ -54,7 +54,7 @@ const FavoriteBreederIconButton = ({
       aria-disabled={isPending}
       aria-busy={isPending}
     >
-      <ProfileStarIcon filled={isFavorited} className="size-7 drop-shadow-sm" />
+      <ProfileStarIcon filled={isFavorited} className="size-7.5" />
     </IconButton>
   )
 }

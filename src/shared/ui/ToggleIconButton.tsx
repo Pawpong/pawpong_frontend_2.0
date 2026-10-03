@@ -12,7 +12,7 @@ type ToggleIcon = ComponentType<SVGProps<SVGSVGElement> & { status?: ToggleIconS
 
 const toggleIconVariants = tv({
   slots: {
-    root: 'focus-ring inline-flex shrink-0 items-center gap-1 rounded-lg font-semibold text-action-dark disabled:cursor-not-allowed disabled:opacity-50',
+    root: 'focus-ring inline-flex shrink-0 items-center gap-1 rounded-lg transition-colors hover:bg-brand-subtle hover:text-brand-hover font-semibold text-action-dark disabled:cursor-not-allowed disabled:opacity-50',
     icon: 'shrink-0',
     label: 'text-body-sm',
     count: 'text-body-md',
@@ -20,7 +20,7 @@ const toggleIconVariants = tv({
   variants: {
     size: {
       sm: { icon: 'size-6' },
-      md: { icon: 'size-8' },
+      md: { icon: 'size-7.5' },
       lg: { icon: 'size-12' },
       // 카드 썸네일 위 하트 — 모바일 32 / pc 48
       responsive: { icon: 'size-8 pc:size-12' },
@@ -30,24 +30,24 @@ const toggleIconVariants = tv({
       favorite: '',
       bookmark: '',
     },
-    // 눌리지 않은 아이콘 색 — 기본 회색 / 사진 위 반투명 흰색
+    // 상단 내비게이션과 같은 브랜드 색 / 사진 위 흰색
     tone: {
       default: { icon: '' },
       onImage: { icon: '' },
     },
   },
   compoundVariants: [
-    { pressed: false, tone: 'default', className: { icon: 'text-action-muted-fg' } },
-    { pressed: false, tone: 'onImage', className: { icon: 'text-base-white/60' } },
+    { pressed: false, tone: 'default', className: { icon: 'text-brand' } },
+    { pressed: false, tone: 'onImage', className: { icon: 'text-base-white' } },
     {
       pressed: true,
       pressedTone: 'favorite',
-      className: { icon: 'text-pressed-favorite', label: 'text-pressed-favorite' },
+      className: { icon: 'text-brand', label: 'text-brand' },
     },
     {
       pressed: true,
       pressedTone: 'bookmark',
-      className: { icon: 'text-pressed-bookmark', label: 'text-pressed-bookmark' },
+      className: { icon: 'text-brand', label: 'text-brand' },
     },
   ],
   defaultVariants: { size: 'sm', pressed: false, pressedTone: 'favorite', tone: 'default' },
