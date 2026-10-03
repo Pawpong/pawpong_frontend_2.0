@@ -109,9 +109,13 @@ export function SupportConversationView({
                     </div>
                   </details>
                 )}
-              {message.role === 'assistant' && index === messages.length - 1 && conversation?.needsHumanSupport && (
-                <p className="mt-2 text-xs leading-relaxed text-primary-700">정확한 확인이 필요한 내용은 아래에서 운영팀에 전달할 수 있어요.</p>
-              )}
+              {message.role === 'assistant' &&
+                index === messages.length - 1 &&
+                conversation?.needsHumanSupport && (
+                  <p className="mt-2 text-xs leading-relaxed text-primary-700">
+                    정확한 확인이 필요한 내용은 아래에서 운영팀에 전달할 수 있어요.
+                  </p>
+                )}
             </div>
           </div>
         ))}
@@ -178,7 +182,7 @@ export function SupportConversationView({
             )}
             {!!draft.additionalInfo.length && (
               <div className="mt-3 text-sm text-neutral-700">
-                <p className="font-semibold">함께 알려주시면 좋아요</p>
+                <p className="font-semibold">추가 참고사항</p>
                 <ul className="mt-1 list-disc space-y-1 pl-4">
                   {draft.additionalInfo.map((item, index) => (
                     <li key={index}>{item}</li>
@@ -223,6 +227,18 @@ export function SupportConversationView({
               </div>
             )}
           </section>
+        )}
+        {(error || conversation?.needsHumanSupport || submission) && (
+          <div className="text-xs leading-relaxed text-neutral-700">
+            <p>개별 회신이 필요하면 이메일 문의로 연락해 주세요.</p>
+            <a
+              href="mailto:coldingcontact@gmail.com"
+              className="inline-flex min-h-11 items-center rounded-lg text-primary-700 underline underline-offset-4 focus-ring"
+            >
+              담당자에게 이메일 문의
+            </a>
+            <p>메일 앱에서 직접 작성해 보내주세요. 대화 내용은 자동으로 첨부되지 않아요.</p>
+          </div>
         )}
         {!!messages.length && (
           <p className="text-xs leading-relaxed text-neutral-700">
