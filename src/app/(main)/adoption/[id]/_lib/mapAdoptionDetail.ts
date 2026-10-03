@@ -68,6 +68,7 @@ export const mapAdoptionDetail = (
     description: d.description,
     tags: d.tags ?? [],
     imageUrls,
+    breed: d.breed,
     category: petTypeToCategory(d.petType),
     myApplicationId: d.myApplicationId,
     myApplicationStatus: d.myApplicationStatus,
