@@ -16,7 +16,7 @@ interface BreederCardProps {
  *
  * 셸(이미지 + 본문 좌측 텍스트 + 우측 뱃지)은 분양 카드와 같아 MediaCard 로 공유하고,
  * 규격만 이 시안을 따른다: medium(모바일 164) / large(PC 282).
- * 아이콘(IconStar 2949-296222)은 픽셀 마름모다 — 미등록은 흰색 60% 외곽선, 등록은 투톤 채움.
+ * 즐겨찾기는 프로필과 같은 픽셀 별 버튼을 사용하며, 사진과 무관하게 상태가 읽히도록 바탕을 둔다.
  */
 const BreederCard = ({ breeder, showPopularBadge, preload = false }: BreederCardProps) => {
   return (
@@ -38,14 +38,11 @@ const BreederCard = ({ breeder, showPopularBadge, preload = false }: BreederCard
             </div>
           )}
 
-          {/* 즐겨찾기 토글 — 프로필 카드와 같은 공용 버튼 (박스 mo 32 / pc 48, 글리프 24 / 40).
-              이미지 위라 미등록 색만 흰색 60% 로 덮는다 */}
-          <span className="absolute right-2 bottom-1 flex tab:right-3 tab:bottom-2">
+          <span className="absolute right-2 bottom-2 flex tab:right-3 tab:bottom-3">
             <FavoriteBreederIconButton
               breederId={breeder.id}
               isFavorited={!!breeder.isFavorited}
               size="card"
-              iconClassName={breeder.isFavorited ? undefined : 'text-white/60'}
             />
           </span>
         </>
