@@ -5,14 +5,14 @@ export function CarePlaceDetails({ place, onClose }: { place: CarePlace; onClose
   return (
     <section
       aria-label={`${place.name} 상세 정보`}
-      className="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm"
+      className="rounded-2xl border border-secondary-200 bg-white p-5 shadow-sm"
     >
       <div className="mb-3 flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="mb-1 text-xs font-semibold text-primary-500">
             {place.kind === 'hospital' ? '동물병원' : '보호·입양시설'}
           </p>
-          <h2 className="text-lg font-bold break-keep text-primary-900">{place.name}</h2>
+          <h2 className="text-lg font-bold break-keep text-neutral-850">{place.name}</h2>
         </div>
         <button
           type="button"
@@ -23,8 +23,8 @@ export function CarePlaceDetails({ place, onClose }: { place: CarePlace; onClose
           <CareMapIcon name="close" />
         </button>
       </div>
-      <p className="text-sm leading-6 text-gray-700">{place.roadAddress || place.address}</p>
-      <p className="mt-1 text-sm text-gray-600">{place.phone || '등록된 전화번호가 없어요'}</p>
+      <p className="text-sm leading-6 text-neutral-850">{place.roadAddress || place.address}</p>
+      <p className="mt-1 text-sm text-neutral-700">{place.phone || '등록된 전화번호가 없어요'}</p>
       {place.referral && (
         <div className="mt-3 rounded-xl bg-secondary-50 p-3 text-xs leading-5 text-primary-700">
           <p className="font-bold">2차·의뢰 진료 안내 확인</p>
@@ -37,16 +37,16 @@ export function CarePlaceDetails({ place, onClose }: { place: CarePlace; onClose
           >
             병원 공식 안내 ↗
           </a>
-          <span className="ml-2 text-gray-600">{place.referral.checkedAt} 확인</span>
+          <span className="ml-2 text-neutral-700">{place.referral.checkedAt} 확인</span>
         </div>
       )}
       {!place.referral && place.kind === 'hospital' && (
-        <p className="mt-3 text-xs leading-5 text-gray-600">
+        <p className="mt-3 text-xs leading-5 text-neutral-700">
           진료 단계·진료과목·진료 시간은 방문 전에 병원에 확인해 주세요.
         </p>
       )}
       {place.kind === 'shelter' && (
-        <p className="mt-3 text-xs leading-5 text-gray-600">
+        <p className="mt-3 text-xs leading-5 text-neutral-700">
           방문·입양 상담 가능 시간과 지자체 지정 여부를 시설에 먼저 확인해 주세요.
         </p>
       )}
@@ -71,7 +71,7 @@ export function CarePlaceDetails({ place, onClose }: { place: CarePlace; onClose
         href={place.placeUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-3 block py-1 text-center text-xs text-gray-600 underline underline-offset-4"
+        className="mt-3 block py-1 text-center text-xs text-neutral-700 underline underline-offset-4"
       >
         카카오맵에서 상세 정보 보기 ↗
       </a>

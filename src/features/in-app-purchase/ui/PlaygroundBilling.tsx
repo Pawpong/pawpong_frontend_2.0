@@ -121,13 +121,6 @@ export function PlaygroundBilling() {
     retry: 1,
     throwOnError: false,
   })
-  const policy = useQuery({
-    queryKey: ['iap', 'policy'],
-    queryFn: ({ signal }) => iapApi.policy(signal),
-    staleTime: 30_000,
-    retry: 1,
-    throwOnError: false,
-  })
   const store = useQuery({
     queryKey: ['iap', 'store', platform, catalog.data],
     queryFn: ({ signal }) => loadStoreProducts(catalog.data!, platform!, signal),
@@ -145,42 +138,13 @@ export function PlaygroundBilling() {
     retry: 1,
     throwOnError: false,
   })
-  const aiPolicy =
-    account.data?.features.find((item) => item.featureKey === 'ai_image') ??
-    policy.data?.features.find((item) => item.featureKey === 'ai_image')
   const refreshProducts = () => {
     void catalog.refetch()
     void store.refetch()
   }
 
   return (
-    <div className="mx-auto w-full max-w-[64rem] space-y-8 px-5 pt-6 pb-16 tab:px-8 tab:pt-10">
-      <section className="rounded-2xl bg-point-50 p-6 tab:p-8">
-        <p className="text-xs font-semibold text-primary-700">우리 아이와 함께</p>
-        <h1 className="mt-2 text-3xl font-bold text-neutral-850">포퐁 놀이터</h1>
-        <p className="mt-3 text-sm leading-relaxed text-neutral-700">
-          사진 한 장으로 새로운 모습을 만들어 보세요.
-          <br />
-          놀이터 이용권은 기능마다 필요한 개수만큼 사용할 수 있어요.
-        </p>
-        <Link
-          href="/ai-filter"
-          className="mt-5 block rounded-xl border border-primary-200 bg-white p-5 focus-ring"
-        >
-          <span className="text-lg font-bold text-neutral-850">AI 사진 만들기 →</span>
-          <span className="mt-1 block text-sm text-neutral-700">
-            도트 그림부터 스티커·수채화까지
-          </span>
-          {aiPolicy && (
-            <span className="mt-3 block text-xs text-primary-700">
-              {aiPolicy.enabled
-                ? `매일 무료 ${aiPolicy.dailyFreeLimit}회 · 무료분 이후 이용권 ${aiPolicy.creditCost}개 / 회`
-                : '지금은 쉬고 있어요'}
-            </span>
-          )}
-        </Link>
-      </section>
-
+    <div className="space-y-8">
       <section
         aria-labelledby="playground-wallet"
         className="rounded-2xl border border-neutral-200 p-5 tab:p-6"
