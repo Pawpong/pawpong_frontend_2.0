@@ -22,9 +22,9 @@ const iconButtonStyles = tv({
       overlay: 'bg-action-dark/60 text-base-white hover:bg-action-dark/80',
       surface:
         'border border-action-disabled bg-base-white text-action-dark hover:bg-action-subtle',
-      // 배경과 박스 테두리 없이 별 자체의 빈 상태/브랜드 색 채움으로 표현한다.
+      // 별만 표시하고, 선택하면 안쪽을 노랗게 채운다. 호버로 배경이나 색을 바꾸지 않는다.
       favorite:
-        'bg-transparent text-brand hover:bg-brand-subtle hover:text-brand-hover aria-disabled:cursor-wait aria-disabled:opacity-60 motion-reduce:transition-none',
+        'bg-transparent text-brand aria-disabled:cursor-wait aria-disabled:opacity-60 motion-reduce:transition-none',
     },
     size: {
       xs: 'size-6',
