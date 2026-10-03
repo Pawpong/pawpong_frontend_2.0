@@ -24,7 +24,7 @@ const iconButtonStyles = tv({
         'border border-action-disabled bg-base-white text-action-dark hover:bg-action-subtle',
       // 별만 표시하고, 선택하면 안쪽을 노랗게 채운다. 호버로 배경이나 색을 바꾸지 않는다.
       favorite:
-        'bg-transparent text-brand aria-disabled:cursor-wait aria-disabled:opacity-60 motion-reduce:transition-none',
+        'bg-transparent text-brand transition-none [-webkit-tap-highlight-color:transparent] aria-disabled:cursor-wait',
     },
     size: {
       xs: 'size-6',

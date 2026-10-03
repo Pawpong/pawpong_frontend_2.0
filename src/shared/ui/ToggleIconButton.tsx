@@ -12,7 +12,7 @@ type ToggleIcon = ComponentType<SVGProps<SVGSVGElement> & { status?: ToggleIconS
 
 const toggleIconVariants = tv({
   slots: {
-    root: 'focus-ring inline-flex shrink-0 items-center gap-1 rounded-lg font-semibold text-action-dark disabled:cursor-not-allowed disabled:opacity-50',
+    root: 'focus-ring inline-flex shrink-0 items-center gap-1 rounded-lg font-semibold text-action-dark [-webkit-tap-highlight-color:transparent] disabled:cursor-not-allowed',
     icon: 'shrink-0',
     label: 'text-body-sm',
     count: 'text-body-md',
