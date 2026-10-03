@@ -1,6 +1,6 @@
 'use client'
 
-import type { MouseEvent } from 'react'
+import { useRef, type MouseEvent } from 'react'
 import { ProfileStarIcon } from '@/shared/assets'
 import { useAddFavorite, useRemoveFavorite } from '@/features/adopter'
 import { IconButton } from '@/shared/ui'
@@ -18,7 +18,7 @@ const SIZE = {
   card: 'touch',
 } as const
 
-/** 브리더 즐겨찾기 — 빈 픽셀 별을 누르면 별 안쪽이 브랜드 색으로 채워진다. */
+/** 브리더 즐겨찾기 — 빈 픽셀 별을 누르면 별 안쪽만 노랗게 채워진다. */
 const FavoriteBreederIconButton = ({
   breederId,
   isFavorited,
@@ -26,6 +26,7 @@ const FavoriteBreederIconButton = ({
 }: FavoriteBreederIconButtonProps) => {
   const addFavorite = useAddFavorite()
   const removeFavorite = useRemoveFavorite()
+  const requestPending = useRef(false)
   const isPending = addFavorite.isPending || removeFavorite.isPending
   const label = isPending
     ? isFavorited
@@ -39,9 +40,16 @@ const FavoriteBreederIconButton = ({
   const handleClick = (event: MouseEvent) => {
     event.preventDefault()
     event.stopPropagation()
-    if (isPending) return
+    if (isPending || requestPending.current) return
+    requestPending.current = true
     const mutation = isFavorited ? removeFavorite : addFavorite
-    mutation.mutate(breederId)
+    // 화면을 떠나 mutation observer가 해제돼도 요청 잠금은 반드시 해제한다.
+    void mutation
+      .mutateAsync(breederId)
+      .catch(() => undefined)
+      .finally(() => {
+        requestPending.current = false
+      })
   }
 
   return (
