@@ -26,8 +26,7 @@ const BOTTOM_NAV_PATHS = new Set([
   '/hall-of-fame',
   '/faq',
   '/about',
-  '/adoption/drafts',
-  '/community/drafts',
+  '/drafts',
 ])
 
 // 목록에서 들어간 상세도 같은 네비를 유지한다

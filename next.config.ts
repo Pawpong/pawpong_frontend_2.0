@@ -18,6 +18,9 @@ const nextConfig: NextConfig = {
         destination: '/activity/applications/:path*',
         permanent: false,
       },
+      // 분양글·게시글 임시저장 목록을 /drafts 한 화면으로 합쳤다
+      { source: '/adoption/drafts', destination: '/drafts', permanent: false },
+      { source: '/community/drafts', destination: '/drafts', permanent: false },
     ]
   },
   // 앱 딥링크 검증 파일.
