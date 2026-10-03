@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 import { iapApi, type IapProduct, type IapPlatform } from '@/entities/iap'
 import { nativeIap, type NativeIapProduct } from '@/shared/lib/nativeIap'
 import { Button, buttonVariants } from '@/shared/ui'
+import { PLAYGROUND_BILLING_ENABLED } from '@/shared/config/playground'
 import { usePurchases } from './PurchaseProvider'
 import { loadStoreProducts, purchaseOptions } from '../model/storeProducts'
 
@@ -104,6 +105,10 @@ function ProductCard({
 }
 
 export function PlaygroundBilling() {
+  return PLAYGROUND_BILLING_ENABLED ? <EnabledPlaygroundBilling /> : null
+}
+
+function EnabledPlaygroundBilling() {
   const billing = usePurchases()
   const { platform, memberId, account, busy, notice, recover, refresh } = billing
   useEffect(() => {
