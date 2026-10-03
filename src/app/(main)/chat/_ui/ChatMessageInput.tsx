@@ -4,7 +4,7 @@ import * as React from 'react'
 import { useUploadSingleFile } from '@/features/upload'
 import { createClientMessageId } from '@/features/chat-realtime'
 import { normalizeApiError } from '@/shared/api'
-import { Button, CtaModal } from '@/shared/ui'
+import { Button, CtaModal, Textarea } from '@/shared/ui'
 import { LocationPinIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { preparePhoto } from '@/shared/lib/preparePhoto'
@@ -68,7 +68,9 @@ const ChatMessageInput = ({ onSend, disabled, unavailableMessage }: ChatMessageI
     const el = textareaRef.current
     if (!el) return
     el.style.height = 'auto'
-    el.style.height = `${Math.min(el.scrollHeight, MAX_INPUT_HEIGHT)}px`
+    // scrollHeight 는 테두리를 빼고 재므로 더해 줘야 한 줄일 때 스크롤바가 생기지 않는다
+    const border = el.offsetHeight - el.clientHeight
+    el.style.height = `${Math.min(el.scrollHeight + border, MAX_INPUT_HEIGHT)}px`
   }, [value])
   const [pendingAttachment, setPendingAttachment] = React.useState<{
     content: string
@@ -254,43 +256,42 @@ const ChatMessageInput = ({ onSend, disabled, unavailableMessage }: ChatMessageI
             </Button>
           </div>
         )}
-        <div className="flex items-center gap-2">
+        {/* 댓글 입력창과 같은 구성 — 아바타 자리에 첨부(+), 공통 입력 필드, 따로 떨어진 전송 버튼.
+            여러 줄로 늘어나면 첨부·전송 버튼은 마지막 줄에 맞춘다 */}
+        <div className="flex items-end gap-2">
           {/* 첨부 메뉴 (+ 버튼 클릭 시 이미지/위치/파일) */}
           <ChatAttachMenu
             disabled={isDisabled || Boolean(pendingAttachment)}
             onSelectFile={handleAttachment}
             onSelectLocation={handleLocationRequest}
           />
-
-          {/* 입력 + 전송 — 댓글 입력창과 같은 필 모양 안에 함께 둔다 */}
-          <div className="flex min-h-12 min-w-0 flex-1 items-end gap-2 rounded-3xl border border-neutral-300 bg-base-white py-1 pr-1.5 pl-5 transition-[border-color,box-shadow] duration-150 focus-within:border-primary-500 focus-within:ring-4 focus-within:ring-point-500/45 motion-reduce:transition-none pc:min-h-14 pc:pl-6">
-            <textarea
-              ref={textareaRef}
-              rows={1}
-              value={value}
-              onChange={(e) => {
-                textDraftId.current = null
-                setValue(e.target.value)
-              }}
-              onKeyDown={handleKeyDown}
-              placeholder={
-                uploadFile.isPending ? '파일을 업로드하는 중입니다.' : '메시지를 입력하세요'
-              }
-              disabled={isDisabled}
-              aria-label="메시지"
-              className="block min-w-0 flex-1 resize-none self-center bg-transparent py-1.5 text-body-lg font-medium text-neutral-850 outline-none placeholder:text-neutral-500 disabled:cursor-not-allowed"
-            />
-            <div className="flex min-w-14">
-              <Button
-                size="md"
-                onClick={handleSubmit}
-                disabled={isDisabled || !value.trim()}
-                aria-busy={isSending}
-                width="full"
-              >
-                {isSending ? '확인 중' : '보내기'}
-              </Button>
-            </div>
+          <Textarea
+            ref={textareaRef}
+            autoGrow
+            rows={1}
+            value={value}
+            onChange={(e) => {
+              textDraftId.current = null
+              setValue(e.target.value)
+            }}
+            onKeyDown={handleKeyDown}
+            placeholder={
+              uploadFile.isPending ? '파일을 업로드하는 중입니다.' : '메시지를 입력하세요'
+            }
+            disabled={isDisabled}
+            aria-label="메시지"
+            className="min-w-0 flex-1"
+          />
+          <div className="flex min-w-14 shrink-0">
+            <Button
+              size="md"
+              onClick={handleSubmit}
+              disabled={isDisabled || !value.trim()}
+              aria-busy={isSending}
+              width="full"
+            >
+              {isSending ? '확인 중' : '보내기'}
+            </Button>
           </div>
         </div>
       </div>
