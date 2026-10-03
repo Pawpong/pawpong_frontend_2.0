@@ -32,7 +32,7 @@ const BreederCard = ({ breeder, showPopularBadge, preload = false }: BreederCard
           {/* 인기 뱃지 — 좌상단, 박스 mo px-8 py-4 / pc px-12 py-8 */}
           {showPopularBadge && (
             <div className="absolute top-1 left-2 flex items-center tab:top-2 tab:left-3">
-              <Badge variant="primaryOutline" size="md" className="tab:h-[1.8125rem] tab:text-sm">
+              <Badge variant="primaryOutline" size="responsive">
                 인기
               </Badge>
             </div>
