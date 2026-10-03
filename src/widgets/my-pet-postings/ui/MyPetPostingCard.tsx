@@ -48,7 +48,7 @@ export const MyPetPostingCard = ({ posting }: { posting: Posting }) => {
         <div className="flex min-w-0 flex-1 flex-col items-start gap-2">
           <div className="flex w-full items-center justify-between gap-2">
             <div className="flex min-w-0 flex-wrap items-center gap-2">
-              <AdoptionStatusBadge status={posting.status} size="md" />
+              <AdoptionStatusBadge status={posting.status} />
               <span className={TEXT.meta}>{posting.breed || '품종 미등록'}</span>
             </div>
             {/* 수정 진입 — 모바일·태블릿 공통 아이콘 하나 (터치 영역 40px, 아이콘은 오른쪽 가장자리에 맞춤) */}

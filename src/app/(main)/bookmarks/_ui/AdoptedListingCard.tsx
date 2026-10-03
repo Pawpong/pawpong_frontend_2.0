@@ -102,7 +102,7 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
             <p className="w-full truncate text-base leading-[1.5] font-bold text-neutral-850">
               {listing.name}
             </p>
-            <AdoptionStatusBadge status={listing.status} size="md" />
+            <AdoptionStatusBadge status={listing.status} />
           </div>
           {/* [refactored] CardStats */}
           <CardStats listing={listing} size="sm" className="w-full text-xs text-neutral-700" />

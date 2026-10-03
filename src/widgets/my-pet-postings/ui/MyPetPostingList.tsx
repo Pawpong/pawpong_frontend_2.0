@@ -21,10 +21,8 @@ const DEFAULT_GRID = 'flex flex-col'
 
 interface MyPetPostingListProps {
   pageSize: number
-  /** 라벨 줄 오른쪽 액션(분양글 작성 등) — 있으면 필터 칩은 다음 줄로 내려간다 */
-  action?: ReactNode
-  /** 필터 줄 오른쪽의 낮은 위계 관리 액션(임시저장 목록 등). */
-  secondaryAction?: ReactNode
+  /** 등록된 글이 없을 때 안내와 함께 보여줄 액션. */
+  emptyAction?: ReactNode
   /** 라벨 옆에 필터 적용 후 전체 개수 표시 (분양 페이지 시안의 '분양 목록 109') */
   showTotalCount?: boolean
   /** 그리드 간격 오버라이드 — 화면마다 시안 값이 다르다 */
@@ -37,8 +35,7 @@ interface MyPetPostingListProps {
  */
 const MyPetPostingList = ({
   pageSize,
-  action,
-  secondaryAction,
+  emptyAction,
   showTotalCount = false,
   gridClassName,
 }: MyPetPostingListProps) => {
@@ -62,25 +59,20 @@ const MyPetPostingList = ({
 
   return (
     <section aria-label="내 분양 목록" className="flex flex-col">
-      <div className="flex flex-col gap-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className={TEXT.section}>분양 목록</h2>
-              {showTotalCount && data && (
-                <span className={TEXT.sub}>{getTotalItems(data).toLocaleString('ko-KR')}건</span>
-              )}
-            </div>
-            <p className={`${TEXT.meta} mt-2`}>등록한 아이들의 분양 현황을 확인하고 관리하세요.</p>
-          </div>
-          <div className="flex items-center gap-1">
-            {secondaryAction}
-            {action}
-          </div>
+      {/* [refactored] 액션 자리가 빠지며 자식 하나만 남은 래퍼들을 걷어냄 */}
+      <div className="flex flex-col gap-3">
+        <div className="flex min-w-0 items-center gap-2">
+          <h2 className={TEXT.section}>분양 목록</h2>
+          {showTotalCount && data && (
+            <span className="text-sm font-normal text-neutral-500">
+              {getTotalItems(data).toLocaleString('ko-KR')}건
+            </span>
+          )}
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-neutral-200 pb-4">
+        <div className="flex flex-col gap-2 border-b border-neutral-200 pb-2">
           <PetStatusFilter value={status} onChange={setStatus} />
           <SortOptions
+            compact
             ariaLabel="내 분양 목록 정렬"
             options={SORT_OPTIONS}
             value={sort}
@@ -110,7 +102,7 @@ const MyPetPostingList = ({
                 전체 보기
               </Button>
             ) : (
-              action
+              emptyAction
             )}
           </div>
         }

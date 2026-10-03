@@ -74,7 +74,7 @@ const ReviewDetailContent = ({ reviewId, backHref }: { reviewId: string; backHre
                       <ReviewTypeBadge reviewType={data.reviewType} />
                       <Badge
                         variant={data.isVisible ? 'primaryOutline' : 'neutralFilled'}
-                        size="md"
+                        size="responsive"
                       >
                         {data.isVisible ? '공개 중' : '비공개'}
                       </Badge>

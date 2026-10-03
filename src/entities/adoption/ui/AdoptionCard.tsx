@@ -123,7 +123,7 @@ const AdoptionCard = ({ listing, className, isFavorite, onToggle, preload }: Ado
           <div className="flex items-start justify-between gap-[0.5rem]">
             {/* [refactored] 제목 공통 클래스 + 모바일 사이즈 */}
             <p className={cn(CARD_TITLE_BASE, 'min-w-0 flex-1 text-[0.875rem]')}>{listing.name}</p>
-            <AdoptionStatusBadge status={listing.status} size="md" className="shrink-0" />
+            <AdoptionStatusBadge status={listing.status} className="shrink-0" />
           </div>
           {/* 하단: 문의/관심/조회 */}
           <CardStats
@@ -225,11 +225,7 @@ const AdoptionCardHorizontal = ({
             {listing.name}
           </p>
           <div className="flex items-center">
-            <AdoptionStatusBadge
-              status={listing.status}
-              size="md"
-              className="px-[0.5rem] py-[0.125rem] text-[0.75rem] leading-normal"
-            />
+            <AdoptionStatusBadge status={listing.status} />
           </div>
         </div>
 

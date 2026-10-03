@@ -4,7 +4,8 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { Button, buttonVariants, Container, InputUpload, NavigationBar } from '@/shared/ui'
+import { Button, buttonVariants, Container, NavigationBar } from '@/shared/ui'
+import { cn } from '@/shared/lib/cn'
 import { transientQueryRecoveryOptions } from '@/shared/api'
 import { profileQueries } from '@/entities/profile'
 import { AiPhotoArchive } from '@/features/ai-image'
@@ -13,6 +14,7 @@ import { communityQueries } from '@/entities/community'
 import { MyPetPostingList } from '@/widgets/my-pet-postings'
 import { toMyProfileCardProps } from '../_lib/toMyProfileCardProps'
 import { ProfileCard } from './ProfileCard'
+import { MyHomeActionMenu } from './MyHomeActionMenu'
 import { BreederIntroduction } from './BreederIntroduction'
 import { HomeTabs, TabsContent } from './HomeTabs'
 import { FavoriteBreedersContent } from './FavoriteBreedersContent'
@@ -87,14 +89,30 @@ const MyHomeContent = () => {
       {/* 스크롤 시 GNB 아래 고정(sticky) — tab+만. PC는 사이드바가 프로필/현재 위치를 이미 보여줘
           타이틀 바가 GNB의 '마이홈' 활성 표시와 겹쳐 위계가 흐트러지므로 숨긴다 */}
       <div className="bg-white tab:hidden">
-        <NavigationBar title="마이홈" titleVariant="page" className="px-4 tab:px-12" />
+        <NavigationBar
+          title="마이홈"
+          titleVariant="page"
+          titleClassName="px-10"
+          className="relative min-h-12 px-4 tab:px-12"
+          right={
+            <div className="absolute top-1/2 right-4 -translate-y-1/2">
+              <MyHomeActionMenu isBreeder={isBreeder} />
+            </div>
+          }
+        />
       </div>
 
       <HomeTabs
         tabs={tabs}
         activeTab={activeTab}
         onTabChange={setSelectedTab}
-        sidebar={<ProfileCard {...profileCardProps} layout="sidebar" />}
+        sidebar={
+          <ProfileCard
+            {...profileCardProps}
+            layout="sidebar"
+            menu={<MyHomeActionMenu isBreeder={isBreeder} />}
+          />
+        }
         sideLinks={isBreeder ? BREEDER_MY_HOME_SIDE_LINKS : MY_HOME_SIDE_LINKS}
       >
         {/* 분양 목록 탭 (브리더만) — 시안 3170-790275: 라벨+필터 -> 카드 그리드.
@@ -109,22 +127,17 @@ const MyHomeContent = () => {
               editHref="/profile/edit"
             />
 
-            {/* 작성 버튼은 목록 라벨 줄에 붙인다 — 소개 카드와 목록 사이에 혼자 떠 있지 않게 */}
+            {/* 작성 진입점은 + 메뉴(모바일 상단 바·2단 프로필 카드)가 맡는다 */}
             <Container className="py-8 tab:py-10">
               <MyPetPostingList
                 pageSize={HOME_LISTING_PAGE_SIZE}
                 showTotalCount
-                action={
-                  <Link href="/adoption/create" className={buttonVariants({ size: 'md' })}>
-                    분양글 작성하기
-                  </Link>
-                }
-                secondaryAction={
+                emptyAction={
                   <Link
-                    href="/adoption/drafts"
-                    className={buttonVariants({ intent: 'ghost', size: 'md' })}
+                    href="/adoption/create"
+                    className={cn(buttonVariants({ size: 'md' }), 'hidden tab:inline-flex')}
                   >
-                    임시저장
+                    첫 분양글 작성하기
                   </Link>
                 }
               />
@@ -134,20 +147,6 @@ const MyHomeContent = () => {
 
         {/* Figma 4145:721426 — 모바일·태블릿 3열, PC 4열의 정사각 미디어 그리드 */}
         <TabsContent value="posts" className="mt-0">
-          <InputUpload
-            text="작성하기"
-            href="/community/write"
-            className="px-4"
-            left={
-              <Link
-                href="/community/drafts"
-                className={buttonVariants({ intent: 'ghost', size: 'inline' })}
-              >
-                임시저장 →
-              </Link>
-            }
-          />
-
           <HomePostGrid
             posts={posts}
             isPending={postsQuery.isPending}
@@ -161,7 +160,6 @@ const MyHomeContent = () => {
         </TabsContent>
 
         <TabsContent value="ai-photos" className="mt-0">
-          <InputUpload text="AI 필터로 만들기" href="/ai-filter" className="px-4" />
           <div className="px-4 pt-4 tab:px-0">
             <AiPhotoArchive enabled={!!myProfile} />
           </div>

@@ -18,7 +18,7 @@ const buttonStyles = tv({
     intent: {
       // Figma BaseButton — default point-500 / hover point-300 / press point-600
       primary:
-        'bg-action-primary text-action-dark hover:bg-action-primary-hover active:bg-action-primary-press disabled:bg-action-disabled',
+        'bg-action-primary text-action-dark hover:bg-action-primary-hover active:bg-action-primary-press disabled:bg-point-200 disabled:text-neutral-700',
       secondary:
         'border border-action-border bg-base-white text-action-dark hover:bg-action-subtle active:bg-action-subtle-press',
       dark: 'bg-action-dark text-neutral-50 hover:bg-action-dark-hover disabled:bg-action-disabled',

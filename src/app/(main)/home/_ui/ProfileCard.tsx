@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, type ComponentType } from 'react'
-import Link from 'next/link'
+import { useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   useInfiniteQuery,
@@ -10,7 +9,6 @@ import {
 } from '@tanstack/react-query'
 import {
   Button,
-  buttonVariants,
   LocationText,
   ProfileAvatar,
   FollowersModal,
@@ -59,8 +57,6 @@ const toPaging = (query: FollowListQuery) => ({
   onLoadMore: query.fetchNextPage,
 })
 
-type ProfileMode = 'mine' | 'mine-breeder' | 'other' | 'breeder'
-
 /**
  * strip  — 가로 한 줄 (아바타 | 이름·카운트·소개 | 액션). 공개 홈처럼 폭이 넉넉한 자리.
  * sidebar — PC 2단 레이아웃의 좁은 좌측 컬럼에서 세로로 쌓는다 (블로그형 마이홈).
@@ -79,7 +75,10 @@ interface ProfileCardBreederProps {
   layout?: ProfileCardLayout
 }
 
-type ProfileCardProps = ProfileCardBaseProps | ProfileCardBreederProps
+type ProfileCardProps = (ProfileCardBaseProps | ProfileCardBreederProps) & {
+  /** 내 홈 작성·수정 메뉴 — 2단(tab+)에서 아바타 줄 오른쪽 끝에 둔다 (모바일은 상단 바가 맡는다) */
+  menu?: ReactNode
+}
 
 // [refactored] 아바타 미리보기 + "친구 목록" 라벨 → 실제 팔로워/팔로잉 숫자.
 // 카운트는 profile 에 이미 있는데 모달에만 넘기고 있어서, 카드가 공간만 쓰고 정보는 없었다.
@@ -105,22 +104,9 @@ const FollowCounts = ({
 
 /* ── mode별 하단 액션 (디자인: pill border 버튼) ── */
 
-// 프로필 편집·팔로우·메시지 공통 폭 — flex-1 + min-w 로 두어 컨테이너가 폭을 정한다.
+// 팔로우·메시지 공통 폭 — flex-1 + min-w 로 두어 컨테이너가 폭을 정한다.
 // (strip 은 w-auto 라 min-w 만큼, sidebar 는 w-full 이라 컬럼을 채운다)
 const ACTION_LAYOUT = 'flex min-w-0 flex-1 pc:min-w-30'
-
-const EditButton = () => (
-  <div className={ACTION_LAYOUT}>
-    <Link
-      href="/profile/edit"
-      className={buttonVariants({ intent: 'secondary', size: 'md', width: 'full' })}
-    >
-      프로필 편집
-    </Link>
-  </div>
-)
-
-const MineActions = () => <EditButton />
 
 /* ── 남의 홈에서 보이는 액션 (Figma 3349-2026986) ── */
 
@@ -215,18 +201,9 @@ const VisitorActions = (props: VisitorActionsProps) => (
   </>
 )
 
-// 내 홈 액션은 props 를 쓰지 않는다 (같은 자리에서 렌더되므로 시그니처만 맞춤)
-const ACTION_MAP = {
-  mine: MineActions,
-  'mine-breeder': MineActions,
-  breeder: VisitorActions,
-  other: VisitorActions,
-} satisfies Record<ProfileMode, ComponentType<VisitorActionsProps>>
-
 /* ── ProfileCard ── */
 
-const ProfileCard = ({ profile, mode = 'mine', layout = 'strip' }: ProfileCardProps) => {
-  const Actions = ACTION_MAP[mode]
+const ProfileCard = ({ profile, mode = 'mine', layout = 'strip', menu }: ProfileCardProps) => {
   // 세로 배치는 2단(tab+)에서만 — 모바일은 두 레이아웃 모두 같은 가로 스트립이다
   const isSidebar = layout === 'sidebar'
   const [followOpen, setFollowOpen] = useState(false)
@@ -274,6 +251,8 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip' }: ProfileCardPr
       {canReportBreeder && <ReportBreederAction breederId={breederProfile.breederId} />}
     </div>
   ) : null
+  // [refactored] 2단 아바타 줄 우상단 — 남의 홈은 즐겨찾기·신고, 내 홈은 작성·수정 메뉴
+  const cornerActions = favoriteActions ?? menu
 
   return (
     <>
@@ -302,7 +281,7 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip' }: ProfileCardPr
                 alt={profile.nickname}
                 className="shrink-0 tab:size-20 pc:size-24"
               />
-              {favoriteActions && <div className="hidden tab:block">{favoriteActions}</div>}
+              {cornerActions && <div className="hidden tab:block">{cornerActions}</div>}
             </div>
           ) : (
             <ProfileAvatar
@@ -346,15 +325,17 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip' }: ProfileCardPr
         </div>
 
         {/* 팔로우 + 메시지 — 동급 액션 두 개가 폭을 반씩 나눠 갖는다(ACTION_SIZE의 flex-1) */}
-        <div
-          className={cn(
-            'flex w-full shrink-0 items-center gap-2.5 pc:gap-3',
-            // 좁은 컬럼에 팔로우+메시지를 나란히 두면 라벨이 두 줄로 깨진다
-            isSidebar ? 'tab:w-full' : 'pc:w-auto',
-          )}
-        >
-          <Actions targetId={profileUserId} isFollowing={isFollowing} />
-        </div>
+        {isVisitor && (
+          <div
+            className={cn(
+              'flex w-full shrink-0 items-center gap-2.5 pc:gap-3',
+              // 좁은 컬럼에 팔로우+메시지를 나란히 두면 라벨이 두 줄로 깨진다
+              isSidebar ? 'tab:w-full' : 'pc:w-auto',
+            )}
+          >
+            <VisitorActions targetId={profileUserId} isFollowing={isFollowing} />
+          </div>
+        )}
       </div>
 
       <FollowersModal

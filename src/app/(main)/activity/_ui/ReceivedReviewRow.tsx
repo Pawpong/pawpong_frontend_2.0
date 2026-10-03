@@ -133,7 +133,10 @@ export const ReceivedReviewRow = ({
           )}
           <p className={TEXT.meta}>작성일 {formatDate(review.writtenAt)}</p>
           <div>
-            <Badge variant={review.isVisible ? 'primaryOutline' : 'neutralFilled'} size="md">
+            <Badge
+              variant={review.isVisible ? 'primaryOutline' : 'neutralFilled'}
+              size="responsive"
+            >
               {review.isVisible ? '공개 중' : '비공개'}
             </Badge>
           </div>
