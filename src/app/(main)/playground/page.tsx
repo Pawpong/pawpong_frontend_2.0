@@ -1,13 +1,13 @@
 import { createPageMetadata } from '@/shared/lib/metadata'
 
-import { PlaygroundBilling } from '@/features/in-app-purchase'
+import { PlaygroundContent } from './_ui/PlaygroundContent'
 
 export const metadata = createPageMetadata({
   title: '놀이터',
-  description: 'AI 사진 만들기와 놀이터 이용권을 한곳에서 확인하세요.',
+  description: '사진 한 장으로 우리 아이의 새로운 모습을 만들고 함께 자랑해 보세요.',
   path: '/playground',
 })
 
 export default function PlaygroundPage() {
-  return <PlaygroundBilling />
+  return <PlaygroundContent />
 }

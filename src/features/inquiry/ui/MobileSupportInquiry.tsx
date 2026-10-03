@@ -22,7 +22,7 @@ const SupportInquiryLauncher = ({ audience }: MobileSupportInquiryProps) => {
         <button
           type="button"
           aria-label="AI 문의하기"
-          className="fixed right-4 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-sticky flex size-18 flex-col items-center justify-center gap-1 rounded-full border border-primary-100 bg-action-primary text-primary-700 shadow-[0_4px_12px_rgba(55,55,55,0.12)] focus-ring transition-colors hover:bg-action-primary-hover active:bg-action-primary-press motion-reduce:transition-none tab:hidden"
+          className="fixed right-4 bottom-[calc(8rem+env(safe-area-inset-bottom))] z-10 flex size-18 flex-col items-center justify-center gap-1 rounded-full border border-primary-100 bg-action-primary text-primary-700 shadow-[0_4px_12px_rgba(55,55,55,0.12)] focus-ring transition-colors hover:bg-action-primary-hover active:bg-action-primary-press motion-reduce:transition-none tab:right-12 pc:hidden"
         >
           <PawPrintIcon aria-hidden className="size-6" />
           <span className="text-xs leading-[1.5] font-semibold">AI 문의하기</span>
@@ -32,11 +32,11 @@ const SupportInquiryLauncher = ({ audience }: MobileSupportInquiryProps) => {
   )
 }
 
-/** 모바일 설정의 문의 진입점. 넓은 화면으로 바꾸면 포털로 열린 시트도 함께 닫는다. */
+/** 전체 메뉴 안에서만 표시한다. 메뉴가 데스크톱 드롭다운이 되면 상담 시트도 닫는다. */
 const MobileSupportInquiry = (props: MobileSupportInquiryProps) => {
-  const isTablet = useBreakpoint('tab')
+  const isDesktop = useBreakpoint('pc')
 
-  if (isTablet) return null
+  if (isDesktop) return null
 
   return <SupportInquiryLauncher {...props} />
 }

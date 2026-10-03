@@ -1,16 +1,22 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 
 const useImageCarousel = (images: string[], initialIndex = 0) => {
-  const [currentIndex, setCurrentIndex] = useState(initialIndex)
+  const [index, setCurrentIndex] = useState(initialIndex)
+  const [previousInitialIndex, setPreviousInitialIndex] = useState(initialIndex)
+  const initialIndexChanged = !Object.is(previousInitialIndex, initialIndex)
+  const requestedIndex = initialIndexChanged ? initialIndex : index
+  const currentIndex = Number.isFinite(requestedIndex)
+    ? Math.max(0, Math.min(Math.trunc(requestedIndex), images.length - 1))
+    : 0
 
-  useEffect(() => {
-    setCurrentIndex(initialIndex)
-  }, [initialIndex])
+  // 다른 사진을 열거나 목록이 줄면 커밋 전에 선택을 맞춰 이전/없는 사진이 깜박이지 않게 한다.
+  if (initialIndexChanged) setPreviousInitialIndex(initialIndex)
+  if (!Object.is(index, currentIndex)) setCurrentIndex(currentIndex)
 
   const handlePrev = useCallback(() => {
-    setCurrentIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1))
+    setCurrentIndex((prev) => (prev > 0 ? prev - 1 : Math.max(0, images.length - 1)))
   }, [images.length])
 
   const handleNext = useCallback(() => {

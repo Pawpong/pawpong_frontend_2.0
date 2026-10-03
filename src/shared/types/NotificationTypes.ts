@@ -21,6 +21,20 @@ export type NotificationType =
   | 'COMMUNITY_COMMENT_REPLIED'
   | 'CHAT_MESSAGE_RECEIVED'
 
+/** 백엔드 알림 분류(GET/DELETE /notification ?category=). 화면 필터와 일괄 삭제 단위. */
+export type NotificationCategory = 'chat' | 'community' | 'adoption' | 'account' | 'notice'
+
+export interface NotificationListFilter {
+  isRead?: boolean
+  category?: NotificationCategory
+}
+
+export interface NotificationBulkDeleteFilter {
+  category?: NotificationCategory
+  /** true면 읽은 알림만 지운다 */
+  onlyRead?: boolean
+}
+
 export interface NotificationResponseDto {
   notificationId: string
   userId: string
