@@ -15,6 +15,7 @@ interface FavoriteShareActionsProps {
   // (피그마 모바일 1943:112830 라벨 없음 / 탭 1654:148613 라벨 12px neutral-700)
   labelVisibility?: 'always' | 'tablet'
   // 공유 모달 메타 (카카오/OS 공유용) — 없으면 현재 페이지 URL·title 기본값
+  shareUrl?: string
   shareTitle?: string
   shareDescription?: string
   shareImageUrl?: string
@@ -29,6 +30,7 @@ const FavoriteShareActions = ({
   showFavorite = true,
   showShare = true,
   labelVisibility,
+  shareUrl,
   shareTitle,
   shareDescription,
   shareImageUrl,
@@ -62,6 +64,7 @@ const FavoriteShareActions = ({
       <ShareModal
         open={shareOpen}
         onOpenChange={setShareOpen}
+        url={shareUrl}
         title={shareTitle}
         description={shareDescription}
         imageUrl={shareImageUrl}

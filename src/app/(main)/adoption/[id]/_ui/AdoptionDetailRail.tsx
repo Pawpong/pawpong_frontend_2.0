@@ -157,6 +157,7 @@ const AdoptionDetailRail = ({
           className="text-neutral-700"
         />
         <FavoriteShareActions
+          shareUrl={`/adoption/${detail.listingId}`}
           shareTitle={detail.name}
           shareDescription={detail.description}
           shareImageUrl={detail.imageUrls[0]}

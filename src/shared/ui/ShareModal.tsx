@@ -5,6 +5,8 @@ import * as DialogPrimitive from '@radix-ui/react-dialog'
 import Image from 'next/image'
 import { CloseIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
+import { SHARE_IMAGE } from '@/shared/config/site'
+import { summarizeShareText } from '@/shared/lib/metadata'
 import { getKakao, shareToKakao } from '@/shared/lib/kakao'
 import {
   hasNativeCapability,
@@ -97,6 +99,8 @@ const ShareModal = ({
 }: ShareModalProps) => {
   // [refactored] 4-state enum -> boolean (로드 완료 여부만 쓰인다)
   const [kakaoReady, setKakaoReady] = useState(false)
+  const [kakaoError, setKakaoError] = useState<string | null>(null)
+  const [kakaoAttempt, setKakaoAttempt] = useState(0)
   const [feedback, setFeedback] = useState<ShareFeedback | null>(null)
   const deviceShare = useSyncExternalStore(
     subscribeNativeCapabilities,
@@ -109,6 +113,7 @@ const ShareModal = ({
   const handleOpenChange = (next: boolean) => {
     if (!next) {
       setKakaoReady(false)
+      setKakaoError(null)
       setFeedback(null)
     }
     onOpenChange(next)
@@ -123,25 +128,31 @@ const ShareModal = ({
       .then(() => {
         if (!cancelled) setKakaoReady(true)
       })
-      .catch(() => {})
+      .catch((error: unknown) => {
+        if (!cancelled)
+          setKakaoError(
+            error instanceof Error ? error.message : '카카오 공유를 불러오지 못했습니다.',
+          )
+      })
 
     return () => {
       cancelled = true
     }
-  }, [open])
+  }, [open, kakaoAttempt])
 
   const share = async (key: ShareKey) => {
-    const shareUrl = new URL(url ?? window.location.href, window.location.href).href
-    const shareTitle = title ?? document.title
+    const shareUrl = new URL(url ?? window.location.pathname, window.location.origin).href
+    const shareTitle = summarizeShareText(title ?? document.title, 200)
+    const shareDescription = description ? summarizeShareText(description, 200) : undefined
     setFeedback(null)
 
     try {
       switch (key) {
         case 'native': {
           if (hasNativeCapability('nativeShare')) {
-            await shareNatively({ url: shareUrl, title: shareTitle, message: description })
+            await shareNatively({ url: shareUrl, title: shareTitle, message: shareDescription })
           } else {
-            await navigator.share({ url: shareUrl, title: shareTitle, text: description })
+            await navigator.share({ url: shareUrl, title: shareTitle, text: shareDescription })
           }
           break
         }
@@ -166,7 +177,12 @@ const ShareModal = ({
         }
         // [refactored] SDK 페이로드 조립은 shared/lib/kakao로 이동. await 없이 동기 호출해야 팝업이 안 막힌다.
         case 'kakao': {
-          shareToKakao({ url: shareUrl, title: shareTitle, description, imageUrl })
+          shareToKakao({
+            url: shareUrl,
+            title: shareTitle,
+            description: shareDescription,
+            imageUrl: imageUrl || SHARE_IMAGE,
+          })
           break
         }
       }
@@ -228,8 +244,9 @@ const ShareModal = ({
                   key={option.key}
                   type="button"
                   onClick={() => void share(option.key)}
-                  aria-busy={isKakao && !kakaoReady}
-                  className="flex flex-col items-center gap-0.5 rounded-md focus-ring"
+                  disabled={isKakao && !kakaoReady}
+                  aria-busy={isKakao && !kakaoReady && !kakaoError}
+                  className="flex flex-col items-center gap-0.5 rounded-md focus-ring disabled:cursor-wait disabled:opacity-50"
                 >
                   <span
                     className={cn(
@@ -253,6 +270,22 @@ const ShareModal = ({
             })}
           </div>
 
+          {kakaoError && (
+            <div role="status" className="px-5 pb-4 text-center text-sm text-error-600">
+              <p>{kakaoError}</p>
+              <button
+                type="button"
+                className="mt-2 rounded px-2 py-1 font-semibold underline focus-ring"
+                onClick={() => {
+                  setKakaoError(null)
+                  setKakaoReady(false)
+                  setKakaoAttempt((attempt) => attempt + 1)
+                }}
+              >
+                카카오 공유 다시 불러오기
+              </button>
+            </div>
+          )}
           {feedback && (
             <p
               role="status"

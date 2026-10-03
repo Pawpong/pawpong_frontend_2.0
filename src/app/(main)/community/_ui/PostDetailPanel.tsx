@@ -138,6 +138,16 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
         commentCount={post.commentCount}
         liked={post.isLiked}
         saved={post.isSaved}
+        share={
+          post.visibility === 'public' && post.status === 'published'
+            ? {
+                url: `/community/post/${postId}`,
+                title: post.title || `${post.authorNickname}님의 게시글`,
+                description: post.body,
+                imageUrl: post.photoUrls[0],
+              }
+            : undefined
+        }
         onToggleLike={isLikePending ? undefined : guard(toggleLike)}
         onToggleSave={isBookmarkPending ? undefined : guard(toggleBookmark)}
       />

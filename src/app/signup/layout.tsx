@@ -1,4 +1,8 @@
+import { createPageMetadata } from '@/shared/lib/metadata'
+
 import { SignupLogoLink } from './_ui/SignupLogoLink'
+
+export const metadata = createPageMetadata({ title: '회원가입', noIndex: true })
 
 const SignupLayout = ({ children }: { children: React.ReactNode }) => {
   return (
