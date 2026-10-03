@@ -60,13 +60,18 @@ test('referrers retain origin or safe route only', () => {
   assert.equal(policy.analyticsReferrer('javascript:alert(1)'), '')
 })
 
-function componentSession({ native = false, debug = false, host = 'pawpong.kr' } = {}) {
+function componentSession({
+  native = false,
+  debug = false,
+  host = 'pawpong.kr',
+  webview = false,
+} = {}) {
   const queue = [],
     scripts = [],
     messages = [],
     refs = [],
     effects = [],
-    timers = []
+    timers = new Map()
   const browser = { dataLayer: queue }
   if (native) {
     browser.__PAWPONG_APP__ = { platform: 'android', capabilities: { analytics: true } }
@@ -81,11 +86,24 @@ function componentSession({ native = false, debug = false, host = 'pawpong.kr' }
     addEventListener() {},
     removeEventListener() {},
   }
-  browser.setTimeout = (callback) => {
-    timers.push(callback)
-    return timers.length
+  let now = 0,
+    timerId = 0,
+    cleanup
+  browser.setTimeout = (callback, delay) => {
+    const id = ++timerId
+    timers.set(id, { callback, at: now + delay })
+    return id
   }
-  browser.clearTimeout = () => {}
+  browser.clearTimeout = (id) => timers.delete(id)
+  const advance = (ms) => {
+    now += ms
+    for (const [id, timer] of timers) {
+      if (timer.at <= now) {
+        timers.delete(id)
+        timer.callback()
+      }
+    }
+  }
   let path = '/community',
     index = 0
   const code = ts.transpileModule(fs.readFileSync('src/shared/lib/PawpongAnalytics.tsx', 'utf8'), {
@@ -115,17 +133,20 @@ function componentSession({ native = false, debug = false, host = 'pawpong.kr' }
     browser,
     document,
     { hostname: host },
-    { userAgent: native ? 'Android PawpongApp/1.0' : 'Browser' },
+    { userAgent: native || webview ? 'Android PawpongApp/1.0' : 'Browser' },
     { env: { NEXT_PUBLIC_APP_ENV: 'production', NEXT_PUBLIC_ANALYTICS_DEBUG: String(debug) } },
   )
-  const render = (next) => {
+  const render = (next, flush = true) => {
+    cleanup?.()
     path = next
     index = 0
     out.PawpongAnalytics()
-    effects.splice(0).forEach((fn) => fn())
-    timers.splice(0).forEach((fn) => fn())
+    effects.splice(0).forEach((fn) => {
+      cleanup = fn()
+    })
+    if (flush) advance(300)
   }
-  return { queue, scripts, messages, render }
+  return { queue, scripts, messages, render, advance }
 }
 
 test('SPA navigation sends one page_view per visit, including return navigation; no duplicate script', () => {
@@ -159,4 +180,20 @@ test('new Android uses native screen views without any web GTM; development rema
   const dev = componentSession({ host: 'dev.pawpong.kr' })
   dev.render('/community')
   assert.equal(dev.queue.length, 0)
+})
+
+test('WebView quick visits and back navigation are retained after initial transport selection', () => {
+  for (const native of [false, true]) {
+    const session = componentSession({ native, webview: true })
+    session.render('/community')
+    session.render('/explore', false)
+    session.advance(250)
+    session.render('/community', false)
+    const screens = native
+      ? session.messages.map((message) => message.screen)
+      : session.queue
+          .filter((item) => item.event === 'pawpong_page_view')
+          .map((item) => item.page_title)
+    assert.deepEqual(screens, ['community', 'explore', 'community'])
+  }
 })
