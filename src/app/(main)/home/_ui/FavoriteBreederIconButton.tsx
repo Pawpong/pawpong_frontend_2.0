@@ -11,14 +11,14 @@ interface FavoriteBreederIconButtonProps {
   size?: 'nav' | 'profile' | 'card'
 }
 
-// 사진을 덜 가리도록 카드 버튼은 모든 화면에서 40px, 별은 24px로 유지한다.
+// 별 주변은 투명하게 유지하면서 누를 수 있는 영역은 최소 44px를 확보한다.
 const SIZE = {
-  nav: 'md',
+  nav: 'touch',
   profile: 'lg',
-  card: 'md',
+  card: 'touch',
 } as const
 
-/** 브리더 즐겨찾기 — 크림색 빈 별에서 노란 바탕의 채운 픽셀 별로 전환한다. */
+/** 브리더 즐겨찾기 — 빈 픽셀 별을 누르면 별 안쪽이 노란색으로 채워진다. */
 const FavoriteBreederIconButton = ({
   breederId,
   isFavorited,
@@ -54,7 +54,7 @@ const FavoriteBreederIconButton = ({
       aria-disabled={isPending}
       aria-busy={isPending}
     >
-      <ProfileStarIcon filled={isFavorited} className="size-6" />
+      <ProfileStarIcon filled={isFavorited} className="size-7 drop-shadow-sm" />
     </IconButton>
   )
 }
