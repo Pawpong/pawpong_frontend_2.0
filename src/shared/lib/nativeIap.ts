@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { PLAYGROUND_BILLING_ENABLED } from '../config/playground'
 import { requestNative } from './nativeBridge'
 
 const productId = z.string().regex(/^[A-Za-z0-9._-]{1,100}$/)
@@ -95,6 +96,8 @@ export const nativeIap = {
     },
     signal?: AbortSignal,
   ): Promise<NativeIapOutcome> => {
+    // 화면을 우회해 호출해도 출시 전에는 네이티브 구매 메시지를 보내지 않는다.
+    if (!PLAYGROUND_BILLING_ENABLED) throw new Error('지금은 결제를 이용할 수 없어요.')
     const payload = parse(
       z.object({
         productId,

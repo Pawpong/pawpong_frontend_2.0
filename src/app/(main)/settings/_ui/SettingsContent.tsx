@@ -7,7 +7,6 @@ import { AlertCircleIcon, ArrowRightIcon, CheckIcon } from '@/shared/assets'
 import { useDeleteAdopterAccount } from '@/features/adopter'
 import { useLogoutAndRedirect } from '@/features/auth'
 import { useDeleteBreederAccount } from '@/features/breeder'
-import { MobileSupportInquiry } from '@/features/inquiry'
 import { normalizeApiError } from '@/shared/api'
 import { useToast } from '@/shared/lib/useToast'
 import { WithdrawReason } from '@/shared/types'
@@ -115,7 +114,7 @@ const SettingsContent = ({ userRole }: SettingsContentProps) => {
   }
 
   return (
-    <div className="flex w-full flex-1 flex-col bg-white pb-24 tab:pb-16">
+    <div className="flex w-full flex-1 flex-col bg-white pb-16">
       <NavigationBar title="설정" backHref="/home" />
 
       <Container className="py-5 tab:py-8 pc:py-10">
@@ -189,8 +188,6 @@ const SettingsContent = ({ userRole }: SettingsContentProps) => {
           </section>
         </div>
       </Container>
-
-      <MobileSupportInquiry audience={userRole} />
 
       {toast.current && (
         <Container className="fixed inset-x-0 bottom-4 z-header">

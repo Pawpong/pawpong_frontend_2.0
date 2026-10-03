@@ -15,6 +15,7 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { iapApi, type IapProduct } from '@/entities/iap'
 import { getAccessToken, ApiError } from '@/shared/api'
+import { PLAYGROUND_BILLING_ENABLED } from '@/shared/config/playground'
 import { getAuthSessionGeneration, isAuthSessionCurrent } from '@/shared/lib/authSessionLifecycle'
 import {
   getNativePlatform,
@@ -208,6 +209,10 @@ function usePurchaseController(memberId: string | null, generation: number) {
   }, [memberId, recover, refresh])
 
   const purchase = async (product: IapProduct, offerToken?: string) => {
+    if (!PLAYGROUND_BILLING_ENABLED) {
+      setNotice('지금은 결제를 이용할 수 없어요.')
+      return
+    }
     if (busyRef.current || !platform || !memberId) return
     let current: ReturnType<typeof session> | undefined
     try {

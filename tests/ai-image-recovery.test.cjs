@@ -485,7 +485,7 @@ test(
   },
 )
 
-function studioMarkup(phase, canResume = true) {
+function studioMarkup(phase, canResume = true, props = {}) {
   const React = require('react')
   const { renderToStaticMarkup } = require('react-dom/server')
   const { AiFilterStudio } = load('src/features/ai-image/ui/AiFilterStudio.tsx', {
@@ -501,6 +501,7 @@ function studioMarkup(phase, canResume = true) {
     '@/entities/ai-image': { aiImageQueries: { myGenerations: () => ({ queryKey: [] }) } },
     '@/shared/assets': { PawPrintIcon: () => null },
     '@/shared/lib/fonts': { cafe24Proup: { className: 'fixture-font' } },
+    '@/shared/config/playground': load('src/shared/config/playground.ts'),
     '@/shared/lib/cn': { cn: (...args) => args.filter(Boolean).join(' ') },
     '@/shared/lib/preparePhoto': {},
     '@/shared/ui': {
@@ -525,7 +526,7 @@ function studioMarkup(phase, canResume = true) {
     './AiPhotoArchive': { AiPhotoArchive: () => null },
     './BeforeAfterCompare': {},
   })
-  return renderToStaticMarkup(React.createElement(AiFilterStudio, { isLoggedIn: true }))
+  return renderToStaticMarkup(React.createElement(AiFilterStudio, { isLoggedIn: true, ...props }))
 }
 
 test('pending feedback offers read-only recovery and the archive instead of another generation button', () => {
@@ -542,4 +543,13 @@ test('reconnecting feedback explains the existing job and does not claim a gener
   assert.match(markup, /같은 사진의 결과를 다시 확인/)
   assert.match(markup, /생성 횟수를 추가로 쓰지 않/)
   assert.doesNotMatch(markup, /timeout of|role="alert"/)
+})
+
+test('before billing launch the studio shows the free allowance without credit purchase navigation', () => {
+  const markup = studioMarkup('idle', true, {
+    allowance: { remaining: 0, freeRemaining: 0, dailyFreeLimit: 3, enabled: true },
+  })
+  assert.match(markup, /오늘 무료 0\/3회/)
+  assert.match(markup, /오늘 만들 수 있는 횟수를 모두 사용했어요/)
+  assert.doesNotMatch(markup, /이용권|href="\/playground"/)
 })

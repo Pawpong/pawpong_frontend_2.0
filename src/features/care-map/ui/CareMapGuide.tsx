@@ -2,13 +2,13 @@ import type { CarePlaceKind } from '@/entities/care-place'
 
 export function CareMapGuide({ kind }: { kind: CarePlaceKind }) {
   return (
-    <details className="rounded-2xl border border-primary-100 bg-secondary-50 px-4 py-3 text-primary-900">
+    <details className="rounded-2xl border border-secondary-200 bg-point-50 px-4 py-3 text-neutral-850">
       <summary className="cursor-pointer text-sm font-semibold">
         {kind === 'hospital'
           ? '1차·2차 동물병원, 어떻게 찾아야 할까요?'
           : '보호소 방문·입양 전 확인해 주세요'}
       </summary>
-      <div className="mt-3 space-y-2 text-sm leading-6 text-primary-700">
+      <div className="mt-3 space-y-2 text-sm leading-6 text-neutral-700">
         {kind === 'hospital' ? (
           <>
             <p>

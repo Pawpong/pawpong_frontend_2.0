@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { useQueryClient } from '@tanstack/react-query'
 import { aiImageQueries } from '@/entities/ai-image'
 import { PawPrintIcon } from '@/shared/assets'
+import { PLAYGROUND_BILLING_ENABLED } from '@/shared/config/playground'
 import { cafe24Proup } from '@/shared/lib/fonts'
 import { cn } from '@/shared/lib/cn'
 import { preparePhoto } from '@/shared/lib/preparePhoto'
@@ -168,9 +169,11 @@ export function AiFilterStudio({
             <div className="flex flex-col items-start gap-2">
               <span className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-neutral-850">
                 {allowance
-                  ? `이용 가능 ${remaining}회 · 오늘 무료 ${allowance.freeRemaining}/${allowance.dailyFreeLimit}회`
+                  ? PLAYGROUND_BILLING_ENABLED
+                    ? `이용 가능 ${remaining}회 · 오늘 무료 ${allowance.freeRemaining}/${allowance.dailyFreeLimit}회`
+                    : `오늘 무료 ${allowance.freeRemaining}/${allowance.dailyFreeLimit}회`
                   : quotaError
-                    ? '이용권을 확인하지 못했어요'
+                    ? '이용 가능 횟수를 확인하지 못했어요'
                     : '이용 가능 횟수를 확인하고 있어요…'}
               </span>
               {quotaError && (
@@ -178,9 +181,14 @@ export function AiFilterStudio({
                   다시 확인
                 </Button>
               )}
-              <Link href="/playground" className="text-sm font-semibold text-primary-700 underline">
-                놀이터 이용권 확인하기
-              </Link>
+              {PLAYGROUND_BILLING_ENABLED && (
+                <Link
+                  href="/playground"
+                  className="text-sm font-semibold text-primary-700 underline"
+                >
+                  놀이터 이용권 확인하기
+                </Link>
+              )}
             </div>
           )}
         </div>
@@ -418,7 +426,9 @@ export function AiFilterStudio({
                   : !allowance.enabled
                     ? '지금은 AI 사진 만들기가 쉬고 있어요'
                     : remaining === 0
-                      ? '이용권이 부족해요 · 놀이터에서 확인해 주세요'
+                      ? PLAYGROUND_BILLING_ENABLED
+                        ? '이용권이 부족해요 · 놀이터에서 확인해 주세요'
+                        : '오늘 만들 수 있는 횟수를 모두 사용했어요'
                       : selectedFilter
                         ? `${selectedFilter.name} 씌우기`
                         : '필터를 골라 주세요'}
