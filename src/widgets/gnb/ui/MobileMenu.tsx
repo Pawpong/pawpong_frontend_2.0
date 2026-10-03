@@ -5,6 +5,7 @@ import Image from 'next/image'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { RESPONSIVE_SHELL_CLASS } from '@/shared/config'
 import { useAuthStatus } from '@/features/auth'
+import { MobileSupportInquiry } from '@/features/inquiry'
 import { cn } from '@/shared/lib/cn'
 import { Dialog, DialogOverlay, DialogPortal, iconButtonVariants } from '@/shared/ui'
 import { LogoButton } from './LogoButton'
@@ -18,7 +19,7 @@ interface MobileMenuProps {
 }
 
 const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
-  const { isLoggedIn } = useAuthStatus()
+  const { isLoggedIn, userRole } = useAuthStatus()
   const close = () => onOpenChange(false)
   // 인증이 필요한 화면도 목록에서 감추지 않고, 비로그인이면 돌아올 주소를 실어 로그인으로 보낸다
   const hrefFor = ({ href, requiresAuth }: NavItem) =>
@@ -89,6 +90,7 @@ const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
               <AuthActions placement="menu-footer" />
             </div>
           </div>
+          <MobileSupportInquiry audience={userRole === 'breeder' ? 'breeder' : 'adopter'} />
         </DialogPrimitive.Content>
       </DialogPortal>
     </Dialog>
