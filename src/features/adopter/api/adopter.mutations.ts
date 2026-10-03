@@ -5,12 +5,14 @@ import {
   useQueryClient,
   type InfiniteData,
   type QueryClient,
+  type QueryFilters,
 } from '@tanstack/react-query'
 import { adopterQueries } from '@/entities/adopter'
 import { applicationQueries } from '@/entities/application'
 import { breederQueries } from '@/entities/breeder'
 import { communityQueries } from '@/entities/community'
 import { profileQueries } from '@/entities/profile'
+import { patchCachedItem } from '@/shared/lib/patchCachedItem'
 import {
   updateAdopterProfile,
   deleteAdopterAccount,
@@ -20,6 +22,7 @@ import {
 } from './adopter.api'
 import type {
   AdopterProfileUpdateRequest,
+  FavoriteAddResponseDto,
   FavoriteBreederCard,
   PaginationResponse,
   ReviewCreateRequest,
@@ -48,31 +51,46 @@ export const useDeleteAdopterAccount = () =>
       deleteAdopterAccount(data),
   })
 
-/**
- * 즐겨찾기 토글이 건드리는 캐시.
- * isFavorited 를 들고 있는 브리더 쿼리가 공개 프로필·탐색 목록 여럿이고 staleTime 도
- * 길어(VERY_LONG) breeder 루트째 지워야 다시 들어왔을 때 별 상태가 어긋나지 않는다.
- */
+// 브리더 화면은 이미 패치한 상태를 유지하고, 다음 진입 때 서버와 다시 맞춘다.
+// 별 하나를 누를 때 탐색·인기·프로필을 모두 다시 조회하지 않는다.
 const invalidateFavoriteCaches = (qc: QueryClient) =>
   Promise.all([
-    qc.invalidateQueries({ queryKey: adopterQueries.all() }),
-    qc.invalidateQueries({ queryKey: profileQueries.favoriteBreeders().queryKey }),
-    qc.invalidateQueries({ queryKey: breederQueries.all() }),
+    // 공개 프로필의 400/404는 브리더 홈 판정에 쓰인다. 재조회하면 홈이 다시 마운트된다.
+    qc.invalidateQueries({ queryKey: adopterQueries.profile().queryKey, exact: true }),
+    qc.invalidateQueries({ queryKey: [...profileQueries.all(), 'favoriteBreeders'] }),
+    qc.invalidateQueries({ queryKey: breederQueries.all(), refetchType: 'none' }),
   ])
 
-export const useAddFavorite = () => {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (breederId: string) => addFavorite(breederId),
-    onSuccess: () => {
-      void invalidateFavoriteCaches(qc)
-    },
-  })
+interface FavoritableBreeder {
+  breederId: string
+  isFavorited: boolean
+  favoriteCount?: number
 }
+
+const isFavoritableBreeder = (value: unknown): value is FavoritableBreeder =>
+  typeof value === 'object' &&
+  value !== null &&
+  'breederId' in value &&
+  typeof value.breederId === 'string' &&
+  'isFavorited' in value &&
+  typeof value.isFavorited === 'boolean'
+
+const patchBreederFavorite = (data: unknown, breederId: string, isFavorited: boolean) =>
+  patchCachedItem(data, (value) => {
+    if (!isFavoritableBreeder(value) || value.breederId !== breederId) return value
+    if (value.isFavorited === isFavorited) return value
+    return {
+      ...value,
+      isFavorited,
+      ...(typeof value.favoriteCount === 'number' && {
+        favoriteCount: Math.max(0, value.favoriteCount + (isFavorited ? 1 : -1)),
+      }),
+    }
+  })
 
 /**
  * 즐겨찾는 브리더 목록 캐시에서 해당 카드를 즉시 제거한다.
- * 목록은 등록된 브리더만 반환해(isFavorited 항상 true) 재조회 전까지 카드가 채워진 별로 남는다.
+ * 삭제 성공 후 적용하므로 실패한 요청 때문에 카드가 사라졌다 다시 나타나지 않는다.
  */
 const dropFromFavoriteList = (qc: QueryClient, breederId: string) =>
   qc.setQueriesData<InfiniteData<PaginationResponse<FavoriteBreederCard>>>(
@@ -87,22 +105,103 @@ const dropFromFavoriteList = (qc: QueryClient, breederId: string) =>
       },
   )
 
-export const useRemoveFavorite = () => {
+const favoriteMutationKey = ['breeder-favorite'] as const
+// 같은 브리더가 모바일/태블릿/다른 카드에 동시에 렌더되어도 하나의 요청만 처리한다.
+const favoriteRequests = new WeakMap<QueryClient, Map<string, Promise<FavoriteAddResponseDto>>>()
+const breederFavoriteScope: QueryFilters = {
+  queryKey: breederQueries.all(),
+  predicate: (query) =>
+    ['public-profile', 'explore', 'popular'].includes(String(query.queryKey[1])),
+}
+const favoriteScopes: QueryFilters[] = [
+  breederFavoriteScope,
+  { queryKey: [...profileQueries.all(), 'favoriteBreeders'] },
+]
+
+const useFavoriteMutation = (nextFavorited: boolean) => {
   const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (breederId: string) => removeFavorite(breederId),
-    onMutate: (breederId) => {
-      dropFromFavoriteList(qc, breederId)
+  const mutation = useMutation({
+    mutationKey: favoriteMutationKey,
+    mutationFn: (breederId: string) =>
+      nextFavorited ? addFavorite(breederId) : removeFavorite(breederId),
+    onMutate: async (breederId) => {
+      await Promise.all(
+        favoriteScopes.map((scope) =>
+          qc.cancelQueries({
+            ...scope,
+            predicate: (query) =>
+              query.state.data !== undefined && (!scope.predicate || scope.predicate(query)),
+          }),
+        ),
+      )
+      const snapshot = favoriteScopes.flatMap((scope) => qc.getQueriesData(scope))
+      favoriteScopes.forEach((scope) =>
+        qc.setQueriesData(scope, (data) => patchBreederFavorite(data, breederId, nextFavorited)),
+      )
+      return { snapshot }
     },
-    // ponytail: 롤백 스냅샷 대신 재조회로 되돌린다 (실패는 드물고 서버가 정답)
-    onError: () => {
-      void qc.invalidateQueries({ queryKey: profileQueries.favoriteBreeders().queryKey })
+    onError: (_error, breederId, context) => {
+      context?.snapshot.forEach(([queryKey, previous]) => {
+        // 다른 별의 동시 변경까지 오래된 목록 전체로 덮어쓰지 않는다.
+        patchCachedItem(previous, (value) => {
+          if (isFavoritableBreeder(value) && value.breederId === breederId) {
+            qc.setQueryData(queryKey, (data: unknown) =>
+              patchBreederFavorite(data, breederId, value.isFavorited),
+            )
+          }
+          return value
+        })
+      })
     },
-    onSuccess: () => {
-      void invalidateFavoriteCaches(qc)
+    onSuccess: async (_result, breederId) => {
+      // 저장 중 새로 진입한 화면도 확정 상태로 맞추고, 이전 응답이 덮어쓰지 않게 한다.
+      await Promise.all(favoriteScopes.map((scope) => qc.cancelQueries(scope)))
+      favoriteScopes.forEach((scope) =>
+        qc.setQueriesData(scope, (data) => patchBreederFavorite(data, breederId, nextFavorited)),
+      )
+      if (!nextFavorited) dropFromFavoriteList(qc, breederId)
+      // 아직 데이터가 없는 새 화면의 최초 조회만 재개한다. 보이는 기존 목록은 유지한다.
+      await qc.refetchQueries({
+        ...breederFavoriteScope,
+        type: 'active',
+        predicate: (query) =>
+          query.state.data === undefined && !!breederFavoriteScope.predicate?.(query),
+      })
+    },
+    onSettled: () => {
+      // 여러 별을 연속으로 누르면 마지막 요청 이후에만 즐겨찾기 목록을 새로 받는다.
+      if (qc.isMutating({ mutationKey: favoriteMutationKey }) === 1) {
+        return invalidateFavoriteCaches(qc)
+      }
     },
   })
+
+  const mutateAsync: typeof mutation.mutateAsync = (breederId, options) => {
+    let requests = favoriteRequests.get(qc)
+    if (!requests) {
+      requests = new Map()
+      favoriteRequests.set(qc, requests)
+    }
+    const pending = requests.get(breederId)
+    if (pending) return pending
+    const request = mutation.mutateAsync(breederId, options).finally(() => {
+      requests.delete(breederId)
+    })
+    requests.set(breederId, request)
+    return request
+  }
+
+  return {
+    ...mutation,
+    mutateAsync,
+    mutate: ((breederId, options) => {
+      void mutateAsync(breederId, options).catch(() => undefined)
+    }) as typeof mutation.mutate,
+  }
 }
+
+export const useAddFavorite = () => useFavoriteMutation(true)
+export const useRemoveFavorite = () => useFavoriteMutation(false)
 
 export const useCreateReview = () => {
   const qc = useQueryClient()
