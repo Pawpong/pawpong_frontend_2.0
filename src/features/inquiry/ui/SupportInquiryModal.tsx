@@ -46,6 +46,7 @@ const SupportChat = ({
   )
   const [topic, setTopic] = useState<SupportTopic>('usage')
   const [showReset, setShowReset] = useState(false)
+  const [showDiscard, setShowDiscard] = useState(false)
   const session = sessions[topic]
   const selectedTopic = SUPPORT_TOPICS.find((item) => item.id === topic)!
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -192,6 +193,28 @@ const SupportChat = ({
                       대화를 충분히 나눴어요. 정리한 내용을 전달하거나 새 문의를 시작해 주세요.
                     </p>
                   )}
+                  {atLimit && !submission && !!session.draft.trim() && (
+                    <div className="mb-3 rounded-lg border border-primary-100 bg-point-50 p-3">
+                      <p className="text-xs font-semibold text-primary-700">
+                        아직 보내지 않은 내용
+                      </p>
+                      <p className="mt-2 max-h-20 overflow-y-auto text-sm break-words whitespace-pre-wrap">
+                        {session.draft}
+                      </p>
+                      <p className="my-2 text-xs leading-relaxed text-neutral-700">
+                        새 문의에서 이어 쓸 수 있어요. 이 내용을 비우면 위에 정리한 문의를 전달할 수
+                        있어요.
+                      </p>
+                      <Button
+                        size="lg"
+                        intent="secondary"
+                        disabled={busy || awaitingSubmission}
+                        onClick={() => setShowDiscard(true)}
+                      >
+                        작성 내용 비우기
+                      </Button>
+                    </div>
+                  )}
                   <Button
                     size="lg"
                     intent="secondary"
@@ -273,6 +296,18 @@ const SupportChat = ({
           </DialogPrimitive.Content>
         </DialogPortal>
       </Dialog>
+      <ExitConfirmModal
+        open={showDiscard}
+        onClose={() => setShowDiscard(false)}
+        onConfirm={() => {
+          controller.discardUnsentDraft(topic)
+          setShowDiscard(false)
+        }}
+        title="보내지 않은 내용을 비울까요?"
+        description="아직 보내지 않은 작성 내용만 지워져요. 지금까지의 대화와 정리한 문의는 그대로 남아요."
+        closeLabel="계속 보관하기"
+        confirmLabel="내용 비우기"
+      />
       <ExitConfirmModal
         open={showReset}
         onClose={() => setShowReset(false)}

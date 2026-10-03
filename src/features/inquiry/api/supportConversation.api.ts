@@ -7,26 +7,31 @@ import {
 const BASE = '/api/support/conversations'
 
 async function request(path: string, body?: unknown) {
-  let response: Response
+  // iOS 15 WKWebView에는 AbortSignal.timeout이 없으므로 기본 API로 제한한다.
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 65_000)
   try {
-    response = await fetch(`${BASE}${path}`, {
+    const response = await fetch(`${BASE}${path}`, {
       method: body === undefined ? 'GET' : 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'same-origin',
       cache: 'no-store',
       ...(body === undefined ? {} : { body: JSON.stringify(body) }),
-      signal: AbortSignal.timeout(65_000),
+      signal: controller.signal,
     })
-  } catch {
+    const envelope = await response.json().catch(() => null)
+    if (!response.ok || !envelope?.success) {
+      throw new SupportChatError(response.status, envelope?.errorCode ?? envelope?.code)
+    }
+    const parsed = supportConversationSchema.safeParse(envelope.data)
+    if (!parsed.success) throw new SupportChatError(502)
+    return parsed.data
+  } catch (error) {
+    if (error instanceof SupportChatError) throw error
     throw new SupportChatError(0)
+  } finally {
+    clearTimeout(timeout)
   }
-  const envelope = await response.json().catch(() => null)
-  if (!response.ok || !envelope?.success) {
-    throw new SupportChatError(response.status, envelope?.errorCode ?? envelope?.code)
-  }
-  const parsed = supportConversationSchema.safeParse(envelope.data)
-  if (!parsed.success) throw new SupportChatError(502)
-  return parsed.data
 }
 
 // 대화 capability는 BFF의 HttpOnly 쿠키에만 존재한다. 로그인 refresh와도 분리한다.

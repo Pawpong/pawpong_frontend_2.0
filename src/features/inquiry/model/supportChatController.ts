@@ -1,4 +1,5 @@
 import { SUPPORT_TOPICS, MAX_SUPPORT_MESSAGE_LENGTH, type SupportTopic } from './supportTopics'
+import { createSupportRequestId } from './supportRequestId'
 import {
   SupportChatError,
   type SupportAudience,
@@ -61,6 +62,18 @@ export class SupportChatController {
     this.update(topic, { consent })
   }
 
+  discardUnsentDraft(topic: SupportTopic) {
+    const session = this.state[topic]
+    if (
+      session.phase !== 'idle' ||
+      session.pendingTurn ||
+      session.submissionRevision !== null ||
+      session.conversation?.submission
+    )
+      return
+    this.update(topic, { draft: '' })
+  }
+
   restart(topic: SupportTopic) {
     const session = this.state[topic]
     if (session.phase !== 'idle') return
@@ -81,13 +94,15 @@ export class SupportChatController {
       return
     const message = session.pendingTurn?.message ?? session.draft.trim()
     if (!message) return
-    const attempt = session.pendingTurn ?? {
-      clientRequestId: crypto.randomUUID(),
-      revision: session.conversation?.revision ?? 0,
-      message,
-    }
-    this.update(topic, { phase: 'sending', pendingTurn: attempt, error: null })
+    this.update(topic, { phase: 'sending', error: null })
     try {
+      // ID 생성 실패도 작성 내용을 보존한 가시적인 오류로 처리한다.
+      const attempt = session.pendingTurn ?? {
+        clientRequestId: createSupportRequestId(),
+        revision: session.conversation?.revision ?? 0,
+        message,
+      }
+      this.update(topic, { pendingTurn: attempt })
       let conversation = session.conversation
       if (!conversation) {
         conversation = await this.api.create(topic, this.audience)
@@ -181,9 +196,12 @@ export class SupportChatController {
     }
     if (
       status === 409 &&
-      ['REVISION_CONFLICT', 'CONVERSATION_SUBMITTED', 'REQUEST_ID_CONFLICT', 'DRAFT_REQUIRED'].includes(
-        code ?? '',
-      )
+      [
+        'REVISION_CONFLICT',
+        'CONVERSATION_SUBMITTED',
+        'REQUEST_ID_CONFLICT',
+        'DRAFT_REQUIRED',
+      ].includes(code ?? '')
     ) {
       const session = this.state[topic]
       if (session.conversation) {
