@@ -29,6 +29,8 @@ export function FeatureHighlights({
     staleTime: 0,
     gcTime: 0,
     retry: 1,
+    // 선택적 소개 영역의 잘못된 응답이 전체 페이지 오류 경계로 전파되지 않게 한다.
+    throwOnError: false,
     refetchOnMount: 'always',
     refetchOnWindowFocus: true,
   })
