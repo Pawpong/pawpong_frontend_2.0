@@ -22,14 +22,15 @@ const iconButtonStyles = tv({
       overlay: 'bg-action-dark/60 text-base-white hover:bg-action-dark/80',
       surface:
         'border border-action-disabled bg-base-white text-action-dark hover:bg-action-subtle',
-      // 밝거나 어두운 사진 위에서도 대비를 유지하는 즐겨찾기 토글.
+      // 배경과 박스 테두리 없이 별 자체의 빈 상태/노란 채움으로 표현한다.
       favorite:
-        'border border-brand/30 bg-point-50 text-brand aria-pressed:border-brand aria-pressed:bg-action-primary aria-disabled:cursor-wait aria-disabled:opacity-60 motion-reduce:transition-none',
+        'bg-transparent text-brand hover:text-brand-hover aria-disabled:cursor-wait aria-disabled:opacity-60 motion-reduce:transition-none',
     },
     size: {
       xs: 'size-6',
       sm: 'size-8',
       md: 'size-10',
+      touch: 'size-11',
       lg: 'size-12',
       responsive: 'size-8 tab:size-12',
     },

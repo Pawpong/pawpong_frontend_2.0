@@ -1,20 +1,20 @@
 import type { SVGProps } from 'react'
 
-// 2px 그리드의 픽셀 별. 미등록은 빈 별, 등록은 채운 별로 색 없이도 구분한다.
-const STAR_OUTLINE =
+// 같은 픽셀 윤곽을 유지하고 별 안쪽만 채워 선택 상태를 구분한다.
+const STAR_PATH =
   'M10 2H14V6H16V8H22V12H20V14H18V16H20V22H16V20H14V18H10V20H8V22H4V16H6V14H4V12H2V8H8V6H10Z'
-const STAR_CUTOUT =
-  'M10 8H14V10H20V12H18V14H16V16H18V20H16V18H14V16H10V18H8V20H6V16H8V14H6V12H4V10H10Z'
 
 export const ProfileStarIcon = ({
   filled = false,
   ...props
 }: SVGProps<SVGSVGElement> & { filled?: boolean }) => (
-  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
     <path
-      d={filled ? STAR_OUTLINE : `${STAR_OUTLINE} ${STAR_CUTOUT}`}
-      fillRule="evenodd"
-      clipRule="evenodd"
+      d={STAR_PATH}
+      fill={filled ? 'var(--color-point-500)' : 'none'}
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinejoin="miter"
     />
   </svg>
 )
