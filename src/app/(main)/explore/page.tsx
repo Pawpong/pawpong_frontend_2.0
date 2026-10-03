@@ -2,7 +2,7 @@ import { createPageMetadata } from '@/shared/lib/metadata'
 
 import { Suspense } from 'react'
 import { ExploreContent } from './_ui/ExploreContent'
-import { CareMapEntry } from '@/widgets/care-map-entry'
+import { ManagedFeatureHighlights } from '../_ui/ManagedFeatureHighlights'
 
 export const metadata = createPageMetadata({
   title: '반려동물 탐색',
@@ -17,7 +17,7 @@ export const metadata = createPageMetadata({
 const ExplorePage = () => {
   return (
     <Suspense fallback={null}>
-      <CareMapEntry />
+      <ManagedFeatureHighlights placement="explore" />
       <ExploreContent />
     </Suspense>
   )
