@@ -49,30 +49,28 @@ export function PetAdoption({
       className="rounded-2xl border border-secondary-200 bg-base-white p-5 tab:p-8"
     >
       <h2 id="adopt-heading" className="font-cafe24 text-xl text-neutral-850 tab:text-2xl">
-        어떤 친구와 함께할까요?
+        함께할 반려동물을 골라 주세요
       </h2>
       <ol className="mt-4 grid gap-2 text-sm text-neutral-700 tab:grid-cols-3">
-        {['우리 아이 사진 고르기', 'AI 도트 그림 완성하기', '이름 짓고 친구 맞이하기'].map(
-          (step, index) => (
-            <li key={step} className="flex items-center gap-2">
-              <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-point-100 text-xs font-semibold text-brand">
-                {index + 1}
-              </span>
-              {step}
-            </li>
-          ),
-        )}
+        {['완성된 그림 고르기', '이름 지어 주기', '매일 돌보기'].map((step, index) => (
+          <li key={step} className="flex items-center gap-2">
+            <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-point-100 text-xs font-semibold text-brand">
+              {index + 1}
+            </span>
+            {step}
+          </li>
+        ))}
       </ol>
       <p className="mt-5 text-sm leading-6 text-neutral-700">
-        내 보관함에서 입양 가능한 도트 그림만 모았어요. 한 계정에서 한 친구와 함께해요.
+        내 AI 보관함의 완성된 도트 그림에서 골라 주세요. 한 계정에서 한 아이를 키울 수 있어요.
       </p>
       {candidates.isPending ? (
         <p role="status" className="py-12 text-center text-neutral-700">
-          도트 친구를 데려오고 있어요…
+          완성된 도트 그림을 불러오고 있어요…
         </p>
       ) : candidates.isError ? (
         <div role="alert" className="space-y-4 py-8">
-          <p>입양 가능한 사진을 불러오지 못했어요.</p>
+          <p>선택할 수 있는 그림을 불러오지 못했어요.</p>
           <Button intent="secondary" onClick={() => void candidates.refetch()}>
             다시 불러오기
           </Button>
@@ -81,16 +79,16 @@ export function PetAdoption({
         <div className="mt-6 rounded-xl bg-point-50 px-5 py-9 text-center">
           <PawPrintIcon aria-hidden className="mx-auto size-12 text-secondary-500" />
           <h3 className="mt-4 font-cafe24 text-lg text-neutral-850">
-            첫 도트 친구를 기다리고 있어요
+            먼저 우리 아이의 도트 그림을 만들어요
           </h3>
           <p className="mt-2 text-sm leading-6 text-neutral-700">
-            우리 아이 사진으로 AI 도트 그림을 완성해 주세요.
+            아직 키울 수 있는 그림이 없어요. AI 사진 만들기에서
             <br />
-            만든 그림이 준비되면 이곳에서 만날 수 있어요.
+            도트 그림을 완성하면 이곳에서 골라 키울 수 있어요.
           </p>
           <div className="mt-5">
             <Link href="/ai-filter" className={buttonVariants()}>
-              AI로 도트 친구 만들기
+              도트 그림 만들러 가기
             </Link>
           </div>
           <p className="mt-3 text-xs leading-5 text-neutral-700">
@@ -116,7 +114,7 @@ export function PetAdoption({
         >
           <fieldset disabled={disabled} className="mt-6">
             <legend className="mb-3 text-sm font-semibold text-neutral-850">
-              1. 친구가 될 도트 그림
+              1. 키우고 싶은 도트 그림
             </legend>
             <div className="grid grid-cols-2 gap-3 tab:grid-cols-3 pc:grid-cols-4">
               {images.map((image, index) => (
@@ -134,7 +132,7 @@ export function PetAdoption({
                     <PetImage
                       key={image.imageUrl}
                       src={image.imageUrl}
-                      alt={`입양 가능한 ${index + 1}번째 도트 그림`}
+                      alt={`선택 가능한 ${index + 1}번째 도트 그림`}
                       compact
                     />
                   </span>
@@ -161,7 +159,7 @@ export function PetAdoption({
             )}
             <div className="mt-7">
               <label htmlFor="pet-name" className="text-sm font-semibold text-neutral-850">
-                2. 친구의 이름
+                2. 우리 아이 이름 짓기
               </label>
               <Input
                 id="pet-name"
@@ -184,20 +182,20 @@ export function PetAdoption({
                   <PetImage
                     key={selected.imageUrl}
                     src={selected.imageUrl}
-                    alt="입양할 친구 미리보기"
+                    alt="키울 반려동물 미리보기"
                     compact
                   />
                 </div>
                 <p className="text-sm leading-6 text-neutral-850">
-                  <strong>{normalizePetName(name) || '새 친구'}</strong>와 오늘부터 함께해요.
+                  <strong>{normalizePetName(name) || '우리 아이'}</strong>의 첫날을 시작해요.
                   <br />
-                  입양한 친구는 새로고침해도 그대로 있어요.
+                  이름을 정하면 우리 아이의 방에서 매일 돌볼 수 있어요.
                 </p>
               </div>
             )}
             <div className="mt-6">
               <Button type="submit" width="full" disabled={!selected || !nameValid || disabled}>
-                {disabled ? '친구를 맞이하는 중…' : '이 친구와 시작하기'}
+                {disabled ? '우리 아이의 방을 준비하는 중…' : '이 이름으로 시작하기'}
               </Button>
             </div>
           </fieldset>

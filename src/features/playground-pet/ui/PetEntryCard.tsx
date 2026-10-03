@@ -15,18 +15,18 @@ export function PetEntryCard() {
       className="grid items-center gap-6 rounded-2xl border border-secondary-200 bg-point-50 p-5 tab:grid-cols-[1fr_auto] tab:p-8"
     >
       <div>
-        <p className="text-xs font-semibold text-brand">내 사진에서 태어난 작은 친구</p>
+        <p className="text-xs font-semibold text-brand">사진에서 시작되는 작은 일상</p>
         <h2 id="playground-pet" className="mt-2 font-cafe24 text-2xl text-neutral-850">
-          도트 친구 키우기
+          내 반려동물 키우기
         </h2>
         <p className="mt-3 text-sm leading-6 text-neutral-700">
-          완성한 AI 도트 그림을 골라 이름을 지어 주세요.
+          사진으로 나만의 도트 반려동물을 만들고 함께 성장해요.
           <br />
-          밥도 먹고, 함께 놀며 우리만의 방을 채워 가요.
+          완성된 그림을 고르고 이름을 지으면, 매일 돌볼 수 있어요.
         </p>
         <div className="mt-5">
           <Link href="/playground/pet" className={buttonVariants()}>
-            도트 친구 만나기
+            키우기 시작하기
           </Link>
         </div>
       </div>
