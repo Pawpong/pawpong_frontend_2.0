@@ -118,7 +118,12 @@ function escapeHtml(value: string): string {
   )
 }
 
-function documentHtml(title: string, description: string, metadata: string, content: string): string {
+function documentHtml(
+  title: string,
+  description: string,
+  metadata: string,
+  content: string,
+): string {
   return `<!doctype html>
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#fef9ef"><title>${escapeHtml(title)} | 포퐁</title><meta name="description" content="${escapeHtml(description)}">${metadata}
 <style>
@@ -150,9 +155,11 @@ export function renderLanding(
   ]
     .filter(Boolean)
     .join('')
-  const heroImage = link.imageUrl || (link.targetPath.startsWith('/ai-filter')
-    ? '/images/category/dog-default-md.svg'
-    : '/images/category/cta-paw.svg')
+  const heroImage =
+    link.imageUrl ||
+    (link.targetPath.startsWith('/ai-filter')
+      ? '/images/category/dog-default-md.svg'
+      : '/images/category/cta-paw.svg')
   const downloadSection = storeLinks
     ? `<section class="stores" aria-label="앱 다운로드"><p class="stores-title">포퐁 앱이 아직 없나요?</p><div class="store-links">${storeLinks}</div></section>`
     : '<section class="stores" aria-label="앱 다운로드"><p class="stores-title">포퐁 앱이 아직 없나요?</p><p class="store-pending">앱 다운로드를 준비 중이에요. 지금은 웹에서 먼저 만나보세요.</p></section>'
@@ -160,7 +167,7 @@ export function renderLanding(
     link.title,
     description,
     metadata,
-    `<div class="hero"><img class="${link.imageUrl ? 'cover' : ''}" src="${escapeHtml(heroImage)}" alt=""${link.imageUrl ? ' referrerpolicy="no-referrer"' : ''}></div><div class="copy"><p class="eyebrow">포퐁에서 만나요</p><h1>${escapeHtml(link.title)}</h1><p class="description">${escapeHtml(description)}</p><div class="actions"><a class="button primary" href="${escapeHtml(appUrl)}">포퐁 앱에서 열기 ↗</a><a class="button" href="${escapeHtml(link.targetPath)}">웹으로 보기</a></div>${downloadSection}<p class="hint">앱이 열리지 않으면 웹에서도 바로 볼 수 있어요.</p></div>`,
+    `<div class="hero"><img class="${link.imageUrl ? 'cover' : ''}" src="${escapeHtml(heroImage)}" alt=""${link.imageUrl ? ' referrerpolicy="no-referrer"' : ''}></div><div class="copy"><p class="eyebrow">포퐁에서 만나요</p><h1>${escapeHtml(link.title)}</h1><p class="description">${escapeHtml(description)}</p><div class="actions"><a id="open-pawpong-app" class="button primary" href="${escapeHtml(appUrl)}" data-ios-store="${escapeHtml(stores.ios ?? '')}" data-android-store="${escapeHtml(stores.android ?? '')}" data-web-url="${escapeHtml(webUrl)}">포퐁 앱에서 열기 ↗</a><a class="button" href="${escapeHtml(link.targetPath)}">웹으로 보기</a></div>${downloadSection}<p class="hint">${storeLinks ? '앱이 없으면 스토어로 연결돼요. ' : ''}웹에서도 바로 볼 수 있어요.</p></div><script src="/scripts/deep-link-open.js" defer></script>`,
   )
 }
 

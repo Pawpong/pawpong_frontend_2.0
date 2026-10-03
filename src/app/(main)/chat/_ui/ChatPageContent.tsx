@@ -9,7 +9,7 @@ import type { ChatRoomResponseDto } from '@/shared/types'
 import { ChatRoomList } from './ChatRoomList'
 import { ChatSidebar } from './ChatSidebar'
 import { ChatRoomPanel } from './ChatRoomPanel'
-import { Button } from '@/shared/ui'
+import { RetryButton, Button } from '@/shared/ui'
 
 const ChatPageContent = () => {
   const router = useRouter()
@@ -65,16 +65,13 @@ const ChatPageContent = () => {
           <Button intent="secondary" size="sm" onClick={handleBack}>
             목록으로
           </Button>
-          <Button
-            intent="dark"
-            size="sm"
-            onClick={() => {
+          <RetryButton
+            onRetry={() => {
               void roomsQuery.refetch()
               void profileQuery.refetch()
             }}
-          >
-            다시 시도
-          </Button>
+            isRetrying={roomsQuery.isFetching || profileQuery.isFetching}
+          />
         </div>
       </div>
     )

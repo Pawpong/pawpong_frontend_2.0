@@ -10,12 +10,10 @@ import { type FilterTab, filterRooms } from './constants'
 const useChatRoomFilter = () => {
   const [filter, setFilter] = React.useState<FilterTab>('all')
   const { userRole } = useAuthStatus()
-  // 방을 열면 소켓 이벤트가 rooms를 invalidate하므로, 폴링은 목록만 보고 있을 때의 보조 수단이다.
-  // 폴링 선언은 이 훅 한 곳에만 둔다 (옵저버마다 걸면 인터벌이 각자 돌아 요청이 중복된다).
+  // 방을 열면 소켓 이벤트가 rooms를 invalidate하고, 목록만 보고 있을 때는 상단 NavBar 의 채팅 뱃지가
+  // 같은 캐시를 30초마다 폴링한다. 옵저버마다 인터벌을 걸면 요청이 중복되므로 여기서는 구독만 한다.
   const roomsQuery = useQuery({
     ...chatQueries.rooms(),
-    refetchInterval: 30_000,
-    refetchIntervalInBackground: false,
     throwOnError: false,
   })
   const filteredRooms = React.useMemo(
@@ -30,6 +28,7 @@ const useChatRoomFilter = () => {
     isLoading: roomsQuery.isLoading,
     isError: roomsQuery.isError,
     refetch: roomsQuery.refetch,
+    isFetching: roomsQuery.isFetching,
   }
 }
 

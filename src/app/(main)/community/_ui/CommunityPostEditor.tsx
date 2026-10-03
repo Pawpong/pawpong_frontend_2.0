@@ -13,7 +13,7 @@ import {
 } from '@/features/ai-image'
 import { PetCategorySuggestion, useSubmitCommunityPostForm } from '@/features/community'
 import { useExitGuard } from '@/shared/lib/useExitGuard'
-import { Button, Container, CtaModal, NavigationBar } from '@/shared/ui'
+import { RetryButton, Container, CtaModal, NavigationBar } from '@/shared/ui'
 import {
   usePostForm,
   PostFormLayout,
@@ -277,16 +277,13 @@ const CommunityPostEditor = ({ postId }: CommunityPostEditorProps) => {
         <Container className="flex flex-1 items-center justify-center px-4 py-10">
           <div role="alert" className="flex flex-col items-center gap-3 text-center">
             <p className="text-sm font-medium text-neutral-700">게시글을 불러오지 못했습니다.</p>
-            <Button
-              intent="dark"
-              size="sm"
-              onClick={() => {
+            <RetryButton
+              onRetry={() => {
                 void postQuery.refetch()
                 void meQuery.refetch()
               }}
-            >
-              다시 시도
-            </Button>
+              isRetrying={postQuery.isFetching || meQuery.isFetching}
+            />
           </div>
         </Container>
       </div>

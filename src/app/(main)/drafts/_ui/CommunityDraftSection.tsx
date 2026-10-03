@@ -11,7 +11,13 @@ import { DraftSection } from './DraftSection'
 /** 카드를 누르면 수정 화면에서 이어서 작성한다 */
 const CommunityDraftSection = () => {
   const router = useRouter()
-  const { data, isPending, isError, refetch } = useQuery({
+  const {
+    data,
+    isPending,
+    isError,
+    refetch,
+    isFetching: isRetrying,
+  } = useQuery({
     ...communityQueries.drafts(),
     refetchOnMount: 'always',
     throwOnError: false,
@@ -36,6 +42,7 @@ const CommunityDraftSection = () => {
         isPending={isPending}
         isError={isError}
         onRetry={() => void refetch()}
+        isRetrying={isRetrying}
         loadingText="임시저장한 글을 불러오는 중입니다."
         errorText="임시저장한 글을 불러오지 못했습니다."
         emptyText="임시저장한 글이 없습니다."

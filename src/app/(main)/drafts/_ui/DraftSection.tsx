@@ -1,7 +1,7 @@
 'use client'
 
 import { useId, type ReactNode } from 'react'
-import { Badge, Button, ListState } from '@/shared/ui'
+import { Badge, ListState } from '@/shared/ui'
 import { TEXT } from '@/shared/config'
 
 interface DraftSectionProps {
@@ -10,6 +10,7 @@ interface DraftSectionProps {
   isPending: boolean
   isError: boolean
   onRetry: () => void
+  isRetrying: boolean
   loadingText: string
   errorText: string
   emptyText: string
@@ -23,6 +24,7 @@ const DraftSection = ({
   isPending,
   isError,
   onRetry,
+  isRetrying,
   loadingText,
   errorText,
   emptyText,
@@ -46,11 +48,8 @@ const DraftSection = ({
         loadingText={loadingText}
         errorText={errorText}
         emptyText={emptyText}
-        errorAction={
-          <Button intent="dark" size="sm" onClick={onRetry}>
-            다시 시도
-          </Button>
-        }
+        onRetry={onRetry}
+        isRetrying={isRetrying}
       >
         {children}
       </ListState>

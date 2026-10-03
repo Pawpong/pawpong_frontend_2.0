@@ -4,9 +4,12 @@ import { Suspense } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname, useSearchParams } from 'next/navigation'
+import { useQuery } from '@tanstack/react-query'
 import { cn } from '@/shared/lib/cn'
 import { MAIN_NAV } from '@/shared/config'
-import { useMe } from '@/features/auth'
+import { UnreadCountBadge } from '@/shared/ui'
+import { chatQueries } from '@/entities/chat'
+import { useAuthStatus, useMe } from '@/features/auth'
 
 // 하단 네비를 노출할 화면. 전체 메뉴로 들어가는 화면들도 포함해, 메뉴를 거쳐 온 뒤에도
 // 탐색·커뮤니티·마이홈으로 돌아갈 진입점이 사라지지 않게 한다.
@@ -48,6 +51,13 @@ const BOTTOM_ICONS: Record<string, string> = {
 
 const BottomNavView = ({ pathname }: { pathname: string }) => {
   const { me } = useMe()
+  const { isLoggedIn } = useAuthStatus()
+  // 폴링은 항상 마운트되는 상단 NavBar 가 맡는다 — 여기서는 같은 캐시만 구독한다
+  const { data: unreadChatCount = 0 } = useQuery({
+    ...chatQueries.unreadCount(),
+    enabled: isLoggedIn,
+    throwOnError: false,
+  })
 
   return (
     <>
@@ -70,8 +80,8 @@ const BottomNavView = ({ pathname }: { pathname: string }) => {
               )}
               aria-current={isActive(pathname) ? 'page' : undefined}
             >
-              {!isActive(pathname) && BOTTOM_ICONS[href] ? (
-                <span className="flex size-[1.875rem] shrink-0 items-center justify-center">
+              <span className="relative flex size-[1.875rem] shrink-0 items-center justify-center">
+                {!isActive(pathname) && BOTTOM_ICONS[href] ? (
                   <Image
                     src={BOTTOM_ICONS[href]}
                     alt=""
@@ -79,14 +89,15 @@ const BottomNavView = ({ pathname }: { pathname: string }) => {
                     height={30}
                     className="size-[1.875rem]"
                   />
-                </span>
-              ) : (
-                <Icon
-                  className="size-[1.875rem] shrink-0"
-                  src={href === '/home' ? me?.profileImageUrl : undefined}
-                  active={isActive(pathname)}
-                />
-              )}
+                ) : (
+                  <Icon
+                    className="size-[1.875rem] shrink-0"
+                    src={href === '/home' ? me?.profileImageUrl : undefined}
+                    active={isActive(pathname)}
+                  />
+                )}
+                {href === '/chat' && <UnreadCountBadge count={unreadChatCount} />}
+              </span>
               <span
                 className={cn(
                   'text-xs leading-[1.5]',

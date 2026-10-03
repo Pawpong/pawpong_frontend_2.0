@@ -31,6 +31,7 @@ const PublicHomePosts = ({ userId, className, gridClassName }: PublicHomePostsPr
       isPending={query.isPending}
       isError={query.isError}
       onRetry={() => void query.refetch()}
+      isRetrying={query.isFetching}
       pagination={{
         onLoadMore: () => void query.fetchNextPage(),
         hasNextPage: query.hasNextPage ?? false,

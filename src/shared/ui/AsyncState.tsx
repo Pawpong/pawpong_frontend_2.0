@@ -1,10 +1,14 @@
 import type { ReactNode } from 'react'
+import { RetryButton } from './RetryButton'
 import { EmptyState } from './EmptyState'
 
 interface AsyncStateProps {
   status: 'loading' | 'error' | 'empty'
   message: ReactNode
   action?: ReactNode
+  /** 오류일 때 action보다 우선한다. 다른 상태에서는 action을 그대로 사용한다. */
+  onRetry?: () => void
+  isRetrying?: boolean
   className?: string
 }
 
@@ -13,12 +17,25 @@ interface AsyncStateProps {
  * 오류는 빈 데이터일 때만 이 컴포넌트로 대체하고, 이전 데이터가 있으면 화면을 유지한다.
  */
 // [refactored] EmptyState 와 동일하던 컨테이너를 제거하고 위임 (일러스트는 empty 에서만 노출)
-const AsyncState = ({ status, message, action, className }: AsyncStateProps) => (
+const AsyncState = ({
+  status,
+  message,
+  action,
+  onRetry,
+  isRetrying,
+  className,
+}: AsyncStateProps) => (
   <EmptyState
     role={status === 'error' ? 'alert' : 'status'}
     illustration={status === 'empty'}
     message={message}
-    action={action}
+    action={
+      status === 'error' && onRetry ? (
+        <RetryButton onRetry={onRetry} isRetrying={isRetrying} />
+      ) : (
+        action
+      )
+    }
     className={className}
   />
 )

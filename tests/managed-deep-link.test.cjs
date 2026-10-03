@@ -50,11 +50,17 @@ test('rejects external, encoded, recursive and privileged link destinations', ()
   ]) {
     assert.equal(helpers.isSafeTargetPath(unsafe), false, unsafe)
   }
-  for (const safe of ['/', '/ai-filter', '/explore?animal=dog', '/notices/123', '/community/post/abc#comments'])
+  for (const safe of [
+    '/',
+    '/ai-filter',
+    '/explore?animal=dog',
+    '/notices/123',
+    '/community/post/abc#comments',
+  ])
     assert.equal(helpers.isSafeTargetPath(safe), true, safe)
 })
 
-test('HTML contains escaped metadata, app and web actions without client JavaScript', async () => {
+test('HTML contains escaped metadata and usable link actions before JavaScript runs', async () => {
   const calls = []
   const get = getRoute(async (url, options) => {
     calls.push({ url, options })
@@ -84,7 +90,15 @@ test('HTML contains escaped metadata, app and web actions without client JavaScr
   assert.match(html, /href="\/explore\?animal=dog"/)
   assert.match(html, /App Store에서 받기/)
   assert.match(html, /Google Play에서 받기/)
-  assert.doesNotMatch(html, /<script|<img src=x|javascript:/)
+  assert.match(response.headers.get('content-security-policy'), /script-src 'self'/)
+  const scriptTag = '<script src="/scripts/deep-link-open.js" defer></script>'
+  assert.ok(html.includes(scriptTag))
+  assert.doesNotMatch(html.replace(scriptTag, ''), /<script|<img src=x|javascript:/)
+  assert.match(html, /data-ios-store="https:\/\/apps.apple.com\/kr\/app\/id123456789"/)
+  assert.match(
+    html,
+    /data-android-store="https:\/\/play.google.com\/store\/apps\/details\?id=kr.pawpong.app"/,
+  )
   assert.equal(calls.length, 3)
   assert.ok(
     calls.every(

@@ -45,10 +45,18 @@ const CommunityContent = () => {
   const { guard, isPromptOpen, setPromptOpen } = useLoginGuard()
   const { me } = useMe()
   const { requestDelete, modalProps: deleteModalProps } = useDeletePostConfirm()
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending, isError, refetch } =
-    useInfiniteQuery(
-      communityQueries.posts(sort, petType || undefined, undefined, appliedSearch || undefined),
-    )
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isPending,
+    isError,
+    refetch,
+    isFetching: isRetrying,
+  } = useInfiniteQuery(
+    communityQueries.posts(sort, petType || undefined, undefined, appliedSearch || undefined),
+  )
   const posts = flattenPages(data)
   const firstPhotoPostId = getFirstPhotoPostId(posts)
   const writePost = guard(() => router.push('/community/write'))
@@ -165,11 +173,8 @@ const CommunityContent = () => {
               isEmpty={!isPending && posts.length === 0}
               loadingText="게시글을 불러오는 중입니다."
               errorText="이야기를 불러오지 못했어요."
-              errorAction={
-                <Button size="md" intent="secondary" onClick={() => void refetch()}>
-                  다시 시도
-                </Button>
-              }
+              onRetry={() => void refetch()}
+              isRetrying={isRetrying}
               emptyText={
                 appliedSearch
                   ? '검색 결과가 없어요. 다른 검색어로 찾아보세요.'

@@ -174,6 +174,7 @@ const useChatRoom = (roomId: string, currentUserId: string) => {
     sendMessage,
     markAsRead,
     refetch: messagesQuery.refetch,
+    isFetching: messagesQuery.isFetching,
   }
 }
 
