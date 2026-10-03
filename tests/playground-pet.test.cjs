@@ -274,6 +274,32 @@ test('config route does not contact any backend when the frontend environment is
     global.fetch = originalFetch
   }
 })
+test('same-token login generations get separate caches and logout immediately closes the session', () => {
+  let generation = 1
+  let current = true
+  const token = `header.${Buffer.from(JSON.stringify({ sub: 'owner', role: 'adopter', iat: 1, exp: 9 })).toString('base64url')}.signature`
+  const auth = load('src/features/playground-pet/lib/usePetSession.ts', {
+    react: {
+      useSyncExternalStore: (_subscribe, getSnapshot) => getSnapshot(),
+      useMemo: (fn) => fn(),
+    },
+    '@/shared/api/token': { getAccessToken: () => token },
+    '@/shared/api/unwrap': { ApiError },
+    '@/shared/lib/authStateEvents': { AUTH_STATE_CHANGED: 'auth' },
+    '@/shared/lib/authSessionLifecycle': {
+      getAuthSessionGeneration: () => generation,
+      isAuthSessionCurrent: (expected) => current && generation === expected,
+    },
+  })
+  const first = auth.usePetSession()
+  generation++
+  const second = auth.usePetSession()
+  assert.equal(first.token, second.token)
+  assert.notEqual(first.scope, second.scope)
+  assert.equal(auth.petSessionIsCurrent(first), false)
+  current = false
+  assert.equal(auth.usePetSession(), null)
+})
 test('backend 404 is a safe disabled config; backend failures are retryable 503', async () => {
   const originalFetch = global.fetch
   const oldBase = process.env.NEXT_PUBLIC_API_BASE_URL

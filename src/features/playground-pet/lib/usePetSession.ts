@@ -8,6 +8,11 @@ import { getAuthSessionGeneration, isAuthSessionCurrent } from '@/shared/lib/aut
 
 export type PetSession = { token: string; scope: string; generation: number }
 
+function sessionSnapshot() {
+  const generation = getAuthSessionGeneration()
+  return JSON.stringify([isAuthSessionCurrent(generation) ? getAccessToken() : null, generation])
+}
+
 function subscribe(listener: () => void) {
   window.addEventListener(AUTH_STATE_CHANGED, listener)
   window.addEventListener('focus', listener)
@@ -22,15 +27,15 @@ function subscribe(listener: () => void) {
 }
 
 export function usePetSession(): PetSession | null {
-  const token = useSyncExternalStore(subscribe, getAccessToken, () => null)
+  const snapshot = useSyncExternalStore(subscribe, sessionSnapshot, () => '[null,0]')
   return useMemo(() => {
+    const [token, generation] = JSON.parse(snapshot) as [string | null, number]
     if (!token) return null
     try {
       // JWT는 캐시 분리에만 사용한다. 자격·권한은 매번 인증된 API에서 검증한다.
       const claims = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')))
       if (typeof claims.sub !== 'string' || !['adopter', 'breeder'].includes(claims.role))
         return null
-      const generation = getAuthSessionGeneration()
       return {
         token,
         generation,
@@ -39,7 +44,7 @@ export function usePetSession(): PetSession | null {
     } catch {
       return null
     }
-  }, [token])
+  }, [snapshot])
 }
 
 export function petSessionIsCurrent(session: PetSession): boolean {
