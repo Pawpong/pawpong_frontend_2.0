@@ -12,17 +12,19 @@ interface NotificationListItemProps {
   item: NotificationResponseDto
   onSelect: (item: NotificationResponseDto) => void
   onDelete?: (item: NotificationResponseDto) => void
+  /** 팝업에서 읽음 처리해 치운다. 알림 원본을 삭제하지 않는다. */
+  onDismiss?: (item: NotificationResponseDto) => void
   compact?: boolean
-  /** 삭제 중인 항목은 버튼을 잠근다 */
-  deleting?: boolean
+  dismissing?: boolean
 }
 
 const NotificationListItem = ({
   item,
   onSelect,
   onDelete,
+  onDismiss,
   compact = false,
-  deleting = false,
+  dismissing = false,
 }: NotificationListItemProps) => {
   const category = notificationCategoryOf(item.type)
   return (
@@ -62,25 +64,21 @@ const NotificationListItem = ({
         </span>
       </button>
 
-      {/* 드롭다운은 바로 지우는 X 버튼, 알림 화면은 확인을 거치는 더보기 메뉴 */}
-      {onDelete &&
-        (compact ? (
-          <IconButton
-            tone="danger"
-            size="xs"
-            edge="end"
-            aria-label={`${item.title} 알림 삭제`}
-            disabled={deleting}
-            onClick={() => onDelete(item)}
-          >
-            <CloseIcon className="size-4" />
-          </IconButton>
-        ) : (
-          <OwnerActionsMenu
-            onDelete={() => onDelete(item)}
-            ariaLabel={`${item.title} 알림 더보기`}
-          />
-        ))}
+      {/* 팝업의 지우기와 센터의 영구 삭제는 서로 다른 동작이다. */}
+      {compact && onDismiss ? (
+        <IconButton
+          tone="muted"
+          size="lg"
+          edge="end"
+          aria-label={`${item.title} 알림 지우기`}
+          disabled={dismissing}
+          onClick={() => onDismiss(item)}
+        >
+          <CloseIcon className="size-4" />
+        </IconButton>
+      ) : !compact && onDelete ? (
+        <OwnerActionsMenu onDelete={() => onDelete(item)} ariaLabel={`${item.title} 알림 더보기`} />
+      ) : null}
     </article>
   )
 }
