@@ -6,7 +6,7 @@ import { dedupeBy } from '@/shared/lib/dedupeBy'
 import { flattenPages, getTotalItems } from '@/shared/lib/infiniteList'
 import { formatDate } from '@/shared/lib/formatDate'
 // [refactored] 타입 배지는 공용 ReviewTypeBadge 사용 (라우트마다 복붙하던 매핑 제거)
-import { Button, Container, InfiniteScrollTrigger, ListState, ReviewTypeBadge } from '@/shared/ui'
+import { Container, InfiniteScrollTrigger, ListState, ReviewTypeBadge } from '@/shared/ui'
 import type { PublicReviewDto } from '@/shared/types'
 
 const REVIEW_PAGE_SIZE = 10
@@ -75,11 +75,8 @@ const PublicBreederReviews = ({ breederId }: PublicBreederReviewsProps) => {
           loadingText="후기를 불러오는 중입니다."
           errorText="후기를 불러오지 못했습니다."
           emptyText="아직 등록된 후기가 없습니다."
-          errorAction={
-            <Button intent="dark" size="sm" onClick={() => void query.refetch()}>
-              다시 시도
-            </Button>
-          }
+          onRetry={() => void query.refetch()}
+          isRetrying={query.isFetching}
         >
           <section className="overflow-hidden rounded-xl border border-neutral-150 bg-white shadow-[0_7px_7px_rgba(55,55,55,0.06)]">
             <div className="divide-y divide-neutral-150">

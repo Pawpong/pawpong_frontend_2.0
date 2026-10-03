@@ -224,6 +224,7 @@ const useAdoptionEditForm = (petId: string) => {
     isLoading: postingQuery.isPending,
     isLoadError: postingQuery.isError && !posting,
     retry: postingQuery.refetch,
+    isFetching: postingQuery.isFetching,
     showGuard,
     cancelExit,
     handleCloseClick,

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { PAGE_WIDTH_CLASS, TEXT } from '@/shared/config'
-import { AlertMessage, Button, Container, InfiniteScrollTrigger, ListState } from '@/shared/ui'
+import { RetryButton, AlertMessage, Container, InfiniteScrollTrigger, ListState } from '@/shared/ui'
 
 interface ActivityListLayoutProps {
   title: string
@@ -12,6 +12,7 @@ interface ActivityListLayoutProps {
   hasNextPage: boolean
   isFetchingNextPage: boolean
   onRetry: () => void
+  isRetrying: boolean
   onLoadMore: () => void
   children: ReactNode
 }
@@ -27,6 +28,7 @@ export const ActivityListLayout = ({
   hasNextPage,
   isFetchingNextPage,
   onRetry,
+  isRetrying,
   onLoadMore,
   children,
 }: ActivityListLayoutProps) => (
@@ -43,20 +45,15 @@ export const ActivityListLayout = ({
         loadingText={`${title}을 불러오는 중입니다.`}
         errorText={`${title}을 불러오지 못했습니다.`}
         emptyText={emptyText}
-        errorAction={
-          <Button intent="dark" size="sm" onClick={onRetry}>
-            다시 시도
-          </Button>
-        }
+        onRetry={onRetry}
+        isRetrying={isRetrying}
       >
         <ul className="flex flex-col gap-4">{children}</ul>
       </ListState>
       {isError && !isEmpty && (
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
           <AlertMessage status="error" message="목록을 갱신하지 못했어요. 다시 시도해 주세요." />
-          <Button intent="secondary" size="sm" onClick={onRetry}>
-            다시 시도
-          </Button>
+          <RetryButton onRetry={onRetry} isRetrying={isRetrying} />
         </div>
       )}
       <InfiniteScrollTrigger

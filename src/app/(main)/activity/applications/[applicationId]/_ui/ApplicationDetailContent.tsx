@@ -24,7 +24,13 @@ const ApplicationDetailContent = ({
   applicationId: string
   backHref: string
 }) => {
-  const { data, isPending, isError, refetch } = useQuery(applicationQueries.detail(applicationId))
+  const {
+    data,
+    isPending,
+    isError,
+    refetch,
+    isFetching: isRetrying,
+  } = useQuery(applicationQueries.detail(applicationId))
   const reviewType = data ? getReviewTypeForStatus(data.status) : null
 
   return (
@@ -35,6 +41,7 @@ const ApplicationDetailContent = ({
       isError={isError}
       hasData={!!data}
       onRetry={() => void refetch()}
+      isRetrying={isRetrying}
     >
       {data && (
         <>

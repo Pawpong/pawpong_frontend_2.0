@@ -258,6 +258,7 @@ const useAdoptionCreateForm = () => {
     isLoadingDraft: Boolean(draftId) && draftQuery.isPending,
     isDraftLoadError: Boolean(draftId) && draftQuery.isError && !draft,
     retryDraft: draftQuery.refetch,
+    isFetching: draftQuery.isFetching,
     showGuard,
     cancelExit,
     handleCloseClick,

@@ -1,5 +1,6 @@
 'use client'
 
+import { RetryButton } from '@/shared/ui'
 import { useEffect, useRef, useState } from 'react'
 import type { CareCoordinates, MappedCarePlace } from '@/entities/care-place'
 import { loadKakaoMaps, type KakaoMapInstance, type KakaoMaps } from '../lib/kakao-map'
@@ -191,16 +192,13 @@ export default function KakaoMapCanvas({
             <>
               <p>지도를 불러오지 못했어요.</p>
               <p className="text-sm">시설 목록은 아래에서 계속 확인할 수 있어요.</p>
-              <button
-                type="button"
-                className="care-map-button"
-                onClick={() => {
+              <RetryButton
+                onRetry={() => {
                   setError(false)
                   setAttempt((value) => value + 1)
                 }}
-              >
-                지도 다시 시도
-              </button>
+                aria-label="지도 다시 시도"
+              />
             </>
           ) : (
             <p className="animate-pulse">우리 동네 지도를 펼치는 중이에요…</p>
