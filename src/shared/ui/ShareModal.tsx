@@ -90,6 +90,7 @@ const ShareModal = ({
   const [kakaoAttempt, setKakaoAttempt] = useState(0)
   const [feedback, setFeedback] = useState<ShareFeedback | null>(null)
   const [pending, setPending] = useState<ShareKey | null>(null)
+  const [previousOpen, setPreviousOpen] = useState(open)
   const inFlight = useRef(false)
   const feedbackVersion = useRef(0)
   const deviceShare = useSyncExternalStore(
@@ -98,14 +99,26 @@ const ShareModal = ({
     serverShareSnapshot,
   )
 
-  // 닫을 때 상태 리셋은 이벤트에서 한다. effect 안에서 동기로 setState 하면
-  // 렌더가 한 번 더 도는 데다(react-hooks/set-state-in-effect) 닫히는 순간 필요도 없다.
-  const handleOpenChange = (next: boolean) => {
-    if (!next) {
+  // 부모가 open=false로 닫아도 다음 열림에 이전 안내/대기 상태를 가져오지 않는다.
+  // 조건부 상태 조정으로 effect 뒤의 추가 렌더 없이 닫힌 렌더에서 정리한다.
+  if (previousOpen !== open) {
+    setPreviousOpen(open)
+    if (!open) {
       setKakaoReady(false)
       setKakaoError(null)
       setFeedback(null)
+      setPending(null)
+    }
+  }
+
+  const handleOpenChange = (next: boolean) => {
+    if (!next) {
       feedbackVersion.current += 1
+      inFlight.current = false
+      setKakaoReady(false)
+      setKakaoError(null)
+      setFeedback(null)
+      setPending(null)
     }
     onOpenChange(next)
   }
@@ -129,6 +142,7 @@ const ShareModal = ({
     return () => {
       cancelled = true
       feedbackVersion.current += 1
+      inFlight.current = false
     }
   }, [open, kakaoAttempt])
 
@@ -196,8 +210,11 @@ const ShareModal = ({
             : '공유하지 못했습니다. 잠시 후 다시 시도해주세요.',
       })
     } finally {
-      inFlight.current = false
-      setPending(null)
+      // 닫힌 팝업의 늦은 완료가 재열린 팝업의 새 요청을 풀지 않도록 한다.
+      if (version === feedbackVersion.current) {
+        inFlight.current = false
+        setPending(null)
+      }
     }
   }
 
