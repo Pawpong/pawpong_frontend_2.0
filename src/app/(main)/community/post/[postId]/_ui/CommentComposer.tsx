@@ -154,7 +154,8 @@ const CommentComposer = ({
           maxLength={1000}
           className="min-w-0 flex-1"
         />
-        <div className="flex w-24 shrink-0">
+        {/* 채팅 보내기와 같은 폭 — 진행 상태는 아래 안내 문구가 알려 주므로 라벨은 고정한다 */}
+        <div className="flex min-w-14 shrink-0">
           <Button
             size="md"
             type="submit"
@@ -165,7 +166,7 @@ const CommentComposer = ({
             aria-busy={busy}
             width="full"
           >
-            {busy ? '게시 중…' : '게시'}
+            게시
           </Button>
         </div>
       </form>
