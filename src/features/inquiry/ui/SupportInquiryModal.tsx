@@ -139,7 +139,7 @@ const SupportChat = ({
                   </DialogPrimitive.Title>
                 </div>
                 <IconButton
-                  tone="muted"
+                  tone="brand"
                   size="touch"
                   onClick={() => onOpenChange(false)}
                   aria-label="AI 문의 닫기"
