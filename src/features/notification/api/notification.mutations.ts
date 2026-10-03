@@ -2,6 +2,7 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { notificationQueries } from '@/entities/notification'
+import type { NotificationBulkDeleteFilter } from '@/shared/types'
 import {
   markAsRead,
   markAllAsRead,
@@ -42,7 +43,7 @@ export const useDeleteNotification = () => {
 export const useDeleteAllNotifications = () => {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: deleteAllNotifications,
+    mutationFn: (filter?: NotificationBulkDeleteFilter) => deleteAllNotifications(filter),
     onSuccess: async () => {
       // 삭제 전 진행 중이던 조회와 누적 페이지를 비우고 목록·헤더 배지를 함께 갱신한다.
       await qc.resetQueries({ queryKey: notificationQueries.all() }, { cancelRefetch: true })
