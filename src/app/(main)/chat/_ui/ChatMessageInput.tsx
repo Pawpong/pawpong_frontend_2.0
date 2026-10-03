@@ -7,7 +7,7 @@ import { normalizeApiError } from '@/shared/api'
 import { Button, CtaModal, Textarea } from '@/shared/ui'
 import { LocationPinIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
-import { preparePhoto } from '@/shared/lib/preparePhoto'
+import { isPhotoFile, preparePhoto } from '@/shared/lib/preparePhoto'
 import type { ChatMessageType } from '@/shared/types'
 import { CHAT_CONTENT_WIDTH, CHAT_GUTTER_X } from '../_lib/constants'
 import { serializeChatAttachment, type ChatLocationPayload } from '../_lib/attachment'
@@ -115,7 +115,9 @@ const ChatMessageInput = ({ onSend, disabled, unavailableMessage }: ChatMessageI
     }
   }
 
-  const handleAttachment = async (file: File, messageType: 'image' | 'file') => {
+  // 사진은 정리(축소·JPG·위치 메타데이터 제거) 후 사진 말풍선으로, 그 밖의 파일은 원본 그대로 파일 카드로 보낸다
+  const handleAttachment = async (file: File) => {
+    const messageType = isPhotoFile(file) ? 'image' : 'file'
     if (isDisabled || preparingAttachment.current) return
     setAttachmentError(null)
 
