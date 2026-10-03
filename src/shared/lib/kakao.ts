@@ -50,8 +50,16 @@ const loadScript = () => {
     const script = document.createElement('script')
     script.src = SDK_URL
     script.async = true
-    script.onload = () => resolve()
+    script.onload = () => {
+      if (window.Kakao) resolve()
+      else {
+        scriptPromise = null
+        script.remove()
+        reject(new Error('카카오 공유를 불러오지 못했습니다. 다시 시도해주세요.'))
+      }
+    }
     script.onerror = () => {
+      script.remove()
       scriptPromise = null
       reject(new Error('Kakao SDK 로드 실패'))
     }
