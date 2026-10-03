@@ -161,6 +161,8 @@ test('public API uses placement and abort signal without credentials or refresh,
   assert.equal(calls[0][1].skipAuth, true)
   assert.equal(calls[0][1].skipAuthRefresh, true)
   assert.equal(calls[0][1].withCredentials, false)
+  // 운영 CORS는 Cache-Control 요청 헤더를 허용하지 않는다.
+  assert.equal(calls[0][1].headers, undefined)
   response = undefined
   await assert.rejects(getFeatureHighlights('home'))
 })
