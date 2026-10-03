@@ -8,7 +8,11 @@ function load(path, deps = {}) {
     'exports',
     'require',
     ts.transpileModule(fs.readFileSync(path, 'utf8'), {
-      compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+      compilerOptions: {
+        module: ts.ModuleKind.CommonJS,
+        target: ts.ScriptTarget.ES2022,
+        jsx: ts.JsxEmit.ReactJSX,
+      },
     }).outputText,
   )(out, (id) => deps[id] ?? (id === 'zod' ? require('zod') : assert.fail(id)))
   return out
@@ -88,6 +92,7 @@ test('malformed bridge messages are sanitized and cancellation never becomes a r
   let reply = { status: 'cancelled' }
   const { nativeIap } = load('src/shared/lib/nativeIap.ts', {
     './nativeBridge': { requestNative: async () => reply },
+    '../config/playground': { PLAYGROUND_BILLING_ENABLED: true },
   })
   const input = {
     productId: 'credits',
@@ -178,4 +183,60 @@ test('verification HTTP body cannot include client grants or prices and does not
   ])
   assert.equal(config.headers.Authorization, 'Bearer original-access')
   assert.equal(config.skipAuthRefresh, true)
+})
+
+test('release lock blocks both credit and subscription purchases before any native message', async () => {
+  const calls = []
+  const { nativeIap } = load('src/shared/lib/nativeIap.ts', {
+    '../config/playground': load('src/shared/config/playground.ts'),
+    './nativeBridge': { requestNative: async (...args) => calls.push(args) },
+  })
+  for (const productType of ['in-app', 'subs']) {
+    await assert.rejects(
+      nativeIap.purchase({
+        productId: 'credits',
+        productType,
+        accountToken: '37e9e344-d494-4e6b-bb4c-e855dc221610',
+      }),
+      /지금은 결제를 이용할 수 없어요/,
+    )
+  }
+  assert.deepEqual(calls, [])
+})
+
+test('release lock keeps existing purchase recovery and transaction finalization available', async () => {
+  const calls = []
+  const { nativeIap } = load('src/shared/lib/nativeIap.ts', {
+    '../config/playground': load('src/shared/config/playground.ts'),
+    './nativeBridge': {
+      requestNative: async (_capability, type) => {
+        calls.push(type)
+        return type === 'IAP_FINISH'
+          ? { status: 'finished' }
+          : { status: 'ok', purchases: [purchase] }
+      },
+    },
+  })
+  assert.equal((await nativeIap.purchases(true)).length, 1)
+  await nativeIap.finish('native-original', true)
+  assert.deepEqual(calls, ['IAP_RESTORE', 'IAP_FINISH'])
+})
+
+test('direct billing component renders no purchase UI and starts no billing hooks before launch', () => {
+  const React = require('react')
+  const { renderToStaticMarkup } = require('react-dom/server')
+  const forbidden = () => assert.fail('billing hooks must not run while locked')
+  const { PlaygroundBilling } = load('src/features/in-app-purchase/ui/PlaygroundBilling.tsx', {
+    react: { useState: forbidden, useEffect: forbidden },
+    'react/jsx-runtime': require('react/jsx-runtime'),
+    'next/link': {},
+    '@tanstack/react-query': { useQuery: forbidden },
+    '@/entities/iap': {},
+    '@/shared/lib/nativeIap': {},
+    '@/shared/ui': {},
+    '@/shared/config/playground': load('src/shared/config/playground.ts'),
+    './PurchaseProvider': { usePurchases: forbidden },
+    '../model/storeProducts': {},
+  })
+  assert.equal(renderToStaticMarkup(React.createElement(PlaygroundBilling)), '')
 })
