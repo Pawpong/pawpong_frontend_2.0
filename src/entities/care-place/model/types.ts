@@ -5,7 +5,7 @@ export interface CareCoordinates {
   longitude: number
 }
 
-export interface CarePlace extends CareCoordinates {
+export interface CarePlace {
   id: string
   name: string
   kind: CarePlaceKind
@@ -13,17 +13,24 @@ export interface CarePlace extends CareCoordinates {
   address: string
   roadAddress: string
   phone: string | null
-  distanceMeters: number
+  latitude: number | null
+  longitude: number | null
+  distanceMeters: number | null
   placeUrl: string
-  directionsUrl: string
+  directionsUrl: string | null
   referral: { url: string; checkedAt: string; label: string } | null
+  locationStatus?: 'place' | 'address' | 'not-found' | 'unavailable'
+  registration?: { source: string; url: string; checkedAt: string; jurisdictions: string[] }
 }
+
+export type MappedCarePlace = CarePlace & CareCoordinates & { markerNumber: number }
 
 export interface CarePlaceSearch extends CareCoordinates {
   kind: CarePlaceKind
   query: string
   radius: number
-  scope: 'nearby' | 'keyword'
+  scope: 'nearby' | 'keyword' | 'directory'
+  region: string
   referralOnly: boolean
 }
 
@@ -32,5 +39,18 @@ export interface CarePlacePage {
   page: number
   hasMore: boolean
   limited: boolean
-  source: 'kakao'
+  source: 'kakao' | 'animal-go'
+  totalCount?: number
+  totalPages?: number
+  locationUnavailable?: boolean
+}
+
+export interface CareDirectorySummary {
+  checkedAt: string
+  hospitalCount: number
+  shelterCount: number
+  shelterRegistrations: number
+  referralCount: number
+  sourceUrls: Record<CarePlaceKind, string>
+  regions: { id: string; label: string }[]
 }

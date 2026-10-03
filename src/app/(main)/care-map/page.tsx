@@ -3,9 +3,9 @@ import { createPageMetadata } from '@/shared/lib/metadata'
 import { CareMapContent } from '@/features/care-map'
 
 export const metadata = createPageMetadata({
-  title: '우리 동네 돌봄 지도',
+  title: '전국 돌봄 지도',
   description:
-    '가까운 동물병원과 보호·입양시설을 찾아보세요. 시설 정보부터 전화, 길찾기까지 함께해요.',
+    '전국 동물병원과 유기동물 보호센터를 찾아보세요. 공식 등록 정보부터 전화, 길찾기까지 함께해요.',
   path: '/care-map',
 })
 
