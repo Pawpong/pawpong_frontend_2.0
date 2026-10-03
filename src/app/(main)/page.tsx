@@ -5,7 +5,7 @@ import { HallOfFame } from '@/widgets/hall-of-fame'
 import { AdoptionShowcase } from '@/widgets/adoption-showcase'
 import { CommunityShowcase } from '@/widgets/community-showcase'
 import { CategoryBrowse } from '@/features/category-browse'
-import { CareMapEntry } from '@/widgets/care-map-entry'
+import { ManagedFeatureHighlights } from './_ui/ManagedFeatureHighlights'
 
 export const metadata = createPageMetadata({
   title: '포퐁',
@@ -20,7 +20,7 @@ const HomePage = () => {
       <Banner />
 
       <CategoryBrowse />
-      <CareMapEntry />
+      <ManagedFeatureHighlights placement="home" />
 
       <HallOfFame />
       <AdoptionShowcase />
