@@ -84,11 +84,16 @@ export function PawpongAnalytics() {
       browser.dataLayer.push({ event: 'pawpong_page_view', ...parameters })
     }
 
-    // RN injects capabilities before content loads; a brief yield also covers Android's onLoad injection.
-    const timer = window.setTimeout(track, /PawpongApp\//.test(navigator.userAgent) ? 300 : 0)
+    // Only the first view waits for RN's onLoad capability injection. Later committed
+    // navigation must track immediately so quick visits/back navigation are not lost.
+    const timer =
+      transport.current === null && /PawpongApp\//.test(navigator.userAgent)
+        ? window.setTimeout(track, 300)
+        : undefined
+    if (timer === undefined) track()
     document.addEventListener('visibilitychange', track)
     return () => {
-      window.clearTimeout(timer)
+      if (timer !== undefined) window.clearTimeout(timer)
       document.removeEventListener('visibilitychange', track)
     }
   }, [pathname])
