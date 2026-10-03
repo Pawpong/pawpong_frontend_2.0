@@ -6,6 +6,14 @@ const React = require('react')
 const { renderToStaticMarkup } = require('react-dom/server')
 const { QueryClient, QueryObserver } = require('@tanstack/react-query')
 
+const searchState = {}
+new Function(
+  'exports',
+  ts.transpileModule(fs.readFileSync('src/features/care-map/lib/care-search-state.ts', 'utf8'), {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 },
+  }).outputText,
+)(searchState)
+
 const compiled = ts.transpileModule(
   fs.readFileSync('src/features/care-map/ui/CareMapContent.tsx', 'utf8'),
   {
@@ -30,6 +38,7 @@ function renderer(getResult) {
     '@/entities/care-place': {},
     '@/shared/lib/fonts': { cafe24Proup: { className: 'test-font' } },
     '../lib/care-location': {},
+    '../lib/care-search-state': searchState,
     '@/shared/ui/FeatureIntro': {
       FeatureIntro: ({ children }) => React.createElement('header', null, children),
     },
