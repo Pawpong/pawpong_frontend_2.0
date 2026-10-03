@@ -10,7 +10,7 @@ import { uniqueBy } from '@/shared/lib/uniqueBy'
 import { useOpenNotification, useMarkAsRead, useMarkAllAsRead } from '@/features/notification'
 import { normalizeApiError } from '@/shared/api'
 import type { NotificationResponseDto } from '@/shared/types'
-import { Button, EmptyState, ActionSheetItem } from '@/shared/ui'
+import { Button, EmptyState, ActionSheetItem, UnreadCountBadge } from '@/shared/ui'
 
 // Figma icon/ bell (1596:77455 세트, 1596:97271) — nav 아이콘과 같은 픽셀 글리프라 currentColor 로 그린다.
 // Figma 원본은 속이 찬 실루엣 하나뿐이라, nav 아이콘들처럼 비활성은 외곽선만 남기고
@@ -119,11 +119,7 @@ const NotificationBell = ({ className }: { className?: string }) => {
       >
         <span className="relative flex size-7 items-center justify-center">
           <BellIcon className="size-7" filled={open} />
-          {unreadCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-error-500 px-1 text-[0.625rem] leading-none font-semibold text-white">
-              {unreadCount > 99 ? '99+' : unreadCount}
-            </span>
-          )}
+          <UnreadCountBadge count={unreadCount} />
         </span>
         <span className="hidden pc:inline">알림</span>
       </button>
