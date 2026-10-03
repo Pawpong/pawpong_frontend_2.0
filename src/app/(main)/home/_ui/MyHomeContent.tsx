@@ -85,6 +85,13 @@ const MyHomeContent = () => {
     )
   }
 
+  const introProps = {
+    nickname: profileCardProps.profile.nickname,
+    description: myProfile?.longDescription,
+    photos: myProfile?.representativePhotos,
+    editHref: '/profile/edit',
+  }
+
   return (
     <div className="flex w-full flex-col">
       {/* 스크롤 시 GNB 아래 고정(sticky) — tab+만. PC는 사이드바가 프로필/현재 위치를 이미 보여줘
@@ -108,11 +115,14 @@ const MyHomeContent = () => {
         activeTab={activeTab}
         onTabChange={setSelectedTab}
         sidebar={
-          <ProfileCard
-            {...profileCardProps}
-            layout="sidebar"
-            menu={<MyHomeActionMenu isBreeder={isBreeder} />}
-          />
+          <>
+            <ProfileCard
+              {...profileCardProps}
+              layout="sidebar"
+              menu={<MyHomeActionMenu isBreeder={isBreeder} />}
+            />
+            {isBreeder && <BreederIntroduction {...introProps} placement="profile" />}
+          </>
         }
         sideLinks={isBreeder ? BREEDER_MY_HOME_SIDE_LINKS : MY_HOME_SIDE_LINKS}
       >
@@ -121,12 +131,7 @@ const MyHomeContent = () => {
             분양 페이지 진입점은 전부 이 탭(/home)으로 온다 */}
         {isBreeder && (
           <TabsContent value="listings" className="mt-0">
-            <BreederIntroduction
-              nickname={profileCardProps.profile.nickname}
-              description={myProfile?.longDescription}
-              photos={myProfile?.representativePhotos}
-              editHref="/profile/edit"
-            />
+            <BreederIntroduction {...introProps} placement="tab" />
 
             {/* 작성 진입점은 + 메뉴(모바일 상단 바·2단 프로필 카드)가 맡는다 */}
             <Container className="py-8 tab:py-10">
