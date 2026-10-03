@@ -1,22 +1,11 @@
 import type { SVGProps } from 'react'
-
-// 같은 픽셀 윤곽을 유지하고 별 안쪽만 채워 선택 상태를 구분한다.
-const STAR_PATH =
-  'M10 2H14V6H16V8H22V12H20V14H18V16H20V22H16V20H14V18H10V20H8V22H4V16H6V14H4V12H2V8H8V6H10Z'
+import { PixelActionIcon } from './PixelActionIcon'
 
 export const ProfileStarIcon = ({
   filled = false,
   ...props
 }: SVGProps<SVGSVGElement> & { filled?: boolean }) => (
-  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
-    <path
-      d={STAR_PATH}
-      fill={filled ? 'var(--color-point-500)' : 'none'}
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinejoin="miter"
-    />
-  </svg>
+  <PixelActionIcon glyph="star" filled={filled} {...props} />
 )
 
 // 가져온 사이렌 경로는 유지하고, 실제 도형의 중심에 맞춰 여백을 정규화한다.
