@@ -12,6 +12,13 @@ export const chatQueries = {
       staleTime: STALE_TIME.REALTIME,
     }),
 
+  // nav 채팅 뱃지용 안 읽은 메시지 합계 — 방 목록과 같은 캐시라 소켓·전송 후 invalidate 가 그대로 반영된다
+  unreadCount: () =>
+    queryOptions({
+      ...chatQueries.rooms(),
+      select: (rooms) => rooms.reduce((sum, room) => sum + room.unreadCount, 0),
+    }),
+
   messages: (roomId: string, limit = 50) =>
     queryOptions({
       queryKey: [...chatQueries.all(), 'messages', roomId, limit],
