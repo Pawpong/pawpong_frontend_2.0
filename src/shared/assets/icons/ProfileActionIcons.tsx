@@ -5,7 +5,7 @@ export const ProfileStarIcon = ({
   filled = false,
   ...props
 }: SVGProps<SVGSVGElement> & { filled?: boolean }) => (
-  <PixelActionIcon glyph="star" filled={filled} {...props} />
+  <PixelActionIcon glyph="star" filled={filled} selectedFill="var(--color-point-500)" {...props} />
 )
 
 // 가져온 사이렌 경로는 유지하고, 실제 도형의 중심에 맞춰 여백을 정규화한다.
