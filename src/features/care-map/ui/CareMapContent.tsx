@@ -1,9 +1,9 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { useCallback, useMemo, useRef, useState, type FormEvent } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Button } from '@/shared/ui/Button'
+import { cafe24Proup } from '@/shared/lib/fonts'
 import { FeatureIntro } from '@/shared/ui/FeatureIntro'
 import {
   getCareDirectorySummary,
@@ -17,6 +17,7 @@ import {
 import { CareMapIcon } from './CareMapIcon'
 import { CarePlaceDetails } from './CarePlaceDetails'
 import { CareMapGuide } from './CareMapGuide'
+import { careLocationFailureMessage, startCareLocation } from '../lib/care-location'
 import './care-map.css'
 
 const KakaoMapCanvas = dynamic(() => import('./KakaoMapCanvas'), {
@@ -48,6 +49,29 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
     '전국 등록 시설을 보여드려요. 지역을 선택하면 더 쉽게 찾을 수 있어요.',
   )
   const viewportCenter = useRef<CareCoordinates>(DEFAULT_CENTER)
+  const cancelLocation = useRef<() => void>(() => {})
+  const cancelPendingLocation = useCallback(() => {
+    cancelLocation.current()
+    setLocating(false)
+  }, [])
+  useEffect(() => {
+    const cancel = startCareLocation(navigator, 'granted-only', {
+      onChecking: () => setLocating(true),
+      onLocated: (center) => {
+        setLocating(false)
+        viewportCenter.current = center
+        setSearch((current) => ({ ...current, ...center, scope: 'nearby', referralOnly: false }))
+        setCenterRequest(center)
+        setLocationMessage('내 위치에서 가까운 시설이에요. 방문 전 전화로 확인해 주세요.')
+      },
+      onFailure: (reason) => {
+        setLocating(false)
+        setLocationMessage(careLocationFailureMessage(reason))
+      },
+    })
+    cancelLocation.current = cancel
+    return () => cancelLocation.current()
+  }, [])
   const detailRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<HTMLOListElement>(null)
   const config = useQuery({
@@ -95,6 +119,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
     summary.data?.regions.find((region) => region.id === search.region)?.label ?? '전국'
 
   const updateSearch = (next: CarePlaceSearch) => {
+    cancelPendingLocation()
     setSelectedId(null)
     setCenterRequest(null)
     setPage(1)
@@ -116,17 +141,21 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
         : '일반 진료는 가까운 병원부터, 전문 진료는 의뢰 안내를 확인해 보세요.',
     )
   }
-  const onSelect = useCallback((id: string) => {
-    setSelectedId(id)
-    requestAnimationFrame(() => {
-      if (window.matchMedia('(max-width: 1023px)').matches)
-        detailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-      else
-        listRef.current
-          ?.querySelector<HTMLElement>(`[data-place-id="${CSS.escape(id)}"]`)
-          ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-    })
-  }, [])
+  const onSelect = useCallback(
+    (id: string) => {
+      cancelPendingLocation()
+      setSelectedId(id)
+      requestAnimationFrame(() => {
+        if (window.matchMedia('(max-width: 1023px)').matches)
+          detailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+        else
+          listRef.current
+            ?.querySelector<HTMLElement>(`[data-place-id="${CSS.escape(id)}"]`)
+            ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      })
+    },
+    [cancelPendingLocation],
+  )
   const onCenterChange = useCallback((center: CareCoordinates) => {
     viewportCenter.current = center
   }, [])
@@ -147,40 +176,21 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
     setLocationMessage('지도 중심에서 가까운 카카오 등록 시설이에요. 거리는 직선 거리예요.')
   }
   const locate = () => {
-    if (!navigator.geolocation) {
-      setLocationMessage('현재 위치를 확인할 수 없어요. 지역을 선택해 주세요.')
-      return
-    }
-    setLocating(true)
-    navigator.geolocation.getCurrentPosition(
-      ({ coords }) => {
-        setLocating(false)
-        if (
-          coords.latitude < 32 ||
-          coords.latitude > 39 ||
-          coords.longitude < 123 ||
-          coords.longitude > 133
-        ) {
-          setLocationMessage('국내 시설을 제공하고 있어요. 찾으실 지역을 선택해 주세요.')
-          return
-        }
-        const center = { latitude: coords.latitude, longitude: coords.longitude }
+    cancelPendingLocation()
+    cancelLocation.current = startCareLocation(navigator, 'manual', {
+      onChecking: () => setLocating(true),
+      onLocated: (center) => {
         viewportCenter.current = center
         setInput('')
         updateSearch({ ...search, ...center, query: '', scope: 'nearby', referralOnly: false })
         setCenterRequest(center)
         setLocationMessage('내 위치에서 가까운 시설이에요. 방문 전 전화로 확인해 주세요.')
       },
-      (error) => {
+      onFailure: (reason) => {
         setLocating(false)
-        setLocationMessage(
-          error.code === 1
-            ? '위치 권한이 꺼져 있어요. 지역을 선택하거나 브라우저에서 위치 권한을 켜 주세요.'
-            : '현재 위치를 확인하지 못했어요. 지역을 선택하거나 다시 시도해 주세요.',
-        )
+        setLocationMessage(careLocationFailureMessage(reason))
       },
-      { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 },
-    )
+    })
   }
 
   return (
@@ -189,51 +199,48 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
         아플 때 찾아갈 병원, 새 가족을 기다리는 보호소.
         <br className="tab:hidden" /> 포퐁에서 가까이 만나보세요.
       </FeatureIntro>
-      <div className="mt-4 mb-6">
-        {summary.data && (
-          <div className="care-map-counts" aria-label="전국 등록 시설 수">
-            <button type="button" onClick={() => changeKind('hospital')}>
-              <span>동물병원</span>
-              <strong>
-                {summary.data.hospitalCount.toLocaleString()}
-                <small>곳</small>
-              </strong>
+      <div className="care-map-counts" role="group" aria-label="시설 종류 · 전국 등록 시설 수">
+        {(['hospital', 'shelter'] as const).map((kind) => {
+          const active = search.kind === kind
+          const count =
+            kind === 'hospital' ? summary.data?.hospitalCount : summary.data?.shelterCount
+          return (
+            <button
+              key={kind}
+              type="button"
+              aria-pressed={active}
+              onClick={() => changeKind(kind)}
+              className={`care-map-category ${active ? 'care-map-category-active' : ''}`}
+            >
+              <span className="care-map-category-heading">
+                <CareMapIcon name={kind} className="size-5 shrink-0" />
+                <span className={cafe24Proup.className}>
+                  {kind === 'hospital' ? '동물병원' : '보호센터'}
+                </span>
+                <span className="care-map-selection" aria-hidden="true">
+                  {active ? '✓' : ''}
+                </span>
+              </span>
+              <span className="care-map-count">
+                <span className="care-map-count-label">전국 등록</span>
+                {count === undefined ? (
+                  <span className="care-map-count-label">
+                    {summary.isError ? '집계 확인 불가' : '확인 중'}
+                  </span>
+                ) : (
+                  <strong>
+                    <span>{count.toLocaleString()}</span>
+                    <small>곳</small>
+                  </strong>
+                )}
+              </span>
             </button>
-            <span className="h-9 border-l border-primary-100" aria-hidden="true" />
-            <button type="button" onClick={() => changeKind('shelter')}>
-              <span>보호센터</span>
-              <strong>
-                {summary.data.shelterCount.toLocaleString()}
-                <small>곳</small>
-              </strong>
-            </button>
-          </div>
-        )}
-      </div>
-
-      <div className="care-map-tabs" role="group" aria-label="시설 종류">
-        <button
-          type="button"
-          aria-pressed={!isShelter}
-          onClick={() => changeKind('hospital')}
-          className={`care-map-category ${!isShelter ? 'care-map-category-active' : ''}`}
-        >
-          <CareMapIcon name="hospital" />
-          동물병원
-        </button>
-        <button
-          type="button"
-          aria-pressed={isShelter}
-          onClick={() => changeKind('shelter')}
-          className={`care-map-category ${isShelter ? 'care-map-category-active' : ''}`}
-        >
-          <CareMapIcon name="shelter" />
-          유기동물 보호센터
-        </button>
+          )
+        })}
       </div>
 
       <div className="care-map-search-panel">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="care-map-search-fields">
           <label className="care-map-region">
             <CareMapIcon name="pin" className="size-4" />
             <select
@@ -263,7 +270,10 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
             <input
               id="care-place-search"
               value={input}
-              onChange={(event) => setInput(event.target.value)}
+              onChange={(event) => {
+                cancelPendingLocation()
+                setInput(event.target.value)
+              }}
               maxLength={80}
               placeholder={isShelter ? '보호센터 이름 또는 지역 검색' : '병원 이름 또는 지역 검색'}
               enterKeyHint="search"
@@ -271,19 +281,22 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
             {input && (
               <button
                 type="button"
-                onClick={() => setInput('')}
+                onClick={() => {
+                  cancelPendingLocation()
+                  setInput('')
+                }}
                 className="care-map-icon-button"
                 aria-label="검색어 지우기"
               >
                 <CareMapIcon name="close" className="size-4" />
               </button>
             )}
-            <Button type="submit" size="md">
+            <button type="submit" className={`care-map-search-submit ${cafe24Proup.className}`}>
               검색
-            </Button>
+            </button>
           </form>
         </div>
-        <div className="mt-3 flex flex-wrap items-center gap-2">
+        <div className="care-map-filters">
           <button
             type="button"
             className={`care-map-chip ${isDirectory && !search.referralOnly ? 'care-map-chip-active' : ''}`}
@@ -474,6 +487,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
                 className="care-map-button"
                 disabled={page === 1 || result.isFetching}
                 onClick={() => {
+                  cancelPendingLocation()
                   setSelectedId(null)
                   setPage(page - 1)
                 }}
@@ -489,6 +503,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
                 className="care-map-button"
                 disabled={!result.data?.hasMore || result.isFetching}
                 onClick={() => {
+                  cancelPendingLocation()
                   setSelectedId(null)
                   setPage(page + 1)
                 }}
@@ -506,7 +521,12 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
         </section>
 
         <div className="order-1 min-w-0 lap:sticky lap:top-20 lap:order-2">
-          <div className="care-map-canvas relative h-[340px] overflow-hidden tab:h-[440px] lap:h-[530px]">
+          <div
+            className="care-map-canvas relative h-[340px] overflow-hidden tab:h-[440px] lap:h-[530px]"
+            onPointerDownCapture={cancelPendingLocation}
+            onWheelCapture={cancelPendingLocation}
+            onKeyDownCapture={cancelPendingLocation}
+          >
             {config.data ? (
               <KakaoMapCanvas
                 javascriptKey={config.data.javascriptKey}

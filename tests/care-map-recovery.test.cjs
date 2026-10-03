@@ -28,7 +28,8 @@ function renderer(getResult) {
       useQuery: ({ queryKey }) => (queryKey[0] === 'care-places' ? getResult() : {}),
     },
     '@/entities/care-place': {},
-    '@/shared/ui/Button': { Button: (props) => React.createElement('button', props) },
+    '@/shared/lib/fonts': { cafe24Proup: { className: 'test-font' } },
+    '../lib/care-location': {},
     '@/shared/ui/FeatureIntro': {
       FeatureIntro: ({ children }) => React.createElement('header', null, children),
     },
