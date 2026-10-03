@@ -1,6 +1,7 @@
 import { createPageMetadata } from '@/shared/lib/metadata'
 
 import { PlaygroundContent } from './_ui/PlaygroundContent'
+import { ManagedFeatureHighlights } from '../_ui/ManagedFeatureHighlights'
 
 export const metadata = createPageMetadata({
   title: '놀이터',
@@ -9,5 +10,10 @@ export const metadata = createPageMetadata({
 })
 
 export default function PlaygroundPage() {
-  return <PlaygroundContent />
+  return (
+    <>
+      <PlaygroundContent />
+      <ManagedFeatureHighlights placement="playground" />
+    </>
+  )
 }
