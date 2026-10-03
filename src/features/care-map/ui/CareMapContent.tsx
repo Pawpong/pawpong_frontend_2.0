@@ -146,12 +146,15 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
       cancelPendingLocation()
       setSelectedId(id)
       requestAnimationFrame(() => {
+        const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+          ? 'auto'
+          : 'smooth'
         if (window.matchMedia('(max-width: 1023px)').matches)
-          detailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+          detailRef.current?.scrollIntoView({ behavior, block: 'nearest' })
         else
           listRef.current
             ?.querySelector<HTMLElement>(`[data-place-id="${CSS.escape(id)}"]`)
-            ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+            ?.scrollIntoView({ behavior, block: 'nearest' })
       })
     },
     [cancelPendingLocation],
