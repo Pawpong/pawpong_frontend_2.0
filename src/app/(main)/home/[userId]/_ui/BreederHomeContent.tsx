@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { AsyncState, Button } from '@/shared/ui'
+import { AsyncState } from '@/shared/ui'
 import { transientQueryRecoveryOptions } from '@/shared/api'
 import { breederQueries } from '@/entities/breeder'
 import { HomeTabs, TabsContent } from '../../_ui/HomeTabs'
@@ -34,13 +34,8 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
         message={
           profileQuery.isError ? '프로필을 불러오지 못했습니다.' : '프로필을 불러오는 중입니다.'
         }
-        action={
-          profileQuery.isError ? (
-            <Button intent="dark" size="sm" onClick={() => void profileQuery.refetch()}>
-              다시 시도
-            </Button>
-          ) : undefined
-        }
+        onRetry={profileQuery.isError ? () => void profileQuery.refetch() : undefined}
+        isRetrying={profileQuery.isFetching}
         className="min-h-[calc(100dvh-3.5rem)]"
       />
     )

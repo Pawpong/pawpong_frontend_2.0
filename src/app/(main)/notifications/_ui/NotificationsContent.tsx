@@ -24,6 +24,7 @@ import type {
 import { dedupeBy } from '@/shared/lib/dedupeBy'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import {
+  RetryButton,
   Button,
   Chip,
   Container,
@@ -72,12 +73,20 @@ const NotificationsContent = () => {
   const [category, setCategory] = useState<NotificationCategory | undefined>()
   const [readFilter, setReadFilter] = useState<ReadFilter>('all')
   const isRead = readFilter === 'all' ? undefined : readFilter === 'read'
-  const { data, isPending, isError, hasNextPage, fetchNextPage, isFetchingNextPage, refetch } =
-    useInfiniteQuery({
-      ...notificationQueries.list({ category, isRead }),
-      refetchOnMount: 'always',
-      throwOnError: false,
-    })
+  const {
+    data,
+    isPending,
+    isError,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+    refetch,
+    isFetching: isRetrying,
+  } = useInfiniteQuery({
+    ...notificationQueries.list({ category, isRead }),
+    refetchOnMount: 'always',
+    throwOnError: false,
+  })
   const { mutate: markAllAsRead, isPending: isMarkingAll } = useMarkAllAsRead()
   const { mutate: deleteNotification, isPending: isDeleting } = useDeleteNotification()
   const { mutate: deleteAllNotifications, isPending: isDeletingAll } = useDeleteAllNotifications()
@@ -147,9 +156,10 @@ const NotificationsContent = () => {
               </p>
             </div>
             {unreadCountQuery.isError ? (
-              <Button intent="link" onClick={() => void unreadCountQuery.refetch()} size="sm">
-                다시 시도
-              </Button>
+              <RetryButton
+                onRetry={() => void unreadCountQuery.refetch()}
+                isRetrying={unreadCountQuery.isFetching}
+              />
             ) : unreadCount > 0 ? (
               <Button
                 intent="link"
@@ -241,11 +251,8 @@ const NotificationsContent = () => {
             loadingText="알림을 불러오는 중입니다."
             errorText="알림을 불러오지 못했습니다."
             emptyText={isFiltered ? '조건에 맞는 알림이 없습니다.' : '아직 도착한 알림이 없습니다.'}
-            errorAction={
-              <Button intent="dark" size="sm" onClick={() => void refetch()}>
-                다시 시도
-              </Button>
-            }
+            onRetry={() => void refetch()}
+            isRetrying={isRetrying}
           >
             <div className="overflow-hidden rounded-xl border border-neutral-150 bg-white shadow-[0_7px_7px_rgba(55,55,55,0.06)]">
               <div className="flex flex-col divide-y divide-neutral-150">

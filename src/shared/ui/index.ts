@@ -81,3 +81,5 @@ export * from './SortOptions'
 export { BeforeAfterSlider } from './BeforeAfterSlider'
 
 export { ShareButton, type ShareButtonProps } from './ShareButton'
+
+export { RetryButton, type RetryButtonProps } from './RetryButton'

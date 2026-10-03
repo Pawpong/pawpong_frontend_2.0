@@ -138,9 +138,13 @@ const StatusActionSection = ({
 }
 
 const ReceivedApplicationDetailContent = ({ applicationId }: { applicationId: string }) => {
-  const { data, isPending, isError, refetch } = useQuery(
-    breederQueries.receivedApplicationDetail(applicationId),
-  )
+  const {
+    data,
+    isPending,
+    isError,
+    refetch,
+    isFetching: isRetrying,
+  } = useQuery(breederQueries.receivedApplicationDetail(applicationId))
   const counterpartUserId = data ? toCounterpartUserId(data.adopterId) : null
 
   return (
@@ -151,6 +155,7 @@ const ReceivedApplicationDetailContent = ({ applicationId }: { applicationId: st
       isError={isError}
       hasData={!!data}
       onRetry={() => void refetch()}
+      isRetrying={isRetrying}
     >
       {data && (
         <>

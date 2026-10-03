@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { getAiImageGenerationSourceImage } from '@/entities/ai-image'
-import { Button } from '@/shared/ui'
+import { RetryButton, Button } from '@/shared/ui'
 
 /** 보관한 사진의 원본은 필요할 때만 인증해서 불러오고 닫힐 때 메모리에서 해제한다. */
 export function ArchivePhotoCompare({
@@ -86,16 +86,12 @@ export function ArchivePhotoCompare({
           >
             <p>{error ? '원본 사진을 불러오지 못했어요.' : '원본 사진을 불러오는 중…'}</p>
             {error && (
-              <Button
-                intent="secondary"
-                size="sm"
-                onClick={() => {
+              <RetryButton
+                onRetry={() => {
                   setError(false)
                   setAttempt((a) => a + 1)
                 }}
-              >
-                다시 시도
-              </Button>
+              />
             )}
           </div>
         )}

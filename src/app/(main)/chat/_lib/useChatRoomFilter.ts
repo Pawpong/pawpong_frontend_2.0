@@ -28,6 +28,7 @@ const useChatRoomFilter = () => {
     isLoading: roomsQuery.isLoading,
     isError: roomsQuery.isError,
     refetch: roomsQuery.refetch,
+    isFetching: roomsQuery.isFetching,
   }
 }
 
