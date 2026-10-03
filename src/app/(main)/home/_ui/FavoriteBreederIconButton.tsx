@@ -2,7 +2,6 @@
 
 import type { MouseEvent } from 'react'
 import { ProfileStarIcon } from '@/shared/assets'
-import { cn } from '@/shared/lib/cn'
 import { useAddFavorite, useRemoveFavorite } from '@/features/adopter'
 import { IconButton } from '@/shared/ui'
 
@@ -10,30 +9,33 @@ interface FavoriteBreederIconButtonProps {
   breederId: string
   isFavorited: boolean
   size?: 'nav' | 'profile' | 'card'
-  /** 미등록 아이콘 색 오버라이드 (이미지 위 카드에서는 흰색) */
-  iconClassName?: string
 }
 
-// 버튼 틀은 IconButton, 글리프 크기만 여기서 (시안 icon/star: md 32 -> 24, lg 48 -> 40)
+// 사진을 덜 가리도록 카드 버튼은 모든 화면에서 40px, 별은 24px로 유지한다.
 const SIZE = {
-  nav: { button: { tone: 'brand', size: 'md' }, icon: 'size-6' },
-  profile: { button: { tone: 'neutral', size: 'lg' }, icon: 'size-10' },
-  card: { button: { tone: 'neutral', size: 'responsive' }, icon: 'size-6 tab:size-10' },
+  nav: 'md',
+  profile: 'lg',
+  card: 'md',
 } as const
 
-/** 브리더 즐겨찾기 토글 — 프로필 상단·이미지 카드 모두 같은 별(등록 시 point-500 채움). */
+/** 브리더 즐겨찾기 — 크림색 빈 별에서 노란 바탕의 채운 픽셀 별로 전환한다. */
 const FavoriteBreederIconButton = ({
   breederId,
   isFavorited,
   size = 'profile',
-  iconClassName,
 }: FavoriteBreederIconButtonProps) => {
   const addFavorite = useAddFavorite()
   const removeFavorite = useRemoveFavorite()
   const isPending = addFavorite.isPending || removeFavorite.isPending
-  const label = isFavorited ? '즐겨찾기 해제' : '즐겨찾기 등록'
+  const label = isPending
+    ? isFavorited
+      ? '즐겨찾기 해제 중'
+      : '즐겨찾기 등록 중'
+    : isFavorited
+      ? '즐겨찾기 해제'
+      : '즐겨찾기 등록'
 
-  // 카드 전체가 Link 라 이동을 막고 토글만 한다 (링크 밖에서는 무해)
+  // 카드의 상세 이동과 분리하고, 처리 중에는 키보드 포커스를 유지하면서 중복 요청을 막는다.
   const handleClick = (event: MouseEvent) => {
     event.preventDefault()
     event.stopPropagation()
@@ -44,14 +46,15 @@ const FavoriteBreederIconButton = ({
 
   return (
     <IconButton
-      {...SIZE[size].button}
+      tone="favorite"
+      size={SIZE[size]}
       onClick={handleClick}
       aria-label={label}
-      title={label}
       aria-pressed={isFavorited}
       aria-disabled={isPending}
+      aria-busy={isPending}
     >
-      <ProfileStarIcon filled={isFavorited} className={cn(SIZE[size].icon, iconClassName)} />
+      <ProfileStarIcon filled={isFavorited} className="size-6" />
     </IconButton>
   )
 }

@@ -22,6 +22,9 @@ const iconButtonStyles = tv({
       overlay: 'bg-action-dark/60 text-base-white hover:bg-action-dark/80',
       surface:
         'border border-action-disabled bg-base-white text-action-dark hover:bg-action-subtle',
+      // 밝거나 어두운 사진 위에서도 대비를 유지하는 즐겨찾기 토글.
+      favorite:
+        'border border-brand/30 bg-point-50 text-brand aria-pressed:border-brand aria-pressed:bg-action-primary aria-disabled:cursor-wait aria-disabled:opacity-60 motion-reduce:transition-none',
     },
     size: {
       xs: 'size-6',
