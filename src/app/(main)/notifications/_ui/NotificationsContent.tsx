@@ -82,6 +82,7 @@ const NotificationsContent = () => {
   const { mutate: deleteNotification, isPending: isDeleting } = useDeleteNotification()
   const { mutate: deleteAllNotifications, isPending: isDeletingAll } = useDeleteAllNotifications()
   const [deleteTarget, setDeleteTarget] = useState<NotificationResponseDto | null>(null)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
   // null이면 닫힘. 열린 순간의 조건을 고정해 확인 중에 필터를 바꿔도 범위가 달라지지 않게 한다.
   const [bulkDelete, setBulkDelete] = useState<NotificationBulkDeleteFilter | null>(null)
   const [deleteAllError, setDeleteAllError] = useState<string | null>(null)
@@ -96,9 +97,11 @@ const NotificationsContent = () => {
   }
 
   const handleConfirmDelete = () => {
-    if (!deleteTarget) return
+    if (!deleteTarget || isDeleting) return
+    setDeleteError(null)
     deleteNotification(deleteTarget.notificationId, {
       onSuccess: () => setDeleteTarget(null),
+      onError: () => setDeleteError('알림을 삭제하지 못했어요. 다시 시도해 주세요.'),
     })
   }
 
@@ -251,7 +254,10 @@ const NotificationsContent = () => {
                     key={item.notificationId}
                     item={item}
                     onSelect={handleSelect}
-                    onDelete={setDeleteTarget}
+                    onDelete={(item) => {
+                      setDeleteError(null)
+                      setDeleteTarget(item)
+                    }}
                   />
                 ))}
               </div>
@@ -283,6 +289,7 @@ const NotificationsContent = () => {
         target="알림"
         onConfirm={handleConfirmDelete}
         isPending={isDeleting}
+        errorMessage={deleteError}
       />
       <CtaModal
         open={bulkDelete !== null}
