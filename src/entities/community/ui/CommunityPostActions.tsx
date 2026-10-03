@@ -47,6 +47,7 @@ const CommunityPostActions = ({
       />
       <ToggleIconButton
         icon={PixelBookmarkIcon}
+        hasFillState
         size="md"
         aria-label="북마크"
         pressed={saved}

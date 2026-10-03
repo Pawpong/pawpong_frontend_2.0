@@ -23,8 +23,8 @@ const MENU_ITEMS = [
 const MyHomeActionMenu = ({ isBreeder }: { isBreeder: boolean }) => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
-      <IconButton aria-label="마이홈 작성 및 수정 메뉴">
-        <PlusIcon aria-hidden className="size-6 text-neutral-850" />
+      <IconButton tone="brand" aria-label="마이홈 작성 및 수정 메뉴">
+        <PlusIcon aria-hidden className="size-7.5" />
       </IconButton>
     </DropdownMenuTrigger>
     <DropdownMenuContent align="end" sideOffset={8} collisionPadding={16} className="min-w-48">
