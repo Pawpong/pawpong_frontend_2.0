@@ -103,7 +103,7 @@
 }
 .care-map-marker {
   position: relative;
-  width: 36px;
+  width: 40px;
   height: 40px;
   border: 2px solid var(--color-base-white);
   border-radius: 18px 18px 18px 4px;
@@ -133,5 +133,194 @@
     scroll-behavior: auto !important;
     transition: none !important;
     animation: none !important;
+  }
+}
+
+/* Nationwide directory controls extend the shared care-map appearance. */
+.care-map-page {
+  --care-ink: var(--color-neutral-850, #312921);
+  --care-brown: var(--color-primary-500, #ad651d);
+  --care-yellow: var(--color-point-500, #fffe72);
+  --care-line: var(--color-neutral-150, #eae6e0);
+  color: var(--care-ink);
+}
+.care-map-counts {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 14px 20px;
+  background: var(--color-secondary-50, #fffaf0);
+  border-radius: 8px;
+}
+.care-map-counts button {
+  text-align: left;
+  cursor: pointer;
+}
+.care-map-counts span {
+  font-size: 11px;
+  color: var(--care-brown);
+}
+.care-map-counts strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 24px;
+  letter-spacing: -1px;
+}
+.care-map-counts small {
+  margin-left: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.care-map-search-panel {
+  margin-bottom: 20px;
+}
+.care-map-region {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 48px;
+  border: 1px solid var(--care-line);
+  border-radius: 12px;
+  padding: 0 12px;
+  background: white;
+  color: var(--care-brown);
+}
+.care-map-region select {
+  width: 108px;
+  min-height: 44px;
+  color: var(--care-ink);
+  font-size: 13px;
+  cursor: pointer;
+}
+.care-map-search {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  min-width: 170px;
+  min-height: 48px;
+  border: 1px solid var(--care-line);
+  border-radius: 12px;
+  padding: 0 6px 0 14px;
+  background: white;
+}
+.care-map-search:focus-within {
+  border-color: var(--care-brown);
+}
+.care-map-search input {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  font-size: 16px;
+  outline: none;
+  background: transparent;
+}
+.care-map-radius {
+  border: 1px solid var(--care-line);
+  border-radius: 8px;
+  min-height: 36px;
+  padding: 5px;
+  font-size: 12px;
+}
+.care-map-results {
+  overflow: hidden;
+  border: 1px solid var(--care-line);
+  border-radius: 8px;
+  background: white;
+}
+.care-map-place {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 17px 16px;
+  text-align: left;
+  cursor: pointer;
+}
+.care-map-place:hover {
+  background: var(--color-secondary-50, #fffaf0);
+}
+.care-map-place-selected {
+  background: var(--color-secondary-50, #fffaf0);
+  box-shadow: inset 3px 0 var(--care-brown);
+}
+.care-map-list-number {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 25px;
+  height: 26px;
+  margin-top: 1px;
+  border-radius: 3px;
+  color: var(--care-brown);
+  background: var(--color-secondary-50, #fffaf0);
+  font-size: 12px;
+  font-weight: 700;
+}
+.care-map-place-selected .care-map-list-number {
+  background: var(--care-yellow);
+}
+.care-map-badge {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: var(--color-secondary-50, #fffaf0);
+  color: var(--care-brown);
+  font-size: 10px;
+}
+.care-map-canvas {
+  border: 1px solid var(--care-line);
+  border-radius: 8px;
+  background: var(--color-secondary-50, #fffaf0);
+}
+.care-map-caption {
+  max-width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #fffffff2;
+  color: var(--care-ink);
+  font-size: 11px;
+  text-align: center;
+  box-shadow: 0 2px 5px #00000012;
+}
+.care-map-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--color-point-50);
+}
+.care-map-search input:focus-visible {
+  outline: none;
+}
+@media (min-width: 768px) {
+  .care-map-search input {
+    font-size: 14px;
+  }
+}
+@media (max-width: 767px) {
+  .care-map-counts {
+    width: 100%;
+    gap: 20px;
+    padding: 12px 16px;
+  }
+  .care-map-counts button {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .care-map-counts strong {
+    font-size: 20px;
+    margin-top: 0;
+  }
+  .care-map-region {
+    padding: 0 8px;
+  }
+  .care-map-region select {
+    width: 76px;
   }
 }
