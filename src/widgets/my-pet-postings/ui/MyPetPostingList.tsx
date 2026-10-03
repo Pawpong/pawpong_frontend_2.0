@@ -2,7 +2,7 @@
 
 import { useState, type ReactNode } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { Button, SortOptions, InfiniteScrollTrigger, ListState } from '@/shared/ui'
+import { RetryButton, Button, SortOptions, InfiniteScrollTrigger, ListState } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { TEXT } from '@/shared/config'
 import { flattenPages, getTotalItems } from '@/shared/lib/infiniteList'
@@ -52,6 +52,7 @@ const MyPetPostingList = ({
     isError,
     refetch,
     isFetchNextPageError,
+    isFetching: isRetrying,
   } = useInfiniteQuery(petPostingQueries.myList(status ?? undefined, pageSize, sort))
 
   // 무한스크롤 페이지 병합 시 petId 중복 제거 (React key 중복 방어)
@@ -106,11 +107,8 @@ const MyPetPostingList = ({
             )}
           </div>
         }
-        errorAction={
-          <Button intent="secondary" size="md" onClick={() => void refetch()}>
-            다시 시도
-          </Button>
-        }
+        onRetry={() => void refetch()}
+        isRetrying={isRetrying}
       >
         <div className={cn(DEFAULT_GRID, gridClassName)}>
           {postings.map((posting) => (
@@ -125,9 +123,7 @@ const MyPetPostingList = ({
           className="flex flex-wrap items-center justify-center gap-3 text-body-md text-neutral-700"
         >
           다음 분양글을 불러오지 못했습니다.
-          <Button intent="secondary" size="sm" onClick={() => void fetchNextPage()}>
-            다시 시도
-          </Button>
+          <RetryButton onRetry={() => void fetchNextPage()} isRetrying={isFetchingNextPage} />
         </div>
       )}
       <InfiniteScrollTrigger

@@ -160,11 +160,8 @@ const VerificationContent = () => {
       <AsyncState
         status="error"
         message="인증 정보를 불러오지 못했습니다."
-        action={
-          <Button intent="dark" size="sm" onClick={() => void profileQuery.refetch()}>
-            다시 시도
-          </Button>
-        }
+        onRetry={() => void profileQuery.refetch()}
+        isRetrying={profileQuery.isFetching}
         className="min-h-dvh"
       />
     )

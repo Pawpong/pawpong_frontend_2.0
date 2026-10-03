@@ -25,8 +25,16 @@ export const ActivityInfiniteList = <T,>({
   keyOf,
   renderItem,
 }: ActivityInfiniteListProps<T>) => {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending, isError, refetch } =
-    useInfiniteQuery(query)
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isPending,
+    isError,
+    refetch,
+    isFetching: isRetrying,
+  } = useInfiniteQuery(query)
   // eslint-disable-next-line react-hooks/exhaustive-deps -- keyOf/renderItem은 호출부에서 매 렌더 새로 만들어지는 순수 함수라, data 변경 시에만 재계산하면 된다
   const items = useMemo(() => dedupeBy(flattenPages(data), keyOf), [data])
 
@@ -41,6 +49,7 @@ export const ActivityInfiniteList = <T,>({
       hasNextPage={!!hasNextPage}
       isFetchingNextPage={isFetchingNextPage}
       onRetry={() => void refetch()}
+      isRetrying={isRetrying}
       onLoadMore={() => void fetchNextPage()}
     >
       {items.map(renderItem)}

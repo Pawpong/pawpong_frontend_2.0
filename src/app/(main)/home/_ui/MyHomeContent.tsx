@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { Button, buttonVariants, Container, NavigationBar } from '@/shared/ui'
+import { RetryButton, buttonVariants, Container, NavigationBar } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { transientQueryRecoveryOptions } from '@/shared/api'
 import { profileQueries } from '@/entities/profile'
@@ -74,14 +74,22 @@ const MyHomeContent = () => {
           ) : (
             <div role="alert" className="flex flex-col items-center gap-3 text-center">
               <p className="text-sm font-medium text-neutral-700">프로필을 불러오지 못했습니다.</p>
-              <Button intent="dark" size="sm" onClick={() => void profileQuery.refetch()}>
-                다시 시도
-              </Button>
+              <RetryButton
+                onRetry={() => void profileQuery.refetch()}
+                isRetrying={profileQuery.isFetching}
+              />
             </div>
           )}
         </Container>
       </div>
     )
+  }
+
+  const introProps = {
+    nickname: profileCardProps.profile.nickname,
+    description: myProfile?.longDescription,
+    photos: myProfile?.representativePhotos,
+    editHref: '/profile/edit',
   }
 
   return (
@@ -107,11 +115,14 @@ const MyHomeContent = () => {
         activeTab={activeTab}
         onTabChange={setSelectedTab}
         sidebar={
-          <ProfileCard
-            {...profileCardProps}
-            layout="sidebar"
-            menu={<MyHomeActionMenu isBreeder={isBreeder} />}
-          />
+          <>
+            <ProfileCard
+              {...profileCardProps}
+              layout="sidebar"
+              menu={<MyHomeActionMenu isBreeder={isBreeder} />}
+            />
+            {isBreeder && <BreederIntroduction {...introProps} placement="profile" />}
+          </>
         }
         sideLinks={isBreeder ? BREEDER_MY_HOME_SIDE_LINKS : MY_HOME_SIDE_LINKS}
       >
@@ -120,12 +131,7 @@ const MyHomeContent = () => {
             분양 페이지 진입점은 전부 이 탭(/home)으로 온다 */}
         {isBreeder && (
           <TabsContent value="listings" className="mt-0">
-            <BreederIntroduction
-              nickname={profileCardProps.profile.nickname}
-              description={myProfile?.longDescription}
-              photos={myProfile?.representativePhotos}
-              editHref="/profile/edit"
-            />
+            <BreederIntroduction {...introProps} placement="tab" />
 
             {/* 작성 진입점은 + 메뉴(모바일 상단 바·2단 프로필 카드)가 맡는다 */}
             <Container className="py-8 tab:py-10">
@@ -152,6 +158,7 @@ const MyHomeContent = () => {
             isPending={postsQuery.isPending}
             isError={postsQuery.isError}
             onRetry={() => void postsQuery.refetch()}
+            isRetrying={postsQuery.isFetching}
             loadingText="내가 쓴 글을 불러오는 중입니다."
             errorText="내가 쓴 글을 불러오지 못했습니다."
             emptyText="내가 쓴 글이 없습니다."

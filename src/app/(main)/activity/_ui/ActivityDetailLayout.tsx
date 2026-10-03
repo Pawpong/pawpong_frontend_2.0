@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { PAGE_WIDTH_CLASS } from '@/shared/config'
-import { AlertMessage, AsyncState, Button, Container, NavigationBar } from '@/shared/ui'
+import { RetryButton, AlertMessage, AsyncState, Container, NavigationBar } from '@/shared/ui'
 
 interface ActivityDetailLayoutProps {
   title: string
@@ -9,6 +9,7 @@ interface ActivityDetailLayoutProps {
   isError: boolean
   hasData: boolean
   onRetry: () => void
+  isRetrying: boolean
   children: ReactNode
 }
 
@@ -20,6 +21,7 @@ export const ActivityDetailLayout = ({
   isError,
   hasData,
   onRetry,
+  isRetrying,
   children,
 }: ActivityDetailLayoutProps) => (
   <div className="flex w-full flex-1 flex-col bg-white pb-16">
@@ -36,19 +38,14 @@ export const ActivityDetailLayout = ({
         <AsyncState
           status="error"
           message="상세 내용을 불러오지 못했습니다."
-          action={
-            <Button intent="dark" size="sm" onClick={onRetry}>
-              다시 시도
-            </Button>
-          }
+          onRetry={onRetry}
+          isRetrying={isRetrying}
         />
       )}
       {isError && hasData && (
         <div className="mb-6 flex flex-wrap items-center gap-3">
           <AlertMessage status="error" message="최신 정보를 불러오지 못했어요." />
-          <Button intent="secondary" size="sm" onClick={onRetry}>
-            다시 시도
-          </Button>
+          <RetryButton onRetry={onRetry} isRetrying={isRetrying} />
         </div>
       )}
       <div className="flex min-w-0 flex-col gap-8 [overflow-wrap:anywhere] tab:gap-10">

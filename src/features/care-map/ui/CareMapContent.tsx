@@ -1,5 +1,6 @@
 'use client'
 
+import { RetryButton } from '@/shared/ui'
 import dynamic from 'next/dynamic'
 import {
   useCallback,
@@ -420,13 +421,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
             ) : result.isError && !result.data ? (
               <div className="px-5 py-12 text-center" role="alert">
                 <p className="mb-3 text-sm">시설 정보를 불러오지 못했어요.</p>
-                <button
-                  type="button"
-                  className="care-map-button"
-                  onClick={() => void result.refetch()}
-                >
-                  다시 시도
-                </button>
+                <RetryButton onRetry={() => void result.refetch()} isRetrying={result.isFetching} />
               </div>
             ) : !places?.length ? (
               <div className="px-5 py-12 text-center">
@@ -549,13 +544,11 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
                 {config.isError ? (
                   <>
                     <p>지도를 준비하지 못했어요. 시설 목록은 계속 확인할 수 있어요.</p>
-                    <button
-                      type="button"
-                      className="care-map-button"
-                      onClick={() => void config.refetch()}
-                    >
-                      지도 다시 시도
-                    </button>
+                    <RetryButton
+                      onRetry={() => void config.refetch()}
+                      isRetrying={config.isFetching}
+                      aria-label="지도 다시 시도"
+                    />
                   </>
                 ) : (
                   '우리 아이의 지도를 펼치는 중이에요…'

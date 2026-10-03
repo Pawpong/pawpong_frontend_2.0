@@ -10,6 +10,7 @@ export * from './DetailLink'
 export * from './DocumentFilePicker'
 export * from './Badge'
 export * from './ReviewTypeBadge'
+export * from './UnreadCountBadge'
 export * from './Chip'
 export * from './Button'
 export * from './IconButton'
@@ -80,3 +81,5 @@ export * from './SortOptions'
 export { BeforeAfterSlider } from './BeforeAfterSlider'
 
 export { ShareButton, type ShareButtonProps } from './ShareButton'
+
+export { RetryButton, type RetryButtonProps } from './RetryButton'

@@ -3,11 +3,17 @@
 import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import { applicationQueries } from '@/entities/application'
-import { AsyncState, Button, buttonVariants } from '@/shared/ui'
+import { AsyncState, buttonVariants } from '@/shared/ui'
 import { EditApplicationFormFields } from './EditApplicationForm'
 
 const EditApplicationPageContent = ({ applicationId }: { applicationId: string }) => {
-  const { data, isPending, isError, refetch } = useQuery(applicationQueries.detail(applicationId))
+  const {
+    data,
+    isPending,
+    isError,
+    refetch,
+    isFetching: isRetrying,
+  } = useQuery(applicationQueries.detail(applicationId))
 
   if (isPending) {
     return (
@@ -24,11 +30,8 @@ const EditApplicationPageContent = ({ applicationId }: { applicationId: string }
       <AsyncState
         status="error"
         message="신청서를 불러오지 못했습니다."
-        action={
-          <Button intent="dark" size="sm" onClick={() => void refetch()}>
-            다시 시도
-          </Button>
-        }
+        onRetry={() => void refetch()}
+        isRetrying={isRetrying}
         className="min-h-[24rem]"
       />
     )

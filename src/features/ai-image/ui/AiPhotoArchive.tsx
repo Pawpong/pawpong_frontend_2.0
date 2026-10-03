@@ -6,9 +6,11 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { aiImageQueries, hideAiImageGeneration } from '@/entities/ai-image'
+import { PetResultLink } from '@/features/playground-pet/ui/PetResultLink'
 import { cn } from '@/shared/lib/cn'
 import type { AiImageGeneration } from '@/shared/types'
 import {
+  RetryButton,
   Button,
   Dialog,
   DialogContent,
@@ -104,9 +106,10 @@ export function AiPhotoArchive({ enabled, limit, moreHref, gridClassName }: AiPh
         size="compact"
         message="보관함을 불러오지 못했어요."
         action={
-          <Button intent="secondary" size="sm" onClick={() => void generationsQuery.refetch()}>
-            다시 시도
-          </Button>
+          <RetryButton
+            onRetry={() => void generationsQuery.refetch()}
+            isRetrying={generationsQuery.isFetching}
+          />
         }
       />
     )
@@ -202,6 +205,7 @@ export function AiPhotoArchive({ enabled, limit, moreHref, gridClassName }: AiPh
               onChange={setShareComparison}
               disabled={!!busyAction}
             />
+            <PetResultLink sourceJobId={opened.jobId} />
             {actionError && (
               <p role="alert" className="text-sm text-error-500">
                 {actionError}

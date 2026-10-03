@@ -1,6 +1,6 @@
 'use client'
 
-import { Button, Container, CtaModal, NavigationBar } from '@/shared/ui'
+import { RetryButton, Button, Container, CtaModal, NavigationBar } from '@/shared/ui'
 import { AdoptionPostingForm } from '../../../_ui/AdoptionPostingForm'
 import { useAdoptionEditForm } from '../_lib/useAdoptionEditForm'
 
@@ -31,6 +31,7 @@ const AdoptionEditContent = ({ petId }: AdoptionEditContentProps) => {
     handleCloseClick,
     handleExitConfirm,
     handleSubmit,
+    isFetching: isRetrying,
   } = useAdoptionEditForm(petId)
 
   // 남의 글이면 서버가 막으므로 여기서도 '불러오지 못했습니다' 로 수렴한다
@@ -56,9 +57,7 @@ const AdoptionEditContent = ({ petId }: AdoptionEditContentProps) => {
                 <Button intent="secondary" size="sm" onClick={handleCloseClick}>
                   돌아가기
                 </Button>
-                <Button intent="dark" size="sm" onClick={() => void retry()}>
-                  다시 시도
-                </Button>
+                <RetryButton onRetry={() => void retry()} isRetrying={isRetrying} />
               </div>
             )}
           </div>

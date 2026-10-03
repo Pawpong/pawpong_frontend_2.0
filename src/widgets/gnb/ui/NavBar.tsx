@@ -3,9 +3,12 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { type MouseEvent } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { cn } from '@/shared/lib/cn'
 import { useNavigationGuardContext } from '@/shared/lib/NavigationGuardContext'
 import { HEADER_NAV } from '@/shared/config'
+import { UnreadCountBadge } from '@/shared/ui'
+import { chatQueries } from '@/entities/chat'
 import { useAuthStatus, useMe } from '@/features/auth'
 import { AuthActions } from './AuthActions'
 import { NotificationBell } from './NotificationBell'
@@ -22,6 +25,15 @@ const NavBar = ({ className }: NavBarProps) => {
   // 비로그인은 마이홈 대신 로그인 버튼이 그 자리에 온다
   const items = isReady && !isLoggedIn ? HEADER_NAV.filter((i) => i.href !== '/home') : HEADER_NAV
   const guardContext = useNavigationGuardContext()
+  // 새 채팅은 방에 들어가 있을 때만 소켓으로 오므로 목록을 폴링한다.
+  // 상단 nav 는 모든 화면에 마운트(모바일은 CSS 로만 숨김)돼 여기 한 곳에서만 폴링하고, BottomNav 는 같은 캐시를 구독한다.
+  const { data: unreadChatCount = 0 } = useQuery({
+    ...chatQueries.unreadCount(),
+    enabled: isLoggedIn,
+    refetchInterval: 30_000,
+    refetchIntervalInBackground: false,
+    throwOnError: false,
+  })
 
   const handleLinkClick = (e: MouseEvent<HTMLAnchorElement>, href: string) => {
     if (!guardContext?.guardNavigation || pathname === href) return
@@ -39,16 +51,22 @@ const NavBar = ({ className }: NavBarProps) => {
           onClick={(e) => handleLinkClick(e, href)}
           className={cn(
             'flex items-center rounded pr-1 text-sm leading-[1.5] font-medium whitespace-nowrap text-primary-500 focus-ring transition-colors hover:text-primary-700',
-            // 활성: point-500 배경 칩 + semibold, 글자색은 primary-500 유지 (Figma 4042:722106)
-            isActive(pathname) && 'bg-point-500 font-semibold',
+            // 활성: 하단 밑줄 + semibold (Figma 4042:722106 의 point-500 배경 칩에서 변경)
+            // 배경 칩은 글쓰기 CTA 와 같은 point-500 톤이라 주요 동작과 현재 위치가 서로 경쟁했다.
+            // 밑줄은 배경을 비워 노란색 강조를 CTA 한 곳으로 몰아준다.
+            isActive(pathname) &&
+              'relative font-semibold text-primary-700 after:absolute after:inset-x-0 after:-bottom-1 after:h-[0.1875rem] after:bg-primary-500',
           )}
           aria-current={isActive(pathname) ? 'page' : undefined}
         >
-          <Icon
-            className="size-7.5"
-            src={href === '/home' ? me?.profileImageUrl : undefined}
-            active={isActive(pathname)}
-          />
+          <span className="relative flex shrink-0">
+            <Icon
+              className="size-7.5"
+              src={href === '/home' ? me?.profileImageUrl : undefined}
+              active={isActive(pathname)}
+            />
+            {href === '/chat' && <UnreadCountBadge count={unreadChatCount} />}
+          </span>
           {label}
         </Link>
       ))}
