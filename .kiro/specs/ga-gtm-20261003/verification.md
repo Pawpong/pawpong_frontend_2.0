@@ -33,3 +33,10 @@
 - 자동 history page_view와 별도 gtag.js를 추가하면 중복 집계됨. 태그를 추가할 때 사용자 입력값을 변수로 등록하지 않음.
 - Android SDK 추가는 새 네이티브 바이너리 배포가 필요함. 웹 배포만으로 기존 APK의 Firebase SDK가 추가되지는 않음.
 - 문서 근거: https://firebase.google.com/docs/analytics/webview, https://developers.google.com/analytics/devguides/collection/ga4/single-page-applications, https://developers.google.com/tag-platform/tag-manager/android/v5
+
+## Independent review follow-up
+
+- A separate Codex reviewer inspected a28a8731 / dev PR #370, verified the existing GA realtime observations without generating extra traffic, and reported one P2: a 250 ms WebView visit followed by Back lost both the intermediate and return views.
+- Capability detection now waits only for the first transport selection. Subsequent committed routes are sent immediately. A regression covers community → explore (250 ms) → community for both native Android and the older WebView fallback.
+- After integrating origin/dev 0046fa8b, `node --test tests/*.test.cjs` passed 227 tests, TypeScript and the production build passed. The changed component passed ESLint; test CJS files are excluded by the repository ESLint configuration.
+- CodeRabbit reported SUCCESS but explicitly skipped automatic review for the OSS repository. The independent review above is the actual review evidence.
