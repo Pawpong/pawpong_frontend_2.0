@@ -55,8 +55,6 @@ const FavoriteShareActions = ({
         <ToggleIconButton
           icon={ShareIcon}
           size="md"
-          label="공유"
-          labelVisibility={labelVisibility}
           aria-label="공유"
           onClick={() => setShareOpen(true)}
         />
