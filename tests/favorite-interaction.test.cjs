@@ -60,7 +60,12 @@ function setup(api) {
         return { mutateAsync: (variables) => observer.mutate(variables) }
       },
     },
-    '@/entities/adopter': { adopterQueries: { all: () => ['adopter'] } },
+    '@/entities/adopter': {
+      adopterQueries: {
+        all: () => ['adopter'],
+        profile: () => ({ queryKey: ['adopter', 'profile'] }),
+      },
+    },
     '@/entities/breeder': { breederQueries: { all: () => ['breeder'] } },
     '@/entities/profile': { profileQueries: { all: () => ['profile'] } },
     '@/entities/application': {},
@@ -105,6 +110,44 @@ test('star updates popular, paginated and profile views immediately without refe
     assert.equal(client.getQueryState(popular).isInvalidated, true)
   } finally {
     unsubscribe()
+    client.clear()
+  }
+})
+
+test('saving a star preserves the public home role decision while refreshing my profile', async () => {
+  const { client, useAddFavorite } = setup(async () => ({ message: 'saved' }))
+  let publicRequests = 0,
+    privateRequests = 0
+  const publicObserver = new query.QueryObserver(client, {
+    queryKey: ['adopter', 'public-profile', 'breeder-a'],
+    queryFn: async () => {
+      publicRequests++
+      throw Object.assign(new Error('This account is a breeder'), { status: 400 })
+    },
+  })
+  const states = []
+  const unsubscribePublic = publicObserver.subscribe((state) => states.push(state.status))
+  const privateObserver = new query.QueryObserver(client, {
+    queryKey: ['adopter', 'profile'],
+    initialData: { favoriteCount: 0 },
+    queryFn: async () => {
+      privateRequests++
+      return { favoriteCount: 1 }
+    },
+  })
+  const unsubscribePrivate = privateObserver.subscribe(() => {})
+  try {
+    await until(() => publicObserver.getCurrentResult().isError)
+    states.length = 0
+    await useAddFavorite().mutateAsync('breeder-a')
+    assert.equal(publicRequests, 1, 'the public home must not repeat its role lookup')
+    assert.ok(states.every((state) => state === 'error'), 'the breeder home must stay mounted')
+    assert.equal(publicObserver.getCurrentResult().status, 'error')
+    assert.equal(privateRequests, 1)
+    assert.equal(client.getQueryData(['adopter', 'profile']).favoriteCount, 1)
+  } finally {
+    unsubscribePublic()
+    unsubscribePrivate()
     client.clear()
   }
 })

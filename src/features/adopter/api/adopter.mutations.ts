@@ -55,7 +55,8 @@ export const useDeleteAdopterAccount = () =>
 // 별 하나를 누를 때 탐색·인기·프로필을 모두 다시 조회하지 않는다.
 const invalidateFavoriteCaches = (qc: QueryClient) =>
   Promise.all([
-    qc.invalidateQueries({ queryKey: adopterQueries.all() }),
+    // 공개 프로필의 400/404는 브리더 홈 판정에 쓰인다. 재조회하면 홈이 다시 마운트된다.
+    qc.invalidateQueries({ queryKey: adopterQueries.profile().queryKey, exact: true }),
     qc.invalidateQueries({ queryKey: [...profileQueries.all(), 'favoriteBreeders'] }),
     qc.invalidateQueries({ queryKey: breederQueries.all(), refetchType: 'none' }),
   ])
