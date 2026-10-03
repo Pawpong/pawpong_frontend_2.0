@@ -2,7 +2,6 @@
 
 import { BeforeAfterSlider } from '@/shared/ui'
 
-import Link from 'next/link'
 import type { ReactNode } from 'react'
 import {
   AsyncState,
@@ -40,7 +39,8 @@ interface PostDetailPanelProps {
 }
 
 // [refactored] 두 레이아웃 분기에 같은 값이 있어 상수로
-const COMPOSER_CLASS = 'shrink-0 border-t border-neutral-100 px-5'
+const COMPOSER_CLASS =
+  'shrink-0 border-t border-neutral-150 bg-base-white px-4 pb-[env(safe-area-inset-bottom)]'
 
 const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDetailPanelProps) => {
   const {
@@ -96,17 +96,22 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
 
   const header = (
     <div className="flex shrink-0 items-center justify-between gap-2 px-4 py-2">
-      <Link href={`/home/${post.authorId}`} className="flex min-w-0 items-center gap-2">
+      {/* 전체 페이지 이동으로 홈에서 연 모달과 인터셉트 모달 상태도 함께 정리한다. */}
+      <a
+        href={`/home/${post.authorId}`}
+        aria-label={`${post.authorNickname}님의 홈으로 이동`}
+        className="flex min-w-0 items-center gap-2 rounded-lg focus-ring"
+      >
         <ProfileAvatar
           size="medium"
           src={post.authorProfileImageUrl}
           alt={post.authorNickname}
           className="shrink-0"
         />
-        <span className="truncate text-base font-semibold text-neutral-850">
+        <span className="truncate text-body-lg font-semibold text-neutral-850">
           {post.authorNickname}
         </span>
-      </Link>
+      </a>
       {trailingAction}
     </div>
   )

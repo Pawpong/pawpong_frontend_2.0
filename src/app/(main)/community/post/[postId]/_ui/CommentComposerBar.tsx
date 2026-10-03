@@ -1,6 +1,6 @@
 'use client'
 
-import { LoginPromptModal } from '@/shared/ui'
+import { Button, LoginPromptModal } from '@/shared/ui'
 import { COMMUNITY_LOGIN_PROMPT } from '@/entities/community'
 import { useLoginGuard } from '@/features/auth'
 import { CommentComposer } from './CommentComposer'
@@ -36,13 +36,9 @@ const CommentComposerBar = ({ thread, className }: CommentComposerBarProps) => {
       ) : (
         // [refactored] 마크업 복제 대신 CommentComposer와 같은 Shell을 공유한다
         <CommentComposerShell>
-          <button
-            type="button"
-            onClick={openPrompt}
-            className="flex h-12 min-w-0 flex-1 items-center rounded-full border border-neutral-300 bg-base-white px-5 text-left text-body-md font-medium text-neutral-500 transition-[border-color,box-shadow] duration-150 hover:border-primary-500 focus-visible:border-primary-500 focus-visible:ring-4 focus-visible:ring-point-500/45 focus-visible:outline-none motion-reduce:transition-none pc:h-14 pc:px-6"
-          >
+          <Button intent="secondary" size="md" width="full" onClick={openPrompt}>
             로그인하고 댓글을 남겨보세요
-          </button>
+          </Button>
         </CommentComposerShell>
       )}
 

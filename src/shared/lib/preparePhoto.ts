@@ -3,14 +3,19 @@ export const PHOTO_ACCEPT =
   'image/jpeg,image/png,image/webp,image/gif,image/avif,image/heic,image/heif,.jpg,.jpeg,.png,.webp,.gif,.avif,.heic,.heif'
 export const MAX_PHOTO_BYTES = 100 * 1024 * 1024
 
-export function validatePhoto(file: File) {
-  if (!file.size) throw new Error('비어 있는 사진입니다. 다른 사진을 선택해 주세요.')
-  if (file.size > MAX_PHOTO_BYTES) throw new Error('사진은 100MB 이하로 선택해 주세요.')
+/** PHOTO_ACCEPT 형식인지. 일부 기기는 HEIC 의 MIME 을 비워 보내므로 그때만 확장자로 판단한다. */
+export function isPhotoFile(file: File) {
   const type = file.type.toLowerCase()
   const knownType =
     /^image\/(jpeg|jpg|png|webp|gif|avif|heic|heif|heic-sequence|heif-sequence)$/.test(type)
   const knownExtension = /\.(jpe?g|png|webp|gif|avif|heic|heif)$/i.test(file.name)
-  if (!knownType && !((!type || type === 'application/octet-stream') && knownExtension)) {
+  return knownType || ((!type || type === 'application/octet-stream') && knownExtension)
+}
+
+export function validatePhoto(file: File) {
+  if (!file.size) throw new Error('비어 있는 사진입니다. 다른 사진을 선택해 주세요.')
+  if (file.size > MAX_PHOTO_BYTES) throw new Error('사진은 100MB 이하로 선택해 주세요.')
+  if (!isPhotoFile(file)) {
     throw new Error('JPG, PNG, WEBP, GIF, AVIF, HEIC 또는 HEIF 사진을 선택해 주세요.')
   }
 }

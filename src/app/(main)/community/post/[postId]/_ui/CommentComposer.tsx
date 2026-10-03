@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { isApiError } from '@/shared/api'
-import { Button } from '@/shared/ui'
+import { Button, Input } from '@/shared/ui'
 import { CommentComposerShell } from './CommentComposerShell'
 
 interface CommentComposerProps {
@@ -72,7 +72,7 @@ const CommentComposer = ({
 
   // [refactored] py-3 래퍼·아바타 마크업을 CommentComposerShell로 위임
   const banner = replyingToNickname && (
-    <div className="flex items-center justify-between gap-2 rounded-xl bg-primary-50 px-3 py-2 text-body-md text-primary-700">
+    <div className="flex items-center justify-between gap-2 rounded-lg bg-action-subtle px-3 py-2 text-body-md text-neutral-850">
       <span className="min-w-0 font-semibold break-words">@{replyingToNickname}에게 답글</span>
       <Button intent="link" size="inline" onClick={onCancelReply}>
         취소
@@ -120,9 +120,9 @@ const CommentComposer = ({
           void handleSubmit()
         }}
         aria-busy={busy}
-        className="flex h-12 min-w-0 flex-1 items-center gap-2 rounded-full border border-neutral-300 bg-base-white py-1 pr-1.5 pl-5 transition-[border-color,box-shadow] duration-150 focus-within:border-primary-500 focus-within:ring-4 focus-within:ring-point-500/45 motion-reduce:transition-none pc:h-14 pc:pl-6"
+        className="flex min-w-0 flex-1 items-center gap-2"
       >
-        <input
+        <Input
           ref={inputRef}
           type="text"
           value={value}
@@ -152,7 +152,7 @@ const CommentComposer = ({
           aria-label={replyingToNickname ? '답글 입력' : '댓글 입력'}
           placeholder={replyingToNickname ? '답글을 남겨주세요' : '댓글을 남겨주세요'}
           maxLength={1000}
-          className="h-full min-w-0 flex-1 bg-transparent text-body-lg font-medium text-neutral-850 outline-none placeholder:text-neutral-500"
+          className="min-w-0 flex-1"
         />
         <div className="flex w-24 shrink-0">
           <Button
