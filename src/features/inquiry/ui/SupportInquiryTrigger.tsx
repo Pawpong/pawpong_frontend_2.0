@@ -14,7 +14,7 @@ const SupportInquiryTrigger = forwardRef<
     ref={ref}
     type="button"
     aria-label="AI 문의하기"
-    className="group fixed right-4 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-sticky flex size-18 flex-col items-center justify-center gap-1 rounded-xl text-primary-700 focus-ring tab:hidden"
+    className="group fixed right-4 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-sticky flex size-18 flex-col items-center justify-center gap-1 rounded-xl text-primary-700 focus-ring pc:hidden"
   >
     <svg
       aria-hidden
