@@ -1,13 +1,19 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
 import { cn } from '@/shared/lib/cn'
 import { useAuthStatus } from '@/features/auth'
 import { NotificationListItem, notificationQueries } from '@/entities/notification'
 import { uniqueBy } from '@/shared/lib/uniqueBy'
-import { useOpenNotification, useMarkAllAsRead } from '@/features/notification'
+import {
+  useOpenNotification,
+  useMarkAllAsRead,
+  useDeleteNotification,
+  useDeleteAllNotifications,
+} from '@/features/notification'
+import { normalizeApiError } from '@/shared/api'
 import type { NotificationResponseDto } from '@/shared/types'
 import { Button, EmptyState, ActionSheetItem } from '@/shared/ui'
 
@@ -29,6 +35,17 @@ const NotificationBell = ({ className }: { className?: string }) => {
   const router = useRouter()
   const { isLoggedIn } = useAuthStatus()
   const [open, setOpen] = useState(false)
+  // 전체 삭제는 되돌릴 수 없어 헤더 안에서 한 번 더 확인한다(모달은 바깥 클릭으로 드롭다운을 닫는다).
+  const [confirmDeleteAll, setConfirmDeleteAll] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
+  // 닫을 때 확인·오류 상태를 함께 비워 다음에 열 때 이전 단계가 남지 않게 한다.
+  const setPanelOpen = useCallback((next: boolean) => {
+    setOpen(next)
+    if (!next) {
+      setConfirmDeleteAll(false)
+      setDeleteError(null)
+    }
+  }, [])
   const rootRef = useRef<HTMLDivElement>(null)
 
   const { data: unreadCount = 0 } = useQuery({
@@ -45,6 +62,8 @@ const NotificationBell = ({ className }: { className?: string }) => {
 
   const openNotification = useOpenNotification()
   const { mutate: markAllAsRead } = useMarkAllAsRead()
+  const deleteOne = useDeleteNotification()
+  const deleteAll = useDeleteAllNotifications()
 
   const notifications = uniqueBy(
     data?.pages.flatMap((page) => page.items) ?? [],
@@ -55,10 +74,10 @@ const NotificationBell = ({ className }: { className?: string }) => {
   useEffect(() => {
     if (!open) return
     const handlePointer = (e: MouseEvent) => {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false)
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setPanelOpen(false)
     }
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false)
+      if (e.key === 'Escape') setPanelOpen(false)
     }
     document.addEventListener('mousedown', handlePointer)
     document.addEventListener('keydown', handleKey)
@@ -66,12 +85,29 @@ const NotificationBell = ({ className }: { className?: string }) => {
       document.removeEventListener('mousedown', handlePointer)
       document.removeEventListener('keydown', handleKey)
     }
-  }, [open])
+  }, [open, setPanelOpen])
 
   if (!isLoggedIn) return null
 
+  const handleDeleteOne = (item: NotificationResponseDto) => {
+    setDeleteError(null)
+    deleteOne.mutate(item.notificationId, {
+      onError: (error) =>
+        setDeleteError(normalizeApiError(error, '알림을 삭제하지 못했어요.').message),
+    })
+  }
+
+  const handleDeleteAll = () => {
+    setDeleteError(null)
+    deleteAll.mutate(undefined, {
+      onSuccess: () => setConfirmDeleteAll(false),
+      onError: (error) =>
+        setDeleteError(normalizeApiError(error, '알림을 모두 삭제하지 못했어요.').message),
+    })
+  }
+
   const handleSelect = (item: NotificationResponseDto) => {
-    setOpen(false)
+    setPanelOpen(false)
     void openNotification(item)
   }
 
@@ -79,7 +115,7 @@ const NotificationBell = ({ className }: { className?: string }) => {
     <div ref={rootRef} className={cn('relative', className)}>
       <button
         type="button"
-        onClick={() => setOpen((prev) => !prev)}
+        onClick={() => setPanelOpen(!open)}
         aria-label="알림"
         aria-expanded={open}
         className={cn(
@@ -109,14 +145,64 @@ const NotificationBell = ({ className }: { className?: string }) => {
             'pc:absolute pc:top-full pc:right-0 pc:left-auto pc:mt-1 pc:w-[22.5rem]',
           )}
         >
-          <div className="flex items-center justify-between border-b border-neutral-150 bg-primary-50/60 px-4 py-3">
-            <span className="text-base font-semibold text-neutral-850">알림</span>
-            {unreadCount > 0 && (
-              <Button intent="link" onClick={() => markAllAsRead()} size="inline">
-                모두 읽기
-              </Button>
+          <div className="flex items-center justify-between gap-3 border-b border-neutral-150 bg-primary-50/60 px-4 py-3">
+            {confirmDeleteAll ? (
+              <>
+                <span className="text-sm font-semibold text-neutral-850">
+                  알림을 모두 삭제할까요?
+                </span>
+                <span className="flex items-center gap-3">
+                  <Button
+                    intent="link"
+                    size="inline"
+                    disabled={deleteAll.isPending}
+                    onClick={() => setConfirmDeleteAll(false)}
+                  >
+                    취소
+                  </Button>
+                  <Button
+                    intent="link"
+                    size="inline"
+                    disabled={deleteAll.isPending}
+                    onClick={handleDeleteAll}
+                  >
+                    {deleteAll.isPending ? '삭제하는 중' : '삭제'}
+                  </Button>
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="text-base font-semibold text-neutral-850">알림</span>
+                <span className="flex items-center gap-3">
+                  {unreadCount > 0 && (
+                    <Button intent="link" onClick={() => markAllAsRead()} size="inline">
+                      모두 읽기
+                    </Button>
+                  )}
+                  {notifications.length > 0 && (
+                    <Button
+                      intent="link"
+                      size="inline"
+                      onClick={() => {
+                        setDeleteError(null)
+                        setConfirmDeleteAll(true)
+                      }}
+                    >
+                      전체 삭제
+                    </Button>
+                  )}
+                </span>
+              </>
             )}
           </div>
+          {deleteError && (
+            <p
+              role="alert"
+              className="border-b border-neutral-150 px-4 py-2 text-sm text-error-600"
+            >
+              {deleteError}
+            </p>
+          )}
 
           <div className="max-h-[min(26rem,60vh)] overflow-y-auto">
             {isLoading ? (
@@ -134,6 +220,8 @@ const NotificationBell = ({ className }: { className?: string }) => {
                     key={item.notificationId}
                     item={item}
                     onSelect={handleSelect}
+                    onDelete={handleDeleteOne}
+                    deleting={deleteOne.isPending && deleteOne.variables === item.notificationId}
                     compact
                   />
                 ))}
@@ -152,7 +240,7 @@ const NotificationBell = ({ className }: { className?: string }) => {
               size="sm"
               width="full"
               onClick={() => {
-                setOpen(false)
+                setPanelOpen(false)
                 router.push('/notifications')
               }}
             >

@@ -2,7 +2,12 @@
 
 import { useMemo, useState } from 'react'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
-import { NotificationListItem, notificationQueries } from '@/entities/notification'
+import {
+  NOTIFICATION_CATEGORY_OPTIONS,
+  NotificationListItem,
+  notificationCategoryLabel,
+  notificationQueries,
+} from '@/entities/notification'
 import {
   useDeleteAllNotifications,
   useDeleteNotification,
@@ -11,11 +16,16 @@ import {
 } from '@/features/notification'
 import { PawPrintIcon } from '@/shared/assets'
 import { normalizeApiError } from '@/shared/api'
-import type { NotificationResponseDto } from '@/shared/types'
+import type {
+  NotificationBulkDeleteFilter,
+  NotificationCategory,
+  NotificationResponseDto,
+} from '@/shared/types'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import {
   Button,
+  Chip,
   Container,
   CtaModal,
   DeleteConfirmModal,
@@ -23,6 +33,33 @@ import {
   ListState,
   NavigationBar,
 } from '@/shared/ui'
+
+type ReadFilter = 'all' | 'unread' | 'read'
+
+const READ_FILTERS: ReadonlyArray<{ value: ReadFilter; label: string }> = [
+  { value: 'all', label: '전체' },
+  { value: 'unread', label: '안 읽음' },
+  { value: 'read', label: '읽음' },
+]
+
+/** 일괄 삭제 확인 문구. 지금 보고 있는 조건과 실제로 지워지는 범위가 같아야 한다. */
+const bulkDeleteCopy = (filter: NotificationBulkDeleteFilter, readFiltered: boolean) => {
+  const scope = filter.category ? `${notificationCategoryLabel(filter.category)} 알림` : '알림'
+  if (filter.onlyRead) {
+    return {
+      title: `읽은 ${scope}을 삭제할까요?`,
+      body: `읽은 ${scope}만 삭제되고 안 읽은 알림은 남아요.`,
+      action: '읽은 알림 삭제',
+    }
+  }
+  const target = filter.category ? scope : '모든 알림'
+  return {
+    title: `${scope}을 모두 삭제할까요?`,
+    // 안 읽음/읽음 필터를 보고 있어도 일괄 삭제는 읽음 여부와 무관하다는 점을 분명히 한다.
+    body: readFiltered ? `읽음 여부와 관계없이 ${target}이 삭제돼요.` : `${target}이 삭제돼요.`,
+    action: '모두 삭제',
+  }
+}
 
 const NotificationsContent = () => {
   const openNotification = useOpenNotification()
@@ -32,9 +69,12 @@ const NotificationsContent = () => {
     throwOnError: false,
   })
   const unreadCount = unreadCountQuery.data ?? 0
+  const [category, setCategory] = useState<NotificationCategory | undefined>()
+  const [readFilter, setReadFilter] = useState<ReadFilter>('all')
+  const isRead = readFilter === 'all' ? undefined : readFilter === 'read'
   const { data, isPending, isError, hasNextPage, fetchNextPage, isFetchingNextPage, refetch } =
     useInfiniteQuery({
-      ...notificationQueries.list(),
+      ...notificationQueries.list({ category, isRead }),
       refetchOnMount: 'always',
       throwOnError: false,
     })
@@ -42,7 +82,8 @@ const NotificationsContent = () => {
   const { mutate: deleteNotification, isPending: isDeleting } = useDeleteNotification()
   const { mutate: deleteAllNotifications, isPending: isDeletingAll } = useDeleteAllNotifications()
   const [deleteTarget, setDeleteTarget] = useState<NotificationResponseDto | null>(null)
-  const [showDeleteAll, setShowDeleteAll] = useState(false)
+  // null이면 닫힘. 열린 순간의 조건을 고정해 확인 중에 필터를 바꿔도 범위가 달라지지 않게 한다.
+  const [bulkDelete, setBulkDelete] = useState<NotificationBulkDeleteFilter | null>(null)
   const [deleteAllError, setDeleteAllError] = useState<string | null>(null)
 
   const notifications = useMemo(
@@ -61,15 +102,24 @@ const NotificationsContent = () => {
     })
   }
 
-  const handleDeleteAll = () => {
-    if (isDeletingAll) return
+  const openBulkDelete = (filter: NotificationBulkDeleteFilter) => {
     setDeleteAllError(null)
-    deleteAllNotifications(undefined, {
-      onSuccess: () => setShowDeleteAll(false),
+    setBulkDelete(filter)
+  }
+
+  const handleDeleteAll = () => {
+    if (isDeletingAll || !bulkDelete) return
+    setDeleteAllError(null)
+    deleteAllNotifications(bulkDelete, {
+      onSuccess: () => setBulkDelete(null),
       onError: (error) =>
-        setDeleteAllError(normalizeApiError(error, '알림 전체 삭제에 실패했습니다.').message),
+        setDeleteAllError(normalizeApiError(error, '알림 삭제에 실패했습니다.').message),
     })
   }
+
+  const copy = bulkDelete ? bulkDeleteCopy(bulkDelete, readFilter !== 'all') : null
+  const isFiltered = category !== undefined || readFilter !== 'all'
+  const busy = isDeleting || isDeletingAll || isMarkingAll
 
   return (
     <div className="flex w-full flex-1 flex-col bg-white pb-16">
@@ -109,21 +159,77 @@ const NotificationsContent = () => {
             ) : null}
           </div>
 
-          {notifications.length > 0 && (
-            <div className="mb-3 flex justify-end">
-              <Button
-                intent="link"
-                size="sm"
-                disabled={isDeleting || isDeletingAll || isMarkingAll}
-                onClick={() => {
-                  setDeleteAllError(null)
-                  setShowDeleteAll(true)
-                }}
+          <div className="mb-3 flex flex-col gap-2">
+            <div
+              role="group"
+              aria-label="알림 분류"
+              className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none]"
+            >
+              <Chip
+                size="responsive"
+                selected={category === undefined}
+                onClick={() => setCategory(undefined)}
               >
-                전체 삭제
-              </Button>
+                전체
+              </Chip>
+              {NOTIFICATION_CATEGORY_OPTIONS.map((option) => (
+                <Chip
+                  key={option.value}
+                  size="responsive"
+                  selected={category === option.value}
+                  onClick={() => setCategory(option.value)}
+                >
+                  {option.label}
+                </Chip>
+              ))}
             </div>
-          )}
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div role="group" aria-label="읽음 상태" className="flex gap-3">
+                {READ_FILTERS.map((option) => (
+                  <Button
+                    key={option.value}
+                    intent="link"
+                    size="sm"
+                    aria-pressed={readFilter === option.value}
+                    onClick={() => setReadFilter(option.value)}
+                  >
+                    <span
+                      className={
+                        readFilter === option.value
+                          ? 'font-semibold text-primary-600 underline underline-offset-4'
+                          : 'text-neutral-500'
+                      }
+                    >
+                      {option.label}
+                    </span>
+                  </Button>
+                ))}
+              </div>
+              <div className="flex items-center gap-3">
+                {/* 알림함이 완전히 비었을 때만 숨긴다. 필터 결과가 비어도 같은 분류의 읽은 알림은 남아 있을 수 있다. */}
+                {(notifications.length > 0 || isFiltered) && (
+                  <Button
+                    intent="link"
+                    size="sm"
+                    disabled={busy}
+                    onClick={() => openBulkDelete({ category, onlyRead: true })}
+                  >
+                    읽은 알림 삭제
+                  </Button>
+                )}
+                {notifications.length > 0 && readFilter !== 'read' && (
+                  <Button
+                    intent="link"
+                    size="sm"
+                    disabled={busy}
+                    onClick={() => openBulkDelete({ category })}
+                  >
+                    {category ? `${notificationCategoryLabel(category)} 모두 삭제` : '전체 삭제'}
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
 
           <ListState
             isPending={isPending}
@@ -131,7 +237,7 @@ const NotificationsContent = () => {
             isEmpty={notifications.length === 0}
             loadingText="알림을 불러오는 중입니다."
             errorText="알림을 불러오지 못했습니다."
-            emptyText="아직 도착한 알림이 없습니다."
+            emptyText={isFiltered ? '조건에 맞는 알림이 없습니다.' : '아직 도착한 알림이 없습니다.'}
             errorAction={
               <Button intent="dark" size="sm" onClick={() => void refetch()}>
                 다시 시도
@@ -179,12 +285,12 @@ const NotificationsContent = () => {
         isPending={isDeleting}
       />
       <CtaModal
-        open={showDeleteAll}
-        onOpenChange={(open) => !isDeletingAll && setShowDeleteAll(open)}
-        title="알림을 모두 삭제할까요?"
+        open={bulkDelete !== null}
+        onOpenChange={(open) => !isDeletingAll && !open && setBulkDelete(null)}
+        title={copy?.title ?? ''}
         description={
           <>
-            모든 알림이 삭제돼요.
+            {copy?.body}
             <br />
             삭제한 알림은 다시 볼 수 없어요.
             {deleteAllError && (
@@ -199,10 +305,10 @@ const NotificationsContent = () => {
             label: '취소',
             intent: 'secondary',
             disabled: isDeletingAll,
-            onClick: () => setShowDeleteAll(false),
+            onClick: () => setBulkDelete(null),
           },
           {
-            label: isDeletingAll ? '삭제하는 중' : '전체 삭제',
+            label: isDeletingAll ? '삭제하는 중' : (copy?.action ?? '삭제'),
             intent: 'danger',
             disabled: isDeletingAll,
             onClick: handleDeleteAll,
