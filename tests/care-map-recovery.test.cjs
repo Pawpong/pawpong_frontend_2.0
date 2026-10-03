@@ -26,28 +26,6 @@ const compiled = ts.transpileModule(
   },
 ).outputText
 
-// The shared retry control now owns its label and busy state. Load its actual
-// implementation so this recovery test keeps checking the integrated UI.
-function loadShared(file, dependencies = {}) {
-  const exports = {}
-  const source = ts.transpileModule(fs.readFileSync(file, 'utf8'), {
-    compilerOptions: {
-      module: ts.ModuleKind.CommonJS,
-      target: ts.ScriptTarget.ES2020,
-      jsx: ts.JsxEmit.ReactJSX,
-      esModuleInterop: true,
-    },
-  }).outputText
-  new Function('exports', 'require', source)(exports, (id) => dependencies[id] ?? require(id))
-  return exports
-}
-const button = loadShared('src/shared/ui/Button.tsx', {
-  '@/shared/lib/tv': loadShared('src/shared/lib/tv.ts', {
-    './cn': loadShared('src/shared/lib/cn.ts'),
-  }),
-})
-const retry = loadShared('src/shared/ui/RetryButton.tsx', { './Button': button })
-
 function renderer(getResult) {
   const exports = {}
   // Render the actual result/error branches with real React hooks and React Query state.
@@ -58,7 +36,6 @@ function renderer(getResult) {
       useQuery: ({ queryKey }) => (queryKey[0] === 'care-places' ? getResult() : {}),
     },
     '@/entities/care-place': {},
-    '@/shared/ui': retry,
     '@/shared/lib/fonts': { cafe24Proup: { className: 'test-font' } },
     '../lib/care-location': {},
     '../lib/care-search-state': searchState,
