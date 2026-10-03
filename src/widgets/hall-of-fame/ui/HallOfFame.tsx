@@ -25,7 +25,7 @@ const HallOfFame = () => {
   return (
     <section className="w-full bg-white">
       <Container
-        className={cn('px-4 py-4 tab:py-[0.625rem] pc:py-20', hasWinners && 'pc:h-[36rem]')}
+        className={cn('px-4 py-4 tab:py-[0.625rem] pc:py-10', hasWinners && 'pc:h-[31rem]')}
       >
         <div
           className={cn(

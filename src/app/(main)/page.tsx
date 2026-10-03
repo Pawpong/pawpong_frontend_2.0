@@ -3,14 +3,12 @@ import { HallOfFame } from '@/widgets/hall-of-fame'
 import { AdoptionShowcase } from '@/widgets/adoption-showcase'
 import { CommunityShowcase } from '@/widgets/community-showcase'
 import { CategoryBrowse } from '@/features/category-browse'
-import { HomeCta } from '@/widgets/home-cta'
 import { CareMapEntry } from '@/widgets/care-map-entry'
 
 const HomePage = () => {
   return (
     <div>
       <Banner />
-      <HomeCta />
 
       <CategoryBrowse />
       <CareMapEntry />
