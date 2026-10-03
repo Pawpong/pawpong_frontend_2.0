@@ -1,9 +1,14 @@
-import type { Metadata } from 'next'
+import { createPageMetadata } from '@/shared/lib/metadata'
+
 import Link from 'next/link'
 import { TermsArticle } from '../_ui/TermsArticle'
 import { TERMS_OF_PRIVACY_INTRO, TERMS_OF_PRIVACY_SECTIONS } from './_lib/constants'
 
-export const metadata: Metadata = { title: '개인정보처리방침 | Pawpong' }
+export const metadata = createPageMetadata({
+  title: '개인정보처리방침',
+  description: '포퐁의 개인정보 처리방침을 확인하세요.',
+  path: '/terms-of-privacy',
+})
 
 const TermsOfPrivacyPage = () => (
   <>

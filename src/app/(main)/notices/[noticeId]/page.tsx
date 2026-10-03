@@ -1,3 +1,8 @@
+import { getNoticeMetadata } from '@/app/_lib/contentMetadata'
+
+export const generateMetadata = async ({ params }: { params: Promise<{ noticeId: string }> }) =>
+  getNoticeMetadata((await params).noticeId)
+
 import { NoticeDetailContent } from './_ui/NoticeDetailContent'
 
 interface NoticeDetailPageProps {

@@ -1,4 +1,8 @@
+import { createPageMetadata } from '@/shared/lib/metadata'
+
 import { CommunityPostEditor } from '../../../_ui/CommunityPostEditor'
+
+export const metadata = createPageMetadata({ title: '게시글 수정', noIndex: true })
 
 interface CommunityPostEditPageProps {
   params: Promise<{ postId: string }>

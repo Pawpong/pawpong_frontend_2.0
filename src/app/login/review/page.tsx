@@ -1,4 +1,5 @@
-import type { Metadata } from 'next'
+import { createPageMetadata } from '@/shared/lib/metadata'
+
 import Link from 'next/link'
 import { ReviewLoginForm } from '@/features/auth'
 import { RESPONSIVE_SHELL_CLASS } from '@/shared/config'
@@ -7,10 +8,7 @@ import { cafe24Proup } from '@/shared/lib/fonts'
 import { normalizeReturnUrl } from '@/shared/lib/normalizeReturnUrl'
 import { LogoButton } from '@/widgets/gnb'
 
-export const metadata: Metadata = {
-  title: '심사용 계정 로그인 | 포퐁',
-  robots: { index: false, follow: false },
-}
+export const metadata = createPageMetadata({ title: '심사용 계정 로그인', noIndex: true })
 
 export default async function ReviewLoginPage({
   searchParams,

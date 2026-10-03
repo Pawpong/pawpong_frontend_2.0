@@ -1,7 +1,11 @@
+import { createPageMetadata } from '@/shared/lib/metadata'
+
 import { requireAuth } from '@/features/auth/server'
 import { Container, NavigationBar } from '@/shared/ui'
 import { AdoptionDraftSection } from './_ui/AdoptionDraftSection'
 import { CommunityDraftSection } from './_ui/CommunityDraftSection'
+
+export const metadata = createPageMetadata({ title: '임시저장한 글', noIndex: true })
 
 /** 임시저장한 글 — 분양글(브리더만)과 게시글을 한 화면에서 이어 쓴다. 진입점은 전부 마이홈이다 */
 const DraftsPage = async () => {
