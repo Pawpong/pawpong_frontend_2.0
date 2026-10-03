@@ -103,7 +103,7 @@
 }
 .care-map-marker {
   position: relative;
-  width: 36px;
+  width: 40px;
   height: 40px;
   border: 2px solid var(--color-base-white);
   border-radius: 18px 18px 18px 4px;
