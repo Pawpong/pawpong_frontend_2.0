@@ -1,6 +1,6 @@
 'use client'
 
-import { Button, Container, CtaModal, NavigationBar } from '@/shared/ui'
+import { RetryButton, Button, Container, CtaModal, NavigationBar } from '@/shared/ui'
 import { AdoptionPostingForm } from '../../_ui/AdoptionPostingForm'
 import { useAdoptionCreateForm } from '../_lib/useAdoptionCreateForm'
 
@@ -25,6 +25,7 @@ const AdoptionCreateContent = () => {
     handleExitConfirm,
     handleUpload,
     handleSaveDraft,
+    isFetching: isRetrying,
   } = useAdoptionCreateForm()
 
   if (isLoadingDraft || isDraftLoadError) {
@@ -51,9 +52,7 @@ const AdoptionCreateContent = () => {
                 <Button intent="secondary" size="sm" onClick={handleCloseClick}>
                   목록으로
                 </Button>
-                <Button intent="dark" size="sm" onClick={() => void retryDraft()}>
-                  다시 시도
-                </Button>
+                <RetryButton onRetry={() => void retryDraft()} isRetrying={isRetrying} />
               </div>
             )}
           </div>

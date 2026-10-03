@@ -2,7 +2,7 @@
 
 import { useParams } from 'next/navigation'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
-import { AsyncState, Button } from '@/shared/ui'
+import { AsyncState } from '@/shared/ui'
 import { adoptionQueries } from '@/entities/adoption'
 import { AdoptionDetailContent } from './AdoptionDetailContent'
 import { mapAdoptionDetail } from '../_lib/mapAdoptionDetail'
@@ -39,11 +39,8 @@ const AdoptionDetailPageClient = () => {
       <AsyncState
         status="error"
         message="분양글을 불러오지 못했습니다."
-        action={
-          <Button intent="dark" size="sm" onClick={() => void detailQuery.refetch()}>
-            다시 시도
-          </Button>
-        }
+        onRetry={() => void detailQuery.refetch()}
+        isRetrying={detailQuery.isFetching}
         className="min-h-[calc(100dvh-3rem)] tab:min-h-[calc(100dvh-3.5rem)]"
       />
     )

@@ -152,6 +152,7 @@ const useApplicationForm = (detail: AdoptionDetailDto) => {
     isProfilePending: adopterProfileQuery.isPending,
     isProfileError: adopterProfileQuery.isError,
     retryProfile: adopterProfileQuery.refetch,
+    isFetching: adopterProfileQuery.isFetching,
     toast,
   }
 }

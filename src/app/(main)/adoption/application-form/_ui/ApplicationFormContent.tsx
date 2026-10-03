@@ -94,13 +94,8 @@ const ApplicationFormContent = () => {
           message={
             formQuery.isError ? '신청서를 불러오지 못했습니다.' : '신청서를 불러오는 중입니다.'
           }
-          action={
-            formQuery.isError ? (
-              <Button intent="dark" size="sm" onClick={() => void formQuery.refetch()}>
-                다시 시도
-              </Button>
-            ) : undefined
-          }
+          onRetry={formQuery.isError ? () => void formQuery.refetch() : undefined}
+          isRetrying={formQuery.isFetching}
           className="min-h-[calc(100dvh-3.5rem)]"
         />
       </div>
