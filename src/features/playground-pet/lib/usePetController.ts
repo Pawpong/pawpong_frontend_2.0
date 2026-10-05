@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   getPet,
-  getPetConfig,
+  petConfigOptions,
   latestPetView,
   petErrorMessage,
   runPetCommand,
@@ -16,14 +16,7 @@ import {
 import { PetCommandQueue } from '@/entities/playground-pet/model/commandQueue'
 import { inPetSession, petSessionIsCurrent, type PetSession } from './usePetSession'
 
-export const petConfigOptions = {
-  queryKey: ['playground-pet', 'config'],
-  queryFn: ({ signal }: { signal: AbortSignal }) => getPetConfig(signal),
-  staleTime: 30_000,
-  refetchOnWindowFocus: true,
-  retry: false,
-  throwOnError: false,
-} as const
+export { petConfigOptions }
 
 export const petPrivateKey = (session: PetSession) =>
   ['playground-pet', 'private', session.scope] as const

@@ -1,6 +1,12 @@
 // Imported only by PetStage's client effect; Phaser never enters a server render or a common bundle.
 import Phaser from 'phaser'
-import type { PetRoomState, PetSnackSession, SnackLane, PetAction } from '@/entities/playground-pet'
+import type {
+  PetRoomState,
+  PetSnackSession,
+  SnackLane,
+  PetAction,
+  PetGameKind,
+} from '@/entities/playground-pet'
 import { PET_SLOT_POSITIONS } from '@/entities/playground-pet/model/room'
 import { SNACK_LANE_X } from '@/entities/playground-pet/model/snack'
 import { petAsset, type PetAssetManifest } from './gameAssets'
@@ -17,6 +23,7 @@ export type PetStageSnapshot = {
 }
 export type PetGameHandle = {
   sync: (snapshot: PetStageSnapshot) => void
+  prepareGame: (kind: PetGameKind) => Promise<boolean>
   retry: () => void
   destroy: () => void
 }
@@ -32,6 +39,7 @@ export function createPetGame(
     characterKey = ''
   let scene: RoomScene | null = null
   let loadVersion = 0
+  let preparedGame: PetGameKind | null = null
   const pendingImages = new Set<HTMLImageElement>()
   const assetTextures = new Map<string, string>()
   const loading = new Map<string, Promise<void>>()
@@ -39,6 +47,12 @@ export function createPetGame(
   let keySerial = 0
   let reactionAt = 0,
     lastReaction = initial.reaction
+
+  function requiredAssets(state: PetStageSnapshot) {
+    const ids = Object.values(state.room ?? {}).filter((id): id is string => Boolean(id))
+    if (state.snack || preparedGame === 'snack') ids.push('toy_bone', 'toy_ball')
+    return [...new Set(ids)]
+  }
 
   function imageFor(url: string): Promise<HTMLImageElement> {
     const existing = loadedImages.get(url)
@@ -97,15 +111,19 @@ export function createPetGame(
   }
 
   async function loadSnapshot() {
-    if (!scene || !snapshot.manifest || !snapshot.characterUrl) return
+    if (!alive || !scene || !snapshot.manifest) return false
     const version = ++loadVersion
     const url = snapshot.characterUrl
+    ready = false
     onState('loading')
     try {
-      await Promise.all(Object.keys(snapshot.manifest.assets).map(ensureAsset))
-      if (url !== characterKey) {
+      // Load this room's layers first. Unused shop assets cannot delay or fail the room.
+      await Promise.allSettled(requiredAssets(snapshot).map(ensureAsset))
+      if (!alive || version !== loadVersion || !scene) return false
+      scene.apply()
+      if (url && url !== characterKey) {
         const img = await imageFor(url)
-        if (!alive || version !== loadVersion || !scene) return
+        if (!alive || version !== loadVersion || !scene) return false
         const oldKey = characterKey
         const texture = scene.textures.addSpriteSheet(url, img, {
           frameWidth: 96,
@@ -122,12 +140,21 @@ export function createPetGame(
           loadedImages.delete(oldKey)
         }
       }
-      if (!alive || version !== loadVersion) return
+      if (!url && characterKey) {
+        scene.textures.remove(characterKey)
+        loadedImages.delete(characterKey)
+        characterKey = ''
+      }
+      if (!alive || version !== loadVersion) return false
+      if (requiredAssets(snapshot).some((id) => !assetTextures.has(id)))
+        throw new Error('room asset unavailable')
       ready = true
       scene.apply()
       onState('ready')
+      return true
     } catch {
       if (alive && version === loadVersion) onState('error')
+      return false
     }
   }
 
@@ -144,12 +171,34 @@ export function createPetGame(
     create() {
       scene = this
       this.cameras.main.roundPixels = true
-      this.wall = this.add.image(0, 0, '__WHITE').setOrigin(0).setVisible(false)
-      this.floor = this.add.tileSprite(0, 128, 320, 96, '__WHITE').setOrigin(0).setVisible(false)
+      this.cameras.main.setBackgroundColor('#fff2d8')
+      // Opaque room pixels exist before any texture load. Transparent/missing wallpaper
+      // reveals this bright room, independently of GPU clearColor and DOM/CSS overlays.
+      const base = this.add.graphics().setDepth(-10)
+      base.fillStyle(0xfff2d8).fillRect(0, 0, 320, 128)
+      base.fillStyle(0xe7c799).fillRect(0, 128, 320, 96)
+      base.fillStyle(0xcaa372).fillRect(0, 124, 320, 4)
+      for (let y = 144; y < 224; y += 16) base.fillRect(0, y, 320, 1)
+      base.fillStyle(0xf7d18f).fillRect(53, 21, 70, 79)
+      base.fillStyle(0x98d8ee).fillRect(59, 27, 58, 67)
+      base.fillStyle(0xf9f7df).fillRect(60, 43, 17, 5).fillRect(94, 36, 16, 5)
+      base.fillStyle(0xb8d695).fillRect(59, 73, 58, 21)
+      base.fillStyle(0xf7d18f).fillRect(86, 27, 4, 67).fillRect(59, 59, 58, 4)
+      base.fillStyle(0xfff9e6).fillTriangle(63, 100, 108, 100, 145, 124)
+      this.wall = this.add.image(0, 0, '__WHITE').setDepth(-5).setOrigin(0).setVisible(false)
+      this.floor = this.add
+        .tileSprite(0, 128, 320, 96, '__WHITE')
+        .setDepth(-4)
+        .setOrigin(0)
+        .setVisible(false)
       for (const [slot, position] of Object.entries(PET_SLOT_POSITIONS)) {
         this.furniture.set(
           slot,
-          this.add.image(position.x, position.y, '__WHITE').setOrigin(0.5, 1).setVisible(false),
+          this.add
+            .image(position.x, position.y, '__WHITE')
+            .setDepth(10)
+            .setOrigin(0.5, 1)
+            .setVisible(false),
         )
       }
       this.shadow = this.add.ellipse(130, 190, 40, 8, 0x6c5341, 0.2).setDepth(20).setVisible(false)
@@ -198,8 +247,9 @@ export function createPetGame(
             asset?.logicalHeight ?? position.height,
           )
       }
+      this.hero.setVisible(Boolean(characterKey))
       if (characterKey)
-        this.hero.setTexture(characterKey, 0).setDisplaySize(72, 72).setVisible(true)
+        this.hero.setTexture(characterKey, 0).setDisplaySize(96, 96).setVisible(true)
       this.shadow.setVisible(Boolean(characterKey))
       const snack = snapshot.snack
       const changedSession = this.dropSession !== (snack?.session.sessionId ?? '')
@@ -209,16 +259,20 @@ export function createPetGame(
         this.dropSession = snack?.session.sessionId ?? ''
         if (snack)
           this.drops = snack.session.drops.map((drop) => {
-            const id = drop.kind === 'snack' ? 'toy_bone' : 'toy_ball'
             const image = this.add
               .image(SNACK_LANE_X[drop.lane], 0, '__WHITE')
               .setDepth(30)
               .setVisible(false)
-            this.showAsset(image, id, 24, 24)
             if (drop.kind === 'hazard') image.setTint(0xb3443c)
             return image
           })
       }
+      // The session can survive a failed download. Rebind every drop when assets retry.
+      if (snack)
+        this.drops.forEach((image, index) => {
+          const id = snack.session.drops[index].kind === 'snack' ? 'toy_bone' : 'toy_ball'
+          this.showAsset(image, id, 24, 24)
+        })
       if (!snack) this.hero.setPosition(snapshot.resting ? 246 : 130, snapshot.resting ? 164 : 196)
     }
 
@@ -277,7 +331,7 @@ export function createPetGame(
     parent,
     width: 320,
     height: 224,
-    backgroundColor: '#ede5cd',
+    backgroundColor: '#fff2d8',
     pixelArt: true,
     roundPixels: true,
     antialias: false,
@@ -289,9 +343,15 @@ export function createPetGame(
     scene: RoomScene,
   })
   return {
+    prepareGame(kind) {
+      preparedGame = kind
+      return loadSnapshot()
+    },
     sync(next) {
       const reload =
-        next.characterUrl !== snapshot.characterUrl || next.manifest !== snapshot.manifest
+        next.characterUrl !== snapshot.characterUrl ||
+        next.manifest !== snapshot.manifest ||
+        requiredAssets(next).join('|') !== requiredAssets(snapshot).join('|')
       snapshot = next
       if (reload) void loadSnapshot()
       else if (ready) scene?.apply()

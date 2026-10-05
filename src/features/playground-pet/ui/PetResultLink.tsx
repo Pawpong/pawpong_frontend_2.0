@@ -35,7 +35,7 @@ export function PetResultLink({ sourceJobId }: { sourceJobId: string }) {
         href={`/playground/pet?sourceJobId=${encodeURIComponent(sourceJobId)}`}
         className={buttonVariants({ intent: 'secondary', width: 'full' })}
       >
-        이 그림으로 반려동물 키우기
+        이 전신 캐릭터 확인하고 키우기
       </Link>
     </div>
   )

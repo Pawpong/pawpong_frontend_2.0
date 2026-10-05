@@ -8,22 +8,28 @@ export function PetStage({
   snapshot,
   name,
   onReady,
+  onGame,
   children,
 }: {
   snapshot: PetStageSnapshot
   name: string
   onReady: (ready: boolean) => void
+  onGame?: (game: PetGameHandle | null) => void
   children?: ReactNode
 }) {
   const host = useRef<HTMLDivElement>(null)
   const latest = useRef(snapshot)
   const readiness = useRef(onReady)
+  const gameListener = useRef(onGame)
   const engine = useRef<PetGameHandle | null>(null)
   const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading')
   const [attempt, setAttempt] = useState(0)
   useEffect(() => {
     readiness.current = onReady
   }, [onReady])
+  useEffect(() => {
+    gameListener.current = onGame
+  }, [onGame])
   useEffect(() => {
     latest.current = snapshot
     engine.current?.sync(snapshot)
@@ -39,6 +45,7 @@ export function PetStage({
             readiness.current(next === 'ready')
           }
         })
+        gameListener.current?.(engine.current)
       })
       .catch(() => {
         if (alive) {
@@ -50,14 +57,19 @@ export function PetStage({
       alive = false
       engine.current?.destroy()
       engine.current = null
+      gameListener.current?.(null)
     }
   }, [attempt])
   return (
-    <div className={styles.stage}>
-      <div ref={host} className={styles.canvasHost} aria-hidden="true" />
-      <span className="sr-only">
-        {name}의 도트 캐릭터와 저장된 가구가 있는 방. 게임은 아래 버튼과 방향키로 조작할 수 있어요.
-      </span>
+    <>
+      <div className={styles.stage}>
+        <div ref={host} className={styles.canvasHost} aria-hidden="true" />
+        <span className="sr-only">
+          {name}의 도트 캐릭터와 저장된 가구가 있는 방. 게임은 아래 버튼과 방향키로 조작할 수
+          있어요.
+        </span>
+        {children}
+      </div>
       {state !== 'ready' && (
         <div className={styles.stageStatus} role={state === 'error' ? 'alert' : 'status'}>
           <p>
@@ -78,7 +90,6 @@ export function PetStage({
           )}
         </div>
       )}
-      {children}
-    </div>
+    </>
   )
 }

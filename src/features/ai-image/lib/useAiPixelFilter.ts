@@ -11,7 +11,7 @@ import { useAiPixelTransform } from './useAiPixelTransform'
  * 필터는 관리자가 정한 정렬 순서의 첫 번째(기본: 포퐁 도트 초상화)를 미리 골라 둔다.
  * 콘테스트 없이 쓰므로 생성 횟수는 서버가 하루 3회로 센다.
  */
-export const useAiPixelFilter = () => {
+export const useAiPixelFilter = (gameCharacter = false) => {
   const filtersQuery = useQuery(aiImageQueries.filters())
   const transform = useAiPixelTransform()
   const [pickedFilterId, setPickedFilterId] = useState<string | null>(null)
@@ -26,9 +26,13 @@ export const useAiPixelFilter = () => {
   const start = useCallback(
     async (file: File) => {
       if (!selectedFilterId) return null
-      return runTransform({ file, filterId: selectedFilterId })
+      return runTransform({
+        file,
+        filterId: selectedFilterId,
+        ...(gameCharacter ? { generationPurpose: 'pet-sprite-v1' as const } : {}),
+      })
     },
-    [runTransform, selectedFilterId],
+    [runTransform, selectedFilterId, gameCharacter],
   )
 
   return {
