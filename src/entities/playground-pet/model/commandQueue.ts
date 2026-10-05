@@ -9,18 +9,32 @@ export type PetCommandResult =
 /** 응답 유실 후에는 같은 본문·키만 재전송한다. 다른 행동으로 덮어쓰지 않는다. */
 export class PetCommandQueue {
   private pending: PetCommand | null = null
+  private controller = new AbortController()
   isRunning = false
 
-  constructor(private readonly send: (command: PetCommand) => Promise<PetMutationView>) {}
+  constructor(
+    private readonly send: (command: PetCommand, signal: AbortSignal) => Promise<PetMutationView>,
+  ) {}
+
+  get isDisposed() {
+    return this.controller.signal.aborted
+  }
+  activate() {
+    if (this.isDisposed) this.controller = new AbortController()
+  }
+  dispose() {
+    this.controller.abort()
+    this.pending = null
+  }
 
   async run(command?: PetCommand): Promise<PetCommandResult> {
-    if (this.isRunning || (command && this.pending)) return { type: 'busy' }
+    if (this.isDisposed || this.isRunning || (command && this.pending)) return { type: 'busy' }
     const request = command ?? this.pending
     if (!request) return { type: 'busy' }
     this.pending = request
     this.isRunning = true
     try {
-      const data = await this.send(request)
+      const data = await this.send(request, this.controller.signal)
       this.pending = null
       return { type: 'success', data }
     } catch (cause) {

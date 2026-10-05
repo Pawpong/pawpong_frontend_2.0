@@ -1,0 +1,278 @@
+{
+  "version": "classic-v2",
+  "world": {
+    "width": 320,
+    "height": 224,
+    "wallHeight": 128
+  },
+  "assets": {
+    "wallpaper_cream": {
+      "url": "/playground/pet/v2/wallpaper_cream.png",
+      "width": 320,
+      "height": 128,
+      "logicalWidth": 320,
+      "logicalHeight": 128,
+      "anchor": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "wallpaper_forest": {
+      "url": "/playground/pet/v2/wallpaper_forest.png",
+      "width": 320,
+      "height": 128,
+      "logicalWidth": 320,
+      "logicalHeight": 128,
+      "anchor": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "wallpaper_starry": {
+      "url": "/playground/pet/v2/wallpaper_starry.png",
+      "width": 320,
+      "height": 128,
+      "logicalWidth": 320,
+      "logicalHeight": 128,
+      "anchor": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "wallpaper_cloud": {
+      "url": "/playground/pet/v2/wallpaper_cloud.png",
+      "width": 320,
+      "height": 128,
+      "logicalWidth": 320,
+      "logicalHeight": 128,
+      "anchor": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "floor_oak": {
+      "url": "/playground/pet/v2/floor_oak.png",
+      "width": 32,
+      "height": 32,
+      "logicalWidth": 32,
+      "logicalHeight": 32,
+      "repeat": true,
+      "anchor": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "floor_checker": {
+      "url": "/playground/pet/v2/floor_checker.png",
+      "width": 32,
+      "height": 32,
+      "logicalWidth": 32,
+      "logicalHeight": 32,
+      "repeat": true,
+      "anchor": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "floor_moss": {
+      "url": "/playground/pet/v2/floor_moss.png",
+      "width": 32,
+      "height": 32,
+      "logicalWidth": 32,
+      "logicalHeight": 32,
+      "repeat": true,
+      "anchor": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "floor_rose": {
+      "url": "/playground/pet/v2/floor_rose.png",
+      "width": 32,
+      "height": 32,
+      "logicalWidth": 32,
+      "logicalHeight": 32,
+      "repeat": true,
+      "anchor": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "bed_cushion": {
+      "url": "/playground/pet/v2/bed_cushion.png",
+      "width": 64,
+      "height": 64,
+      "logicalWidth": 64,
+      "logicalHeight": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "bed_basket": {
+      "url": "/playground/pet/v2/bed_basket.png",
+      "width": 64,
+      "height": 64,
+      "logicalWidth": 64,
+      "logicalHeight": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "bed_moon": {
+      "url": "/playground/pet/v2/bed_moon.png",
+      "width": 64,
+      "height": 64,
+      "logicalWidth": 64,
+      "logicalHeight": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "bed_tent": {
+      "url": "/playground/pet/v2/bed_tent.png",
+      "width": 64,
+      "height": 64,
+      "logicalWidth": 64,
+      "logicalHeight": 64,
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "toy_ball": {
+      "url": "/playground/pet/v2/toy_ball.png",
+      "width": 64,
+      "height": 64,
+      "logicalWidth": 28,
+      "logicalHeight": 28,
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "toy_bone": {
+      "url": "/playground/pet/v2/toy_bone.png",
+      "width": 64,
+      "height": 64,
+      "logicalWidth": 28,
+      "logicalHeight": 28,
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "toy_duck": {
+      "url": "/playground/pet/v2/toy_duck.png",
+      "width": 64,
+      "height": 64,
+      "logicalWidth": 28,
+      "logicalHeight": 28,
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "toy_train": {
+      "url": "/playground/pet/v2/toy_train.png",
+      "width": 64,
+      "height": 64,
+      "logicalWidth": 28,
+      "logicalHeight": 28,
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "plant_sprout": {
+      "url": "/playground/pet/v2/plant_sprout.png",
+      "width": 64,
+      "height": 64,
+      "logicalWidth": 48,
+      "logicalHeight": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "plant_flower": {
+      "url": "/playground/pet/v2/plant_flower.png",
+      "width": 64,
+      "height": 64,
+      "logicalWidth": 48,
+      "logicalHeight": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "plant_cactus": {
+      "url": "/playground/pet/v2/plant_cactus.png",
+      "width": 64,
+      "height": 64,
+      "logicalWidth": 48,
+      "logicalHeight": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "plant_tree": {
+      "url": "/playground/pet/v2/plant_tree.png",
+      "width": 64,
+      "height": 64,
+      "logicalWidth": 48,
+      "logicalHeight": 48,
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "decoration_paw": {
+      "url": "/playground/pet/v2/decoration_paw.png",
+      "width": 64,
+      "height": 64,
+      "logicalWidth": 36,
+      "logicalHeight": 36,
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "decoration_books": {
+      "url": "/playground/pet/v2/decoration_books.png",
+      "width": 64,
+      "height": 64,
+      "logicalWidth": 36,
+      "logicalHeight": 36,
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "decoration_lamp": {
+      "url": "/playground/pet/v2/decoration_lamp.png",
+      "width": 64,
+      "height": 64,
+      "logicalWidth": 36,
+      "logicalHeight": 36,
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "decoration_trophy": {
+      "url": "/playground/pet/v2/decoration_trophy.png",
+      "width": 64,
+      "height": 64,
+      "logicalWidth": 36,
+      "logicalHeight": 36,
+      "anchor": {
+        "x": 0.5,
+        "y": 1
+      }
+    }
+  }
+}

@@ -87,5 +87,23 @@ export function petErrorMessage(status?: number, code?: string): string {
   if (code === 'DAILY_LIMIT') return '오늘의 돌봄 보상을 모두 받았어요.'
   if (code === 'LOW_ENERGY') return '놀이 전에 잠깐 쉬며 에너지를 채워 주세요.'
   if (code === 'SOURCE_CHANGED') return '그림의 상태가 바뀌었어요. 사용할 그림을 다시 골라 주세요.'
+  if (code === 'INSUFFICIENT_STARS') return '별사탕이 부족해요. 돌봄과 미니게임으로 모아 주세요.'
+  if (code === 'ITEM_OWNED') return '이미 가지고 있는 소품이에요. 인벤토리를 확인해 주세요.'
+  if (code === 'LEVEL_REQUIRED' || code === 'LEVEL_LOCKED')
+    return '조금 더 자라면 사용할 수 있어요.'
+  if (code === 'ITEM_NOT_OWNED') return '먼저 이 소품을 별사탕으로 받아 주세요.'
+  if (code === 'GAME_ACTIVE') return '진행 중인 게임이 있어요. 이어 하거나 종료해 주세요.'
+  if (code === 'GAME_EXPIRED') return '게임 시간이 만료됐어요. 새 게임을 시작해 주세요.'
+  if (code === 'GAME_FINISHED') return '이미 끝난 게임이에요. 저장된 결과를 확인해 주세요.'
+  if (code === 'GAME_CANCELLED') return '종료한 게임이에요. 새 게임을 시작해 주세요.'
+  if (code === 'MEMORY_LOCKED' || code === 'FLIP_TOO_FAST')
+    return '카드를 확인하는 중이에요. 잠깐 기다려 주세요.'
+  if (code === 'GAME_FLIP_LIMIT')
+    return '이번 판의 뒤집기 횟수를 모두 썼어요. 종료하고 다시 시작해 주세요.'
+  if (code === 'CARD_UNAVAILABLE') return '이미 맞춘 카드예요. 다른 카드를 골라 주세요.'
+  if (code === 'GAME_NOT_ACTIVE') return '진행 중인 게임을 다시 확인해 주세요.'
+  if (code === 'IDEMPOTENCY_CONFLICT')
+    return '이 요청은 이미 처리됐어요. 최신 상태를 다시 확인해 주세요.'
+  if (code === 'GAME_TOO_EARLY') return '아직 게임이 끝나지 않았어요. 잠시 뒤 결과를 확인해 주세요.'
   return '요청을 완료하지 못했어요. 상태를 다시 확인해 주세요.'
 }
