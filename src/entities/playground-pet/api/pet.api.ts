@@ -49,14 +49,35 @@ async function readEligiblePetImages(
   )
 }
 
-export async function runPetCommand(command: PetCommand): Promise<PetMutationView> {
+export async function runPetCommand(
+  command: PetCommand,
+  signal?: AbortSignal,
+): Promise<PetMutationView> {
   return unwrap(
     await apiClient.post<ApiResponse<PetMutationView>>(
       `${BASE}/${command.kind}`,
       command.body,
-      sessionRequest(),
+      sessionRequest(signal),
     ),
   )
+}
+
+/** Binary owner-only endpoint; never put the personal sheet in a shared image cache. */
+export async function getPetCharacter(signal?: AbortSignal): Promise<Blob> {
+  const request = sessionRequest(signal)
+  const response = await apiClient.get<Blob>(`${BASE}/character`, {
+    ...request,
+    responseType: 'blob',
+    headers: { ...request.headers, Accept: 'image/png' },
+  })
+  if (
+    !(response.data instanceof Blob) ||
+    response.data.type !== 'image/png' ||
+    response.data.size === 0 ||
+    response.data.size > 2_000_000
+  )
+    throw new ApiError('캐릭터 그림을 준비하지 못했어요.', 503)
+  return response.data
 }
 
 export async function isEligiblePetImage(
