@@ -72,9 +72,15 @@ const paths = Object.fromEntries(
 type PixelActionIconProps = SVGProps<SVGSVGElement> & {
   glyph: Glyph
   filled?: boolean
+  selectedFill?: string
 }
 
-export const PixelActionIcon = ({ glyph, filled = false, ...props }: PixelActionIconProps) => (
+export const PixelActionIcon = ({
+  glyph,
+  filled = false,
+  selectedFill,
+  ...props
+}: PixelActionIconProps) => (
   <svg width="30" height="30" viewBox="0 0 30 30" fill="currentColor" aria-hidden="true" {...props}>
     {glyph in contours ? (
       <>
@@ -86,6 +92,11 @@ export const PixelActionIcon = ({ glyph, filled = false, ...props }: PixelAction
           strokeLinejoin="miter"
         />
         {glyph === 'comment' && <path d="M9 12h2v2H9zM14 12h2v2h-2zM19 12h2v2h-2z" />}
+      </>
+    ) : filled && selectedFill ? (
+      <>
+        <path d={paths[glyph as PixelGlyph].filled} fill={selectedFill} />
+        <path d={paths[glyph as PixelGlyph].outline} />
       </>
     ) : (
       <path d={paths[glyph as PixelGlyph][filled ? 'filled' : 'outline']} />

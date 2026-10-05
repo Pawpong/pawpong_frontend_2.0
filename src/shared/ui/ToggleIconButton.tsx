@@ -8,11 +8,13 @@ import { tv } from '@/shared/lib/tv'
 // onClick → 버튼, href → 링크(댓글 아이콘 등), 둘 다 없으면 표시 전용.
 
 type ToggleIconStatus = 'default' | 'fill'
-type ToggleIcon = ComponentType<SVGProps<SVGSVGElement> & { status?: ToggleIconStatus }>
+type ToggleIcon = ComponentType<
+  SVGProps<SVGSVGElement> & { status?: ToggleIconStatus; size?: 'md' | 'lg' }
+>
 
 const toggleIconVariants = tv({
   slots: {
-    root: 'focus-ring inline-flex shrink-0 items-center gap-1 rounded-lg transition-colors hover:bg-brand-subtle hover:text-brand-hover font-semibold text-action-dark disabled:cursor-not-allowed disabled:opacity-50',
+    root: 'focus-ring inline-flex shrink-0 items-center gap-1 rounded-lg font-semibold text-action-dark [-webkit-tap-highlight-color:transparent] disabled:cursor-not-allowed',
     icon: 'shrink-0',
     label: 'text-body-sm',
     count: 'text-body-md',
@@ -26,23 +28,30 @@ const toggleIconVariants = tv({
       responsive: { icon: 'size-8 pc:size-12' },
     },
     pressed: { true: '', false: '' },
+    heart: {
+      true: '',
+      false: { root: 'transition-colors hover:bg-brand-subtle hover:text-brand-hover' },
+    },
     pressedTone: {
       favorite: '',
       bookmark: '',
     },
-    // 상단 내비게이션과 같은 브랜드 색 / 사진 위 흰색
+    // 하트의 외곽은 화면 배경과 관계없이 브라운으로 표시한다.
     tone: {
       default: { icon: '' },
       onImage: { icon: '' },
     },
   },
   compoundVariants: [
-    { pressed: false, tone: 'default', className: { icon: 'text-brand' } },
-    { pressed: false, tone: 'onImage', className: { icon: 'text-base-white' } },
+    { pressed: false, tone: 'default', heart: false, className: { icon: 'text-brand' } },
+    { pressed: false, tone: 'onImage', heart: false, className: { icon: 'text-base-white' } },
+    { pressed: false, tone: 'default', heart: true, className: { icon: 'text-brand' } },
+    { pressed: false, tone: 'onImage', heart: true, className: { icon: 'text-brand' } },
+    { size: 'md', heart: true, className: { icon: 'size-8' } },
     {
       pressed: true,
       pressedTone: 'favorite',
-      className: { icon: 'text-brand', label: 'text-brand' },
+      className: { icon: 'text-pressed-favorite', label: 'text-pressed-favorite' },
     },
     {
       pressed: true,
@@ -90,15 +99,44 @@ const ToggleIconButton = ({
   href,
   disabled,
 }: ToggleIconButtonProps) => {
-  const styles = toggleIconVariants({ size, pressed, pressedTone, tone })
+  const isHeart = hasFillState && pressedTone !== 'bookmark'
+  const styles = toggleIconVariants({
+    size,
+    pressed,
+    pressedTone,
+    tone,
+    heart: isHeart,
+  })
+  const iconState = hasFillState
+    ? { status: pressed ? ('fill' as const) : ('default' as const) }
+    : {}
 
   const content = (
     <>
-      <Icon
-        aria-hidden="true"
-        {...(hasFillState && { status: pressed ? 'fill' : 'default' })}
-        className={styles.icon()}
-      />
+      {isHeart && size === 'responsive' ? (
+        <>
+          {/* 화면 폭을 JS로 읽지 않아 첫 렌더와 크기 변경 때도 모양이 깜빡이지 않는다. */}
+          <Icon
+            aria-hidden="true"
+            {...iconState}
+            size="md"
+            className={styles.icon({ className: 'pc:hidden' })}
+          />
+          <Icon
+            aria-hidden="true"
+            {...iconState}
+            size="lg"
+            className={styles.icon({ className: 'hidden pc:block' })}
+          />
+        </>
+      ) : (
+        <Icon
+          aria-hidden="true"
+          {...iconState}
+          {...(isHeart && { size: size === 'lg' ? ('lg' as const) : ('md' as const) })}
+          className={styles.icon()}
+        />
+      )}
       {label && (
         <span
           className={styles.label({
