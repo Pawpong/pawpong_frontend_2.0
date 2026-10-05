@@ -12,6 +12,7 @@ import {
   type PetCommand,
   type PetView,
   type PetGameOutcome,
+  type PetGameKind,
 } from '@/entities/playground-pet'
 import type { PetCommandResult } from '@/entities/playground-pet/model/commandQueue'
 import { PET_SLOT_LABELS, PET_SLOTS, previewPetRoom } from '@/entities/playground-pet/model/room'
@@ -20,12 +21,13 @@ import { usePetCharacter } from '../lib/usePetCharacter'
 import { usePetAssets } from '../lib/usePetAssets'
 import { usePetSound } from '../lib/usePetSound'
 import type { PetSession } from '../lib/usePetSession'
-import type { PetStageSnapshot } from '../lib/petGameEngine'
+import type { PetGameHandle, PetStageSnapshot } from '../lib/petGameEngine'
 import { PetImage } from './PetImage'
 import { PetStage } from './PetStage'
 import { PetDecorations } from './PetDecorations'
 import { PetMiniGames } from './PetMiniGames'
 import { PetGlyph } from './PetGlyph'
+import { PetAdoption } from './PetAdoption'
 import styles from './PetRoom.module.css'
 
 const STATS = [
@@ -66,6 +68,7 @@ export function PetRoom({
   onAction,
   onRefresh,
   onCommand,
+  initialCharacterSourceId,
 }: {
   view: PetView
   session: PetSession
@@ -77,9 +80,15 @@ export function PetRoom({
   onAction: (action: PetAction) => void
   onRefresh: () => void
   onCommand: (command: PetCommand) => Promise<PetCommandResult | undefined>
+  initialCharacterSourceId?: string
 }) {
   const pet = view.pet!
   const game = view.game
+  const fullBody = pet.character?.format === 'pet-sprite-v1'
+  const requestedSourceId = initialCharacterSourceId?.toLowerCase()
+  const replaceCharacter =
+    fullBody && requestedSourceId && requestedSourceId !== pet.character?.sourceJobId
+  const showCharacterSelection = !fullBody || Boolean(replaceCharacter)
   const active = game?.games.active
   const availableTabs = game ? TABS : TABS.filter(({ id }) => id === 'room' || id === 'records')
   const [menu, setMenu] = useState<{ tab: PetTab; sessionId: string | null }>(() => ({
@@ -92,11 +101,24 @@ export function PetRoom({
     setMenu((current) => ({ ...current, tab }))
   }
   const [canvasReady, setCanvasReady] = useState(false)
+  const gameHandle = useRef<PetGameHandle | null>(null)
+  const setGameHandle = useCallback((handle: PetGameHandle | null) => {
+    gameHandle.current = handle
+  }, [])
+  const prepareGame = useCallback(
+    (kind: PetGameKind) => gameHandle.current?.prepareGame(kind) ?? Promise.resolve(false),
+    [],
+  )
   const [gameSurface, setGameSurface] = useState<HTMLDivElement | null>(null)
   const [selectedItem, setItem] = useState<PetCatalogItem | null>(null)
   const [snack, setSnack] = useState<PetStageSnapshot['snack']>(null)
   const [reducedMotion, setReducedMotion] = useState(false)
-  const character = usePetCharacter(session, pet.id, pet.sourceJobId, Boolean(game))
+  const character = usePetCharacter(
+    session,
+    pet.id,
+    pet.character?.sourceJobId ?? pet.sourceJobId,
+    Boolean(game) && fullBody,
+  )
   const assets = usePetAssets()
   const sound = usePetSound()
   const lastSound = useRef(reaction)
@@ -133,7 +155,7 @@ export function PetRoom({
     () => ({
       room,
       manifest: assets.manifest,
-      characterUrl: character.url,
+      characterUrl: fullBody ? character.url : null,
       resting: Boolean(pet.restEndsAt && now < Date.parse(pet.restEndsAt)),
       reaction,
       feedback,
@@ -144,6 +166,7 @@ export function PetRoom({
       room,
       assets.manifest,
       character.url,
+      fullBody,
       pet.restEndsAt,
       now,
       reaction,
@@ -166,7 +189,7 @@ export function PetRoom({
     setTab(availableTabs[next].id)
     event.currentTarget.querySelectorAll<HTMLButtonElement>('[role="tab"]')[next]?.focus()
   }
-  const stageReady = Boolean(canvasReady && character.url && assets.manifest)
+  const stageReady = fullBody && Boolean(canvasReady && character.url && assets.manifest)
   const operationNotice = (operation.busy || operation.notice) && (
     <div
       className={active ? styles.activeOperation : styles.operationLabel}
@@ -215,20 +238,30 @@ export function PetRoom({
         </div>
         <div className={styles.screenFrame}>
           {game ? (
-            <PetStage snapshot={snapshot} name={pet.name} onReady={setCanvasReady} />
+            <PetStage
+              snapshot={snapshot}
+              name={pet.name}
+              onReady={setCanvasReady}
+              onGame={setGameHandle}
+            />
           ) : (
             <div className={styles.carePortrait}>
               <PetImage src={pet.imageUrl} alt={`${pet.name}의 도트 초상화`} />
+            </div>
+          )}
+          {game && !fullBody && !active && (
+            <div className={styles.stageStatus}>
+              <p>우리 아이의 전신 캐릭터를 연결하면 이 방에서 함께 놀 수 있어요.</p>
+              <a className={styles.smallButton} href="#pet-character-connection">
+                전신 캐릭터 연결하기
+              </a>
             </div>
           )}
           {!active && operationNotice}
           {game && (character.error || assets.error) && (
             <div className={styles.characterError} role="alert">
               <p>{character.error || assets.error}</p>
-              <p>아래는 원본 초상화예요. 게임 캐릭터는 다시 준비할 수 있어요.</p>
-              <div className={styles.portrait}>
-                <PetImage src={pet.imageUrl} alt={`${pet.name}의 원본 도트 초상화`} />
-              </div>
+              <p>원래 그림은 성장 기록에서 볼 수 있어요. 게임 캐릭터는 다시 준비할 수 있어요.</p>
               <div className={styles.buttonRow}>
                 {character.error && (
                   <button className={styles.smallButton} onClick={character.retry}>
@@ -331,6 +364,30 @@ export function PetRoom({
         </div>
       </section>
       <div className={styles.contentPanels}>
+        {showCharacterSelection && (
+          <section
+            id="pet-character-connection"
+            className={styles.panel}
+            aria-label="전신 캐릭터 연결 안내"
+          >
+            <h2>우리 아이에게 작은 전신 캐릭터를 연결해요</h2>
+            <p className={styles.hint}>
+              {fullBody
+                ? '새 전신 그림을 확인하고 직접 연결해 주세요.'
+                : '기존 그림은 사진용 초상화예요.'}{' '}
+              돌봄·이름·성장 기록·별사탕은 그대로 유지돼요. 자동으로 새 그림을 만들거나 이용 횟수를
+              쓰지 않아요.
+            </p>
+            <PetAdoption
+              key={requestedSourceId ?? pet.character?.sourceJobId ?? pet.sourceJobId}
+              session={session}
+              initialSourceJobId={requestedSourceId}
+              connectRevision={pet.revision}
+              disabled={disabled || Boolean(active)}
+              onAdopt={(command) => void onCommand(command)}
+            />
+          </section>
+        )}
         <div
           id="pet-panel-room"
           role="tabpanel"
@@ -430,6 +487,7 @@ export function PetRoom({
               now={now}
               disabled={disabled}
               characterReady={stageReady}
+              onPrepareGame={prepareGame}
               gameSurface={gameSurface}
               onCommand={onCommand}
               onRefresh={refresh}
@@ -487,6 +545,12 @@ export function PetRoom({
                 </li>
               ))}
             </ul>
+            <details className={styles.hint}>
+              <summary>처음 함께한 그림 보기</summary>
+              <div className={styles.portrait}>
+                <PetImage src={pet.imageUrl} alt={`${pet.name}의 처음 함께한 그림`} />
+              </div>
+            </details>
           </section>
         </div>
       </div>
