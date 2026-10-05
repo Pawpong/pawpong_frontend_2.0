@@ -155,6 +155,11 @@ test(
       for (const [path, endpoint] of [
         ['/api/v2/profile/users/private-user', '/api/v2/profile/users/:id'],
         ['/api/v2/profile/users/adoption/follow', '/api/v2/profile/users/:id/follow'],
+        ['/api/v2/care-map/directory?query=private-user', '/api/v2/care-map/directory'],
+        ['/api/v2/playground/pet/me', '/api/v2/playground/pet/me'],
+        ['/api/v2/playground/pet/eligible-images', '/api/v2/playground/pet/eligible-images'],
+        ['/api/v2/playground/pet/games/memory/flip', '/api/v2/playground/pet/games/memory/flip'],
+        ['/api/v2/chat/blocks/private-user', '/api/v2/chat/blocks/:id'],
         ['/api/v2/private-user/unknown', '/unknown'],
       ]) {
         await assert.rejects(
