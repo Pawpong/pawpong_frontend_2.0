@@ -8,7 +8,9 @@ import { tv } from '@/shared/lib/tv'
 // onClick → 버튼, href → 링크(댓글 아이콘 등), 둘 다 없으면 표시 전용.
 
 type ToggleIconStatus = 'default' | 'fill'
-type ToggleIcon = ComponentType<SVGProps<SVGSVGElement> & { status?: ToggleIconStatus }>
+type ToggleIcon = ComponentType<
+  SVGProps<SVGSVGElement> & { status?: ToggleIconStatus; size?: 'md' | 'lg' }
+>
 
 const toggleIconVariants = tv({
   slots: {
@@ -26,7 +28,10 @@ const toggleIconVariants = tv({
       responsive: { icon: 'size-8 pc:size-12' },
     },
     pressed: { true: '', false: '' },
-    heart: { true: '', false: '' },
+    heart: {
+      true: '',
+      false: { root: 'transition-colors hover:bg-brand-subtle hover:text-brand-hover' },
+    },
     pressedTone: {
       favorite: '',
       bookmark: '',
@@ -94,21 +99,44 @@ const ToggleIconButton = ({
   href,
   disabled,
 }: ToggleIconButtonProps) => {
+  const isHeart = hasFillState && pressedTone !== 'bookmark'
   const styles = toggleIconVariants({
     size,
     pressed,
     pressedTone,
     tone,
-    heart: hasFillState && pressedTone !== 'bookmark',
+    heart: isHeart,
   })
+  const iconState = hasFillState
+    ? { status: pressed ? ('fill' as const) : ('default' as const) }
+    : {}
 
   const content = (
     <>
-      <Icon
-        aria-hidden="true"
-        {...(hasFillState && { status: pressed ? 'fill' : 'default' })}
-        className={styles.icon()}
-      />
+      {isHeart && size === 'responsive' ? (
+        <>
+          {/* 화면 폭을 JS로 읽지 않아 첫 렌더와 크기 변경 때도 모양이 깜빡이지 않는다. */}
+          <Icon
+            aria-hidden="true"
+            {...iconState}
+            size="md"
+            className={styles.icon({ className: 'pc:hidden' })}
+          />
+          <Icon
+            aria-hidden="true"
+            {...iconState}
+            size="lg"
+            className={styles.icon({ className: 'hidden pc:block' })}
+          />
+        </>
+      ) : (
+        <Icon
+          aria-hidden="true"
+          {...iconState}
+          {...(isHeart && { size: size === 'lg' ? ('lg' as const) : ('md' as const) })}
+          className={styles.icon()}
+        />
+      )}
       {label && (
         <span
           className={styles.label({
