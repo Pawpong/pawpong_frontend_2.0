@@ -498,6 +498,7 @@ test('silent cookie expiry releases the care controls and notifies the session w
       ...presentation,
       getPet() {},
       getPetConfig() {},
+      petConfigOptions: { queryKey: ['playground-pet', 'config'] },
       runPetCommand: async () => sent++,
     },
     '@/entities/playground-pet/model/commandQueue': { PetCommandQueue },

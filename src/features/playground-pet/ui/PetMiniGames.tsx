@@ -80,6 +80,7 @@ export function PetMiniGames({
   now,
   disabled,
   characterReady,
+  onPrepareGame,
   gameSurface,
   onCommand,
   onRefresh,
@@ -92,6 +93,7 @@ export function PetMiniGames({
   now: number
   disabled: boolean
   characterReady: boolean
+  onPrepareGame: (kind: PetGameKind) => Promise<boolean>
   gameSurface: HTMLElement | null
   onCommand: (command: PetCommand) => Promise<PetCommandResult | undefined>
   onRefresh: () => void
@@ -111,6 +113,8 @@ export function PetMiniGames({
   const [cancelConfirm, setCancelConfirm] = useState(false)
   const [finishing, setFinishing] = useState(false)
   const finishLocked = useRef(false)
+  const startLocked = useRef(false)
+  const [starting, setStarting] = useState(false)
   const hiddenGeneration = useRef(0)
   const lastLockRefresh = useRef('')
   const panel = useRef<HTMLElement>(null)
@@ -191,39 +195,55 @@ export function PetMiniGames({
   }
 
   async function start(kind: PetGameKind) {
+    if (disabled || !characterReady || active || startLocked.current) return
+    startLocked.current = true
+    setStarting(true)
     const visibilityAtStart = hiddenGeneration.current
     const startedHidden = document.hidden
-    const result = await send({
-      kind: 'games/start',
-      body: { game: kind, expectedRevision: revision, idempotencyKey: petRequestKey() },
-    })
-    if (result?.type !== 'success') return
-    setTerminal(null)
-    setDismissedResult(gameOutcome?.sessionId ?? null)
-    const session = result.data.game?.games.active
-    setInterrupted((current) =>
-      session?.game === 'snack' &&
-      (startedHidden ||
+    try {
+      // Prepare the chosen game's textures before starting the server's timed session.
+      if (
+        !(await onPrepareGame(kind)) ||
+        startedHidden ||
         document.hidden ||
-        hiddenGeneration.current !== visibilityAtStart ||
-        current === session.sessionId)
-        ? session.sessionId
-        : null,
-    )
-    if (session?.game === 'snack') {
-      const received = performance.now()
-      setRun({
-        sessionId: session.sessionId,
-        inputs: [],
-        lane: 1,
-        origin:
-          received -
-          Math.max(0, Date.parse(result.data.serverTime) - Date.parse(session.startedAt)),
-        submitted: false,
+        hiddenGeneration.current !== visibilityAtStart
+      )
+        return
+      const result = await send({
+        kind: 'games/start',
+        body: { game: kind, expectedRevision: revision, idempotencyKey: petRequestKey() },
       })
-      setTick(received)
+      if (result?.type !== 'success') return
+      setTerminal(null)
+      setDismissedResult(gameOutcome?.sessionId ?? null)
+      const session = result.data.game?.games.active
+      setInterrupted((current) =>
+        session?.game === 'snack' &&
+        (startedHidden ||
+          document.hidden ||
+          hiddenGeneration.current !== visibilityAtStart ||
+          current === session.sessionId)
+          ? session.sessionId
+          : null,
+      )
+      if (session?.game === 'snack') {
+        const received = performance.now()
+        setRun({
+          sessionId: session.sessionId,
+          inputs: [],
+          lane: 1,
+          origin:
+            received -
+            Math.max(0, Date.parse(result.data.serverTime) - Date.parse(session.startedAt)),
+          submitted: false,
+        })
+        setTick(received)
+      }
+      activePanel.current?.focus({ preventScroll: true })
+    } finally {
+      startLocked.current = false
+      setStarting(false)
     }
-    activePanel.current?.focus({ preventScroll: true })
   }
 
   function move(direction: -1 | 1) {
@@ -466,7 +486,7 @@ export function PetMiniGames({
               </p>
               <button
                 className={styles.primaryButton}
-                disabled={disabled || !characterReady}
+                disabled={disabled || starting || !characterReady}
                 onClick={() => void start('memory')}
               >
                 {practice ? '짝 맞추기 연습' : '짝 맞추기 시작'}
@@ -479,13 +499,18 @@ export function PetMiniGames({
               <p className={styles.hint}>최고 {game.games.bestScores.snack}점 · 최대 별사탕 18개</p>
               <button
                 className={styles.primaryButton}
-                disabled={disabled || !characterReady}
+                disabled={disabled || starting || !characterReady}
                 onClick={() => void start('snack')}
               >
                 {practice ? '간식 받기 연습' : '간식 받기 시작'}
               </button>
             </div>
           </div>
+          {starting && (
+            <p role="status" className={styles.hint}>
+              게임 그림을 준비하고 있어요…
+            </p>
+          )}
           {!characterReady && (
             <p className={styles.hint}>우리 아이의 게임 캐릭터를 준비한 뒤 시작할 수 있어요.</p>
           )}

@@ -1,6 +1,12 @@
 // Imported only by PetStage's client effect; Phaser never enters a server render or a common bundle.
 import Phaser from 'phaser'
-import type { PetRoomState, PetSnackSession, SnackLane, PetAction } from '@/entities/playground-pet'
+import type {
+  PetRoomState,
+  PetSnackSession,
+  SnackLane,
+  PetAction,
+  PetGameKind,
+} from '@/entities/playground-pet'
 import { PET_SLOT_POSITIONS } from '@/entities/playground-pet/model/room'
 import { SNACK_LANE_X } from '@/entities/playground-pet/model/snack'
 import { petAsset, type PetAssetManifest } from './gameAssets'
@@ -17,6 +23,7 @@ export type PetStageSnapshot = {
 }
 export type PetGameHandle = {
   sync: (snapshot: PetStageSnapshot) => void
+  prepareGame: (kind: PetGameKind) => Promise<boolean>
   retry: () => void
   destroy: () => void
 }
@@ -32,6 +39,7 @@ export function createPetGame(
     characterKey = ''
   let scene: RoomScene | null = null
   let loadVersion = 0
+  let preparedGame: PetGameKind | null = null
   const pendingImages = new Set<HTMLImageElement>()
   const assetTextures = new Map<string, string>()
   const loading = new Map<string, Promise<void>>()
@@ -42,7 +50,7 @@ export function createPetGame(
 
   function requiredAssets(state: PetStageSnapshot) {
     const ids = Object.values(state.room ?? {}).filter((id): id is string => Boolean(id))
-    if (state.snack) ids.push('toy_bone', 'toy_ball')
+    if (state.snack || preparedGame === 'snack') ids.push('toy_bone', 'toy_ball')
     return [...new Set(ids)]
   }
 
@@ -103,7 +111,7 @@ export function createPetGame(
   }
 
   async function loadSnapshot() {
-    if (!scene || !snapshot.manifest) return
+    if (!alive || !scene || !snapshot.manifest) return false
     const version = ++loadVersion
     const url = snapshot.characterUrl
     ready = false
@@ -111,11 +119,11 @@ export function createPetGame(
     try {
       // Load this room's layers first. Unused shop assets cannot delay or fail the room.
       await Promise.allSettled(requiredAssets(snapshot).map(ensureAsset))
-      if (!alive || version !== loadVersion || !scene) return
+      if (!alive || version !== loadVersion || !scene) return false
       scene.apply()
       if (url && url !== characterKey) {
         const img = await imageFor(url)
-        if (!alive || version !== loadVersion || !scene) return
+        if (!alive || version !== loadVersion || !scene) return false
         const oldKey = characterKey
         const texture = scene.textures.addSpriteSheet(url, img, {
           frameWidth: 96,
@@ -137,14 +145,16 @@ export function createPetGame(
         loadedImages.delete(characterKey)
         characterKey = ''
       }
-      if (!alive || version !== loadVersion) return
+      if (!alive || version !== loadVersion) return false
       if (requiredAssets(snapshot).some((id) => !assetTextures.has(id)))
         throw new Error('room asset unavailable')
       ready = true
       scene.apply()
       onState('ready')
+      return true
     } catch {
       if (alive && version === loadVersion) onState('error')
+      return false
     }
   }
 
@@ -249,16 +259,20 @@ export function createPetGame(
         this.dropSession = snack?.session.sessionId ?? ''
         if (snack)
           this.drops = snack.session.drops.map((drop) => {
-            const id = drop.kind === 'snack' ? 'toy_bone' : 'toy_ball'
             const image = this.add
               .image(SNACK_LANE_X[drop.lane], 0, '__WHITE')
               .setDepth(30)
               .setVisible(false)
-            this.showAsset(image, id, 24, 24)
             if (drop.kind === 'hazard') image.setTint(0xb3443c)
             return image
           })
       }
+      // The session can survive a failed download. Rebind every drop when assets retry.
+      if (snack)
+        this.drops.forEach((image, index) => {
+          const id = snack.session.drops[index].kind === 'snack' ? 'toy_bone' : 'toy_ball'
+          this.showAsset(image, id, 24, 24)
+        })
       if (!snack) this.hero.setPosition(snapshot.resting ? 246 : 130, snapshot.resting ? 164 : 196)
     }
 
@@ -329,6 +343,10 @@ export function createPetGame(
     scene: RoomScene,
   })
   return {
+    prepareGame(kind) {
+      preparedGame = kind
+      return loadSnapshot()
+    },
     sync(next) {
       const reload =
         next.characterUrl !== snapshot.characterUrl ||

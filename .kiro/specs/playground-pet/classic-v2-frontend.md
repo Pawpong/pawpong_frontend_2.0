@@ -22,6 +22,8 @@ Phaser 4.2.1 exact를 PetStage 클라이언트 effect에서 동적으로 불러�
 
 Phaser camera/clearColor와 동기 fallback 방은 불투명 크림색, 창문·햇빛·나무 바닥을 갖는다. 선택한 방/간식 게임의 필수 그림만 먼저 읽으며 사용하지 않는 상점 그림은 준비를 지연하지 않는다. 장착/미리보기/게임 변경 때 필수 자산을 재검사한다. 선택 자산이 실패해도 밝은 fallback과 성공한 다른 레이어를 보여주고 작은 오류 안내와 재시도를 제공한다. 게임 시작은 실패 상태에서 차단한다.
 
+선택한 게임의 prepare가 성공한 뒤에만 서버 games/start를 보낸다. 간식의 bone/ball은 30초 서버 타이머 전에 읽으며 준비 실패·중복 클릭·준비 중 화면 숨김은 start를 보내지 않는다. 같은 세션에서 필수 이미지 재시도가 성공하면 기존 drop에도 실제 texture를 다시 적용하며 ready 상태의 흰 임시 사각형을 남기지 않는다. 생성 화면·게임 메뉴의 config는 entity의 공통 query 정책을 사용하고 30초 poll·stale focus 재조회·cached enabled의 오류 차단을 공유한다.
+
 PetStage는 게임 인스턴스 하나를 유지하고 immutable snapshot을 sync한다. 탭, 구매 미리보기, 서버 응답, 게임 시작/종료마다 Canvas/WebGL을 다시 만들지 않는다. unmount는 이미지 핸들러와 pending fetch를 취소하고 Phaser를 파괴한다. Phaser destroy가 다음 프레임까지 지연되므로 실행을 시작한 게임은 public headlessStep의 pendingDestroy 경로를 호출해 숨겨진 탭의 정지 루프에서도 정리한다. 초기 texture boot가 아직 끝나지 않은 게임은 READY 이벤트의 동기 start가 끝난 microtask에서 같은 경로로 정리한다. 재실행 가능한 페이지이므로 noReturn을 켜지 않는다.
 
 ## 두 미니게임
