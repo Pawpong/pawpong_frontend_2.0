@@ -1,7 +1,7 @@
 /** BE .kiro/specs/playground-pet/contract.md / dev-v1. 상태와 보상은 서버가 결정한다. */
 export type PetAction = 'greet' | 'feed' | 'play' | 'rest'
 export type PetQuest = Exclude<PetAction, 'rest'>
-export type PetConfig = { enabled: boolean; policyVersion?: string }
+export type PetConfig = { enabled: boolean; policyVersion?: string; publicEnabled?: boolean }
 export type EligiblePetImage = { sourceJobId: string; imageUrl: string; createdAt: string }
 export type EligiblePetImages = { images: EligiblePetImage[]; nextCursor: string | null }
 export type PetAvailability = {

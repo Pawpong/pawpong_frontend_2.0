@@ -3,7 +3,7 @@
 import { useMemo, useSyncExternalStore } from 'react'
 import { getAccessToken } from '@/shared/api/token'
 import { ApiError } from '@/shared/api/unwrap'
-import { AUTH_STATE_CHANGED } from '@/shared/lib/authStateEvents'
+import { AUTH_STATE_CHANGED, notifyAuthStateChanged } from '@/shared/lib/authStateEvents'
 import { getAuthSessionGeneration, isAuthSessionCurrent } from '@/shared/lib/authSessionLifecycle'
 
 export type PetSession = { token: string; scope: string; generation: number }
@@ -52,8 +52,14 @@ export function petSessionIsCurrent(session: PetSession): boolean {
 }
 
 export async function inPetSession<T>(session: PetSession, request: () => Promise<T>): Promise<T> {
-  if (!petSessionIsCurrent(session)) throw new ApiError('인증 세션이 변경됐어요.', 401)
+  if (!petSessionIsCurrent(session)) {
+    notifyAuthStateChanged()
+    throw new ApiError('인증 세션이 변경됐어요.', 401)
+  }
   const data = await request()
-  if (!petSessionIsCurrent(session)) throw new ApiError('인증 세션이 변경됐어요.', 401)
+  if (!petSessionIsCurrent(session)) {
+    notifyAuthStateChanged()
+    throw new ApiError('인증 세션이 변경됐어요.', 401)
+  }
   return data
 }
