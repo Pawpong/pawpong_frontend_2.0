@@ -16,6 +16,9 @@ function load(file, deps = {}) {
     },
   }).outputText
   new Function('exports', 'require', code)(exports, (name) => {
+    if (name === '@/shared/config/apiDiagnosticRoutes') {
+      return load('src/shared/config/apiDiagnosticRoutes.ts')
+    }
     if (!(name in deps)) throw new Error(`Missing dependency ${name}`)
     return deps[name]
   })

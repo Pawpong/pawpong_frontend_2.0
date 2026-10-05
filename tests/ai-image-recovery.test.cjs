@@ -13,6 +13,9 @@ function load(file, dependencies = {}) {
   }).outputText
   const output = {}
   new Function('exports', 'require', code)(output, (name) => {
+    if (name === '@/shared/config/apiDiagnosticRoutes') {
+      return load('src/shared/config/apiDiagnosticRoutes.ts')
+    }
     if (!(name in dependencies)) throw new Error(`Missing test dependency: ${name}`)
     return dependencies[name]
   })
