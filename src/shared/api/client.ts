@@ -9,6 +9,7 @@ import { getAccessToken } from './token'
 import { getAuthSessionGeneration, isAuthSessionCurrent } from '@/shared/lib/authSessionLifecycle'
 import { refreshAuthSession } from '@/shared/lib/authSessionRecovery'
 import { getApiBaseUrl } from '@/shared/config/apiBaseUrl'
+import { API_DIAGNOSTIC_ROUTES } from '@/shared/config/apiDiagnosticRoutes'
 
 export interface ApiRequestConfig extends AxiosRequestConfig {
   skipAuth?: boolean
@@ -21,6 +22,33 @@ export interface ApiRequestConfig extends AxiosRequestConfig {
 
 const setAuthorizationHeader = (config: InternalAxiosRequestConfig, accessToken: string) => {
   config.headers['Authorization'] = `Bearer ${accessToken}`
+}
+
+/** 운영 오류에서 어느 API가 실패했는지 확인하되 개인정보는 수집하지 않는다. */
+const requestDiagnostics = (error: AxiosError) => {
+  let endpoint = '/unknown'
+  try {
+    const path = new URL(error.config?.url ?? '', 'https://api.invalid').pathname
+    const segments = path.split('/')
+    // 경로 값이 영문 닉네임이어도 정적 템플릿의 문자열로 대체한다.
+    endpoint =
+      API_DIAGNOSTIC_ROUTES.find((route) => {
+        const template = route.split('/')
+        return (
+          template.length === segments.length &&
+          template.every((segment, index) =>
+            segment === ':id' ? Boolean(segments[index]) : segment === segments[index],
+          )
+        )
+      }) ?? '/unknown'
+  } catch {
+    // 주소 해석 실패가 원래 API 오류를 덮지 않게 한다.
+  }
+  return {
+    method: (error.config?.method ?? 'unknown').toUpperCase(),
+    endpoint,
+    transportCode: error.code,
+  }
 }
 
 function createApiClient(): AxiosInstance {
@@ -115,7 +143,22 @@ function createApiClient(): AxiosInstance {
         error.message ??
         'Unknown error'
 
-      return Promise.reject(new ApiError(message, error.response?.status, undefined, errorData))
+      const transportMessage =
+        !error.response && ['ECONNABORTED', 'ETIMEDOUT'].includes(error.code ?? '')
+          ? '서버 응답이 늦어지고 있어요. 잠시 후 다시 시도해 주세요.'
+          : !error.response && error.code === 'ERR_NETWORK'
+            ? '네트워크 연결을 확인한 뒤 다시 시도해 주세요.'
+            : message
+
+      return Promise.reject(
+        new ApiError(
+          transportMessage,
+          error.response?.status,
+          undefined,
+          errorData,
+          requestDiagnostics(error),
+        ),
+      )
     },
   )
 
