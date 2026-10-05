@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import { ApiError } from '@/shared/api/unwrap'
 import { Button, buttonVariants } from '@/shared/ui/Button'
-import { FeatureIntro } from '@/shared/ui/FeatureIntro'
 import { PawPrintIcon } from '@/shared/assets'
 import { petConfigOptions, usePetController } from '../lib/usePetController'
 import { petRequestKey } from '../lib/useServerClock'
@@ -52,7 +51,44 @@ function PetSessionContent({
   const view = query.data
   return (
     <div className="space-y-5">
-      {(notice || busy || query.isError) && (
+      {view.pet ? (
+        <PetRoom
+          view={view}
+          session={session}
+          disabled={busy || uncertain || query.isError}
+          reaction={controller.reaction}
+          gameOutcome={controller.gameOutcome}
+          feedback={controller.feedback}
+          operation={{
+            busy,
+            uncertain,
+            notice:
+              notice || (query.isError ? '최신 상태를 확인하지 못했어요. 다시 불러와 주세요.' : ''),
+            onRetry: () => void controller.execute(),
+          }}
+          onRefresh={() => void query.refetch()}
+          onCommand={controller.execute}
+          onAction={(action) => {
+            if (!view.pet || !view.actions?.[action].allowed) return
+            void controller.execute({
+              kind: 'actions',
+              body: {
+                action,
+                expectedRevision: view.pet.revision,
+                idempotencyKey: petRequestKey(),
+              },
+            })
+          }}
+        />
+      ) : (
+        <PetAdoption
+          session={session}
+          initialSourceJobId={initialSourceJobId}
+          disabled={busy || uncertain}
+          onAdopt={(command) => void controller.execute(command)}
+        />
+      )}
+      {!view.pet && (notice || busy || query.isError) && (
         <div
           role={uncertain || query.isError ? 'alert' : 'status'}
           aria-live="polite"
@@ -74,32 +110,6 @@ function PetSessionContent({
             <p className="mt-2">최신 상태를 확인하지 못했어요. 연결 후 다시 불러와 주세요.</p>
           )}
         </div>
-      )}
-      {view.pet ? (
-        <PetRoom
-          view={view}
-          disabled={busy || uncertain}
-          reaction={controller.reaction}
-          onRefresh={() => void query.refetch()}
-          onAction={(action) => {
-            if (!view.pet || !view.actions?.[action].allowed) return
-            void controller.execute({
-              kind: 'actions',
-              body: {
-                action,
-                expectedRevision: view.pet.revision,
-                idempotencyKey: petRequestKey(),
-              },
-            })
-          }}
-        />
-      ) : (
-        <PetAdoption
-          session={session}
-          initialSourceJobId={initialSourceJobId}
-          disabled={busy || uncertain}
-          onAdopt={(command) => void controller.execute(command)}
-        />
       )}
       {!uncertain && (
         <div className="flex justify-center">
@@ -128,9 +138,10 @@ export function PetPage({ initialSourceJobId }: { initialSourceJobId?: string })
       >
         ← 놀이터
       </Link>
-      <FeatureIntro eyebrow="함께 자라는 작은 일상" title="내 반려동물 키우기">
-        사진으로 나만의 도트 반려동물을 만들고 함께 성장해요.
-      </FeatureIntro>
+      <div>
+        <h1 className="font-cafe24 text-xl text-neutral-850 tab:text-2xl">내 반려동물 키우기</h1>
+        <p className="mt-2 text-sm text-neutral-700">우리 아이와 함께하는 작은 도트 세상</p>
+      </div>
       {config.isPending ? (
         <p role="status" className="py-10 text-center text-neutral-700">
           우리 아이를 만나러 가는 중…
