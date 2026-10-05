@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { aiImageQueries, hideAiImageGeneration } from '@/entities/ai-image'
+import { PetResultLink } from '@/features/playground-pet/ui/PetResultLink'
 import { cn } from '@/shared/lib/cn'
 import type { AiImageGeneration } from '@/shared/types'
 import {
@@ -204,6 +205,7 @@ export function AiPhotoArchive({ enabled, limit, moreHref, gridClassName }: AiPh
               onChange={setShareComparison}
               disabled={!!busyAction}
             />
+            <PetResultLink sourceJobId={opened.jobId} />
             {actionError && (
               <p role="alert" className="text-sm text-error-500">
                 {actionError}

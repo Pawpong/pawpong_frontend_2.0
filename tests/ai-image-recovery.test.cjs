@@ -499,6 +499,7 @@ function studioMarkup(phase, canResume = true, props = {}) {
       useQueryClient: () => ({ invalidateQueries() {} }),
     },
     '@/entities/ai-image': { aiImageQueries: { myGenerations: () => ({ queryKey: [] }) } },
+    '@/features/playground-pet/ui/PetResultLink': { PetResultLink: () => null },
     '@/shared/assets': { PawPrintIcon: () => null },
     '@/shared/lib/fonts': { cafe24Proup: { className: 'fixture-font' } },
     '@/shared/config/playground': load('src/shared/config/playground.ts'),
