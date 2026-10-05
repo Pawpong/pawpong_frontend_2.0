@@ -31,7 +31,7 @@ const toggleIconVariants = tv({
       favorite: '',
       bookmark: '',
     },
-    // 하트는 기존 회색·반투명 흰색과 눌림 색을 유지한다.
+    // 하트의 외곽은 화면 배경과 관계없이 브라운으로 표시한다.
     tone: {
       default: { icon: '' },
       onImage: { icon: '' },
@@ -40,8 +40,8 @@ const toggleIconVariants = tv({
   compoundVariants: [
     { pressed: false, tone: 'default', heart: false, className: { icon: 'text-brand' } },
     { pressed: false, tone: 'onImage', heart: false, className: { icon: 'text-base-white' } },
-    { pressed: false, tone: 'default', heart: true, className: { icon: 'text-action-muted-fg' } },
-    { pressed: false, tone: 'onImage', heart: true, className: { icon: 'text-base-white/60' } },
+    { pressed: false, tone: 'default', heart: true, className: { icon: 'text-brand' } },
+    { pressed: false, tone: 'onImage', heart: true, className: { icon: 'text-brand' } },
     { size: 'md', heart: true, className: { icon: 'size-8' } },
     {
       pressed: true,
