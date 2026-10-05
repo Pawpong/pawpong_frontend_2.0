@@ -5,13 +5,22 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Container } from '@/shared/ui'
 
-const FOOTER_PATHS = new Set(['/', '/explore', '/community', '/hall-of-fame', '/about', '/faq'])
+const FOOTER_PATHS = new Set([
+  '/',
+  '/explore',
+  '/community',
+  '/hall-of-fame',
+  '/about',
+  '/app',
+  '/faq',
+])
 
 const SERVICE_LINKS = [
   { href: '/', label: '서비스 홈' },
   { href: '/explore', label: '탐색' },
   { href: '/hall-of-fame', label: '명예의 전당' },
   { href: '/about', label: '서비스 소개' },
+  { href: '/app', label: '앱 다운로드' },
   { href: '/faq', label: '자주 묻는 질문' },
 ] as const
 
@@ -47,7 +56,7 @@ const SiteFooter = () => {
               <Link
                 key={link.href}
                 href={link.href}
-                className="rounded text-sm font-semibold text-neutral-850 focus-ring transition-colors hover:text-primary-600"
+                className="flex min-h-11 items-center rounded text-sm font-semibold text-neutral-850 focus-ring transition-colors hover:text-primary-600"
               >
                 {link.label}
               </Link>
