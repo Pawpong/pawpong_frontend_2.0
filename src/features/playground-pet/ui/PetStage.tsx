@@ -53,11 +53,15 @@ export function PetStage({
     }
   }, [attempt])
   return (
-    <div className={styles.stage}>
-      <div ref={host} className={styles.canvasHost} aria-hidden="true" />
-      <span className="sr-only">
-        {name}의 도트 캐릭터와 저장된 가구가 있는 방. 게임은 아래 버튼과 방향키로 조작할 수 있어요.
-      </span>
+    <>
+      <div className={styles.stage}>
+        <div ref={host} className={styles.canvasHost} aria-hidden="true" />
+        <span className="sr-only">
+          {name}의 도트 캐릭터와 저장된 가구가 있는 방. 게임은 아래 버튼과 방향키로 조작할 수
+          있어요.
+        </span>
+        {children}
+      </div>
       {state !== 'ready' && (
         <div className={styles.stageStatus} role={state === 'error' ? 'alert' : 'status'}>
           <p>
@@ -78,7 +82,6 @@ export function PetStage({
           )}
         </div>
       )}
-      {children}
-    </div>
+    </>
   )
 }

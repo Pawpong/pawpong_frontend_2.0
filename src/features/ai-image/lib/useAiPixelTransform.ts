@@ -46,6 +46,8 @@ const ERROR_MESSAGES: Record<string, string> = {
   INPUT_DOWNLOAD_FAILED: '사진을 읽지 못했어요. 다른 사진으로 다시 시도해 주세요.',
   OPENAI_NOT_CONFIGURED: '지금은 도트 변환을 쓸 수 없어요. 잠시 후 다시 시도해 주세요.',
   QUEUE_UNAVAILABLE: '지금은 변환을 시작할 수 없어요. 잠시 후 다시 시도해 주세요.',
+  PET_SPRITE_INVALID:
+    '몸과 발·꼬리가 분명한 캐릭터를 완성하지 못했어요. 기존 그림은 그대로 있고, 실패한 생성은 이용 횟수에서 제외돼요.',
 }
 const DEFAULT_ERROR = '도트 변환에 실패했어요. 잠시 후 다시 시도해 주세요.'
 
@@ -86,7 +88,11 @@ export const useAiPixelTransform = () => {
   }, [])
 
   const perform = useCallback(
-    (input?: { file: File; filterId: string }): Promise<AiPixelTransformResult | null> => {
+    (input?: {
+      file: File
+      filterId: string
+      generationPurpose?: 'pet-sprite-v1'
+    }): Promise<AiPixelTransformResult | null> => {
       if (inFlight.current) return inFlight.current
       if (!input && !pendingJob.current) return Promise.resolve(null)
       const current = ++operation.current
@@ -112,7 +118,11 @@ export const useAiPixelTransform = () => {
             generationRequested = true
             // Never replay this POST: a lost response does not mean the job was rejected.
             const accepted = await requestAiImageGeneration(
-              { filterId: input.filterId, inputObjectKey },
+              {
+                filterId: input.filterId,
+                inputObjectKey,
+                ...(input.generationPurpose ? { generationPurpose: input.generationPurpose } : {}),
+              },
               { signal },
             )
             if (!isCurrent()) return null

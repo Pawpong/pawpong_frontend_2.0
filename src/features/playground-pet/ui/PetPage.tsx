@@ -53,6 +53,7 @@ function PetSessionContent({
     <div className="space-y-5">
       {view.pet ? (
         <PetRoom
+          initialCharacterSourceId={initialSourceJobId}
           view={view}
           session={session}
           disabled={busy || uncertain || query.isError}

@@ -28,7 +28,9 @@ const { ApiError, unwrap } = load('src/shared/api/unwrap.ts')
 const { PetCommandQueue } = load('src/entities/playground-pet/model/commandQueue.ts')
 const snack = load('src/entities/playground-pet/model/snack.ts')
 const room = load('src/entities/playground-pet/model/room.ts')
-const { PetCharacterResource } = load('src/features/playground-pet/lib/characterResource.ts')
+const { PetCharacterResource, validatePetSheetPixels } = load(
+  'src/features/playground-pet/lib/characterResource.ts',
+)
 const { petAsset, loadPetAssets } = load('src/features/playground-pet/lib/gameAssets.ts')
 
 function sessionHarness() {
@@ -403,6 +405,25 @@ test('failed sprite validation revokes its Blob and a later retry can create a v
   assert.deepEqual(revoked, ['blob:fixture-0', 'blob:fixture-1'])
 })
 
+test('same-size sheets with opaque wallpaper, partial alpha, broken grid or empty frames are rejected', () => {
+  const valid = new Uint8ClampedArray(576 * 96 * 4)
+  for (let frame = 0; frame < 6; frame++)
+    for (let y = 40; y < 84; y++)
+      for (let x = frame * 96 + 20; x < frame * 96 + 76; x++)
+        valid.set([240, 220, 180, 255], (y * 576 + x) * 4)
+  validatePetSheetPixels(valid)
+  const opaque = valid.slice()
+  for (let i = 3; i < opaque.length; i += 4) opaque[i] = 255
+  assert.throws(() => validatePetSheetPixels(opaque), /전신/)
+  const partial = valid.slice()
+  partial[(40 * 576 + 20) * 4 + 3] = 128
+  assert.throws(() => validatePetSheetPixels(partial), /투명/)
+  const blurry = valid.slice()
+  blurry[(40 * 576 + 21) * 4] = 239
+  assert.throws(() => validatePetSheetPixels(blurry), /격자/)
+  assert.throws(() => validatePetSheetPixels(new Uint8ClampedArray(valid.length)), /프레임/)
+})
+
 test('asset resolver refuses external or traversal URLs; manifest must cover all24 at320x224', async () => {
   const descriptor = {
     url: '/playground/pet/v2/toy_bone.png',
@@ -500,8 +521,9 @@ function roomUiHarness() {
     },
   }
   const Stage = () => null,
-    Games = () => null
-  let characterEnabled
+    Games = () => null,
+    Adoption = () => null
+  let characterEnabled, characterSource
   const presentation = load('src/entities/playground-pet/model/presentation.ts')
   const { PetRoom } = load('src/features/playground-pet/ui/PetRoom.tsx', {
     react: hooks,
@@ -512,12 +534,14 @@ function roomUiHarness() {
     '../lib/usePetCharacter': {
       usePetCharacter: (_session, _pet, _source, enabled) => {
         characterEnabled = enabled
+        characterSource = _source
         return { url: 'blob:owner-sheet', error: null }
       },
     },
     '../lib/usePetAssets': { usePetAssets: () => ({ manifest: { assets: {} }, error: null }) },
     '../lib/usePetSound': { usePetSound: () => ({ play() {}, toggle() {}, enabled: false }) },
     './PetImage': { PetImage: () => null },
+    './PetAdoption': { PetAdoption: Adoption },
     './PetStage': { PetStage: Stage },
     './PetDecorations': { PetDecorations: () => null },
     './PetMiniGames': { PetMiniGames: Games },
@@ -534,6 +558,7 @@ function roomUiHarness() {
       id: 'owner-pet',
       sourceJobId: 'owner-source',
       imageUrl: '/owner.png',
+      character: { format: 'pet-sprite-v1', sourceJobId: 'owner-source' },
       name: '도토리',
       level: 1,
       totalXp: 0,
@@ -551,7 +576,7 @@ function roomUiHarness() {
     unlocks: [],
     serverTime: '2026-10-05T00:00:00Z',
   }
-  function render(nextView = view, gameOutcome = null) {
+  function render(nextView = view, gameOutcome = null, initialCharacterSourceId) {
     cursor = 0
     return nodes(
       PetRoom({
@@ -565,11 +590,100 @@ function roomUiHarness() {
         onAction() {},
         onRefresh() {},
         onCommand() {},
+        initialCharacterSourceId,
       }),
     )
   }
-  return { render, view, Stage, Games, characterEnabled: () => characterEnabled }
+  return {
+    render,
+    view,
+    Stage,
+    Games,
+    Adoption,
+    characterEnabled: () => characterEnabled,
+    characterSource: () => characterSource,
+  }
 }
+
+test('an existing full-body pet can explicitly connect a new result link and then loads its new sheet source', () => {
+  const ui = roomUiHarness()
+  const view = {
+    ...ui.view,
+    game: {
+      room: {},
+      catalog: [],
+      achievements: [],
+      wallet: { stars: 50 },
+      games: { active: null },
+    },
+  }
+  assert.equal(
+    ui.render(view).some((node) => node.type === ui.Adoption),
+    false,
+  )
+  const proposed = ui.render(view, null, 'new-owned-source')
+  const selection = proposed.find((node) => node.type === ui.Adoption)
+  assert.equal(selection.props.initialSourceJobId, 'new-owned-source')
+  assert.equal(selection.props.connectRevision, 7)
+  assert.equal(ui.characterSource(), 'owner-source')
+  const connected = {
+    ...view,
+    pet: { ...view.pet, character: { format: 'pet-sprite-v1', sourceJobId: 'new-owned-source' } },
+  }
+  assert.equal(
+    ui.render(connected, null, 'new-owned-source').some((node) => node.type === ui.Adoption),
+    false,
+  )
+  assert.equal(ui.characterSource(), 'new-owned-source')
+})
+
+test('a candidate link never submits an ineligible or other-owner source and valid connection is explicit', () => {
+  const calls = []
+  const noop = () => null
+  const { PetAdoption } = load('src/features/playground-pet/ui/PetAdoption.tsx', {
+    react: { useState: (initial) => [initial, () => {}] },
+    'react/jsx-runtime': require('react/jsx-runtime'),
+    'next/link': { default: noop },
+    '@tanstack/react-query': {
+      useInfiniteQuery: () => ({
+        data: { pages: [{ images: [{ sourceJobId: 'owned-source', imageUrl: '/owned.png' }] }] },
+      }),
+    },
+    '@/entities/playground-pet': {
+      ...load('src/entities/playground-pet/model/presentation.ts'),
+      getEligiblePetImages: async () => ({ images: [] }),
+    },
+    '@/shared/ui/Button': { Button: noop, buttonVariants: () => '' },
+    '@/shared/ui/Input': { Input: noop },
+    '@/shared/assets': { PawPrintIcon: noop, PixelCheckIcon: noop },
+    '../lib/usePetSession': { inPetSession: (_session, read) => read() },
+    '../lib/usePetController': { petPrivateKey: () => [] },
+    '../lib/useServerClock': { petRequestKey: () => 'explicit-command-key' },
+    './PetImage': { PetImage: noop },
+  })
+  for (const candidate of ['bad-id', 'other-owner-source', 'owned-source']) {
+    const tree = PetAdoption({
+      session: {},
+      initialSourceJobId: candidate,
+      connectRevision: 7,
+      disabled: false,
+      onAdopt: (command) => calls.push(command),
+    })
+    assert.equal(calls.length, 0) // Displaying a result link never performs a mutation.
+    elementNodes(tree)
+      .find((node) => node.type === 'form')
+      .props.onSubmit({ preventDefault() {} })
+    assert.equal(calls.length, candidate === 'owned-source' ? 1 : 0)
+  }
+  assert.deepEqual(calls[0], {
+    kind: 'character-source',
+    body: {
+      sourceJobId: 'owned-source',
+      expectedRevision: 7,
+      idempotencyKey: 'explicit-command-key',
+    },
+  })
+})
 
 test('care-only API view keeps care/records and skips unavailable tabs in keyboard navigation', () => {
   const ui = roomUiHarness()
@@ -623,6 +737,30 @@ test('restored game stays on its results tab and starts require actual engine re
   assert.equal(nodes.find((n) => n.type === ui.Games).props.gameOutcome, result)
   nodes.find((n) => n.type === ui.Stage).props.onReady(false)
   nodes = ui.render({ ...ui.view, game })
+  assert.equal(nodes.find((n) => n.type === ui.Games).props.characterReady, false)
+})
+
+test('legacy portraits never load into the room or unlock games; explicit connection preserves care', () => {
+  const ui = roomUiHarness()
+  const view = {
+    ...ui.view,
+    pet: { ...ui.view.pet, character: { format: 'legacy-portrait', sourceJobId: 'original' } },
+    game: {
+      wallet: { stars: 50 },
+      room: {},
+      catalog: [],
+      achievements: [],
+      games: { active: null },
+    },
+  }
+  let nodes = ui.render(view)
+  assert.equal(ui.characterEnabled(), false)
+  assert.equal(nodes.find((n) => n.type === ui.Stage).props.snapshot.characterUrl, null)
+  assert.equal(nodes.find((n) => n.type === ui.Games).props.characterReady, false)
+  assert.ok(nodes.some((n) => n.props?.connectRevision === 7))
+  assert.ok(nodes.some((n) => n.props?.['aria-label']?.startsWith('인사하기')))
+  nodes.find((n) => n.type === ui.Stage).props.onReady(true)
+  nodes = ui.render(view)
   assert.equal(nodes.find((n) => n.type === ui.Games).props.characterReady, false)
 })
 
@@ -797,6 +935,7 @@ test('room engine preserves its game, honours reduced motion and flushes destruc
       'setSize',
       'setTint',
       'fillStyle',
+      'fillTriangle',
     ])
       item[method] = () => item
     item.setVisible = (value) => {
@@ -832,7 +971,7 @@ test('room engine preserves its game, honours reduced motion and flushes destruc
   }
   class Scene {
     constructor() {
-      this.cameras = { main: {} }
+      this.cameras = { main: { setBackgroundColor() {} } }
       this.textures = {
         addImage: () => ({ setFilter() {}, add() {} }),
         addSpriteSheet: () => ({ setFilter() {} }),
@@ -872,8 +1011,9 @@ test('room engine preserves its game, honours reduced motion and flushes destruc
     }
   }
   global.Image = class {
-    set src(_value) {
-      queueMicrotask(() => this.onload?.())
+    set src(value) {
+      if (!value.includes('slow-unselected'))
+        queueMicrotask(() => (value.includes('unavailable') ? this.onerror?.() : this.onload?.()))
     }
   }
   try {
@@ -897,6 +1037,8 @@ test('room engine preserves its game, honours reduced motion and flushes destruc
         assets: {
           wallpaper_cream: { url: '/playground/pet/v2/wallpaper_cream.png' },
           floor_oak: { url: '/playground/pet/v2/floor_oak.png' },
+          toy_bone: { url: '/playground/pet/v2/slow-unselected.png' },
+          toy_ball: { url: '/playground/pet/v2/unavailable.png' },
         },
       },
       room: { wallpaper: 'wallpaper_cream', floor: 'floor_oak' },
@@ -912,7 +1054,8 @@ test('room engine preserves its game, honours reduced motion and flushes destruc
     await new Promise(setImmediate)
     assert.equal(states.at(-1), 'ready')
     const hero = objects.find((item) => item.kind === 'sprite'),
-      sparks = objects.find((item) => item.kind === 'graphics')
+      sparks = objects.filter((item) => item.kind === 'graphics').at(-1)
+    assert.ok(objects.find((item) => item.kind === 'graphics').sparkRects >= 10)
     instance.scene.update(650)
     assert.equal(hero.frame, 1)
     snapshot = { ...snapshot, reducedMotion: true }
@@ -932,14 +1075,43 @@ test('room engine preserves its game, honours reduced motion and flushes destruc
     handle.destroy()
     assert.equal(destroyed, 1)
     assert.equal(instance.pendingDestroy, false)
+    const equippedStates = []
+    const equipped = createPetGame({}, snapshot, (state) => equippedStates.push(state))
+    await new Promise(setImmediate)
+    assert.equal(equippedStates.at(-1), 'ready')
+    equipped.sync({ ...snapshot, room: { ...snapshot.room, toy: 'toy_ball' } })
+    await new Promise(setImmediate)
+    assert.equal(equippedStates.at(-1), 'error')
+    equipped.destroy()
     const booting = createPetGame({ awaitBoot: true }, snapshot, () => {})
     booting.destroy()
-    assert.equal(destroyed, 1)
+    assert.equal(destroyed, 2)
     instance.onReady()
     instance.isRunning = true
     await new Promise(setImmediate)
-    assert.equal(destroyed, 2)
+    assert.equal(destroyed, 3)
     assert.equal(instance.pendingDestroy, false)
+    const failures = []
+    const failed = createPetGame(
+      {},
+      {
+        ...snapshot,
+        characterUrl: null,
+        manifest: {
+          assets: {
+            wallpaper_cream: { url: '/playground/pet/v2/unavailable.png' },
+            floor_oak: { url: '/playground/pet/v2/floor_oak.png' },
+          },
+        },
+      },
+      (state) => failures.push(state),
+    )
+    await new Promise(setImmediate)
+    assert.equal(failures.at(-1), 'error')
+    assert.equal(objects.filter((item) => item.kind === 'tileSprite').at(-1).visible, true)
+    assert.equal(objects.filter((item) => item.kind === 'sprite').at(-1).visible, false)
+    assert.ok(objects.filter((item) => item.kind === 'graphics').at(-2).sparkRects >= 10)
+    failed.destroy()
   } finally {
     global.Image = previousImage
   }

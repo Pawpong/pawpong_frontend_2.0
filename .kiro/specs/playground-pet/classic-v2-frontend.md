@@ -14,7 +14,13 @@ Obsidian 선행 기획과 game-v2-brief/game-v2-contract를 바탕으로 기존 
 
 Phaser 4.2.1 exact를 PetStage 클라이언트 effect에서 동적으로 불러온다. 앱 전체를 Phaser로 옮기지 않는다. 화면은 320×224, 벽 320×128, 바닥 320×96이며 원본 PNG 가구를 쌓는다. public/playground/pet/v2/manifest.json과 pixel-art.md의 원본 이미지 계약을 사용한다. 24개 소품의 assetKey는 서버 item ID와 동일하며 외부/경로 이탈 URL을 받지 않는다.
 
-개인 character API의 image/png Blob을 검증해 576×96의 96×96 6프레임 sheet 하나만 방과 간식 게임에서 함께 사용한다. 발 기준은 anchor (48,84)다. 공용 강아지로 대체하지 않는다. 준비 실패는 원본 개인 초상화와 명시 재시도를 제공하고 게임 시작을 막는다. 이미지 객체 URL은 소유 세션/반려동물/원본 작업에 묶이며 변경, 실패, unmount 때 revoke한다.
+개인 character API의 image/png Blob을 검증해 576×96의 96×96 6프레임 sheet 하나만 방과 간식 게임에서 함께 사용한다. 논리 격자는48×48를 nearest2배 확대한 것이며 발 기준은 anchor (48,84)다. hard alpha, 최대48색,2×2 격자, 각 프레임 padding/빈 실루엣/잘림을 검사한다. 공용 강아지나 원본 초상화로 방 캐릭터를 대체하지 않는다. 준비 실패는 명시 재시도를 제공하고 게임 시작을 막는다. 원래 그림은 기록에서 보존한다. 이미지 객체 URL은 소유 세션/반려동물/연결 캐릭터 작업에 묶이며 변경, 실패, unmount 때 revoke한다.
+
+`PetView.pet.character.format=pet-sprite-v1`만 character를 불러오고 게임 시작을 연다. 필드 누락도 구형 portrait로 취급한다. 구형 친구는 밝은 방·기존 돌봄·기록·구매 소품을 유지하며 전신 연결 안내를 보여준다. 사용자가 선택한 eligible sourceJobId를 `POST /character-source`로 보내며 이름/성장/원래 그림을 바꾸거나 생성·사용량을 자동 실행하지 않는다. `/ai-filter?purpose=pet-sprite-v1`은 게임용 생성을 명시적으로 선택한 화면이다. 서버 config가 닫혔거나 갱신 오류가 나면 cached enabled 데이터가 있어도 화면을 차단한다. 일반 사진 필터는 이 purpose를 보내지 않는다.
+
+구형 친구의 첫 방 아래에는 연결 안내와 native anchor가 있다. 이미 전신을 연결한 사용자도 새 result link의 sourceJobId가 현재 character와 다르면 명시 선택 섹션을 열 수 있다. 현재 character는 제출 전까지 유지하고, 실제 연결 응답의 새 source로 sheet를 갱신한다. eligible에 없는 후보는 제출하지 않는다. 오류/준비 안내는 canvas 밖에 배치하여 전신과 밝은 방을 가리지 않는다.
+
+Phaser camera/clearColor와 동기 fallback 방은 불투명 크림색, 창문·햇빛·나무 바닥을 갖는다. 선택한 방/간식 게임의 필수 그림만 먼저 읽으며 사용하지 않는 상점 그림은 준비를 지연하지 않는다. 장착/미리보기/게임 변경 때 필수 자산을 재검사한다. 선택 자산이 실패해도 밝은 fallback과 성공한 다른 레이어를 보여주고 작은 오류 안내와 재시도를 제공한다. 게임 시작은 실패 상태에서 차단한다.
 
 PetStage는 게임 인스턴스 하나를 유지하고 immutable snapshot을 sync한다. 탭, 구매 미리보기, 서버 응답, 게임 시작/종료마다 Canvas/WebGL을 다시 만들지 않는다. unmount는 이미지 핸들러와 pending fetch를 취소하고 Phaser를 파괴한다. Phaser destroy가 다음 프레임까지 지연되므로 실행을 시작한 게임은 public headlessStep의 pendingDestroy 경로를 호출해 숨겨진 탭의 정지 루프에서도 정리한다. 초기 texture boot가 아직 끝나지 않은 게임은 READY 이벤트의 동기 start가 끝난 microtask에서 같은 경로로 정리한다. 재실행 가능한 페이지이므로 noReturn을 켜지 않는다.
 

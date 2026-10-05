@@ -48,6 +48,7 @@ const useElapsedSeconds = (running: boolean) => {
 }
 
 interface AiFilterStudioProps {
+  gameCharacter?: boolean
   isLoggedIn: boolean
   allowance?: { remaining: number; freeRemaining: number; dailyFreeLimit: number; enabled: boolean }
   quotaError?: boolean
@@ -61,6 +62,7 @@ interface AiFilterStudioProps {
  * 만든 사진은 보관함에 쌓이고, 마이홈 'AI 사진' 탭에서도 볼 수 있다.
  */
 export function AiFilterStudio({
+  gameCharacter = false,
   isLoggedIn,
   allowance,
   quotaError,
@@ -69,7 +71,7 @@ export function AiFilterStudio({
 }: AiFilterStudioProps) {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const ai = useAiPixelFilter()
+  const ai = useAiPixelFilter(gameCharacter)
   const elapsed = useElapsedSeconds(ai.isWorking)
   const [photo, setPhoto] = useState<{ file: File; url: string }>()
   const [preparing, setPreparing] = useState(false)
@@ -151,7 +153,7 @@ export function AiFilterStudio({
           <div>
             <p className="flex items-center gap-1.5 text-xs font-semibold text-primary-700">
               <PawPrintIcon aria-hidden className="size-4 rotate-30 text-secondary-500" />
-              포퐁 AI 필터
+              {gameCharacter ? '우리 아이 게임 캐릭터' : '포퐁 AI 필터'}
             </p>
             <h1
               className={cn(
@@ -159,11 +161,12 @@ export function AiFilterStudio({
                 'mt-2 font-cafe24 text-2xl leading-snug font-bold text-neutral-850 tab:text-3xl',
               )}
             >
-              우리 아이, 오늘은 어떤 모습?
+              {gameCharacter ? '작고 귀여운 전신 도트 친구' : '우리 아이, 오늘은 어떤 모습?'}
             </h1>
             <p className="mt-2 text-sm leading-relaxed text-neutral-700">
-              사진 한 장이면 도트 그림부터 스티커·수채화까지. 마음에 들면 저장하거나 커뮤니티에
-              자랑해 보세요.
+              {gameCharacter
+                ? '사진 속 털색·무늬·귀 모양을 살려 몸과 발·꼬리가 보이는 게임 친구를 만들어요. 완성된 그림을 직접 골라 연결하면 기존 아이의 이름과 성장 기록은 그대로예요.'
+                : '사진 한 장이면 도트 그림부터 스티커·수채화까지. 마음에 들면 저장하거나 커뮤니티에 자랑해 보세요.'}
             </p>
           </div>
           {isLoggedIn && (
@@ -219,7 +222,9 @@ export function AiFilterStudio({
                 </p>
               )}
               <p className="mt-2 text-xs text-neutral-700">
-                얼굴이 잘 보이는 정면 사진일수록 우리 아이와 닮게 나와요.
+                {gameCharacter
+                  ? '몸과 꼬리까지 잘 보이는 사진을 권해요. 얼굴 사진도 전신 캐릭터로 그리지만 몸의 무늬는 추정될 수 있어요.'
+                  : '얼굴이 잘 보이는 정면 사진일수록 우리 아이와 닮게 나와요.'}
               </p>
             </>
           ) : (
@@ -228,7 +233,7 @@ export function AiFilterStudio({
                 로그인하면 우리 아이 사진으로 바로 만들어 볼 수 있어요
               </p>
               <Link
-                href={`/login?returnUrl=${encodeURIComponent('/ai-filter')}`}
+                href={`/login?returnUrl=${encodeURIComponent(gameCharacter ? '/ai-filter?purpose=pet-sprite-v1' : '/ai-filter')}`}
                 className={buttonVariants()}
               >
                 로그인하고 시작하기
@@ -240,12 +245,24 @@ export function AiFilterStudio({
         {/* 2. 필터 */}
         <section aria-labelledby="ai-filter-heading" className="min-w-0">
           <ComposerSectionHeading id="ai-filter-heading" step={2} required>
-            필터 고르기
+            {gameCharacter ? '게임 캐릭터로 만들기' : '필터 고르기'}
           </ComposerSectionHeading>
           {ai.filters.length === 0 ? (
             <p className="rounded-xl bg-neutral-50 p-5 text-sm text-neutral-700">
               지금은 쓸 수 있는 필터가 없어요. 곧 새 필터로 찾아올게요!
             </p>
+          ) : gameCharacter ? (
+            <div className="rounded-xl border-2 border-primary-200 bg-point-50 p-5 text-sm leading-6 text-neutral-850">
+              <strong>전신 도트 캐릭터</strong>
+              <p>
+                작은 머리와 통통한 몸, 발·꼬리가 또렷한 고전 게임 모습이에요. 배경 없이 우리 아이만
+                그려요.
+              </p>
+              <p className="mt-3 text-xs text-neutral-700">
+                만들기를 누르면 기존 AI 이용 횟수 1회를 사용해요. 완성된 그림을 확인한 뒤 직접
+                연결할 수 있어요.
+              </p>
+            </div>
           ) : (
             <ul className="grid grid-cols-2 gap-3 pc:grid-cols-3" aria-label="필터 목록">
               {ai.filters.map((filter) => {
@@ -379,9 +396,22 @@ export function AiFilterStudio({
                   'mb-3 text-center font-cafe24 text-xl font-bold text-primary-500',
                 )}
               >
-                짜잔! {selectedFilter?.name ?? 'AI 필터'} 완성
+                짜잔! {gameCharacter ? '전신 도트 친구' : (selectedFilter?.name ?? 'AI 필터')} 완성
               </h2>
-              <BeforeAfterCompare beforeSrc={photo.url} afterSrc={result.imageUrl} />
+              {gameCharacter ? (
+                <div className="rounded-xl border-2 border-primary-200 bg-point-50 p-6">
+                  <Image
+                    src={result.imageUrl}
+                    alt="몸과 발·꼬리가 보이는 완성된 전신 도트 캐릭터"
+                    width={288}
+                    height={288}
+                    unoptimized
+                    className="mx-auto aspect-square w-full max-w-72 object-contain [image-rendering:pixelated]"
+                  />
+                </div>
+              ) : (
+                <BeforeAfterCompare beforeSrc={photo.url} afterSrc={result.imageUrl} />
+              )}
               <PetResultLink sourceJobId={result.jobId} />
               <AiPostShareChoice
                 checked={shareComparison}
@@ -389,7 +419,9 @@ export function AiFilterStudio({
                 disabled={saving}
               />
               <p className="mt-2 text-center text-xs text-neutral-700">
-                가운데 손잡이를 끌어 원본과 비교해 보세요. 보관함에도 저장됐어요.
+                {gameCharacter
+                  ? '우리 아이와 닮았는지 확인해 주세요. 보관함에도 저장됐어요.'
+                  : '가운데 손잡이를 끌어 원본과 비교해 보세요. 보관함에도 저장됐어요.'}
               </p>
               <div className="mt-4 grid grid-cols-2 gap-2">
                 <Button intent="secondary" size="lg" disabled={saving} onClick={() => void save()}>
@@ -411,7 +443,7 @@ export function AiFilterStudio({
                       ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
                   }}
                 >
-                  다른 필터로 또 만들기
+                  {gameCharacter ? '새 사진으로 다시 만들기' : '다른 필터로 또 만들기'}
                 </Button>
               </div>
             </div>
@@ -432,7 +464,9 @@ export function AiFilterStudio({
                         ? '이용권이 부족해요 · 놀이터에서 확인해 주세요'
                         : '오늘 만들 수 있는 횟수를 모두 사용했어요'
                       : selectedFilter
-                        ? `${selectedFilter.name} 씌우기`
+                        ? gameCharacter
+                          ? '전신 게임 캐릭터 만들기 · 1회 사용'
+                          : `${selectedFilter.name} 씌우기`
                         : '필터를 골라 주세요'}
               </Button>
               {!photo && (

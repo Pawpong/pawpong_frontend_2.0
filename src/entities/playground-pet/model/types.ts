@@ -74,7 +74,7 @@ export type PetGameState = {
   gamePolicyVersion: 'classic-v2'
 }
 export type PetGameOutcome = {
-  kind: 'purchase' | 'equip' | 'start' | 'cancel' | 'flip' | 'finish'
+  kind: 'purchase' | 'equip' | 'start' | 'cancel' | 'flip' | 'finish' | 'character'
   starsDelta: number
   itemId?: string | null
   slot?: PetRoomSlot
@@ -92,6 +92,8 @@ export type PetView = {
     id: string
     sourceJobId: string
     imageUrl: string
+    /** Missing on an older server: fail closed for sprites, preserve care and the portrait. */
+    character?: { format: 'pet-sprite-v1' | 'legacy-portrait'; sourceJobId: string }
     name: string
     level: number
     totalXp: number
@@ -139,6 +141,7 @@ export type PetCommand =
       body: { action: PetAction; expectedRevision: number; idempotencyKey: string }
     }
   | { kind: 'items/purchase'; body: RevisionCommand & { itemId: string } }
+  | { kind: 'character-source'; body: RevisionCommand & { sourceJobId: string } }
   | { kind: 'room'; body: RevisionCommand & { slot: PetRoomSlot; itemId: string | null } }
   | { kind: 'games/start'; body: RevisionCommand & { game: PetGameKind } }
   | { kind: 'games/cancel'; body: RevisionCommand & { sessionId: string } }
