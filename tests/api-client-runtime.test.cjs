@@ -10,7 +10,11 @@ function load(file, dependencies) {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
   }).outputText
   const output = {}
-  new Function('exports', 'require', code)(output, (name) => dependencies[name])
+  new Function('exports', 'require', code)(output, (name) =>
+    name === '@/shared/config/apiDiagnosticRoutes'
+      ? load('src/shared/config/apiDiagnosticRoutes.ts', {})
+      : dependencies[name],
+  )
   return output
 }
 
@@ -138,6 +142,33 @@ test(
           return true
         },
       )
+      await assert.rejects(
+        apiClient.get('/api/v2/adoption/ffffffffffffffffffffffff', {
+          adapter: (config) =>
+            Promise.reject(new axios.AxiosError('Network Error', 'ERR_NETWORK', config)),
+        }),
+        (error) => {
+          assert.equal(error.request.endpoint, '/api/v2/adoption/:id')
+          return true
+        },
+      )
+      for (const [path, endpoint] of [
+        ['/api/v2/profile/users/private-user', '/api/v2/profile/users/:id'],
+        ['/api/v2/profile/users/adoption/follow', '/api/v2/profile/users/:id/follow'],
+        ['/api/v2/private-user/unknown', '/unknown'],
+      ]) {
+        await assert.rejects(
+          apiClient.get(path, {
+            adapter: (config) =>
+              Promise.reject(new axios.AxiosError('Network Error', 'ERR_NETWORK', config)),
+          }),
+          (error) => {
+            assert.equal(error.request.endpoint, endpoint)
+            assert.doesNotMatch(JSON.stringify(error), /private-user/)
+            return true
+          },
+        )
+      }
     } finally {
       server.closeAllConnections()
       await new Promise((resolve) => server.close(resolve))
