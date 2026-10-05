@@ -9,6 +9,7 @@ import { getAccessToken } from './token'
 import { getAuthSessionGeneration, isAuthSessionCurrent } from '@/shared/lib/authSessionLifecycle'
 import { refreshAuthSession } from '@/shared/lib/authSessionRecovery'
 import { getApiBaseUrl } from '@/shared/config/apiBaseUrl'
+import { API_DIAGNOSTIC_ROUTES } from '@/shared/config/apiDiagnosticRoutes'
 
 export interface ApiRequestConfig extends AxiosRequestConfig {
   skipAuth?: boolean
@@ -28,16 +29,18 @@ const requestDiagnostics = (error: AxiosError) => {
   let endpoint = '/unknown'
   try {
     const path = new URL(error.config?.url ?? '', 'https://api.invalid').pathname
-    if (path.startsWith('/api/')) {
-      endpoint = path
-        .split('/')
-        .map((segment, index) =>
-          index === 0 || /^[a-z][a-z-]{0,47}$/.test(segment) || /^v\d+$/.test(segment)
-            ? segment
-            : ':id',
+    const segments = path.split('/')
+    // 경로 값이 영문 닉네임이어도 정적 템플릿의 문자열로 대체한다.
+    endpoint =
+      API_DIAGNOSTIC_ROUTES.find((route) => {
+        const template = route.split('/')
+        return (
+          template.length === segments.length &&
+          template.every((segment, index) =>
+            segment === ':id' ? Boolean(segments[index]) : segment === segments[index],
+          )
         )
-        .join('/')
-    }
+      }) ?? '/unknown'
   } catch {
     // 주소 해석 실패가 원래 API 오류를 덮지 않게 한다.
   }

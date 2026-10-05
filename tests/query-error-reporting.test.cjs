@@ -45,7 +45,13 @@ test('failed queries and mutations reach Sentry with safe request context and no
     await assert.rejects(mutation.execute(), (actual) => actual === error)
     assert.equal(attempts, 1)
     assert.deepEqual(captures, [
-      [error, { contexts: { api_request: { ...error.request, httpStatus: undefined } } }],
+      [
+        error,
+        {
+          contexts: { api_request: { ...error.request, httpStatus: undefined } },
+          fingerprint: ['{{ default }}', 'POST', '/api/v2/adopter/favorite'],
+        },
+      ],
     ])
 
     const unavailable = new ApiError('시설 목록을 불러오지 못했어요.', 503, undefined, undefined, {
@@ -64,6 +70,17 @@ test('failed queries and mutations reach Sentry with safe request context and no
     )
     assert.equal(captures.length, 2)
     assert.equal(captures[1][1].contexts.api_request.httpStatus, 503)
+
+    const dedupe = require('@sentry/nextjs').dedupeIntegration()
+    const sameException = { values: [{ type: 'ApiError', value: 'Network Error' }] }
+    const favoriteEvent = { exception: sameException, ...captures[0][1] }
+    const mapEvent = { exception: sameException, ...captures[1][1] }
+    assert.ok(dedupe.processEvent(favoriteEvent))
+    assert.ok(
+      dedupe.processEvent(mapEvent),
+      'the actual Sentry SDK preserves a different API error',
+    )
+    assert.equal(dedupe.processEvent(mapEvent), null)
 
     const invalidInput = new ApiError('입력값을 확인해 주세요.', 400)
     await assert.rejects(

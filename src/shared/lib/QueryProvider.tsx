@@ -28,12 +28,15 @@ const shouldCaptureError = (error: unknown): error is Error => {
 }
 
 const captureRequestError = (error: Error) => {
-  Sentry.captureException(error, {
-    contexts:
-      error instanceof ApiError && error.request
-        ? { api_request: { ...error.request, httpStatus: error.status } }
-        : {},
-  })
+  if (error instanceof ApiError && error.request) {
+    Sentry.captureException(error, {
+      contexts: { api_request: { ...error.request, httpStatus: error.status } },
+      // SDK의 기본 중복 제거도 서로 다른 API의 같은 메시지를 버리지 않게 한다.
+      fingerprint: ['{{ default }}', error.request.method, error.request.endpoint],
+    })
+    return
+  }
+  Sentry.captureException(error)
 }
 
 export function QueryProvider({ children }: { children: React.ReactNode }) {

@@ -18,17 +18,17 @@
 
 ## 수정 내용
 
-- Axios가 정규화한 ApiError에 HTTP 메서드, 쿼리를 제거하고 식별자 경로를 마스킹한 API 경로, 전송 오류 코드만 보관한다. Axios config나 인증 헤더, 요청 본문은 붙이지 않는다.
-- QueryCache/MutationCache의 Sentry 전송에 이 안전한 요청 context를 연결한다. 같은 메시지의 서로 다른 API 장애는 분당 오류 예산 안에서 각각 기록한다. 같은 요청의 반복 제한과 분당 20건 상한은 유지한다.
+- Axios가 정규화한 ApiError에 HTTP 메서드, API 계약에 정의된 정적 경로 템플릿, 전송 오류 코드만 보관한다. 영문 닉네임을 포함한 모든 동적 위치는 `:id`, 미등록 경로는 `/unknown`으로 기록한다. Axios config나 인증 헤더, 요청 본문, 쿼리는 붙이지 않는다. Codex 리뷰의 P1 개인정보 지적을 수정했다.
+- QueryCache/MutationCache의 Sentry 전송에 이 안전한 요청 context와 경로별 fingerprint를 연결한다. SDK 중복 제거와 분당 오류 예산 모두 서로 다른 API 장애를 보존한다. 같은 요청의 반복 제한과 분당 20건 상한은 유지한다.
 - 타임아웃·연결 실패의 사용자 메시지를 한국어 재시도 안내로 바꾼다. 변경 작업의 모호한 POST 타임아웃은 자동 재전송하지 않는다. 인증 refresh 처리와 즐겨찾기 동작을 유지한다.
 - 기존 미해결 이슈를 일괄 숨기거나 해결 처리하지 않는다. 이번 변경은 진단 공백과 오류 안내를 고친다. 과거 연결 오류의 발생 원인이 모두 해결됐다는 의미는 아니다.
 
 ## 검증
 
 - 실제 설치된 Axios와 로컬 HTTP 서버로 multipart 파일 내용·401 refresh·멈춘 POST 타임아웃·민감 정보 제외·중복 POST 방지를 확인했다.
-- 실제 설치된 TanStack Query의 query/mutation 실패에서 Sentry context 전달과 400 오류 제외를 확인했다.
+- 실제 설치된 TanStack Query의 query/mutation 실패에서 Sentry context 전달과 400 오류 제외를 확인했다. 실제 Sentry SDK의 중복 제거에서도 서로 다른 API 오류가 보존되는지 확인했다.
 - API·세션 복구·즐겨찾기·Sentry 환경 및 오류 예산 회귀 테스트 28건 통과. 이는 격리된 자동 테스트이며 실제 심사 계정 로그인 검증으로 보고하지 않는다.
-- 변경 소스 ESLint, TypeScript 타입 검사 및 최종 Next.js 운영 빌드 확인 후 병합한다.
+- 변경 소스 ESLint, TypeScript 타입 검사 및 최종 Next.js 운영 빌드 통과. 선별 운영 브랜치에서는 동일 진단·세션 테스트 16건을 별도로 검증한다.
 
 ## 반영 범위
 
