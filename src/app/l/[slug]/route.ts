@@ -2,10 +2,10 @@ import {
   getLandingOrigin,
   isValidSlug,
   parseDeepLink,
-  parseStoreUrl,
   renderLanding,
   renderUnavailable,
 } from './_lib/landing'
+import { resolveMobileStoreUrl } from '@/shared/lib/mobileApp'
 
 export const dynamic = 'force-dynamic'
 
@@ -69,8 +69,8 @@ export async function GET(
         link,
         request.headers.get('user-agent') ?? '',
         {
-          ios: parseStoreUrl(ios?.data?.storeUrl, 'ios'),
-          android: parseStoreUrl(android?.data?.storeUrl, 'android'),
+          ios: resolveMobileStoreUrl(ios?.data?.storeUrl, 'ios'),
+          android: resolveMobileStoreUrl(android?.data?.storeUrl, 'android'),
         },
         getLandingOrigin(
           request.url,
