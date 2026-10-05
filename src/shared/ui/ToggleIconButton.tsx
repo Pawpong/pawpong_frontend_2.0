@@ -24,8 +24,8 @@ const toggleIconVariants = tv({
       sm: { icon: 'size-6' },
       md: { icon: 'size-7.5' },
       lg: { icon: 'size-12' },
-      // 카드 썸네일 위 하트 — 모바일 32 / pc 48
-      responsive: { icon: 'size-8 pc:size-12' },
+      // 카드 썸네일 위 하트 — 모바일 30 / pc 48
+      responsive: { icon: 'size-7.5 pc:size-12' },
     },
     pressed: { true: '', false: '' },
     heart: {
@@ -47,7 +47,6 @@ const toggleIconVariants = tv({
     { pressed: false, tone: 'onImage', heart: false, className: { icon: 'text-base-white' } },
     { pressed: false, tone: 'default', heart: true, className: { icon: 'text-brand' } },
     { pressed: false, tone: 'onImage', heart: true, className: { icon: 'text-brand' } },
-    { size: 'md', heart: true, className: { icon: 'size-8' } },
     {
       pressed: true,
       pressedTone: 'favorite',
