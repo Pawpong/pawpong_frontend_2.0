@@ -31,6 +31,7 @@ export interface AiImageSourceUpload {
 
 /** 생성 요청 */
 export interface AiImageGenerationRequest {
+  generationPurpose?: 'photo' | 'pet-sprite-v1'
   filterId: string
   inputObjectKey: string
   /** 대상 콘테스트 — 생성 횟수(3회) 산정 기준 */

@@ -37,6 +37,38 @@ const job = (status = 'queued', jobId = 'fixture-job') => ({
   completedAt: null,
 })
 const input = { file: new File(['fixture'], 'pet.png'), filterId: 'fixture-filter' }
+test('game generation fails closed after config refetch error even with enabled cached data; photo studio stays usable', () => {
+  let config = { data: { enabled: true }, isPending: false, isError: true }
+  const options = []
+  const studio = () => null
+  const { AiFilterContent } = load('src/app/(main)/ai-filter/_ui/AiFilterContent.tsx', {
+    react: { useEffect() {} },
+    'react/jsx-runtime': require('react/jsx-runtime'),
+    '@/features/ai-image': { AiFilterStudio: studio },
+    '@/features/auth': { useMe: () => ({ isLoggedIn: true }) },
+    '@/features/in-app-purchase': {
+      usePurchases: () => ({ refresh: async () => {}, account: { isError: false } }),
+    },
+    '@/entities/iap': { featureAllowance: () => undefined },
+    '@tanstack/react-query': {
+      useQuery: (value) => {
+        options.push(value)
+        return config
+      },
+    },
+    '@/entities/playground-pet': { getPetConfig: async () => config.data },
+  })
+  const closed = AiFilterContent({ gameCharacter: true })
+  assert.equal(closed.type, 'p')
+  assert.equal(closed.props.role, 'status')
+  assert.equal(AiFilterContent({}).type, studio)
+  assert.deepEqual(
+    options.map((option) => option.enabled),
+    [true, false],
+  )
+  config = { ...config, isError: false }
+  assert.equal(AiFilterContent({ gameCharacter: true }).type, studio)
+})
 const deferred = () => {
   let resolve, reject
   const promise = new Promise((a, b) => {
@@ -114,6 +146,25 @@ function mount(overrides = {}) {
     },
   }
 }
+
+test('only an explicit game generation sends its purpose; both paths keep one normal result download', async () => {
+  for (const purpose of [undefined, 'pet-sprite-v1']) {
+    const hook = mount({ request: () => job('succeeded') })
+    const result = await hook
+      .render()
+      .transform({ ...input, ...(purpose && { generationPurpose: purpose }) })
+    assert.equal(hook.calls.request.length, 1)
+    assert.deepEqual(hook.calls.request[0][0], {
+      filterId: input.filterId,
+      inputObjectKey: 'ai-image/source/fixture.png',
+      ...(purpose && { generationPurpose: purpose }),
+    })
+    assert.equal(hook.render().phase, 'done')
+    assert.equal(result.jobId, 'fixture-job')
+    assert.equal(hook.calls.image.length, 1)
+    hook.unmount()
+  }
+})
 
 test('a polling timeout recovers the same job without replaying the generation POST', async (t) => {
   clock(t)

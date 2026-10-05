@@ -6,7 +6,7 @@ The room uses 320×224 logical pixels: a 320×128 wall, a 32×32 floor tile repe
 
 Positions after visual inspection: bed (250,168), toy (190,184), plant (40,142), decoration (280,70). The decoration sits to the right of the painted clock; the previous (245,58) overlapped it. These are client room coordinates, never arbitrary purchase/equip payloads. A wall clock is part of the wallpaper and cannot be removed individually.
 
-The player's own existing pet image is processed separately by the private character API; none of these furniture assets substitutes a stock pet. Six 96×96 character reaction frames use the same pet identity. Furnishing thumbnails and room props resolve the same server catalog `assetKey` through `manifest.json`.
+The private character API processes the player's explicitly connected, certified `pet-sprite-v1` generation. Ordinary photo-filter portraits are retained in records and require explicit full-body connection before games. The generation preserves the photo's species, coat colors, markings, muzzle and ear shape; a strict final-image semantic check rejects portraits, cropped anatomy and decorative backgrounds. Six 96×96 reaction frames use the same identity, a 48px logical grid enlarged 2×, hard alpha and a shared feet baseline. None of the furniture assets substitutes a stock pet. Furnishing thumbnails and room props resolve the same server catalog `assetKey` through `manifest.json`.
 
 Design reference decisions: [Tamagotchi's official care guide](https://tamagotchi-official.com/us/series/paradise/howto/) informed the care-to-play loop, [Kairosoft's official Forest Camp Story trailer](https://www.youtube.com/watch?v=gGWPu6wr7ys) informed compact room silhouettes and restrained warm outlines, and [Aseprite's sprite-sheet documentation](https://www.aseprite.org/docs/sprite-sheet/) informed separate texture/frame sizing. These references are inspiration only, not copied assets.
 
@@ -70,4 +70,3 @@ Panel3: muted sage mint woven mat, small regular basket-weave pixel pattern in t
 Panel4 rightmost: pastel rose and peach diagonal woven rug pattern, gentle low contrast and tiny cream dot accents, sweet cozy room.
 These are production game tiles, understated so a moving pet and furniture sprites remain readable. All four should match classic cozy pixel furniture with brown outlines and cream/yellow/mint/rose color palette.
 ```
-
