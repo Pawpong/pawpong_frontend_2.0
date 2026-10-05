@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import { aiImageQueries } from '@/entities/ai-image'
 import { PlaygroundBilling } from '@/features/in-app-purchase'
+import { PetEntryCard } from '@/features/playground-pet/ui/PetEntryCard'
 import { PawPrintIcon, PixelArrowRightIcon } from '@/shared/assets'
 import { PLAYGROUND_BILLING_ENABLED } from '@/shared/config/playground'
 import { buttonVariants } from '@/shared/ui/Button'
@@ -97,6 +98,7 @@ export function PlaygroundContent() {
         </ol>
       </section>
 
+      <PetEntryCard />
       {PLAYGROUND_BILLING_ENABLED && <PlaygroundBilling />}
     </div>
   )
