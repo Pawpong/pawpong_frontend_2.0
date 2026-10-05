@@ -21,10 +21,22 @@ const shouldThrowToBoundary = (error: unknown) => {
   return false
 }
 
-const shouldCaptureError = (error: unknown) => {
+const shouldCaptureError = (error: unknown): error is Error => {
   if (!(error instanceof Error)) return false
   if (!(error instanceof ApiError)) return true
   return error.status === undefined || error.status >= 500
+}
+
+const captureRequestError = (error: Error) => {
+  if (error instanceof ApiError && error.request) {
+    Sentry.captureException(error, {
+      contexts: { api_request: { ...error.request, httpStatus: error.status } },
+      // SDK의 기본 중복 제거도 서로 다른 API의 같은 메시지를 버리지 않게 한다.
+      fingerprint: ['{{ default }}', error.request.method, error.request.endpoint],
+    })
+    return
+  }
+  Sentry.captureException(error)
 }
 
 export function QueryProvider({ children }: { children: React.ReactNode }) {
@@ -34,14 +46,14 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
         queryCache: new QueryCache({
           onError: (error) => {
             if (!shouldThrowToBoundary(error) && shouldCaptureError(error)) {
-              Sentry.captureException(error)
+              captureRequestError(error)
             }
           },
         }),
         mutationCache: new MutationCache({
           onError: (error) => {
             if (shouldCaptureError(error)) {
-              Sentry.captureException(error)
+              captureRequestError(error)
             }
           },
         }),
