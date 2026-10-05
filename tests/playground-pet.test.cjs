@@ -19,7 +19,9 @@ function load(file, deps = {}) {
   return exports
 }
 
-const { isPetEnvironmentAllowed } = load('src/features/playground-pet/lib/environment.ts')
+const { isPetEnvironmentAllowed, petExposureMode } = load(
+  'src/features/playground-pet/lib/environment.ts',
+)
 const presentation = load('src/entities/playground-pet/model/presentation.ts')
 const { PetCommandQueue } = load('src/entities/playground-pet/model/commandQueue.ts')
 const { ApiError, unwrap } = load('src/shared/api/unwrap.ts')
@@ -68,6 +70,27 @@ test('production deployment, branches, unknown hosts and missing flags stay clos
   ]) {
     assert.equal(isPetEnvironmentAllowed({ ...env, ...patch }), false, JSON.stringify(patch))
   }
+})
+test('only the real production deployment and canonical host can query the public release gate', () => {
+  const production = {
+    appEnv: 'production',
+    deploymentEnv: 'production',
+    branch: 'main',
+    hostname: 'pawpong.kr',
+  }
+  assert.equal(petExposureMode(production), 'public')
+  assert.equal(petExposureMode({ ...production, hostname: 'www.pawpong.kr' }), 'public')
+  for (const patch of [
+    { deploymentEnv: 'preview' },
+    { deploymentEnv: undefined },
+    { branch: 'dev' },
+    { branch: undefined },
+    { appEnv: 'development' },
+    { hostname: 'localhost:3033' },
+    { hostname: 'pawpong.kr.attacker.test' },
+    { hostname: 'dev.pawpong.kr' },
+  ])
+    assert.equal(petExposureMode({ ...production, ...patch }), null)
 })
 test('NFC names accept 1–12 codepoints but reject blank, controls and invisible format characters', () => {
   assert.equal(presentation.normalizePetName('  도토리  '), '도토리')
@@ -178,7 +201,8 @@ test('API sends the documented URLs and exact mutation body without client rewar
         },
       },
     },
-    '@/shared/api/unwrap': { unwrap },
+    '@/shared/api/unwrap': { ApiError, unwrap },
+    '@/shared/api/token': { getAccessToken: () => 'fixture-pet-session' },
   })
   await api.getPet()
   await api.getEligiblePetImages('page-2')
@@ -191,8 +215,8 @@ test('API sends the documented URLs and exact mutation body without client rewar
   assert.equal(calls[0][1], '/api/v2/playground/pet/me')
   assert.equal(calls[1][1], '/api/v2/playground/pet/eligible-images')
   assert.equal(calls[1][2].params.cursor, 'page-2')
-  assert.deepEqual(calls[2], ['POST', '/api/v2/playground/pet/actions', command.body])
-  assert.deepEqual(calls[3], ['POST', '/api/v2/playground/pet/adopt', adopt.body])
+  assert.deepEqual(calls[2].slice(0, 3), ['POST', '/api/v2/playground/pet/actions', command.body])
+  assert.deepEqual(calls[3].slice(0, 3), ['POST', '/api/v2/playground/pet/adopt', adopt.body])
 })
 test('eligibility follows server cursor pages and never trusts an input URL or filter name', async () => {
   const cursors = []
@@ -213,7 +237,8 @@ test('eligibility follows server cursor pages and never trusts an input URL or f
         },
       },
     },
-    '@/shared/api/unwrap': { unwrap },
+    '@/shared/api/unwrap': { ApiError, unwrap },
+    '@/shared/api/token': { getAccessToken: () => 'fixture-pet-session' },
   })
   assert.equal(await api.isEligiblePetImage('allowed'), true)
   assert.deepEqual(cursors, [null, 'page2'])
@@ -225,7 +250,8 @@ test('a session change while awaiting a private response rejects the old account
     react: {},
     '@/shared/api/token': { getAccessToken: () => token },
     '@/shared/api/unwrap': { ApiError },
-    '@/shared/lib/authStateEvents': { AUTH_STATE_CHANGED: 'auth' },
+    '@/shared/lib/authStateEvents': { AUTH_STATE_CHANGED: 'auth', notifyAuthStateChanged() {} },
+    '@/shared/lib/authSessionRecovery': { refreshAuthSession: async () => token },
     '@/shared/lib/authSessionLifecycle': {
       getAuthSessionGeneration: () => 1,
       isAuthSessionCurrent: (generation) => generation === 1,
@@ -248,6 +274,242 @@ test('a session change while awaiting a private response rejects the old account
   )
   assert.equal(sent, false)
 })
+
+function petSessionHarness() {
+  const state = { token: 'fixture-account-a', generation: 1, refreshes: 0, notifications: 0 }
+  const lifecycle = {
+    getAuthSessionGeneration: () => state.generation,
+    isAuthSessionCurrent: (generation) => generation === state.generation,
+  }
+  const token = { getAccessToken: () => state.token }
+  const recovery = {
+    refreshAuthSession: async () => {
+      state.refreshes++
+      return state.token
+    },
+  }
+  const { apiClient } = load('src/shared/api/client.ts', {
+    axios: require('axios'),
+    './unwrap': { ApiError },
+    './token': token,
+    '@/shared/lib/authSessionLifecycle': lifecycle,
+    '@/shared/lib/authSessionRecovery': recovery,
+    '@/shared/config/apiBaseUrl': { getApiBaseUrl: () => 'http://fixture.invalid' },
+  })
+  const api = load('src/entities/playground-pet/api/pet.api.ts', {
+    '@/shared/api/client': { apiClient, API_VERSION: '/api/v2' },
+    '@/shared/api/token': token,
+    '@/shared/api/unwrap': { ApiError, unwrap },
+  })
+  const auth = load('src/features/playground-pet/lib/usePetSession.ts', {
+    react: {},
+    '@/shared/api/token': token,
+    '@/shared/api/unwrap': { ApiError },
+    '@/shared/lib/authStateEvents': {
+      AUTH_STATE_CHANGED: 'auth',
+      notifyAuthStateChanged: () => state.notifications++,
+    },
+    '@/shared/lib/authSessionLifecycle': lifecycle,
+    '@/shared/lib/authSessionRecovery': recovery,
+  })
+  return {
+    state,
+    apiClient,
+    api,
+    auth,
+    recovery,
+    session: { token: state.token, generation: 1, scope: 'fixture-account-a' },
+  }
+}
+
+test('a delayed 401 never refreshes and replays an old pet mutation under the new account', async () => {
+  const { state, apiClient, api, auth, session } = petSessionHarness()
+  const owners = []
+  let rejectFirst, announceStarted
+  const started = new Promise((resolve) => (announceStarted = resolve))
+  apiClient.defaults.adapter = async (config) => {
+    owners.push(config.headers.Authorization === 'Bearer fixture-account-a' ? 'a' : 'b')
+    announceStarted()
+    return new Promise((_resolve, reject) => {
+      rejectFirst = () =>
+        reject(
+          new (require('axios').AxiosError)('expired', 'ERR_BAD_REQUEST', config, null, {
+            status: 401,
+            data: { message: '인증이 필요합니다.' },
+            config,
+          }),
+        )
+    })
+  }
+  const pending = auth.inPetSession(session, () => api.runPetCommand(command))
+  const rejection = assert.rejects(pending, { status: 401 })
+  await started
+  state.token = 'fixture-account-b'
+  state.generation++
+  rejectFirst()
+  await rejection
+  assert.deepEqual(owners, ['a'])
+  assert.equal(state.refreshes, 0)
+})
+
+test('a queued Axios request stays bound to its owner when the account changes before dispatch', async () => {
+  const { state, apiClient, api, auth, session } = petSessionHarness()
+  const owners = []
+  apiClient.defaults.adapter = async (config) => {
+    owners.push(config.headers.Authorization === 'Bearer fixture-account-a' ? 'a' : 'b')
+    return { status: 200, data: { success: true, data: view(8) }, config, headers: {} }
+  }
+  const pending = auth.inPetSession(session, () => api.runPetCommand(command))
+  state.token = 'fixture-account-b'
+  state.generation++
+  await assert.rejects(pending, { status: 401 })
+  assert.deepEqual(owners, ['a'])
+  assert.equal(state.notifications, 1)
+})
+
+test('a current-account 401 recovers credentials without replaying the rejected command', async () => {
+  const { state, apiClient, api, auth, session, recovery } = petSessionHarness()
+  const calls = []
+  recovery.refreshAuthSession = async () => {
+    state.refreshes++
+    state.token = 'fixture-account-a-refreshed'
+    return state.token
+  }
+  apiClient.defaults.adapter = async (config) => {
+    calls.push({ method: config.method, path: config.url })
+    if (config.headers.Authorization === 'Bearer fixture-account-a')
+      throw new (require('axios').AxiosError)('expired', 'ERR_BAD_REQUEST', config, null, {
+        status: 401,
+        data: { message: '인증이 필요합니다.' },
+        config,
+      })
+    return { status: 200, data: { success: true, data: view(8) }, config, headers: {} }
+  }
+  await assert.rejects(
+    auth.inPetSession(session, () => api.runPetCommand(command)),
+    { status: 401 },
+  )
+  assert.equal(state.refreshes, 1)
+  assert.equal(state.notifications, 1)
+  assert.equal(auth.petSessionIsCurrent(session), false)
+  assert.equal(calls.length, 1)
+  const fresh = { ...session, token: state.token, scope: 'fixture-refreshed-account-a' }
+  assert.equal((await auth.inPetSession(fresh, () => api.getPet())).pet.revision, 8)
+  assert.deepEqual(
+    calls.map((c) => c.method),
+    ['post', 'get'],
+  )
+})
+
+test('a rejected refresh invalidates the current session without replaying its pet request', async () => {
+  const { state, apiClient, api, auth, session, recovery } = petSessionHarness()
+  let sent = 0
+  recovery.refreshAuthSession = async () => {
+    state.refreshes++
+    state.token = null
+    throw new ApiError('세션 만료', 401)
+  }
+  apiClient.defaults.adapter = async (config) => {
+    sent++
+    throw new (require('axios').AxiosError)('expired', 'ERR_BAD_REQUEST', config, null, {
+      status: 401,
+      data: { message: '인증이 필요합니다.' },
+      config,
+    })
+  }
+  await assert.rejects(
+    auth.inPetSession(session, () => api.getPet()),
+    { status: 401 },
+  )
+  assert.equal(auth.petSessionIsCurrent(session), false)
+  assert.equal(state.notifications, 1)
+  assert.equal(state.refreshes, 1)
+  assert.equal(sent, 1)
+})
+
+test('all eligibility cursor pages use one originating session and discard data after an account switch', async () => {
+  const { state, apiClient, api, auth, session } = petSessionHarness()
+  const owners = []
+  apiClient.defaults.adapter = async (config) => {
+    owners.push(config.headers.Authorization === 'Bearer fixture-account-a' ? 'a' : 'b')
+    const first = owners.length === 1
+    if (first) {
+      state.token = 'fixture-account-b'
+      state.generation++
+    }
+    return {
+      status: 200,
+      data: {
+        success: true,
+        data: first
+          ? { images: [], nextCursor: 'second-page' }
+          : { images: [{ sourceJobId: 'eligible-a' }], nextCursor: null },
+      },
+      config,
+      headers: {},
+    }
+  }
+  await assert.rejects(
+    auth.inPetSession(session, () => api.isEligiblePetImage('eligible-a')),
+    {
+      status: 401,
+    },
+  )
+  assert.deepEqual(owners, ['a', 'a'])
+})
+
+test('silent cookie expiry releases the care controls and notifies the session without sending a mutation', async () => {
+  const { state, auth, session } = petSessionHarness()
+  const slots = []
+  let cursor = 0,
+    sent = 0,
+    cached = 0
+  const react = {
+    useEffect() {},
+    useState(initial) {
+      const index = cursor++
+      if (!(index in slots)) slots[index] = typeof initial === 'function' ? initial() : initial
+      return [
+        slots[index],
+        (value) => (slots[index] = typeof value === 'function' ? value(slots[index]) : value),
+      ]
+    },
+    useRef(initial) {
+      const index = cursor++
+      if (!(index in slots)) slots[index] = { current: initial }
+      return slots[index]
+    },
+  }
+  const { usePetController } = load('src/features/playground-pet/lib/usePetController.ts', {
+    react,
+    '@tanstack/react-query': {
+      useQuery: () => ({ data: view(7), refetch: async () => {} }),
+      useQueryClient: () => ({
+        cancelQueries: async () => {},
+        removeQueries() {},
+        invalidateQueries() {},
+        setQueryData: () => cached++,
+      }),
+    },
+    '@/entities/playground-pet': {
+      ...presentation,
+      getPet() {},
+      getPetConfig() {},
+      runPetCommand: async () => sent++,
+    },
+    '@/entities/playground-pet/model/commandQueue': { PetCommandQueue },
+    './usePetSession': auth,
+  })
+  const controller = usePetController(session)
+  state.token = null
+  await controller.execute(command)
+  cursor = 0
+  assert.equal(usePetController(session).busy, false)
+  assert.equal(sent, 0)
+  assert.equal(cached, 0)
+  assert.equal(state.notifications, 1)
+})
+
 test('config route does not contact any backend when the frontend environment is closed', async () => {
   const originalFetch = global.fetch
   let calls = 0
@@ -258,9 +520,12 @@ test('config route does not contact any backend when the frontend environment is
   try {
     const { GET } = load('src/app/api/playground/pet/config/route.ts', {
       'next/server': { NextResponse: { json: (body, options) => ({ body, ...options }) } },
-      '@/features/playground-pet/lib/server': {
-        isPetServerEnabled: (hostname) => isPetEnvironmentAllowed({ ...env, hostname }),
-      },
+      '@/features/playground-pet/lib/server': load('src/features/playground-pet/lib/server.ts', {
+        'server-only': {},
+        './environment': {
+          petExposureMode: ({ hostname }) => petExposureMode({ ...env, hostname }),
+        },
+      }),
     })
     // A reverse proxy may expose an internal localhost URL with a production Host.
     const response = await GET({
@@ -285,7 +550,8 @@ test('same-token login generations get separate caches and logout immediately cl
     },
     '@/shared/api/token': { getAccessToken: () => token },
     '@/shared/api/unwrap': { ApiError },
-    '@/shared/lib/authStateEvents': { AUTH_STATE_CHANGED: 'auth' },
+    '@/shared/lib/authStateEvents': { AUTH_STATE_CHANGED: 'auth', notifyAuthStateChanged() {} },
+    '@/shared/lib/authSessionRecovery': { refreshAuthSession: async () => token },
     '@/shared/lib/authSessionLifecycle': {
       getAuthSessionGeneration: () => generation,
       isAuthSessionCurrent: (expected) => current && generation === expected,
@@ -307,7 +573,10 @@ test('backend 404 is a safe disabled config; backend failures are retryable 503'
   try {
     const { GET } = load('src/app/api/playground/pet/config/route.ts', {
       'next/server': { NextResponse: { json: (body, options) => ({ body, ...options }) } },
-      '@/features/playground-pet/lib/server': { isPetServerEnabled: () => true },
+      '@/features/playground-pet/lib/server': load('src/features/playground-pet/lib/server.ts', {
+        'server-only': {},
+        './environment': { petExposureMode: () => 'development' },
+      }),
     })
     for (const status of [404, 503]) {
       global.fetch = async () => ({ status, ok: false })
@@ -317,6 +586,91 @@ test('backend 404 is a safe disabled config; backend failures are retryable 503'
     }
   } finally {
     global.fetch = originalFetch
+    if (oldBase === undefined) delete process.env.NEXT_PUBLIC_API_BASE_URL
+    else process.env.NEXT_PUBLIC_API_BASE_URL = oldBase
+  }
+})
+
+test('production rejects developer preview and defaults; only explicit public server approval opens', async () => {
+  const oldFetch = global.fetch
+  const oldBase = process.env.NEXT_PUBLIC_API_BASE_URL
+  process.env.NEXT_PUBLIC_API_BASE_URL = 'https://production-api.example.test'
+  const server = load('src/features/playground-pet/lib/server.ts', {
+    'server-only': {},
+    './environment': { petExposureMode: () => 'public' },
+  })
+  try {
+    for (const data of [
+      {},
+      { enabled: true },
+      { enabled: true, publicEnabled: false },
+      { enabled: false, publicEnabled: true },
+      { enabled: true, publicEnabled: 'true' },
+    ]) {
+      global.fetch = async () => ({
+        ok: true,
+        status: 200,
+        json: async () => ({ success: true, data }),
+      })
+      assert.equal(await server.isPetServerEnabled('pawpong.kr'), false)
+    }
+    let options
+    global.fetch = async (_url, init) => {
+      options = init
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({
+          success: true,
+          data: {
+            enabled: true,
+            publicEnabled: true,
+            policyVersion: 'v1',
+            privateAudit: 'must-not-expose',
+          },
+        }),
+      }
+    }
+    assert.deepEqual((await server.getPetServerConfig('pawpong.kr')).config, {
+      enabled: true,
+      publicEnabled: true,
+      policyVersion: 'v1',
+    })
+    assert.equal(options.cache, 'no-store')
+    global.fetch = async () => {
+      throw new Error('backend unavailable')
+    }
+    assert.equal(await server.isPetServerEnabled('pawpong.kr'), false)
+  } finally {
+    global.fetch = oldFetch
+    if (oldBase === undefined) delete process.env.NEXT_PUBLIC_API_BASE_URL
+    else process.env.NEXT_PUBLIC_API_BASE_URL = oldBase
+  }
+})
+
+test('existing development config remains a private preview while its public release is off', async () => {
+  const oldFetch = global.fetch
+  const oldBase = process.env.NEXT_PUBLIC_API_BASE_URL
+  process.env.NEXT_PUBLIC_API_BASE_URL = 'https://dev-api.example.test'
+  const server = load('src/features/playground-pet/lib/server.ts', {
+    'server-only': {},
+    './environment': { petExposureMode: () => 'development' },
+  })
+  try {
+    global.fetch = async () => ({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        success: true,
+        data: { enabled: true, publicEnabled: false },
+      }),
+    })
+    assert.deepEqual((await server.getPetServerConfig('localhost:3033')).config, {
+      enabled: true,
+      publicEnabled: false,
+    })
+  } finally {
+    global.fetch = oldFetch
     if (oldBase === undefined) delete process.env.NEXT_PUBLIC_API_BASE_URL
     else process.env.NEXT_PUBLIC_API_BASE_URL = oldBase
   }

@@ -16,7 +16,7 @@ export default async function PlaygroundPetPage({
   searchParams: Promise<{ sourceJobId?: string }>
 }) {
   const host = (await headers()).get('host') ?? ''
-  if (!isPetServerEnabled(host)) notFound()
+  if (!(await isPetServerEnabled(host))) notFound()
   const { sourceJobId } = await searchParams
   return <PetPage initialSourceJobId={typeof sourceJobId === 'string' ? sourceJobId : undefined} />
 }
