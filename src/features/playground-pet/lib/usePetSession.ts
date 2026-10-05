@@ -5,6 +5,7 @@ import { getAccessToken } from '@/shared/api/token'
 import { ApiError } from '@/shared/api/unwrap'
 import { AUTH_STATE_CHANGED, notifyAuthStateChanged } from '@/shared/lib/authStateEvents'
 import { getAuthSessionGeneration, isAuthSessionCurrent } from '@/shared/lib/authSessionLifecycle'
+import { refreshAuthSession } from '@/shared/lib/authSessionRecovery'
 
 export type PetSession = { token: string; scope: string; generation: number }
 
@@ -56,7 +57,21 @@ export async function inPetSession<T>(session: PetSession, request: () => Promis
     notifyAuthStateChanged()
     throw new ApiError('인증 세션이 변경됐어요.', 401)
   }
-  const data = await request()
+  let data: T
+  try {
+    data = await request()
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 401 && petSessionIsCurrent(session)) {
+      // Recover credentials only. A new scope reloads its own data; the rejected command is never replayed.
+      try {
+        await refreshAuthSession()
+      } catch {
+        // Shared recovery clears rejected credentials and preserves them on a transport failure.
+      }
+      notifyAuthStateChanged()
+    }
+    throw error
+  }
   if (!petSessionIsCurrent(session)) {
     notifyAuthStateChanged()
     throw new ApiError('인증 세션이 변경됐어요.', 401)

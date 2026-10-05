@@ -251,6 +251,7 @@ test('a session change while awaiting a private response rejects the old account
     '@/shared/api/token': { getAccessToken: () => token },
     '@/shared/api/unwrap': { ApiError },
     '@/shared/lib/authStateEvents': { AUTH_STATE_CHANGED: 'auth', notifyAuthStateChanged() {} },
+    '@/shared/lib/authSessionRecovery': { refreshAuthSession: async () => token },
     '@/shared/lib/authSessionLifecycle': {
       getAuthSessionGeneration: () => 1,
       isAuthSessionCurrent: (generation) => generation === 1,
@@ -281,17 +282,18 @@ function petSessionHarness() {
     isAuthSessionCurrent: (generation) => generation === state.generation,
   }
   const token = { getAccessToken: () => state.token }
+  const recovery = {
+    refreshAuthSession: async () => {
+      state.refreshes++
+      return state.token
+    },
+  }
   const { apiClient } = load('src/shared/api/client.ts', {
     axios: require('axios'),
     './unwrap': { ApiError },
     './token': token,
     '@/shared/lib/authSessionLifecycle': lifecycle,
-    '@/shared/lib/authSessionRecovery': {
-      refreshAuthSession: async () => {
-        state.refreshes++
-        return state.token
-      },
-    },
+    '@/shared/lib/authSessionRecovery': recovery,
     '@/shared/config/apiBaseUrl': { getApiBaseUrl: () => 'http://fixture.invalid' },
   })
   const api = load('src/entities/playground-pet/api/pet.api.ts', {
@@ -308,12 +310,14 @@ function petSessionHarness() {
       notifyAuthStateChanged: () => state.notifications++,
     },
     '@/shared/lib/authSessionLifecycle': lifecycle,
+    '@/shared/lib/authSessionRecovery': recovery,
   })
   return {
     state,
     apiClient,
     api,
     auth,
+    recovery,
     session: { token: state.token, generation: 1, scope: 'fixture-account-a' },
   }
 }
@@ -361,6 +365,66 @@ test('a queued Axios request stays bound to its owner when the account changes b
   await assert.rejects(pending, { status: 401 })
   assert.deepEqual(owners, ['a'])
   assert.equal(state.notifications, 1)
+})
+
+test('a current-account 401 recovers credentials without replaying the rejected command', async () => {
+  const { state, apiClient, api, auth, session, recovery } = petSessionHarness()
+  const calls = []
+  recovery.refreshAuthSession = async () => {
+    state.refreshes++
+    state.token = 'fixture-account-a-refreshed'
+    return state.token
+  }
+  apiClient.defaults.adapter = async (config) => {
+    calls.push({ method: config.method, path: config.url })
+    if (config.headers.Authorization === 'Bearer fixture-account-a')
+      throw new (require('axios').AxiosError)('expired', 'ERR_BAD_REQUEST', config, null, {
+        status: 401,
+        data: { message: '인증이 필요합니다.' },
+        config,
+      })
+    return { status: 200, data: { success: true, data: view(8) }, config, headers: {} }
+  }
+  await assert.rejects(
+    auth.inPetSession(session, () => api.runPetCommand(command)),
+    { status: 401 },
+  )
+  assert.equal(state.refreshes, 1)
+  assert.equal(state.notifications, 1)
+  assert.equal(auth.petSessionIsCurrent(session), false)
+  assert.equal(calls.length, 1)
+  const fresh = { ...session, token: state.token, scope: 'fixture-refreshed-account-a' }
+  assert.equal((await auth.inPetSession(fresh, () => api.getPet())).pet.revision, 8)
+  assert.deepEqual(
+    calls.map((c) => c.method),
+    ['post', 'get'],
+  )
+})
+
+test('a rejected refresh invalidates the current session without replaying its pet request', async () => {
+  const { state, apiClient, api, auth, session, recovery } = petSessionHarness()
+  let sent = 0
+  recovery.refreshAuthSession = async () => {
+    state.refreshes++
+    state.token = null
+    throw new ApiError('세션 만료', 401)
+  }
+  apiClient.defaults.adapter = async (config) => {
+    sent++
+    throw new (require('axios').AxiosError)('expired', 'ERR_BAD_REQUEST', config, null, {
+      status: 401,
+      data: { message: '인증이 필요합니다.' },
+      config,
+    })
+  }
+  await assert.rejects(
+    auth.inPetSession(session, () => api.getPet()),
+    { status: 401 },
+  )
+  assert.equal(auth.petSessionIsCurrent(session), false)
+  assert.equal(state.notifications, 1)
+  assert.equal(state.refreshes, 1)
+  assert.equal(sent, 1)
 })
 
 test('all eligibility cursor pages use one originating session and discard data after an account switch', async () => {
@@ -486,7 +550,8 @@ test('same-token login generations get separate caches and logout immediately cl
     },
     '@/shared/api/token': { getAccessToken: () => token },
     '@/shared/api/unwrap': { ApiError },
-    '@/shared/lib/authStateEvents': { AUTH_STATE_CHANGED: 'auth' },
+    '@/shared/lib/authStateEvents': { AUTH_STATE_CHANGED: 'auth', notifyAuthStateChanged() {} },
+    '@/shared/lib/authSessionRecovery': { refreshAuthSession: async () => token },
     '@/shared/lib/authSessionLifecycle': {
       getAuthSessionGeneration: () => generation,
       isAuthSessionCurrent: (expected) => current && generation === expected,
