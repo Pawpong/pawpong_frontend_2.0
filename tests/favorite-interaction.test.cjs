@@ -3,6 +3,8 @@ const assert = require('node:assert/strict')
 const fs = require('node:fs')
 const ts = require('typescript')
 const query = require('@tanstack/react-query')
+const React = require('react')
+const { renderToStaticMarkup } = require('react-dom/server')
 
 function load(file, dependencies = {}) {
   const module = { exports: {} }
@@ -20,6 +22,47 @@ function load(file, dependencies = {}) {
   )
   return module.exports
 }
+
+function renderFavoriteButton(props) {
+  const { tv } = load('src/shared/lib/tv.ts', {
+    './cn': load('src/shared/lib/cn.ts'),
+  })
+  const { ToggleIconButton } = load('src/shared/ui/ToggleIconButton.tsx', {
+    '@/shared/lib/tv': { tv },
+  })
+  const { FavoriteIcon } = load('src/shared/assets/icons/FavoriteIcon.tsx')
+  return renderToStaticMarkup(
+    React.createElement(ToggleIconButton, {
+      icon: FavoriteIcon,
+      hasFillState: true,
+      onClick: () => {},
+      'aria-label': '관심',
+      ...props,
+    }),
+  )
+}
+
+test('heart hover is removed without removing other shared action feedback', () => {
+  const heart = renderFavoriteButton({ tone: 'onImage', size: 'md' })
+  assert.doesNotMatch(heart, /hover:/)
+  assert.match(heart, /text-brand/)
+  assert.doesNotMatch(heart, /text-base-white/)
+  assert.match(renderFavoriteButton({ pressed: true }), /text-pressed-favorite/)
+  // The same control also renders non-heart actions, such as ShareButton.
+  assert.match(renderFavoriteButton({ hasFillState: false }), /hover:bg-brand-subtle/)
+  assert.match(renderFavoriteButton({ pressedTone: 'bookmark' }), /hover:bg-brand-subtle/)
+})
+
+test('large and responsive hearts render their own 32/48px SVG geometry', () => {
+  assert.match(renderFavoriteButton({ size: 'md' }), /viewBox="0 0 32 32"/)
+  const large = renderFavoriteButton({ size: 'lg' })
+  assert.match(large, /viewBox="0 0 48 48"/)
+  assert.doesNotMatch(large, /viewBox="0 0 32 32"/)
+  const responsive = renderFavoriteButton({ size: 'responsive' })
+  assert.match(responsive, /viewBox="0 0 32 32"[^>]+pc:hidden/)
+  assert.match(responsive, /viewBox="0 0 48 48"[^>]+hidden pc:block/)
+  assert.equal((responsive.match(/aria-hidden="true"/g) || []).length, 2)
+})
 
 const patch = load('src/shared/lib/patchCachedItem.ts')
 const breeder = (id, selected = false) => ({
@@ -141,7 +184,10 @@ test('saving a star preserves the public home role decision while refreshing my 
     states.length = 0
     await useAddFavorite().mutateAsync('breeder-a')
     assert.equal(publicRequests, 1, 'the public home must not repeat its role lookup')
-    assert.ok(states.every((state) => state === 'error'), 'the breeder home must stay mounted')
+    assert.ok(
+      states.every((state) => state === 'error'),
+      'the breeder home must stay mounted',
+    )
     assert.equal(publicObserver.getCurrentResult().status, 'error')
     assert.equal(privateRequests, 1)
     assert.equal(client.getQueryData(['adopter', 'profile']).favoriteCount, 1)
