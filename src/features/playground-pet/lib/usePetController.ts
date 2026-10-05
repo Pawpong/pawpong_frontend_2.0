@@ -101,7 +101,8 @@ export function usePetController(session: PetSession) {
       }
     } finally {
       requestLocked.current = false
-      if (petSessionIsCurrent(session)) setBusy(false)
+      // A changed scope mounts a different controller; an expired cookie may leave this one mounted.
+      setBusy(false)
     }
   }
 
