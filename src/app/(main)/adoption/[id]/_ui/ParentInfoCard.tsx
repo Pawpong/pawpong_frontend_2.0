@@ -30,7 +30,7 @@ const ParentInfoCard = ({ detail, onImageClick }: ParentInfoCardProps) => {
             <button
               type="button"
               onClick={() => onImageClick?.(parentImages, i)}
-              className="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-neutral-200"
+              className="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-neutral-200 focus-ring-inset"
             >
               {/* 사진 미등록이면 회색 배경만 — 빈 src를 <Image>에 넘기지 않는다 */}
               {parent.imageUrl && (

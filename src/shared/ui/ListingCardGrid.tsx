@@ -1,5 +1,5 @@
 import { Fragment, type Key, type ReactNode } from 'react'
-import { tv, type VariantProps } from 'tailwind-variants'
+import { tv, type VariantProps } from '@/shared/lib/tv'
 import { cn } from '@/shared/lib/cn'
 
 const listingCardGrid = tv({

@@ -53,8 +53,9 @@ const ExploreContent = () => {
     [pathname],
   )
 
+  // 기본 탭은 브리더 탐색 — 입양 탐색은 type=adoption 으로 명시해야 열린다
   const typeParam = searchParams.get('type')
-  const selectedType: ExploreType = typeParam === 'breeder' ? 'breeder' : 'adoption'
+  const selectedType: ExploreType = typeParam === 'adoption' ? 'adoption' : 'breeder'
   const [adoptionListFilter, setAdoptionListFilter] = useState<ExploreListFilter>('all')
 
   const keyword = searchParams.get('keyword') ?? undefined
@@ -92,8 +93,8 @@ const ExploreContent = () => {
   const handleTypeChange = useCallback(
     (type: ExploreType) => {
       const params = new URLSearchParams()
-      if (type === 'breeder') {
-        params.set('type', 'breeder')
+      if (type === 'adoption') {
+        params.set('type', 'adoption')
       }
       // 탭을 바꾸면 카테고리 칩(URL 파라미터)이 초기화되므로 목록 필터도 같이 되돌린다
       // (브리더 탭 필터는 컴포넌트가 언마운트되며 저절로 초기화된다)
@@ -219,6 +220,7 @@ const ExploreContent = () => {
               }
             >
               <ListState
+                appPublicContent
                 isPending={isPending}
                 isError={isError}
                 isEmpty={listings.length === 0}

@@ -1,10 +1,10 @@
 'use client'
 
-import Link from 'next/link'
+import { BeforeAfterSlider } from '@/shared/ui'
+
 import type { ReactNode } from 'react'
 import {
   AsyncState,
-  Button,
   DeleteConfirmModal,
   ImageCarousel,
   LoginPromptModal,
@@ -38,7 +38,8 @@ interface PostDetailPanelProps {
 }
 
 // [refactored] 두 레이아웃 분기에 같은 값이 있어 상수로
-const COMPOSER_CLASS = 'shrink-0 border-t border-neutral-100 px-5'
+const COMPOSER_CLASS =
+  'shrink-0 border-t border-neutral-150 bg-base-white px-4 pb-[env(safe-area-inset-bottom)]'
 
 const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDetailPanelProps) => {
   const {
@@ -56,6 +57,7 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
     setConfirmDeletePost,
     handleDeletePost,
     isDeletePending,
+    isFetching: isRetrying,
   } = usePostDetail(postId)
   // 좋아요·북마크는 비로그인 요청이 401로 떨어지므로 먼저 로그인으로 유도한다
   const { guard, isPromptOpen, setPromptOpen } = useLoginGuard()
@@ -76,13 +78,8 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
                 ? '게시글을 불러오는 중입니다.'
                 : '삭제되었거나 볼 수 없는 게시글입니다.'
           }
-          action={
-            isError ? (
-              <Button variant="fill" size="sm" onClick={() => void refetch()}>
-                다시 시도
-              </Button>
-            ) : undefined
-          }
+          onRetry={isError ? () => void refetch() : undefined}
+          isRetrying={isRetrying}
           className="min-h-0 flex-1"
         />
       </div>
@@ -94,17 +91,22 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
 
   const header = (
     <div className="flex shrink-0 items-center justify-between gap-2 px-4 py-2">
-      <Link href={`/home/${post.authorId}`} className="flex min-w-0 items-center gap-2">
+      {/* 전체 페이지 이동으로 홈에서 연 모달과 인터셉트 모달 상태도 함께 정리한다. */}
+      <a
+        href={`/home/${post.authorId}`}
+        aria-label={`${post.authorNickname}님의 홈으로 이동`}
+        className="flex min-w-0 items-center gap-2 rounded-lg focus-ring"
+      >
         <ProfileAvatar
           size="medium"
           src={post.authorProfileImageUrl}
           alt={post.authorNickname}
           className="shrink-0"
         />
-        <span className="truncate text-base font-semibold text-neutral-850">
+        <span className="truncate text-body-lg font-semibold text-neutral-850">
           {post.authorNickname}
         </span>
-      </Link>
+      </a>
       {trailingAction}
     </div>
   )
@@ -118,7 +120,6 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
         <OwnerActionsMenu
           onEdit={() => router.push(`/community/post/${postId}/edit`)}
           onDelete={() => setConfirmDeletePost(true)}
-          className="shrink-0 text-neutral-850"
         />
       )}
     </div>
@@ -132,6 +133,16 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
         commentCount={post.commentCount}
         liked={post.isLiked}
         saved={post.isSaved}
+        share={
+          post.visibility === 'public' && post.status === 'published'
+            ? {
+                url: `/community/post/${postId}`,
+                title: post.title || `${post.authorNickname}님의 게시글`,
+                description: post.body,
+                imageUrl: post.photoUrls[0],
+              }
+            : undefined
+        }
         onToggleLike={isLikePending ? undefined : guard(toggleLike)}
         onToggleSave={isBookmarkPending ? undefined : guard(toggleBookmark)}
       />
@@ -156,17 +167,45 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
   )
 
   // 브랜드 옐로우 점·불투명 진회색 화살표 — 피드 카드와 동일한 톤
-  const imageCarousel = hasImages && (
-    <ImageCarousel
-      images={post.photoUrls}
-      alt={post.authorNickname}
-      preloadFirstImage
-      bgClassName="bg-white"
-      imageClassName="object-contain"
-      className={isSideBySide ? 'h-full w-[60%] shrink-0' : 'aspect-square w-full shrink-0'}
-      {...COMMUNITY_CAROUSEL_STYLE} // [refactored] 피드 카드와 공유하는 상수로
-    />
-  )
+  const comparison = post.aiComparison
+  const extraImages = comparison
+    ? post.photoUrls.filter(
+        (_, index) => index !== comparison.beforePhotoIndex && index !== comparison.afterPhotoIndex,
+      )
+    : []
+  const imageCarousel =
+    hasImages &&
+    (comparison &&
+    post.photoUrls[comparison.beforePhotoIndex] &&
+    post.photoUrls[comparison.afterPhotoIndex] ? (
+      <div className={isSideBySide ? 'h-full w-[60%] shrink-0 overflow-y-auto' : 'w-full shrink-0'}>
+        <BeforeAfterSlider
+          beforeSrc={post.photoUrls[comparison.beforePhotoIndex]}
+          afterSrc={post.photoUrls[comparison.afterPhotoIndex]}
+          className="rounded-none"
+        />
+        {extraImages.length > 0 && (
+          <ImageCarousel
+            images={extraImages}
+            alt={post.authorNickname}
+            bgClassName="bg-white"
+            imageClassName="object-contain"
+            className="aspect-square w-full"
+            {...COMMUNITY_CAROUSEL_STYLE}
+          />
+        )}
+      </div>
+    ) : (
+      <ImageCarousel
+        images={post.photoUrls}
+        alt={post.authorNickname}
+        preloadFirstImage
+        bgClassName="bg-white"
+        imageClassName="object-contain"
+        className={isSideBySide ? 'h-full w-[60%] shrink-0' : 'aspect-square w-full shrink-0'}
+        {...COMMUNITY_CAROUSEL_STYLE}
+      />
+    ))
 
   if (isSideBySide) {
     return (

@@ -16,7 +16,6 @@ interface ProfileAvatarProps {
     | 'responsivePc'
     | 'responsiveProfile'
   className?: string
-  fallbackClassName?: string
 }
 
 export type ProfileAvatarSize = NonNullable<ProfileAvatarProps['size']>
@@ -41,17 +40,12 @@ const AVATAR_SIZE = {
  * 프로필 아바타 — 사진 있으면 이미지, 없으면 paw 글리프 placeholder.
  * 색: 배경 primary-50(#f5eadf) · 글리프 primary-500(#ad651d, 메뉴바와 동일)
  */
-const ProfileAvatar = ({
-  src,
-  alt,
-  size = 'small',
-  className,
-  fallbackClassName,
-}: ProfileAvatarProps) => {
+const ProfileAvatar = ({ src, alt, size = 'small', className }: ProfileAvatarProps) => {
   return (
     <Avatar className={cn(AVATAR_SIZE[size].box, className)}>
       {src && <AvatarImage src={src} alt={alt} />}
-      <AvatarFallback className={cn('bg-primary-50 text-primary-500', fallbackClassName)}>
+      {/* 빈 프로필 색은 Avatar 기본값 하나로 고정 — 호출부에서 바꾸지 않는다 */}
+      <AvatarFallback>
         <PawPrintIcon className={AVATAR_SIZE[size].glyph} />
       </AvatarFallback>
     </Avatar>

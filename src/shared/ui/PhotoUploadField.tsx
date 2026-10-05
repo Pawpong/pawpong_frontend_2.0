@@ -1,12 +1,13 @@
 'use client'
 
-import { useId, useRef, useState, type ReactNode } from 'react'
+import { useId, useRef, useState } from 'react'
 import Image from 'next/image'
 import { CloseIcon } from '@/shared/assets'
 import { PHOTO_ACCEPT } from '@/shared/lib/preparePhoto'
 import { cn } from '@/shared/lib/cn'
 import { Button } from './Button'
 import { PhotoSelectPrompt } from './PhotoSelectPrompt'
+import { IconButton } from './IconButton'
 
 interface PhotoUploadFieldProps {
   preview?: string
@@ -14,10 +15,6 @@ interface PhotoUploadFieldProps {
   processing?: boolean
   onSelect: (files: FileList) => void
   onRemove: () => void
-  /** 미리보기 좌상단 표시 (예: AI 도트 버전 표시) */
-  badge?: ReactNode
-  /** processing 중 문구 (기본: 사진 준비) */
-  processingLabel?: string
 }
 
 /** Single-photo selection with replacement, keyboard access and desktop drop support. */
@@ -27,8 +24,6 @@ export function PhotoUploadField({
   processing,
   onSelect,
   onRemove,
-  badge,
-  processingLabel = '사진을 준비하고 있어요…',
 }: PhotoUploadFieldProps) {
   const input = useRef<HTMLInputElement>(null)
   const hintId = useId()
@@ -59,7 +54,7 @@ export function PhotoUploadField({
           onClick={() => input.current?.click()}
           aria-label={preview ? '사진 바꾸기' : '참여 사진 선택'}
           aria-describedby={hintId}
-          className="relative flex aspect-square w-full flex-col items-center justify-center gap-4 p-6 text-center focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-primary-500 disabled:cursor-wait"
+          className="relative flex aspect-square w-full flex-col items-center justify-center gap-4 p-6 text-center focus-ring-inset disabled:cursor-wait"
         >
           {preview ? (
             <Image
@@ -78,24 +73,18 @@ export function PhotoUploadField({
           )}
         </button>
         {preview && !busy && (
-          <button
-            type="button"
-            onClick={onRemove}
-            aria-label="선택한 사진 삭제"
-            className="absolute top-3 right-3 flex size-11 items-center justify-center rounded-full border border-neutral-150 bg-white text-neutral-850 focus-visible:outline-2 focus-visible:outline-primary-500"
-          >
-            <CloseIcon className="size-5" />
-          </button>
-        )}
-        {preview && badge && !processing && (
-          <span className="pointer-events-none absolute top-3 left-3">{badge}</span>
+          <span className="absolute top-3 right-3 flex">
+            <IconButton tone="surface" onClick={onRemove} aria-label="선택한 사진 삭제">
+              <CloseIcon className="size-5" />
+            </IconButton>
+          </span>
         )}
         {processing && (
           <div
             role="status"
             className="absolute inset-0 flex items-center justify-center bg-white/90 text-sm font-semibold text-primary-700"
           >
-            {processingLabel}
+            사진을 준비하고 있어요…
           </div>
         )}
       </div>
@@ -119,12 +108,7 @@ export function PhotoUploadField({
           JPG, PNG, WEBP, GIF, AVIF, HEIC·HEIF
         </p>
         {preview && (
-          <Button
-            variant="text"
-            disabled={busy}
-            onClick={() => input.current?.click()}
-            className="min-h-11 shrink-0 px-3"
-          >
+          <Button size="md" intent="ghost" disabled={busy} onClick={() => input.current?.click()}>
             사진 바꾸기
           </Button>
         )}

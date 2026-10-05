@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { homeQueries } from '@/entities/home'
+import { SupportInquiryModal } from '@/features/inquiry'
 import { ChevronDownIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { cafe24Proup } from '@/shared/lib/fonts'
@@ -17,7 +18,6 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/shared/ui'
-import { InquiryModal } from './InquiryModal'
 
 type FaqAudience = 'adopter' | 'breeder'
 
@@ -35,16 +35,21 @@ const FAQ_QUERY_BY_AUDIENCE: Record<FaqAudience, () => ReturnType<typeof homeQue
 
 // 질문 행 — Figma 3395:638598 'FAQ'. 카드/보더/그림자 없이 neutral-300 구분선만 있는 플러시 리스트.
 // design.md 원칙대로 별도 JS 아코디언 대신 native details/summary를 그대로 쓴다.
-const FaqItem = ({ faq }: { faq: FaqDto }) => (
+const FaqItem = ({ faq, onInquiryClick }: { faq: FaqDto; onInquiryClick: () => void }) => (
   <details className="group border-b border-neutral-300 last:border-b-0">
-    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-left focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-500 [&::-webkit-details-marker]:hidden">
+    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-left focus-ring-inset [&::-webkit-details-marker]:hidden">
       <span className="min-w-0 text-base leading-[1.5] font-semibold text-neutral-850">
         {faq.question}
       </span>
       <ChevronDownIcon className="size-6 shrink-0 text-neutral-850 transition-transform group-open:rotate-180" />
     </summary>
-    <div className="mb-4 rounded-lg bg-point-100 p-3 text-base leading-[1.5] font-medium whitespace-pre-line text-neutral-850">
+    <div className="mb-4 rounded-lg bg-point-100 p-3 text-base leading-[1.5] font-medium break-words whitespace-pre-line text-neutral-850">
       {faq.answer}
+      <div className="mt-4">
+        <Button intent="dark" size="sm" onClick={onInquiryClick}>
+          AI에게 문의하기
+        </Button>
+      </div>
     </div>
   </details>
 )
@@ -67,7 +72,11 @@ const FaqHero = ({ onInquiryClick }: { onInquiryClick: () => void }) => (
     {/* 얇은 밴드, 상하 8px만. CtaBanner 가 자체 max-w-[70.875rem](1134px) 로 가운데 정렬하므로
         폭을 다시 좁히지 않는다 */}
     <Container className="py-2">
-      <CtaBanner text="직접 문의 남기기" tone="point" onClick={onInquiryClick} />
+      <CtaBanner
+        text="AI에게 문의하기 · 운영팀도 함께 확인해요"
+        tone="point"
+        onClick={onInquiryClick}
+      />
     </Container>
   </>
 )
@@ -131,15 +140,12 @@ const FaqContent = () => {
               loadingText="자주 묻는 질문을 불러오는 중입니다."
               errorText="자주 묻는 질문을 불러오지 못했습니다."
               emptyText="등록된 질문이 없습니다."
-              errorAction={
-                <Button variant="fill" size="sm" onClick={() => void query.refetch()}>
-                  다시 시도
-                </Button>
-              }
+              onRetry={() => void query.refetch()}
+              isRetrying={query.isFetching}
             >
               <div>
                 {faqs.map((faq) => (
-                  <FaqItem key={faq.faqId} faq={faq} />
+                  <FaqItem key={faq.faqId} faq={faq} onInquiryClick={() => setInquiryOpen(true)} />
                 ))}
               </div>
             </ListState>
@@ -147,7 +153,7 @@ const FaqContent = () => {
         </div>
       </Container>
 
-      <InquiryModal
+      <SupportInquiryModal
         key={audience}
         audience={audience}
         open={inquiryOpen}

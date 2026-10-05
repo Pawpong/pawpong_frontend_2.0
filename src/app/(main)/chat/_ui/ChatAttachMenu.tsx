@@ -6,44 +6,39 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  IconButton,
 } from '@/shared/ui'
-import { CameraIcon, FileIcon, LocationPinIcon, PlusIcon } from '@/shared/assets'
-import { PHOTO_ACCEPT } from '@/shared/lib/preparePhoto'
+import { CameraIcon, LocationPinIcon, PlusIcon } from '@/shared/assets'
 
+// iOS 는 사진을 받는 파일 선택이면 항상 같은 시트(사진 보관함·사진 찍기·파일 선택)를 띄워
+// 사진·파일을 나눠도 구분이 안 된다 — 하나로 받고 고른 파일 형식으로 사진/파일 전송을 가른다
 const ATTACH_ITEMS = [
-  { icon: CameraIcon, label: '이미지', type: 'image' },
+  { icon: CameraIcon, label: '사진·파일', type: 'file' },
   { icon: LocationPinIcon, label: '위치 공유', type: 'location' },
-  { icon: FileIcon, label: '파일 첨부', type: 'file' },
 ] as const
 
 interface ChatAttachMenuProps {
   disabled?: boolean
-  onSelectFile: (file: File, type: 'image' | 'file') => void
+  onSelectFile: (file: File) => void
   onSelectLocation: () => void
 }
 
 const ChatAttachMenu = ({ disabled, onSelectFile, onSelectLocation }: ChatAttachMenuProps) => {
-  const imageInputRef = React.useRef<HTMLInputElement>(null)
   const fileInputRef = React.useRef<HTMLInputElement>(null)
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'file') => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     event.target.value = ''
-    if (file) onSelectFile(file, type)
+    if (file) onSelectFile(file)
   }
 
   return (
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button
-            type="button"
-            aria-label="첨부"
-            disabled={disabled}
-            className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-600 transition-colors hover:bg-primary-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500 disabled:cursor-not-allowed disabled:bg-neutral-100 disabled:text-neutral-400"
-          >
+          <IconButton tone="brandSoft" aria-label="첨부" disabled={disabled}>
             <PlusIcon className="size-5" />
-          </button>
+          </IconButton>
         </DropdownMenuTrigger>
 
         <DropdownMenuContent side="top" align="start" sideOffset={8} className="min-w-[11rem]">
@@ -52,7 +47,6 @@ const ChatAttachMenu = ({ disabled, onSelectFile, onSelectLocation }: ChatAttach
               key={label}
               className="h-[3.0625rem]"
               onSelect={() => {
-                if (type === 'image') imageInputRef.current?.click()
                 if (type === 'location') onSelectLocation()
                 if (type === 'file') fileInputRef.current?.click()
               }}
@@ -64,19 +58,7 @@ const ChatAttachMenu = ({ disabled, onSelectFile, onSelectLocation }: ChatAttach
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <input
-        ref={imageInputRef}
-        type="file"
-        accept={PHOTO_ACCEPT}
-        className="hidden"
-        onChange={(event) => handleChange(event, 'image')}
-      />
-      <input
-        ref={fileInputRef}
-        type="file"
-        className="hidden"
-        onChange={(event) => handleChange(event, 'file')}
-      />
+      <input ref={fileInputRef} type="file" className="hidden" onChange={handleChange} />
     </>
   )
 }

@@ -4,7 +4,7 @@ import type { ReactNode } from 'react'
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { OwnerActionsMenu, ProfileHeader, TextLabel } from '@/shared/ui'
+import { BeforeAfterSlider, OwnerActionsMenu, ProfileHeader, TextLabel } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import type { CommunityPreviewProps } from '../model/communityPreview'
 import { CommunityPostActions } from './CommunityPostActions'
@@ -79,11 +79,13 @@ const PostCard = ({
   createdAt,
   text,
   images = [],
+  aiComparison,
   likeCount,
   commentCount,
   isLiked,
   isSaved,
   detailHref,
+  shareable,
   profileType,
   showMore,
   commentPreview,
@@ -95,6 +97,12 @@ const PostCard = ({
   className,
 }: PostCardProps) => {
   const hasImages = images.length > 0
+  const extraImages = aiComparison
+    ? images.filter(
+        (_, index) =>
+          index !== aiComparison.beforePhotoIndex && index !== aiComparison.afterPhotoIndex,
+      )
+    : []
 
   const profileCluster = (
     <CommunityPostProfile
@@ -118,17 +126,7 @@ const PostCard = ({
           profileImageUrl={author.profileImageUrl}
           detailHref={detailHref}
           showMore={showMore}
-          action={
-            onDelete ? (
-              <OwnerActionsMenu
-                onEdit={onEdit}
-                onDelete={onDelete}
-                className="shrink-0 text-neutral-850"
-              />
-            ) : (
-              moreAction
-            )
-          }
+          action={onDelete ? <OwnerActionsMenu onEdit={onEdit} onDelete={onDelete} /> : moreAction}
           className="p-2 pc:px-0"
         />
       ) : (
@@ -140,28 +138,38 @@ const PostCard = ({
           ) : (
             profileCluster
           )}
-          {onDelete ? (
-            <OwnerActionsMenu
-              onEdit={onEdit}
-              onDelete={onDelete}
-              className="shrink-0 text-neutral-850"
-            />
-          ) : (
-            moreAction
-          )}
+          {onDelete ? <OwnerActionsMenu onEdit={onEdit} onDelete={onDelete} /> : moreAction}
         </div>
       )}
 
       {/* 이미지 + 액션 — 사진↔아이콘 8px gap */}
       <div className="flex flex-col gap-2">
         {/* 이미지 (가로 스크롤) — 저장피드(profileType)는 상단패딩 제거 */}
-        {hasImages && (
-          <ImagesRow
-            images={images}
-            detailHref={detailHref}
-            className={cn('pt-3 pc:pt-3', profileType && 'pt-0')}
-          />
-        )}
+        {hasImages &&
+          (aiComparison &&
+          images[aiComparison.beforePhotoIndex] &&
+          images[aiComparison.afterPhotoIndex] ? (
+            <div className="max-w-md pt-3">
+              <BeforeAfterSlider
+                beforeSrc={images[aiComparison.beforePhotoIndex]}
+                afterSrc={images[aiComparison.afterPhotoIndex]}
+              />
+              {extraImages.length > 0 && (
+                <ImagesRow images={extraImages} detailHref={detailHref} className="mt-3" />
+              )}
+              {detailHref && (
+                <Link href={detailHref} className="mt-2 block text-sm text-primary-700 underline">
+                  게시글 자세히 보기
+                </Link>
+              )}
+            </div>
+          ) : (
+            <ImagesRow
+              images={images}
+              detailHref={detailHref}
+              className={cn('pt-3 pc:pt-3', profileType && 'pt-0')}
+            />
+          ))}
 
         {/* 액션 + 댓글 미리보기 — 아이콘↔댓글 4px gap */}
         <div className="flex flex-col gap-1">
@@ -173,6 +181,16 @@ const PostCard = ({
             saved={isSaved}
             onToggleLike={onToggleLike}
             onToggleSave={onToggleSave}
+            share={
+              shareable && detailHref
+                ? {
+                    url: detailHref,
+                    title: `${author.nickname}님의 게시글`,
+                    description: text,
+                    imageUrl: images[0],
+                  }
+                : undefined
+            }
             detailHref={detailHref}
           />
 

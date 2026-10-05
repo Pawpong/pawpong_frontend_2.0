@@ -1,5 +1,13 @@
+import { createPageMetadata } from '@/shared/lib/metadata'
+
 import Link from 'next/link'
 import { Container, NavigationBar } from '@/shared/ui'
+
+export const metadata = createPageMetadata({
+  title: '서비스 소개',
+  description: '반려동물과 가족의 좋은 만남을 연결하는 포퐁을 소개합니다.',
+  path: '/about',
+})
 
 /** 현재 제공하는 서비스와 실제 진입점을 안내한다. */
 const AboutPage = () => (

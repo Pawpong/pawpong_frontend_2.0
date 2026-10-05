@@ -1,4 +1,4 @@
-import { tv, type VariantProps } from 'tailwind-variants'
+import { tv, type VariantProps } from '@/shared/lib/tv'
 import { cn } from '@/shared/lib/cn'
 
 // Figma 926-25253 Label — 텍스트 라벨 (패딩 spacing/2 2px)

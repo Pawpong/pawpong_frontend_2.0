@@ -1,4 +1,5 @@
-import type { Metadata } from 'next'
+import { createPageMetadata } from '@/shared/lib/metadata'
+
 import Link from 'next/link'
 import { ReviewLoginForm } from '@/features/auth'
 import { RESPONSIVE_SHELL_CLASS } from '@/shared/config'
@@ -7,10 +8,7 @@ import { cafe24Proup } from '@/shared/lib/fonts'
 import { normalizeReturnUrl } from '@/shared/lib/normalizeReturnUrl'
 import { LogoButton } from '@/widgets/gnb'
 
-export const metadata: Metadata = {
-  title: '심사용 계정 로그인 | 포퐁',
-  robots: { index: false, follow: false },
-}
+export const metadata = createPageMetadata({ title: '심사용 계정 로그인', noIndex: true })
 
 export default async function ReviewLoginPage({
   searchParams,
@@ -44,7 +42,7 @@ export default async function ReviewLoginPage({
         <ReviewLoginForm returnUrl={returnUrl} />
         <Link
           href={loginHref}
-          className="mx-auto mt-6 rounded px-2 py-2 text-sm text-neutral-700 underline underline-offset-4 hover:text-neutral-850 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+          className="mx-auto mt-6 rounded px-2 py-2 text-sm text-neutral-700 underline underline-offset-4 focus-ring hover:text-neutral-850"
         >
           소셜 로그인으로 돌아가기
         </Link>

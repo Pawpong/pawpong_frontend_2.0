@@ -39,7 +39,7 @@ export const getChatMessages = (
 ) =>
   apiClient
     .get<ChatListPayload<ChatMessageResponseDto>>(`${API_VERSION}/chat/rooms/${roomId}/messages`, {
-      params: { limit, before },
+      params: { limit, before, markAsRead: false },
       signal,
       timeout: 8_000,
     })

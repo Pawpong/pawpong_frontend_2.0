@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { cn } from '@/shared/lib/cn'
 import type { ChatRoomResponseDto } from '@/shared/types'
-import { Button, EmptyState, SearchBar } from '@/shared/ui'
+import { RetryButton, EmptyState, SearchBar } from '@/shared/ui'
 import { CHAT_GUTTER_X } from '../_lib/constants'
 import { useChatRoomFilter } from '../_lib/useChatRoomFilter'
 import { ChatFilterTabs } from './ChatFilterTabs'
@@ -27,7 +27,15 @@ const ChatRoomFilterableList = ({
   listClassName,
   gutterClassName = CHAT_GUTTER_X,
 }: ChatRoomFilterableListProps) => {
-  const { filter, setFilter, filteredRooms, isLoading, isError, refetch } = useChatRoomFilter()
+  const {
+    filter,
+    setFilter,
+    filteredRooms,
+    isLoading,
+    isError,
+    refetch,
+    isFetching: isRetrying,
+  } = useChatRoomFilter()
   const [search, setSearch] = useState('')
   const visibleRooms = filteredRooms.filter((room) =>
     room.counterpart.nickname.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase()),
@@ -57,13 +65,7 @@ const ChatRoomFilterableList = ({
       ) : isError ? (
         <div className="flex flex-col items-center justify-center gap-3 py-20">
           <p className="text-sm font-medium text-neutral-700">채팅방을 불러오지 못했습니다.</p>
-          <Button
-            variant="fill"
-            onClick={() => void refetch()}
-            className="rounded-lg bg-neutral-850 px-4 py-2 text-sm font-semibold text-neutral-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
-          >
-            다시 시도
-          </Button>
+          <RetryButton onRetry={() => void refetch()} isRetrying={isRetrying} />
         </div>
       ) : visibleRooms.length === 0 ? (
         <EmptyState

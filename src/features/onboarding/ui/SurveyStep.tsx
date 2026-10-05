@@ -7,7 +7,7 @@ import { surveySchema, SURVEY_TEXT_MAX_LENGTH, type SurveyFormData } from '../mo
 import { cn } from '@/shared/lib/cn'
 import { STEP_LAYOUT } from '../model/stepLayout'
 import { StepContainer } from './StepContainer'
-import { TextareaField, TextLabel } from '@/shared/ui'
+import { TextareaField, TextLabel, Button } from '@/shared/ui'
 import { CheckboxField } from './CheckboxField'
 import { ADOPTION_SURVEY_QUESTIONS } from '@/shared/config'
 
@@ -99,8 +99,12 @@ const SurveyStep = () => {
           <TextLabel as="ul" size="16" weight="medium" className="list-disc ps-6">
             <li>수집하는 개인정보 항목 : 이름, 연락처, 이메일주소 등</li>
             <li>수집 및 이용 목적 : 입양자 상담 및 검토</li>
-            <li>보유 및 이용기간 : 상담 또는 입양 직후 폐기</li>
+            <li>보유 및 이용기간 : 상담 종료 또는 입양 확정 후 1년 보관 후 파기</li>
           </TextLabel>
+          <p className="text-sm leading-relaxed text-neutral-700">
+            기간 만료 시 책임자 김승찬이 확인하여 수동 파기합니다. 기존에 더 짧은 기간으로 동의한
+            정보에는 기존 기준을 적용하며, 계정 영구삭제 요청은 별도로 처리합니다.
+          </p>
 
           <Controller
             name="privacyAgreed"
@@ -118,20 +122,17 @@ const SurveyStep = () => {
 
         {/* 섹션 2: 조사 항목 — 버튼·라벨·텍스트에어리어 전부 flat gap 12px (Figma 966:22241) */}
         <div className={cn('flex w-full flex-col', STEP_LAYOUT.fieldGap)}>
-          <button
-            type="button"
-            onClick={handleSkip}
-            disabled={isPending}
-            className="flex items-center gap-0 self-end rounded-lg bg-neutral-850 px-2 py-1 text-[0.875rem] font-semibold text-neutral-50 disabled:opacity-40"
-          >
-            다음에 작성하기
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="size-4">
-              <path
-                d="M9.7 18.3L15.3 12.7C15.4 12.6 15.475 12.4917 15.525 12.375C15.575 12.2583 15.6 12.1333 15.6 12C15.6 11.8667 15.575 11.7417 15.525 11.625C15.475 11.5083 15.4 11.4 15.3 11.3L9.7 5.7C9.38333 5.38333 9.31267 5.021 9.488 4.613C9.66267 4.20433 9.97467 4 10.424 4C10.8733 4 11.2 4.2 11.4 4.6L17.025 10.225C17.225 10.425 17.375 10.65 17.475 10.9C17.575 11.15 17.625 11.4167 17.625 11.7C17.625 11.9833 17.575 12.25 17.475 12.5C17.375 12.75 17.225 12.975 17.025 13.175L11.4 18.8C11.0833 19.1167 10.721 19.1877 10.313 19.013C9.90433 18.8377 9.7 18.5253 9.7 18.076V18.3Z"
-                fill="#f6f6f6"
-              />
-            </svg>
-          </button>
+          <div className="flex self-end">
+            <Button intent="dark" size="sm" onClick={handleSkip} disabled={isPending}>
+              다음에 작성하기
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="size-4">
+                <path
+                  d="M9.7 18.3L15.3 12.7C15.4 12.6 15.475 12.4917 15.525 12.375C15.575 12.2583 15.6 12.1333 15.6 12C15.6 11.8667 15.575 11.7417 15.525 11.625C15.475 11.5083 15.4 11.4 15.3 11.3L9.7 5.7C9.38333 5.38333 9.31267 5.021 9.488 4.613C9.66267 4.20433 9.97467 4 10.424 4C10.8733 4 11.2 4.2 11.4 4.6L17.025 10.225C17.225 10.425 17.375 10.65 17.475 10.9C17.575 11.15 17.625 11.4167 17.625 11.7C17.625 11.9833 17.575 12.25 17.475 12.5C17.375 12.75 17.225 12.975 17.025 13.175L11.4 18.8C11.0833 19.1167 10.721 19.1877 10.313 19.013C9.90433 18.8377 9.7 18.5253 9.7 18.076V18.3Z"
+                  fill="#f6f6f6"
+                />
+              </svg>
+            </Button>
+          </div>
 
           <SurveyTextarea
             {...SURVEY_FIELDS[0]}

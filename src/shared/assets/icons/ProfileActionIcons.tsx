@@ -1,19 +1,11 @@
 import type { SVGProps } from 'react'
+import { PixelActionIcon } from './PixelActionIcon'
 
-// 신고 아이콘의 표시 선 두께(약 1.35px)와 크기에 맞춘 단일 외곽선.
 export const ProfileStarIcon = ({
   filled = false,
   ...props
 }: SVGProps<SVGSVGElement> & { filled?: boolean }) => (
-  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
-    <path
-      d="M12 2.5L15 8.6L21.7 9.6L16.85 14.3L18 21L12 17.85L6 21L7.15 14.3L2.3 9.6L9 8.6Z"
-      className={filled ? 'fill-point-500' : undefined}
-      stroke="currentColor"
-      strokeWidth="1.35"
-      strokeLinejoin="round"
-    />
-  </svg>
+  <PixelActionIcon glyph="star" filled={filled} selectedFill="var(--color-point-500)" {...props} />
 )
 
 // 가져온 사이렌 경로는 유지하고, 실제 도형의 중심에 맞춰 여백을 정규화한다.

@@ -1,8 +1,13 @@
-import type { Metadata } from 'next'
+import { createPageMetadata } from '@/shared/lib/metadata'
+
 import { NavigationBar } from '@/shared/ui/NavigationBar'
 import { AccountDeletionContent } from './_ui/AccountDeletionContent'
 
-export const metadata: Metadata = { title: '계정 영구삭제 | 포퐁' }
+export const metadata = createPageMetadata({
+  title: '계정 영구삭제',
+  description: '포퐁 계정과 연결된 서비스 데이터의 영구삭제 절차를 안내합니다.',
+  path: '/account/delete',
+})
 
 export default function AccountDeletionPage() {
   return (

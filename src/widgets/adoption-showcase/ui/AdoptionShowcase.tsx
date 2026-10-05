@@ -18,8 +18,13 @@ const AdoptionShowcase = () => {
   const pets = flattenPages(data).slice(0, CARD_COUNT).map(mapAdoptionCard)
 
   return (
-    <ShowcaseSection title="분양중인 동물" linkText="탐색 바로가기" linkHref="/explore">
+    <ShowcaseSection
+      title="분양중인 동물"
+      linkText="탐색 바로가기"
+      linkHref="/explore?type=adoption"
+    >
       <ListState
+        appPublicContent
         isPending={isPending}
         isError={isError}
         isEmpty={pets.length === 0}

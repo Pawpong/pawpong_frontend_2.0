@@ -6,12 +6,13 @@ import { useInfiniteQuery } from '@tanstack/react-query'
 import {
   Button,
   DeleteConfirmModal,
-  FilterChip,
+  Chip,
   InfiniteScrollTrigger,
   ListState,
   LoginPromptModal,
   NavigationBar,
   SearchBar,
+  SortOptions,
 } from '@/shared/ui'
 import { PlusIcon } from '@/shared/assets'
 import {
@@ -23,6 +24,7 @@ import {
 } from '@/entities/community'
 import { ConnectedFeedCard, useDeletePostConfirm } from '@/features/community'
 import { useLoginGuard, useMe } from '@/features/auth'
+import { FeedFollowButton } from './FeedFollowButton'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import { cn } from '@/shared/lib/cn'
 import type { CommunityPetType, CommunitySortType } from '@/shared/types'
@@ -43,10 +45,18 @@ const CommunityContent = () => {
   const { guard, isPromptOpen, setPromptOpen } = useLoginGuard()
   const { me } = useMe()
   const { requestDelete, modalProps: deleteModalProps } = useDeletePostConfirm()
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending, isError, refetch } =
-    useInfiniteQuery(
-      communityQueries.posts(sort, petType || undefined, undefined, appliedSearch || undefined),
-    )
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isPending,
+    isError,
+    refetch,
+    isFetching: isRetrying,
+  } = useInfiniteQuery(
+    communityQueries.posts(sort, petType || undefined, undefined, appliedSearch || undefined),
+  )
   const posts = flattenPages(data)
   const firstPhotoPostId = getFirstPhotoPostId(posts)
   const writePost = guard(() => router.push('/community/write'))
@@ -58,14 +68,12 @@ const CommunityContent = () => {
         title="커뮤니티"
         titleVariant="page"
         right={
-          <Button
-            onClick={writePost}
-            variant="primary"
-            className="hidden h-10 shrink-0 gap-1.5 rounded-xl px-4 tab:flex pc:hidden"
-          >
-            <PlusIcon className="size-5" />
-            글쓰기
-          </Button>
+          <div className="hidden tab:flex pc:hidden">
+            <Button size="md" onClick={writePost}>
+              <PlusIcon className="size-5" />
+              글쓰기
+            </Button>
+          </div>
         }
       />
 
@@ -80,7 +88,7 @@ const CommunityContent = () => {
                   aria-pressed={petType === option.value}
                   onClick={() => setPetType(option.value)}
                   className={cn(
-                    'flex min-h-12 items-center justify-between rounded-xl px-4 text-left text-[0.9375rem] transition-colors focus-visible:outline-2 focus-visible:outline-primary-500',
+                    'flex min-h-12 items-center justify-between rounded-xl px-4 text-left text-[0.9375rem] focus-ring transition-colors',
                     petType === option.value
                       ? 'bg-neutral-100 font-semibold text-neutral-850'
                       : 'font-medium text-neutral-500 hover:bg-neutral-50 hover:text-neutral-850',
@@ -94,7 +102,7 @@ const CommunityContent = () => {
               ))}
             </nav>
             <div className="mt-6 border-t border-neutral-100 pt-6">
-              <Button variant="primary" onClick={writePost} className="h-12 w-full rounded-xl">
+              <Button onClick={writePost} width="full" size="lg">
                 글쓰기
               </Button>
               <p className="mt-3 px-1 text-xs leading-relaxed text-neutral-500">
@@ -122,14 +130,13 @@ const CommunityContent = () => {
               className="mb-6 flex gap-2 overflow-x-auto pb-1 pc:hidden"
             >
               {PET_OPTIONS.map((option) => (
-                <FilterChip
+                <Chip
                   key={option.value}
                   selected={petType === option.value}
                   onClick={() => setPetType(option.value)}
-                  className="shrink-0"
                 >
                   {option.shortLabel}
-                </FilterChip>
+                </Chip>
               ))}
             </nav>
 
@@ -137,35 +144,19 @@ const CommunityContent = () => {
               <h2 className="text-base font-semibold text-neutral-850">
                 {appliedSearch ? '검색 결과' : selectedLabel}
               </h2>
-              <div className="flex items-center gap-3" aria-label="게시글 정렬">
-                {COMMUNITY_SORT_OPTIONS.map((option) => (
-                  <button
-                    key={option.value}
-                    type="button"
-                    aria-pressed={sort === option.value}
-                    onClick={() => setSort(option.value)}
-                    className={cn(
-                      'min-h-10 rounded px-1 text-sm focus-visible:outline-2 focus-visible:outline-primary-500',
-                      sort === option.value
-                        ? 'font-semibold text-neutral-850'
-                        : 'text-neutral-500 hover:text-neutral-850',
-                    )}
-                  >
-                    {option.label}
-                  </button>
-                ))}
-              </div>
+              <SortOptions
+                ariaLabel="게시글 정렬"
+                options={COMMUNITY_SORT_OPTIONS}
+                value={sort}
+                onValueChange={setSort}
+              />
             </div>
             {appliedSearch && (
               <div className="flex items-center justify-between gap-3 border-b border-neutral-100 py-3 text-sm">
                 <p className="min-w-0 truncate text-neutral-700">“{appliedSearch}” 검색 결과</p>
-                <button
-                  type="button"
-                  onClick={() => setAppliedSearch('')}
-                  className="min-h-10 shrink-0 rounded px-2 font-medium text-neutral-500 hover:text-neutral-850"
-                >
+                <Button intent="ghost" size="sm" onClick={() => setAppliedSearch('')}>
                   검색 해제
-                </button>
+                </Button>
               </div>
             )}
             {isPending && (
@@ -176,16 +167,14 @@ const CommunityContent = () => {
               </div>
             )}
             <ListState
+              appPublicContent={!appliedSearch}
               isPending={false}
               isError={isError}
               isEmpty={!isPending && posts.length === 0}
               loadingText="게시글을 불러오는 중입니다."
               errorText="이야기를 불러오지 못했어요."
-              errorAction={
-                <Button variant="outline" onClick={() => void refetch()}>
-                  다시 시도
-                </Button>
-              }
+              onRetry={() => void refetch()}
+              isRetrying={isRetrying}
               emptyText={
                 appliedSearch
                   ? '검색 결과가 없어요. 다른 검색어로 찾아보세요.'
@@ -208,6 +197,13 @@ const CommunityContent = () => {
                           : undefined
                       }
                       onDelete={isMyPost ? () => requestDelete(post.postId) : undefined}
+                      followAction={
+                        <FeedFollowButton
+                          userId={post.authorId}
+                          isFollowing={post.isFollowingAuthor ?? false}
+                          guard={guard}
+                        />
+                      }
                     />
                   )
                 })}
@@ -221,14 +217,12 @@ const CommunityContent = () => {
           </section>
         </div>
 
-        <Button
-          onClick={writePost}
-          variant="primary"
-          className="fixed right-5 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-sticky h-12 gap-1.5 px-5 shadow-md tab:hidden"
-        >
-          <PlusIcon className="size-5" />
-          글쓰기
-        </Button>
+        <div className="fixed right-5 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-sticky flex rounded-lg shadow-md tab:hidden">
+          <Button onClick={writePost} size="lg">
+            <PlusIcon className="size-5" />
+            글쓰기
+          </Button>
+        </div>
         <LoginPromptModal
           open={isPromptOpen}
           onOpenChange={setPromptOpen}

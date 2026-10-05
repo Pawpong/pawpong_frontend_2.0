@@ -1,7 +1,7 @@
 'use client'
 
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { Button, Container, InfiniteScrollTrigger, ListState, ListingCardGrid } from '@/shared/ui'
+import { Container, InfiniteScrollTrigger, ListState, ListingCardGrid } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { profileQueries } from '@/entities/profile'
 import type { FavoriteBreederCard } from '@/shared/types'
@@ -28,8 +28,16 @@ const FavoriteBreedersContent = ({
   className?: string
   gridClassName?: string
 }) => {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending, isError, refetch } =
-    useInfiniteQuery(profileQueries.favoriteBreeders())
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isPending,
+    isError,
+    refetch,
+    isFetching: isRetrying,
+  } = useInfiniteQuery(profileQueries.favoriteBreeders())
 
   const breeders = (data?.pages ?? []).flatMap((page) => page.items.map(toBreederCardModel))
 
@@ -44,11 +52,8 @@ const FavoriteBreedersContent = ({
         loadingText="즐겨찾는 브리더를 불러오는 중입니다."
         errorText="즐겨찾는 브리더를 불러오지 못했습니다."
         emptyText="즐겨찾는 브리더가 없습니다."
-        errorAction={
-          <Button variant="fill" size="sm" onClick={() => void refetch()} className="px-4">
-            다시 시도
-          </Button>
-        }
+        onRetry={() => void refetch()}
+        isRetrying={isRetrying}
       >
         <ListingCardGrid
           layout="compact"

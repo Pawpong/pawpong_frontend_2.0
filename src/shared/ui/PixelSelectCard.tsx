@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { tv } from 'tailwind-variants'
+import { tv } from '@/shared/lib/tv'
 import { PawPrintIcon } from '@/shared/assets'
 import { cafe24Proup } from '@/shared/lib/fonts'
 import { cn } from '@/shared/lib/cn'
@@ -19,7 +19,7 @@ const PIXEL_FILL =
 // 카드 크기: mo·tab 187.65×160 / pc 250.503×213.591. 텍스트는 32px / 40px.
 const pixelSelectCard = tv({
   slots: {
-    root: 'group relative flex h-[10rem] w-[11.728rem] shrink-0 items-center justify-center transition-colors pc:h-[13.3494rem] pc:w-[15.6564rem]',
+    root: 'focus-ring group relative flex h-[10rem] w-[11.728rem] shrink-0 items-center justify-center transition-colors pc:h-[13.3494rem] pc:w-[15.6564rem]',
     fill: '',
     paw: 'pointer-events-none absolute top-[57.52%] left-[76.44%] aspect-square w-[19.43%] -translate-x-1/2 -translate-y-1/2 rotate-30 items-center justify-center text-secondary-500',
   },

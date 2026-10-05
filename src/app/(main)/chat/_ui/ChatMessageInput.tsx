@@ -4,10 +4,10 @@ import * as React from 'react'
 import { useUploadSingleFile } from '@/features/upload'
 import { createClientMessageId } from '@/features/chat-realtime'
 import { normalizeApiError } from '@/shared/api'
-import { Button, CtaModal } from '@/shared/ui'
+import { Button, CtaModal, Textarea } from '@/shared/ui'
 import { LocationPinIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
-import { preparePhoto } from '@/shared/lib/preparePhoto'
+import { isPhotoFile, preparePhoto } from '@/shared/lib/preparePhoto'
 import type { ChatMessageType } from '@/shared/types'
 import { CHAT_CONTENT_WIDTH, CHAT_GUTTER_X } from '../_lib/constants'
 import { serializeChatAttachment, type ChatLocationPayload } from '../_lib/attachment'
@@ -20,9 +20,17 @@ interface ChatMessageInputProps {
     clientMessageId?: string,
   ) => Promise<boolean>
   disabled?: boolean
+  /** 있으면 입력창 대신 이 안내를 보여준다 (차단·탈퇴 등으로 대화할 수 없는 방) */
+  unavailableMessage?: string
 }
 
 const MAX_ATTACHMENT_SIZE = 100 * 1024 * 1024
+/** 입력창이 늘어나는 최대 높이 — 넘으면 입력창 안에서 스크롤한다 (약 4줄) */
+const MAX_INPUT_HEIGHT = 112
+
+/** 터치 키보드 기기(모바일 웹·앱 WebView)에서는 Enter 를 줄바꿈으로 쓰고 전송은 버튼으로만 한다 */
+const isTouchKeyboard = () =>
+  typeof window !== 'undefined' && window.matchMedia('(hover: none) and (pointer: coarse)').matches
 
 const GEOLOCATION_OPTIONS: PositionOptions = {
   enableHighAccuracy: false,
@@ -42,7 +50,7 @@ const getLocationErrorMessage = (error: GeolocationPositionError) => {
   return '위치 확인 시간이 초과되었습니다. 네트워크 상태를 확인하고 다시 시도해주세요.'
 }
 
-const ChatMessageInput = ({ onSend, disabled }: ChatMessageInputProps) => {
+const ChatMessageInput = ({ onSend, disabled, unavailableMessage }: ChatMessageInputProps) => {
   const [value, setValue] = React.useState('')
   const [attachmentError, setAttachmentError] = React.useState<string | null>(null)
   const [locationModalOpen, setLocationModalOpen] = React.useState(false)
@@ -53,6 +61,17 @@ const ChatMessageInput = ({ onSend, disabled }: ChatMessageInputProps) => {
   const sending = React.useRef(false)
   const preparingAttachment = React.useRef(false)
   const textDraftId = React.useRef<string | null>(null)
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null)
+
+  // 줄 수에 맞춰 높이를 다시 잰다 — 전송 후 값이 비면 한 줄 높이로 돌아온다
+  React.useLayoutEffect(() => {
+    const el = textareaRef.current
+    if (!el) return
+    el.style.height = 'auto'
+    // scrollHeight 는 테두리를 빼고 재므로 더해 줘야 한 줄일 때 스크롤바가 생기지 않는다
+    const border = el.offsetHeight - el.clientHeight
+    el.style.height = `${Math.min(el.scrollHeight + border, MAX_INPUT_HEIGHT)}px`
+  }, [value])
   const [pendingAttachment, setPendingAttachment] = React.useState<{
     content: string
     type: 'image' | 'file' | 'location'
@@ -88,14 +107,17 @@ const ChatMessageInput = ({ onSend, disabled }: ChatMessageInputProps) => {
     }
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
+  // PC: Enter 전송, Shift+Enter 줄바꿈 / 터치 키보드: Enter 는 기본 동작(줄바꿈)
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing && !isTouchKeyboard()) {
       e.preventDefault()
       void handleSubmit()
     }
   }
 
-  const handleAttachment = async (file: File, messageType: 'image' | 'file') => {
+  // 사진은 정리(축소·JPG·위치 메타데이터 제거) 후 사진 말풍선으로, 그 밖의 파일은 원본 그대로 파일 카드로 보낸다
+  const handleAttachment = async (file: File) => {
+    const messageType = isPhotoFile(file) ? 'image' : 'file'
     if (isDisabled || preparingAttachment.current) return
     setAttachmentError(null)
 
@@ -177,6 +199,22 @@ const ChatMessageInput = ({ onSend, disabled }: ChatMessageInputProps) => {
     )
   }
 
+  if (unavailableMessage) {
+    return (
+      <div className={cn('shrink-0 border-t border-neutral-150 bg-white py-4', CHAT_GUTTER_X)}>
+        <p
+          role="status"
+          className={cn(
+            CHAT_CONTENT_WIDTH,
+            'text-center text-body-md font-medium text-neutral-500',
+          )}
+        >
+          {unavailableMessage}
+        </p>
+      </div>
+    )
+  }
+
   return (
     <div className={cn('shrink-0 border-t border-neutral-150 bg-white py-3', CHAT_GUTTER_X)}>
       <div className={cn(CHAT_CONTENT_WIDTH, 'flex flex-col gap-2')}>
@@ -193,10 +231,10 @@ const ChatMessageInput = ({ onSend, disabled }: ChatMessageInputProps) => {
             <span className="min-w-0 flex-1 truncate">
               {pendingAttachment.name} · {isSending ? '전송 확인 중' : '전송 대기'}
             </span>
-            <button
-              type="button"
+            <Button
+              intent="link"
+              size="inline"
               disabled={isDisabled}
-              className="shrink-0 font-semibold text-primary-600 underline disabled:opacity-50"
               onClick={async () => {
                 if (
                   await send(
@@ -209,49 +247,50 @@ const ChatMessageInput = ({ onSend, disabled }: ChatMessageInputProps) => {
               }}
             >
               다시 보내기
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
+              intent="ghost"
+              size="inline"
               disabled={isSending}
-              className="shrink-0 font-semibold text-neutral-600 underline"
               onClick={() => setPendingAttachment(null)}
             >
               닫기
-            </button>
+            </Button>
           </div>
         )}
-        <div className="flex items-center gap-2">
+        {/* 댓글 입력창과 같은 구성 — 아바타 자리에 첨부(+), 공통 입력 필드, 따로 떨어진 전송 버튼.
+            여러 줄로 늘어나면 첨부·전송 버튼은 마지막 줄에 맞춘다 */}
+        <div className="flex items-end gap-2">
           {/* 첨부 메뉴 (+ 버튼 클릭 시 이미지/위치/파일) */}
           <ChatAttachMenu
             disabled={isDisabled || Boolean(pendingAttachment)}
             onSelectFile={handleAttachment}
             onSelectLocation={handleLocationRequest}
           />
-
-          {/* 입력 + 전송 — 댓글 입력창과 같은 필 모양 안에 함께 둔다 */}
-          <div className="flex h-12 min-w-0 flex-1 items-center gap-2 rounded-full border border-neutral-300 bg-base-white py-1 pr-1.5 pl-5 transition-[border-color,box-shadow] duration-150 focus-within:border-primary-500 focus-within:ring-4 focus-within:ring-point-500/45 motion-reduce:transition-none pc:h-14 pc:pl-6">
-            <input
-              type="text"
-              value={value}
-              onChange={(e) => {
-                textDraftId.current = null
-                setValue(e.target.value)
-              }}
-              onKeyDown={handleKeyDown}
-              placeholder={
-                uploadFile.isPending ? '파일을 업로드하는 중입니다.' : '메시지를 입력하세요'
-              }
-              disabled={isDisabled}
-              aria-label="메시지"
-              className="h-full min-w-0 flex-1 bg-transparent text-body-lg font-medium text-neutral-850 outline-none placeholder:text-neutral-500 disabled:cursor-not-allowed"
-            />
+          <Textarea
+            ref={textareaRef}
+            autoGrow
+            rows={1}
+            value={value}
+            onChange={(e) => {
+              textDraftId.current = null
+              setValue(e.target.value)
+            }}
+            onKeyDown={handleKeyDown}
+            placeholder={
+              uploadFile.isPending ? '파일을 업로드하는 중입니다.' : '메시지를 입력하세요'
+            }
+            disabled={isDisabled}
+            aria-label="메시지"
+            className="min-w-0 flex-1"
+          />
+          <div className="flex min-w-14 shrink-0">
             <Button
-              variant="primary"
-              size="sm"
+              size="md"
               onClick={handleSubmit}
               disabled={isDisabled || !value.trim()}
               aria-busy={isSending}
-              className="h-10 min-w-14 shrink-0 px-3 whitespace-nowrap pc:h-11"
+              width="full"
             >
               {isSending ? '확인 중' : '보내기'}
             </Button>
@@ -283,13 +322,13 @@ const ChatMessageInput = ({ onSend, disabled }: ChatMessageInputProps) => {
         actions={[
           {
             label: '취소',
-            variant: 'outline',
+            intent: 'secondary',
             disabled: isLocating,
             onClick: () => setLocationModalOpen(false),
           },
           {
             label: isLocating ? '위치 확인 중' : '위치 공유',
-            variant: 'fill',
+            intent: 'primary',
             disabled: isLocating,
             onClick: handleLocationShare,
           },

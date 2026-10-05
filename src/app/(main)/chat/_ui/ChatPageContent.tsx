@@ -9,6 +9,7 @@ import type { ChatRoomResponseDto } from '@/shared/types'
 import { ChatRoomList } from './ChatRoomList'
 import { ChatSidebar } from './ChatSidebar'
 import { ChatRoomPanel } from './ChatRoomPanel'
+import { RetryButton, Button } from '@/shared/ui'
 
 const ChatPageContent = () => {
   const router = useRouter()
@@ -61,23 +62,16 @@ const ChatPageContent = () => {
       <div className="flex h-[calc(100dvh-4rem)] flex-col items-center justify-center gap-3 px-5 text-center">
         <p className="text-sm text-neutral-700">채팅방을 불러오지 못했습니다.</p>
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={handleBack}
-            className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm font-semibold text-neutral-850"
-          >
+          <Button intent="secondary" size="sm" onClick={handleBack}>
             목록으로
-          </button>
-          <button
-            type="button"
-            onClick={() => {
+          </Button>
+          <RetryButton
+            onRetry={() => {
               void roomsQuery.refetch()
               void profileQuery.refetch()
             }}
-            className="rounded-lg bg-neutral-850 px-3 py-2 text-sm font-semibold text-white"
-          >
-            다시 시도
-          </button>
+            isRetrying={roomsQuery.isFetching || profileQuery.isFetching}
+          />
         </div>
       </div>
     )
@@ -87,13 +81,9 @@ const ChatPageContent = () => {
     return (
       <div className="flex h-[calc(100dvh-4rem)] flex-col items-center justify-center gap-3">
         <p className="text-sm text-neutral-700">채팅방을 불러오지 못했습니다.</p>
-        <button
-          type="button"
-          onClick={handleBack}
-          className="rounded-lg bg-neutral-850 px-3 py-2 text-sm font-semibold text-white"
-        >
+        <Button intent="dark" size="sm" onClick={handleBack}>
           목록으로
-        </button>
+        </Button>
       </div>
     )
   }

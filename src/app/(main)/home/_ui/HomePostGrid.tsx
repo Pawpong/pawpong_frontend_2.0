@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Button, Container, InfiniteScrollTrigger, ListState } from '@/shared/ui'
+import { Container, InfiniteScrollTrigger, ListState } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { BREAKPOINTS } from '@/shared/lib/useBreakpoint'
 import { CommunityMediaCard, getFirstPhotoPostId } from '@/entities/community'
@@ -13,6 +13,7 @@ interface HomePostGridProps {
   isPending: boolean
   isError: boolean
   onRetry: () => void
+  isRetrying: boolean
   loadingText?: string
   errorText?: string
   emptyText?: string
@@ -33,6 +34,7 @@ const HomePostGrid = ({
   isPending,
   isError,
   onRetry,
+  isRetrying,
   loadingText = '게시글을 불러오는 중입니다.',
   errorText = '게시글을 불러오지 못했습니다.',
   emptyText = '게시글이 없습니다.',
@@ -55,11 +57,8 @@ const HomePostGrid = ({
           loadingText={loadingText}
           errorText={errorText}
           emptyText={emptyText}
-          errorAction={
-            <Button variant="fill" size="sm" onClick={onRetry} className="px-4">
-              다시 시도
-            </Button>
-          }
+          onRetry={onRetry}
+          isRetrying={isRetrying}
         >
           <div
             className={cn(

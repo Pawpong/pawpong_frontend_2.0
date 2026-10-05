@@ -1,15 +1,16 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
 import { cn } from '@/shared/lib/cn'
 import { useAuthStatus } from '@/features/auth'
 import { NotificationListItem, notificationQueries } from '@/entities/notification'
 import { uniqueBy } from '@/shared/lib/uniqueBy'
-import { useMarkAsRead, useMarkAllAsRead } from '@/features/notification'
+import { useOpenNotification, useMarkAsRead, useMarkAllAsRead } from '@/features/notification'
+import { normalizeApiError } from '@/shared/api'
 import type { NotificationResponseDto } from '@/shared/types'
-import { Button, EmptyState } from '@/shared/ui'
+import { Button, EmptyState, ActionSheetItem, UnreadCountBadge } from '@/shared/ui'
 
 // Figma icon/ bell (1596:77455 세트, 1596:97271) — nav 아이콘과 같은 픽셀 글리프라 currentColor 로 그린다.
 // Figma 원본은 속이 찬 실루엣 하나뿐이라, nav 아이콘들처럼 비활성은 외곽선만 남기고
@@ -29,6 +30,11 @@ const NotificationBell = ({ className }: { className?: string }) => {
   const router = useRouter()
   const { isLoggedIn } = useAuthStatus()
   const [open, setOpen] = useState(false)
+  const [clearError, setClearError] = useState<string | null>(null)
+  const setPanelOpen = useCallback((next: boolean) => {
+    setOpen(next)
+    if (!next) setClearError(null)
+  }, [])
   const rootRef = useRef<HTMLDivElement>(null)
 
   const { data: unreadCount = 0 } = useQuery({
@@ -38,13 +44,16 @@ const NotificationBell = ({ className }: { className?: string }) => {
 
   const { data, isLoading, isError, hasNextPage, fetchNextPage, isFetchingNextPage } =
     useInfiniteQuery({
-      ...notificationQueries.list(),
+      // 팝업은 안 읽은 알림만 보여 준다. 지우기는 읽음 처리이며 원본은 센터에 남는다.
+      ...notificationQueries.list({ isRead: false }),
       // 드롭다운을 열었을 때만 목록을 불러온다
       enabled: isLoggedIn && open,
     })
 
-  const { mutate: markAsRead } = useMarkAsRead()
-  const { mutate: markAllAsRead } = useMarkAllAsRead()
+  const openNotification = useOpenNotification()
+  const clearOne = useMarkAsRead()
+  const clearAll = useMarkAllAsRead()
+  const isClearing = clearOne.isPending || clearAll.isPending
 
   const notifications = uniqueBy(
     data?.pages.flatMap((page) => page.items) ?? [],
@@ -55,10 +64,10 @@ const NotificationBell = ({ className }: { className?: string }) => {
   useEffect(() => {
     if (!open) return
     const handlePointer = (e: MouseEvent) => {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false)
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setPanelOpen(false)
     }
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false)
+      if (e.key === 'Escape') setPanelOpen(false)
     }
     document.addEventListener('mousedown', handlePointer)
     document.addEventListener('keydown', handleKey)
@@ -66,36 +75,51 @@ const NotificationBell = ({ className }: { className?: string }) => {
       document.removeEventListener('mousedown', handlePointer)
       document.removeEventListener('keydown', handleKey)
     }
-  }, [open])
+  }, [open, setPanelOpen])
 
   if (!isLoggedIn) return null
 
+  const handleClearOne = (item: NotificationResponseDto) => {
+    setClearError(null)
+    clearOne.mutate(item.notificationId, {
+      onError: (error) =>
+        setClearError(
+          normalizeApiError(error, '알림을 지우지 못했어요. 다시 시도해 주세요.').message,
+        ),
+    })
+  }
+
+  const handleClearAll = () => {
+    setClearError(null)
+    clearAll.mutate(undefined, {
+      onError: (error) =>
+        setClearError(
+          normalizeApiError(error, '알림을 지우지 못했어요. 다시 시도해 주세요.').message,
+        ),
+    })
+  }
+
   const handleSelect = (item: NotificationResponseDto) => {
-    if (!item.isRead) markAsRead(item.notificationId)
-    setOpen(false)
-    if (item.targetUrl?.startsWith('/')) router.push(item.targetUrl)
+    setPanelOpen(false)
+    void openNotification(item)
   }
 
   return (
     <div ref={rootRef} className={cn('relative', className)}>
       <button
         type="button"
-        onClick={() => setOpen((prev) => !prev)}
+        onClick={() => setPanelOpen(!open)}
         aria-label="알림"
         aria-expanded={open}
         className={cn(
           // 헤더 nav 항목(NavBar)과 동일한 톤·아이콘 크기·간격을 쓴다
-          'flex items-center rounded pr-1 text-sm leading-[1.5] font-medium whitespace-nowrap text-primary-500 transition-colors hover:text-primary-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500',
+          'flex min-h-11 min-w-11 items-center justify-center rounded text-sm leading-[1.5] font-medium whitespace-nowrap text-primary-500 focus-ring transition-colors hover:text-primary-700',
           open && 'font-semibold',
         )}
       >
         <span className="relative flex size-7 items-center justify-center">
           <BellIcon className="size-7" filled={open} />
-          {unreadCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-error-500 px-1 text-[0.625rem] leading-none font-semibold text-white">
-              {unreadCount > 99 ? '99+' : unreadCount}
-            </span>
-          )}
+          <UnreadCountBadge count={unreadCount} />
         </span>
         <span className="hidden pc:inline">알림</span>
       </button>
@@ -110,18 +134,25 @@ const NotificationBell = ({ className }: { className?: string }) => {
             'pc:absolute pc:top-full pc:right-0 pc:left-auto pc:mt-1 pc:w-[22.5rem]',
           )}
         >
-          <div className="flex items-center justify-between border-b border-neutral-150 bg-primary-50/60 px-4 py-3">
+          <div className="flex items-center justify-between gap-3 border-b border-neutral-150 bg-primary-50/60 px-4 py-3">
             <span className="text-base font-semibold text-neutral-850">알림</span>
             {unreadCount > 0 && (
-              <Button
-                variant="text"
-                onClick={() => markAllAsRead()}
-                className="h-7 px-2 text-xs text-primary-600 hover:bg-white"
-              >
-                모두 읽기
+              <Button intent="link" size="sm" disabled={isClearing} onClick={handleClearAll}>
+                {clearAll.isPending ? '지우는 중' : '모두 지우기'}
               </Button>
             )}
           </div>
+          <p className="border-b border-neutral-150 px-4 py-2 text-xs text-neutral-600">
+            지운 알림도 알림 센터에서 다시 볼 수 있어요.
+          </p>
+          {clearError && (
+            <p
+              role="alert"
+              className="border-b border-neutral-150 px-4 py-2 text-sm text-error-600"
+            >
+              {clearError}
+            </p>
+          )}
 
           <div className="max-h-[min(26rem,60vh)] overflow-y-auto">
             {isLoading ? (
@@ -131,7 +162,7 @@ const NotificationBell = ({ className }: { className?: string }) => {
                 알림을 불러오지 못했습니다.
               </p>
             ) : notifications.length === 0 ? (
-              <EmptyState message="알림이 없습니다." className="py-8" />
+              <EmptyState message="새 알림이 없습니다." className="py-8" />
             ) : (
               <div className="flex flex-col divide-y divide-neutral-100">
                 {notifications.map((item) => (
@@ -139,34 +170,32 @@ const NotificationBell = ({ className }: { className?: string }) => {
                     key={item.notificationId}
                     item={item}
                     onSelect={handleSelect}
+                    onDismiss={handleClearOne}
+                    dismissing={isClearing}
                     compact
                   />
                 ))}
                 {hasNextPage && (
-                  <button
-                    type="button"
-                    onClick={() => fetchNextPage()}
-                    disabled={isFetchingNextPage}
-                    className="py-3 text-center text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 disabled:opacity-50"
-                  >
+                  <ActionSheetItem onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
                     {isFetchingNextPage ? '불러오는 중...' : '더 보기'}
-                  </button>
+                  </ActionSheetItem>
                 )}
               </div>
             )}
           </div>
 
           <div className="border-t border-neutral-150 p-2">
-            <button
-              type="button"
+            <Button
+              intent="link"
+              size="sm"
+              width="full"
               onClick={() => {
-                setOpen(false)
+                setPanelOpen(false)
                 router.push('/notifications')
               }}
-              className="flex h-9 w-full items-center justify-center rounded-lg text-sm font-semibold text-primary-600 transition-colors hover:bg-primary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
             >
-              알림 전체 보기
-            </button>
+              알림 센터
+            </Button>
           </div>
         </div>
       )}

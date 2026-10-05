@@ -2,17 +2,19 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { BookmarkIcon } from '@/shared/assets'
-import { Button, buttonVariants, Container, InputUpload, NavigationBar } from '@/shared/ui'
-import { transientQueryRecoveryOptions } from '@/shared/api'
+import { RetryButton, buttonVariants, Container, NavigationBar } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
+import { transientQueryRecoveryOptions } from '@/shared/api'
 import { profileQueries } from '@/entities/profile'
+import { AiPhotoArchive } from '@/features/ai-image'
 import { communityQueries } from '@/entities/community'
 // [refactored] 분양 페이지와 동일한 목록 블록 — 위젯으로 공유
 import { MyPetPostingList } from '@/widgets/my-pet-postings'
 import { toMyProfileCardProps } from '../_lib/toMyProfileCardProps'
 import { ProfileCard } from './ProfileCard'
+import { MyHomeActionMenu } from './MyHomeActionMenu'
 import { BreederIntroduction } from './BreederIntroduction'
 import { HomeTabs, TabsContent } from './HomeTabs'
 import { FavoriteBreedersContent } from './FavoriteBreedersContent'
@@ -53,7 +55,9 @@ const MyHomeContent = () => {
   const defaultTab = isBreeder ? 'listings' : 'posts'
   // 프로필 조회 전에는 역할을 모르므로 선택값을 비워두고, 조회 후 역할별 기본 탭을 사용한다.
   // useState(defaultTab)로 바로 시드하면 최초 adopter 기본값('posts')이 브리더에게도 고정된다.
-  const [selectedTab, setSelectedTab] = useState<string | null>(null)
+  // AI 필터 화면의 '보관함 →' 처럼 특정 탭으로 바로 들어오는 링크(?tab=ai-photos)를 받는다
+  const requestedTab = useSearchParams().get('tab')
+  const [selectedTab, setSelectedTab] = useState<string | null>(requestedTab)
   const activeTab = tabs.find((tab) => tab.id === selectedTab)?.id ?? defaultTab
   const posts = myPostsData?.items ?? []
   const profileCardProps = myProfile ? toMyProfileCardProps(myProfile) : null
@@ -70,19 +74,22 @@ const MyHomeContent = () => {
           ) : (
             <div role="alert" className="flex flex-col items-center gap-3 text-center">
               <p className="text-sm font-medium text-neutral-700">프로필을 불러오지 못했습니다.</p>
-              <Button
-                variant="fill"
-                size="sm"
-                onClick={() => void profileQuery.refetch()}
-                className="px-4"
-              >
-                다시 시도
-              </Button>
+              <RetryButton
+                onRetry={() => void profileQuery.refetch()}
+                isRetrying={profileQuery.isFetching}
+              />
             </div>
           )}
         </Container>
       </div>
     )
+  }
+
+  const introProps = {
+    nickname: profileCardProps.profile.nickname,
+    description: myProfile?.longDescription,
+    photos: myProfile?.representativePhotos,
+    editHref: '/profile/edit',
   }
 
   return (
@@ -93,15 +100,12 @@ const MyHomeContent = () => {
         <NavigationBar
           title="마이홈"
           titleVariant="page"
-          className="px-4 tab:px-12"
+          titleClassName="px-10"
+          className="relative min-h-12 px-4 tab:px-12"
           right={
-            <Link
-              href="/bookmarks"
-              aria-label="저장목록"
-              className="-m-2 flex size-10 items-center justify-center rounded-lg transition-colors hover:bg-primary-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
-            >
-              <BookmarkIcon className="size-6 text-neutral-700" />
-            </Link>
+            <div className="absolute top-1/2 right-4 -translate-y-1/2">
+              <MyHomeActionMenu isBreeder={isBreeder} />
+            </div>
           }
         />
       </div>
@@ -110,7 +114,16 @@ const MyHomeContent = () => {
         tabs={tabs}
         activeTab={activeTab}
         onTabChange={setSelectedTab}
-        sidebar={<ProfileCard {...profileCardProps} layout="sidebar" />}
+        sidebar={
+          <>
+            <ProfileCard
+              {...profileCardProps}
+              layout="sidebar"
+              menu={<MyHomeActionMenu isBreeder={isBreeder} />}
+            />
+            {isBreeder && <BreederIntroduction {...introProps} placement="profile" />}
+          </>
+        }
         sideLinks={isBreeder ? BREEDER_MY_HOME_SIDE_LINKS : MY_HOME_SIDE_LINKS}
       >
         {/* 분양 목록 탭 (브리더만) — 시안 3170-790275: 라벨+필터 -> 카드 그리드.
@@ -118,41 +131,21 @@ const MyHomeContent = () => {
             분양 페이지 진입점은 전부 이 탭(/home)으로 온다 */}
         {isBreeder && (
           <TabsContent value="listings" className="mt-0">
-            <BreederIntroduction
-              nickname={profileCardProps.profile.nickname}
-              description={myProfile?.longDescription}
-              photos={myProfile?.representativePhotos}
-              editHref="/profile/edit"
-            />
+            <BreederIntroduction {...introProps} placement="tab" />
 
-            {/* 작성 버튼은 목록 라벨 줄에 붙인다 — 소개 카드와 목록 사이에 혼자 떠 있지 않게 */}
-            <Container className="py-5">
+            {/* 작성 진입점은 + 메뉴(모바일 상단 바·2단 프로필 카드)가 맡는다 */}
+            <Container className="py-8 tab:py-10">
               <MyPetPostingList
                 pageSize={HOME_LISTING_PAGE_SIZE}
                 showTotalCount
-                action={
+                emptyAction={
                   <Link
                     href="/adoption/create"
-                    className={cn(
-                      buttonVariants({ variant: 'primary', size: 'sm' }),
-                      'shrink-0 px-4',
-                    )}
+                    className={cn(buttonVariants({ size: 'md' }), 'hidden tab:inline-flex')}
                   >
-                    분양글 작성하기
+                    첫 분양글 작성하기
                   </Link>
                 }
-                secondaryAction={
-                  <Link
-                    href="/adoption/drafts"
-                    className={cn(
-                      buttonVariants({ variant: 'text' }),
-                      'text-neutral-700 hover:text-neutral-850',
-                    )}
-                  >
-                    임시저장 →
-                  </Link>
-                }
-                gridClassName={`${CARD_GRID} pc:gap-x-[1.375rem]`}
               />
             </Container>
           </TabsContent>
@@ -160,33 +153,23 @@ const MyHomeContent = () => {
 
         {/* Figma 4145:721426 — 모바일·태블릿 3열, PC 4열의 정사각 미디어 그리드 */}
         <TabsContent value="posts" className="mt-0">
-          <InputUpload
-            text="작성하기"
-            href="/community/write"
-            className="px-4"
-            left={
-              <Link
-                href="/community/drafts"
-                className={cn(
-                  buttonVariants({ variant: 'text' }),
-                  'text-neutral-700 hover:text-neutral-850',
-                )}
-              >
-                임시저장 →
-              </Link>
-            }
-          />
-
           <HomePostGrid
             posts={posts}
             isPending={postsQuery.isPending}
             isError={postsQuery.isError}
             onRetry={() => void postsQuery.refetch()}
+            isRetrying={postsQuery.isFetching}
             loadingText="내가 쓴 글을 불러오는 중입니다."
             errorText="내가 쓴 글을 불러오지 못했습니다."
             emptyText="내가 쓴 글이 없습니다."
             gridClassName={PHOTO_GRID}
           />
+        </TabsContent>
+
+        <TabsContent value="ai-photos" className="mt-0">
+          <div className="px-4 pt-4 tab:px-0">
+            <AiPhotoArchive enabled={!!myProfile} />
+          </div>
         </TabsContent>
 
         <TabsContent value="breeders" className="mt-0">

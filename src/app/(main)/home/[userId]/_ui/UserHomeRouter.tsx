@@ -7,7 +7,7 @@ import { profileQueries } from '@/entities/profile'
 import { adopterQueries } from '@/entities/adopter'
 import { useAuthStatus } from '@/features/auth'
 import { isApiError, transientQueryRecoveryOptions } from '@/shared/api'
-import { AsyncState, Button } from '@/shared/ui'
+import { AsyncState } from '@/shared/ui'
 import { UserHomeContent } from './UserHomeContent'
 import { BreederHomeContent } from './BreederHomeContent'
 
@@ -74,11 +74,8 @@ const UserHomeRouter = ({ userId }: UserHomeRouterProps) => {
       <AsyncState
         status="error"
         message="프로필을 불러오지 못했습니다."
-        action={
-          <Button variant="fill" size="sm" onClick={() => void adopterProfileQuery.refetch()}>
-            다시 시도
-          </Button>
-        }
+        onRetry={() => void adopterProfileQuery.refetch()}
+        isRetrying={adopterProfileQuery.isFetching}
         className="min-h-[calc(100dvh-3.5rem)]"
       />
     )

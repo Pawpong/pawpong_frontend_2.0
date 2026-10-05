@@ -1,18 +1,23 @@
 import * as React from 'react'
-import { tv, type VariantProps } from 'tailwind-variants'
+import { tv, type VariantProps } from '@/shared/lib/tv'
 import { FireIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 
+// [refactored] label-badge 계열 — lg/md/responsive 크기가 적용되는 variant 목록 (compoundVariants 3곳 공유)
+const LABEL_VARIANTS: ('primaryFilled' | 'primaryOutline' | 'pointFilled' | 'neutralFilled')[] = [
+  'primaryFilled',
+  'primaryOutline',
+  'pointFilled',
+  'neutralFilled',
+]
+
 const badgeVariants = tv({
-  base: 'inline-flex items-center justify-center gap-[0.125rem] rounded-[999px] whitespace-nowrap font-semibold',
+  // [refactored] 토큰이 있는 임의값을 토큰으로 (gap-[0.125rem] → gap-0.5, rounded-[999px] → rounded-full)
+  base: 'inline-flex items-center justify-center gap-0.5 rounded-full whitespace-nowrap font-semibold',
   variants: {
     variant: {
-      outline:
-        'border border-[#a8a8a8] text-[#a8a8a8] px-[0.625rem] py-[0.25rem] text-[0.875rem] leading-[1.375rem]',
-      filled:
-        'bg-[#e1e1e1] text-[#5d5d5d] px-[0.625rem] py-[0.25rem] text-[0.875rem] leading-[1.375rem]',
-      status:
-        'bg-[#5d5d5d] text-white px-[0.625rem] py-[0.25rem] text-[0.875rem] leading-[1.375rem]',
+      // [refactored] 같은 값의 토큰으로 교체, 사용처 없던 filled·status 제거
+      outline: 'border border-[#a8a8a8] text-[#a8a8a8] px-2.5 py-1 text-sm leading-5.5',
       // Figma 디자인 시스템 뱃지 (743-68292) — large 기준, size="md"로 medium 전환
       default:
         'border border-neutral-300 bg-white px-2 py-1 text-base leading-[1.5] font-medium text-neutral-700',
@@ -33,21 +38,27 @@ const badgeVariants = tv({
     size: {
       lg: '',
       md: '',
+      responsive: '',
     },
   },
   compoundVariants: [
     // medium: h-24 / py-2 / 14px (default·active·disabled 전용)
     { variant: ['default', 'active', 'disabled'], size: 'md', class: 'h-6 px-2 py-0.5 text-sm' },
     // label-badge primary: lg 14px·h-29 / md 10px·h-24
+    { variant: LABEL_VARIANTS, size: 'lg', class: 'h-[1.8125rem] px-2 py-1 text-sm' },
+    { variant: LABEL_VARIANTS, size: 'md', class: 'h-6 px-2 py-0 text-[0.625rem]' },
+    // 상태 뱃지: 필터 칩(Chip responsive)과 같은 크기 — 13px·28 → 14px·29.
+    // 높이는 고정하지 않고 줄높이 + 패딩 + 테두리로 만든다 (모바일 20+6+2, tab+ 21+6+2)
     {
-      variant: ['primaryFilled', 'primaryOutline', 'pointFilled', 'neutralFilled'],
-      size: 'lg',
-      class: 'h-[1.8125rem] px-2 py-1 text-sm',
+      variant: LABEL_VARIANTS,
+      size: 'responsive',
+      class: 'px-2 py-0.75 text-[0.8125rem] leading-5 tab:text-body-md tab:leading-normal',
     },
+    // 채움 뱃지는 테두리가 없어 아웃라인보다 2px 낮아지므로 투명 테두리로 높이를 맞춘다
     {
-      variant: ['primaryFilled', 'primaryOutline', 'pointFilled', 'neutralFilled'],
-      size: 'md',
-      class: 'h-6 px-2 py-0 text-[0.625rem]',
+      variant: ['primaryFilled', 'neutralFilled'],
+      size: 'responsive',
+      class: 'border border-transparent',
     },
   ],
   defaultVariants: {

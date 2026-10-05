@@ -14,6 +14,7 @@ export const getMyPetPostings = async (
   params: MyPetPostingListParams = {},
 ): Promise<PaginationResponse<MyPetPostingCard>> => {
   const query = new URLSearchParams()
+  if (params.sort) query.set('sort', params.sort)
   if (params.status) query.set('status', params.status)
   if (params.page) query.set('page', String(params.page))
   if (params.pageSize) query.set('pageSize', String(params.pageSize))

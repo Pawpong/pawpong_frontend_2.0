@@ -1,0 +1,77 @@
+'use client'
+
+import { Fragment, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useQuery } from '@tanstack/react-query'
+import { DeleteConfirmModal, Separator } from '@/shared/ui'
+import { communityQueries, toCommunityPreviewProps } from '@/entities/community'
+import { ConnectedPostCard, useDeleteCommunityPost } from '@/features/community'
+import { DraftSection } from './DraftSection'
+
+/** 카드를 누르면 수정 화면에서 이어서 작성한다 */
+const CommunityDraftSection = () => {
+  const router = useRouter()
+  const {
+    data,
+    isPending,
+    isError,
+    refetch,
+    isFetching: isRetrying,
+  } = useQuery({
+    ...communityQueries.drafts(),
+    refetchOnMount: 'always',
+    throwOnError: false,
+  })
+  const drafts = data?.items ?? []
+
+  const deletePost = useDeleteCommunityPost()
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null)
+
+  // 삭제 성공 후에만 모달을 닫는다 (실패하면 모달을 유지해 재시도 가능)
+  const handleDeleteDraft = () => {
+    if (!deleteTargetId || deletePost.isPending) return
+    deletePost.mutate(deleteTargetId, { onSuccess: () => setDeleteTargetId(null) })
+  }
+
+  return (
+    <>
+      {/* [refactored] 제목·개수·목록 상태는 DraftSection 골격으로 */}
+      <DraftSection
+        title="게시글"
+        count={drafts.length}
+        isPending={isPending}
+        isError={isError}
+        onRetry={() => void refetch()}
+        isRetrying={isRetrying}
+        loadingText="임시저장한 글을 불러오는 중입니다."
+        errorText="임시저장한 글을 불러오지 못했습니다."
+        emptyText="임시저장한 글이 없습니다."
+      >
+        <div className="flex min-w-0 flex-col gap-5 tab:gap-8 tab:rounded-lg tab:border tab:border-neutral-300 tab:p-3">
+          {drafts.map((draft, index) => (
+            <Fragment key={draft.postId}>
+              {index > 0 && <Separator className="bg-border-light" />}
+              <ConnectedPostCard
+                {...toCommunityPreviewProps(draft)}
+                // 임시저장 글은 상세가 없으므로 수정 화면으로 바로 보낸다
+                detailHref={`/community/post/${draft.postId}/edit`}
+                onEdit={() => router.push(`/community/post/${draft.postId}/edit`)}
+                onDelete={() => setDeleteTargetId(draft.postId)}
+              />
+            </Fragment>
+          ))}
+        </div>
+      </DraftSection>
+
+      <DeleteConfirmModal
+        open={deleteTargetId !== null}
+        onOpenChange={(open) => !open && setDeleteTargetId(null)}
+        target="임시저장 글"
+        onConfirm={handleDeleteDraft}
+        isPending={deletePost.isPending}
+      />
+    </>
+  )
+}
+
+export { CommunityDraftSection }

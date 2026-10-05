@@ -14,8 +14,6 @@ const CONTEST_UPLOAD_FOLDER = 'contest'
  * 1) 고른 사진을 upload 모듈로 먼저 업로드해 fileName 을 확보하고
  * 2) POST /contest/entry 로 photoFileName + description 을 보낸다.
  *
- * AI 도트 필터로 만든 사진은 이미 버킷에 있으므로 업로드 없이 그 파일키(photoFileName)로 바로 참여한다.
- *
  * 성공 시 entryId 를 반환한다. 콘테스트는 임시저장 개념이 없다.
  */
 export const useSubmitContestEntryForm = () => {
@@ -29,23 +27,15 @@ export const useSubmitContestEntryForm = () => {
   const isSubmitting = uploadMutation.isPending || submitMutation.isPending
 
   const submit = useCallback(
-    async (
-      input: ({ file: File } | { photoFileName: string }) & { description: string },
-    ): Promise<string | null> => {
+    async ({ file, description }: { file: File; description: string }): Promise<string | null> => {
       setError(null)
       try {
-        const photoFileName =
-          'photoFileName' in input
-            ? input.photoFileName
-            : (
-                await uploadMutation.mutateAsync({
-                  file: input.file,
-                  folder: CONTEST_UPLOAD_FOLDER,
-                })
-              ).fileName
-        const { description } = input
+        const uploaded = await uploadMutation.mutateAsync({
+          file,
+          folder: CONTEST_UPLOAD_FOLDER,
+        })
         const entry = await submitMutation.mutateAsync({
-          photoFileName,
+          photoFileName: uploaded.fileName,
           description: description.trim(),
         })
         return entry.entryId

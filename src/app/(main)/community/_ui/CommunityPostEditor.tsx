@@ -5,9 +5,15 @@ import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { communityQueries } from '@/entities/community'
 import { profileQueries } from '@/entities/profile'
-import { useSubmitCommunityPostForm } from '@/features/community'
+import Link from 'next/link'
+import {
+  takePendingCommunityPost,
+  PostAiComparisonEditor,
+  usePostAiComparison,
+} from '@/features/ai-image'
+import { PetCategorySuggestion, useSubmitCommunityPostForm } from '@/features/community'
 import { useExitGuard } from '@/shared/lib/useExitGuard'
-import { Button, Container, CtaModal, FilterChip, NavigationBar } from '@/shared/ui'
+import { RetryButton, Container, CtaModal, NavigationBar } from '@/shared/ui'
 import {
   usePostForm,
   PostFormLayout,
@@ -15,12 +21,6 @@ import {
   type VisibilityType,
 } from '@/widgets/post-form'
 import type { CommunityPetType, CommunityPostDetail, CommunityPostStatus } from '@/shared/types'
-
-const PET_TYPE_OPTIONS: { value: CommunityPetType; label: string }[] = [
-  { value: 'dog', label: '강아지' },
-  { value: 'cat', label: '고양이' },
-  { value: 'reptile', label: '파충류' },
-]
 
 interface CommunityPostEditorProps {
   /** 전달하면 수정 모드 — 기존 게시글로 폼을 채운다 */
@@ -44,37 +44,73 @@ const PostForm = ({ postId, post }: PostFormProps) => {
   const isDraft = post?.status === 'draft'
   const isEdit = !!postId && !isDraft
   const formText = FORM_TEXT[isEdit ? 'edit' : 'create']
+  // AI 필터에서 '커뮤니티에 자랑하기'로 넘어온 사진은 새 글의 첫 사진으로 채운다 (한 번만 꺼낸다)
+  const [handoff] = useState(() => (post ? null : takePendingCommunityPost()))
+  const initialComparison = post?.aiComparison ?? handoff?.aiComparison
   const form = usePostForm({
+    maxImages: initialComparison ? 11 : 10,
     initialText: post?.body ?? '',
     initialImages: post?.photoUrls ?? [],
+    initialFiles: handoff?.files,
   })
+  const currentPhotos: (string | File)[] = [...form.uploadedImages, ...form.files]
+  const comparison = usePostAiComparison(currentPhotos, initialComparison, handoff?.jobId)
+
+  const visiblePhotoIndexes = currentPhotos.flatMap((photo, index) =>
+    comparison.choice.sources.includes(photo) ? [] : [index],
+  )
+  const visibleForm = {
+    ...form,
+    images: visiblePhotoIndexes.map((index) => form.images[index]),
+    maxImages: comparison.choice.enabled ? 9 : 10,
+    handleRemoveImage: (index: number) => form.handleRemoveImage(visiblePhotoIndexes[index]),
+  }
 
   const initialVisibility = post?.visibility ?? 'public'
   const [visibility, setVisibility] = useState<VisibilityType>(initialVisibility)
   const initialPetType = post?.petType ?? ''
   const [petType, setPetType] = useState<CommunityPetType | ''>(initialPetType)
   const { submit, isSubmitting, error } = useSubmitCommunityPostForm(postId)
-  const hasChanges = form.hasChanges || visibility !== initialVisibility || petType !== initialPetType
+  const hasChanges =
+    form.hasChanges ||
+    comparison.hasChanges ||
+    visibility !== initialVisibility ||
+    petType !== initialPetType
   const { showGuard, requestExit, confirmExit, cancelExit } = useExitGuard({
     hasChanges,
   })
 
   // 발행(published)은 본문이 필수, 임시저장(draft)은 본문 없이 사진만으로도 가능 (백엔드 계약)
   const hasBody = form.text.trim().length > 0
-  const canPublish = hasBody && !isSubmitting && !form.isProcessingPhotos
+  const canPublish =
+    hasBody &&
+    !isSubmitting &&
+    !form.isProcessingPhotos &&
+    !comparison.busy &&
+    !comparison.submission.error
   const canSaveDraft =
-    (hasBody || form.images.length > 0) && !isSubmitting && !form.isProcessingPhotos
+    (hasBody || form.images.length > 0) &&
+    !isSubmitting &&
+    !form.isProcessingPhotos &&
+    !comparison.busy &&
+    !comparison.submission.error
 
   // 발행/임시저장 모두 저장 후 마이홈으로 이동 (status 만 다름)
   const save = async (status: CommunityPostStatus) => {
-    if (form.hasPendingPhotos() || (status === 'published' ? !canPublish : !canSaveDraft)) return
+    if (
+      form.hasPendingPhotos() ||
+      comparison.hasPending() ||
+      (status === 'published' ? !canPublish : !canSaveDraft)
+    )
+      return
     const savedId = await submit({
       text: form.text,
-      files: form.files,
+      files: comparison.submission.files,
       visibility,
       status,
-      petType: petType || undefined,
-      keptImageUrls: form.uploadedImages,
+      petType: petType || (postId ? null : undefined),
+      aiComparison: comparison.submission.aiComparison,
+      keptImageUrls: comparison.submission.keptImageUrls,
     })
     if (savedId) {
       cancelExit()
@@ -95,7 +131,7 @@ const PostForm = ({ postId, post }: PostFormProps) => {
       <PostFormLayout
         title={formText.title}
         mobileTitle={formText.mobileTitle}
-        form={form}
+        form={visibleForm}
         introTitle={isEdit ? '우리 아이의 이야기를 다듬어주세요' : '우리 아이의 일상을 나눠주세요'}
         introDescription="함께 웃고, 궁금한 것을 묻고, 반려동물과의 소중한 순간을 기록해요."
         placeholder="오늘 우리 아이는 어떤 하루를 보냈나요?"
@@ -112,20 +148,34 @@ const PostForm = ({ postId, post }: PostFormProps) => {
         }}
         belowContent={
           <div className="flex flex-col gap-4">
-            <div className="rounded-xl bg-neutral-50 p-5">
-              <h3 className="mb-3 text-sm font-semibold">어떤 아이 이야기인가요?</h3>
-              <div className="flex flex-wrap gap-2">
-                {PET_TYPE_OPTIONS.map((option) => (
-                  <FilterChip
-                    key={option.value}
-                    selected={petType === option.value}
-                    onClick={() => setPetType(petType === option.value ? '' : option.value)}
-                  >
-                    {option.label}
-                  </FilterChip>
-                ))}
-              </div>
-            </div>
+            <Link
+              href="/ai-filter"
+              className="flex items-center justify-between gap-3 rounded-xl border border-primary-200 bg-point-50 p-4 focus-ring transition-colors hover:bg-point-100"
+            >
+              <span>
+                <span className="block text-sm font-bold text-primary-700">
+                  {handoff ? 'AI 필터로 만든 사진을 담았어요' : 'AI 필터로 사진 꾸미기'}
+                </span>
+                <span className="mt-0.5 block text-xs text-neutral-700">
+                  도트 그림·스티커·수채화로 바꿔 올리면 좋아요를 더 받을지도 몰라요
+                </span>
+              </span>
+              <span aria-hidden className="text-lg text-primary-700">
+                →
+              </span>
+            </Link>
+            <PostAiComparisonEditor
+              editor={comparison}
+              photos={currentPhotos}
+              disabled={isSubmitting || form.isProcessingPhotos}
+            />
+            <PetCategorySuggestion
+              text={form.text}
+              photo={form.files[0]}
+              value={petType}
+              onChange={setPetType}
+              disabled={isSubmitting || form.isProcessingPhotos}
+            />
             <div className="rounded-xl bg-neutral-50 p-5">
               <h3 className="mb-2 text-sm font-semibold">누구와 나눌까요?</h3>
               <p className="mb-3 text-xs leading-relaxed text-neutral-700">
@@ -157,7 +207,7 @@ const PostForm = ({ postId, post }: PostFormProps) => {
             ? [
                 {
                   label: '임시저장',
-                  variant: 'fill' as const,
+                  intent: 'primary' as const,
                   onClick: handleSaveDraft,
                   disabled: !canSaveDraft || isSubmitting,
                 },
@@ -165,11 +215,11 @@ const PostForm = ({ postId, post }: PostFormProps) => {
             : []),
           {
             label: isEdit ? '수정 그만하기' : '게시글 작성 그만하기',
-            variant: 'outline',
+            intent: 'secondary',
             onClick: handleExitConfirm,
             disabled: isSubmitting,
           },
-          { label: '닫기', variant: 'ghost', onClick: cancelExit, disabled: isSubmitting },
+          { label: '닫기', intent: 'ghost', onClick: cancelExit, disabled: isSubmitting },
         ]}
       />
     </>
@@ -227,17 +277,13 @@ const CommunityPostEditor = ({ postId }: CommunityPostEditorProps) => {
         <Container className="flex flex-1 items-center justify-center px-4 py-10">
           <div role="alert" className="flex flex-col items-center gap-3 text-center">
             <p className="text-sm font-medium text-neutral-700">게시글을 불러오지 못했습니다.</p>
-            <Button
-              variant="fill"
-              size="sm"
-              onClick={() => {
+            <RetryButton
+              onRetry={() => {
                 void postQuery.refetch()
                 void meQuery.refetch()
               }}
-              className="px-4"
-            >
-              다시 시도
-            </Button>
+              isRetrying={postQuery.isFetching || meQuery.isFetching}
+            />
           </div>
         </Container>
       </div>

@@ -5,7 +5,6 @@ import { AlertCircleIcon, PawPrintIcon } from '@/shared/assets'
 import {
   AlertMessage,
   AsyncState,
-  Button,
   Container,
   CtaModal,
   ExitConfirmModal,
@@ -66,6 +65,7 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
     isProfileError,
     retryProfile,
     toast,
+    isFetching: isRetrying,
   } = useApplicationForm(detail)
 
   const stickyHeader = (
@@ -94,13 +94,8 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
               ? '신청자 정보를 불러오지 못했습니다.'
               : '신청자 정보를 불러오는 중입니다.'
           }
-          action={
-            isProfileError ? (
-              <Button variant="fill" size="sm" onClick={() => void retryProfile()}>
-                다시 시도
-              </Button>
-            ) : undefined
-          }
+          onRetry={isProfileError ? () => void retryProfile() : undefined}
+          isRetrying={isRetrying}
           className="min-h-[24rem]"
         />
       </div>
@@ -211,8 +206,8 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
         title={CONSULT_CONFIRM_TITLE}
         direction="row"
         actions={[
-          { label: '그만두기', variant: 'outline', onClick: giveUpFromConsult },
-          { label: '상담하기', variant: 'fill', onClick: confirmConsult },
+          { label: '그만두기', intent: 'secondary', onClick: giveUpFromConsult },
+          { label: '상담하기', intent: 'primary', onClick: confirmConsult },
         ]}
       />
     </div>

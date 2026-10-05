@@ -1,14 +1,20 @@
 import { apiClient, API_VERSION, unwrap } from '@/shared/api'
-import type { ApiResponseFull, NotificationResponseDto, PaginationResponse } from '@/shared/types'
+import type {
+  ApiResponseFull,
+  NotificationListFilter,
+  NotificationResponseDto,
+  PaginationResponse,
+} from '@/shared/types'
 
 /** 알림 목록 조회 */
 export const getNotifications = async (
   page = 1,
   limit = 20,
-  isRead?: boolean,
+  filter: NotificationListFilter = {},
 ): Promise<PaginationResponse<NotificationResponseDto>> => {
-  const params: Record<string, unknown> = { page, limit }
-  if (isRead !== undefined) params.isRead = isRead
+  const params: Record<string, unknown> = { pageNumber: page, itemsPerPage: limit }
+  if (filter.isRead !== undefined) params.isRead = filter.isRead
+  if (filter.category) params.category = filter.category
   return apiClient
     .get<
       ApiResponseFull<PaginationResponse<NotificationResponseDto>>

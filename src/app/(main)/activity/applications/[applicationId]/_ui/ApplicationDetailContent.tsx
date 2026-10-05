@@ -24,7 +24,13 @@ const ApplicationDetailContent = ({
   applicationId: string
   backHref: string
 }) => {
-  const { data, isPending, isError, refetch } = useQuery(applicationQueries.detail(applicationId))
+  const {
+    data,
+    isPending,
+    isError,
+    refetch,
+    isFetching: isRetrying,
+  } = useQuery(applicationQueries.detail(applicationId))
   const reviewType = data ? getReviewTypeForStatus(data.status) : null
 
   return (
@@ -35,6 +41,7 @@ const ApplicationDetailContent = ({
       isError={isError}
       hasData={!!data}
       onRetry={() => void refetch()}
+      isRetrying={isRetrying}
     >
       {data && (
         <>
@@ -50,19 +57,23 @@ const ApplicationDetailContent = ({
                       counterpartUserId={data.breederId}
                       applicationId={data.applicationId}
                       label="브리더와 상담하기"
-                      className="h-12 w-full"
+                      size="lg"
+                      width="full"
                     />
                     {data.status === 'consultation_pending' && (
                       <Link
                         href={`/activity/applications/${data.applicationId}/edit`}
-                        className={buttonVariants({ variant: 'outline', size: 'lg' })}
+                        className={buttonVariants({ intent: 'secondary', size: 'lg' })}
                       >
                         신청서 수정
                       </Link>
                     )}
                     <Link
                       href={`/home/${data.breederId}`}
-                      className={buttonVariants({ variant: 'text', className: 'min-h-10' })}
+                      className={buttonVariants({
+                        intent: 'ghost',
+                        size: 'md',
+                      })}
                     >
                       브리더 홈 보기 →
                     </Link>
@@ -103,9 +114,8 @@ const ApplicationDetailContent = ({
                 <Link
                   href={`/activity/reviews/${data.reviewId}`}
                   className={buttonVariants({
-                    variant: 'primary',
+                    intent: 'primary',
                     size: 'lg',
-                    className: 'px-6',
                   })}
                 >
                   후기 보기

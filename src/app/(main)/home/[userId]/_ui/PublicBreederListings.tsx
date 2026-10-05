@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { Button, Container, InfiniteScrollTrigger, ListState, ListingCardGrid } from '@/shared/ui'
+import { Container, InfiniteScrollTrigger, ListState, ListingCardGrid } from '@/shared/ui'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
 import { flattenPages, getTotalItems } from '@/shared/lib/infiniteList'
 import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
@@ -58,11 +58,8 @@ const PublicBreederListings = ({ breederId, gridClassName }: PublicBreederListin
           loadingText="분양글을 불러오는 중입니다."
           errorText="분양글을 불러오지 못했습니다."
           emptyText={status ? '해당 상태의 분양글이 없습니다.' : '등록된 분양글이 없습니다.'}
-          errorAction={
-            <Button variant="fill" size="sm" onClick={() => void query.refetch()}>
-              다시 시도
-            </Button>
-          }
+          onRetry={() => void query.refetch()}
+          isRetrying={query.isFetching}
         >
           <ListingCardGrid
             layout="publicBreeder"

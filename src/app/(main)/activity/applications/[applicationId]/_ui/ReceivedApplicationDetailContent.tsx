@@ -21,18 +21,18 @@ import { ApplicationChatButton } from '@/features/chat-entry'
 interface StatusAction {
   label: string
   nextStatus: ApplicationStatus
-  variant: 'primary' | 'outline'
+  intent: 'primary' | 'secondary'
   /** 되돌리기 어려운 결정이라 확인창을 거친다 (상담 완료 표시는 바로 적용) */
   confirm?: { title: string; description: string }
 }
 
 const STATUS_ACTIONS: Partial<Record<ApplicationStatus, StatusAction[]>> = {
   consultation_pending: [
-    { label: '상담 완료로 표시', nextStatus: 'consultation_completed', variant: 'primary' },
+    { label: '상담 완료로 표시', nextStatus: 'consultation_completed', intent: 'primary' },
     {
       label: '신청 거절',
       nextStatus: 'adoption_rejected',
-      variant: 'outline',
+      intent: 'secondary',
       confirm: {
         title: '신청을 거절할까요?',
         description: '거절하면 입양자에게 진행 종료로 표시됩니다.',
@@ -43,7 +43,7 @@ const STATUS_ACTIONS: Partial<Record<ApplicationStatus, StatusAction[]>> = {
     {
       label: '입양 확정',
       nextStatus: 'adoption_approved',
-      variant: 'primary',
+      intent: 'primary',
       confirm: {
         title: '입양을 확정할까요?',
         description: '확정하면 입양자가 후기를 작성할 수 있게 됩니다.',
@@ -52,7 +52,7 @@ const STATUS_ACTIONS: Partial<Record<ApplicationStatus, StatusAction[]>> = {
     {
       label: '신청 거절',
       nextStatus: 'adoption_rejected',
-      variant: 'outline',
+      intent: 'secondary',
       confirm: {
         title: '신청을 거절할까요?',
         description: '거절하면 입양자에게 진행 종료로 표시됩니다.',
@@ -96,9 +96,8 @@ const StatusActionSection = ({
           {actions.map((action) => (
             <Button
               key={action.nextStatus}
-              variant={action.variant}
+              intent={action.intent}
               size="lg"
-              className="px-4"
               disabled={updateStatus.isPending}
               onClick={() =>
                 action.confirm ? setPendingAction(action) : applyStatus(action.nextStatus)
@@ -121,13 +120,13 @@ const StatusActionSection = ({
           actions={[
             {
               label: '취소',
-              variant: 'outline',
+              intent: 'secondary',
               onClick: () => setPendingAction(null),
               disabled: updateStatus.isPending,
             },
             {
               label: pendingAction.label,
-              variant: 'fill',
+              intent: 'primary',
               onClick: () => applyStatus(pendingAction.nextStatus),
               disabled: updateStatus.isPending,
             },
@@ -139,9 +138,13 @@ const StatusActionSection = ({
 }
 
 const ReceivedApplicationDetailContent = ({ applicationId }: { applicationId: string }) => {
-  const { data, isPending, isError, refetch } = useQuery(
-    breederQueries.receivedApplicationDetail(applicationId),
-  )
+  const {
+    data,
+    isPending,
+    isError,
+    refetch,
+    isFetching: isRetrying,
+  } = useQuery(breederQueries.receivedApplicationDetail(applicationId))
   const counterpartUserId = data ? toCounterpartUserId(data.adopterId) : null
 
   return (
@@ -152,6 +155,7 @@ const ReceivedApplicationDetailContent = ({ applicationId }: { applicationId: st
       isError={isError}
       hasData={!!data}
       onRetry={() => void refetch()}
+      isRetrying={isRetrying}
     >
       {data && (
         <>
@@ -168,21 +172,22 @@ const ReceivedApplicationDetailContent = ({ applicationId }: { applicationId: st
                         counterpartUserId={counterpartUserId}
                         applicationId={data.applicationId}
                         label="신청자와 상담하기"
-                        className="h-12 w-full"
+                        size="lg"
+                        width="full"
                       />
                     )}
                     {STATUS_ACTIONS[data.status] && (
-                      <button
-                        type="button"
+                      <Button
+                        size="md"
+                        intent="link"
                         onClick={() =>
                           document
                             .getElementById('application-decision')
                             ?.scrollIntoView({ behavior: 'smooth' })
                         }
-                        className="flex min-h-10 items-center text-sm font-semibold text-primary-500"
                       >
                         신청 처리로 이동 ↓
-                      </button>
+                      </Button>
                     )}
                   </>
                 }

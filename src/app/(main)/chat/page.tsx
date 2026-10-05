@@ -1,6 +1,11 @@
+import { createPageMetadata } from '@/shared/lib/metadata'
+
 import { Suspense } from 'react'
 import { requireAuth } from '@/features/auth/server'
 import { ChatPageContent } from './_ui/ChatPageContent'
+import { ChatPushNotice } from './_ui/ChatPushNotice'
+
+export const metadata = createPageMetadata({ title: '채팅', noIndex: true })
 
 interface ChatPageProps {
   searchParams: Promise<{ roomId?: string | string[] }>
@@ -17,6 +22,7 @@ const ChatPage = async ({ searchParams }: ChatPageProps) => {
   return (
     <Suspense fallback={null}>
       <ChatPageContent />
+      <ChatPushNotice />
     </Suspense>
   )
 }

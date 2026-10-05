@@ -66,3 +66,79 @@ test('Android document messages report camera denial and timeout frees pending l
   await assert.rejects(unresponsive)
   assert.equal(app.timers.size, 0)
 })
+
+test('old apps never receive notification permission or settings requests', async () => {
+  const app = setup({ pushTokenSession: true })
+  await assert.rejects(app.getNativeNotificationPermission())
+  await assert.rejects(app.openNativeNotificationSettings())
+  assert.equal(app.messages.length, 0)
+})
+
+test('notification permission correlates IDs and keeps OS query failures distinct from denial', async () => {
+  const app = setup({ notificationPermission: true })
+  const denied = app.getNativeNotificationPermission()
+  app.respond({
+    type: 'NOTIFICATION_PERMISSION_RESULT',
+    requestId: app.messages[0].requestId,
+    granted: false,
+  })
+  assert.equal(await denied, false)
+  const unknown = app.getNativeNotificationPermission()
+  app.respond({
+    type: 'NOTIFICATION_PERMISSION_RESULT',
+    requestId: app.messages[1].requestId,
+    granted: null,
+  })
+  await assert.rejects(unknown)
+  assert.equal(app.timers.size, 0)
+})
+
+test('notification settings report errors and release listeners after successful opens', async () => {
+  const app = setup({ notificationSettings: true })
+  const opened = app.openNativeNotificationSettings()
+  app.respond(
+    {
+      type: 'OPEN_NOTIFICATION_SETTINGS_RESULT',
+      requestId: app.messages[0].requestId,
+      status: 'opened',
+    },
+    app.document,
+  )
+  await opened
+  const failed = app.openNativeNotificationSettings()
+  app.respond({
+    type: 'OPEN_NOTIFICATION_SETTINGS_RESULT',
+    requestId: app.messages[1].requestId,
+    status: 'error',
+  })
+  await assert.rejects(failed)
+  assert.equal(app.timers.size, 0)
+})
+
+test('aborted payment requests release listeners and cannot accept late receipts', async () => {
+  const app = setup({ inAppPurchase: true })
+  const controller = new AbortController()
+  const pending = app.requestNative(
+    'inAppPurchase',
+    'IAP_PURCHASE',
+    'IAP_PURCHASE_RESULT',
+    {},
+    1000,
+    controller.signal,
+  )
+  controller.abort()
+  await assert.rejects(pending, { name: 'AbortError' })
+  assert.equal(app.timers.size, 0)
+  await assert.rejects(
+    app.requestNative(
+      'inAppPurchase',
+      'IAP_PURCHASE',
+      'IAP_PURCHASE_RESULT',
+      {},
+      1000,
+      controller.signal,
+    ),
+    { name: 'AbortError' },
+  )
+  assert.equal(app.messages.length, 1)
+})

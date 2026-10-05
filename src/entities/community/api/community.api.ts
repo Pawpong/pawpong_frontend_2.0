@@ -33,6 +33,7 @@ interface RawCommunityPostCard {
   bodyExcerpt: string
   primaryPhotoUrl?: string
   photoUrls: string[]
+  aiComparison?: import('@/shared/types').CommunityAiComparison | null
   petType?: CommunityPetType
   category?: string
   visibility: CommunityPostVisibility
@@ -42,6 +43,7 @@ interface RawCommunityPostCard {
   saveCount: number
   isLiked: boolean
   isSaved: boolean
+  isFollowingAuthor?: boolean
   createdAt: string
   commentPreview?: RawCommunityComment[]
 }
@@ -64,6 +66,7 @@ interface RawCommunityPostDetail {
   title?: string
   body: string
   photoUrls: string[]
+  aiComparison?: import('@/shared/types').CommunityAiComparison | null
   petType?: CommunityPetType
   category?: string
   visibility: CommunityPostVisibility
@@ -92,6 +95,7 @@ const mapCard = (raw: RawCommunityPostCard): CommunityPostCard => ({
   bodyExcerpt: raw.bodyExcerpt,
   primaryPhotoUrl: raw.primaryPhotoUrl,
   photoUrls: raw.photoUrls,
+  aiComparison: raw.aiComparison,
   petType: raw.petType,
   category: raw.category,
   visibility: raw.visibility,
@@ -101,6 +105,7 @@ const mapCard = (raw: RawCommunityPostCard): CommunityPostCard => ({
   saveCount: raw.saveCount,
   isLiked: raw.isLiked,
   isSaved: raw.isSaved,
+  isFollowingAuthor: raw.isFollowingAuthor,
   createdAt: raw.createdAt,
   commentPreview: raw.commentPreview?.map(mapComment),
 })
@@ -123,6 +128,7 @@ const mapDetail = (raw: RawCommunityPostDetail): CommunityPostDetail => ({
   title: raw.title,
   body: raw.body,
   photoUrls: raw.photoUrls,
+  aiComparison: raw.aiComparison,
   petType: raw.petType,
   category: raw.category,
   visibility: raw.visibility,

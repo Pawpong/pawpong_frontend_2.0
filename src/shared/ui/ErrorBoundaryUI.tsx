@@ -3,6 +3,7 @@
 import * as Sentry from '@sentry/nextjs'
 import { useEffect } from 'react'
 import { needsDocumentReload, recoverPageError } from '@/shared/lib/pageErrorRecovery'
+import { RetryButton } from './RetryButton'
 import { Button } from './Button'
 import { FullPageMessage } from './FullPageMessage'
 
@@ -38,18 +39,24 @@ export function ErrorBoundaryUI({
       }
       actions={
         <>
-          <Button
-            onClick={() => recoverPageError(error, reset, () => window.location.reload())}
-            size="lg"
-            className="w-full px-5"
-          >
-            {reloadRequired ? '페이지 새로 불러오기' : '다시 시도'}
-          </Button>
+          {reloadRequired ? (
+            <Button
+              onClick={() => recoverPageError(error, reset, () => window.location.reload())}
+              size="lg"
+              width="full"
+            >
+              페이지 새로 불러오기
+            </Button>
+          ) : (
+            <RetryButton
+              onRetry={() => recoverPageError(error, reset, () => window.location.reload())}
+            />
+          )}
           <Button
             onClick={() => window.location.assign('/')}
-            variant="outline"
+            intent="secondary"
             size="lg"
-            className="w-full px-5 hover:bg-neutral-50"
+            width="full"
           >
             홈으로 가기
           </Button>

@@ -156,7 +156,7 @@ const useAdoptionCreateForm = () => {
     hasChanges: () => isDirty || hasUnsavedImageChanges || hasUnsavedRepresentativeChange,
   })
 
-  const exitHref = draftId ? '/adoption/drafts' : '/home'
+  const exitHref = draftId ? '/drafts' : '/home'
 
   const handleCloseClick = () => {
     if (requestExit()) {
@@ -233,7 +233,7 @@ const useAdoptionCreateForm = () => {
     setSavedRepresentativeIndex(representativeIndex)
     // 저장된 내용은 서버가 갖고 있으므로 폼을 비워 이탈 가드가 다시 뜨지 않게 한다
     form.reset(form.getValues(), { keepValues: true, keepDirty: false })
-    router.push('/adoption/drafts')
+    router.push('/drafts')
   }
 
   return {
@@ -258,6 +258,7 @@ const useAdoptionCreateForm = () => {
     isLoadingDraft: Boolean(draftId) && draftQuery.isPending,
     isDraftLoadError: Boolean(draftId) && draftQuery.isError && !draft,
     retryDraft: draftQuery.refetch,
+    isFetching: draftQuery.isFetching,
     showGuard,
     cancelExit,
     handleCloseClick,

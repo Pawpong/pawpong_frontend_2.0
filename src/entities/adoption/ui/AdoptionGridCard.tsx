@@ -1,9 +1,8 @@
 'use client'
 
-import { GenderIcon } from '@/shared/assets'
-import { cn } from '@/shared/lib/cn'
+import { FavoriteIcon, GenderIcon } from '@/shared/assets'
 import type { AdoptionListingCard } from '@/shared/types'
-import { FavoriteToggle, MediaCard, PopularBadge } from '@/shared/ui'
+import { MediaCard, PopularBadge, ToggleIconButton } from '@/shared/ui'
 import { AdoptionStatusBadge } from './AdoptionStatusBadge'
 
 /** 이 카드가 실제로 그리는 필드만 (분양글 목록처럼 다른 응답 타입도 그대로 넘길 수 있게) */
@@ -46,34 +45,29 @@ const AdoptionGridCard = ({
 
           <div className="absolute top-1 right-2 left-2 flex items-center gap-1 pc:top-2 pc:right-3 pc:left-3">
             {listing.isPopular && (
-              <PopularBadge
-                variant="primaryOutline"
-                size="md"
-                iconSize="responsive"
-                className="bg-white pc:h-[1.8125rem] pc:py-1 pc:text-sm"
-              />
+              // 같은 줄의 상태 뱃지와 크기를 맞춘다 (primaryOutline 에 bg-white 포함)
+              <PopularBadge variant="primaryOutline" size="responsive" iconSize="responsive" />
             )}
-            <AdoptionStatusBadge status={status} size="md" className="shrink-0 pc:hidden" />
+            <AdoptionStatusBadge status={status} className="shrink-0 pc:hidden" />
           </div>
 
           {/* 하트는 클릭을 가로채므로(preventDefault) 토글이 없는 화면에선 아예 그리지 않는다 */}
           {showFavorite && (
-            <FavoriteToggle
-              isFavorite={isFavorite}
-              onToggle={onToggle}
-              className="absolute right-2 bottom-1 pc:right-3 pc:bottom-2"
-              iconClassName={cn('size-8 pc:size-12', !isFavorite && '!text-white/60')}
-            />
+            <span className="absolute right-2 bottom-1 flex pc:right-3 pc:bottom-2">
+              <ToggleIconButton
+                icon={FavoriteIcon}
+                hasFillState
+                size="responsive"
+                tone="onImage"
+                aria-label="관심 등록"
+                pressed={isFavorite}
+                onClick={onToggle}
+              />
+            </span>
           )}
         </>
       }
-      trailing={
-        <AdoptionStatusBadge
-          status={status}
-          size="md"
-          className="hidden shrink-0 pc:flex pc:h-[1.8125rem] pc:py-1 pc:text-sm"
-        />
-      }
+      trailing={<AdoptionStatusBadge status={status} className="hidden shrink-0 pc:inline-flex" />}
     >
       <div className="flex min-w-0 items-center">
         <p className="truncate text-sm leading-[1.5] font-semibold text-neutral-850 pc:text-base">

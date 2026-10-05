@@ -10,6 +10,8 @@ interface DeleteConfirmModalProps {
   onConfirm: () => void
   /** 삭제 요청 진행 중 — 두 버튼을 잠가 중복 요청/조기 취소를 막는다 */
   isPending?: boolean
+  /** 실패 후에도 확인창을 유지하며 재시도할 수 있도록 안내한다. */
+  errorMessage?: string | null
 }
 
 /** 삭제 확인 모달 — 게시글·댓글 등에서 공통으로 쓰는 취소/삭제 2버튼 확인창 */
@@ -19,21 +21,31 @@ const DeleteConfirmModal = ({
   target,
   onConfirm,
   isPending = false,
+  errorMessage,
 }: DeleteConfirmModalProps) => (
   <CtaModal
     open={open}
     // 요청 중에는 오버레이·X 로도 닫히지 않게 (닫혀도 요청은 계속 날아간다)
     onOpenChange={(next) => !isPending && onOpenChange(next)}
     title={`${target}을 삭제할까요?`}
-    description={`삭제한 ${target}은 복구할 수 없습니다.`}
+    description={
+      <>
+        {`삭제한 ${target}은 복구할 수 없습니다.`}
+        {errorMessage && (
+          <span role="alert" className="mt-2 block text-sm text-error-600">
+            {errorMessage}
+          </span>
+        )}
+      </>
+    }
     actions={[
       {
         label: '취소',
-        variant: 'outline',
+        intent: 'secondary',
         onClick: () => onOpenChange(false),
         disabled: isPending,
       },
-      { label: '삭제', variant: 'fill', onClick: onConfirm, disabled: isPending },
+      { label: '삭제', intent: 'primary', onClick: onConfirm, disabled: isPending },
     ]}
   />
 )

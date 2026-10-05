@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { FavoriteButton, ShareModal } from '@/shared/ui'
-import { ShareIcon } from '@/shared/assets'
+import { ShareModal, ToggleIconButton } from '@/shared/ui'
+import { FavoriteIcon, ShareIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 
 interface FavoriteShareActionsProps {
@@ -11,11 +11,11 @@ interface FavoriteShareActionsProps {
   // 피그마 Frame1707484443 like/share 토글 — 화면별 중복 액션은 showFavorite/className으로 제어한다.
   showFavorite?: boolean
   showShare?: boolean
-  favoriteClassName?: string
   // 라벨 스타일 — 모바일은 아이콘만, 탭+는 라벨 노출이라 boolean이 아닌 반응형 클래스로 제어
   // (피그마 모바일 1943:112830 라벨 없음 / 탭 1654:148613 라벨 12px neutral-700)
-  labelClassName?: string
+  labelVisibility?: 'always' | 'tablet'
   // 공유 모달 메타 (카카오/OS 공유용) — 없으면 현재 페이지 URL·title 기본값
+  shareUrl?: string
   shareTitle?: string
   shareDescription?: string
   shareImageUrl?: string
@@ -29,8 +29,8 @@ const FavoriteShareActions = ({
   onToggle,
   showFavorite = true,
   showShare = true,
-  favoriteClassName,
-  labelClassName,
+  labelVisibility,
+  shareUrl,
   shareTitle,
   shareDescription,
   shareImageUrl,
@@ -41,32 +41,28 @@ const FavoriteShareActions = ({
   return (
     <div className={cn('flex items-center gap-[1rem]', className)}>
       {showFavorite && (
-        <FavoriteButton
-          size="lg"
-          className={cn(
-            'gap-0 p-0 text-[0.75rem] font-semibold text-neutral-850',
-            favoriteClassName,
-          )}
-          iconClassName="size-[2rem]"
-          labelClassName={labelClassName}
-          isFavorite={isFavorite}
-          onToggle={onToggle}
+        <ToggleIconButton
+          icon={FavoriteIcon}
+          hasFillState
+          size="md"
+          label="관심있어요"
+          labelVisibility={labelVisibility}
+          pressed={isFavorite}
+          onClick={onToggle}
         />
       )}
       {showShare && (
-        <button
-          type="button"
-          onClick={() => setShareOpen(true)}
+        <ToggleIconButton
+          icon={ShareIcon}
+          size="md"
           aria-label="공유"
-          className="flex items-center gap-0 text-[0.75rem] font-semibold text-neutral-850"
-        >
-          <ShareIcon className="size-[2rem] text-neutral-700" />
-          <span className={labelClassName}>공유</span>
-        </button>
+          onClick={() => setShareOpen(true)}
+        />
       )}
       <ShareModal
         open={shareOpen}
         onOpenChange={setShareOpen}
+        url={shareUrl}
         title={shareTitle}
         description={shareDescription}
         imageUrl={shareImageUrl}

@@ -4,20 +4,29 @@ import { cn } from '@/shared/lib/cn'
 import { formatRelativeTime } from '@/shared/lib/formatRelativeTime'
 import type { NotificationResponseDto } from '@/shared/types'
 import { OwnerActionsMenu } from '@/shared/ui/OwnerActionsMenu'
+import { IconButton } from '@/shared/ui/IconButton'
+import { CloseIcon } from '@/shared/assets'
+import { notificationCategoryLabel, notificationCategoryOf } from '../model/notificationCategory'
 
 interface NotificationListItemProps {
   item: NotificationResponseDto
   onSelect: (item: NotificationResponseDto) => void
   onDelete?: (item: NotificationResponseDto) => void
+  /** 팝업에서 읽음 처리해 치운다. 알림 원본을 삭제하지 않는다. */
+  onDismiss?: (item: NotificationResponseDto) => void
   compact?: boolean
+  dismissing?: boolean
 }
 
 const NotificationListItem = ({
   item,
   onSelect,
   onDelete,
+  onDismiss,
   compact = false,
+  dismissing = false,
 }: NotificationListItemProps) => {
+  const category = notificationCategoryOf(item.type)
   return (
     <article
       className={cn(
@@ -29,7 +38,7 @@ const NotificationListItem = ({
       <button
         type="button"
         onClick={() => onSelect(item)}
-        className="flex min-w-0 flex-1 items-start gap-3 text-left focus-visible:rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+        className="flex min-w-0 flex-1 items-start gap-3 text-left focus-ring focus-visible:rounded-lg"
       >
         <span
           className={cn(
@@ -44,19 +53,32 @@ const NotificationListItem = ({
           <span className="line-clamp-2 text-sm leading-[1.5] font-medium text-neutral-700">
             {item.body}
           </span>
-          <time className="text-xs font-medium text-neutral-500" dateTime={item.createdAt}>
-            {formatRelativeTime(item.createdAt)}
-          </time>
+          <span className="flex items-center gap-1.5 text-xs font-medium text-neutral-500">
+            {category && !compact && (
+              <span className="rounded bg-neutral-100 px-1.5 py-0.5 text-neutral-700">
+                {notificationCategoryLabel(category)}
+              </span>
+            )}
+            <time dateTime={item.createdAt}>{formatRelativeTime(item.createdAt)}</time>
+          </span>
         </span>
       </button>
 
-      {onDelete && (
-        <OwnerActionsMenu
-          onDelete={() => onDelete(item)}
-          ariaLabel={`${item.title} 알림 더보기`}
-          className="shrink-0 rounded-full p-1 text-neutral-500 transition-colors hover:bg-white hover:text-neutral-850"
-        />
-      )}
+      {/* 팝업의 지우기와 센터의 영구 삭제는 서로 다른 동작이다. */}
+      {compact && onDismiss ? (
+        <IconButton
+          tone="muted"
+          size="lg"
+          edge="end"
+          aria-label={`${item.title} 알림 지우기`}
+          disabled={dismissing}
+          onClick={() => onDismiss(item)}
+        >
+          <CloseIcon className="size-4" />
+        </IconButton>
+      ) : !compact && onDelete ? (
+        <OwnerActionsMenu onDelete={() => onDelete(item)} ariaLabel={`${item.title} 알림 더보기`} />
+      ) : null}
     </article>
   )
 }

@@ -1,0 +1,476 @@
+'use client'
+
+import { useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useQueryClient } from '@tanstack/react-query'
+import { aiImageQueries } from '@/entities/ai-image'
+import { PetResultLink } from '@/features/playground-pet/ui/PetResultLink'
+import { PawPrintIcon } from '@/shared/assets'
+import { PLAYGROUND_BILLING_ENABLED } from '@/shared/config/playground'
+import { cafe24Proup } from '@/shared/lib/fonts'
+import { cn } from '@/shared/lib/cn'
+import { preparePhoto } from '@/shared/lib/preparePhoto'
+import { Button, ComposerSectionHeading, buttonVariants } from '@/shared/ui'
+import { PhotoUploadField } from '@/shared/ui/PhotoUploadField'
+import { saveAiImageFile } from '../lib/aiImageFile'
+import { setPendingCommunityPhoto } from '../lib/pendingCommunityPhoto'
+import { AiPostShareChoice } from './AiPostShareChoice'
+import { useAiPixelFilter } from '../lib/useAiPixelFilter'
+import { AiPhotoArchive } from './AiPhotoArchive'
+import { BeforeAfterCompare } from './BeforeAfterCompare'
+
+const PROGRESS_BLOCKS = 12
+/** 보통 30~60초. 이 시간 동안 막대를 90%까지만 채우고 결과가 오면 끝낸다 */
+const EXPECTED_SECONDS = 50
+
+/** 기다리는 동안 번갈아 보여줄 문구 */
+const WAITING_TIPS = [
+  '우리 아이 얼굴을 살피고 있어요',
+  '어울리는 색을 고르고 있어요',
+  '한 칸 한 칸 그려 넣고 있어요',
+  '마지막으로 다듬고 있어요',
+]
+
+const useElapsedSeconds = (running: boolean) => {
+  const [elapsed, setElapsed] = useState(0)
+  useEffect(() => {
+    if (!running) return
+    const startedAt = Date.now()
+    const timer = setInterval(() => setElapsed(Math.floor((Date.now() - startedAt) / 1000)), 1000)
+    return () => {
+      clearInterval(timer)
+      setElapsed(0)
+    }
+  }, [running])
+  return elapsed
+}
+
+interface AiFilterStudioProps {
+  isLoggedIn: boolean
+  allowance?: { remaining: number; freeRemaining: number; dailyFreeLimit: number; enabled: boolean }
+  quotaError?: boolean
+  onRefreshQuota?: () => void
+  onGenerationSettled?: () => void
+}
+
+/**
+ * AI 필터 탭.
+ * 사진 한 장 → 어드민이 등록한 필터 중 하나 고르기 → 변환 → 원본과 비교 → 저장·커뮤니티에 올리기.
+ * 만든 사진은 보관함에 쌓이고, 마이홈 'AI 사진' 탭에서도 볼 수 있다.
+ */
+export function AiFilterStudio({
+  isLoggedIn,
+  allowance,
+  quotaError,
+  onRefreshQuota,
+  onGenerationSettled,
+}: AiFilterStudioProps) {
+  const router = useRouter()
+  const queryClient = useQueryClient()
+  const ai = useAiPixelFilter()
+  const elapsed = useElapsedSeconds(ai.isWorking)
+  const [photo, setPhoto] = useState<{ file: File; url: string }>()
+  const [preparing, setPreparing] = useState(false)
+  const [photoError, setPhotoError] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [shareComparison, setShareComparison] = useState(false)
+  const resultRef = useRef<HTMLDivElement>(null)
+
+  useEffect(
+    () => () => {
+      if (photo) URL.revokeObjectURL(photo.url)
+    },
+    [photo],
+  )
+
+  const remaining = allowance?.remaining
+  const canGenerate = Boolean(allowance?.enabled && remaining && remaining > 0)
+  const selectedFilter = ai.filters.find((filter) => filter.filterId === ai.selectedFilterId)
+  const result = ai.result
+  const awaitingResult = ai.phase === 'pending'
+
+  const selectPhoto = async (files: FileList) => {
+    if (!files.length || preparing || ai.isWorking) return
+    setPreparing(true)
+    setPhotoError(null)
+    try {
+      const file = await preparePhoto(files[0])
+      ai.reset()
+      setShareComparison(false)
+      setPhoto({ file, url: URL.createObjectURL(file) })
+    } catch (error) {
+      setPhotoError(error instanceof Error ? error.message : '사진을 준비하지 못했어요.')
+    } finally {
+      setPreparing(false)
+    }
+  }
+
+  const convert = async () => {
+    if (!photo || ai.isWorking || !canGenerate) return
+    const done = await ai.start(photo.file)
+    void queryClient.invalidateQueries({ queryKey: aiImageQueries.myGenerations().queryKey })
+    onGenerationSettled?.()
+    if (done) resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
+
+  const checkResult = async () => {
+    const done = await ai.resume()
+    void queryClient.invalidateQueries({ queryKey: aiImageQueries.myGenerations().queryKey })
+    onGenerationSettled?.()
+    if (done) resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
+
+  const save = async () => {
+    if (!result) return
+    setSaving(true)
+    try {
+      await saveAiImageFile(result.file)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const postToCommunity = () => {
+    if (!result) return
+    setPendingCommunityPhoto(result.file, shareComparison ? photo?.file : undefined, result.jobId)
+    router.push('/community/write')
+  }
+
+  const filledBlocks =
+    ai.phase === 'uploading' || ai.phase === 'checking'
+      ? 1
+      : Math.max(2, Math.round(Math.min(0.9, elapsed / EXPECTED_SECONDS) * PROGRESS_BLOCKS))
+
+  return (
+    <div className="mx-auto w-full max-w-[68rem] px-5 pt-6 pb-16 tab:px-8 tab:pt-10 pc:px-10">
+      {/* 소개 */}
+      <section className="rounded-2xl bg-point-50 p-5 tab:p-8">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="flex items-center gap-1.5 text-xs font-semibold text-primary-700">
+              <PawPrintIcon aria-hidden className="size-4 rotate-30 text-secondary-500" />
+              포퐁 AI 필터
+            </p>
+            <h1
+              className={cn(
+                cafe24Proup.className,
+                'mt-2 font-cafe24 text-2xl leading-snug font-bold text-neutral-850 tab:text-3xl',
+              )}
+            >
+              우리 아이, 오늘은 어떤 모습?
+            </h1>
+            <p className="mt-2 text-sm leading-relaxed text-neutral-700">
+              사진 한 장이면 도트 그림부터 스티커·수채화까지. 마음에 들면 저장하거나 커뮤니티에
+              자랑해 보세요.
+            </p>
+          </div>
+          {isLoggedIn && (
+            <div className="flex flex-col items-start gap-2">
+              <span className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-neutral-850">
+                {allowance
+                  ? PLAYGROUND_BILLING_ENABLED
+                    ? `이용 가능 ${remaining}회 · 오늘 무료 ${allowance.freeRemaining}/${allowance.dailyFreeLimit}회`
+                    : `오늘 무료 ${allowance.freeRemaining}/${allowance.dailyFreeLimit}회`
+                  : quotaError
+                    ? '이용 가능 횟수를 확인하지 못했어요'
+                    : '이용 가능 횟수를 확인하고 있어요…'}
+              </span>
+              {quotaError && (
+                <Button intent="link" size="sm" onClick={onRefreshQuota}>
+                  다시 확인
+                </Button>
+              )}
+              {PLAYGROUND_BILLING_ENABLED && (
+                <Link
+                  href="/playground"
+                  className="text-sm font-semibold text-primary-700 underline"
+                >
+                  놀이터 이용권 확인하기
+                </Link>
+              )}
+            </div>
+          )}
+        </div>
+      </section>
+
+      <div className="mt-8 grid gap-8 tab:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] tab:gap-10">
+        {/* 1. 사진 */}
+        <section aria-labelledby="ai-photo-heading" className="min-w-0">
+          <ComposerSectionHeading id="ai-photo-heading" step={1} required>
+            우리 아이 사진
+          </ComposerSectionHeading>
+          {isLoggedIn ? (
+            <>
+              <PhotoUploadField
+                preview={photo?.url}
+                processing={preparing}
+                disabled={ai.isWorking || awaitingResult}
+                onSelect={(files) => void selectPhoto(files)}
+                onRemove={() => {
+                  ai.reset()
+                  setPhoto(undefined)
+                }}
+              />
+              {photoError && (
+                <p role="alert" className="mt-3 text-sm text-error-500">
+                  {photoError}
+                </p>
+              )}
+              <p className="mt-2 text-xs text-neutral-700">
+                얼굴이 잘 보이는 정면 사진일수록 우리 아이와 닮게 나와요.
+              </p>
+            </>
+          ) : (
+            <div className="flex aspect-square w-full flex-col items-center justify-center gap-4 rounded-xl border border-primary-200 bg-point-50 p-6 text-center">
+              <p className="text-sm font-semibold text-neutral-850">
+                로그인하면 우리 아이 사진으로 바로 만들어 볼 수 있어요
+              </p>
+              <Link
+                href={`/login?returnUrl=${encodeURIComponent('/ai-filter')}`}
+                className={buttonVariants()}
+              >
+                로그인하고 시작하기
+              </Link>
+            </div>
+          )}
+        </section>
+
+        {/* 2. 필터 */}
+        <section aria-labelledby="ai-filter-heading" className="min-w-0">
+          <ComposerSectionHeading id="ai-filter-heading" step={2} required>
+            필터 고르기
+          </ComposerSectionHeading>
+          {ai.filters.length === 0 ? (
+            <p className="rounded-xl bg-neutral-50 p-5 text-sm text-neutral-700">
+              지금은 쓸 수 있는 필터가 없어요. 곧 새 필터로 찾아올게요!
+            </p>
+          ) : (
+            <ul className="grid grid-cols-2 gap-3 pc:grid-cols-3" aria-label="필터 목록">
+              {ai.filters.map((filter) => {
+                const selected = filter.filterId === ai.selectedFilterId
+                return (
+                  <li key={filter.filterId}>
+                    <button
+                      type="button"
+                      aria-pressed={selected}
+                      disabled={ai.isWorking || awaitingResult}
+                      onClick={() => ai.selectFilter(filter.filterId)}
+                      className={cn(
+                        'relative flex w-full flex-col overflow-hidden rounded-xl border-2 bg-white text-left focus-ring transition-colors disabled:cursor-not-allowed',
+                        selected
+                          ? 'border-primary-500'
+                          : 'border-neutral-150 hover:border-primary-200',
+                      )}
+                    >
+                      <span className="relative block aspect-square w-full bg-point-100">
+                        {filter.thumbnailUrl && (
+                          <Image
+                            src={filter.thumbnailUrl}
+                            alt=""
+                            fill
+                            unoptimized
+                            sizes="(min-width: 1024px) 200px, 45vw"
+                            className="object-cover"
+                          />
+                        )}
+                        {selected && (
+                          <span className="absolute top-2 right-2 flex size-8 items-center justify-center rounded-full bg-point-500 shadow">
+                            <PawPrintIcon
+                              aria-hidden
+                              className="size-5 rotate-30 text-secondary-500"
+                            />
+                          </span>
+                        )}
+                      </span>
+                      <span className="block p-3">
+                        <span className="block text-sm font-bold text-neutral-850">
+                          {filter.name}
+                        </span>
+                        <span className="mt-0.5 line-clamp-2 block text-xs text-neutral-700">
+                          {filter.description}
+                        </span>
+                      </span>
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+        </section>
+      </div>
+
+      {/* 3. 만들기 · 결과 */}
+      {isLoggedIn && ai.filters.length > 0 && (
+        <section ref={resultRef} aria-live="polite" className="mx-auto mt-10 max-w-xl">
+          {ai.isWorking ? (
+            <div role="status" className="rounded-2xl border border-primary-200 bg-point-50 p-5">
+              <div
+                className="flex gap-1"
+                role="progressbar"
+                aria-label="AI 필터 진행"
+                aria-valuemin={0}
+                aria-valuemax={PROGRESS_BLOCKS}
+                aria-valuenow={filledBlocks}
+              >
+                {Array.from({ length: PROGRESS_BLOCKS }, (_, index) => (
+                  <span
+                    key={index}
+                    className={cn(
+                      'h-3 flex-1 transition-colors duration-500',
+                      index < filledBlocks
+                        ? 'bg-primary-500'
+                        : index === filledBlocks
+                          ? 'animate-pulse bg-primary-200'
+                          : 'bg-white',
+                    )}
+                  />
+                ))}
+              </div>
+              <p className="mt-3 text-sm font-semibold text-neutral-850">
+                {ai.phase === 'uploading'
+                  ? '사진을 올리고 있어요…'
+                  : ai.phase === 'checking'
+                    ? '귀여운 우리 아이가 잘 보이는지 확인하고 있어요…'
+                    : ai.phase === 'reconnecting'
+                      ? '연결이 잠시 불안정해요. 같은 사진의 결과를 다시 확인하고 있어요…'
+                      : `${WAITING_TIPS[Math.min(WAITING_TIPS.length - 1, Math.floor(elapsed / 12))]}… ${elapsed}초`}
+              </p>
+              <p className="mt-0.5 text-xs text-neutral-700">
+                {ai.phase === 'checking'
+                  ? '사진 확인에는 생성 횟수를 쓰지 않아요.'
+                  : ai.phase === 'reconnecting'
+                    ? '사진을 새로 만들지 않으므로 생성 횟수를 추가로 쓰지 않아요.'
+                    : '보통 30초~1분 걸려요.'}
+              </p>
+            </div>
+          ) : awaitingResult ? (
+            <div role="status" className="rounded-2xl border border-primary-200 bg-point-50 p-5">
+              <p className="text-sm font-semibold text-neutral-850">결과 확인이 필요해요</p>
+              <p className="mt-2 text-sm leading-relaxed text-neutral-700">{ai.error}</p>
+              <p className="mt-2 text-xs text-neutral-700">
+                접수된 작업은 화면 연결이 끊겨도 계속 진행돼요. 완성되면 보관함에 저장돼요.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {ai.canResume && <Button onClick={() => void checkResult()}>결과 다시 확인</Button>}
+                <Link
+                  href="/home?tab=ai-photos"
+                  className={buttonVariants({ intent: 'secondary' })}
+                >
+                  보관함 확인
+                </Link>
+                <Button
+                  intent="link"
+                  onClick={() => {
+                    ai.reset()
+                    setPhoto(undefined)
+                  }}
+                >
+                  새 사진 선택
+                </Button>
+              </div>
+            </div>
+          ) : result && photo ? (
+            <div>
+              <h2
+                className={cn(
+                  cafe24Proup.className,
+                  'mb-3 text-center font-cafe24 text-xl font-bold text-primary-500',
+                )}
+              >
+                짜잔! {selectedFilter?.name ?? 'AI 필터'} 완성
+              </h2>
+              <BeforeAfterCompare beforeSrc={photo.url} afterSrc={result.imageUrl} />
+              <PetResultLink sourceJobId={result.jobId} />
+              <AiPostShareChoice
+                checked={shareComparison}
+                onChange={setShareComparison}
+                disabled={saving}
+              />
+              <p className="mt-2 text-center text-xs text-neutral-700">
+                가운데 손잡이를 끌어 원본과 비교해 보세요. 보관함에도 저장됐어요.
+              </p>
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <Button intent="secondary" size="lg" disabled={saving} onClick={() => void save()}>
+                  {saving ? '준비 중…' : '저장하기'}
+                </Button>
+                <Button size="lg" onClick={postToCommunity}>
+                  커뮤니티에 자랑하기
+                </Button>
+              </div>
+              <div className="mt-3 flex justify-center">
+                <Button
+                  size="md"
+                  intent="link"
+                  disabled={!canGenerate}
+                  onClick={() => {
+                    ai.reset()
+                    document
+                      .getElementById('ai-filter-heading')
+                      ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                  }}
+                >
+                  다른 필터로 또 만들기
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <Button
+                size="lg"
+                disabled={!photo || !selectedFilter || !canGenerate || preparing}
+                onClick={() => void convert()}
+                width="full"
+              >
+                {!allowance
+                  ? '이용 가능 횟수를 확인해 주세요'
+                  : !allowance.enabled
+                    ? '지금은 AI 사진 만들기가 쉬고 있어요'
+                    : remaining === 0
+                      ? PLAYGROUND_BILLING_ENABLED
+                        ? '이용권이 부족해요 · 놀이터에서 확인해 주세요'
+                        : '오늘 만들 수 있는 횟수를 모두 사용했어요'
+                      : selectedFilter
+                        ? `${selectedFilter.name} 씌우기`
+                        : '필터를 골라 주세요'}
+              </Button>
+              {!photo && (
+                <p className="mt-2 text-center text-xs text-neutral-700">
+                  먼저 우리 아이 사진을 올려 주세요.
+                </p>
+              )}
+              <p className="mt-3 text-center text-xs leading-relaxed text-neutral-700">
+                필터를 씌우면 포퐁 AI가 사진 속 동물을 확인한 뒤 변환해요. 동물이 잘 보이지 않는
+                사진은 생성 횟수를 사용하지 않아요.
+              </p>
+              {ai.error && (
+                <p
+                  role="alert"
+                  className="mt-3 rounded-lg bg-neutral-50 p-3 text-sm text-error-500"
+                >
+                  {ai.error}
+                </p>
+              )}
+            </>
+          )}
+        </section>
+      )}
+
+      {/* 보관함 미리보기 */}
+      {isLoggedIn && (
+        <section aria-labelledby="ai-archive-heading" className="mt-14">
+          <div className="mb-3 flex items-end justify-between">
+            <h2 id="ai-archive-heading" className="text-lg font-bold text-neutral-850">
+              내 AI 사진
+            </h2>
+            <Link href="/home?tab=ai-photos" className="text-sm font-semibold text-primary-700">
+              보관함 →
+            </Link>
+          </div>
+          <AiPhotoArchive enabled={isLoggedIn} limit={8} moreHref="/home?tab=ai-photos" />
+        </section>
+      )}
+    </div>
+  )
+}

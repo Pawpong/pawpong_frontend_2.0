@@ -12,6 +12,7 @@ import {
   ListingStats,
   PopularBadge,
   ProfileAvatar,
+  Chip,
 } from '@/shared/ui'
 import { ArrowRightIcon, CheckIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
@@ -38,12 +39,7 @@ const STATUS_OPTIONS: PetStatus[] = ['reserved', 'available', 'adopted']
 const StatusDropdown = ({ currentStatus }: { currentStatus: PetStatus }) => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
-      <button
-        type="button"
-        className="inline-flex shrink-0 items-center rounded-full border border-primary-500 bg-white px-[0.625rem] py-[0.25rem] text-[0.75rem] leading-[1.375rem] font-semibold text-primary-500 pc:text-[0.875rem]"
-      >
-        {ADOPTION_CARD_STATUS[currentStatus].label}
-      </button>
+      <Chip>{ADOPTION_CARD_STATUS[currentStatus].label}</Chip>
     </DropdownMenuTrigger>
     <DropdownMenuContent
       align="start"
@@ -93,10 +89,7 @@ const BreederRow = ({ breeder }: { breeder: AdoptionDetailDto['breeder'] }) => {
       {isWithdrawn ? (
         identity
       ) : (
-        <Link
-          href={homeHref}
-          className="flex min-w-0 flex-1 items-center gap-2 rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
-        >
+        <Link href={homeHref} className="flex min-w-0 flex-1 items-center gap-2 rounded focus-ring">
           {identity}
         </Link>
       )}
@@ -164,6 +157,7 @@ const AdoptionDetailRail = ({
           className="text-neutral-700"
         />
         <FavoriteShareActions
+          shareUrl={`/adoption/${detail.listingId}`}
           shareTitle={detail.name}
           shareDescription={detail.description}
           shareImageUrl={detail.imageUrls[0]}
@@ -171,7 +165,7 @@ const AdoptionDetailRail = ({
           onToggle={onToggleFavorite}
           showFavorite={showFavoriteAction}
           className="gap-2"
-          labelClassName="hidden text-neutral-700 tab:inline"
+          labelVisibility="tablet"
         />
       </div>
 

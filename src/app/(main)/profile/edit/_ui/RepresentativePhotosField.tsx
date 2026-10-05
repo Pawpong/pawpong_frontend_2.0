@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { PHOTO_ACCEPT } from '@/shared/lib/preparePhoto'
-import { Button, InputField, RepresentativePhoto } from '@/shared/ui'
+import { TEXT } from '@/shared/config'
+import { CloseIcon, PlusIcon } from '@/shared/assets'
+import { Button, InputField, RepresentativePhoto, IconButton } from '@/shared/ui'
 import {
   MAX_REPRESENTATIVE_PHOTOS,
   addRepresentativePhotos,
@@ -84,9 +86,9 @@ export function RepresentativePhotosField({
                 onClick={() => choosePhotos(index)}
                 disabled={disabled}
                 aria-label="대표사진 추가"
-                className="flex aspect-square items-center justify-center rounded-lg border border-dashed border-neutral-300 bg-white text-2xl font-medium text-neutral-500 transition-colors hover:border-primary-500 hover:text-primary-500"
+                className="flex aspect-square items-center justify-center rounded-lg border border-dashed border-neutral-300 bg-white text-neutral-500 focus-ring transition-colors hover:border-primary-500 hover:text-primary-500"
               >
-                +
+                <PlusIcon className="size-6" />
               </button>
             )
           }
@@ -97,33 +99,36 @@ export function RepresentativePhotosField({
               className="relative aspect-square overflow-hidden rounded-lg bg-point-50"
             >
               <PhotoPreview photo={photo} index={index} />
-              <button
-                type="button"
-                aria-label={`대표사진 ${index + 1} 빼기`}
-                disabled={disabled}
-                onClick={() =>
-                  onChange(
-                    Array.from({ length: MAX_REPRESENTATIVE_PHOTOS }, (_, i) =>
-                      i === index ? null : (photoSlots[i] ?? null),
-                    ),
-                  )
-                }
-                className="absolute top-1 right-1 flex size-6 items-center justify-center rounded-full bg-neutral-850/60 text-sm font-semibold text-white"
-              >
-                ×
-              </button>
+              <span className="absolute top-1 right-1 flex">
+                <IconButton
+                  tone="overlay"
+                  size="xs"
+                  aria-label={`대표사진 ${index + 1} 빼기`}
+                  disabled={disabled}
+                  onClick={() =>
+                    onChange(
+                      Array.from({ length: MAX_REPRESENTATIVE_PHOTOS }, (_, i) =>
+                        i === index ? null : (photoSlots[i] ?? null),
+                      ),
+                    )
+                  }
+                >
+                  <CloseIcon className="size-4" />
+                </IconButton>
+              </span>
             </div>
           )
         })}
       </div>
       <Button
-        variant="outline"
+        size="md"
+        intent="secondary"
         onClick={() => choosePhotos()}
         disabled={disabled || photoSlots.filter(Boolean).length >= MAX_REPRESENTATIVE_PHOTOS}
       >
         사진 더 고르기
       </Button>
-      <p className="mt-1 text-[0.625rem] leading-[1.5] font-medium text-neutral-700">
+      <p className={`${TEXT.meta} mt-2`}>
         기존 사진은 유지돼요. 사진을 빼거나 추가한 뒤 프로필을 적용해주세요. 장당 100MB까지 선택할
         수 있으며, 업로드할 때 JPG로 변환해 용량을 줄여요.
       </p>

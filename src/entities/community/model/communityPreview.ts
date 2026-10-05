@@ -12,16 +12,19 @@ interface CommunityPreviewProps {
   createdAt: string
   text: string
   images?: string[]
+  aiComparison?: CommunityPostCard['aiComparison']
   likeCount: number
   commentCount: number
   isLiked: boolean
   isSaved: boolean
+  shareable?: boolean
   detailHref?: string
   commentPreview?: { nickname: string; body: string }
 }
 
 const toCommunityPreviewProps = (post: CommunityPostCard): CommunityPreviewProps => ({
   postId: post.postId,
+  shareable: post.visibility === 'public' && post.status === 'published',
   author: {
     id: post.authorId,
     nickname: post.authorNickname,
@@ -30,6 +33,7 @@ const toCommunityPreviewProps = (post: CommunityPostCard): CommunityPreviewProps
   createdAt: post.createdAt,
   text: post.bodyExcerpt,
   images: post.photoUrls,
+  aiComparison: post.aiComparison,
   likeCount: post.likeCount,
   commentCount: post.commentCount,
   isLiked: post.isLiked,

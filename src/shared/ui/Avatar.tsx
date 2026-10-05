@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import * as AvatarPrimitive from '@radix-ui/react-avatar'
-import { tv, type VariantProps } from 'tailwind-variants'
+import { tv, type VariantProps } from '@/shared/lib/tv'
 import { cn } from '@/shared/lib/cn'
 import { PawPrintIcon } from '@/shared/assets'
 
@@ -46,17 +46,15 @@ export const AvatarImage = React.forwardRef<
 ))
 AvatarImage.displayName = AvatarPrimitive.Image.displayName
 
+// 빈 프로필 색은 여기 한 곳에서만 정한다 — 호출부가 className·style 로 바꿀 수 없다
 export const AvatarFallback = React.forwardRef<
   React.ComponentRef<typeof AvatarPrimitive.Fallback>,
-  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback>
->(({ className, children, ...props }, ref) => (
+  Omit<React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback>, 'className' | 'style'>
+>(({ children, ...props }, ref) => (
   <AvatarPrimitive.Fallback
     ref={ref}
-    className={cn(
-      'flex size-full items-center justify-center rounded-full bg-primary-50 text-sm font-medium text-primary-500',
-      className,
-    )}
     {...props}
+    className="flex size-full items-center justify-center rounded-full bg-primary-50 text-sm font-medium text-primary-500"
   >
     {/* 이니셜 등을 넘기지 않으면 기본 아바타(발바닥) */}
     {children ?? <PawPrintIcon className="size-[58%] text-primary-500" />}

@@ -79,7 +79,7 @@ const CounselProfileFields = ({ initialValues }: { initialValues: CounselValues 
             저장했습니다
           </span>
         )}
-        <Button type="submit" size="lg" disabled={updateProfile.isPending} className="px-6">
+        <Button type="submit" size="lg" disabled={updateProfile.isPending}>
           {updateProfile.isPending ? '저장 중' : '저장'}
         </Button>
       </div>
@@ -92,7 +92,13 @@ const CounselProfileFields = ({ initialValues }: { initialValues: CounselValues 
  * 가입 때 한 번 쓰고 끝이던 값을 여기서 고친다 — 이후 보내는 신청서에 이 값이 채워진다.
  */
 const CounselProfileForm = () => {
-  const { data: profile, isPending, isError, refetch } = useQuery(adopterQueries.profile())
+  const {
+    data: profile,
+    isPending,
+    isError,
+    refetch,
+    isFetching: isRetrying,
+  } = useQuery(adopterQueries.profile())
 
   return (
     <Container className="px-4 py-5 tab:py-8 pc:py-10">
@@ -103,11 +109,8 @@ const CounselProfileForm = () => {
         loadingText="신청서를 불러오는 중입니다."
         errorText="신청서를 불러오지 못했습니다."
         emptyText=""
-        errorAction={
-          <Button variant="outline" size="sm" onClick={() => void refetch()}>
-            다시 시도
-          </Button>
-        }
+        onRetry={() => void refetch()}
+        isRetrying={isRetrying}
       >
         {/* 조사를 건너뛴 계정은 counselDefaultProfile 이 null 이라 빈 폼으로 시작한다 */}
         <CounselProfileFields initialValues={toValues(profile?.counselDefaultProfile ?? null)} />

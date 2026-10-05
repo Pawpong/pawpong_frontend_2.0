@@ -1,10 +1,11 @@
 'use client'
 
+import { useAuthStatus } from '@/features/auth'
 import { cn } from '@/shared/lib/cn'
 import type { ChatRoomResponseDto } from '@/shared/types'
 import { Badge, ProfileAvatar } from '@/shared/ui'
 import { getChatMessagePreview } from '../_lib/attachment'
-import { isAdoptionRoom } from '../_lib/constants'
+import { isAdoptionRoom, isGeneralRoom } from '../_lib/constants'
 import { ChatRoomActionsMenu } from './ChatRoomActionsMenu'
 import { RelativeTime } from './RelativeTime'
 
@@ -23,6 +24,10 @@ const ChatRoomItem = ({
   onClick,
   onRoomClosed,
 }: ChatRoomItemProps) => {
+  const { userRole } = useAuthStatus()
+  // 일반(입양자끼리) 대화는 입양 문의/상담 구분이 의미 없어 뱃지를 숨긴다
+  const showRoomTypeBadge = !isGeneralRoom(room, userRole)
+
   return (
     <div
       className={cn(
@@ -34,7 +39,7 @@ const ChatRoomItem = ({
       <button
         type="button"
         onClick={onClick}
-        className="flex min-w-0 flex-1 items-center gap-3 rounded-lg text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
+        className="flex min-w-0 flex-1 items-center gap-3 rounded-lg text-left focus-ring"
       >
         <ProfileAvatar
           src={room.counterpart.profileImageUrl}
@@ -46,9 +51,11 @@ const ChatRoomItem = ({
             <span className="truncate text-body-s font-semibold text-neutral-850">
               {room.counterpart.nickname}
             </span>
-            <Badge variant="primarySoft" className="shrink-0">
-              {isAdoptionRoom(room) ? '입양 문의' : '상담'}
-            </Badge>
+            {showRoomTypeBadge && (
+              <Badge variant="primarySoft" className="shrink-0">
+                {isAdoptionRoom(room) ? '입양 문의' : '상담'}
+              </Badge>
+            )}
           </div>
           <p
             className={cn(
@@ -69,7 +76,9 @@ const ChatRoomItem = ({
       <div className="shrink-0">
         <ChatRoomActionsMenu
           roomId={room.roomId}
+          counterpartUserId={room.counterpart.userId}
           counterpartName={room.counterpart.nickname}
+          blockedByMe={room.blockedByMe}
           onClosed={onRoomClosed}
         />
       </div>

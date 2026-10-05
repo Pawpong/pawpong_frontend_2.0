@@ -3,11 +3,17 @@
 import { useQuery } from '@tanstack/react-query'
 import { noticeQueries } from '@/entities/notice'
 import { formatDate } from '@/shared/lib/formatDate'
-import { AsyncState, Badge, Button, Container, NavigationBar } from '@/shared/ui'
+import { AsyncState, Badge, Container, NavigationBar } from '@/shared/ui'
 
 /** 공지사항 상세. GET /api/v2/notice/{noticeId} */
 const NoticeDetailContent = ({ noticeId }: { noticeId: string }) => {
-  const { data, isPending, isError, refetch } = useQuery(noticeQueries.detail(noticeId))
+  const {
+    data,
+    isPending,
+    isError,
+    refetch,
+    isFetching: isRetrying,
+  } = useQuery(noticeQueries.detail(noticeId))
 
   return (
     <div className="flex w-full flex-1 flex-col bg-white pb-16">
@@ -20,11 +26,8 @@ const NoticeDetailContent = ({ noticeId }: { noticeId: string }) => {
             <AsyncState
               status="error"
               message="공지사항을 불러오지 못했습니다."
-              action={
-                <Button variant="fill" size="sm" className="px-4" onClick={() => void refetch()}>
-                  다시 시도
-                </Button>
-              }
+              onRetry={() => void refetch()}
+              isRetrying={isRetrying}
             />
           )}
 

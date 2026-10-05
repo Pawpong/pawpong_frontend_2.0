@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import { cn } from '@/shared/lib/cn'
+import { Button, buttonVariants } from '@/shared/ui'
+import { getActionLayout } from '../_lib/actionLayout'
 
 interface AdoptionOwnerBarProps {
   listingId: string
@@ -25,11 +27,7 @@ const AdoptionOwnerBar = ({
   variant = 'fixed',
 }: AdoptionOwnerBarProps) => {
   const isInline = variant === 'inline'
-  const ACTION_CLASS = cn(
-    'flex h-[3rem] flex-1 items-center justify-center rounded-full px-[0.5rem] text-[1rem] font-semibold tab:h-[2.5rem]',
-    // 레일 안에서는 컬럼 폭을 그대로 쓴다 (고정 바에서만 시안의 최대 폭을 지킨다)
-    isInline ? 'tab:h-[2.75rem]' : 'max-w-[18.5625rem] tab:max-w-[16.125rem]',
-  )
+  const ACTION_LAYOUT = getActionLayout(isInline)
 
   return (
     <div
@@ -50,27 +48,17 @@ const AdoptionOwnerBar = ({
             'tab:w-[22.5rem] tab:max-w-[33.5rem] tab:min-w-[22.5rem] tab:justify-end tab:gap-[1.25rem]',
         )}
       >
-        <button
-          type="button"
-          onClick={onDelete}
-          disabled={isDeleting}
-          className={cn(
-            ACTION_CLASS,
-            'border border-neutral-300 bg-white text-neutral-850 hover:text-neutral-700 disabled:opacity-50',
-          )}
-        >
-          삭제
-        </button>
+        <div className={ACTION_LAYOUT}>
+          <Button intent="secondary" onClick={onDelete} disabled={isDeleting} width="full">
+            삭제
+          </Button>
+        </div>
 
-        <Link
-          href={`/adoption/${listingId}/edit`}
-          className={cn(
-            ACTION_CLASS,
-            'bg-point-500 text-neutral-850 hover:text-neutral-700 active:bg-point-600 active:text-neutral-850',
-          )}
-        >
-          수정하기
-        </Link>
+        <div className={ACTION_LAYOUT}>
+          <Link href={`/adoption/${listingId}/edit`} className={buttonVariants({ width: 'full' })}>
+            수정하기
+          </Link>
+        </div>
       </div>
     </div>
   )

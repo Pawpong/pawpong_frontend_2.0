@@ -14,7 +14,10 @@ export const useCreateCommunityComment = (postId: string) => {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (data: CreateCommunityCommentRequest) => createCommunityComment(postId, data),
-    onSuccess: () => invalidateCommunityPostSurface(qc, postId),
+    // 저장 응답 후 작성 상태를 끝낸다. 목록 갱신 지연을 댓글 저장 지연처럼 보이지 않게 한다.
+    onSuccess: () => {
+      void invalidateCommunityPostSurface(qc, postId)
+    },
   })
 }
 

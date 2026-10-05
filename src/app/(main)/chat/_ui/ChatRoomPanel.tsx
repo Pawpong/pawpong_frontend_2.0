@@ -1,5 +1,6 @@
 'use client'
 
+import { RetryButton } from '@/shared/ui'
 import * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { cn } from '@/shared/lib/cn'
@@ -31,6 +32,7 @@ const ChatRoomPanel = ({ room, currentUserId, onBack, onRoomClosed }: ChatRoomPa
     sendMessage,
     markAsRead,
     refetch,
+    isFetching: isRetrying,
   } = useChatRoom(room.roomId, currentUserId)
   const messagesEndRef = React.useRef<HTMLDivElement>(null)
   const displayName = room.counterpart.nickname
@@ -51,11 +53,11 @@ const ChatRoomPanel = ({ room, currentUserId, onBack, onRoomClosed }: ChatRoomPa
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages.length])
 
-  // 상대가 보낸 안 읽은 메시지가 있을 때만 읽음 처리를 emit한다.
+  // 방을 다시 열 때 기존 채팅 알림도 정리하고, 보이는 동안 새 메시지를 읽음 처리한다.
   const hasUnread = messages.some((message) => !message.isMine && !message.isRead)
   React.useEffect(() => {
     const readVisibleMessages = () => {
-      if (document.visibilityState !== 'hidden' && isConnected && hasUnread) markAsRead()
+      if (document.visibilityState !== 'hidden' && isConnected) markAsRead()
     }
     readVisibleMessages()
     document.addEventListener('visibilitychange', readVisibleMessages)
@@ -74,6 +76,7 @@ const ChatRoomPanel = ({ room, currentUserId, onBack, onRoomClosed }: ChatRoomPa
         displayName={displayName}
         profileImageUrl={room.counterpart.profileImageUrl}
         counterpartUserId={room.counterpart.userId}
+        blockedByMe={room.blockedByMe}
         // 애정도 뱃지 보류로 미전달
         // hasApplication={!!room.applicationId}
         onBack={onBack}
@@ -108,13 +111,7 @@ const ChatRoomPanel = ({ room, currentUserId, onBack, onRoomClosed }: ChatRoomPa
             ) : isError ? (
               <div className="flex flex-col items-center gap-3 py-10">
                 <p className="text-sm text-neutral-700">메시지를 불러오지 못했습니다.</p>
-                <button
-                  type="button"
-                  onClick={() => void refetch()}
-                  className="rounded-lg bg-neutral-850 px-3 py-2 text-sm font-semibold text-white"
-                >
-                  다시 시도
-                </button>
+                <RetryButton onRetry={() => void refetch()} isRetrying={isRetrying} />
               </div>
             ) : (
               messages.map((msg, idx) => (
@@ -139,7 +136,17 @@ const ChatRoomPanel = ({ room, currentUserId, onBack, onRoomClosed }: ChatRoomPa
       )}
 
       {/* Input */}
-      <ChatMessageInput onSend={sendMessage} disabled={room.status === 'closed' || !isConnected} />
+      <ChatMessageInput
+        onSend={sendMessage}
+        disabled={room.status === 'closed' || !isConnected}
+        unavailableMessage={
+          room.canMessage !== false
+            ? undefined
+            : room.blockedByMe
+              ? '차단한 사용자예요. 더보기 메뉴에서 차단을 해제하면 다시 대화할 수 있어요.'
+              : '지금은 메시지를 보낼 수 없는 대화예요.'
+        }
+      />
     </div>
   )
 }

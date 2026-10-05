@@ -2,6 +2,8 @@
 
 import { useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query'
 import { breederQueries } from '@/entities/breeder'
+import { adopterQueries } from '@/entities/adopter'
+import { communityQueries } from '@/entities/community'
 import { profileQueries, updateMyProfile } from '@/entities/profile'
 import type { UpdateMyProfileRequest } from '@/shared/types'
 import { followUser, unfollowUser, removeFollower } from './profile.api'
@@ -18,12 +20,14 @@ export const useUpdateMyProfile = () => {
 
 /**
  * 팔로우 관계가 바뀌면 프로필 루트뿐 아니라 브리더 루트도 지운다 —
- * 브리더홈의 isFollowing/followerCount 는 breederQueries 쪽 캐시에 있다.
+ * 브리더홈의 isFollowing/followerCount 는 breederQueries, 커뮤니티 카드의 isFollowingAuthor 는 communityQueries 캐시에 있다.
  */
 const invalidateFollowCaches = (qc: QueryClient) =>
   Promise.all([
     qc.invalidateQueries({ queryKey: profileQueries.all() }),
     qc.invalidateQueries({ queryKey: breederQueries.all() }),
+    qc.invalidateQueries({ queryKey: adopterQueries.all() }),
+    qc.invalidateQueries({ queryKey: communityQueries.all() }),
   ])
 
 export const useFollowUser = () => {

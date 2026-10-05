@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import { PixelArrowRightIcon } from '@/shared/assets'
+import { IconButton } from './IconButton'
 
 interface ModalPhotoProps {
   images: string[]
@@ -44,14 +45,9 @@ export const ModalPhoto = ({
     </div>
     <div className="flex shrink-0 items-center justify-center gap-4 py-3">
       {images.length > 1 && (
-        <button
-          type="button"
-          onClick={onPrev}
-          aria-label="이전 이미지"
-          className="flex size-10 items-center justify-center rounded-full text-primary-500 hover:bg-primary-50 focus-visible:outline-2 focus-visible:outline-primary-500"
-        >
+        <IconButton tone="brand" onClick={onPrev} aria-label="이전 이미지">
           <PixelArrowRightIcon className="size-5 rotate-180" />
-        </button>
+        </IconButton>
       )}
       <p aria-live="polite" className="text-body-md font-medium text-neutral-500 tabular-nums">
         <span className="font-semibold text-neutral-850">
@@ -61,14 +57,9 @@ export const ModalPhoto = ({
       </p>
 
       {images.length > 1 && (
-        <button
-          type="button"
-          onClick={onNext}
-          aria-label="다음 이미지"
-          className="flex size-10 items-center justify-center rounded-full text-primary-500 hover:bg-primary-50 focus-visible:outline-2 focus-visible:outline-primary-500"
-        >
+        <IconButton tone="brand" onClick={onNext} aria-label="다음 이미지">
           <PixelArrowRightIcon className="size-5" />
-        </button>
+        </IconButton>
       )}
     </div>
   </>

@@ -3,54 +3,57 @@
 import Link from 'next/link'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import type { CommunityHallOfFame } from '@/shared/types'
-import { ArrowRightIcon, FavoriteIcon } from '@/shared/assets'
+import { ArrowRightIcon } from '@/shared/assets'
 import { Container, InfiniteScrollTrigger, ListState, NavigationBar } from '@/shared/ui'
 import { flattenPages } from '@/shared/lib/infiniteList'
-import { CommunityMediaCard, communityQueries, formatHallOfFamePeriod } from '@/entities/community'
+import { communityQueries, formatHallOfFamePeriod } from '@/entities/community'
 import { contestQueries } from '@/entities/contest'
-import { HallOfFamePodium } from '@/widgets/hall-of-fame'
+import { HallOfFamePodium, PodiumCard, toRankSlots } from '@/widgets/hall-of-fame'
 
 const HISTORY_PAGE_SIZE = 10
 
 const PastPeriod = ({ hallOfFame }: { hallOfFame: CommunityHallOfFame }) => {
-  const { title, range } = formatHallOfFamePeriod(hallOfFame)
+  const { year, title, range } = formatHallOfFamePeriod(hallOfFame)
+
+  const isEmpty = hallOfFame.winners.length === 0
 
   return (
-    <article className="flex flex-col gap-3 border-t border-neutral-200 pt-5 pc:pt-6">
-      <h3 className="flex items-baseline gap-2">
-        <span className="text-sm leading-[1.5] font-semibold text-neutral-850 pc:text-base">
-          {title}
-        </span>
-        <span className="text-xs leading-[1.5] text-neutral-500 pc:text-sm">{range}</span>
-      </h3>
+    <article
+      aria-labelledby={`period-${hallOfFame.periodKey}`}
+      className="min-w-0 pc:grid pc:grid-cols-[12.75rem_minmax(0,1fr)] pc:gap-9"
+    >
+      <header className="mb-4 flex items-center justify-between gap-4 pc:mb-0 pc:flex-col pc:items-start pc:justify-start pc:pt-6">
+        <div className="flex items-baseline gap-3 pc:flex-col pc:gap-2">
+          <span className="text-body-sm font-medium text-primary-600">{year}</span>
+          <h3
+            id={`period-${hallOfFame.periodKey}`}
+            className="font-cafe24 text-body-lg text-neutral-850 tab:text-body-xl"
+          >
+            {title}
+          </h3>
+        </div>
+        <p className="text-body-sm text-neutral-600">{range}</p>
+      </header>
 
-      {hallOfFame.winners.length === 0 ? (
-        <p className="text-sm leading-[1.5] text-neutral-500">이 회차에는 선정된 동물이 없어요.</p>
+      {isEmpty ? (
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl bg-base-white/60 px-5 py-6 pc:my-2">
+          <span className="text-body-md font-medium text-neutral-700">잠시 쉬어간 회차</span>
+          <p className="text-body-sm text-neutral-600">이 회차에는 선정된 동물이 없어요.</p>
+        </div>
       ) : (
-        <ol className="grid grid-cols-3 gap-2.5 tab:gap-4 pc:max-w-[48rem] pc:gap-5">
-          {hallOfFame.winners.map((winner) => (
-            <li key={winner.postId} className="flex min-w-0 flex-col gap-1.5">
-              <CommunityMediaCard
-                href={`/community/post/${winner.postId}`}
-                imageUrl={winner.photoUrl ?? undefined}
-                imageCount={0}
-                alt={`${winner.rank}위 ${winner.author.nickname}`}
-                className="aspect-square size-auto w-full"
-              />
-              <div className="flex min-w-0 items-center gap-1 text-xs leading-[1.5] pc:text-sm">
-                <span className="shrink-0 font-semibold text-primary-500">{winner.rank}위</span>
-                <span className="min-w-0 flex-1 truncate font-medium text-neutral-850">
-                  {winner.author.nickname}
-                </span>
-                <span className="flex shrink-0 items-center gap-0.5 text-neutral-500">
-                  <FavoriteIcon className="size-4" aria-hidden="true" />
-                  <span className="sr-only">좋아요</span>
-                  {winner.likeCount}
-                </span>
-              </div>
-            </li>
-          ))}
-        </ol>
+        <div className="min-w-0 rounded-xl bg-secondary-100">
+          <ol
+            aria-label={`${year}년 ${title} 수상 동물`}
+            tabIndex={0}
+            className="flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pt-9 pb-6 focus-ring tab:justify-center tab:gap-6 tab:px-6 tab:pt-10 tab:pb-8 pc:gap-8 pc:py-10"
+          >
+            {toRankSlots(hallOfFame.winners).map(({ rank, winner }) => (
+              <li key={rank} className="shrink-0 snap-center">
+                <PodiumCard rank={rank} winner={winner} />
+              </li>
+            ))}
+          </ol>
+        </div>
       )}
     </article>
   )
@@ -70,20 +73,20 @@ const HallOfFameContent = () => {
   const pastPeriods = flattenPages(history.data)
 
   return (
-    <div className="flex w-full flex-col bg-base-white pb-12">
+    <div className="flex w-full flex-col bg-base-white">
       <NavigationBar title="명예의 전당" titleVariant="page" />
 
       <section className="w-full">
         <Container className="px-4 py-4 tab:px-12 tab:py-10 pc:max-w-[80rem] pc:px-0">
           <div className="flex w-full flex-col items-start gap-2.5 tab:gap-4 pc:flex-row pc:gap-9">
-            <div className="flex w-full shrink-0 flex-col gap-1 pc:w-[12.75rem]">
-              <h2 className="font-cafe24 text-sm leading-[1.5] font-normal text-neutral-850 tab:text-base pc:text-xl">
+            <div className="flex w-full shrink-0 flex-col gap-1 pc:w-min pc:min-w-[12.75rem]">
+              <h2 className="font-cafe24 text-sm leading-[1.5] font-normal text-neutral-850 tab:text-base pc:text-xl pc:whitespace-nowrap">
                 <span className="block tab:inline pc:block">이번 회차 명예의 동물들을 </span>
                 <span className="block tab:inline pc:block">소개합니다 !</span>
               </h2>
               {period && (
                 <p className="text-xs leading-[1.5] font-medium text-neutral-500 pc:text-sm">
-                  {period.title} · {period.range}
+                  {period.summary}
                 </p>
               )}
               <p className="text-xs leading-[1.5] text-neutral-500">
@@ -116,11 +119,17 @@ const HallOfFameContent = () => {
         </Container>
       </section>
 
-      <section className="w-full">
-        <Container className="px-5 pt-6 pb-12 tab:px-12 tab:pt-10 pc:max-w-[80rem] pc:px-0">
-          <h2 className="mb-3 text-sm leading-[1.5] font-semibold text-neutral-850 pc:text-base pc:leading-[1.4]">
-            지난 명예의 전당
-          </h2>
+      <section aria-labelledby="hall-of-fame-history" className="w-full bg-secondary-50">
+        <Container className="px-4 py-10 tab:px-12 tab:py-14 pc:max-w-[80rem] pc:px-0">
+          <div className="mb-8 flex flex-col gap-3 tab:mb-12">
+            <h2 id="hall-of-fame-history" className="font-cafe24 text-body-xl text-neutral-850">
+              지난 명예의 전당
+            </h2>
+            <p className="text-body-md text-neutral-700">
+              오래도록 기억하고 싶은, <br className="tab:hidden" />
+              많은 사랑을 받은 동물들을 만나보세요.
+            </p>
+          </div>
 
           <ListState
             isPending={history.isPending}
@@ -130,7 +139,7 @@ const HallOfFameContent = () => {
             errorText="지난 명예의 전당을 불러오지 못했습니다."
             emptyText="아직 지난 회차가 없습니다."
           >
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-10 tab:gap-12">
               {pastPeriods.map((hallOfFame) => (
                 <PastPeriod key={hallOfFame.periodKey} hallOfFame={hallOfFame} />
               ))}

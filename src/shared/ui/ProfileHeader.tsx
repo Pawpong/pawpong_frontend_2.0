@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { ProfileAvatar } from './ProfileAvatar'
 import { MoreVertIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
+import { IconButton } from './IconButton'
 
 // Figma chat-profile (1867-182359) — 아바타 + 이름·시각 + 미리보기 1줄 + (옵션)빨간 배지 + 더보기
 // 채팅 리스트·저장피드 카드 헤더 공용.
@@ -109,15 +110,10 @@ const ProfileHeader = ({
       </div>
       {action ??
         (onMore && (
-          <button
-            type="button"
-            aria-label="더보기"
-            onClick={onMore}
-            className="-m-2 flex size-10 shrink-0 items-center justify-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
-          >
+          <IconButton edge="both" aria-label="더보기" onClick={onMore}>
             {/* 쇼케이스는 가로 더보기(⋯) — 세로 아이콘 90도 회전 재사용 */}
-            <MoreVertIcon className={cn('size-6 text-neutral-850', isShowcase && 'rotate-90')} />
-          </button>
+            <MoreVertIcon className={cn('size-6', isShowcase && 'rotate-90')} />
+          </IconButton>
         ))}
     </div>
   )

@@ -25,6 +25,7 @@ export const ReceivedReviewDetailContent = ({ reviewId }: { reviewId: string }) 
       isError={isError}
       hasData={!!review}
       onRetry={() => void refetch()}
+      isRetrying={isFetching}
     >
       {review ? (
         <ReceivedReviewRow review={review} detail />

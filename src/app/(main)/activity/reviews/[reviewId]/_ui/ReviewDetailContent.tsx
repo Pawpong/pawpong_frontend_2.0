@@ -11,7 +11,13 @@ import { Avatar, AvatarFallback, AvatarImage, Badge, buttonVariants } from '@/sh
 import { ReviewTypeBadge } from '../../../_ui/ActivityBadges'
 
 const ReviewDetailContent = ({ reviewId, backHref }: { reviewId: string; backHref: string }) => {
-  const { data, isPending, isError, refetch } = useQuery(adopterQueries.reviewDetail(reviewId))
+  const {
+    data,
+    isPending,
+    isError,
+    refetch,
+    isFetching: isRetrying,
+  } = useQuery(adopterQueries.reviewDetail(reviewId))
 
   return (
     <ActivityDetailLayout
@@ -21,6 +27,7 @@ const ReviewDetailContent = ({ reviewId, backHref }: { reviewId: string; backHre
       isError={isError}
       hasData={!!data}
       onRetry={() => void refetch()}
+      isRetrying={isRetrying}
     >
       {data && (
         <>
@@ -35,9 +42,9 @@ const ReviewDetailContent = ({ reviewId, backHref }: { reviewId: string; backHre
                       <Link
                         href={`/home/${data.breederId}`}
                         className={buttonVariants({
-                          variant: 'outline',
+                          intent: 'secondary',
                           size: 'lg',
-                          className: 'w-full px-6',
+                          width: 'full',
                         })}
                       >
                         브리더 홈
@@ -47,9 +54,9 @@ const ReviewDetailContent = ({ reviewId, backHref }: { reviewId: string; backHre
                       <Link
                         href={`/activity/applications/${data.applicationId}?view=sent`}
                         className={buttonVariants({
-                          variant: 'primary',
+                          intent: 'primary',
                           size: 'lg',
-                          className: 'w-full px-6',
+                          width: 'full',
                         })}
                       >
                         신청 내역 보기
@@ -74,7 +81,7 @@ const ReviewDetailContent = ({ reviewId, backHref }: { reviewId: string; backHre
                       <ReviewTypeBadge reviewType={data.reviewType} />
                       <Badge
                         variant={data.isVisible ? 'primaryOutline' : 'neutralFilled'}
-                        size="md"
+                        size="responsive"
                       >
                         {data.isVisible ? '공개 중' : '비공개'}
                       </Badge>

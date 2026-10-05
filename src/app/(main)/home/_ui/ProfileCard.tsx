@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, type ComponentType } from 'react'
-import Link from 'next/link'
+import { useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   useInfiniteQuery,
@@ -10,7 +9,7 @@ import {
 } from '@tanstack/react-query'
 import {
   Button,
-  buttonVariants,
+  ShareButton,
   LocationText,
   ProfileAvatar,
   FollowersModal,
@@ -19,6 +18,7 @@ import {
   type FollowUser,
 } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
+import { normalizeApiError } from '@/shared/api'
 import { formatBreederLocation } from '@/shared/lib/formatBreederLocation'
 import { profileQueries } from '@/entities/profile'
 import { useAuthStatus, useLoginGuard } from '@/features/auth'
@@ -58,8 +58,6 @@ const toPaging = (query: FollowListQuery) => ({
   onLoadMore: query.fetchNextPage,
 })
 
-type ProfileMode = 'mine' | 'mine-breeder' | 'other' | 'breeder'
-
 /**
  * strip  — 가로 한 줄 (아바타 | 이름·카운트·소개 | 액션). 공개 홈처럼 폭이 넉넉한 자리.
  * sidebar — PC 2단 레이아웃의 좁은 좌측 컬럼에서 세로로 쌓는다 (블로그형 마이홈).
@@ -78,7 +76,10 @@ interface ProfileCardBreederProps {
   layout?: ProfileCardLayout
 }
 
-type ProfileCardProps = ProfileCardBaseProps | ProfileCardBreederProps
+type ProfileCardProps = (ProfileCardBaseProps | ProfileCardBreederProps) & {
+  /** 내 홈 작성·수정 메뉴 — 2단(tab+)에서 아바타 줄 오른쪽 끝에 둔다 (모바일은 상단 바가 맡는다) */
+  menu?: ReactNode
+}
 
 // [refactored] 아바타 미리보기 + "친구 목록" 라벨 → 실제 팔로워/팔로잉 숫자.
 // 카운트는 profile 에 이미 있는데 모달에만 넘기고 있어서, 카드가 공간만 쓰고 정보는 없었다.
@@ -91,35 +92,22 @@ const FollowCounts = ({
   followingCount: number
   onClick: () => void
 }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className="flex items-center gap-1 text-sm leading-[1.5] font-medium whitespace-nowrap text-neutral-700 hover:text-neutral-850"
-  >
-    <span>팔로워</span>
+  <Button intent="ghost" size="inline" onClick={onClick}>
+    <span className="font-medium text-neutral-700">팔로워</span>
     <span className="font-semibold text-neutral-850">{followerCount}</span>
     <span aria-hidden className="px-0.5 text-neutral-300">
       ·
     </span>
-    <span>팔로잉</span>
+    <span className="font-medium text-neutral-700">팔로잉</span>
     <span className="font-semibold text-neutral-850">{followingCount}</span>
-  </button>
+  </Button>
 )
 
 /* ── mode별 하단 액션 (디자인: pill border 버튼) ── */
 
-// 프로필 편집·팔로우·메시지 공통 크기 — 모바일 32, PC 40
-// [refactored] flex-1 + min-w 로 두어 컨테이너가 폭을 정한다.
-// (strip 은 w-auto 라 min-w 만큼, sidebar 는 w-full 이라 컬럼을 채운다 — max-w 캡 두 개 제거)
-const ACTION_SIZE = 'h-8 flex-1 text-sm whitespace-nowrap pc:h-10 pc:min-w-30 pc:px-6 pc:text-base'
-
-const EditButton = () => (
-  <Link href="/profile/edit" className={cn(buttonVariants({ variant: 'outline' }), ACTION_SIZE)}>
-    프로필 편집
-  </Link>
-)
-
-const MineActions = () => <EditButton />
+// 팔로우·메시지 공통 폭 — flex-1 + min-w 로 두어 컨테이너가 폭을 정한다.
+// (strip 은 w-auto 라 min-w 만큼, sidebar 는 w-full 이라 컬럼을 채운다)
+const ACTION_LAYOUT = 'flex min-w-0 flex-1 pc:min-w-30'
 
 /* ── 남의 홈에서 보이는 액션 (Figma 3349-2026986) ── */
 
@@ -133,22 +121,25 @@ const MessageButton = ({ targetId }: { targetId: string }) => {
 
   return (
     <>
-      <Button
-        variant="outline"
-        disabled={isPending}
-        onClick={guard(() =>
-          startChat(
-            { breederId: targetId },
-            {
-              onSuccess: (room) => router.push(`/chat?roomId=${room.roomId}`),
-              onError: () => setErrorOpen(true),
-            },
-          ),
-        )}
-        className={ACTION_SIZE}
-      >
-        메시지
-      </Button>
+      <div className={ACTION_LAYOUT}>
+        <Button
+          intent="secondary"
+          size="md"
+          disabled={isPending}
+          onClick={guard(() =>
+            startChat(
+              { counterpartUserId: targetId },
+              {
+                onSuccess: (room) => router.push(`/chat?roomId=${room.roomId}`),
+                onError: () => setErrorOpen(true),
+              },
+            ),
+          )}
+          width="full"
+        >
+          메시지
+        </Button>
+      </div>
       <LoginPromptModal
         open={isPromptOpen}
         onOpenChange={setPromptOpen}
@@ -159,7 +150,7 @@ const MessageButton = ({ targetId }: { targetId: string }) => {
         onOpenChange={setErrorOpen}
         title="채팅방을 열지 못했어요"
         description="잠시 후 다시 시도해주세요."
-        actions={[{ label: '확인', variant: 'fill', onClick: () => setErrorOpen(false) }]}
+        actions={[{ label: '확인', intent: 'primary', onClick: () => setErrorOpen(false) }]}
       />
     </>
   )
@@ -171,22 +162,36 @@ interface VisitorActionsProps {
   isFollowing: boolean
 }
 
-// 시안의 팔로우는 point 색 BaseButton(최대 258).
-// 공통 FollowButton 은 팔로워 모달용 muted pill 이라 여기서는 쓰지 않는다
+// 시안의 팔로우는 point 색 BaseButton(최대 258). 처리 중 문구·에러 안내가 있어 공통 FollowButton 대신 직접 쓴다
 const FollowActionButton = ({ targetId, isFollowing }: VisitorActionsProps) => {
   const follow = useFollowUser()
   const unfollow = useUnfollowUser()
   const isPending = follow.isPending || unfollow.isPending
+  const { guard, isPromptOpen, setPromptOpen } = useLoginGuard()
+  const error = follow.error ?? unfollow.error
 
   return (
-    <Button
-      variant={isFollowing ? 'outline' : 'primary'}
-      disabled={isPending}
-      onClick={() => (isFollowing ? unfollow : follow).mutate(targetId)}
-      className={ACTION_SIZE}
-    >
-      {isFollowing ? '팔로우 취소' : '팔로우'}
-    </Button>
+    <div className={cn(ACTION_LAYOUT, 'flex-col gap-1')}>
+      <Button
+        intent={isFollowing ? 'secondary' : 'primary'}
+        size="md"
+        disabled={isPending}
+        onClick={guard(() => (isFollowing ? unfollow : follow).mutate(targetId))}
+        width="full"
+      >
+        {isPending ? '처리 중…' : isFollowing ? '팔로잉' : '팔로우'}
+      </Button>
+      {error && (
+        <p role="alert" className="text-xs text-error-600">
+          {normalizeApiError(error, '팔로우를 변경하지 못했어요.').message}
+        </p>
+      )}
+      <LoginPromptModal
+        open={isPromptOpen}
+        onOpenChange={setPromptOpen}
+        description="로그인하고 팔로우해보세요."
+      />
+    </div>
   )
 }
 
@@ -197,18 +202,9 @@ const VisitorActions = (props: VisitorActionsProps) => (
   </>
 )
 
-// 내 홈 액션은 props 를 쓰지 않는다 (같은 자리에서 렌더되므로 시그니처만 맞춤)
-const ACTION_MAP = {
-  mine: MineActions,
-  'mine-breeder': MineActions,
-  breeder: VisitorActions,
-  other: VisitorActions,
-} satisfies Record<ProfileMode, ComponentType<VisitorActionsProps>>
-
 /* ── ProfileCard ── */
 
-const ProfileCard = ({ profile, mode = 'mine', layout = 'strip' }: ProfileCardProps) => {
-  const Actions = ACTION_MAP[mode]
+const ProfileCard = ({ profile, mode = 'mine', layout = 'strip', menu }: ProfileCardProps) => {
   // 세로 배치는 2단(tab+)에서만 — 모바일은 두 레이아웃 모두 같은 가로 스트립이다
   const isSidebar = layout === 'sidebar'
   const [followOpen, setFollowOpen] = useState(false)
@@ -256,6 +252,25 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip' }: ProfileCardPr
       {canReportBreeder && <ReportBreederAction breederId={breederProfile.breederId} />}
     </div>
   ) : null
+  // [refactored] 2단 아바타 줄 우상단 — 남의 홈은 즐겨찾기·신고, 내 홈은 작성·수정 메뉴
+  const profileActions = (
+    <div className="flex shrink-0 items-center gap-1">
+      <ShareButton
+        url={`/home/${profileUserId}`}
+        title={`${profile.nickname}님의 홈`}
+        description={profile.bio}
+        imageUrl={profile.profileImageUrl}
+        ariaLabel="프로필 공유하기"
+      />
+      {favoriteActions}
+    </div>
+  )
+  const cornerActions = (
+    <div className="flex items-center gap-1">
+      {profileActions}
+      {menu}
+    </div>
+  )
 
   return (
     <>
@@ -284,7 +299,7 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip' }: ProfileCardPr
                 alt={profile.nickname}
                 className="shrink-0 tab:size-20 pc:size-24"
               />
-              {favoriteActions && <div className="hidden tab:block">{favoriteActions}</div>}
+              {cornerActions && <div className="hidden tab:block">{cornerActions}</div>}
             </div>
           ) : (
             <ProfileAvatar
@@ -302,17 +317,17 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip' }: ProfileCardPr
               <p className="min-w-0 flex-1 truncate text-lg leading-[1.5] font-semibold text-neutral-850 pc:text-xl">
                 {profile.nickname}
               </p>
-              {favoriteActions && (
-                <div className={cn(isSidebar && 'tab:hidden')}>{favoriteActions}</div>
-              )}
+              <div className={cn(isSidebar && 'tab:hidden')}>{profileActions}</div>
             </div>
             {/* 위치 → 카운트 순으로 이름 아래에 각각 한 줄씩 (같은 줄에 묶지 않는다) */}
             {locationText && <LocationText location={locationText} />}
-            <FollowCounts
-              followerCount={profile.followerCount}
-              followingCount={profile.followingCount}
-              onClick={() => setFollowOpen(true)}
-            />
+            <div className="flex">
+              <FollowCounts
+                followerCount={profile.followerCount}
+                followingCount={profile.followingCount}
+                onClick={() => setFollowOpen(true)}
+              />
+            </div>
             {/* 스트립은 한 줄, 사이드바는 폭이 좁으니 세 줄까지 편다 */}
             <p
               className={cn(
@@ -326,15 +341,17 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip' }: ProfileCardPr
         </div>
 
         {/* 팔로우 + 메시지 — 동급 액션 두 개가 폭을 반씩 나눠 갖는다(ACTION_SIZE의 flex-1) */}
-        <div
-          className={cn(
-            'flex w-full shrink-0 items-center gap-2.5 pc:gap-3',
-            // 좁은 컬럼에 팔로우+메시지를 나란히 두면 라벨이 두 줄로 깨진다
-            isSidebar ? 'tab:w-full' : 'pc:w-auto',
-          )}
-        >
-          <Actions targetId={profileUserId} isFollowing={isFollowing} />
-        </div>
+        {isVisitor && (
+          <div
+            className={cn(
+              'flex w-full shrink-0 items-center gap-2.5 pc:gap-3',
+              // 좁은 컬럼에 팔로우+메시지를 나란히 두면 라벨이 두 줄로 깨진다
+              isSidebar ? 'tab:w-full' : 'pc:w-auto',
+            )}
+          >
+            <VisitorActions targetId={profileUserId} isFollowing={isFollowing} />
+          </div>
+        )}
       </div>
 
       <FollowersModal

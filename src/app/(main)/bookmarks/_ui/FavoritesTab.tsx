@@ -6,7 +6,7 @@ import { ADOPTION_CARD_STATUS, adoptionQueries } from '@/entities/adoption'
 import { AdoptionCardGrid } from '@/features/adoption'
 import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
-import { Container, FilterChip, InfiniteScrollTrigger, ListState, SectionHeader } from '@/shared/ui'
+import { Container, Chip, InfiniteScrollTrigger, ListState, SectionHeader } from '@/shared/ui'
 import type { PetStatus } from '@/shared/types'
 import { flattenPages, getTotalItems } from '@/shared/lib/infiniteList'
 
@@ -44,14 +44,14 @@ const FavoritesTab = () => {
           // 탐색 탭과 동일한 필터 칩 (Figma 975-19584)
           <div className="flex shrink-0 items-center gap-2" aria-label="분양 상태 필터">
             {STATUS_FILTERS.map(({ value, label }) => (
-              <FilterChip
+              <Chip
                 key={value}
                 selected={filter === value}
                 onClick={() => setFilter(value)}
                 size="responsive"
               >
                 {label}
-              </FilterChip>
+              </Chip>
             ))}
           </div>
         }

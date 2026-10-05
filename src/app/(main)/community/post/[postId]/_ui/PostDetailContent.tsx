@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { CloseIcon } from '@/shared/assets'
 import { useBreakpoint } from '@/shared/lib/useBreakpoint'
 import { PostDetailPanel } from '../../../_ui/PostDetailPanel'
+import { iconButtonVariants } from '@/shared/ui'
 
 interface PostDetailContentProps {
   postId: string
@@ -13,7 +14,7 @@ const closeButton = (
   <Link
     href="/community"
     aria-label="닫기"
-    className="-mr-2 flex size-10 items-center justify-center rounded-full text-neutral-700 transition-colors hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-primary-500"
+    className={iconButtonVariants({ tone: 'muted', edge: 'end' })}
   >
     <CloseIcon className="size-5" />
   </Link>

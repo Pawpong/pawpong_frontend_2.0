@@ -126,6 +126,8 @@ export interface AdoptionDetailDto {
   name: string
   status: PetStatus
   price: string
+  /** 품종명 (예: '셰틀랜드 쉽독'). 브리더가 입력하지 않았으면 빈 문자열 */
+  breed: string
   birthDate: string
   gender: 'male' | 'female'
   description: string

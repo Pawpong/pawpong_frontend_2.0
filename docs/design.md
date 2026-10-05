@@ -157,8 +157,13 @@ Use the breakpoints Figma specifies, identically in CSS and JS.
 
 ### Actions and Selection
 
-- `Button`: primary, outline, text, fill, ghost. Extend these variants first for any new CTA.
-- `FavoriteButton`, `FavoriteToggle`, `FollowButton`, `PostActionButton`: own the icon, label, and pending state of domain actions.
+- `Button`: owns intent, size, and width. `width="auto"` uses content width, `full` fills its parent, `fill` shares a **horizontal flex row**, and `responsive` fills mobile width then uses 192px from tablet. Never use `fill` in a vertical flex container.
+- `Button`, `IconButton`, `ToggleIconButton`, `Chip`, and `ActionSheetItem` reject caller `className` and `style` in their public types. `buttonVariants`, `iconButtonVariants`, and `chipVariants` only accept named component variants; do not concatenate classes onto their results. Max-width, fixed widths, margins, alignment, positioning, and visibility belong to parent layout slots.
+- `IconButton.edge` (`start`, `end`, `both`) aligns the glyph to a container edge without reducing the selected touch area (`md`: 40px). Social login uses Button intents `kakao`, `naver`, `google`, and `apple`; their brand colors are defined only inside Button.
+- `IconButton.tone="favorite"` shows only the pixel star on a transparent background with no box border or hover effect. `FavoriteBreederIconButton` keeps the team's 30px pixel outline and at least 44px card/nav targets. Selecting it fills the inside with `point-500` yellow while keeping the brand outline; it must not become a solid brown star. Pending state preserves keyboard focus and full opacity. Selection updates immediately without refetching the visible breeder views; failures restore only the affected breeder. Rapid repeated clicks cannot start overlapping requests. This is the user's confirmed favorite design of 2026-10-04.
+- `FavoriteIcon` keeps its previous pixel heart paths, 32/48px canvas metrics, muted outline (60% white on photos), and `pressed-favorite` filled color. `ToggleIconButton` gives hearts their previous 32px medium size and has no hover background or color effect. Keep the other shared pixel action glyphs when updating these favorite controls.
+- `tests/button-contracts.typecheck.tsx` guards against reintroducing style overrides, including through prop spreads.
+- `ToggleIconButton` owns favorite/bookmark pressed states, icon sizes, labels, and counts; `FollowButton` maps follow state to shared Button variants. Domain wrappers use width props and keep pending/error behavior.
 - The adoption-interest action is exposed to a regular visitor in exactly one place: Mobile CTA, Tablet hero, or PC hero. It is not shown on the owner's own listing, and the server also blocks self-registration with 403 to protect popularity ranking signals.
 - `FilterChip`, `Badge`, `PixelTab`, `PixelSelectCard`: used for selection, categorization, and status display.
 - `Checkbox`, `Switch`, `Select`, `Dropdown`, `DropdownMenu`: own form selection and menus.
@@ -196,7 +201,7 @@ Use the breakpoints Figma specifies, identically in CSS and JS.
 
 - `MediaCard`: provides image, body, and meta slots for image cards. It does not nest the image detail link and the favorite button, and it preserves the aspect ratio with a `point-50` and paw-glyph fallback when the image is missing or fails to load.
 - `CommunityMediaCard`: the square media tile in the home "동물 자랑하기" section. Body text and reaction actions stay on the community feed card; home shows only the representative image and the multi-image badge. Mobile uses 122px horizontal scrolling, Tablet 122px with 5 items, PC 300px with 4 items, and image failures keep the same-ratio brand fallback.
-- `ProfileAvatar`, `ProfileHeader`, `AuthorInfo`, `Avatar`, `AvatarGroup`: unify profile image fallbacks and name/grade alignment.
+- `ProfileAvatar`, `ProfileHeader`, `AuthorInfo`, `Avatar`: unify profile image fallbacks and name/grade alignment. The empty-profile fallback color comes only from `AvatarFallback`'s default (primary-50 surface + primary-500 paw); callers never override it.
 - `ListingStats`, `ListingCardGrid`, `PostedDate`, `DetailLink`: provide list metadata and navigation affordances.
 - `ImageCarousel`, `ImageModal`, `ImageDetailModal`: own image browsing, zoom, and the detail modal.
 - `Pagination`, `InfiniteScrollTrigger`: own loading more items in paged and infinite lists.
@@ -246,7 +251,7 @@ Use the breakpoints Figma specifies, identically in CSS and JS.
 - Hall of Fame entries keep the `point-100` podium surface from the Figma home. When an external image from historical data expires or fails to load, do not show the browser's broken-image icon — swap in the `point-100 + primary-300 PawIcon` fallback. Known placeholder hosts such as the development seed's `picsum.photos` skip the Next image proxy request entirely and also block entry into the detail modal, so no 503 or timeout logs pile up behind the on-screen fallback.
 - Account menus and help lists use `rounded-xl + neutral-150 border + white surface` as their shared card contract, and do not scatter small text links.
 - The policy fixed on 2026-08-31 has no New/Elite breeder grade system. Do not display or collect a grade on cards, profiles, search, sign-up, or settings.
-- `/grade-policy` and `/grade-policy/apply` return `notFound()` and are not linked from any menu. The old UI is removed from the active build; the restore point and the policy decision are recorded in `docs/archive/grade-policy.md`.
+- The `/grade-policy` and `/grade-policy/apply` routes are removed (they fall through to the default 404). The old UI is removed from the active build; the restore point and the policy decision are recorded in `docs/archive/grade-policy.md`.
 - Breeder verification status (`pending | reviewing | approved | rejected`) and subscription plan (`basic | pro`) remain real contracts, independent of grades.
 - The Figma design system contains a `progress bar-EXP`, but there is no basis yet for the EXP calculation, tiers, or benefits. Do not speculatively implement BPM/EXP as a replacement for New/Elite.
 - Business information in the public footer follows the current values published on pawpong.kr and in the privacy policy. Do not invent an unconfirmed phone number, e-commerce registration number, or support hours.

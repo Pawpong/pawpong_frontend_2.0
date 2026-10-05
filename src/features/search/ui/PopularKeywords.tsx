@@ -3,6 +3,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { popularKeywordQueries } from '@/entities/popular-keyword'
+import { Chip } from '@/shared/ui'
 
 interface PopularKeywordsProps {
   /** 칩 클릭 동작. 미지정이면 탐색 페이지로 이동한다 */
@@ -23,7 +24,7 @@ const PopularKeywords = ({ onSelect }: PopularKeywordsProps) => {
       onSelect(keyword)
       return
     }
-    router.push(`/explore?keyword=${encodeURIComponent(keyword)}`)
+    router.push(`/explore?type=adoption&keyword=${encodeURIComponent(keyword)}`)
   }
 
   return (
@@ -33,14 +34,9 @@ const PopularKeywords = ({ onSelect }: PopularKeywordsProps) => {
       </span>
       <div className="flex min-w-max items-center gap-1 tab:gap-2">
         {keywords.map(({ keywordId, keyword }) => (
-          <button
-            key={keywordId}
-            type="button"
-            onClick={() => select(keyword)}
-            className="flex h-6 items-center rounded-full border border-primary-500 px-2 text-[0.625rem] leading-[1.5] font-medium whitespace-nowrap text-primary-500 transition-colors hover:bg-primary-50 tab:h-auto tab:py-0.5 tab:text-sm"
-          >
+          <Chip size="responsive" key={keywordId} onClick={() => select(keyword)}>
             {keyword}
-          </button>
+          </Chip>
         ))}
       </div>
     </div>

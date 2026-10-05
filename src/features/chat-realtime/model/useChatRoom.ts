@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { chatQueries } from '@/entities/chat'
+import { notificationQueries } from '@/entities/notification'
 import { useAccessToken } from '@/shared/lib/useAccessToken'
 import type {
   ChatMessageResponseDto,
@@ -100,6 +101,10 @@ const useChatRoom = (roomId: string, currentUserId: string) => {
         updateReadState(current),
       )
       void queryClient.invalidateQueries({ queryKey: chatQueries.rooms().queryKey })
+      if (event.readBy === currentUserId) {
+        // 서버가 읽은 방의 알림을 정리한 다음 배지·누적 목록도 함께 갱신한다.
+        void queryClient.resetQueries({ queryKey: notificationQueries.all() })
+      }
     },
     [currentUserId, queryClient, queryKey, roomId],
   )
@@ -169,6 +174,7 @@ const useChatRoom = (roomId: string, currentUserId: string) => {
     sendMessage,
     markAsRead,
     refetch: messagesQuery.refetch,
+    isFetching: messagesQuery.isFetching,
   }
 }
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useCloseChatRoom } from '@/features/send-message'
+import { useCloseChatRoom, useChangeChatUserBlock } from '@/features/send-message'
 import { normalizeApiError } from '@/shared/api'
 import { MoreVertIcon } from '@/shared/assets'
 import {
@@ -10,17 +10,40 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  IconButton,
 } from '@/shared/ui'
 
 interface ChatRoomActionsMenuProps {
   roomId: string
+  counterpartUserId: string
   counterpartName: string
+  /** 채팅방 응답의 blockedByMe — 없으면(구버전 서버) 차단·해제를 모두 노출한다 */
+  blockedByMe?: boolean
   onClosed?: () => void
 }
 
 /** 채팅방 헤더와 목록이 공유하는 나가기 메뉴·확인 흐름. */
-const ChatRoomActionsMenu = ({ roomId, counterpartName, onClosed }: ChatRoomActionsMenuProps) => {
+const ChatRoomActionsMenu = ({
+  roomId,
+  counterpartUserId,
+  counterpartName,
+  blockedByMe,
+  onClosed,
+}: ChatRoomActionsMenuProps) => {
   const closeRoom = useCloseChatRoom()
+  const changeBlock = useChangeChatUserBlock()
+  const [blockAction, setBlockAction] = useState<'block' | 'unblock' | null>(null)
+
+  const closeBlockDialog = () => {
+    if (changeBlock.isPending) return
+    setBlockAction(null)
+    changeBlock.reset()
+  }
+
+  const openBlockDialog = (action: 'block' | 'unblock') => {
+    changeBlock.reset()
+    setBlockAction(action)
+  }
   const [confirmOpen, setConfirmOpen] = useState(false)
 
   const handleOpenChange = (open: boolean) => {
@@ -47,15 +70,23 @@ const ChatRoomActionsMenu = ({ roomId, counterpartName, onClosed }: ChatRoomActi
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button
-            type="button"
-            aria-label={`${counterpartName} 채팅방 더보기`}
-            className="-m-2 flex size-10 shrink-0 items-center justify-center text-neutral-850 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
-          >
+          <IconButton edge="both" aria-label={`${counterpartName} 채팅방 더보기`}>
             <MoreVertIcon className="size-6" />
-          </button>
+          </IconButton>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
+          {/* 서버의 blockedByMe 로 둘 중 하나만 보인다. 값이 없으면 상태를 모르니 둘 다 둔다
+              (차단·해제 명령은 멱등이라 잘못 눌러도 상태가 꼬이지 않는다). */}
+          {blockedByMe !== true && (
+            <DropdownMenuItem onSelect={() => openBlockDialog('block')}>
+              사용자 차단
+            </DropdownMenuItem>
+          )}
+          {blockedByMe !== false && (
+            <DropdownMenuItem onSelect={() => openBlockDialog('unblock')}>
+              사용자 차단 해제
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem
             onSelect={() => {
               closeRoom.reset()
@@ -67,6 +98,62 @@ const ChatRoomActionsMenu = ({ roomId, counterpartName, onClosed }: ChatRoomActi
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      <CtaModal
+        open={blockAction !== null}
+        onOpenChange={(open) => {
+          if (!open) closeBlockDialog()
+        }}
+        title={
+          changeBlock.isSuccess
+            ? blockAction === 'block'
+              ? '사용자를 차단했어요'
+              : '차단을 해제했어요'
+            : blockAction === 'block'
+              ? '사용자를 차단할까요?'
+              : '차단을 해제할까요?'
+        }
+        description={
+          changeBlock.error
+            ? normalizeApiError(
+                changeBlock.error,
+                '차단 설정을 변경하지 못했습니다. 다시 시도해 주세요.',
+              ).message
+            : blockAction === 'block'
+              ? `${counterpartName}님과 서로 새 대화를 시작하거나 메시지를 보낼 수 없습니다. 기존 대화는 남아 있으며 이 메뉴에서 차단을 해제할 수 있습니다.`
+              : `${counterpartName}님에 대한 내 차단을 해제합니다. 상대방도 나를 차단했다면 대화를 시작할 수 없습니다.`
+        }
+        showClose={!changeBlock.isPending}
+        direction="row"
+        actions={
+          changeBlock.isSuccess
+            ? [{ label: '확인', intent: 'primary', onClick: closeBlockDialog }]
+            : [
+                {
+                  label: '취소',
+                  intent: 'secondary',
+                  onClick: closeBlockDialog,
+                  disabled: changeBlock.isPending,
+                },
+                {
+                  label: changeBlock.isPending
+                    ? '처리 중'
+                    : blockAction === 'block'
+                      ? '차단'
+                      : '차단 해제',
+                  intent: 'primary',
+                  disabled: changeBlock.isPending,
+                  onClick: () => {
+                    if (changeBlock.isPending || !blockAction) return
+                    changeBlock.mutate({
+                      userId: counterpartUserId,
+                      blocked: blockAction === 'block',
+                    })
+                  },
+                },
+              ]
+        }
+      />
 
       <CtaModal
         open={confirmOpen}
@@ -81,16 +168,15 @@ const ChatRoomActionsMenu = ({ roomId, counterpartName, onClosed }: ChatRoomActi
         actions={[
           {
             label: '취소',
-            variant: 'outline',
+            intent: 'secondary',
             onClick: () => handleOpenChange(false),
             disabled: closeRoom.isPending,
           },
           {
             label: closeRoom.isPending ? '나가는 중' : '나가기',
-            variant: 'fill',
+            intent: 'danger',
             onClick: handleConfirm,
             disabled: closeRoom.isPending,
-            className: 'bg-error-500 text-white hover:bg-error-600 active:bg-error-600',
           },
         ]}
       />
