@@ -13,8 +13,7 @@ export function resolveSentryEnvironment(input: {
   /** 서버 런타임에서 Vercel 위인지 (로컬 next dev/start 는 false) — 클라이언트는 hostname 으로 판정 */
   onVercel?: boolean
 }) {
-  const local =
-    input.hostname !== undefined && !PROD_HOSTS.includes(input.hostname)
+  const local = input.hostname !== undefined && !PROD_HOSTS.includes(input.hostname)
   const environment =
     input.nodeEnv === 'production' && !local && input.environment === 'production'
       ? 'production'
@@ -29,8 +28,8 @@ export function resolveSentryEnvironment(input: {
       : input.onVercel === true
   const enabled = Boolean(
     dsn &&
-      (production ||
-        (input.enableDevelopment === 'true' && dsn !== input.productionDsn && devHostAllowed)),
+    (production ||
+      (input.enableDevelopment === 'true' && dsn !== input.productionDsn && devHostAllowed)),
   )
   return { environment, dsn: enabled ? dsn : undefined, enabled }
 }
@@ -61,7 +60,11 @@ export function createErrorBudget(now = () => Date.now()) {
   let sent = 0
   const recent = new Map<string, number>()
   return <
-    T extends { message?: string; exception?: { values?: { type?: string; value?: string }[] } },
+    T extends {
+      message?: string
+      exception?: { values?: { type?: string; value?: string }[] }
+      contexts?: Record<string, unknown>
+    },
   >(
     event: T,
   ): T | null => {
@@ -71,11 +74,18 @@ export function createErrorBudget(now = () => Date.now()) {
       sent = 0
       recent.clear()
     }
-    const key = JSON.stringify(
-      event.exception?.values?.map(({ type, value }) => [type, value]) ||
-        event.message ||
-        'unknown',
-    )
+    const exceptionKey =
+      event.exception?.values?.map(({ type, value }) => [type, value]) || event.message || 'unknown'
+    const request = event.contexts?.api_request
+    const requestKey =
+      request && typeof request === 'object'
+        ? [
+            'method' in request ? request.method : undefined,
+            'endpoint' in request ? request.endpoint : undefined,
+          ]
+        : undefined
+    // 같은 오류 메시지여도 서로 다른 API 장애의 진단 정보는 보존한다.
+    const key = JSON.stringify([exceptionKey, requestKey])
     if (sent >= 20 || recent.has(key)) return null
     recent.set(key, time)
     sent += 1
