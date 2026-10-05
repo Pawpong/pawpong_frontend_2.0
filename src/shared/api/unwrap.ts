@@ -2,12 +2,20 @@ import type { ApiResponse, ApiResponseFull } from '@/shared/types'
 
 type ApiEnvelope<T> = ApiResponse<T> | ApiResponseFull<T>
 
+/** 실패한 요청의 진단 정보만 보관한다. 쿼리·본문·헤더·토큰은 포함하지 않는다. */
+export interface ApiErrorRequest {
+  method: string
+  endpoint: string
+  transportCode?: string
+}
+
 export class ApiError extends Error {
   constructor(
     message: string,
     public readonly status?: number,
     public readonly code?: number,
     public readonly details?: unknown,
+    public readonly request?: ApiErrorRequest,
   ) {
     super(message)
     this.name = 'ApiError'

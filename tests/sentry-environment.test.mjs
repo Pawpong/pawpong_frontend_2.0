@@ -46,3 +46,20 @@ test('반복 오류와 실행 환경당 분당 20건 제한 및 다음 창 복�
   time = 60_000
   assert.ok(filter({ message: 'first' }))
 })
+
+test('서로 다른 API 장애는 보존하고 같은 요청의 반복 오류는 제한함', () => {
+  const filter = createErrorBudget(() => 0)
+  const error = { exception: { values: [{ type: 'ApiError', value: 'Network Error' }] } }
+  const upload = {
+    ...error,
+    contexts: { api_request: { method: 'POST', endpoint: '/api/v2/auth/upload-breeder-profile' } },
+  }
+  const favorite = {
+    ...error,
+    contexts: { api_request: { method: 'POST', endpoint: '/api/v2/adopter/favorite' } },
+  }
+  assert.ok(filter(upload))
+  assert.ok(filter(favorite))
+  assert.equal(filter(upload), null)
+  assert.equal(filter(favorite), null)
+})

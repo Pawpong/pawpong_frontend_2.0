@@ -21,10 +21,19 @@ const shouldThrowToBoundary = (error: unknown) => {
   return false
 }
 
-const shouldCaptureError = (error: unknown) => {
+const shouldCaptureError = (error: unknown): error is Error => {
   if (!(error instanceof Error)) return false
   if (!(error instanceof ApiError)) return true
   return error.status === undefined || error.status >= 500
+}
+
+const captureRequestError = (error: Error) => {
+  Sentry.captureException(error, {
+    contexts:
+      error instanceof ApiError && error.request
+        ? { api_request: { ...error.request, httpStatus: error.status } }
+        : {},
+  })
 }
 
 export function QueryProvider({ children }: { children: React.ReactNode }) {
@@ -34,14 +43,14 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
         queryCache: new QueryCache({
           onError: (error) => {
             if (!shouldThrowToBoundary(error) && shouldCaptureError(error)) {
-              Sentry.captureException(error)
+              captureRequestError(error)
             }
           },
         }),
         mutationCache: new MutationCache({
           onError: (error) => {
             if (shouldCaptureError(error)) {
-              Sentry.captureException(error)
+              captureRequestError(error)
             }
           },
         }),
