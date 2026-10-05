@@ -12,6 +12,7 @@ import {
   type PetCommand,
   type PetView,
   type PetGameOutcome,
+  type PetGameKind,
 } from '@/entities/playground-pet'
 import type { PetCommandResult } from '@/entities/playground-pet/model/commandQueue'
 import { PET_SLOT_LABELS, PET_SLOTS, previewPetRoom } from '@/entities/playground-pet/model/room'
@@ -20,7 +21,7 @@ import { usePetCharacter } from '../lib/usePetCharacter'
 import { usePetAssets } from '../lib/usePetAssets'
 import { usePetSound } from '../lib/usePetSound'
 import type { PetSession } from '../lib/usePetSession'
-import type { PetStageSnapshot } from '../lib/petGameEngine'
+import type { PetGameHandle, PetStageSnapshot } from '../lib/petGameEngine'
 import { PetImage } from './PetImage'
 import { PetStage } from './PetStage'
 import { PetDecorations } from './PetDecorations'
@@ -100,6 +101,14 @@ export function PetRoom({
     setMenu((current) => ({ ...current, tab }))
   }
   const [canvasReady, setCanvasReady] = useState(false)
+  const gameHandle = useRef<PetGameHandle | null>(null)
+  const setGameHandle = useCallback((handle: PetGameHandle | null) => {
+    gameHandle.current = handle
+  }, [])
+  const prepareGame = useCallback(
+    (kind: PetGameKind) => gameHandle.current?.prepareGame(kind) ?? Promise.resolve(false),
+    [],
+  )
   const [gameSurface, setGameSurface] = useState<HTMLDivElement | null>(null)
   const [selectedItem, setItem] = useState<PetCatalogItem | null>(null)
   const [snack, setSnack] = useState<PetStageSnapshot['snack']>(null)
@@ -229,7 +238,12 @@ export function PetRoom({
         </div>
         <div className={styles.screenFrame}>
           {game ? (
-            <PetStage snapshot={snapshot} name={pet.name} onReady={setCanvasReady} />
+            <PetStage
+              snapshot={snapshot}
+              name={pet.name}
+              onReady={setCanvasReady}
+              onGame={setGameHandle}
+            />
           ) : (
             <div className={styles.carePortrait}>
               <PetImage src={pet.imageUrl} alt={`${pet.name}의 도트 초상화`} />
@@ -473,6 +487,7 @@ export function PetRoom({
               now={now}
               disabled={disabled}
               characterReady={stageReady}
+              onPrepareGame={prepareGame}
               gameSurface={gameSurface}
               onCommand={onCommand}
               onRefresh={refresh}

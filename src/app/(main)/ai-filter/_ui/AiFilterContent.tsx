@@ -6,7 +6,7 @@ import { useMe } from '@/features/auth'
 import { usePurchases } from '@/features/in-app-purchase'
 import { featureAllowance } from '@/entities/iap'
 import { useQuery } from '@tanstack/react-query'
-import { getPetConfig } from '@/entities/playground-pet'
+import { petConfigOptions } from '@/entities/playground-pet'
 
 /** 로그인 상태는 여기서 읽어 넘긴다 — 기능 슬라이스끼리 직접 참조하지 않도록 */
 export const AiFilterContent = ({ gameCharacter = false }: { gameCharacter?: boolean }) => {
@@ -14,11 +14,8 @@ export const AiFilterContent = ({ gameCharacter = false }: { gameCharacter?: boo
   const billing = usePurchases()
   const { refresh } = billing
   const petConfig = useQuery({
-    queryKey: ['playground-pet', 'config'],
-    queryFn: ({ signal }) => getPetConfig(signal),
+    ...petConfigOptions,
     enabled: gameCharacter,
-    retry: false,
-    throwOnError: false,
   })
   useEffect(() => {
     void refresh()

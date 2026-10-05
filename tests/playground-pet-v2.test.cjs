@@ -1117,6 +1117,170 @@ test('room engine preserves its game, honours reduced motion and flushes destruc
   }
 })
 
+test('failed snack assets retry to real textures in the same session and preparation loads only chosen game assets', async () => {
+  const previousImage = global.Image,
+    objects = [],
+    requests = [],
+    textures = new Map()
+  let failBall = true,
+    instance,
+    instances = 0
+  const object = (kind, x, y, texture) => {
+    const item = { kind, x, y, texture, visible: false }
+    for (const method of [
+      'setOrigin',
+      'setDisplaySize',
+      'setSize',
+      'fillStyle',
+      'fillRect',
+      'fillTriangle',
+      'clear',
+      'setFrame',
+    ])
+      item[method] = () => item
+    for (const [method, field] of [
+      ['setDepth', 'depth'],
+      ['setTexture', 'texture'],
+      ['setVisible', 'visible'],
+      ['setTint', 'tint'],
+      ['setY', 'y'],
+    ])
+      item[method] = (value) => {
+        item[field] = value
+        return item
+      }
+    item.setPosition = (x, y) => {
+      item.x = x
+      item.y = y
+      return item
+    }
+    item.destroy = () => {
+      item.destroyed = true
+    }
+    objects.push(item)
+    return item
+  }
+  class Scene {
+    constructor() {
+      this.cameras = { main: { setBackgroundColor() {} } }
+      this.textures = {
+        addImage(key, image) {
+          textures.set(key, image.url)
+          return { setFilter() {}, add() {} }
+        },
+        addSpriteSheet: () => ({ setFilter() {} }),
+        remove() {},
+      }
+      this.add = Object.fromEntries(
+        ['image', 'tileSprite', 'sprite', 'ellipse', 'graphics'].map((kind) => [
+          kind,
+          (x, y, texture) => object(kind, x, y, texture),
+        ]),
+      )
+    }
+  }
+  class Game {
+    constructor(config) {
+      instance = this
+      instances++
+      this.isRunning = true
+      this.scene = new config.scene()
+      this.scene.create()
+    }
+    destroy() {}
+    headlessStep() {}
+  }
+  global.Image = class {
+    set src(url) {
+      this.url = url
+      requests.push(url)
+      queueMicrotask(() => (url.includes('ball') && failBall ? this.onerror?.() : this.onload?.()))
+    }
+  }
+  try {
+    const { createPetGame } = load('src/features/playground-pet/lib/petGameEngine.ts', {
+      phaser: {
+        default: {
+          Game,
+          Scene,
+          AUTO: 0,
+          Textures: { FilterMode: { NEAREST: 0 } },
+          Scale: { FIT: 0, CENTER_BOTH: 0 },
+        },
+      },
+      '@/entities/playground-pet/model/room': room,
+      '@/entities/playground-pet/model/snack': snack,
+      './gameAssets': { petAsset },
+    })
+    const snapshot = {
+      room: { wallpaper: 'wallpaper_cream', floor: 'floor_oak' },
+      manifest: {
+        assets: Object.fromEntries(
+          ['wallpaper_cream', 'floor_oak', 'toy_bone', 'toy_ball', 'unused_shop_item'].map((id) => [
+            id,
+            { url: `/playground/pet/v2/${id}.png` },
+          ]),
+        ),
+      },
+      characterUrl: 'blob:certified-six-frame-sheet',
+      resting: false,
+      reaction: 0,
+      feedback: { action: null, xp: 0, stars: 0 },
+      reducedMotion: false,
+      snack: null,
+    }
+    const states = [],
+      handle = createPetGame({}, snapshot, (state) => states.push(state))
+    await new Promise(setImmediate)
+    assert.equal(states.at(-1), 'ready')
+    assert.equal(
+      requests.some((url) => url.includes('toy_')),
+      false,
+    )
+    assert.equal(await handle.prepareGame('snack'), false)
+    assert.equal(states.at(-1), 'error')
+    assert.equal(
+      requests.some((url) => url.includes('unused_shop')),
+      false,
+    )
+    const active = {
+      session: {
+        sessionId,
+        drops: [
+          { kind: 'snack', lane: 0, landingAtMs: 1000 },
+          { kind: 'hazard', lane: 1, landingAtMs: 1500 },
+        ],
+      },
+      elapsed: 0,
+      lane: 1,
+    }
+    handle.sync({ ...snapshot, snack: active })
+    handle.retry()
+    await new Promise(setImmediate)
+    const drops = objects.filter((item) => item.depth === 30),
+      hazard = drops[1]
+    assert.equal(states.at(-1), 'error')
+    assert.equal(hazard.texture, '__WHITE')
+    assert.equal(hazard.visible, false)
+    failBall = false
+    handle.retry()
+    await new Promise(setImmediate)
+    assert.equal(states.at(-1), 'ready')
+    assert.equal(objects.filter((item) => item.depth === 30).length, 2)
+    assert.equal(textures.get(drops[0].texture), '/playground/pet/v2/toy_bone.png')
+    assert.equal(textures.get(hazard.texture), '/playground/pet/v2/toy_ball.png')
+    assert.equal(hazard.tint, 0xb3443c)
+    instance.scene.update(1000)
+    assert.equal(hazard.visible, true)
+    assert.equal(await handle.prepareGame('snack'), true)
+    assert.equal(instances, 1)
+    handle.destroy()
+    assert.equal(await handle.prepareGame('snack'), false)
+  } finally {
+    global.Image = previousImage
+  }
+})
+
 test('expired sessions offer refresh/cancel and restored snack never invents a finish replay', () => {
   const jsx = require('react/jsx-runtime')
   const { PetGlyph } = load('src/features/playground-pet/ui/PetGlyph.tsx', {
@@ -1157,6 +1321,7 @@ test('expired sessions offer refresh/cancel and restored snack never invents a f
     now: Date.parse('2026-10-05T00:01:00Z'),
     disabled: false,
     characterReady: true,
+    onPrepareGame: async () => true,
     gameSurface: null,
     onCommand() {
       throw new Error('A render must never send a mutation')
@@ -1263,6 +1428,7 @@ function snackUiHarness() {
     gameSurface: null,
     onRefresh() {},
     onSnack: (value) => snapshots.push(value),
+    onPrepareGame: async () => true,
     onCommand() {},
   }
   const render = () => {
@@ -1299,6 +1465,50 @@ function snackUiHarness() {
     },
   }
 }
+
+test('snack start waits for successful preparation, blocks duplicate clicks and never posts after failure or hidden preparation', async () => {
+  const h = snackUiHarness(),
+    requests = []
+  let prepared,
+    preparations = 0
+  h.props.onPrepareGame = (kind) => {
+    assert.equal(kind, 'snack')
+    preparations++
+    return new Promise((resolve) => {
+      prepared = resolve
+    })
+  }
+  h.props.onCommand = async (command) => {
+    requests.push(command)
+    return { type: 'busy' }
+  }
+  const startButton = () => h.render().find((n) => n.props.children === '간식 받기 시작')
+  try {
+    const first = startButton()
+    first.props.onClick()
+    first.props.onClick()
+    assert.equal(preparations, 1)
+    assert.equal(requests.length, 0)
+    assert.equal(startButton().props.disabled, true)
+    prepared(false)
+    await new Promise(setImmediate)
+    assert.equal(requests.length, 0)
+    startButton().props.onClick()
+    prepared(true)
+    await new Promise(setImmediate)
+    assert.equal(requests.length, 1)
+    assert.equal(requests[0].kind, 'games/start')
+    assert.equal(requests[0].body.game, 'snack')
+    startButton().props.onClick()
+    h.visibility(true)
+    h.visibility(false)
+    prepared(true)
+    await new Promise(setImmediate)
+    assert.equal(requests.length, 1)
+  } finally {
+    h.dispose()
+  }
+})
 
 test('rejected explicit finish retry unlocks a fresh revision without replaying inputs automatically', async () => {
   const h = snackUiHarness(),
@@ -1387,6 +1597,7 @@ test('visibility during a pending game start survives late completion and cleans
       h.render()
         .find((n) => n.props.children === '간식 받기 시작')
         .props.onClick()
+      await new Promise(setImmediate)
       h.render()
       h.visibility(true)
       h.visibility(false)

@@ -2,7 +2,9 @@
 
 Obsidian 고전 도트 게임 v2의 사용자 시각 수정 기준을 적용했다. 사진 필터와 게임 목적을 분리하고 검증된 전신만 게임에 연결한다. 기존 초상화·사용자 상태는 보존한다. 공개 품질 승인·공개 및 IAP 토글은 변경하지 않는다.
 
-최신 FE dev `dd7b341d`·BE dev `d5b9036b`를 각 소유 브랜치에 안전하게 FF 통합했다. FE 전체367 tests, 타입 검사, build와 변경 파일 lint가 통과했다. BE 전체2492 tests/기존8 skip 뒤 추가한 교체 회귀까지 HTTP29 tests, 실제 CPU gRPC PNG1 test, Python56 tests와 타입/build/변경 파일 lint가 통과했다. 실제 codex review의 필수 자산 갱신·cached config 오류·character 키 보존·alpha0 구멍 보존·2px CPU 검수 문제를 수정했다. 감독자의 기존 전신 교체 UI 리뷰도 반영했다.
+최신 FE dev `dd7b341d`·BE dev `d5b9036b`를 각 소유 브랜치에 안전하게 FF 통합했다. FE 최초367 tests와 최종 후속370 tests, 타입 검사, build와 변경 파일 lint가 통과했다. BE 전체2492 tests/기존8 skip 뒤 추가한 교체 회귀까지 HTTP29 tests, 실제 CPU gRPC PNG1 test, Python56 tests와 타입/build/변경 파일 lint가 통과했다. 실제 codex review의 필수 자산 갱신·cached config 오류·character 키 보존·alpha0 구멍 보존·2px CPU 검수 문제를 수정했다. 감독자의 기존 전신 교체 UI 리뷰도 반영했다.
+
+감독자의 main 최종 실제 리뷰에서 찾은 간식 자산 start 이전 준비, 실패 재시도 후 같은 세션 drop texture 갱신, 생성 화면 config 공유 정책을 source 후속 변경으로 수정했다. 실제 React handler·Phaser 행동 harness·실제 QueryObserver로 실패/중복/숨김 시 start 미전송, 선택 자산만 읽기, 흰 hazard texture의 재시도 복구, visible30초 poll·stale focus·cached enabled+error 차단을 검증했다. 최종 로그는 frontend-p2-all-tests.log·frontend-p2-type.log·frontend-p2-build.log·frontend-p2-lint.log다. UI/Phaser harness는 실제 서버 계정 검증과 구분한다.
 
 기존 실제 OpenAI adapter/workflow로 합성 Maltese 참고 그림을 생성했다. 최종96×96·576×96시트,24색·hard alpha·2px 격자와 실제 semantic validator의6항목 all true를 확인했고 얼굴만 자른 입력은 거절했다. 이 실제 제공자 호출은 실사용자 생성 job/쿼터 검증과 다르다. Nest/JWT/Mongo·storage fixture·CPU 프리뷰는 격리 합성 소유자이며 실제 심사 계정이나 live dev Kafka/storage 로그인 검증이라고 주장하지 않는다. 새 계약이 live dev에 배포되기 전이고 실제 적격 심사 계정이 제공되지 않아 해당 흐름은 감독자 통합 이후 검증 대상이다.
 
