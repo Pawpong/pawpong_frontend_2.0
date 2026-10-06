@@ -194,6 +194,7 @@ test('기록 필터와 관련 글은 계약한 서버 경로만 호출한다', a
   const related = communityQueries.related('post-1')
   assert.deepEqual(related.queryKey, ['community', 'related', 'post-1', 6])
   assert.equal(related.retry, false)
+  assert.equal(related.throwOnError, false)
   assert.equal(communityQueries.related('').enabled, false)
 })
 

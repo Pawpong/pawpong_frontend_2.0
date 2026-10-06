@@ -69,6 +69,8 @@ export const communityQueries = {
       getRelatedCommunityPosts(postId, pageSize, signal),
     enabled: enabled && !!postId,
     retry: false,
+    // 곁들이는 영역이라 실패해도 글 화면을 오류 경계로 넘기지 않는다.
+    throwOnError: false,
     staleTime: 60_000,
   }),
 

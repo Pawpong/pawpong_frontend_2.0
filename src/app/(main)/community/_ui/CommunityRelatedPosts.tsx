@@ -26,6 +26,7 @@ export function CommunityRelatedPosts({
       tags: fallbackTag ? [fallbackTag] : [],
     }),
     enabled: related.isError && !!fallbackTag,
+    throwOnError: false,
   })
   const posts: CommunityPostCard[] = related.isError
     ? (byTag.data?.pages.flatMap((page) => page.items) ?? [])

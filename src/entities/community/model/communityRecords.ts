@@ -57,7 +57,7 @@ export const LIFE_CONDITION_LABELS: Record<
 export const COMMUNITY_RECORD_LABELS: Record<CommunityRecordKind, string> = {
   walk: '산책 기록',
   clinic: '병원 방문',
-  life: '반려생활',
+  life: '일상·돌봄',
 }
 
 export type CommunityTemplateKey = 'walk' | 'clinic' | 'life' | 'travel' | 'question'
