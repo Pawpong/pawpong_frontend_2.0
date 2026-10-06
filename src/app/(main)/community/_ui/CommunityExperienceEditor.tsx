@@ -24,7 +24,7 @@ export type CommunityAutoTagging = 'on' | 'consent' | 'off'
 const AUTO_TAG_COPY: Record<CommunityAutoTagging, { title: string; body: string }> = {
   on: {
     title: '올리면 주제와 태그가 자동으로 붙어요',
-    body: '포퐁 AI가 글과 사진을 읽고 바로 붙여요. 따로 확인하는 단계는 없고, 붙은 뒤에는 글 수정에서 빼거나 바꿀 수 있어요.',
+    body: '포퐁 AI가 글과 사진을 읽고 바로 붙여요. 따로 확인하는 단계는 없고, 붙은 뒤에는 글 수정에서 빼거나 바꿀 수 있고, 뺀 태그는 다시 붙지 않아요.',
   },
   consent: {
     title: 'AI 처리에 동의하면 자동으로 붙어요',
