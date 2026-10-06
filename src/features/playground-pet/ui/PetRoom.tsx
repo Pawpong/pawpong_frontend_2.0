@@ -39,6 +39,7 @@ const ACTION_ICONS = { greet: 'paw', feed: 'bone', play: 'play', rest: 'rest' } 
 const TABS = [
   { id: 'room', label: '내 방' },
   { id: 'decorate', label: '꾸미기' },
+  { id: 'shop', label: '상점' },
   { id: 'games', label: '미니게임' },
   { id: 'records', label: '기록' },
 ] as const
@@ -99,6 +100,7 @@ export function PetRoom({
     setMenu({ tab: 'games', sessionId: active.sessionId })
   function setTab(tab: PetTab) {
     setMenu((current) => ({ ...current, tab }))
+    setItem(null)
   }
   const [canvasReady, setCanvasReady] = useState(false)
   const gameHandle = useRef<PetGameHandle | null>(null)
@@ -150,7 +152,8 @@ export function PetRoom({
     media.addEventListener('change', update)
     return () => media.removeEventListener('change', update)
   }, [])
-  const room = game ? previewPetRoom(game.room, tab === 'decorate' ? selectedItem : null) : null
+  const previewing = tab === 'decorate' || tab === 'shop'
+  const room = game ? previewPetRoom(game.room, previewing ? selectedItem : null) : null
   const snapshot = useMemo<PetStageSnapshot>(
     () => ({
       room,
@@ -276,7 +279,7 @@ export function PetRoom({
               </div>
             </div>
           )}
-          {tab === 'decorate' && selectedItem && (
+          {previewing && selectedItem && (
             <p className={styles.previewLabel}>미리보기 · {selectedItem.name}</p>
           )}
           {pet.restEndsAt && now < Date.parse(pet.restEndsAt) && !active && (
@@ -439,6 +442,9 @@ export function PetRoom({
                   <button className={styles.smallButton} onClick={() => setTab('games')}>
                     미니게임 하기
                   </button>
+                  <button className={styles.smallButton} onClick={() => setTab('shop')}>
+                    별사탕 상점
+                  </button>
                 </div>
               </>
             ) : (
@@ -459,8 +465,30 @@ export function PetRoom({
           aria-labelledby="pet-tab-decorate"
           hidden={tab !== 'decorate'}
         >
-          {game && (
+          {game && tab === 'decorate' && (
             <PetDecorations
+              mode="inventory"
+              game={game}
+              level={pet.level}
+              revision={pet.revision}
+              disabled={disabled}
+              manifest={assets.manifest}
+              selected={selectedItem}
+              onSelect={setItem}
+              onCommand={onCommand}
+              onOpenShop={() => setTab('shop')}
+            />
+          )}
+        </div>
+        <div
+          id="pet-panel-shop"
+          role="tabpanel"
+          aria-labelledby="pet-tab-shop"
+          hidden={tab !== 'shop'}
+        >
+          {game && tab === 'shop' && (
+            <PetDecorations
+              mode="shop"
               game={game}
               level={pet.level}
               revision={pet.revision}
