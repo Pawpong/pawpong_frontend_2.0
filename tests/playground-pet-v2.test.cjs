@@ -528,7 +528,10 @@ function roomUiHarness() {
     Games = () => null,
     Adoption = () => null
   let characterEnabled, characterSource
-  const presentation = load('src/entities/playground-pet/model/presentation.ts')
+  const presentation = {
+    ...load('src/entities/playground-pet/model/presentation.ts'),
+    ...load('src/entities/playground-pet/model/mood.ts'),
+  }
   const { PetRoom } = load('src/features/playground-pet/ui/PetRoom.tsx', {
     react: hooks,
     'react/jsx-runtime': require('react/jsx-runtime'),
@@ -836,6 +839,7 @@ test('failed dynamic engine import retries, immutable sync preserves one game an
   const dependencies = {
     react: runtime.react,
     'react/jsx-runtime': require('react/jsx-runtime'),
+    '@/entities/playground-pet/model/room': room,
     './PetRoom.module.css': { default: new Proxy({}, { get: (_, key) => String(key) }) },
   }
   Object.defineProperty(dependencies, '../lib/petGameEngine', {

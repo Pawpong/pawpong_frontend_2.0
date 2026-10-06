@@ -2,12 +2,18 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import type { PetCatalogItem, PetCommand, PetGameState } from '@/entities/playground-pet'
+import type {
+  PetCatalogItem,
+  PetCommand,
+  PetGameState,
+  PetRoomSlot,
+} from '@/entities/playground-pet'
 import type { PetCommandResult } from '@/entities/playground-pet/model/commandQueue'
 import {
   itemAvailability,
   PET_COLLECTION_LABELS,
   PET_SLOT_LABELS,
+  PET_SLOTS,
 } from '@/entities/playground-pet/model/room'
 import { filterPetCatalog, petCollectionProgress } from '@/entities/playground-pet/model/shop'
 import type {
@@ -50,6 +56,7 @@ export function PetDecorations({
   manifest,
   selected,
   onSelect,
+  slotRequest,
   onCommand,
   onOpenShop,
 }: {
@@ -61,11 +68,19 @@ export function PetDecorations({
   manifest: PetAssetManifest | null
   selected: PetCatalogItem | null
   onSelect: (item: PetCatalogItem | null) => void
+  /** 방 위 핫스팟에서 고른 슬롯. serial이 바뀔 때마다 그 슬롯으로 좁힌다. */
+  slotRequest?: { slot: PetRoomSlot; serial: number } | null
   onCommand: (command: PetCommand) => Promise<PetCommandResult | undefined>
   onOpenShop?: () => void
 }) {
   const [filters, setFilters] = useState<Filters>({ ...PET_CATALOG_DEFAULT_FILTERS })
+  const [appliedRequest, setAppliedRequest] = useState(0)
+  if (slotRequest && slotRequest.serial !== appliedRequest) {
+    setAppliedRequest(slotRequest.serial)
+    setFilters((current) => ({ ...current, slot: slotRequest.slot }))
+  }
   const [confirm, setConfirm] = useState(false)
+  const [moreOpen, setMoreOpen] = useState(false)
   const [saving, setSaving] = useState(false)
   const pending = useRef(false)
   const mounted = useRef(true)
@@ -146,32 +161,23 @@ export function PetDecorations({
             : '이미 가진 소품으로 우리 아이의 방을 꾸며요.'}
         </p>
       </div>
-      <div className={styles.collectionGrid} aria-label="테마 소품 수집">
-        {collections.map((collection) => (
-          <button
-            key={collection.id}
-            className={styles.collectionButton}
-            disabled={busy}
-            aria-pressed={filters.collection === collection.id}
-            onClick={() =>
-              changeFilters({
-                collection: filters.collection === collection.id ? '' : collection.id,
-              })
-            }
-          >
-            <strong>{collection.label}</strong>
-            <span>
-              {collection.owned} / {collection.total} 수집
-            </span>
-            <progress
-              max={collection.total}
-              value={collection.owned}
-              aria-label={`${collection.label} 수집`}
-            />
-          </button>
-        ))}
+      <div className={styles.slots} role="group" aria-label="방의 자리 고르기">
+        {PET_SLOTS.map((slot) => {
+          const equipped = game.catalog.find((item) => item.id === game.room[slot])
+          return (
+            <button
+              key={slot}
+              className={styles.slotButton}
+              disabled={busy}
+              aria-pressed={filters.slot === slot}
+              onClick={() => changeFilters({ slot: filters.slot === slot ? 'all' : slot })}
+            >
+              <strong>{PET_SLOT_LABELS[slot]}</strong>
+              <span>{equipped?.name ?? '비어 있음'}</span>
+            </button>
+          )
+        })}
       </div>
-      <PetCatalogFilters mode={mode} filters={filters} disabled={busy} onChange={changeFilters} />
       <p className={styles.catalogCount} role="status">
         {items.length}개 소품
       </p>
@@ -233,15 +239,34 @@ export function PetDecorations({
           </p>
           <h3>{selected.name}</h3>
           <p>{selected.description}</p>
-          <p className={styles.hint}>위 방은 미리보기예요. 적용 버튼을 누르면 저장돼요.</p>
-          {availability.locked && (
-            <p className={styles.hint}>Lv.{selected.minLevel}이 되면 사용할 수 있어요.</p>
-          )}
-          {!availability.owned && !availability.affordable && (
-            <p className={styles.hint}>
-              별사탕 {selected.price - game.wallet.stars}개가 더 필요해요.
-            </p>
-          )}
+          <ul className={styles.itemFacts}>
+            <li data-state={availability.owned ? 'ok' : 'todo'}>
+              {availability.equipped
+                ? '방에 적용 중'
+                : availability.owned
+                  ? '보유 중 · 아직 방에 두지 않았어요'
+                  : `별사탕 ${selected.price}개`}
+            </li>
+            {!availability.owned && (
+              <li data-state={availability.locked ? 'blocked' : 'ok'}>
+                {availability.locked
+                  ? `Lv.${selected.minLevel}부터 · 지금 Lv.${level}`
+                  : `Lv.${selected.minLevel} 조건 충족`}
+              </li>
+            )}
+            {!availability.owned && (
+              <li data-state={availability.affordable ? 'ok' : 'blocked'}>
+                {availability.affordable
+                  ? `구매 후 별사탕 ${game.wallet.stars - selected.price}개`
+                  : `별사탕 ${selected.price - game.wallet.stars}개가 더 필요해요`}
+              </li>
+            )}
+          </ul>
+          <p className={styles.hint}>
+            {availability.equipped
+              ? '지금 방에 저장된 소품이에요.'
+              : '위 방은 미리보기예요. 아직 저장되지 않았어요.'}
+          </p>
           <div className={styles.buttonRow}>
             {availability.owned ? (
               <button
@@ -277,6 +302,39 @@ export function PetDecorations({
       ) : (
         <p className={styles.hint}>소품을 골라 우리 아이의 방에서 미리 보세요.</p>
       )}
+      <details
+        className={styles.catalogMore}
+        open={moreOpen}
+        onToggle={(event) => setMoreOpen(event.currentTarget.open)}
+      >
+        <summary>테마 모으기 · 검색 · 정렬</summary>
+        <div className={styles.collectionGrid} aria-label="테마 소품 수집">
+          {collections.map((collection) => (
+            <button
+              key={collection.id}
+              className={styles.collectionButton}
+              disabled={busy}
+              aria-pressed={filters.collection === collection.id}
+              onClick={() =>
+                changeFilters({
+                  collection: filters.collection === collection.id ? '' : collection.id,
+                })
+              }
+            >
+              <strong>{collection.label}</strong>
+              <span>
+                {collection.owned} / {collection.total} 수집
+              </span>
+              <progress
+                max={collection.total}
+                value={collection.owned}
+                aria-label={`${collection.label} 수집`}
+              />
+            </button>
+          ))}
+        </div>
+        <PetCatalogFilters mode={mode} filters={filters} disabled={busy} onChange={changeFilters} />
+      </details>
       <p className={styles.finePrint}>별사탕은 돌봄과 게임으로 모아요. 돈으로 살 수 없어요.</p>
       {mode === 'shop' && (
         <PetPurchaseDialog
