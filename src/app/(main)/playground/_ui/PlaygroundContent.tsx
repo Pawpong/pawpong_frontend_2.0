@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 import { aiImageQueries } from '@/entities/ai-image'
 import { PlaygroundBilling } from '@/features/in-app-purchase'
 import { PetEntryCard } from '@/features/playground-pet/ui/PetEntryCard'
+import { PlaygroundToolShelf } from '@/features/playground-tools'
 import { PawPrintIcon, PixelArrowRightIcon } from '@/shared/assets'
 import { PLAYGROUND_BILLING_ENABLED } from '@/shared/config/playground'
 import { buttonVariants } from '@/shared/ui/Button'
@@ -19,9 +20,11 @@ export function PlaygroundContent() {
   return (
     <div className="mx-auto w-full max-w-[68rem] space-y-8 px-5 pt-6 pb-16 tab:px-8 tab:pt-10 pc:px-10">
       <FeatureIntro eyebrow="우리 아이와 함께" title="포퐁 놀이터">
-        사진 한 장으로 시작하는 우리 아이의 새로운 놀이.
-        <br className="tab:hidden" /> 마음에 드는 모습을 만들고 함께 자랑해 보세요.
+        산책을 준비하고, 사진으로 놀고, 하루를 기록해요.
+        <br className="tab:hidden" /> 우리 아이와 함께할 작은 즐거움을 찾아보세요.
       </FeatureIntro>
+
+      <PlaygroundToolShelf />
 
       <section
         aria-labelledby="playground-ai"

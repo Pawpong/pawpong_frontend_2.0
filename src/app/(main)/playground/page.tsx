@@ -5,7 +5,8 @@ import { ManagedFeatureHighlights } from '../_ui/ManagedFeatureHighlights'
 
 export const metadata = createPageMetadata({
   title: '놀이터',
-  description: '사진 한 장으로 우리 아이의 새로운 모습을 만들고 함께 자랑해 보세요.',
+  description:
+    '우리 아이의 추억 카드를 만들고, 외출을 준비하고, 함께한 하루를 이야기로 남겨보세요.',
   path: '/playground',
 })
 
