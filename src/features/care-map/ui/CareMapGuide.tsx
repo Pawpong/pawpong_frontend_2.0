@@ -1,6 +1,45 @@
 import type { CarePlaceKind } from '@/entities/care-place'
 
 export function CareMapGuide({ kind }: { kind: CarePlaceKind }) {
+  if (kind === 'cafe')
+    return (
+      <details className="rounded-2xl border border-secondary-200 bg-point-50 px-4 py-3 text-neutral-850">
+        <summary className="cursor-pointer text-sm font-semibold">
+          애견동반카페, 방문 전 확인해 주세요
+        </summary>
+        <div className="mt-3 space-y-2 text-sm leading-6 text-neutral-700">
+          <p>
+            카카오맵에 ‘애견카페’로 분류된 곳과 한국문화정보원 공공데이터의 반려동물 동반 가능
+            카페를 함께 보여드려요. 공공데이터는 대부분 2022년 작성 자료라 지금은 다를 수 있고,
+            포퐁이 실제 동반 가능 여부를 확인한 목록은 아니에요.
+          </p>
+          <p>
+            동반 가능한 크기·견종, 실내 동반 여부, 리드줄·매너벨트 같은 조건은 매장마다 달라요. 방문
+            전 전화로 확인해 주세요.
+          </p>
+        </div>
+      </details>
+    )
+  if (kind === 'travel' || kind === 'stay')
+    return (
+      <details className="rounded-2xl border border-secondary-200 bg-point-50 px-4 py-3 text-neutral-850">
+        <summary className="cursor-pointer text-sm font-semibold">
+          반려동물과 떠나기 전 확인해 주세요
+        </summary>
+        <div className="mt-3 space-y-2 text-sm leading-6 text-neutral-700">
+          <p>
+            한국관광공사 반려동물 동반여행 서비스에 등록된 {kind === 'stay' ? '숙소' : '여행지'}
+            예요. 장소를 누르면 동반 유형(전 구역·일부 구역), 동반 가능한 크기, 목줄·입마개 같은
+            필수 사항을 볼 수 있어요.
+          </p>
+          <p>
+            일부 구역만 동반 가능한 곳이 많고 조건은 바뀔 수 있어요.
+            {kind === 'stay' ? ' 객실 동반 여부와 추가 요금은 예약 전에' : ' 방문 전'} 꼭 확인해
+            주세요.
+          </p>
+        </div>
+      </details>
+    )
   return (
     <details className="rounded-2xl border border-secondary-200 bg-point-50 px-4 py-3 text-neutral-850">
       <summary className="cursor-pointer text-sm font-semibold">

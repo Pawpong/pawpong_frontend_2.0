@@ -3,6 +3,7 @@ export type {
   CarePlace,
   CarePlacePage,
   CarePlaceKind,
+  CareDirectoryKind,
   CarePlaceSearch,
   CareCoordinates,
   MappedCarePlace,

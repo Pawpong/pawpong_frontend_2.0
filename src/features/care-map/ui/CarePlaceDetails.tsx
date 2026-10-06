@@ -13,9 +13,13 @@ export function CarePlaceDetails({ place, onClose }: { place: CarePlace; onClose
           <p className="mb-1 text-xs font-semibold text-primary-500">
             {place.kind === 'hospital'
               ? '동물병원'
-              : place.registration
-                ? '등록 동물보호센터'
-                : '보호·입양시설'}
+              : place.kind === 'cafe'
+                ? '애견동반카페'
+                : place.kind === 'shelter'
+                  ? place.registration
+                    ? '등록 동물보호센터'
+                    : '보호·입양시설'
+                  : place.category}
           </p>
           <h2 className="text-lg font-bold break-keep text-neutral-850">{place.name}</h2>
         </div>
@@ -65,6 +69,27 @@ export function CarePlaceDetails({ place, onClose }: { place: CarePlace; onClose
       {place.kind === 'shelter' && (
         <p className="mt-3 text-xs leading-5 text-neutral-700">
           방문 예약과 보호 중인 동물의 입양 상담은 센터에 먼저 연락해 주세요.
+        </p>
+      )}
+      {place.petPolicy && (
+        <div className="mt-3 rounded-xl bg-secondary-50 p-3 text-xs leading-5 text-primary-700">
+          <p className="font-bold">반려동물 동반 조건</p>
+          <dl className="mt-1 space-y-1">
+            {place.petPolicy.details.map((detail) => (
+              <div key={detail.label} className="flex gap-2">
+                <dt className="shrink-0 font-semibold">{detail.label}</dt>
+                <dd className="min-w-0 whitespace-pre-line">{detail.value}</dd>
+              </div>
+            ))}
+          </dl>
+          <p className="mt-1 text-neutral-700">
+            {place.petPolicy.source} {place.petPolicy.checkedAt} 기준 자료라 지금과 다를 수 있어요.
+          </p>
+        </div>
+      )}
+      {place.kind !== 'hospital' && place.kind !== 'shelter' && (
+        <p className="mt-3 text-xs leading-5 text-neutral-700">
+          반려동물 동반 가능 여부와 조건은 방문 전에 꼭 확인해 주세요.
         </p>
       )}
       {!!place.registration?.jurisdictions.length && (
