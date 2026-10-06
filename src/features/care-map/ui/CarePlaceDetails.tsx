@@ -112,7 +112,12 @@ export function CarePlaceDetails({ place, onClose }: { place: CarePlace; onClose
         rel="noopener noreferrer"
         className="mt-3 block py-1 text-center text-xs text-neutral-700 underline underline-offset-4"
       >
-        {place.latitude === null ? '카카오맵에서 시설 검색 ↗' : '카카오맵에서 상세 정보 보기 ↗'}
+        {/* 공공데이터 장소는 카카오에 없는 곳이 많아 백엔드가 네이버 지도 검색 링크를 준다 */}
+        {place.placeUrl.startsWith('https://map.naver.com/')
+          ? '네이버 지도에서 보기 ↗'
+          : place.latitude === null
+            ? '카카오맵에서 시설 검색 ↗'
+            : '카카오맵에서 상세 정보 보기 ↗'}
       </a>
       {place.kind === 'shelter' && (
         <a
