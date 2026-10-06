@@ -1,6 +1,6 @@
-export type CarePlaceKind = 'hospital' | 'shelter' | 'cafe'
-/** 공공 등록자료(전국 목록)가 있는 종류 — 애견동반카페는 카카오 장소 검색에만 있다 */
-export type CareDirectoryKind = Exclude<CarePlaceKind, 'cafe'>
+export type CarePlaceKind = 'hospital' | 'shelter' | 'cafe' | 'travel' | 'stay'
+/** 공공 등록자료(전국 목록)가 있는 종류 — 동반 카페·여행지·숙소는 장소 검색에만 있다 */
+export type CareDirectoryKind = 'hospital' | 'shelter'
 
 export interface CareCoordinates {
   latitude: number
@@ -23,12 +23,9 @@ export interface CarePlace {
   referral: { url: string; checkedAt: string; label: string } | null
   locationStatus?: 'place' | 'address' | 'not-found' | 'unavailable'
   registration?: { source: string; url: string; checkedAt: string; jurisdictions: string[] }
-  /** 공공데이터의 반려동물 동반 조건 — 공공 동반 카페에만 온다 */
+  /** 공공데이터의 반려동물 동반 조건 — 출처마다 항목이 달라 라벨/값 목록으로 온다 */
   petPolicy?: {
-    sizes: string
-    restrictions: string
-    indoor: boolean
-    outdoor: boolean
+    details: { label: string; value: string }[]
     source: string
     checkedAt: string
   }
@@ -50,7 +47,7 @@ export interface CarePlacePage {
   page: number
   hasMore: boolean
   limited: boolean
-  source: 'kakao' | 'animal-go'
+  source: 'kakao' | 'animal-go' | 'visitkorea'
   totalCount?: number
   totalPages?: number
   locationUnavailable?: boolean
