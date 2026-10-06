@@ -20,6 +20,7 @@ interface CommunityFeedCardProps extends CommunityPreviewProps {
   onToggleSave?: () => void
   /** 남의 글 헤더 오른쪽에 둘 기능 레이어 액션(팔로우) */
   followAction?: ReactNode
+  badgeSlot?: ReactNode
   /** 남의 글 액션 줄 오른쪽 끝에 둘 기능 레이어 액션(신고 깃발) */
   reportAction?: ReactNode
   /** 이미지 표현 — 커뮤니티 피드는 1:1 캐러셀, 마이홈처럼 카드가 넓은 곳은 가로 스크롤 썸네일 */
@@ -54,6 +55,7 @@ const CommunityFeedCard = ({
   onToggleLike,
   onToggleSave,
   followAction,
+  badgeSlot,
   reportAction,
   mediaLayout = 'carousel',
   preload = false,
@@ -120,6 +122,7 @@ const CommunityFeedCard = ({
             <span className="truncate text-sm leading-[1.5] font-semibold text-neutral-850">
               {author.nickname}
             </span>
+            {badgeSlot}
             <span
               className="text-xs leading-[1.5] font-medium text-neutral-500"
               suppressHydrationWarning

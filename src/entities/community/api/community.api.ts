@@ -26,6 +26,7 @@ interface RawAuthor {
 }
 
 interface RawCommunityPostCard {
+  experience?: import('@/shared/types').CommunityExperience | null
   postId: string
   author: RawAuthor
   authorModel: CommunityAuthorModel
@@ -60,6 +61,7 @@ interface RawCommunityComment {
 }
 
 interface RawCommunityPostDetail {
+  experience?: import('@/shared/types').CommunityExperience | null
   postId: string
   author: RawAuthor
   authorModel: CommunityAuthorModel
@@ -88,6 +90,7 @@ const flattenAuthor = (author: RawAuthor) => ({
 })
 
 const mapCard = (raw: RawCommunityPostCard): CommunityPostCard => ({
+  ...(raw.experience ? { experience: raw.experience } : {}),
   postId: raw.postId,
   ...flattenAuthor(raw.author),
   authorModel: raw.authorModel,
@@ -122,6 +125,7 @@ const mapComment = (raw: RawCommunityComment): CommunityComment => ({
 })
 
 const mapDetail = (raw: RawCommunityPostDetail): CommunityPostDetail => ({
+  ...(raw.experience ? { experience: raw.experience } : {}),
   postId: raw.postId,
   ...flattenAuthor(raw.author),
   authorModel: raw.authorModel,
@@ -149,6 +153,7 @@ export const getCommunityPosts = async (
 ): Promise<PaginationResponse<CommunityPostCard>> => {
   const query = new URLSearchParams()
   if (params.petType) query.set('petType', params.petType)
+  if (params.topic) query.set('topic', params.topic)
   if (params.category) query.set('category', params.category)
   if (params.authorId) query.set('authorId', params.authorId)
   if (params.search) query.set('search', params.search)

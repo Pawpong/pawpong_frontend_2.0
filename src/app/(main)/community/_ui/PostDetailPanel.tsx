@@ -22,6 +22,9 @@ import { usePostDetail } from '../post/[postId]/_ui/usePostDetail'
 import { useCommentThread } from '../post/[postId]/_ui/useCommentThread'
 import { CommentList } from '../post/[postId]/_ui/CommentList'
 import { CommentComposerBar } from '../post/[postId]/_ui/CommentComposerBar'
+import { CommunityExperiencePanel } from './CommunityExperiencePanel'
+import { ActivityBadgeRow } from '@/entities/gamification'
+import { usePublicActivityBadges } from '@/features/gamification'
 
 /**
  * 게시글 상세 본문 (Figma feed-detail, node 3753:246802)
@@ -63,6 +66,11 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
   const { guard, isPromptOpen, setPromptOpen } = useLoginGuard()
   // 목록과 입력창이 서로 떨어진 자리에 배치되므로 스레드 상태는 여기서 한 번만 만든다
   const thread = useCommentThread(postId)
+  const badges = usePublicActivityBadges(
+    post
+      ? [{ ownerId: post.authorId, role: post.authorModel === 'Breeder' ? 'breeder' : 'adopter' }]
+      : [],
+  )
 
   // 캐시가 없는 직접 진입에서는 상세 응답 전까지 채울 값이 없다 — 빈 패널 대신 상태를 알린다
   if (!post) {
@@ -103,8 +111,11 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
           alt={post.authorNickname}
           className="shrink-0"
         />
-        <span className="truncate text-body-lg font-semibold text-neutral-850">
-          {post.authorNickname}
+        <span className="min-w-0">
+          <span className="block truncate text-body-lg font-semibold text-neutral-850">
+            {post.authorNickname}
+          </span>
+          <ActivityBadgeRow badges={badges[0]?.badges ?? []} />
         </span>
       </a>
       {trailingAction}
@@ -220,6 +231,7 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
           {header}
           <div className="min-h-0 flex-1 overflow-y-auto">
             {caption}
+            <CommunityExperiencePanel post={post} isOwner={isOwner} />
             {actionBar}
             <div className="p-4">
               <CommentList thread={thread} />
@@ -239,6 +251,7 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
       <div className="min-h-0 flex-1 overflow-y-auto">
         {imageCarousel}
         {caption}
+        <CommunityExperiencePanel post={post} isOwner={isOwner} />
         {actionBar}
         <div className="p-4">
           <CommentList thread={thread} />

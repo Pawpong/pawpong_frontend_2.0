@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { communityQueries } from '@/entities/community'
+import { communityExperienceConfigOptions, type CommunityExperience } from '@/entities/community'
+import { CommunityExperienceEditor } from './CommunityExperienceEditor'
 import { profileQueries } from '@/entities/profile'
 import Link from 'next/link'
 import {
@@ -70,10 +72,20 @@ const PostForm = ({ postId, post }: PostFormProps) => {
   const [visibility, setVisibility] = useState<VisibilityType>(initialVisibility)
   const initialPetType = post?.petType ?? ''
   const [petType, setPetType] = useState<CommunityPetType | ''>(initialPetType)
+  const experienceConfig = useQuery(communityExperienceConfigOptions)
+  const [experience, setExperience] = useState<CommunityExperience | null | undefined>(
+    post?.experience,
+  )
+  const experienceEnabled = experienceConfig.data?.enabled === true && !experienceConfig.isError
+  const experienceValid =
+    !experienceEnabled ||
+    !experience?.route.length ||
+    (experience.publicPlaceConfirmed && experience.route.every((point) => point.name.trim()))
   const { submit, isSubmitting, error } = useSubmitCommunityPostForm(postId)
   const hasChanges =
     form.hasChanges ||
     comparison.hasChanges ||
+    JSON.stringify(experience) !== JSON.stringify(post?.experience) ||
     visibility !== initialVisibility ||
     petType !== initialPetType
   const { showGuard, requestExit, confirmExit, cancelExit } = useExitGuard({
@@ -83,12 +95,14 @@ const PostForm = ({ postId, post }: PostFormProps) => {
   // 발행(published)은 본문이 필수, 임시저장(draft)은 본문 없이 사진만으로도 가능 (백엔드 계약)
   const hasBody = form.text.trim().length > 0
   const canPublish =
+    experienceValid &&
     hasBody &&
     !isSubmitting &&
     !form.isProcessingPhotos &&
     !comparison.busy &&
     !comparison.submission.error
   const canSaveDraft =
+    experienceValid &&
     (hasBody || form.images.length > 0) &&
     !isSubmitting &&
     !form.isProcessingPhotos &&
@@ -104,6 +118,7 @@ const PostForm = ({ postId, post }: PostFormProps) => {
     )
       return
     const savedId = await submit({
+      ...(experienceEnabled && experience !== undefined ? { experience } : {}),
       text: form.text,
       files: comparison.submission.files,
       visibility,
@@ -148,6 +163,14 @@ const PostForm = ({ postId, post }: PostFormProps) => {
         }}
         belowContent={
           <div className="flex flex-col gap-4">
+            {experienceEnabled && experienceConfig.data && (
+              <CommunityExperienceEditor
+                value={experience}
+                onChange={setExperience}
+                config={experienceConfig.data}
+                disabled={isSubmitting || form.isProcessingPhotos}
+              />
+            )}
             <Link
               href="/ai-filter"
               className="flex items-center justify-between gap-3 rounded-xl border border-primary-200 bg-point-50 p-4 focus-ring transition-colors hover:bg-point-100"

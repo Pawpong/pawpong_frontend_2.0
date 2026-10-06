@@ -21,6 +21,7 @@ export type CommunityPostStatus = 'draft' | 'published'
 
 /** 커뮤니티 게시글 카드 (목록용) */
 export interface CommunityPostCard {
+  experience?: CommunityExperience | null
   aiComparison?: CommunityAiComparison | null
   postId: string
   authorId: string
@@ -63,6 +64,7 @@ export interface CommunityComment {
 
 /** 커뮤니티 게시글 상세 */
 export interface CommunityPostDetail {
+  experience?: CommunityExperience | null
   aiComparison?: CommunityAiComparison | null
   postId: string
   authorId: string
@@ -90,6 +92,7 @@ export interface CommunityPostDetail {
 
 /** 게시글 목록 조회 파라미터 */
 export interface CommunityPostListParams {
+  topic?: string
   petType?: CommunityPetType
   category?: string
   authorId?: string
@@ -102,6 +105,7 @@ export interface CommunityPostListParams {
 
 /** 게시글 작성 요청 */
 export interface CreateCommunityPostRequest {
+  experience?: CommunityExperience | null
   aiComparison?: CommunityAiComparison | null
   /** 발행(published) 시 필수, 임시저장(draft) 시 비어 있어도 됨 */
   body?: string
@@ -117,6 +121,7 @@ export interface CreateCommunityPostRequest {
 
 /** 게시글 수정 요청 */
 export interface UpdateCommunityPostRequest {
+  experience?: CommunityExperience | null
   aiComparison?: CommunityAiComparison | null
   title?: string
   body?: string
@@ -213,4 +218,15 @@ export interface CommunityHallOfFame {
   refreshedAt: string
   /** 0~3건. 회차에 글이 없으면 빈 배열 (서버가 폴백하지 않는다) */
   winners: CommunityHallOfFameWinner[]
+}
+export interface CommunityRoutePoint {
+  name: string
+  latitude: number
+  longitude: number
+}
+export interface CommunityExperience {
+  topics: string[]
+  question: boolean
+  route: CommunityRoutePoint[]
+  publicPlaceConfirmed: boolean
 }

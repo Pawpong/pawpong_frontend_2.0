@@ -13,6 +13,7 @@ import { useCreateCommunityPost, useUpdateCommunityPost } from '../api/community
 import { COMMUNITY_UPLOAD_FOLDER, toCommunityPhotoFileName } from './communityPhotoFileName'
 
 interface SubmitPostFormInput {
+  experience?: import('@/entities/community').CommunityExperience | null
   aiComparison?: CommunityAiComparison | null
   text: string
   files: File[]
@@ -45,6 +46,7 @@ export const useSubmitCommunityPostForm = (postId?: string) => {
 
   const submit = useCallback(
     async ({
+      experience,
       text,
       files,
       visibility,
@@ -80,6 +82,7 @@ export const useSubmitCommunityPostForm = (postId?: string) => {
         const body = text.trim()
         const post = postId
           ? await updateMutation.mutateAsync({
+              ...(experience !== undefined ? { experience } : {}),
               body,
               photos,
               visibility,
@@ -88,6 +91,7 @@ export const useSubmitCommunityPostForm = (postId?: string) => {
               aiComparison,
             })
           : await createMutation.mutateAsync({
+              ...(experience !== undefined ? { experience } : {}),
               body,
               photos,
               visibility,

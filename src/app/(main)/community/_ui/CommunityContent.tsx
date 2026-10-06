@@ -1,8 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import { ActivityBadgeRow } from '@/entities/gamification'
+import { ActivityEntry, usePublicActivityBadges } from '@/features/gamification'
 import { useRouter } from 'next/navigation'
-import { useInfiniteQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import { communityExperienceConfigOptions } from '@/entities/community'
 import {
   Button,
   DeleteConfirmModal,
@@ -42,6 +45,8 @@ const CommunityContent = () => {
   const [petType, setPetType] = useState<CommunityPetType | ''>('')
   const [sort, setSort] = useState<CommunitySortType>('latest')
   const [appliedSearch, setAppliedSearch] = useState('')
+  const [topic, setTopic] = useState('')
+  const experience = useQuery(communityExperienceConfigOptions)
   const { guard, isPromptOpen, setPromptOpen } = useLoginGuard()
   const { me } = useMe()
   const { requestDelete, modalProps: deleteModalProps } = useDeletePostConfirm()
@@ -55,9 +60,22 @@ const CommunityContent = () => {
     refetch,
     isFetching: isRetrying,
   } = useInfiniteQuery(
-    communityQueries.posts(sort, petType || undefined, undefined, appliedSearch || undefined),
+    communityQueries.posts(
+      sort,
+      petType || undefined,
+      undefined,
+      appliedSearch || undefined,
+      15,
+      experience.data?.enabled && !experience.isError ? topic || undefined : undefined,
+    ),
   )
   const posts = flattenPages(data)
+  const authorBadges = usePublicActivityBadges(
+    posts.map((post) => ({
+      ownerId: post.authorId,
+      role: post.authorModel === 'Breeder' ? 'breeder' : 'adopter',
+    })),
+  )
   const firstPhotoPostId = getFirstPhotoPostId(posts)
   const writePost = guard(() => router.push('/community/write'))
   const selectedLabel = PET_OPTIONS.find((option) => option.value === petType)?.label
@@ -102,6 +120,7 @@ const CommunityContent = () => {
               ))}
             </nav>
             <div className="mt-6 border-t border-neutral-100 pt-6">
+              <ActivityEntry />
               <Button onClick={writePost} width="full" size="lg">
                 글쓰기
               </Button>
@@ -114,6 +133,32 @@ const CommunityContent = () => {
           </aside>
 
           <section className="min-w-0" aria-label="커뮤니티 게시글">
+            <div className="pc:hidden">
+              <ActivityEntry />
+            </div>
+            {experience.data?.enabled && !experience.isError && (
+              <div className="mb-5">
+                <label htmlFor="community-topic" className="mb-2 block text-sm font-bold">
+                  어떤 경험을 찾고 있나요?
+                </label>
+                <select
+                  id="community-topic"
+                  value={topic}
+                  onChange={(event) => setTopic(event.target.value)}
+                  className="w-full rounded-xl border border-primary-200 bg-point-50 p-3 text-sm"
+                >
+                  <option value="">모든 주제</option>
+                  {experience.data.topics.map((value) => (
+                    <option key={value.key} value={value.key}>
+                      {value.label}
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-2 text-xs text-neutral-600">
+                  동물 종류·주제·검색어를 함께 골라 찾아보세요.
+                </p>
+              </div>
+            )}
             <SearchBar
               key={appliedSearch}
               className="mb-6"
@@ -190,6 +235,18 @@ const CommunityContent = () => {
                       key={post.postId}
                       preload={post.postId === firstPhotoPostId}
                       guard={guard}
+                      badgeSlot={
+                        <ActivityBadgeRow
+                          badges={
+                            authorBadges.find(
+                              (owner) =>
+                                owner.ownerId === post.authorId &&
+                                owner.role ===
+                                  (post.authorModel === 'Breeder' ? 'breeder' : 'adopter'),
+                            )?.badges ?? []
+                          }
+                        />
+                      }
                       {...toCommunityPreviewProps(post)}
                       onEdit={
                         isMyPost
