@@ -30,6 +30,7 @@ import {
   careSearchReducer,
   createCareSearchState,
   DEFAULT_CARE_CENTER,
+  hasCareDirectory,
   type CareSearchAction,
 } from '../lib/care-search-state'
 import './care-map.css'
@@ -42,6 +43,13 @@ const KakaoMapCanvas = dynamic(() => import('./KakaoMapCanvas'), {
     </div>
   ),
 })
+const KIND_LABEL: Record<CarePlaceKind, string> = {
+  hospital: '동물병원',
+  shelter: '보호센터',
+  cafe: '애견동반카페',
+  travel: '여행지',
+  stay: '숙소',
+}
 export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: CarePlaceKind }) {
   const [{ search, page, selectedId, nearbyOrigin }, dispatch] = useReducer(
     careSearchReducer,
@@ -117,7 +125,10 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
     [places],
   )
   const selected = places?.find((place) => place.id === selectedId)
+  const isHospital = search.kind === 'hospital'
   const isShelter = search.kind === 'shelter'
+  // 동반 카페·여행지·숙소는 공공 등록자료가 없어 지역(전국 목록) 필터와 등록 수를 보여주지 않는다
+  const hasDirectory = hasCareDirectory(search.kind)
   const isDirectory = search.scope === 'directory'
   const regionLabel =
     summary.data?.regions.find((region) => region.id === search.region)?.label ?? '전국'
@@ -185,14 +196,18 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
   return (
     <div className="care-map-page mx-auto w-full max-w-[68rem] px-5 pt-6 pb-16 tab:px-8 tab:pt-10 pc:px-10">
       <FeatureIntro eyebrow="우리 아이 곁에" title="전국 돌봄 지도">
-        아플 때 찾아갈 병원, 새 가족을 기다리는 보호소.
-        <br className="tab:hidden" /> 포퐁에서 가까이 만나보세요.
+        아플 때 찾아갈 병원, 새 가족을 기다리는 보호소,
+        <br className="tab:hidden" /> 함께 떠날 카페·여행지·숙소까지 포퐁에서 가까이 만나보세요.
       </FeatureIntro>
       <div className="care-map-counts" role="group" aria-label="시설 종류 · 전국 등록 시설 수">
-        {(['hospital', 'shelter'] as const).map((kind) => {
+        {(['hospital', 'shelter', 'cafe', 'travel', 'stay'] as const).map((kind) => {
           const active = search.kind === kind
           const count =
-            kind === 'hospital' ? summary.data?.hospitalCount : summary.data?.shelterCount
+            kind === 'hospital'
+              ? summary.data?.hospitalCount
+              : kind === 'shelter'
+                ? summary.data?.shelterCount
+                : null
           return (
             <button
               key={kind}
@@ -203,16 +218,20 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
             >
               <span className="care-map-category-heading">
                 <CareMapIcon name={kind} className="size-5 shrink-0" />
-                <span className={cafe24Proup.className}>
-                  {kind === 'hospital' ? '동물병원' : '보호센터'}
-                </span>
+                <span className={cafe24Proup.className}>{KIND_LABEL[kind]}</span>
                 <span className="care-map-selection" aria-hidden="true">
                   {active ? '✓' : ''}
                 </span>
               </span>
               <span className="care-map-count">
-                <span className="care-map-count-label">전국 등록</span>
-                {count === undefined ? (
+                <span className="care-map-count-label">
+                  {count !== null
+                    ? '전국 등록'
+                    : kind === 'cafe'
+                      ? '카카오·공공데이터'
+                      : '관광공사 동반여행'}
+                </span>
+                {count === null ? null : count === undefined ? (
                   <span className="care-map-count-label">
                     {summary.isError ? '집계 확인 불가' : '확인 중'}
                   </span>
@@ -230,28 +249,30 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
 
       <div className="care-map-search-panel">
         <div className="care-map-search-fields">
-          <label className="care-map-region">
-            <CareMapIcon name="pin" className="size-4" />
-            <select
-              aria-label={isShelter ? '보호센터 관할 지역' : '병원 지역'}
-              value={isDirectory ? search.region : 'nearby'}
-              onChange={(event) => {
-                updateSearch({ type: 'region', region: event.target.value })
-              }}
-            >
-              {!isDirectory && (
-                <option value="nearby" disabled>
-                  {nearbyLabel}
-                </option>
-              )}
-              <option value="all">전국</option>
-              {summary.data?.regions.map((region) => (
-                <option key={region.id} value={region.id}>
-                  {region.label}
-                </option>
-              ))}
-            </select>
-          </label>
+          {hasDirectory && (
+            <label className="care-map-region">
+              <CareMapIcon name="pin" className="size-4" />
+              <select
+                aria-label={isShelter ? '보호센터 관할 지역' : '병원 지역'}
+                value={isDirectory ? search.region : 'nearby'}
+                onChange={(event) => {
+                  updateSearch({ type: 'region', region: event.target.value })
+                }}
+              >
+                {!isDirectory && (
+                  <option value="nearby" disabled>
+                    {nearbyLabel}
+                  </option>
+                )}
+                <option value="all">전국</option>
+                {summary.data?.regions.map((region) => (
+                  <option key={region.id} value={region.id}>
+                    {region.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
           <form onSubmit={submitSearch} className="care-map-search">
             <label htmlFor="care-place-search" className="sr-only">
               지역 또는 시설 이름
@@ -264,7 +285,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
                 setInput(event.target.value)
               }}
               maxLength={80}
-              placeholder={isShelter ? '보호센터 이름 또는 지역 검색' : '병원 이름 또는 지역 검색'}
+              placeholder={`${isHospital ? '병원' : KIND_LABEL[search.kind]} 이름 또는 지역 검색`}
               enterKeyHint="search"
             />
             {(input || search.query) && (
@@ -287,14 +308,16 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
         </div>
         <div className="care-map-filters" role="group" aria-label="검색 범위">
           <span className="care-map-filter-label">검색 범위</span>
-          <button
-            type="button"
-            className={`care-map-chip ${isDirectory ? 'care-map-chip-active' : ''}`}
-            aria-pressed={isDirectory}
-            onClick={() => updateSearch({ type: 'directory' })}
-          >
-            {regionLabel} 등록
-          </button>
+          {hasDirectory && (
+            <button
+              type="button"
+              className={`care-map-chip ${isDirectory ? 'care-map-chip-active' : ''}`}
+              aria-pressed={isDirectory}
+              onClick={() => updateSearch({ type: 'directory' })}
+            >
+              {regionLabel} 등록
+            </button>
+          )}
           <button
             type="button"
             onClick={locate}
@@ -324,7 +347,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
             </select>
           )}
         </div>
-        {!isShelter && (
+        {isHospital && (
           <div className="care-map-filters" role="group" aria-label="진료 조건">
             <span className="care-map-filter-label">진료 조건</span>
             <button
@@ -365,7 +388,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
           </div>
         )}
       </div>
-      {!isShelter && (
+      {isHospital && (
         <p className="mb-3 text-xs leading-5 text-primary-700">
           {search.referralOnly
             ? `공식 의뢰 안내를 확인한 ${summary.data ? `전국 ${summary.data.referralCount}곳 중 ` : '병원 중 '}선택한 조건에 맞는 곳이에요. 전체 2차 병원 목록은 아니에요.`
@@ -382,7 +405,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
           <div className="border-b border-neutral-150 px-4 py-4">
             <div className="flex items-center justify-between gap-2">
               <h2 className="text-sm font-semibold text-neutral-850">
-                {isDirectory ? regionLabel : nearbyLabel} {isShelter ? '보호센터' : '동물병원'}{' '}
+                {isDirectory ? regionLabel : nearbyLabel} {KIND_LABEL[search.kind]}{' '}
                 <span className="text-primary-500">
                   {(result.data?.totalCount ?? places?.length ?? 0).toLocaleString()}
                 </span>
@@ -430,15 +453,17 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
                 <p className="mt-2 text-xs leading-5 text-neutral-600">
                   지역을 넓히거나 시설 이름을 다시 검색해 보세요.
                 </p>
-                <button
-                  type="button"
-                  className="care-map-button mt-4"
-                  onClick={() => {
-                    updateSearch({ type: 'region', region: 'all' })
-                  }}
-                >
-                  전국에서 같은 조건 찾기
-                </button>
+                {hasDirectory && (
+                  <button
+                    type="button"
+                    className="care-map-button mt-4"
+                    onClick={() => {
+                      updateSearch({ type: 'region', region: 'all' })
+                    }}
+                  >
+                    전국에서 같은 조건 찾기
+                  </button>
+                )}
               </div>
             ) : (
               <ol ref={listRef} className="divide-y divide-neutral-100">
@@ -514,7 +539,8 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
           )}
           {result.data?.limited && (
             <p className="border-t border-neutral-150 p-3 text-xs leading-5 text-neutral-600">
-              주변 검색은 일부 결과만 제공돼요. 전국 등록 목록이나 더 구체적인 지역명으로
+              주변 검색은 일부 결과만 제공돼요.{' '}
+              {hasDirectory ? '전국 등록 목록이나' : '반경을 줄이거나'} 더 구체적인 지역명으로
               찾아보세요.
             </p>
           )}
@@ -624,7 +650,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
         </div>
       </div>
       <footer className="mt-6 border-t border-neutral-150 pt-4 text-[11px] leading-5 text-neutral-600">
-        {summary.data && (
+        {summary.data && hasCareDirectory(search.kind) && (
           <p>
             <a
               href={summary.data.sourceUrls[search.kind]}
@@ -638,9 +664,15 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
             건을 {summary.data.shelterCount}곳으로 정리했어요.
           </p>
         )}
+        {search.kind === 'cafe' && (
+          <p>동반 카페: 카카오맵 애견카페 · 한국문화정보원 반려동물 동반 가능 문화시설 데이터</p>
+        )}
+        {(search.kind === 'travel' || search.kind === 'stay') && (
+          <p>여행지·숙소: 한국관광공사 반려동물 동반여행 서비스</p>
+        )}
         <p>
-          지도·장소 위치: 카카오맵 · 주소가 불명확한 시설은 핀을 표시하지 않아요. 진료·방문·입양
-          가능 여부는 전화로 확인해 주세요.
+          지도·장소 위치: 카카오맵 · 주소가 불명확한 시설은 핀을 표시하지 않아요. 진료·방문·입양·
+          반려동물 동반 가능 여부는 전화로 확인해 주세요.
         </p>
       </footer>
     </div>

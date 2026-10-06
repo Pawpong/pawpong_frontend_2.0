@@ -13,9 +13,13 @@ export function CarePlaceDetails({ place, onClose }: { place: CarePlace; onClose
           <p className="mb-1 text-xs font-semibold text-primary-500">
             {place.kind === 'hospital'
               ? '동물병원'
-              : place.registration
-                ? '등록 동물보호센터'
-                : '보호·입양시설'}
+              : place.kind === 'cafe'
+                ? '애견동반카페'
+                : place.kind === 'shelter'
+                  ? place.registration
+                    ? '등록 동물보호센터'
+                    : '보호·입양시설'
+                  : place.category}
           </p>
           <h2 className="text-lg font-bold break-keep text-neutral-850">{place.name}</h2>
         </div>
@@ -67,6 +71,27 @@ export function CarePlaceDetails({ place, onClose }: { place: CarePlace; onClose
           방문 예약과 보호 중인 동물의 입양 상담은 센터에 먼저 연락해 주세요.
         </p>
       )}
+      {place.petPolicy && (
+        <div className="mt-3 rounded-xl bg-secondary-50 p-3 text-xs leading-5 text-primary-700">
+          <p className="font-bold">반려동물 동반 조건</p>
+          <dl className="mt-1 space-y-1">
+            {place.petPolicy.details.map((detail) => (
+              <div key={detail.label} className="flex gap-2">
+                <dt className="shrink-0 font-semibold">{detail.label}</dt>
+                <dd className="min-w-0 whitespace-pre-line">{detail.value}</dd>
+              </div>
+            ))}
+          </dl>
+          <p className="mt-1 text-neutral-700">
+            {place.petPolicy.source} {place.petPolicy.checkedAt} 기준 자료라 지금과 다를 수 있어요.
+          </p>
+        </div>
+      )}
+      {place.kind !== 'hospital' && place.kind !== 'shelter' && (
+        <p className="mt-3 text-xs leading-5 text-neutral-700">
+          반려동물 동반 가능 여부와 조건은 방문 전에 꼭 확인해 주세요.
+        </p>
+      )}
       {!!place.registration?.jurisdictions.length && (
         <p className="mt-2 text-xs leading-5 text-neutral-700">
           관할: {place.registration.jurisdictions.join(' · ')}
@@ -87,7 +112,12 @@ export function CarePlaceDetails({ place, onClose }: { place: CarePlace; onClose
         rel="noopener noreferrer"
         className="mt-3 block py-1 text-center text-xs text-neutral-700 underline underline-offset-4"
       >
-        {place.latitude === null ? '카카오맵에서 시설 검색 ↗' : '카카오맵에서 상세 정보 보기 ↗'}
+        {/* 공공데이터 장소는 카카오에 없는 곳이 많아 백엔드가 네이버 지도 검색 링크를 준다 */}
+        {place.placeUrl.startsWith('https://map.naver.com/')
+          ? '네이버 지도에서 보기 ↗'
+          : place.latitude === null
+            ? '카카오맵에서 시설 검색 ↗'
+            : '카카오맵에서 상세 정보 보기 ↗'}
       </a>
       {place.kind === 'shelter' && (
         <a
