@@ -1065,7 +1065,7 @@ test('방 엔진은 인스턴스와 감소된 움직임 설정을 유지하고 �
       sparks = objects.filter((item) => item.kind === 'graphics').at(-1)
     assert.ok(objects.find((item) => item.kind === 'graphics').sparkRects >= 10)
     instance.scene.update(3900, 0)
-    assert.equal(hero.frame, 1)
+    assert.equal(hero.frame, 0)
     snapshot = { ...snapshot, reducedMotion: true }
     handle.sync(snapshot)
     instance.scene.update(1950)

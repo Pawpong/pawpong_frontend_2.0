@@ -10,7 +10,7 @@ import type {
 import { PET_SLOT_POSITIONS } from '@/entities/playground-pet/model/room'
 import { SNACK_LANE_X } from '@/entities/playground-pet/model/snack'
 import { petAsset, type PetAssetManifest } from './gameAssets'
-import { advancePetMotion, initialPetMotion } from './petMotion'
+import { advancePetMotion, initialPetMotion, petMotionPose } from './petMotion'
 import { PET_ROOM_MOTION } from '../constants/pet-motion'
 
 export type PetStageSnapshot = {
@@ -297,6 +297,11 @@ export function createPetGame(
         reducedMotion: snapshot.reducedMotion,
         ...(snack ? { snackX: SNACK_LANE_X[snack.lane] } : {}),
       })
+      const pose = petMotionPose(
+        this.motion,
+        snapshot.reducedMotion || Boolean(snack) || reacting,
+        snapshot.resting,
+      )
       const frame =
         snapshot.resting && !this.motion.walking
           ? 5
@@ -308,26 +313,16 @@ export function createPetGame(
                 : 2 + (Math.floor(time / 180) % 2)
             : snack
               ? 4
-              : snapshot.reducedMotion
-                ? 0
-                : this.motion.walking
-                  ? Math.floor(time / 240) % 2
-                  : time % 4000 > 3800
-                    ? 1
-                    : 0
+              : pose.frame
       this.hero.setFrame(frame)
-      const bob =
-        snapshot.reducedMotion || snack
-          ? 0
-          : this.motion.walking
-            ? Math.abs(Math.sin(time / 110)) * 0.8
-            : Math.sin(time / 900) * 0.35
       this.hero
-        .setPosition(this.motion.x, this.motion.y - bob)
-        .setFlipX(this.motion.facingLeft)
-        .setAngle(
-          this.motion.walking && !snapshot.reducedMotion && !snack ? Math.sin(time / 110) * 0.7 : 0,
+        .setDisplaySize(
+          PET_ROOM_MOTION.displaySize + pose.width,
+          PET_ROOM_MOTION.displaySize + pose.height,
         )
+        .setPosition(this.motion.x, this.motion.y - pose.bob)
+        .setFlipX(this.motion.facingLeft)
+        .setAngle(pose.angle)
       this.sparks.clear()
       if (reacting && snapshot.feedback.stars > 0 && !snapshot.reducedMotion) {
         const progress = (time - reactionAt) / 700
