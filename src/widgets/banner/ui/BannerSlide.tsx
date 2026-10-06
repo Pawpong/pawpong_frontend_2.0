@@ -4,6 +4,8 @@ import { useState } from 'react'
 import Image, { getImageProps } from 'next/image'
 import Link from 'next/link'
 import type { BannerDto } from '@/shared/types'
+import { BannerCopy } from './BannerCopy'
+import styles from './BannerCopy.module.css'
 
 /** 링크 래퍼 — 표시(BannerSlide)와 링크 분기 로직 분리 (SRP) */
 const BannerLink = ({ banner, children }: { banner: BannerDto; children: React.ReactNode }) => {
@@ -33,7 +35,7 @@ const BannerSlide = ({ banner }: { banner: BannerDto }) => {
   // Swiper의 실제 폭(태블릿 78.75vw, PC 최대 1134px)에 맞는 해상도를 요청한다.
   const { props: desktopImage } = getImageProps({
     src: banner.desktopImageUrl,
-    alt: banner.title ?? '',
+    alt: banner.textOverlay ? '' : (banner.title ?? ''),
     fill: true,
     sizes: '(min-width: 90rem) 70.875rem, 78.75vw',
     quality: 100,
@@ -46,7 +48,9 @@ const BannerSlide = ({ banner }: { banner: BannerDto }) => {
         className="relative w-full overflow-hidden rounded-[0.4455rem] bg-[#d9d9d9] tab:rounded pc:rounded-xl"
       >
         {/* //QA: 이미지 비율 수정 — breakpoint별 Figma 원본 비율을 유지해 이미지 왜곡을 방지한다. */}
-        <div className="relative aspect-[375/191.6667] tab:aspect-[604.8/241.0667] pc:aspect-[1134/452]">
+        <div
+          className={`${styles.frame} relative aspect-[375/191.6667] tab:aspect-[604.8/241.0667] pc:aspect-[1134/452]`}
+        >
           <picture>
             <source
               media="(min-width: 768px)"
@@ -55,7 +59,7 @@ const BannerSlide = ({ banner }: { banner: BannerDto }) => {
             />
             <Image
               src={mobileImageUrl}
-              alt={banner.title ?? ''}
+              alt={banner.textOverlay ? '' : (banner.title ?? '')}
               fill
               sizes="100vw"
               quality={100}
@@ -71,6 +75,7 @@ const BannerSlide = ({ banner }: { banner: BannerDto }) => {
               loading="eager"
             />
           </picture>
+          {banner.textOverlay && <BannerCopy copy={banner.textOverlay} />}
         </div>
       </section>
     </BannerLink>
