@@ -23,6 +23,15 @@ export interface CarePlace {
   referral: { url: string; checkedAt: string; label: string } | null
   locationStatus?: 'place' | 'address' | 'not-found' | 'unavailable'
   registration?: { source: string; url: string; checkedAt: string; jurisdictions: string[] }
+  /** 공공데이터의 반려동물 동반 조건 — 공공 동반 카페에만 온다 */
+  petPolicy?: {
+    sizes: string
+    restrictions: string
+    indoor: boolean
+    outdoor: boolean
+    source: string
+    checkedAt: string
+  }
 }
 
 export type MappedCarePlace = CarePlace & CareCoordinates & { markerNumber: number }

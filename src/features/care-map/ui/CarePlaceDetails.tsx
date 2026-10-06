@@ -69,6 +69,22 @@ export function CarePlaceDetails({ place, onClose }: { place: CarePlace; onClose
           방문 예약과 보호 중인 동물의 입양 상담은 센터에 먼저 연락해 주세요.
         </p>
       )}
+      {place.petPolicy && (
+        <div className="mt-3 rounded-xl bg-secondary-50 p-3 text-xs leading-5 text-primary-700">
+          <p className="font-bold">반려동물 동반 조건</p>
+          <p>입장 가능 크기: {place.petPolicy.sizes || '정보 없음'}</p>
+          <p>제한사항: {place.petPolicy.restrictions || '정보 없음'}</p>
+          <p>
+            동반 공간:{' '}
+            {[place.petPolicy.indoor && '실내', place.petPolicy.outdoor && '실외']
+              .filter(Boolean)
+              .join('·') || '정보 없음'}
+          </p>
+          <p className="mt-1 text-neutral-700">
+            {place.petPolicy.source} {place.petPolicy.checkedAt} 작성 자료라 지금과 다를 수 있어요.
+          </p>
+        </div>
+      )}
       {place.kind === 'cafe' && (
         <p className="mt-3 text-xs leading-5 text-neutral-700">
           반려동물 동반 가능 여부와 조건(크기·실내 동반 등)은 방문 전에 매장에 확인해 주세요.
