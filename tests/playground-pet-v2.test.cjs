@@ -32,6 +32,10 @@ const { PetCharacterResource, validatePetSheetPixels } = load(
   'src/features/playground-pet/lib/characterResource.ts',
 )
 const { petAsset, loadPetAssets } = load('src/features/playground-pet/lib/gameAssets.ts')
+const motionSettings = load('src/features/playground-pet/constants/pet-motion.ts')
+const motion = load('src/features/playground-pet/lib/petMotion.ts', {
+  '../constants/pet-motion': motionSettings,
+})
 
 function sessionHarness() {
   const state = { token: 'fixture-owner-a', generation: 1, refreshes: 0, notifications: 0 }
@@ -919,7 +923,7 @@ test('personal sheet cannot remain visible when its pet/source or account scope 
   assert.equal(disposed, 3)
 })
 
-test('room engine preserves its game, honours reduced motion and flushes destruction with a paused loop', async () => {
+test('방 엔진은 인스턴스와 감소된 움직임 설정을 유지하고 정지된 루프에서도 정리한다', async () => {
   const previousImage = global.Image
   let instance,
     instances = 0,
@@ -934,6 +938,8 @@ test('room engine preserves its game, honours reduced motion and flushes destruc
       'setTexture',
       'setSize',
       'setTint',
+      'setFlipX',
+      'setAngle',
       'fillStyle',
       'fillTriangle',
     ])
@@ -1031,6 +1037,8 @@ test('room engine preserves its game, honours reduced motion and flushes destruc
       '@/entities/playground-pet/model/room': room,
       '@/entities/playground-pet/model/snack': snack,
       './gameAssets': { petAsset },
+      './petMotion': motion,
+      '../constants/pet-motion': motionSettings,
     })
     let snapshot = {
       manifest: {
@@ -1056,7 +1064,7 @@ test('room engine preserves its game, honours reduced motion and flushes destruc
     const hero = objects.find((item) => item.kind === 'sprite'),
       sparks = objects.filter((item) => item.kind === 'graphics').at(-1)
     assert.ok(objects.find((item) => item.kind === 'graphics').sparkRects >= 10)
-    instance.scene.update(650)
+    instance.scene.update(3900, 0)
     assert.equal(hero.frame, 1)
     snapshot = { ...snapshot, reducedMotion: true }
     handle.sync(snapshot)
@@ -1117,7 +1125,7 @@ test('room engine preserves its game, honours reduced motion and flushes destruc
   }
 })
 
-test('failed snack assets retry to real textures in the same session and preparation loads only chosen game assets', async () => {
+test('간식 에셋 실패는 같은 세션에서 다시 읽고 선택한 게임 에셋만 준비한다', async () => {
   const previousImage = global.Image,
     objects = [],
     requests = [],
@@ -1136,6 +1144,8 @@ test('failed snack assets retry to real textures in the same session and prepara
       'fillTriangle',
       'clear',
       'setFrame',
+      'setFlipX',
+      'setAngle',
     ])
       item[method] = () => item
     for (const [method, field] of [
@@ -1211,6 +1221,8 @@ test('failed snack assets retry to real textures in the same session and prepara
       '@/entities/playground-pet/model/room': room,
       '@/entities/playground-pet/model/snack': snack,
       './gameAssets': { petAsset },
+      './petMotion': motion,
+      '../constants/pet-motion': motionSettings,
     })
     const snapshot = {
       room: { wallpaper: 'wallpaper_cream', floor: 'floor_oak' },

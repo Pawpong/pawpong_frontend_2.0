@@ -15,6 +15,7 @@ function resultEntry({
 } = {}) {
   const queries = []
   const { PetResultLink } = loadModule('src/features/playground-pet/ui/PetResultLink.tsx', {
+    '@/shared/lib/cn': { cn: (...args) => args.filter(Boolean).join(' ') },
     'react/jsx-runtime': jsx,
     'next/link': { default: Link },
     '@tanstack/react-query': {
