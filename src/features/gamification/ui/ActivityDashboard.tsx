@@ -1,11 +1,11 @@
 'use client'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useIsMutating, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import {
   getActivity,
   synchronizeActivity,
   displayActivityBadges,
-  withActivitySession,
+  type ActivitySession,
   PixelActivityBadge,
 } from '@/entities/gamification'
 import { Button } from '@/shared/ui'
@@ -20,40 +20,41 @@ const LABELS: Record<string, string> = {
   contest: '콘테스트 출품',
   winner: '명예의 전당',
 }
-export function ActivityDashboard({
-  ownerId,
-  generation,
-}: {
-  ownerId: string
-  generation: number
-}) {
+export function ActivityDashboard({ session }: { session: ActivitySession }) {
   const client = useQueryClient()
-  const key = ['gamification', 'private', ownerId, generation]
+  const key = ['gamification', 'private', session.scope]
+  const mutationKey = ['gamification', 'write', session.scope]
+  const writing = useIsMutating({ mutationKey }) > 0
   const view = useQuery({
     queryKey: key,
-    queryFn: ({ signal }) => withActivitySession(generation, () => getActivity(signal)),
+    queryFn: ({ signal }) => getActivity(session, signal),
+    enabled: !writing,
     retry: false,
     throwOnError: false,
     gcTime: 0,
     refetchOnWindowFocus: true,
   })
+  const cancelReads = () => client.cancelQueries({ queryKey: key, exact: true })
+  const saveView = async (data: Awaited<ReturnType<typeof getActivity>>) => {
+    // Cancel again in case focus/reconnect started another read while a mutation was pending.
+    await cancelReads()
+    client.setQueryData(key, data)
+    void client.invalidateQueries({ queryKey: ['gamification', 'public'] })
+  }
   const sync = useMutation({
-    mutationFn: () => withActivitySession(generation, () => synchronizeActivity()),
-    onSuccess: (data) => {
-      client.setQueryData(key, data)
-      void client.invalidateQueries({ queryKey: ['gamification', 'public'] })
-    },
+    mutationKey,
+    mutationFn: () => synchronizeActivity(session),
+    onMutate: cancelReads,
+    onSuccess: saveView,
   })
   const display = useMutation({
-    mutationFn: (keys: string[]) =>
-      withActivitySession(generation, () => displayActivityBadges(keys)),
-    onSuccess: (data) => {
-      client.setQueryData(key, data)
-      void client.invalidateQueries({ queryKey: ['gamification', 'public'] })
-    },
+    mutationKey,
+    mutationFn: (keys: string[]) => displayActivityBadges(session, keys),
+    onMutate: cancelReads,
+    onSuccess: saveView,
   })
   const data = view.data
-  const busy = sync.isPending || display.isPending
+  const busy = writing || sync.isPending || display.isPending
   const earned = data?.badges.filter((badge) => badge.state === 'earned') ?? []
   const error = view.error ?? sync.error ?? display.error
   return (
@@ -93,7 +94,17 @@ export function ActivityDashboard({
       {error && (
         <div role="alert" className="py-4">
           <p>{error instanceof Error ? error.message : '활동을 확인하지 못했어요.'}</p>
-          <Button intent="secondary" onClick={() => void view.refetch()}>
+          <Button
+            intent="secondary"
+            disabled={busy || view.isFetching}
+            onClick={async () => {
+              const result = await view.refetch()
+              if (result.isSuccess) {
+                sync.reset()
+                display.reset()
+              }
+            }}
+          >
             다시 확인
           </Button>
         </div>
@@ -143,7 +154,7 @@ export function ActivityDashboard({
                   <button
                     type="button"
                     aria-pressed={selected}
-                    disabled={busy || (!selected && data.displayBadges.length >= 3)}
+                    disabled={busy || view.isError || (!selected && data.displayBadges.length >= 3)}
                     onClick={() =>
                       display.mutate(
                         selected

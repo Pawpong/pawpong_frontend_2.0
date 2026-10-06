@@ -2,13 +2,12 @@
 import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import { useMe } from '@/features/auth'
-import { useAuthSessionGeneration } from '@/shared/lib/useAuthSessionGeneration'
 import { activityConfigOptions } from '@/entities/gamification'
-import { ActivityDashboard } from '@/features/gamification'
+import { ActivityDashboard, useActivitySession } from '@/features/gamification'
 export function ActivityContent() {
   const config = useQuery(activityConfigOptions)
   const { me, isLoggedIn } = useMe()
-  const generation = useAuthSessionGeneration()
+  const session = useActivitySession()
   if (config.isPending)
     return (
       <p role="status" className="p-10 text-center">
@@ -28,17 +27,11 @@ export function ActivityContent() {
         <Link href="/login?returnUrl=%2Fmy-activity">로그인하기</Link>
       </div>
     )
-  if (!me?.userId)
+  if (!session || session.ownerId !== me?.userId)
     return (
       <p role="status" className="p-10 text-center">
         로그인한 계정의 배지함을 확인하고 있어요.
       </p>
     )
-  return (
-    <ActivityDashboard
-      key={`${me.userId}:${generation}`}
-      ownerId={me.userId}
-      generation={generation}
-    />
-  )
+  return <ActivityDashboard key={session.scope} session={session} />
 }

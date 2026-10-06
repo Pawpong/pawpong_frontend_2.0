@@ -1,8 +1,10 @@
 import { apiClient, API_VERSION, unwrap, type ApiRequestConfig } from '@/shared/api'
-import { getAccessToken } from '@/shared/api/token'
-import { isAuthSessionCurrent } from '@/shared/lib/authSessionLifecycle'
+import { ApiError } from '@/shared/api/unwrap'
+import { notifyAuthStateChanged } from '@/shared/lib/authStateEvents'
+import { refreshAuthSession } from '@/shared/lib/authSessionRecovery'
 import type { ApiResponseFull } from '@/shared/types'
 import type { ActivityView, ActivityBadgeOwner, PublicActivityBadges } from '../model/types'
+import { isActivitySessionCurrent, type ActivitySession } from '../model/session'
 
 export const activityConfigOptions = {
   queryKey: ['gamification', 'config'],
@@ -17,42 +19,77 @@ export const activityConfigOptions = {
   },
 }
 export async function withActivitySession<T>(
-  generation: number,
-  request: () => Promise<T>,
+  session: ActivitySession,
+  request: (config: ApiRequestConfig) => Promise<T>,
 ): Promise<T> {
-  const token = getAccessToken()
-  if (!token || !isAuthSessionCurrent(generation))
+  if (!isActivitySessionCurrent(session)) {
+    notifyAuthStateChanged()
     throw new Error('로그인 정보를 다시 확인해 주세요.')
-  const result = await request()
-  if (getAccessToken() !== token || !isAuthSessionCurrent(generation))
+  }
+  let result: T
+  try {
+    result = await request({
+      headers: { Authorization: `Bearer ${session.token}` },
+      skipAuth: true,
+      skipAuthRefresh: true,
+    })
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 401 && isActivitySessionCurrent(session)) {
+      // Refresh credentials only. The new scope reloads its data; never replay an old mutation.
+      try {
+        await refreshAuthSession()
+      } catch {
+        // Shared recovery preserves credentials on network errors and clears expired sessions.
+      }
+    }
+    notifyAuthStateChanged()
+    throw error
+  }
+  if (!isActivitySessionCurrent(session)) {
+    notifyAuthStateChanged()
     throw new Error('계정이 변경됐어요. 새 계정의 활동을 확인해 주세요.')
+  }
   return result
 }
-export async function getActivity(signal?: AbortSignal): Promise<ActivityView> {
-  return unwrap(
-    await apiClient.get<ApiResponseFull<ActivityView>>(`${API_VERSION}/gamification/me`, {
-      signal,
-    }),
+export async function getActivity(
+  session: ActivitySession,
+  signal?: AbortSignal,
+): Promise<ActivityView> {
+  return withActivitySession(session, async (config) =>
+    unwrap(
+      await apiClient.get<ApiResponseFull<ActivityView>>(`${API_VERSION}/gamification/me`, {
+        ...config,
+        signal,
+      }),
+    ),
   )
 }
-export async function synchronizeActivity(signal?: AbortSignal): Promise<ActivityView> {
-  return unwrap(
-    await apiClient.post<ApiResponseFull<ActivityView>>(
-      `${API_VERSION}/gamification/me/sync`,
-      {},
-      { signal, timeout: 30000 },
+export async function synchronizeActivity(
+  session: ActivitySession,
+  signal?: AbortSignal,
+): Promise<ActivityView> {
+  return withActivitySession(session, async (config) =>
+    unwrap(
+      await apiClient.post<ApiResponseFull<ActivityView>>(
+        `${API_VERSION}/gamification/me/sync`,
+        {},
+        { ...config, signal, timeout: 30000 },
+      ),
     ),
   )
 }
 export async function displayActivityBadges(
+  session: ActivitySession,
   keys: string[],
   signal?: AbortSignal,
 ): Promise<ActivityView> {
-  return unwrap(
-    await apiClient.patch<ApiResponseFull<ActivityView>>(
-      `${API_VERSION}/gamification/me/display-badges`,
-      { keys },
-      { signal },
+  return withActivitySession(session, async (config) =>
+    unwrap(
+      await apiClient.patch<ApiResponseFull<ActivityView>>(
+        `${API_VERSION}/gamification/me/display-badges`,
+        { keys },
+        { ...config, signal },
+      ),
     ),
   )
 }
