@@ -402,42 +402,42 @@ export function AiFilterStudio({
               </div>
             </div>
           ) : result && photo ? (
-            <div>
+            <div className="space-y-5 rounded-2xl border border-neutral-150 bg-white p-4 tab:space-y-6 tab:p-6">
               <h2
                 className={cn(
                   cafe24Proup.className,
-                  'mb-3 text-center font-cafe24 text-xl font-bold text-primary-500',
+                  'text-center font-cafe24 text-xl leading-relaxed font-bold text-primary-500',
                 )}
               >
                 짜잔! {gameCharacter ? '우리 아이 캐릭터' : (selectedFilter?.name ?? 'AI 필터')}{' '}
                 완성
               </h2>
               {gameCharacter ? (
-                <div className="rounded-xl border-2 border-primary-200 bg-point-50 p-6">
+                <div className="rounded-xl border-2 border-primary-200 bg-point-50 px-6 py-5 tab:py-6">
                   <Image
                     src={result.imageUrl}
                     alt="완성된 우리 아이 게임 캐릭터"
                     width={288}
                     height={288}
                     unoptimized
-                    className="mx-auto aspect-square w-full max-w-72 object-contain [image-rendering:pixelated]"
+                    className="mx-auto aspect-square w-full max-w-60 object-contain [image-rendering:pixelated]"
                   />
                 </div>
               ) : (
                 <BeforeAfterCompare beforeSrc={photo.url} afterSrc={result.imageUrl} />
               )}
-              <PetResultLink sourceJobId={result.jobId} />
+              <PetResultLink sourceJobId={result.jobId} className="mt-0" />
               <AiPostShareChoice
                 checked={shareComparison}
                 onChange={setShareComparison}
                 disabled={saving}
               />
-              <p className="mt-2 text-center text-xs text-neutral-700">
+              <p className="text-center text-xs leading-relaxed text-neutral-700">
                 {gameCharacter
                   ? '우리 아이와 닮았는지 확인해 주세요. 보관함에도 저장됐어요.'
                   : '가운데 손잡이를 끌어 원본과 비교해 보세요. 보관함에도 저장됐어요.'}
               </p>
-              <div className="mt-4 grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2">
                 <Button intent="secondary" size="lg" disabled={saving} onClick={() => void save()}>
                   {saving ? '준비 중…' : '저장하기'}
                 </Button>
@@ -445,7 +445,7 @@ export function AiFilterStudio({
                   커뮤니티에 자랑하기
                 </Button>
               </div>
-              <div className="mt-3 flex justify-center">
+              <div className="flex justify-center">
                 <Button
                   size="md"
                   intent="link"

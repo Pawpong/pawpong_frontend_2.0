@@ -10,7 +10,7 @@ export function AiPostShareChoice({
   disabled?: boolean
 }) {
   return (
-    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-primary-200 bg-point-50 p-3 text-sm text-neutral-850">
+    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-primary-200 bg-point-50 p-4 text-sm leading-relaxed text-neutral-850">
       <input
         type="checkbox"
         checked={checked}

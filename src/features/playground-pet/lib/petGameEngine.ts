@@ -10,6 +10,8 @@ import type {
 import { PET_SLOT_POSITIONS } from '@/entities/playground-pet/model/room'
 import { SNACK_LANE_X } from '@/entities/playground-pet/model/snack'
 import { petAsset, type PetAssetManifest } from './gameAssets'
+import { advancePetMotion, initialPetMotion } from './petMotion'
+import { PET_ROOM_MOTION } from '../constants/pet-motion'
 
 export type PetStageSnapshot = {
   room: PetRoomState | null
@@ -167,6 +169,7 @@ export function createPetGame(
     private drops: Phaser.GameObjects.Image[] = []
     private dropSession = ''
     private sparks!: Phaser.GameObjects.Graphics
+    private motion = initialPetMotion()
 
     create() {
       scene = this
@@ -201,7 +204,7 @@ export function createPetGame(
             .setVisible(false),
         )
       }
-      this.shadow = this.add.ellipse(130, 190, 40, 8, 0x6c5341, 0.2).setDepth(20).setVisible(false)
+      this.shadow = this.add.ellipse(130, 190, 30, 6, 0x6c5341, 0.18).setDepth(20).setVisible(false)
       this.hero = this.add
         .sprite(130, 196, '__WHITE')
         .setOrigin(0.5, 0.875)
@@ -249,7 +252,10 @@ export function createPetGame(
       }
       this.hero.setVisible(Boolean(characterKey))
       if (characterKey)
-        this.hero.setTexture(characterKey, 0).setDisplaySize(96, 96).setVisible(true)
+        this.hero
+          .setTexture(characterKey, 0)
+          .setDisplaySize(PET_ROOM_MOTION.displaySize, PET_ROOM_MOTION.displaySize)
+          .setVisible(true)
       this.shadow.setVisible(Boolean(characterKey))
       const snack = snapshot.snack
       const changedSession = this.dropSession !== (snack?.session.sessionId ?? '')
@@ -273,10 +279,9 @@ export function createPetGame(
           const id = snack.session.drops[index].kind === 'snack' ? 'toy_bone' : 'toy_ball'
           this.showAsset(image, id, 24, 24)
         })
-      if (!snack) this.hero.setPosition(snapshot.resting ? 246 : 130, snapshot.resting ? 164 : 196)
     }
 
-    update(time: number) {
+    update(time: number, delta = 1000 / 30) {
       if (!alive || !characterKey || !ready) return
       if (snapshot.reaction !== lastReaction) {
         lastReaction = snapshot.reaction
@@ -284,20 +289,45 @@ export function createPetGame(
       }
       const snack = snapshot.snack
       const reacting = time - reactionAt < 700 && reactionAt > 0
-      const frame = snapshot.resting
-        ? 5
-        : reacting
-          ? snapshot.feedback.action === 'play'
-            ? 4
-            : snapshot.reducedMotion
-              ? 2
-              : 2 + (Math.floor(time / 180) % 2)
-          : snack
-            ? 4
-            : snapshot.reducedMotion
-              ? 0
-              : Math.floor(time / 650) % 2
+      this.motion = advancePetMotion(this.motion, {
+        time,
+        delta,
+        reacting,
+        resting: snapshot.resting,
+        reducedMotion: snapshot.reducedMotion,
+        ...(snack ? { snackX: SNACK_LANE_X[snack.lane] } : {}),
+      })
+      const frame =
+        snapshot.resting && !this.motion.walking
+          ? 5
+          : reacting
+            ? snapshot.feedback.action === 'play'
+              ? 4
+              : snapshot.reducedMotion
+                ? 2
+                : 2 + (Math.floor(time / 180) % 2)
+            : snack
+              ? 4
+              : snapshot.reducedMotion
+                ? 0
+                : this.motion.walking
+                  ? Math.floor(time / 240) % 2
+                  : time % 4000 > 3800
+                    ? 1
+                    : 0
       this.hero.setFrame(frame)
+      const bob =
+        snapshot.reducedMotion || snack
+          ? 0
+          : this.motion.walking
+            ? Math.abs(Math.sin(time / 110)) * 0.8
+            : Math.sin(time / 900) * 0.35
+      this.hero
+        .setPosition(this.motion.x, this.motion.y - bob)
+        .setFlipX(this.motion.facingLeft)
+        .setAngle(
+          this.motion.walking && !snapshot.reducedMotion && !snack ? Math.sin(time / 110) * 0.7 : 0,
+        )
       this.sparks.clear()
       if (reacting && snapshot.feedback.stars > 0 && !snapshot.reducedMotion) {
         const progress = (time - reactionAt) / 700
@@ -313,7 +343,6 @@ export function createPetGame(
         }
       }
       if (snack) {
-        this.hero.setPosition(SNACK_LANE_X[snack.lane], 213)
         this.drops.forEach((image, index) => {
           const drop = snack.session.drops[index]
           const remaining = drop.landingAtMs - snack.elapsed
@@ -322,7 +351,7 @@ export function createPetGame(
           if (visible) image.setY(Math.round(22 + (1 - remaining / 1700) * 166))
         })
       }
-      this.shadow.setPosition(this.hero.x, this.hero.y - 4)
+      this.shadow.setPosition(this.motion.x, this.motion.y - 4)
     }
   }
 
