@@ -39,6 +39,8 @@ const nextConfig: NextConfig = {
     ]
   },
   images: {
+    // 글자가 포함된 홈 배너는 압축 품질을 별도로 높인다.
+    qualities: [75, 100],
     remotePatterns: [
       {
         protocol: 'https',

@@ -115,9 +115,9 @@ const Banner = () => {
         ))}
       </Swiper>
 
-      {/* 모바일은 배너 아래에 배경 없이 배치하고, 탭·PC에서는 배너 내부에 배치한다. */}
-      <div className="relative z-10 flex justify-center py-2.5 tab:absolute tab:inset-x-0 tab:bottom-0 pc:bottom-10">
-        <div className="flex h-4 w-25 items-center justify-center gap-1 rounded-full px-4 py-1">
+      {/* 페이지 표시가 배너의 글자·캐릭터·스토어 버튼을 가리지 않도록 아래에 둔다. */}
+      <div className="relative z-10 flex justify-center py-2.5">
+        <div className="flex h-4 items-center justify-center gap-1 rounded-full px-4 py-1">
           {orderedBanners.map((banner, index) => (
             <button
               key={banner.bannerId}
@@ -144,7 +144,7 @@ const Banner = () => {
             type="button"
             aria-label={label}
             className={cn(
-              'absolute top-1/2 z-10 hidden -translate-y-1/2 items-center justify-center text-primary-500 focus-ring transition-[color,transform] hover:text-primary-700 focus-visible:rounded-sm tab:flex tab:size-[min(3rem,3.333vw)] [&.swiper-button-disabled]:cursor-default [&.swiper-button-disabled]:text-neutral-400 [&.swiper-button-disabled]:hover:text-neutral-400',
+              'absolute top-[calc(50%-1.125rem)] z-10 hidden -translate-y-1/2 items-center justify-center text-primary-500 focus-ring transition-[color,transform] hover:text-primary-700 focus-visible:rounded-sm tab:flex tab:size-[min(3rem,3.333vw)] [&.swiper-button-disabled]:cursor-default [&.swiper-button-disabled]:text-neutral-400 [&.swiper-button-disabled]:hover:text-neutral-400',
               position,
               className,
             )}
