@@ -37,8 +37,34 @@ function sample(random: () => number) {
   return Number.isFinite(value) ? Math.max(0, Math.min(1, value)) : 0.5
 }
 
-function wanderTarget(current: PetMotion, random: () => number) {
+function clampToFloor(point: { x: number; y: number }) {
+  const { bounds } = PET_ROOM_MOTION
+  return {
+    x: Math.max(bounds.left, Math.min(bounds.right, point.x)),
+    y: Math.max(bounds.top, Math.min(bounds.bottom, point.y)),
+  }
+}
+
+/** 방을 눌러 부르면 바닥의 안전한 범위 안에서 그쪽으로 걸어온다. 휴식·간식 게임 중에는 무시한다. */
+export function callPetTo(current: PetMotion, point: { x: number; y: number }): PetMotion {
+  if (current.mode !== 'room') return current
+  const target = clampToFloor(point)
+  return { ...current, targetX: target.x, targetY: target.y, resumeAt: 0 }
+}
+
+function wanderTarget(
+  current: PetMotion,
+  random: () => number,
+  visits: readonly { x: number; y: number }[] = [],
+) {
   const { bounds, minimumWanderDistance } = PET_ROOM_MOTION
+  // 가끔은 장착한 장난감·화분 근처로 간다.
+  if (visits.length && sample(random) < PET_ROOM_MOTION.visitChance) {
+    const visit = clampToFloor(
+      visits[Math.min(visits.length - 1, Math.floor(sample(random) * visits.length))],
+    )
+    if (Math.hypot(visit.x - current.x, visit.y - current.y) >= minimumWanderDistance) return visit
+  }
   for (let attempt = 0; attempt < 6; attempt++) {
     const x = bounds.left + sample(random) * (bounds.right - bounds.left)
     const y = bounds.top + sample(random) * (bounds.bottom - bounds.top)
@@ -60,6 +86,7 @@ export function advancePetMotion(
     reducedMotion: boolean
     reacting: boolean
     snackX?: number
+    visits?: readonly { x: number; y: number }[]
   },
   random = Math.random,
 ): PetMotion {
@@ -123,7 +150,7 @@ export function advancePetMotion(
     Math.hypot(next.targetX - next.x, next.targetY - next.y) <= arrivalDistance &&
     input.time >= next.nextWanderAt
   ) {
-    const target = wanderTarget(next, random)
+    const target = wanderTarget(next, random, input.visits)
     next.targetX = target.x
     next.targetY = target.y
   }
