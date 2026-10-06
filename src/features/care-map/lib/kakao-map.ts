@@ -19,6 +19,14 @@ export interface KakaoMapInstance {
 }
 
 export interface KakaoMaps {
+  Polyline: new (options: {
+    map: KakaoMapInstance
+    path: MapLatLng[]
+    strokeWeight: number
+    strokeColor: string
+    strokeOpacity: number
+    strokeStyle: string
+  }) => { setMap(map: KakaoMapInstance | null): void }
   load(callback: () => void): void
   Map: new (
     container: HTMLElement,
@@ -35,7 +43,17 @@ export interface KakaoMaps {
     zIndex: number
   }) => { setMap(map: KakaoMapInstance | null): void }
   event: {
+    addListener(
+      target: KakaoMapInstance,
+      event: 'click',
+      callback: (event: { latLng: MapLatLng }) => void,
+    ): void
     addListener(target: KakaoMapInstance, event: string, callback: () => void): void
+    removeListener(
+      target: KakaoMapInstance,
+      event: 'click',
+      callback: (event: { latLng: MapLatLng }) => void,
+    ): void
     removeListener(target: KakaoMapInstance, event: string, callback: () => void): void
   }
 }

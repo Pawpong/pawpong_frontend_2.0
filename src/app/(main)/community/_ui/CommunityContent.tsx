@@ -1,10 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { ActivityBadgeRow } from '@/entities/gamification'
 import { ActivityEntry, usePublicActivityBadges } from '@/features/gamification'
-import { useRouter } from 'next/navigation'
-import { useInfiniteQuery } from '@tanstack/react-query'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import {
+  communityExperienceConfigOptions,
+  countCommunityDiscovery,
+  parseCommunityDiscovery,
+  toCommunityDiscoveryQuery,
+} from '@/entities/community'
 import {
   Button,
   DeleteConfirmModal,
@@ -30,8 +36,10 @@ import { useLoginGuard, useMe } from '@/features/auth'
 import { FeedFollowButton } from './FeedFollowButton'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import { cn } from '@/shared/lib/cn'
-import type { CommunityPetType, CommunitySortType } from '@/shared/types'
+import type { CommunityPetType, CommunitySortType, CommunityDiscoveryFilters } from '@/shared/types'
 import { COMMUNITY_SORT_OPTIONS } from './constants'
+import { CommunityDiscovery } from './CommunityDiscovery'
+import { CommunityFeedMeta } from './CommunityFeedMeta'
 
 const PET_OPTIONS = [
   { value: '', label: '전체 이야기', shortLabel: '전체' },
@@ -42,9 +50,25 @@ const PET_OPTIONS = [
 
 const CommunityContent = () => {
   const router = useRouter()
+  const parameters = useSearchParams()
   const [petType, setPetType] = useState<CommunityPetType | ''>('')
   const [sort, setSort] = useState<CommunitySortType>('latest')
   const [appliedSearch, setAppliedSearch] = useState('')
+  // 필터는 주소가 원본이다 — 상세의 태그 링크, 뒤로 가기, 공유한 주소가 같은 목록을 연다.
+  const discoveryQuery = toCommunityDiscoveryQuery(parseCommunityDiscovery(parameters))
+  const discovery = useMemo(
+    () => parseCommunityDiscovery(new URLSearchParams(discoveryQuery)),
+    [discoveryQuery],
+  )
+  const setDiscovery = (next: CommunityDiscoveryFilters) => {
+    const query = toCommunityDiscoveryQuery(next)
+    router.replace(query ? `/community?${query}` : '/community', { scroll: false })
+  }
+  const experience = useQuery(communityExperienceConfigOptions)
+  const experienceEnabled = experience.data?.enabled === true && !experience.isError
+  const filtered = experienceEnabled && countCommunityDiscovery(discovery) > 0
+  const topicLabel = (key: string) =>
+    experience.data?.topics.find((topic) => topic.key === key)?.label ?? key
   const { guard, isPromptOpen, setPromptOpen } = useLoginGuard()
   const { me } = useMe()
   const { requestDelete, modalProps: deleteModalProps } = useDeletePostConfirm()
@@ -58,7 +82,15 @@ const CommunityContent = () => {
     refetch,
     isFetching: isRetrying,
   } = useInfiniteQuery(
-    communityQueries.posts(sort, petType || undefined, undefined, appliedSearch || undefined),
+    communityQueries.posts(
+      sort,
+      petType || undefined,
+      undefined,
+      appliedSearch || undefined,
+      15,
+      undefined,
+      filtered ? discovery : undefined,
+    ),
   )
   const posts = flattenPages(data)
   const authorBadges = usePublicActivityBadges(
@@ -132,7 +164,7 @@ const CommunityContent = () => {
             </div>
             <SearchBar
               key={appliedSearch}
-              className="mb-6"
+              className={experienceEnabled ? 'mb-4' : 'mb-6'}
               placeholder={{
                 mobile: '궁금한 이야기 검색',
                 desktop: '궁금한 이야기를 검색해보세요',
@@ -140,6 +172,13 @@ const CommunityContent = () => {
               defaultValue={appliedSearch}
               onSubmit={setAppliedSearch}
             />
+            {experienceEnabled && experience.data && (
+              <CommunityDiscovery
+                config={experience.data}
+                value={discovery}
+                onChange={setDiscovery}
+              />
+            )}
 
             <nav
               aria-label="동물별 이야기"
@@ -158,7 +197,7 @@ const CommunityContent = () => {
 
             <div className="flex items-center justify-between gap-3 border-b border-neutral-150 pb-4">
               <h2 className="text-base font-semibold text-neutral-850">
-                {appliedSearch ? '검색 결과' : selectedLabel}
+                {appliedSearch ? '검색 결과' : filtered ? '찾은 이야기' : selectedLabel}
               </h2>
               <SortOptions
                 ariaLabel="게시글 정렬"
@@ -183,7 +222,7 @@ const CommunityContent = () => {
               </div>
             )}
             <ListState
-              appPublicContent={!appliedSearch}
+              appPublicContent={!appliedSearch && !filtered}
               isPending={false}
               isError={isError}
               isEmpty={!isPending && posts.length === 0}
@@ -194,7 +233,9 @@ const CommunityContent = () => {
               emptyText={
                 appliedSearch
                   ? '검색 결과가 없어요. 다른 검색어로 찾아보세요.'
-                  : '아직 이야기가 없어요. 첫 이야기를 들려주세요.'
+                  : filtered
+                    ? '조건에 맞는 이야기가 아직 없어요. 필터를 줄여 보세요.'
+                    : '아직 이야기가 없어요. 첫 이야기를 들려주세요.'
               }
             >
               <div>
@@ -214,6 +255,15 @@ const CommunityContent = () => {
                             ) ?? []
                           }
                         />
+                      }
+                      metaSlot={
+                        experienceEnabled ? (
+                          <CommunityFeedMeta
+                            experience={post.experience}
+                            topicLabel={topicLabel}
+                            onFilter={setDiscovery}
+                          />
+                        ) : undefined
                       }
                       {...toCommunityPreviewProps(post)}
                       onEdit={
