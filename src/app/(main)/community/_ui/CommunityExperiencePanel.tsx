@@ -1,21 +1,24 @@
 'use client'
 
-import { useState } from 'react'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import Link from 'next/link'
+import { useQuery } from '@tanstack/react-query'
 import {
+  CommunityPixelIcon,
+  CommunityRecordCard,
   communityExperienceConfigOptions,
-  readCommunityAiAnswer,
-  requestCommunityAiAnswer,
   isCommunityPostHeld,
+  summarizeCommunityRecords,
+  toCommunityDiscoveryQuery,
 } from '@/entities/community'
 import { SharedRouteMap } from '@/features/care-map'
+import { useCommunityAutoApplied } from '@/features/community'
 import { usePurchases } from '@/features/in-app-purchase'
-import { getAccessToken } from '@/shared/api/token'
-import { isAuthSessionCurrent } from '@/shared/lib/authSessionLifecycle'
 import type { CommunityPostDetail } from '@/shared/types'
-import Link from 'next/link'
-import { communityQueries } from '@/entities/community'
-import { useInfiniteQuery } from '@tanstack/react-query'
+import { CommunityAnswer } from './CommunityAiAnswer'
+import { CommunityRelatedPosts } from './CommunityRelatedPosts'
+
+const CHIP =
+  'inline-flex min-h-8 items-center rounded-full border px-3 text-xs font-semibold focus-ring transition-colors'
 
 export function CommunityExperiencePanel({
   post,
@@ -26,57 +29,111 @@ export function CommunityExperiencePanel({
 }) {
   const config = useQuery(communityExperienceConfigOptions)
   const { generation } = usePurchases()
+  const autoApplied = useCommunityAutoApplied(post.postId, isOwner)
   const active = config.data?.enabled === true && !config.isError
-  if (!active || !post.experience) return null
+  if (!active) return null
+  const experience = post.experience
+  const held = isCommunityPostHeld(post)
+  const topics = experience?.topics ?? []
+  const tags = experience?.tags ?? []
+  const records = summarizeCommunityRecords(experience)
+  const route = experience?.route ?? []
+  const label = (key: string) =>
+    config.data?.topics.find((topic) => topic.key === key)?.label ?? key
+  const auto = {
+    topics: (autoApplied?.topics ?? []).filter((topic) => topics.includes(topic)),
+    tags: (autoApplied?.tags ?? []).filter((tag) => tags.includes(tag)),
+  }
+  const autoCount = auto.topics.length + auto.tags.length
+  const published = post.status === 'published' && !held
+  const moreQuery = toCommunityDiscoveryQuery(
+    tags.length ? { tags: [tags[0]] } : topics.length ? { topics: [topics[0]] } : {},
+  )
+  const empty = !topics.length && !tags.length && !records.length && !route.length
+  if (empty && !published && !experience?.question) return null
+
   return (
     <section
-      className="space-y-4 border-b border-neutral-100 bg-point-50/40 p-4"
-      aria-label="공유한 경험"
+      className="space-y-4 border-b border-neutral-100 bg-secondary-50/60 p-4"
+      aria-label="이야기 정보"
     >
-      <div className="flex flex-wrap gap-2">
-        {post.experience.topics.map((topic) => (
-          <span
-            key={topic}
-            className="rounded-lg border border-primary-200 bg-white px-2 py-1 text-xs font-semibold"
-          >
-            {config.data?.topics.find((value) => value.key === topic)?.label ?? topic}
-          </span>
-        ))}
-      </div>
-      {!!post.experience.tags?.length && (
-        <div className="flex flex-wrap gap-2">
-          {post.experience.tags.map((tag) => (
-            <Link
-              key={tag}
-              href={`/community?tags=${encodeURIComponent(tag)}`}
-              className="text-xs font-semibold text-primary-700 underline"
-            >
-              #{tag}
-            </Link>
-          ))}
+      {(topics.length > 0 || tags.length > 0) && (
+        <div className="space-y-2">
+          <ul className="flex flex-wrap gap-2" aria-label="주제와 태그">
+            {topics.map((topic) => (
+              <li key={`topic-${topic}`}>
+                <Link
+                  href={`/community?${toCommunityDiscoveryQuery({ topics: [topic] })}`}
+                  className={`${CHIP} border-primary-300 bg-white text-primary-700 hover:bg-primary-50`}
+                >
+                  {label(topic)}
+                </Link>
+              </li>
+            ))}
+            {tags.map((tag) => (
+              <li key={`tag-${tag}`}>
+                <Link
+                  href={`/community?${toCommunityDiscoveryQuery({ tags: [tag] })}`}
+                  className={`${CHIP} border-secondary-400 bg-secondary-100 text-primary-700 hover:bg-secondary-200`}
+                >
+                  #{tag}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          {isOwner && autoCount > 0 && (
+            <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs leading-relaxed text-neutral-700">
+              <CommunityPixelIcon name="tag" className="text-secondary-600" />
+              <span>
+                포퐁 AI가 자동으로 붙였어요:{' '}
+                <strong className="font-bold text-primary-700">
+                  {[...auto.topics.map(label), ...auto.tags.map((tag) => `#${tag}`)].join(', ')}
+                </strong>
+              </span>
+              <Link
+                href={`/community/post/${post.postId}/edit`}
+                className="rounded font-bold text-primary-700 underline focus-ring"
+              >
+                빼거나 바꾸기
+              </Link>
+            </p>
+          )}
         </div>
       )}
-      {!!post.experience.tags?.length && post.visibility === 'public' && (
-        <RelatedExperiences postId={post.postId} tag={post.experience.tags[0]} />
+
+      {records.map((summary) => (
+        <CommunityRecordCard key={summary.kind} summary={summary} />
+      ))}
+      {experience?.clinic && (
+        <p className="text-xs leading-relaxed text-neutral-600">
+          작성자가 겪은 방문 경험이에요. 병원 평가나 의학적 판단이 아니에요.
+        </p>
       )}
-      {post.experience.route.length > 0 && (
+
+      {route.length > 0 && (
         <div className="space-y-2">
-          <h3 className="text-sm font-bold">함께 가볼 공개 장소</h3>
-          <SharedRouteMap points={post.experience.route} />
-          <ol className="list-inside list-decimal text-sm">
-            {post.experience.route.map((point, index) => (
+          <h3 className="flex items-center gap-2 font-cafe24 text-sm text-primary-700">
+            <CommunityPixelIcon name="travel" className="text-primary-500" />
+            함께 가 볼 공개 장소
+          </h3>
+          <SharedRouteMap points={route} />
+          <ol className="list-inside list-decimal space-y-0.5 text-sm text-neutral-850">
+            {route.map((point, index) => (
               <li key={index}>{point.name}</li>
             ))}
           </ol>
-          <p className="text-xs text-neutral-600">
-            작성자가 선택한 장소를 순서대로 연결한 지도예요. 실제 도로·산책 길 안내는 아니에요.
+          <p className="text-xs leading-relaxed text-neutral-600">
+            작성자가 고른 장소를 순서대로 이은 지도예요. 실제 길 안내는 아니에요.
           </p>
         </div>
       )}
-      {post.experience.question && !isCommunityPostHeld(post) && (
-        <p className="text-sm font-semibold">궁금한 점이 있다면 댓글로 경험을 나눠주세요.</p>
+
+      {experience?.question && !held && (
+        <p className="text-sm font-semibold text-neutral-850">
+          비슷한 경험이 있다면 댓글로 나눠 주세요.
+        </p>
       )}
-      {post.experience.question && config.data?.aiEnabled && !isCommunityPostHeld(post) && (
+      {experience?.question && config.data?.aiEnabled && !held && (
         <CommunityAnswer
           key={`${post.postId}:${post.body}:${generation}`}
           post={post}
@@ -85,151 +142,25 @@ export function CommunityExperiencePanel({
           notice={config.data.aiNotice}
         />
       )}
-    </section>
-  )
-}
 
-function RelatedExperiences({ postId, tag }: { postId: string; tag: string }) {
-  const result = useInfiniteQuery(
-    communityQueries.posts('latest', undefined, undefined, undefined, 6, undefined, {
-      tags: [tag],
-    }),
-  )
-  const posts =
-    result.data?.pages
-      .flatMap((page) => page.items)
-      .filter((post) => post.postId !== postId)
-      .slice(0, 3) ?? []
-  if (!posts.length || result.isError) return null
-  return (
-    <aside className="rounded-xl bg-white p-3" aria-label="관련 태그 경험">
-      <h3 className="text-xs font-bold">#{tag} · 함께 읽을 경험</h3>
-      <ul className="mt-2 space-y-2">
-        {posts.map((post) => (
-          <li key={post.postId}>
-            <Link
-              className="block truncate text-sm underline"
-              href={`/community/post/${post.postId}`}
-            >
-              {post.title || post.bodyExcerpt}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </aside>
-  )
-}
-
-function CommunityAnswer({
-  post,
-  isOwner,
-  generation,
-  notice,
-}: {
-  post: CommunityPostDetail
-  isOwner: boolean
-  generation: number
-  notice: string
-}) {
-  const [consent, setConsent] = useState(false)
-  const client = useQueryClient()
-  const queryKey = [
-    'community',
-    'ai-answer',
-    post.postId,
-    post.body,
-    post.title,
-    post.experience?.topics,
-    generation,
-  ]
-  const result = useQuery({
-    queryKey,
-    queryFn: ({ signal }) => readCommunityAiAnswer(post.postId, signal),
-    retry: false,
-    gcTime: 0,
-    refetchInterval: (query) => (query.state.data?.status === 'pending' ? 2000 : false),
-  })
-  const request = useMutation({
-    mutationFn: async () => {
-      const token = getAccessToken()
-      if (!consent || !isOwner || !token || !isAuthSessionCurrent(generation))
-        throw new Error('내 질문에서 동의 후 요청해 주세요.')
-      const answer = await requestCommunityAiAnswer(post.postId)
-      if (token !== getAccessToken() || !isAuthSessionCurrent(generation))
-        throw new Error('로그인 정보가 변경됐어요. 답변을 다시 확인해 주세요.')
-      return answer
-    },
-    onSuccess: (answer) => client.setQueryData(queryKey, answer),
-  })
-  const answer = result.data
-  const pending = request.isPending || answer?.status === 'pending'
-  return (
-    <div className="rounded-xl border-2 border-primary-200 bg-white p-4" aria-label="AI 참고 답변">
-      <div className="mb-2 flex items-center justify-between gap-2">
-        <h3 className="text-sm font-bold">포퐁 AI 참고 답변</h3>
-        <span className="rounded bg-point-100 px-2 py-1 text-xs">AI 생성</span>
-      </div>
-      <p className="mb-3 text-xs leading-relaxed text-neutral-600">{notice}</p>
-      {answer?.status === 'completed' && (
-        <>
-          <p className="text-sm leading-relaxed whitespace-pre-wrap">{answer.answer}</p>
-          {answer.needsVet && (
-            <p className="mt-3 rounded-lg bg-point-50 p-3 text-xs font-semibold">
-              증상·응급 여부는 AI 답변만으로 판단하지 마세요. 동물병원이나 담당 수의사에게 확인해
-              주세요.
-            </p>
-          )}
-        </>
+      {published && (
+        <CommunityRelatedPosts
+          postId={post.postId}
+          fallbackTag={post.visibility === 'public' ? tags[0] : undefined}
+          moreHref={moreQuery ? `/community?${moreQuery}` : undefined}
+        />
       )}
-      {pending && (
-        <p role="status" className="text-sm">
-          참고 답변을 준비하고 있어요. 새 답변 요청은 하지 않고 상태만 확인합니다.
-        </p>
-      )}
-      {answer?.status === 'failed' && (
-        <p role="status" className="text-sm text-neutral-700">
-          답변을 만들지 못했어요. 댓글로 경험을 나누거나 동의 후 다시 요청할 수 있어요.
-        </p>
-      )}
-      {result.isError && (
-        <button type="button" className="text-sm underline" onClick={() => void result.refetch()}>
-          답변 상태를 다시 확인하기
-        </button>
-      )}
-      {!answer && !pending && !result.isError && (
-        <p className="text-sm text-neutral-600">
-          아직 AI 답변이 없어요. 사람들의 댓글 답변과 함께 참고할 수 있어요.
-        </p>
-      )}
-      {isOwner && !pending && answer?.status !== 'completed' && (
-        <div className="mt-4 space-y-3">
-          <label className="flex items-start gap-2 text-xs leading-relaxed">
-            <input
-              type="checkbox"
-              checked={consent}
-              onChange={(event) => setConsent(event.target.checked)}
-            />
-            질문 본문과 주제를 AI에 전달하는 데 동의합니다. 개인정보는 적지 마세요. 사진·지도 좌표는
-            전달하지 않습니다.
-          </label>
-          <button
-            type="button"
-            disabled={!consent || result.isPending || result.isError}
-            className="w-full rounded-lg bg-primary-500 px-4 py-3 text-sm font-bold disabled:opacity-40"
-            onClick={() => request.mutate()}
+      {published && post.isSaved && (
+        <p className="text-xs text-neutral-700">
+          저장한 글이에요.{' '}
+          <Link
+            href="/bookmarks?tab=saved-feeds"
+            className="rounded font-bold text-primary-700 underline focus-ring"
           >
-            AI 참고 답변 받기
-          </button>
-          <p className="text-xs text-neutral-600">
-            개발 체험 중이며 하루 최대 3회예요. AI는 잘못된 답변을 할 수 있어요.
-          </p>
-        </div>
-      )}
-      {request.isError && (
-        <p role="alert" className="mt-2 text-sm">
-          {request.error.message || 'AI 답변을 요청하지 못했어요.'}
+            관심 목록에서 다시 보기
+          </Link>
         </p>
       )}
-    </div>
+    </section>
   )
 }

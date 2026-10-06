@@ -38,7 +38,10 @@ function panel(config = { enabled: true, dailyLimit: 10, notice: 'OpenAI 처리 
   let calls = 0
   const component = load('src/app/(main)/community/_ui/CommunityPostReviewPanel.tsx', {
     '@tanstack/react-query': { useQuery: () => ({ data: config }) },
-    '@/entities/community': { communityReviewConfigOptions: {} },
+    '@/entities/community': {
+      communityReviewConfigOptions: {},
+      COMMUNITY_REVIEW_NEXT_STEP: model.COMMUNITY_REVIEW_NEXT_STEP,
+    },
     '@/features/community': {
       useCommunityReviewRequest: () => ({ isPending: false, mutate: () => calls++ }),
     },

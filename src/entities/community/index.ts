@@ -14,11 +14,15 @@ export type { CommunityPreviewAuthor, CommunityPreviewProps } from './model/comm
 export { formatHallOfFamePeriod } from './model/hallOfFamePeriod'
 export * from './model/communityExperience'
 export * from './model/discovery'
+export * from './model/communityRecords'
+export { CommunityPixelIcon, type CommunityPixelIconName } from './ui/CommunityPixelIcon'
+export { CommunityRecordCard } from './ui/CommunityRecordCard'
 export type { CommunityExperience, CommunityRoutePoint } from '@/shared/types'
 export * from './api/communityExperience.api'
 export * from './api/communityReview.api'
 export {
   isCommunityPostHeld,
+  COMMUNITY_REVIEW_NEXT_STEP,
   parseCommunityReviewConfig,
   CLOSED_COMMUNITY_REVIEW_CONFIG,
 } from './model/communityReview'

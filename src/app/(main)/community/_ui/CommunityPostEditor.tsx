@@ -7,7 +7,14 @@ import { communityQueries, communityReviewConfigOptions } from '@/entities/commu
 import { useAuthSessionGeneration } from '@/shared/lib/useAuthSessionGeneration'
 import { getAuthSessionGeneration, isAuthSessionCurrent } from '@/shared/lib/authSessionLifecycle'
 import { CommunityReviewConsent } from './CommunityReviewConsent'
-import { communityExperienceConfigOptions, type CommunityExperience } from '@/entities/community'
+import {
+  communityExperienceConfigOptions,
+  communityWritingPrompt,
+  isCommunityExperienceEmpty,
+  prepareCommunityExperience,
+  validateCommunityExperience,
+  type CommunityExperience,
+} from '@/entities/community'
 import { CommunityExperienceEditor } from './CommunityExperienceEditor'
 import { profileQueries } from '@/entities/profile'
 import Link from 'next/link'
@@ -16,7 +23,12 @@ import {
   PostAiComparisonEditor,
   usePostAiComparison,
 } from '@/features/ai-image'
-import { PetCategorySuggestion, useSubmitCommunityPostForm } from '@/features/community'
+import {
+  PetCategorySuggestion,
+  diffCommunityAutoApplied,
+  rememberCommunityAutoApplied,
+  useSubmitCommunityPostForm,
+} from '@/features/community'
 import { useExitGuard } from '@/shared/lib/useExitGuard'
 import { RetryButton, Container, CtaModal, NavigationBar } from '@/shared/ui'
 import {
@@ -83,10 +95,9 @@ const PostForm = ({ postId, post }: PostFormProps) => {
     post?.experience,
   )
   const experienceEnabled = experienceConfig.data?.enabled === true && !experienceConfig.isError
-  const experienceValid =
-    !experienceEnabled ||
-    !experience?.route.length ||
-    (experience.publicPlaceConfirmed && experience.route.every((point) => point.name.trim()))
+  const experienceNotice =
+    experienceEnabled && experience ? validateCommunityExperience(experience) : null
+  const experienceValid = !experienceNotice
   const { submit, isSubmitting, error } = useSubmitCommunityPostForm(postId)
   const hasChanges =
     form.hasChanges ||
@@ -124,10 +135,19 @@ const PostForm = ({ postId, post }: PostFormProps) => {
     )
       return
     const generation = getAuthSessionGeneration()
+    // 비운 경험은 새 글에서는 보내지 않고, 고치는 글에서는 지웠다고 알린다.
+    const submittedExperience =
+      !experienceEnabled || experience === undefined
+        ? undefined
+        : experience && !isCommunityExperienceEmpty(experience)
+          ? prepareCommunityExperience(experience)
+          : post?.experience
+            ? null
+            : undefined
     const saved = await submit({
       ...(reviewEnabled ? { useOwnedPhotoUpload: true } : {}),
       ...(reviewEnabled && status === 'published' ? { aiReviewConsent } : {}),
-      ...(experienceEnabled && experience !== undefined ? { experience } : {}),
+      ...(submittedExperience !== undefined ? { experience: submittedExperience } : {}),
       text: form.text,
       files: comparison.submission.files,
       visibility,
@@ -137,6 +157,11 @@ const PostForm = ({ postId, post }: PostFormProps) => {
       keptImageUrls: comparison.submission.keptImageUrls,
     })
     if (saved && isAuthSessionCurrent(generation)) {
+      if (status === 'published')
+        rememberCommunityAutoApplied(
+          saved.postId,
+          diffCommunityAutoApplied(submittedExperience ?? post?.experience, saved.experience),
+        )
       cancelExit()
       router.push(saved.aiReview ? `/community/post/${saved.postId}` : '/home')
     }
@@ -158,7 +183,10 @@ const PostForm = ({ postId, post }: PostFormProps) => {
         form={visibleForm}
         introTitle={isEdit ? '우리 아이의 이야기를 다듬어주세요' : '우리 아이의 일상을 나눠주세요'}
         introDescription="함께 웃고, 궁금한 것을 묻고, 반려동물과의 소중한 순간을 기록해요."
-        placeholder="오늘 우리 아이는 어떤 하루를 보냈나요?"
+        placeholder={
+          (experienceEnabled && communityWritingPrompt(experience)) ||
+          '오늘 우리 아이는 어떤 하루를 보냈나요?'
+        }
         error={error}
         onBack={handleClose}
         cta={{
@@ -190,6 +218,8 @@ const PostForm = ({ postId, post }: PostFormProps) => {
                 onChange={setExperience}
                 config={experienceConfig.data}
                 disabled={isSubmitting || form.isProcessingPhotos}
+                autoTagging={reviewEnabled ? (aiReviewConsent ? 'on' : 'consent') : 'off'}
+                error={experienceNotice}
               />
             )}
             <Link

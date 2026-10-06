@@ -22,6 +22,8 @@ interface CommunityFeedCardProps extends CommunityPreviewProps {
   /** 남의 글 헤더 오른쪽에 둘 기능 레이어 액션(팔로우) */
   followAction?: ReactNode
   badgeSlot?: ReactNode
+  /** 본문 아래에 둘 기록·주제·태그 줄 */
+  metaSlot?: ReactNode
   /** 남의 글 액션 줄 오른쪽 끝에 둘 기능 레이어 액션(신고 깃발) */
   reportAction?: ReactNode
   /** 이미지 표현 — 커뮤니티 피드는 1:1 캐러셀, 마이홈처럼 카드가 넓은 곳은 가로 스크롤 썸네일 */
@@ -58,6 +60,7 @@ const CommunityFeedCard = ({
   onToggleSave,
   followAction,
   badgeSlot,
+  metaSlot,
   reportAction,
   mediaLayout = 'carousel',
   preload = false,
@@ -146,6 +149,7 @@ const CommunityFeedCard = ({
           </p>
         </Link>
       )}
+      {metaSlot && <div className={cn('px-3 pb-3', wide && 'mb-4 p-0')}>{metaSlot}</div>}
 
       {/* 미디어 — 기본은 카드 폭을 채우는 1:1 캐러셀 (여러 장이면 우상단에 장수 배지),
           row 는 사진을 원래 비율 그대로 가로로 늘어놓고 넘치면 스크롤한다 */}

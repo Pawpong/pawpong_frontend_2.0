@@ -3,6 +3,7 @@ import type { CommunitySortType, CommunityPetType, CommunityDiscoveryFilters } f
 import {
   getCommunityPosts,
   getCommunityPostDetail,
+  getRelatedCommunityPosts,
   getCommunityComments,
   getMyBookmarkedPosts,
   getMyDraftPosts,
@@ -60,6 +61,16 @@ export const communityQueries = {
       enabled: !!postId,
       staleTime: STALE_TIME.DEFAULT,
     }),
+
+  // 상세 캐시를 통째로 고치는 낙관적 갱신에 섞이지 않게 별도 키를 쓴다.
+  related: (postId: string, enabled = true, pageSize = 6) => ({
+    queryKey: [...communityQueries.all(), 'related', postId, pageSize] as const,
+    queryFn: ({ signal }: { signal: AbortSignal }) =>
+      getRelatedCommunityPosts(postId, pageSize, signal),
+    enabled: enabled && !!postId,
+    retry: false,
+    staleTime: 60_000,
+  }),
 
   myPostsAll: () => [...communityQueries.all(), 'myPosts'] as const,
 

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
-import { communityReviewConfigOptions } from '@/entities/community'
+import { COMMUNITY_REVIEW_NEXT_STEP, communityReviewConfigOptions } from '@/entities/community'
 import { useCommunityReviewRequest } from '@/features/community'
 import { useAuthSessionGeneration } from '@/shared/lib/useAuthSessionGeneration'
 import type { CommunityPostDetail } from '@/shared/types'
@@ -44,24 +44,29 @@ function ReviewForm({ post }: { post: CommunityPostDetail }) {
   const enabled = config.data?.enabled === true && !config.isError
   return (
     <section
-      className="space-y-3 border-b border-primary-200 bg-point-50/70 p-4"
+      className="space-y-3 border-b border-primary-200 bg-secondary-50 p-4"
       aria-label="내 글의 공개 심사"
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="text-sm font-bold">
+        <h3 className="font-cafe24 text-sm text-primary-700">
           {held ? '아직 나만 볼 수 있는 이야기' : 'AI 관련성 확인 완료'}
         </h3>
-        <span className="border border-primary-300 bg-white px-2 py-1 text-xs">
+        <span className="rounded-full border border-primary-300 bg-white px-2.5 py-1 text-xs font-semibold text-primary-700">
           {held ? '공개 보류' : '선택한 공개 범위 적용'}
         </span>
       </div>
       <p className="text-sm leading-relaxed">{review.message}</p>
+      {held && (
+        <p className="rounded-lg bg-white p-3 text-sm leading-relaxed font-semibold text-primary-700">
+          {COMMUNITY_REVIEW_NEXT_STEP[review.reason]}
+        </p>
+      )}
       <p className="text-xs text-neutral-600">AI 판정은 전문 자격·의학적 신뢰 인증이 아니에요.</p>
       {held && (
         <>
           <Link
             href={`/community/post/${post.postId}/edit`}
-            className="inline-block text-sm font-bold text-primary-700 underline"
+            className="inline-flex min-h-9 items-center rounded text-sm font-bold text-primary-700 underline focus-ring"
           >
             내용과 사진 수정하기
           </Link>
@@ -81,7 +86,7 @@ function ReviewForm({ post }: { post: CommunityPostDetail }) {
             type="button"
             disabled={!enabled || !consent || request.isPending || !review.canRequestReview}
             onClick={() => request.mutate(consent)}
-            className="w-full rounded-lg border-2 border-primary-700 bg-primary-500 px-4 py-3 text-sm font-bold disabled:opacity-40"
+            className="min-h-12 w-full rounded-lg bg-action-primary px-4 text-sm font-bold text-action-dark focus-ring hover:bg-action-primary-hover disabled:bg-point-200 disabled:text-neutral-700"
           >
             {request.isPending ? '공개 여부 확인 중' : '동의하고 다시 심사하기'}
           </button>
@@ -100,7 +105,7 @@ function ReviewForm({ post }: { post: CommunityPostDetail }) {
         </>
       )}
       {request.isError && (
-        <p role="alert" className="text-sm">
+        <p role="alert" className="text-sm font-medium text-error-500">
           {request.error.message}
         </p>
       )}

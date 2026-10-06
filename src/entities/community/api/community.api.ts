@@ -165,6 +165,7 @@ export const getCommunityPosts = async (
   if (params.kind) query.set('kind', params.kind)
   if (params.media) query.set('media', params.media)
   if (params.period) query.set('period', params.period)
+  if (params.record) query.set('record', params.record)
   if (params.category) query.set('category', params.category)
   if (params.authorId) query.set('authorId', params.authorId)
   if (params.search) query.set('search', params.search)
@@ -177,6 +178,23 @@ export const getCommunityPosts = async (
   )
 
   const page = unwrap(response, '커뮤니티 게시글 목록 조회에 실패했습니다.')
+  return { ...page, items: page.items.map(mapCard) }
+}
+
+/**
+ * 함께 읽을 글 — 서버가 공통 태그·주제·동물 종류로 고른다.
+ * 열람자가 볼 수 없는 글은 서버에서 빠지므로 여기서 다시 거르지 않는다.
+ */
+export const getRelatedCommunityPosts = async (
+  postId: string,
+  pageSize = 6,
+  signal?: AbortSignal,
+): Promise<PaginationResponse<CommunityPostCard>> => {
+  const response = await apiClient.get<ApiResponseFull<PaginationResponse<RawCommunityPostCard>>>(
+    `${API_VERSION}/community/posts/${postId}/related?page=1&pageSize=${pageSize}`,
+    { signal },
+  )
+  const page = unwrap(response, '함께 읽을 글을 불러오지 못했습니다.')
   return { ...page, items: page.items.map(mapCard) }
 }
 

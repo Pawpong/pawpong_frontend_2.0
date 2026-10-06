@@ -230,7 +230,61 @@ export interface CommunityRoutePoint {
   latitude: number
   longitude: number
 }
+/** 산책 기록 — 날짜만 필수이고 나머지는 작성자가 직접 적은 값만 담는다 */
+export interface CommunityWalkRecord {
+  /** YYYY-MM-DD */
+  walkedOn: string
+  durationMinutes?: number
+  distanceMeters?: number
+  difficulty?: 'easy' | 'moderate' | 'hard'
+  leashRequired?: boolean
+  amenities?: Array<'water' | 'shade' | 'waste-bin' | 'parking'>
+}
+
+export type CommunityClinicVisitReason =
+  | 'checkup'
+  | 'vaccination'
+  | 'dental'
+  | 'skin'
+  | 'emergency'
+  | 'surgery'
+  | 'rehabilitation'
+  | 'other'
+
+/** 병원 방문 경험 — 진단·처방이 아닌 작성자의 방문 기록 */
+export interface CommunityClinicRecord {
+  visitedOn: string
+  clinicName: string
+  visitReason: CommunityClinicVisitReason
+  waitMinutes?: number
+  costKrw?: number
+  followUpOn?: string
+}
+
+export type CommunityLifeActivity =
+  | 'meal'
+  | 'grooming'
+  | 'training'
+  | 'play'
+  | 'rest'
+  | 'habitat'
+  | 'other'
+
+/** 반려생활 기록 */
+export interface CommunityLifeRecord {
+  recordedOn: string
+  activity: CommunityLifeActivity
+  petName?: string
+  condition?: 'great' | 'usual' | 'watching'
+}
+
+export type CommunityRecordKind = 'walk' | 'clinic' | 'life'
+
 export interface CommunityExperience {
+  walk?: CommunityWalkRecord
+  clinic?: CommunityClinicRecord
+  life?: CommunityLifeRecord
+  /** 작성자가 고른 태그와 저장 시 서버가 자동으로 붙인 태그가 함께 내려온다 */
   tags?: string[]
   topics: string[]
   question: boolean
@@ -245,4 +299,5 @@ export interface CommunityDiscoveryFilters {
   kind?: 'question' | 'story'
   media?: 'photos' | 'map'
   period?: 'week' | 'month'
+  record?: CommunityRecordKind
 }

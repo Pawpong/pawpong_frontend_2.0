@@ -142,31 +142,13 @@ test('AI 답변 조회는 생성 요청을 하지 않고 생성에는 동의 본
 
 test('AI 답변 화면은 자동 생성 없이 동의를 받고 의학적 참고 경고를 표시한다', () => {
   let mutations = 0
-  const values = [
-    {
-      data: {
-        enabled: true,
-        aiEnabled: true,
-        topics: [],
-        aiNotice: '진단과 처방을 대신하지 않습니다.',
-      },
-    },
-    { data: null, isPending: false },
-  ]
-  const panel = load('src/app/(main)/community/_ui/CommunityExperiencePanel.tsx', {
+  const answer = load('src/app/(main)/community/_ui/CommunityAiAnswer.tsx', {
     '@tanstack/react-query': {
-      useQuery: () => values.shift(),
+      useQuery: () => ({ data: null, isPending: false }),
       useQueryClient: () => ({}),
       useMutation: () => ({ mutate: () => mutations++ }),
     },
-    '@/entities/community': {
-      communityExperienceConfigOptions: {},
-      readCommunityAiAnswer: () => null,
-      isCommunityPostHeld: load('src/entities/community/model/communityReview.ts')
-        .isCommunityPostHeld,
-    },
-    '@/features/care-map': { SharedRouteMap: () => null },
-    '@/features/in-app-purchase': { usePurchases: () => ({ generation: 0 }) },
+    '@/entities/community': { readCommunityAiAnswer: () => null },
     '@/shared/api/token': { getAccessToken: () => 'fixture' },
     '@/shared/lib/authSessionLifecycle': { isAuthSessionCurrent: () => true },
   })
@@ -176,7 +158,12 @@ test('AI 답변 화면은 자동 생성 없이 동의를 받고 의학적 참고
     experience: { topics: [], question: true, route: [] },
   }
   const html = renderToStaticMarkup(
-    createElement(panel.CommunityExperiencePanel, { post, isOwner: true }),
+    createElement(answer.CommunityAnswer, {
+      post,
+      isOwner: true,
+      generation: 0,
+      notice: '진단과 처방을 대신하지 않습니다.',
+    }),
   )
   assert.equal(mutations, 0)
   assert.match(html, /AI 참고 답변/)

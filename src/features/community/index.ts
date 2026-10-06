@@ -20,3 +20,10 @@ export { useSubmitCommunityPostForm } from './lib/useSubmitCommunityPostForm'
 export { useDeletePostConfirm } from './lib/useDeletePostConfirm'
 export { PetCategorySuggestion } from './ui/PetCategorySuggestion'
 export { useCommunityReviewRequest } from './lib/useCommunityReviewRequest'
+export {
+  diffCommunityAutoApplied,
+  readCommunityAutoApplied,
+  rememberCommunityAutoApplied,
+  type CommunityAutoApplied,
+} from './lib/communityAutoApplied'
+export { useCommunityAutoApplied } from './lib/useCommunityAutoApplied'

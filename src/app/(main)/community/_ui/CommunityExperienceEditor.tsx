@@ -1,265 +1,252 @@
 'use client'
+
 import { useState } from 'react'
-import { searchCarePlaces, type CarePlace } from '@/entities/care-place'
-import { SharedRouteMap } from '@/features/care-map'
 import {
-  normalizeCommunityTags,
+  COMMUNITY_MAX_TOPICS,
+  COMMUNITY_TEMPLATES,
+  COMMUNITY_TOPIC_GROUPS,
+  CommunityPixelIcon,
+  EMPTY_COMMUNITY_EXPERIENCE,
+  isCommunityTemplateActive,
+  toggleCommunityTemplate,
   type CommunityExperience,
   type CommunityExperienceConfig,
 } from '@/entities/community'
-import { Button } from '@/shared/ui'
-const empty: CommunityExperience = {
-  topics: [],
-  question: false,
-  route: [],
-  publicPlaceConfirmed: false,
+import { cn } from '@/shared/lib/cn'
+import { CommunityClinicSearch } from './CommunityClinicSearch'
+import { ClinicRecordFields, LifeRecordFields, WalkRecordFields } from './CommunityRecordFields'
+import { CommunityRoutePicker } from './CommunityRoutePicker'
+import { CommunityTagField } from './CommunityTagField'
+
+/** on: 올릴 때 자동으로 붙음 · consent: 동의하면 붙음 · off: 지금은 쓸 수 없음 */
+export type CommunityAutoTagging = 'on' | 'consent' | 'off'
+
+const AUTO_TAG_COPY: Record<CommunityAutoTagging, { title: string; body: string }> = {
+  on: {
+    title: '올리면 주제와 태그가 자동으로 붙어요',
+    body: '포퐁 AI가 글과 사진을 읽고 바로 붙여요. 따로 확인하는 단계는 없고, 붙은 뒤에는 글 수정에서 빼거나 바꿀 수 있어요.',
+  },
+  consent: {
+    title: 'AI 처리에 동의하면 자동으로 붙어요',
+    body: '위에서 동의하면 올릴 때 포퐁 AI가 주제와 태그를 붙여요. 동의하지 않으면 직접 고른 것만 저장돼요.',
+  },
+  off: {
+    title: '지금은 자동 태그를 쓸 수 없어요',
+    body: '직접 고른 주제와 태그만 저장돼요.',
+  },
 }
+
 export function CommunityExperienceEditor({
-  value = empty,
+  value,
   onChange,
   config,
   disabled,
+  autoTagging,
+  error,
 }: {
   value?: CommunityExperience | null
   onChange: (value: CommunityExperience) => void
   config: CommunityExperienceConfig
   disabled: boolean
+  autoTagging: CommunityAutoTagging
+  /** 저장하려면 마저 채워야 하는 기록 칸 안내 */
+  error?: string | null
 }) {
-  const current = value ?? empty
-  const [showMap, setShowMap] = useState(current.route.length > 0)
-  const [query, setQuery] = useState('')
-  const [places, setPlaces] = useState<CarePlace[]>([])
-  const [searching, setSearching] = useState(false)
-  const [error, setError] = useState('')
-  const [tags, setTags] = useState(current.tags?.join(', ') ?? '')
+  const current = value ?? EMPTY_COMMUNITY_EXPERIENCE
   const update = (patch: Partial<CommunityExperience>) => onChange({ ...current, ...patch })
-  const search = async () => {
-    if (!query.trim() || searching) return
-    setSearching(true)
-    setError('')
-    try {
-      const response = await searchCarePlaces(
-        {
-          latitude: 37.5665,
-          longitude: 126.978,
-          kind: 'hospital',
-          query: query.trim(),
-          radius: 20000,
-          scope: 'keyword',
-          region: '',
-          referralOnly: false,
-        },
-        1,
-      )
-      setPlaces(response.places)
-    } catch {
-      setError('병원 장소를 찾지 못했어요. 지도에서 직접 선택할 수도 있어요.')
-    } finally {
-      setSearching(false)
-    }
-  }
+  const wantsPlace = COMMUNITY_TEMPLATES.some(
+    (template) =>
+      ['walk', 'travel'].includes(template.key) && isCommunityTemplateActive(current, template),
+  )
+  const [placeOpen, setPlaceOpen] = useState(current.route.length > 0)
+  const showPlace = placeOpen || current.route.length > 0
+  const label = (key: string) => config.topics.find((topic) => topic.key === key)?.label
+  const autoCopy = AUTO_TAG_COPY[autoTagging]
+
   return (
     <fieldset
       disabled={disabled}
-      className="space-y-5 rounded-xl border border-primary-200 bg-point-50 p-5"
+      className="min-w-0 space-y-6 rounded-2xl border border-primary-200 bg-secondary-50 p-4 tab:p-5"
     >
-      <legend className="text-sm font-bold">우리 아이 경험을 더 잘 찾을 수 있게</legend>
+      <legend className="sr-only">이야기 종류와 기록</legend>
+
       <div>
-        <p className="mb-2 text-sm font-bold">주제 선택 · 최대 3개</p>
-        <div className="flex max-h-48 flex-wrap gap-2 overflow-y-auto">
-          {config.topics.map((topic) => {
-            const selected = current.topics.includes(topic.key)
+        <h3 className="font-cafe24 text-base text-primary-700">어떤 이야기인가요?</h3>
+        <p className="mt-1 text-xs leading-relaxed text-neutral-700">
+          고르면 알맞은 기록 칸이 열려요. 여러 개를 함께 골라도 되고, 고르지 않아도 올릴 수 있어요.
+        </p>
+        <div className="mt-3 grid grid-cols-2 gap-2 tab:grid-cols-3">
+          {COMMUNITY_TEMPLATES.map((template) => {
+            const selected = isCommunityTemplateActive(current, template)
             return (
               <button
-                key={topic.key}
+                key={template.key}
                 type="button"
                 aria-pressed={selected}
-                disabled={!selected && current.topics.length >= 3}
-                onClick={() =>
-                  update({
-                    ...(topic.key === 'question' ? { question: !selected } : {}),
-                    topics: selected
-                      ? current.topics.filter((key) => key !== topic.key)
-                      : [...current.topics, topic.key],
-                  })
-                }
-                className={
+                onClick={() => {
+                  onChange(toggleCommunityTemplate(current, template))
+                  if (!selected && ['walk', 'travel'].includes(template.key)) setPlaceOpen(true)
+                }}
+                className={cn(
+                  'flex min-h-16 flex-col items-start justify-center gap-0.5 rounded-xl border-2 px-3 py-2 text-left focus-ring transition-colors',
                   selected
-                    ? 'rounded-lg border border-primary-500 bg-white px-3 py-2 text-xs font-bold text-primary-700'
-                    : 'rounded-lg border border-neutral-150 bg-white px-3 py-2 text-xs'
-                }
+                    ? 'border-primary-500 bg-secondary-200'
+                    : 'border-primary-100 bg-white hover:border-primary-300',
+                )}
               >
-                {topic.label}
+                <span className="flex items-center gap-2 text-sm font-bold text-primary-700">
+                  <CommunityPixelIcon name={template.key} className="text-primary-500" />
+                  {template.label}
+                </span>
+                <span className="text-xs text-neutral-700">{template.hint}</span>
               </button>
             )
           })}
         </div>
+        {current.question && config.aiEnabled && (
+          <p className="mt-2 text-xs leading-relaxed text-neutral-700">
+            질문으로 올리면 게시한 뒤 내 글에서 AI 참고 답변을 요청할 수 있어요.
+          </p>
+        )}
       </div>
-      <label className="block text-sm font-bold">
-        경험 태그 · 최대 5개
-        <input
-          value={tags}
-          onChange={(event) => {
-            setTags(event.target.value)
-            update({ tags: normalizeCommunityTags(event.target.value) })
-          }}
-          maxLength={120}
-          placeholder="노령견, 산책 적응, 제주 동반여행"
-          className="mt-2 block w-full rounded-lg border border-neutral-200 bg-white p-3 text-sm"
-        />
-        <span className="mt-2 block text-xs font-normal text-neutral-600">
-          쉼표로 구분하며 한글·영문·숫자와 공백을 사용할 수 있어요. 이름·전화번호·개인 주소는 적지
-          마세요.
-        </span>
-      </label>
-      <label className="flex items-center gap-2 text-sm">
-        <input
-          type="checkbox"
-          checked={current.question}
-          onChange={(event) =>
-            update({
-              question: event.target.checked,
-              ...(!event.target.checked
-                ? { topics: current.topics.filter((topic) => topic !== 'question') }
-                : {}),
-            })
+
+      {current.walk && (
+        <WalkRecordFields value={current.walk} onChange={(walk) => update({ walk })} />
+      )}
+      {current.clinic && (
+        <ClinicRecordFields
+          value={current.clinic}
+          onChange={(clinic) => update({ clinic })}
+          search={
+            <CommunityClinicSearch
+              label="병원 이름 찾아 채우기"
+              disabled={disabled}
+              onPick={(place) =>
+                current.clinic &&
+                update({ clinic: { ...current.clinic, clinicName: place.name.slice(0, 80) } })
+              }
+            />
           }
         />
-        질문으로 올리기{config.aiEnabled ? ' · 게시 후 AI 참고 답변 요청 가능' : ''}
-      </label>
-      <div>
-        <Button intent="secondary" size="sm" onClick={() => setShowMap(!showMap)}>
-          {showMap ? '지도 접기' : '산책 코스·방문 장소 담기'}
-        </Button>
-        <p className="mt-2 text-xs leading-5">
-          집이나 개인 주소는 선택하지 마세요. GPS를 추적하지 않고 직접 고른 공개 장소만 공유해요.
-          사진은 기존 사진 첨부에서 함께 담을 수 있어요.
+      )}
+      {current.life && (
+        <LifeRecordFields value={current.life} onChange={(life) => update({ life })} />
+      )}
+
+      {error && (
+        <p
+          role="status"
+          className="rounded-lg border border-primary-200 bg-white p-3 text-sm font-semibold text-primary-700"
+        >
+          {error}
         </p>
-      </div>
-      {showMap && (
-        <div className="space-y-3">
-          <SharedRouteMap
-            points={current.route}
-            onAdd={
-              !disabled && current.route.length < 8
-                ? (point) =>
-                    update({
-                      route: [
-                        ...current.route,
-                        { ...point, name: `공개 장소 ${current.route.length + 1}` },
-                      ],
-                      publicPlaceConfirmed: false,
-                    })
-                : undefined
-            }
-          />
-          <p className="text-xs">
-            지도에서 산책 지점을 순서대로 누르세요. 최대 8곳이며 연결선은 실제 길찾기 경로가
-            아니에요.
-          </p>
-          <div className="flex gap-2">
-            <input
-              aria-label="방문 병원 장소 검색"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="지역과 병원 이름으로 장소 찾기"
-              maxLength={50}
-              className="min-w-0 flex-1 rounded border border-neutral-200 bg-white p-2 text-sm"
-            />
-            <Button
-              size="sm"
-              intent="secondary"
-              disabled={searching || !query.trim()}
-              onClick={() => void search()}
+      )}
+
+      <section aria-label="산책 코스와 방문 장소">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h3 className="flex items-center gap-2 text-sm font-bold text-neutral-850">
+            <CommunityPixelIcon name="travel" className="text-primary-500" />
+            코스·장소 {current.route.length > 0 && `· ${current.route.length}곳`}
+          </h3>
+          {current.route.length === 0 && (
+            <button
+              type="button"
+              aria-expanded={showPlace}
+              onClick={() => setPlaceOpen(!placeOpen)}
+              className="min-h-9 rounded-lg px-2 text-sm font-semibold text-primary-700 underline focus-ring"
             >
-              {searching ? '검색 중' : '병원 찾기'}
-            </Button>
-          </div>
-          {error && (
-            <p role="alert" className="text-xs text-error-500">
-              {error}
-            </p>
-          )}
-          {places.length > 0 && (
-            <ul className="max-h-36 overflow-y-auto">
-              {places.map((place) => (
-                <li key={place.id}>
-                  <button
-                    type="button"
-                    disabled={
-                      current.route.length >= 8 ||
-                      place.latitude === null ||
-                      place.longitude === null
-                    }
-                    className="w-full p-2 text-left text-xs"
-                    onClick={() => {
-                      if (place.latitude !== null && place.longitude !== null)
-                        update({
-                          route: [
-                            ...current.route,
-                            {
-                              name: place.name,
-                              latitude: Number(place.latitude.toFixed(4)),
-                              longitude: Number(place.longitude.toFixed(4)),
-                            },
-                          ],
-                          publicPlaceConfirmed: false,
-                        })
-                      setPlaces([])
-                    }}
-                  >
-                    {place.name} · {place.roadAddress || place.address}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-          <ol className="space-y-2">
-            {current.route.map((point, index) => (
-              <li key={index} className="flex gap-2">
-                <input
-                  aria-label={`${index + 1}번 장소 이름`}
-                  value={point.name}
-                  maxLength={60}
-                  onChange={(event) =>
-                    update({
-                      route: current.route.map((row, i) =>
-                        i === index ? { ...row, name: event.target.value } : row,
-                      ),
-                    })
-                  }
-                  className="min-w-0 flex-1 rounded border border-neutral-200 bg-white p-2 text-sm"
-                />
-                <Button
-                  intent="ghost"
-                  size="sm"
-                  onClick={() =>
-                    update({
-                      route: current.route.filter((_, i) => i !== index),
-                      publicPlaceConfirmed: false,
-                    })
-                  }
-                >
-                  삭제
-                </Button>
-              </li>
-            ))}
-          </ol>
-          {current.route.length > 0 && (
-            <label className="flex items-start gap-2 text-xs leading-5">
-              <input
-                type="checkbox"
-                checked={current.publicPlaceConfirmed}
-                onChange={(event) => update({ publicPlaceConfirmed: event.target.checked })}
-              />
-              집·개인 주소가 아닌 공개 장소이며, 글의 공개 범위에 따라 공유됨을 확인했어요.
-            </label>
+              {showPlace ? '지도 접기' : '지도에서 담기'}
+            </button>
           )}
         </div>
-      )}
-      <p className="text-xs leading-5">
-        진료 경험을 공유할 때 보호자의 이름·전화번호·진료기록 개인정보를 사진과 본문에서 가려주세요.
-        AI 답변에는 사진이나 지도 좌표를 보내지 않아요.
+        {showPlace ? (
+          <div className="mt-3">
+            <CommunityRoutePicker value={current} onChange={update} disabled={disabled} />
+          </div>
+        ) : (
+          <p className="mt-1 text-xs leading-relaxed text-neutral-700">
+            {wantsPlace
+              ? '다녀온 코스를 지도에 담으면 다른 보호자가 따라가 보기 쉬워요.'
+              : '함께 가 볼 만한 공개 장소가 있다면 지도에 담아 보세요.'}
+          </p>
+        )}
+      </section>
+
+      <section aria-label="주제와 태그" className="space-y-4">
+        <div className="rounded-xl border border-secondary-400 bg-white p-4">
+          <p className="flex items-center gap-2 text-sm font-bold text-primary-700">
+            <CommunityPixelIcon name="tag" className="text-secondary-600" />
+            {autoCopy.title}
+          </p>
+          <p className="mt-1 text-xs leading-relaxed text-neutral-700">{autoCopy.body}</p>
+        </div>
+
+        <CommunityTagField
+          value={current.tags ?? []}
+          onChange={(tags) => update({ tags })}
+          disabled={disabled}
+        />
+
+        <details className="group rounded-xl bg-white">
+          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 rounded-xl px-4 text-sm font-bold text-neutral-850 focus-ring [&::-webkit-details-marker]:hidden">
+            <span>
+              주제 직접 고르기{' '}
+              <span className="font-medium text-neutral-600">
+                {current.topics.length}/{COMMUNITY_MAX_TOPICS}
+              </span>
+            </span>
+            <span
+              aria-hidden
+              className="text-neutral-500 transition-transform group-open:rotate-180"
+            >
+              ▾
+            </span>
+          </summary>
+          <div className="space-y-4 px-4 pb-4">
+            {COMMUNITY_TOPIC_GROUPS.map((group) => {
+              const keys = group.keys.filter((key) => label(key))
+              if (!keys.length) return null
+              return (
+                <fieldset key={group.title}>
+                  <legend className="mb-2 text-xs font-bold text-neutral-700">{group.title}</legend>
+                  <div className="flex flex-wrap gap-2">
+                    {keys.map((key) => {
+                      const selected = current.topics.includes(key)
+                      return (
+                        <button
+                          key={key}
+                          type="button"
+                          aria-pressed={selected}
+                          disabled={!selected && current.topics.length >= COMMUNITY_MAX_TOPICS}
+                          onClick={() =>
+                            update({
+                              ...(key === 'question' ? { question: !selected } : {}),
+                              topics: selected
+                                ? current.topics.filter((topic) => topic !== key)
+                                : [...current.topics, key],
+                            })
+                          }
+                          className={cn(
+                            'min-h-9 rounded-full border px-3 text-sm focus-ring transition-colors disabled:opacity-40',
+                            selected
+                              ? 'border-primary-500 bg-secondary-200 font-bold text-primary-700'
+                              : 'border-neutral-200 bg-white font-medium text-neutral-700 hover:bg-secondary-50',
+                          )}
+                        >
+                          {label(key)}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </fieldset>
+              )
+            })}
+          </div>
+        </details>
+      </section>
+
+      <p className="text-xs leading-relaxed text-neutral-700">
+        보호자의 이름·전화번호·진료기록 같은 개인정보는 사진과 글에서 가려 주세요.
       </p>
     </fieldset>
   )
