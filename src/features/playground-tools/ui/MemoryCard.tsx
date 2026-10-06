@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { setPendingCommunityCard } from '@/entities/community'
 import { Button, buttonVariants } from '@/shared/ui/Button'
 import { CameraIcon, ShareIcon, PixelArrowRightIcon } from '@/shared/assets'
 import { PHOTO_ACCEPT, preparePhoto } from '@/shared/lib/preparePhoto'
@@ -30,6 +32,7 @@ function canShareFile(file: File) {
 }
 
 function CardMaker({ owner }: { owner: string }) {
+  const router = useRouter()
   const canvas = useRef<HTMLCanvasElement>(null)
   const fileInput = useRef<HTMLInputElement>(null)
   const alive = useRef(true)
@@ -190,7 +193,32 @@ function CardMaker({ owner }: { owner: string }) {
       if (current()) setExporting(false)
     }
   }
-  const ready = !!photo && !!assets && !loading && !exporting && !nativeExportUnavailable
+  async function writeStory() {
+    if (!canvas.current || !photo || loading || !assets || busy.current || !current()) return
+    if (owner === 'guest') return
+    if (input.date && !validCardDate(input.date)) {
+      setStatus('날짜를 다시 확인해 주세요.')
+      return
+    }
+    busy.current = true
+    setExporting(true)
+    try {
+      const blob = await cardBlob(canvas.current)
+      if (!current()) return
+      setPendingCommunityCard(new File([blob], memoryFileName(input.date), { type: 'image/png' }))
+      router.push('/community/write?experience=daily&source=memory-card')
+    } catch (error) {
+      if (current())
+        setStatus(
+          error instanceof Error ? error.message : '카드를 옮기지 못했어요. 다시 시도해 주세요.',
+        )
+    } finally {
+      busy.current = false
+      if (current()) setExporting(false)
+    }
+  }
+  const cardReady = !!photo && !!assets && !loading && !exporting
+  const ready = cardReady && !nativeExportUnavailable
   return (
     <div className={styles.cardMaker}>
       <section className={styles.previewPanel} aria-label="추억 카드 미리보기">
@@ -236,8 +264,8 @@ function CardMaker({ owner }: { owner: string }) {
         </p>
         {nativeExportUnavailable && (
           <p className={styles.hint}>
-            이 앱에서는 사진 파일 저장·공유를 지원하지 않아요. PNG 저장은 브라우저에서 사용할 수
-            있어요.
+            이 앱에서는 사진 파일 저장·공유를 지원하지 않아요. 완성된 카드는 아래에서 바로 이야기로
+            남길 수 있어요.
           </p>
         )}
         <canvas
@@ -247,9 +275,9 @@ function CardMaker({ owner }: { owner: string }) {
           aria-label={`${input.name || '우리 아이'}의 하루, ${input.date}, ${input.message || '너와 함께여서 더 좋은 오늘'} 카드 미리보기`}
         />
         <p className={styles.storageNote}>
-          사진은 이 화면에서만 사용해요.
+          카드를 만들 때는 사진을 서버에 올리지 않아요.
           <br />
-          서버에 올리지 않고, 나가면 사진과 입력 내용이 사라져요.
+          이야기로 옮기지 않고 나가면 사진과 입력 내용이 사라져요.
         </p>
       </section>
       <section className={styles.panel} aria-labelledby="memory-make">
@@ -369,14 +397,28 @@ function CardMaker({ owner }: { owner: string }) {
           {status || (!photo ? '사진을 고르면 카드 저장과 공유가 열려요.' : '')}
         </p>
         <div className={styles.nextStep}>
-          <p>저장한 카드를 첨부해 오늘의 이야기를 나눠보세요.</p>
-          <Link
-            href="/community/write?experience=daily"
-            className={buttonVariants({ intent: 'secondary', width: 'full' })}
-          >
-            저장한 카드로 이야기 쓰기
-            <PixelArrowRightIcon aria-hidden className="size-4" />
-          </Link>
+          <p>카드를 새 글에 붙여드려요. 글을 저장하거나 올릴 때 사진이 서버에 전송돼요.</p>
+          {owner === 'guest' ? (
+            <>
+              <p>로그인 후 카드를 만들면 이야기에 바로 붙일 수 있어요.</p>
+              <Link
+                href="/login?returnUrl=%2Fplayground%2Fmemory-card"
+                className={buttonVariants({ intent: 'secondary', width: 'full' })}
+              >
+                로그인하고 이야기 쓰기
+              </Link>
+            </>
+          ) : (
+            <Button
+              intent="secondary"
+              width="fill"
+              disabled={!cardReady}
+              onClick={() => void writeStory()}
+            >
+              카드로 이야기 쓰기
+              <PixelArrowRightIcon aria-hidden className="size-4" />
+            </Button>
+          )}
         </div>
       </section>
     </div>

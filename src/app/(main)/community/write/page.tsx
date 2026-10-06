@@ -7,11 +7,14 @@ export const metadata = createPageMetadata({ title: '게시글 작성', noIndex:
 const CommunityWritePage = async ({
   searchParams,
 }: {
-  searchParams: Promise<{ experience?: string | string[] }>
+  searchParams: Promise<{ experience?: string | string[]; source?: string | string[] }>
 }) => {
-  const { experience } = await searchParams
+  const { experience, source } = await searchParams
   return (
-    <CommunityPostEditor initialRecord={typeof experience === 'string' ? experience : undefined} />
+    <CommunityPostEditor
+      initialRecord={typeof experience === 'string' ? experience : undefined}
+      photoSource={source === 'memory-card' ? 'memory-card' : undefined}
+    />
   )
 }
 

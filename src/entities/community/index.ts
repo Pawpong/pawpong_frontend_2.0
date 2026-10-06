@@ -29,3 +29,4 @@ export {
 export { mapCommunityPostDetail } from './api/community.api'
 export type { RawCommunityPostDetail } from './api/community.api'
 export { CommunityReviewLabel } from './ui/CommunityReviewLabel'
+export { setPendingCommunityCard, takePendingCommunityCard } from './model/pendingCommunityCard'
