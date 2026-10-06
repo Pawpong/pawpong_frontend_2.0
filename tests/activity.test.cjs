@@ -54,6 +54,13 @@ test('설정 조회 실패는 활동 UI를 열지 않는다', async () => {
   assert.equal((await response.json()).enabled, false)
 })
 
+const fixtureSession = {
+  token: 'fixture-session',
+  generation: 1,
+  ownerId: 'fixture-user',
+  scope: 'fixture-scope',
+}
+
 function activityApi({ request, token = () => 'fixture-session', current = () => true } = {}) {
   return load('src/entities/gamification/api/activity.api.ts', {
     '@/shared/api': {
@@ -61,8 +68,12 @@ function activityApi({ request, token = () => 'fixture-session', current = () =>
       API_VERSION: '/v2',
       unwrap: (value) => value.data,
     },
-    '@/shared/api/token': { getAccessToken: token },
-    '@/shared/lib/authSessionLifecycle': { isAuthSessionCurrent: current },
+    '@/shared/api/unwrap': load('src/shared/api/unwrap.ts'),
+    '@/shared/lib/authStateEvents': { notifyAuthStateChanged: () => {} },
+    '@/shared/lib/authSessionRecovery': { refreshAuthSession: async () => {} },
+    '../model/session': {
+      isActivitySessionCurrent: (session) => current() && token() === session.token,
+    },
   })
 }
 
@@ -90,7 +101,7 @@ test('계정이 변경되면 늦게 도착한 이전 EXP 응답을 버린다', a
   let token = 'first'
   const api = activityApi({ token: () => token })
   await assert.rejects(
-    api.withActivitySession(0, async () => {
+    api.withActivitySession({ ...fixtureSession, token: 'first' }, async () => {
       token = 'second'
       return { totalExp: 100 }
     }),
@@ -99,7 +110,7 @@ test('계정이 변경되면 늦게 도착한 이전 EXP 응답을 버린다', a
   const missing = activityApi({ token: () => null })
   let requested = false
   await assert.rejects(
-    missing.withActivitySession(0, async () => {
+    missing.withActivitySession(fixtureSession, async () => {
       requested = true
     }),
     /로그인/,
@@ -156,7 +167,7 @@ test('이전 세대의 활동 요청은 시작하거나 결과를 반영하지 �
   let calls = 0
   const api = activityApi({ current: () => current })
   await assert.rejects(
-    api.withActivitySession(1, async () => {
+    api.withActivitySession(fixtureSession, async () => {
       calls++
       return 100
     }),
@@ -165,7 +176,7 @@ test('이전 세대의 활동 요청은 시작하거나 결과를 반영하지 �
   assert.equal(calls, 0)
   current = true
   await assert.rejects(
-    api.withActivitySession(1, async () => {
+    api.withActivitySession(fixtureSession, async () => {
       current = false
       return 100
     }),
@@ -185,13 +196,15 @@ test('내 활동 요청은 서버 점수와 keys 계약을 사용하고 AbortSig
       API_VERSION: '/v2',
       unwrap: (r) => r.data,
     },
-    '@/shared/api/token': { getAccessToken: () => 'fixture' },
-    '@/shared/lib/authSessionLifecycle': { isAuthSessionCurrent: () => true },
+    '@/shared/api/unwrap': load('src/shared/api/unwrap.ts'),
+    '@/shared/lib/authStateEvents': { notifyAuthStateChanged: () => {} },
+    '@/shared/lib/authSessionRecovery': { refreshAuthSession: async () => {} },
+    '../model/session': { isActivitySessionCurrent: () => true },
   })
   const signal = new AbortController().signal
-  await api.getActivity(signal)
-  await api.synchronizeActivity(signal)
-  await api.displayActivityBadges(['first_step'], signal)
+  await api.getActivity(fixtureSession, signal)
+  await api.synchronizeActivity(fixtureSession, signal)
+  await api.displayActivityBadges(fixtureSession, ['first_step'], signal)
   assert.equal(calls[0][0], '/v2/gamification/me')
   assert.equal(calls[0][1].signal, signal)
   assert.deepEqual(calls[1].slice(0, 2), ['/v2/gamification/me/sync', {}])
@@ -247,7 +260,7 @@ test('배지함은 획득한 배지만 선택하며 3개 한도에서 추가 선
     state: i < 4 ? 'earned' : i === 4 ? 'locked' : 'revoked',
     earnedAt: i < 4 ? '2026-10-06' : null,
   }))
-  client.setQueryData(['gamification', 'private', 'fixture-user', 1], {
+  client.setQueryData(['gamification', 'private', fixtureSession.scope], {
     totalExp: 155,
     displayBadges: badges.slice(0, 3).map((b) => b.key),
     badges,
@@ -264,7 +277,7 @@ test('배지함은 획득한 배지만 선택하며 3개 한도에서 추가 선
     createElement(
       QueryClientProvider,
       { client },
-      createElement(ActivityDashboard, { ownerId: 'fixture-user', generation: 1 }),
+      createElement(ActivityDashboard, { session: fixtureSession }),
     ),
   )
   assert.equal((html.match(/aria-pressed="true"/g) ?? []).length, 3)
@@ -288,9 +301,9 @@ test('배지함 직접 진입은 비활성·설정 오류·비로그인 상태�
       '@/features/auth': {
         useMe: () => ({ isLoggedIn: scenario.isLoggedIn, me: { userId: 'previous-account' } }),
       },
-      '@/shared/lib/useAuthSessionGeneration': { useAuthSessionGeneration: () => 1 },
       '@/entities/gamification': { activityConfigOptions: {} },
       '@/features/gamification': {
+        useActivitySession: () => fixtureSession,
         ActivityDashboard: () => {
           throw new Error('private dashboard must not mount')
         },
