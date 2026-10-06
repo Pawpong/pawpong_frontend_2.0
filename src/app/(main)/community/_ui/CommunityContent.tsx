@@ -7,6 +7,7 @@ import {
   Button,
   DeleteConfirmModal,
   Chip,
+  IconButton,
   InfiniteScrollTrigger,
   ListState,
   LoginPromptModal,
@@ -68,11 +69,11 @@ const CommunityContent = () => {
         title="커뮤니티"
         titleVariant="page"
         right={
-          <div className="hidden tab:flex pc:hidden">
-            <Button size="md" onClick={writePost}>
-              <PlusIcon className="size-5" />
-              글쓰기
-            </Button>
+          // PC 는 사이드바 글쓰기 버튼이 맡는다
+          <div className="flex pc:hidden">
+            <IconButton tone="brand" aria-label="커뮤니티 글쓰기" onClick={writePost}>
+              <PlusIcon aria-hidden className="size-7.5" />
+            </IconButton>
           </div>
         }
       />
@@ -217,12 +218,6 @@ const CommunityContent = () => {
           </section>
         </div>
 
-        <div className="fixed right-5 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-sticky flex rounded-lg shadow-md tab:hidden">
-          <Button onClick={writePost} size="lg">
-            <PlusIcon className="size-5" />
-            글쓰기
-          </Button>
-        </div>
         <LoginPromptModal
           open={isPromptOpen}
           onOpenChange={setPromptOpen}
