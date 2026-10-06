@@ -9,7 +9,13 @@ import { useQuery } from '@tanstack/react-query'
 import { petConfigOptions } from '@/entities/playground-pet'
 
 /** 로그인 상태는 여기서 읽어 넘긴다 — 기능 슬라이스끼리 직접 참조하지 않도록 */
-export const AiFilterContent = ({ gameCharacter = false }: { gameCharacter?: boolean }) => {
+export const AiFilterContent = ({
+  gameCharacter = false,
+  sourceJobId,
+}: {
+  gameCharacter?: boolean
+  sourceJobId?: string
+}) => {
   const { isLoggedIn } = useMe()
   const billing = usePurchases()
   const { refresh } = billing
@@ -25,13 +31,15 @@ export const AiFilterContent = ({ gameCharacter = false }: { gameCharacter?: boo
       <p role="status" className="mx-auto max-w-xl px-5 py-12 text-center">
         {petConfig.isPending
           ? '캐릭터 만들기를 준비하고 있어요…'
-          : '지금은 게임 캐릭터 만들기를 이용할 수 없어요.'}
+          : '지금은 캐릭터 만들기를 이용할 수 없어요.'}
       </p>
     )
   return (
     <AiFilterStudio
-      key={gameCharacter ? 'pet-character' : 'photo'}
+      key={JSON.stringify([gameCharacter, sourceJobId, billing.memberId, billing.generation])}
       gameCharacter={gameCharacter}
+      sourceJobId={gameCharacter ? sourceJobId : undefined}
+      sessionGeneration={billing.generation}
       isLoggedIn={isLoggedIn}
       allowance={
         billing.account.isError ? undefined : featureAllowance(billing.account.data, 'ai_image')
