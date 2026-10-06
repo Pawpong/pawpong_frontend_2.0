@@ -1,6 +1,8 @@
 'use client'
 
 import { BeforeAfterSlider } from '@/shared/ui'
+import { ActivityBadgeRow } from '@/entities/gamification'
+import { usePublicActivityBadges } from '@/features/gamification'
 
 import type { ReactNode } from 'react'
 import {
@@ -63,6 +65,11 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
   const { guard, isPromptOpen, setPromptOpen } = useLoginGuard()
   // 목록과 입력창이 서로 떨어진 자리에 배치되므로 스레드 상태는 여기서 한 번만 만든다
   const thread = useCommentThread(postId)
+  const badges = usePublicActivityBadges(
+    post
+      ? [{ ownerId: post.authorId, role: post.authorModel === 'Breeder' ? 'breeder' : 'adopter' }]
+      : [],
+  )
 
   // 캐시가 없는 직접 진입에서는 상세 응답 전까지 채울 값이 없다 — 빈 패널 대신 상태를 알린다
   if (!post) {
@@ -103,8 +110,19 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
           alt={post.authorNickname}
           className="shrink-0"
         />
-        <span className="truncate text-body-lg font-semibold text-neutral-850">
-          {post.authorNickname}
+        <span className="min-w-0">
+          <span className="block truncate text-body-lg font-semibold text-neutral-850">
+            {post.authorNickname}
+          </span>
+          <ActivityBadgeRow
+            badges={
+              badges.find(
+                (owner) =>
+                  owner.ownerId === post.authorId &&
+                  owner.role === (post.authorModel === 'Breeder' ? 'breeder' : 'adopter'),
+              )?.badges ?? []
+            }
+          />
         </span>
       </a>
       {trailingAction}

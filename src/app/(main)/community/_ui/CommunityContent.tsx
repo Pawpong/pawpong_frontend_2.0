@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import { ActivityBadgeRow } from '@/entities/gamification'
+import { ActivityEntry, usePublicActivityBadges } from '@/features/gamification'
 import { useRouter } from 'next/navigation'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import {
@@ -58,6 +60,15 @@ const CommunityContent = () => {
     communityQueries.posts(sort, petType || undefined, undefined, appliedSearch || undefined),
   )
   const posts = flattenPages(data)
+  const authorBadges = usePublicActivityBadges(
+    posts.map((post) => ({
+      ownerId: post.authorId,
+      role: post.authorModel === 'Breeder' ? 'breeder' : 'adopter',
+    })),
+  )
+  const badgesByOwner = new Map(
+    authorBadges.map((owner) => [`${owner.role}:${owner.ownerId}`, owner.badges]),
+  )
   const firstPhotoPostId = getFirstPhotoPostId(posts)
   const writePost = guard(() => router.push('/community/write'))
   const selectedLabel = PET_OPTIONS.find((option) => option.value === petType)?.label
@@ -102,6 +113,7 @@ const CommunityContent = () => {
               ))}
             </nav>
             <div className="mt-6 border-t border-neutral-100 pt-6">
+              <ActivityEntry />
               <Button onClick={writePost} width="full" size="lg">
                 글쓰기
               </Button>
@@ -114,6 +126,9 @@ const CommunityContent = () => {
           </aside>
 
           <section className="min-w-0" aria-label="커뮤니티 게시글">
+            <div className="pc:hidden">
+              <ActivityEntry />
+            </div>
             <SearchBar
               key={appliedSearch}
               className="mb-6"
@@ -190,6 +205,15 @@ const CommunityContent = () => {
                       key={post.postId}
                       preload={post.postId === firstPhotoPostId}
                       guard={guard}
+                      badgeSlot={
+                        <ActivityBadgeRow
+                          badges={
+                            badgesByOwner.get(
+                              `${post.authorModel === 'Breeder' ? 'breeder' : 'adopter'}:${post.authorId}`,
+                            ) ?? []
+                          }
+                        />
+                      }
                       {...toCommunityPreviewProps(post)}
                       onEdit={
                         isMyPost
