@@ -50,7 +50,7 @@ const buildCommentTree = (comments: CommunityComment[]) => {
  * 목록(CommentList)과 입력창(CommentComposerBar)이 상세 레이아웃에서 서로 떨어진 자리에
  * 배치되므로, 각자 훅을 부르지 않고 부모가 한 번 호출해 결과를 내려준다.
  */
-const useCommentThread = (postId: string) => {
+const useCommentThread = (postId: string, enabled = true) => {
   // [refactored] useAuthStatus + profileQueries.me 조합을 useMe로
   // (상세와 같은 queryKey라 네트워크 요청은 1건으로 합쳐진다)
   const { isLoggedIn, me } = useMe()
@@ -61,7 +61,7 @@ const useCommentThread = (postId: string) => {
     isFetchingNextPage,
     isPending,
     isError,
-  } = useInfiniteQuery(communityQueries.comments(postId))
+  } = useInfiniteQuery({ ...communityQueries.comments(postId), enabled })
   const createComment = useCreateCommunityComment(postId)
 
   // 답글 대상 (parentCommentId 는 최상위 댓글로 고정 — 1단계 스레드)
@@ -80,6 +80,7 @@ const useCommentThread = (postId: string) => {
   }
 
   const handleSubmitComment = async (body: string) => {
+    if (!enabled) throw new Error('공개 보류 중에는 댓글을 작성할 수 없어요.')
     // 답글 쓰는 사이 대상 댓글이 삭제됐으면 없는 parentCommentId를 보내지 않고 최상위로 작성한다
     const parentCommentId =
       replyTarget && loadedIds.has(replyTarget.commentId) ? replyTarget.commentId : undefined

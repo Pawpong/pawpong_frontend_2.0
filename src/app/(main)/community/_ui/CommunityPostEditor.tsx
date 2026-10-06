@@ -3,7 +3,10 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { communityQueries } from '@/entities/community'
+import { communityQueries, communityReviewConfigOptions } from '@/entities/community'
+import { useAuthSessionGeneration } from '@/shared/lib/useAuthSessionGeneration'
+import { getAuthSessionGeneration, isAuthSessionCurrent } from '@/shared/lib/authSessionLifecycle'
+import { CommunityReviewConsent } from './CommunityReviewConsent'
 import { communityExperienceConfigOptions, type CommunityExperience } from '@/entities/community'
 import { CommunityExperienceEditor } from './CommunityExperienceEditor'
 import { profileQueries } from '@/entities/profile'
@@ -50,7 +53,7 @@ const PostForm = ({ postId, post }: PostFormProps) => {
   const [handoff] = useState(() => (post ? null : takePendingCommunityPost()))
   const initialComparison = post?.aiComparison ?? handoff?.aiComparison
   const form = usePostForm({
-    maxImages: initialComparison ? 11 : 10,
+    maxImages: 10,
     initialText: post?.body ?? '',
     initialImages: post?.photoUrls ?? [],
     initialFiles: handoff?.files,
@@ -73,6 +76,9 @@ const PostForm = ({ postId, post }: PostFormProps) => {
   const initialPetType = post?.petType ?? ''
   const [petType, setPetType] = useState<CommunityPetType | ''>(initialPetType)
   const experienceConfig = useQuery(communityExperienceConfigOptions)
+  const reviewConfig = useQuery(communityReviewConfigOptions)
+  const reviewEnabled = reviewConfig.data?.enabled === true && !reviewConfig.isError
+  const [aiReviewConsent, setAiReviewConsent] = useState(false)
   const [experience, setExperience] = useState<CommunityExperience | null | undefined>(
     post?.experience,
   )
@@ -117,7 +123,9 @@ const PostForm = ({ postId, post }: PostFormProps) => {
       (status === 'published' ? !canPublish : !canSaveDraft)
     )
       return
-    const savedId = await submit({
+    const generation = getAuthSessionGeneration()
+    const saved = await submit({
+      ...(reviewEnabled && status === 'published' ? { aiReviewConsent } : {}),
       ...(experienceEnabled && experience !== undefined ? { experience } : {}),
       text: form.text,
       files: comparison.submission.files,
@@ -127,9 +135,9 @@ const PostForm = ({ postId, post }: PostFormProps) => {
       aiComparison: comparison.submission.aiComparison,
       keptImageUrls: comparison.submission.keptImageUrls,
     })
-    if (savedId) {
+    if (saved && isAuthSessionCurrent(generation)) {
       cancelExit()
-      router.push('/home')
+      router.push(saved.aiReview ? `/community/post/${saved.postId}` : '/home')
     }
   }
 
@@ -153,7 +161,11 @@ const PostForm = ({ postId, post }: PostFormProps) => {
         error={error}
         onBack={handleClose}
         cta={{
-          submitLabel: formText.submitLabel,
+          submitLabel: reviewEnabled
+            ? aiReviewConsent
+              ? '심사 후 이야기 올리기'
+              : '나만 확인하며 저장하기'
+            : formText.submitLabel,
           onSubmit: handleSubmit,
           isValid: canPublish,
           // 이미 발행된 글을 임시저장으로 되돌리지는 않는다 (작성 중 / 임시저장 이어쓰기에서만 노출)
@@ -163,6 +175,14 @@ const PostForm = ({ postId, post }: PostFormProps) => {
         }}
         belowContent={
           <div className="flex flex-col gap-4">
+            {reviewEnabled && reviewConfig.data && (
+              <CommunityReviewConsent
+                config={reviewConfig.data}
+                consent={aiReviewConsent}
+                onChange={setAiReviewConsent}
+                disabled={isSubmitting || form.isProcessingPhotos}
+              />
+            )}
             {experienceEnabled && experienceConfig.data && (
               <CommunityExperienceEditor
                 value={experience}
@@ -193,6 +213,11 @@ const PostForm = ({ postId, post }: PostFormProps) => {
               disabled={isSubmitting || form.isProcessingPhotos}
             />
             <PetCategorySuggestion
+              automaticAllowed={
+                !reviewConfig.isPending &&
+                !reviewConfig.isError &&
+                (!reviewEnabled || aiReviewConsent)
+              }
               text={form.text}
               photo={form.files[0]}
               value={petType}
@@ -256,6 +281,7 @@ const PostForm = ({ postId, post }: PostFormProps) => {
  */
 const CommunityPostEditor = ({ postId }: CommunityPostEditorProps) => {
   const router = useRouter()
+  const generation = useAuthSessionGeneration()
   const postQuery = useQuery({
     ...communityQueries.detail(postId ?? ''),
     enabled: !!postId,
@@ -280,7 +306,7 @@ const CommunityPostEditor = ({ postId }: CommunityPostEditorProps) => {
     if (postId && post && meFetched && !isOwner) router.replace(`/community/post/${postId}`)
   }, [postId, post, meFetched, isOwner, router])
 
-  if (!postId) return <PostForm />
+  if (!postId) return <PostForm key={generation} />
   if (postQuery.isPending || meQuery.isPending) {
     return (
       <div className="flex min-h-screen flex-col bg-white">
@@ -314,7 +340,7 @@ const CommunityPostEditor = ({ postId }: CommunityPostEditorProps) => {
   }
   if (!isOwner) return null
 
-  return <PostForm postId={postId} post={post} />
+  return <PostForm key={`${postId}:${generation}`} postId={postId} post={post} />
 }
 
 export { CommunityPostEditor }

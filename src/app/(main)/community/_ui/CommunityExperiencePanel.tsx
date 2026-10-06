@@ -6,6 +6,7 @@ import {
   communityExperienceConfigOptions,
   readCommunityAiAnswer,
   requestCommunityAiAnswer,
+  isCommunityPostHeld,
 } from '@/entities/community'
 import { SharedRouteMap } from '@/features/care-map'
 import { usePurchases } from '@/features/in-app-purchase'
@@ -72,10 +73,10 @@ export function CommunityExperiencePanel({
           </p>
         </div>
       )}
-      {post.experience.question && (
+      {post.experience.question && !isCommunityPostHeld(post) && (
         <p className="text-sm font-semibold">궁금한 점이 있다면 댓글로 경험을 나눠주세요.</p>
       )}
-      {post.experience.question && config.data?.aiEnabled && (
+      {post.experience.question && config.data?.aiEnabled && !isCommunityPostHeld(post) && (
         <CommunityAnswer
           key={`${post.postId}:${post.body}:${generation}`}
           post={post}

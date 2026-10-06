@@ -28,7 +28,7 @@ const ConnectedPostCard = (props: Omit<ComponentProps<typeof PostCard>, Injected
   return (
     <PostCard
       {...props}
-      {...reactions}
+      {...(props.aiReview?.state === 'held' ? {} : reactions)}
       moreAction={props.onDelete ? undefined : <ReportPostAction postId={props.postId} />}
     />
   )
@@ -65,8 +65,20 @@ const ConnectedFeedCard = ({ guard, ...props }: ConnectedFeedCardProps) => {
   return (
     <CommunityFeedCard
       {...props}
-      onToggleLike={guard ? guard(reactions.onToggleLike) : reactions.onToggleLike}
-      onToggleSave={guard ? guard(reactions.onToggleSave) : reactions.onToggleSave}
+      onToggleLike={
+        props.aiReview?.state === 'held'
+          ? undefined
+          : guard
+            ? guard(reactions.onToggleLike)
+            : reactions.onToggleLike
+      }
+      onToggleSave={
+        props.aiReview?.state === 'held'
+          ? undefined
+          : guard
+            ? guard(reactions.onToggleSave)
+            : reactions.onToggleSave
+      }
       reportAction={
         props.onDelete ? undefined : (
           <ReportPostAction postId={props.postId} triggerVariant="flag" />

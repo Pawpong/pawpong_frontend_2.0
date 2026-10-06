@@ -1,0 +1,5 @@
+require('./community-review/community-review-model.test.cjs')
+require('./community-review/community-review-api.test.cjs')
+require('./community-review/community-review-ui.test.cjs')
+require('./community-review/community-review-session.test.cjs')
+require('./community-review/community-review-identity.test.cjs')

@@ -1,4 +1,5 @@
 import { apiClient, API_VERSION, unwrap } from '@/shared/api'
+import { parseCommunityPostReview } from '../model/communityReview'
 import type {
   ApiResponseFull,
   PaginationResponse,
@@ -26,6 +27,7 @@ interface RawAuthor {
 }
 
 interface RawCommunityPostCard {
+  aiReview?: unknown
   experience?: import('@/shared/types').CommunityExperience | null
   postId: string
   author: RawAuthor
@@ -60,7 +62,8 @@ interface RawCommunityComment {
   createdAt: string
 }
 
-interface RawCommunityPostDetail {
+export interface RawCommunityPostDetail {
+  aiReview?: unknown
   experience?: import('@/shared/types').CommunityExperience | null
   postId: string
   author: RawAuthor
@@ -90,6 +93,7 @@ const flattenAuthor = (author: RawAuthor) => ({
 })
 
 const mapCard = (raw: RawCommunityPostCard): CommunityPostCard => ({
+  ...(raw.aiReview !== undefined ? { aiReview: parseCommunityPostReview(raw.aiReview) } : {}),
   ...(raw.experience ? { experience: raw.experience } : {}),
   postId: raw.postId,
   ...flattenAuthor(raw.author),
@@ -124,7 +128,8 @@ const mapComment = (raw: RawCommunityComment): CommunityComment => ({
   createdAt: raw.createdAt,
 })
 
-const mapDetail = (raw: RawCommunityPostDetail): CommunityPostDetail => ({
+export const mapCommunityPostDetail = (raw: RawCommunityPostDetail): CommunityPostDetail => ({
+  ...(raw.aiReview !== undefined ? { aiReview: parseCommunityPostReview(raw.aiReview) } : {}),
   ...(raw.experience ? { experience: raw.experience } : {}),
   postId: raw.postId,
   ...flattenAuthor(raw.author),
@@ -180,7 +185,7 @@ export const getCommunityPostDetail = async (postId: string): Promise<CommunityP
   const response = await apiClient.get<ApiResponseFull<RawCommunityPostDetail>>(
     `${API_VERSION}/community/posts/${postId}`,
   )
-  return mapDetail(unwrap(response, '커뮤니티 게시글 조회에 실패했습니다.'))
+  return mapCommunityPostDetail(unwrap(response, '커뮤니티 게시글 조회에 실패했습니다.'))
 }
 
 /** 내가 저장한 게시글 목록 조회 */

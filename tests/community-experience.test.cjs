@@ -162,6 +162,8 @@ test('AI 답변 화면은 자동 생성 없이 동의를 받고 의학적 참고
     '@/entities/community': {
       communityExperienceConfigOptions: {},
       readCommunityAiAnswer: () => null,
+      isCommunityPostHeld: load('src/entities/community/model/communityReview.ts')
+        .isCommunityPostHeld,
     },
     '@/features/care-map': { SharedRouteMap: () => null },
     '@/features/in-app-purchase': { usePurchases: () => ({ generation: 0 }) },

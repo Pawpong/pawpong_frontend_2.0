@@ -1,3 +1,5 @@
+import type { CommunityPostReview } from './CommunityReviewTypes'
+
 /** 작성자가 공개한 두 사진의 비포·애프터 비교 인덱스 */
 export interface CommunityAiComparison {
   beforePhotoIndex: number
@@ -21,6 +23,7 @@ export type CommunityPostStatus = 'draft' | 'published'
 
 /** 커뮤니티 게시글 카드 (목록용) */
 export interface CommunityPostCard {
+  aiReview?: CommunityPostReview
   experience?: CommunityExperience | null
   aiComparison?: CommunityAiComparison | null
   postId: string
@@ -64,6 +67,7 @@ export interface CommunityComment {
 
 /** 커뮤니티 게시글 상세 */
 export interface CommunityPostDetail {
+  aiReview?: CommunityPostReview
   experience?: CommunityExperience | null
   aiComparison?: CommunityAiComparison | null
   postId: string
@@ -105,6 +109,7 @@ export interface CommunityPostListParams extends CommunityDiscoveryFilters {
 
 /** 게시글 작성 요청 */
 export interface CreateCommunityPostRequest {
+  aiReviewConsent?: boolean
   experience?: CommunityExperience | null
   aiComparison?: CommunityAiComparison | null
   /** 발행(published) 시 필수, 임시저장(draft) 시 비어 있어도 됨 */
@@ -121,6 +126,7 @@ export interface CreateCommunityPostRequest {
 
 /** 게시글 수정 요청 */
 export interface UpdateCommunityPostRequest {
+  aiReviewConsent?: boolean
   experience?: CommunityExperience | null
   aiComparison?: CommunityAiComparison | null
   title?: string
