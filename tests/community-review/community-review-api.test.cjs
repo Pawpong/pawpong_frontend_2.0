@@ -129,6 +129,12 @@ test('업로드 중 계정이 바뀌면 게시글 생성으로 이어가지 않�
         return [{ fileName: 'community/synthetic.jpg' }]
       },
     },
+    '../api/communityReviewPhotos.api': {
+      uploadCommunityReviewPhotos: async () => {
+        state.token = 'other-synthetic'
+        return [{ fileName: 'community/review-synthetic.jpg' }]
+      },
+    },
     '../api/community.api': {
       createCommunityPost: async () => {
         created++
@@ -156,6 +162,7 @@ test('임시저장과 구 요청에는 심사 입력을 넣지 않고 발행에�
   const calls = []
   const submit = load('src/features/community/lib/submitCommunityPostForm.ts', {
     '@/shared/api': { uploadMultipleFiles: async () => [] },
+    '../api/communityReviewPhotos.api': { uploadCommunityReviewPhotos: async () => [] },
     '../api/community.api': {
       createCommunityPost: async (value) => {
         calls.push(value)

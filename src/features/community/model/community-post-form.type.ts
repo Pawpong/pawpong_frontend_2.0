@@ -10,6 +10,7 @@ export interface CommunityPostFormInput {
   experience?: CommunityExperience | null
   aiComparison?: CommunityAiComparison | null
   aiReviewConsent?: boolean
+  useOwnedPhotoUpload?: boolean
   text: string
   files: File[]
   visibility: CommunityPostVisibility

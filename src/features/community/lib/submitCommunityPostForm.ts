@@ -1,5 +1,6 @@
 import { uploadMultipleFiles } from '@/shared/api'
 import { createCommunityPost, updateCommunityPost } from '../api/community.api'
+import { uploadCommunityReviewPhotos } from '../api/communityReviewPhotos.api'
 import type { CommunityPostFormInput } from '../model/community-post-form.type'
 import { captureCommunityWriteSession } from './communityWriteSession'
 import { COMMUNITY_UPLOAD_FOLDER, toCommunityPhotoFileName } from './communityPhotoFileName'
@@ -12,12 +13,10 @@ export async function submitCommunityPostForm(
   const assertCurrent = captureCommunityWriteSession(signal)
   const uploaded = input.files.length
     ? (
-        await uploadMultipleFiles(
-          input.files,
-          COMMUNITY_UPLOAD_FOLDER,
-          signal,
-          input.status === 'published' && input.aiReviewConsent !== undefined,
-        )
+        await (input.useOwnedPhotoUpload === true ||
+        (input.status === 'published' && input.aiReviewConsent !== undefined)
+          ? uploadCommunityReviewPhotos(input.files, signal)
+          : uploadMultipleFiles(input.files, COMMUNITY_UPLOAD_FOLDER, signal))
       ).map((file) => file.fileName)
     : []
   assertCurrent()

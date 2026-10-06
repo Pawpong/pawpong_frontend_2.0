@@ -125,6 +125,7 @@ const PostForm = ({ postId, post }: PostFormProps) => {
       return
     const generation = getAuthSessionGeneration()
     const saved = await submit({
+      ...(reviewEnabled ? { useOwnedPhotoUpload: true } : {}),
       ...(reviewEnabled && status === 'published' ? { aiReviewConsent } : {}),
       ...(experienceEnabled && experience !== undefined ? { experience } : {}),
       text: form.text,

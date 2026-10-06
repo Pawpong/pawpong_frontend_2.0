@@ -161,6 +161,7 @@ export const API_DIAGNOSTIC_ROUTES = [
   '/api/v2/community/posts/:id/like',
   '/api/v2/community/posts/:id/report',
   '/api/v2/community/posts/:id/review',
+  '/api/v2/community/review/photos',
   '/api/v2/community/posts/:id/view',
   '/api/v2/contest/vote/:id',
   '/api/v2/feed/comment/:id',
