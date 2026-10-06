@@ -9,6 +9,7 @@ import { cn } from '@/shared/lib/cn'
 import type { CommunityPreviewProps } from '../model/communityPreview'
 import { CommunityPostActions } from './CommunityPostActions'
 import { CommunityPostProfile } from './CommunityPostProfile'
+import { CommunityReviewLabel } from './CommunityReviewLabel'
 
 interface PostCardProps extends CommunityPreviewProps {
   /** 지정 시 헤더를 공통 ProfileHeader로 렌더 + 이미지 tab 상단패딩 제거 (저장피드 sm / 홈 쇼케이스 responsivePc) */
@@ -80,6 +81,7 @@ const PostCard = ({
   text,
   images = [],
   aiComparison,
+  aiReview,
   likeCount,
   commentCount,
   isLiked,
@@ -142,6 +144,7 @@ const PostCard = ({
         </div>
       )}
 
+      <CommunityReviewLabel review={aiReview} />
       {/* 이미지 + 액션 — 사진↔아이콘 8px gap */}
       <div className="flex flex-col gap-2">
         {/* 이미지 (가로 스크롤) — 저장피드(profileType)는 상단패딩 제거 */}

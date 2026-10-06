@@ -1,4 +1,5 @@
 import { apiClient, API_VERSION, unwrap } from '@/shared/api'
+import { parseCommunityPostReview } from '../model/communityReview'
 import type {
   ApiResponseFull,
   PaginationResponse,
@@ -26,6 +27,8 @@ interface RawAuthor {
 }
 
 interface RawCommunityPostCard {
+  aiReview?: unknown
+  experience?: import('@/shared/types').CommunityExperience | null
   postId: string
   author: RawAuthor
   authorModel: CommunityAuthorModel
@@ -59,7 +62,9 @@ interface RawCommunityComment {
   createdAt: string
 }
 
-interface RawCommunityPostDetail {
+export interface RawCommunityPostDetail {
+  aiReview?: unknown
+  experience?: import('@/shared/types').CommunityExperience | null
   postId: string
   author: RawAuthor
   authorModel: CommunityAuthorModel
@@ -88,6 +93,8 @@ const flattenAuthor = (author: RawAuthor) => ({
 })
 
 const mapCard = (raw: RawCommunityPostCard): CommunityPostCard => ({
+  ...(raw.aiReview !== undefined ? { aiReview: parseCommunityPostReview(raw.aiReview) } : {}),
+  ...(raw.experience ? { experience: raw.experience } : {}),
   postId: raw.postId,
   ...flattenAuthor(raw.author),
   authorModel: raw.authorModel,
@@ -121,7 +128,9 @@ const mapComment = (raw: RawCommunityComment): CommunityComment => ({
   createdAt: raw.createdAt,
 })
 
-const mapDetail = (raw: RawCommunityPostDetail): CommunityPostDetail => ({
+export const mapCommunityPostDetail = (raw: RawCommunityPostDetail): CommunityPostDetail => ({
+  ...(raw.aiReview !== undefined ? { aiReview: parseCommunityPostReview(raw.aiReview) } : {}),
+  ...(raw.experience ? { experience: raw.experience } : {}),
   postId: raw.postId,
   ...flattenAuthor(raw.author),
   authorModel: raw.authorModel,
@@ -149,6 +158,13 @@ export const getCommunityPosts = async (
 ): Promise<PaginationResponse<CommunityPostCard>> => {
   const query = new URLSearchParams()
   if (params.petType) query.set('petType', params.petType)
+  if (params.topic) query.set('topic', params.topic)
+  if (params.topics?.length) query.set('topics', params.topics.join(','))
+  if (params.topicMatch) query.set('topicMatch', params.topicMatch)
+  if (params.tags?.length) query.set('tags', params.tags.join(','))
+  if (params.kind) query.set('kind', params.kind)
+  if (params.media) query.set('media', params.media)
+  if (params.period) query.set('period', params.period)
   if (params.category) query.set('category', params.category)
   if (params.authorId) query.set('authorId', params.authorId)
   if (params.search) query.set('search', params.search)
@@ -169,7 +185,7 @@ export const getCommunityPostDetail = async (postId: string): Promise<CommunityP
   const response = await apiClient.get<ApiResponseFull<RawCommunityPostDetail>>(
     `${API_VERSION}/community/posts/${postId}`,
   )
-  return mapDetail(unwrap(response, '커뮤니티 게시글 조회에 실패했습니다.'))
+  return mapCommunityPostDetail(unwrap(response, '커뮤니티 게시글 조회에 실패했습니다.'))
 }
 
 /** 내가 저장한 게시글 목록 조회 */

@@ -1,5 +1,5 @@
 import { createInfiniteQuery, createQuery, STALE_TIME } from '@/shared/api'
-import type { CommunitySortType, CommunityPetType } from '@/shared/types'
+import type { CommunitySortType, CommunityPetType, CommunityDiscoveryFilters } from '@/shared/types'
 import {
   getCommunityPosts,
   getCommunityPostDetail,
@@ -21,10 +21,31 @@ export const communityQueries = {
     category?: string,
     search?: string,
     pageSize = 15,
+    topic?: string,
+    discovery?: CommunityDiscoveryFilters,
   ) =>
     createInfiniteQuery({
-      queryKey: [...communityQueries.postsAll(), sort, petType, category, search, pageSize],
-      queryFn: (page) => getCommunityPosts({ sort, petType, category, search, page, pageSize }),
+      queryKey: [
+        ...communityQueries.postsAll(),
+        sort,
+        petType,
+        category,
+        search,
+        pageSize,
+        ...(topic ? [topic] : []),
+        ...(discovery ? [discovery] : []),
+      ],
+      queryFn: (page) =>
+        getCommunityPosts({
+          sort,
+          petType,
+          category,
+          search,
+          page,
+          pageSize,
+          ...(topic ? { topic } : {}),
+          ...(discovery ?? {}),
+        }),
       staleTime: STALE_TIME.DEFAULT,
     }),
 

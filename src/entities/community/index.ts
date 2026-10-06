@@ -12,3 +12,16 @@ export { toPlaceholderPostDetail } from './model/placeholderPostDetail'
 export { COMMUNITY_CAROUSEL_STYLE, COMMUNITY_LOGIN_PROMPT } from './model/communityUi'
 export type { CommunityPreviewAuthor, CommunityPreviewProps } from './model/communityPreview'
 export { formatHallOfFamePeriod } from './model/hallOfFamePeriod'
+export * from './model/communityExperience'
+export * from './model/discovery'
+export type { CommunityExperience, CommunityRoutePoint } from '@/shared/types'
+export * from './api/communityExperience.api'
+export * from './api/communityReview.api'
+export {
+  isCommunityPostHeld,
+  parseCommunityReviewConfig,
+  CLOSED_COMMUNITY_REVIEW_CONFIG,
+} from './model/communityReview'
+export { mapCommunityPostDetail } from './api/community.api'
+export type { RawCommunityPostDetail } from './api/community.api'
+export { CommunityReviewLabel } from './ui/CommunityReviewLabel'

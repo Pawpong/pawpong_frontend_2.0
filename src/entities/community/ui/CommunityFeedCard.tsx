@@ -10,6 +10,7 @@ import { formatRelativeTime } from '@/shared/lib/formatRelativeTime'
 import type { CommunityPreviewProps } from '../model/communityPreview'
 import { CommunityPostActions } from './CommunityPostActions'
 import { COMMUNITY_CAROUSEL_STYLE } from '../model/communityUi'
+import { CommunityReviewLabel } from './CommunityReviewLabel'
 
 interface CommunityFeedCardProps extends CommunityPreviewProps {
   /** 내 글일 때만 전달 — 더보기가 삭제(및 필요한 화면에서는 수정)로 동작 */
@@ -44,6 +45,7 @@ const CommunityFeedCard = ({
   text,
   images = [],
   aiComparison,
+  aiReview,
   likeCount,
   commentCount,
   isLiked,
@@ -134,6 +136,9 @@ const CommunityFeedCard = ({
         {onDelete ? <OwnerActionsMenu onEdit={onEdit} onDelete={onDelete} /> : followAction}
       </div>
 
+      <div className="px-3">
+        <CommunityReviewLabel review={aiReview} />
+      </div>
       {wide && text && (
         <Link href={href} prefetch={false} className="mb-4 block rounded focus-ring">
           <p className="line-clamp-4 text-[0.9375rem] leading-7 font-normal whitespace-pre-line text-neutral-850">

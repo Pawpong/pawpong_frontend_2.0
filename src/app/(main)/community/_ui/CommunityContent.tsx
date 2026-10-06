@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import { ActivityBadgeRow } from '@/entities/gamification'
 import { ActivityEntry, usePublicActivityBadges } from '@/features/gamification'
-import { useRouter } from 'next/navigation'
-import { useInfiniteQuery } from '@tanstack/react-query'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import { communityExperienceConfigOptions, normalizeCommunityTags } from '@/entities/community'
 import {
   Button,
   DeleteConfirmModal,
@@ -30,8 +31,9 @@ import { useLoginGuard, useMe } from '@/features/auth'
 import { FeedFollowButton } from './FeedFollowButton'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import { cn } from '@/shared/lib/cn'
-import type { CommunityPetType, CommunitySortType } from '@/shared/types'
+import type { CommunityPetType, CommunitySortType, CommunityDiscoveryFilters } from '@/shared/types'
 import { COMMUNITY_SORT_OPTIONS } from './constants'
+import { CommunityDiscovery } from './CommunityDiscovery'
 
 const PET_OPTIONS = [
   { value: '', label: '전체 이야기', shortLabel: '전체' },
@@ -42,9 +44,14 @@ const PET_OPTIONS = [
 
 const CommunityContent = () => {
   const router = useRouter()
+  const parameters = useSearchParams()
   const [petType, setPetType] = useState<CommunityPetType | ''>('')
   const [sort, setSort] = useState<CommunitySortType>('latest')
   const [appliedSearch, setAppliedSearch] = useState('')
+  const [discovery, setDiscovery] = useState<CommunityDiscoveryFilters>(() => ({
+    tags: normalizeCommunityTags(parameters.get('tags') ?? ''),
+  }))
+  const experience = useQuery(communityExperienceConfigOptions)
   const { guard, isPromptOpen, setPromptOpen } = useLoginGuard()
   const { me } = useMe()
   const { requestDelete, modalProps: deleteModalProps } = useDeletePostConfirm()
@@ -58,7 +65,21 @@ const CommunityContent = () => {
     refetch,
     isFetching: isRetrying,
   } = useInfiniteQuery(
-    communityQueries.posts(sort, petType || undefined, undefined, appliedSearch || undefined),
+    communityQueries.posts(
+      sort,
+      petType || undefined,
+      undefined,
+      appliedSearch || undefined,
+      15,
+      undefined,
+      experience.data?.enabled &&
+        !experience.isError &&
+        Object.values(discovery).some((value) =>
+          Array.isArray(value) ? value.length > 0 : !!value,
+        )
+        ? discovery
+        : undefined,
+    ),
   )
   const posts = flattenPages(data)
   const authorBadges = usePublicActivityBadges(
@@ -130,6 +151,13 @@ const CommunityContent = () => {
             <div className="pc:hidden">
               <ActivityEntry />
             </div>
+            {experience.data?.enabled && !experience.isError && (
+              <CommunityDiscovery
+                config={experience.data}
+                value={discovery}
+                onChange={setDiscovery}
+              />
+            )}
             <SearchBar
               key={appliedSearch}
               className="mb-6"
