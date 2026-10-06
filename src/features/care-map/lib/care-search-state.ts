@@ -29,11 +29,12 @@ export function createCareSearchState(kind: CarePlaceKind): CareSearchState {
       kind,
       query: '',
       radius: kind === 'shelter' ? 20000 : 5000,
-      scope: 'directory',
+      // 애견동반카페는 공공 등록자료(전국 목록)가 없어 지도 중심 주변 검색으로 시작한다
+      scope: kind === 'cafe' ? 'nearby' : 'directory',
       region: 'all',
       referralOnly: false,
     },
-    nearbyOrigin: 'location',
+    nearbyOrigin: kind === 'cafe' ? 'map' : 'location',
     page: 1,
     selectedId: null,
   }
@@ -53,6 +54,12 @@ export function careSearchReducer(
   })
   switch (action.type) {
     case 'kind':
+      // 전국 목록을 보다가 카페로 바꾸면 목록이 없으니 지금 지도 중심 주변 검색으로 옮긴다
+      if (action.kind === 'cafe' && search.scope === 'directory')
+        return {
+          ...change({ kind: action.kind, referralOnly: false, scope: 'nearby' }),
+          nearbyOrigin: 'map',
+        }
       return change({
         kind: action.kind,
         referralOnly: action.kind === 'hospital' && search.referralOnly,

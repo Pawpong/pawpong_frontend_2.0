@@ -1,6 +1,24 @@
 import type { CarePlaceKind } from '@/entities/care-place'
 
 export function CareMapGuide({ kind }: { kind: CarePlaceKind }) {
+  if (kind === 'cafe')
+    return (
+      <details className="rounded-2xl border border-secondary-200 bg-point-50 px-4 py-3 text-neutral-850">
+        <summary className="cursor-pointer text-sm font-semibold">
+          애견동반카페, 방문 전 확인해 주세요
+        </summary>
+        <div className="mt-3 space-y-2 text-sm leading-6 text-neutral-700">
+          <p>
+            카카오 장소 검색에서 ‘애견동반카페’·‘애견카페’로 찾은 카페예요. 포퐁이 실제 동반 가능
+            여부를 확인한 목록은 아니에요.
+          </p>
+          <p>
+            동반 가능한 크기·견종, 실내 동반 여부, 리드줄·매너벨트 같은 조건은 매장마다 달라요. 방문
+            전 전화로 확인해 주세요.
+          </p>
+        </div>
+      </details>
+    )
   return (
     <details className="rounded-2xl border border-secondary-200 bg-point-50 px-4 py-3 text-neutral-850">
       <summary className="cursor-pointer text-sm font-semibold">
