@@ -10,6 +10,7 @@ import { CommunityReviewConsent } from './CommunityReviewConsent'
 import {
   communityExperienceConfigOptions,
   communityWritingPrompt,
+  initialCommunityExperience,
   isCommunityExperienceEmpty,
   prepareCommunityExperience,
   validateCommunityExperience,
@@ -45,10 +46,13 @@ import type { CommunityPetType, CommunityPostDetail, CommunityPostStatus } from 
 interface CommunityPostEditorProps {
   /** 전달하면 수정 모드 — 기존 게시글로 폼을 채운다 */
   postId?: string
+  /** 새 글에서 처음 열어 둘 기록 틀 (walk | clinic | daily) */
+  initialRecord?: string
 }
 
 interface PostFormProps {
   postId?: string
+  initialRecord?: string
   post?: CommunityPostDetail
 }
 
@@ -58,7 +62,7 @@ const FORM_TEXT = {
   edit: { title: '글 수정', mobileTitle: '게시글 수정', submitLabel: '수정 완료' },
 } as const
 
-const PostForm = ({ postId, post }: PostFormProps) => {
+const PostForm = ({ postId, post, initialRecord }: PostFormProps) => {
   const router = useRouter()
   // 임시저장 이어쓰기는 '수정'이 아니라 작성의 연장 — 문구·임시저장 버튼을 작성 화면과 동일하게 둔다
   const isDraft = post?.status === 'draft'
@@ -94,9 +98,11 @@ const PostForm = ({ postId, post }: PostFormProps) => {
   const reviewConfig = useQuery(communityReviewConfigOptions)
   const reviewEnabled = reviewConfig.data?.enabled === true && !reviewConfig.isError
   const [aiReviewConsent, setAiReviewConsent] = useState(false)
-  const [experience, setExperience] = useState<CommunityExperience | null | undefined>(
-    post?.experience,
+  // 수정·임시저장 이어쓰기는 저장된 값을 쓰고, 새 글만 링크가 고른 기록 틀로 시작한다.
+  const [startExperience] = useState<CommunityExperience | null | undefined>(() =>
+    post ? post.experience : initialCommunityExperience(initialRecord),
   )
+  const [experience, setExperience] = useState(startExperience)
   const experienceEnabled = experienceConfig.data?.enabled === true && !experienceConfig.isError
   const experienceNotice =
     experienceEnabled && experience ? validateCommunityExperience(experience) : null
@@ -107,7 +113,7 @@ const PostForm = ({ postId, post }: PostFormProps) => {
   const hasChanges =
     form.hasChanges ||
     comparison.hasChanges ||
-    JSON.stringify(experience) !== JSON.stringify(post?.experience) ||
+    JSON.stringify(experience) !== JSON.stringify(startExperience) ||
     visibility !== initialVisibility ||
     petType !== initialPetType
   const { showGuard, requestExit, confirmExit, cancelExit } = useExitGuard({
@@ -335,7 +341,7 @@ const PostForm = ({ postId, post }: PostFormProps) => {
  * 수정 모드는 조회가 끝난 뒤에 폼을 마운트해 초기값을 시드한다(로드 후 setState 하는 effect 불필요).
  * 남의 글 ID 로 직접 들어오면 폼을 열지 않고 상세로 되돌린다(최종 차단은 백엔드).
  */
-const CommunityPostEditor = ({ postId }: CommunityPostEditorProps) => {
+const CommunityPostEditor = ({ postId, initialRecord }: CommunityPostEditorProps) => {
   const router = useRouter()
   const generation = useAuthSessionGeneration()
   const postQuery = useQuery({
@@ -362,7 +368,7 @@ const CommunityPostEditor = ({ postId }: CommunityPostEditorProps) => {
     if (postId && post && meFetched && !isOwner) router.replace(`/community/post/${postId}`)
   }, [postId, post, meFetched, isOwner, router])
 
-  if (!postId) return <PostForm key={generation} />
+  if (!postId) return <PostForm key={generation} initialRecord={initialRecord} />
   if (postQuery.isPending || meQuery.isPending) {
     return (
       <div className="flex min-h-screen flex-col bg-white">

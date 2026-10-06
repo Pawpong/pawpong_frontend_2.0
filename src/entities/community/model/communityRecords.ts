@@ -350,3 +350,26 @@ export function summarizeCommunityRecords(
     ...(experience.life ? [lifeSummary(experience.life)] : []),
   ]
 }
+
+// 다른 화면의 "기록 남기기" 링크가 쓰는 값. daily는 일상·돌봄 틀을 연다.
+const TEMPLATE_BY_QUERY: Record<string, CommunityTemplateKey> = {
+  walk: 'walk',
+  clinic: 'clinic',
+  daily: 'life',
+}
+
+/**
+ * /community/write?experience=walk|clinic|daily 로 들어온 새 글의 처음 기록 선택.
+ * 날짜만 오늘로 채우고 수치는 비워 둔다. 모르는 값이면 undefined.
+ */
+export function initialCommunityExperience(
+  query: string | null | undefined,
+  today = communityToday(),
+): CommunityExperience | undefined {
+  const key =
+    typeof query === 'string' && Object.hasOwn(TEMPLATE_BY_QUERY, query)
+      ? TEMPLATE_BY_QUERY[query]
+      : undefined
+  const template = COMMUNITY_TEMPLATES.find((item) => item.key === key)
+  return template ? toggleCommunityTemplate(EMPTY_COMMUNITY_EXPERIENCE, template, today) : undefined
+}

@@ -342,3 +342,23 @@ test('같은 내용의 저장 재시도는 같은 식별자와 이미 올린 사
   assert.equal(Object.hasOwn(calls.updated[0], 'clientRequestId'), false)
   assert.equal(calls.uploads, 2)
 })
+
+test('기록 남기기 링크는 새 글의 기록 틀만 열고 수치는 비워 둔다', () => {
+  const start = records.initialCommunityExperience
+  assert.deepEqual(start('walk', '2026-10-07'), {
+    ...base,
+    topics: ['walk'],
+    walk: { walkedOn: '2026-10-07' },
+  })
+  const clinic = start('clinic', '2026-10-07')
+  assert.deepEqual(clinic.clinic, { visitedOn: '2026-10-07', clinicName: '', visitReason: 'other' })
+  // 병원 이름을 적기 전에는 저장할 수 없다.
+  assert.match(records.validateCommunityExperience(clinic), /병원 이름/)
+  assert.deepEqual(start('daily', '2026-10-07').life, {
+    recordedOn: '2026-10-07',
+    activity: 'other',
+  })
+  assert.deepEqual(start('daily', '2026-10-07').topics, ['daily'])
+  for (const value of ['life', 'travel', 'question', 'constructor', '', null, undefined])
+    assert.equal(start(value), undefined)
+})
