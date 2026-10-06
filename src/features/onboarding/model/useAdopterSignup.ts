@@ -10,6 +10,7 @@ import { buildAdopterRegistrationRequest } from './buildAdopterRegistrationReque
 import { useSignupCompletion } from './useSignupCompletion' // [refactored]
 import { SIGNUP_ERROR } from './signupErrors' // [refactored]
 import type { SurveyFormData } from './schema'
+import { hasContactVerification } from './contactVerification'
 
 /**
  * 입양자 가입 완료 (POST /auth/register/adopter)
@@ -37,7 +38,8 @@ export const useAdopterSignup = () => {
     const profile = formData.profile
     const info = formData.info
     // 폼의 이메일은 소셜 세션 값을 그대로 채운 것 — 세션이 우선, 없으면 폼 값
-    const email = social.email || profile?.email || ''
+    const email =
+      profile?.verificationMethod === 'email' ? profile.email : social.email || profile?.email || ''
 
     // 서버 필수값 사전 검증 — 단계를 건너뛰고 URL 로 직접 들어온 경우 원문 400 대신 안내를 띄운다
     const nickname = info?.nickname?.trim()
@@ -49,8 +51,8 @@ export const useAdopterSignup = () => {
       setError(SIGNUP_ERROR.noEmail)
       return
     }
-    if (!profile?.phoneVerified) {
-      setError(SIGNUP_ERROR.phoneUnverified)
+    if (!hasContactVerification(profile)) {
+      setError(SIGNUP_ERROR.contactUnverified)
       return
     }
 

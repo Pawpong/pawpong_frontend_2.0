@@ -28,8 +28,14 @@ export const buildBreederRegistrationRequest = ({
 }: BuildBreederRegistrationRequestParams): RegisterBreederRequest => ({
   tempId: social.tempId,
   provider: social.provider,
-  email: social.email || profile.email,
-  phoneNumber: profile.phone,
+  email:
+    profile.verificationMethod === 'email'
+      ? profile.email.trim().toLowerCase()
+      : social.email || profile.email,
+  verificationMethod: profile.verificationMethod === 'email' ? 'email' : 'phone',
+  emailVerificationToken:
+    profile.verificationMethod === 'email' ? profile.emailVerificationToken : undefined,
+  phoneNumber: profile.verificationMethod === 'email' ? undefined : profile.phone,
   breederName: kennel.breederName,
   breederLocation: { city: kennel.city, district: kennel.district || undefined },
   animal: PET_TYPE_MAP[animal.selected],
