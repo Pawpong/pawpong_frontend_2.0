@@ -20,6 +20,26 @@ export function CareMapGuide({ kind }: { kind: CarePlaceKind }) {
         </div>
       </details>
     )
+  if (kind === 'travel' || kind === 'stay')
+    return (
+      <details className="rounded-2xl border border-secondary-200 bg-point-50 px-4 py-3 text-neutral-850">
+        <summary className="cursor-pointer text-sm font-semibold">
+          반려동물과 떠나기 전 확인해 주세요
+        </summary>
+        <div className="mt-3 space-y-2 text-sm leading-6 text-neutral-700">
+          <p>
+            한국관광공사 반려동물 동반여행 서비스에 등록된 {kind === 'stay' ? '숙소' : '여행지'}
+            예요. 장소를 누르면 동반 유형(전 구역·일부 구역), 동반 가능한 크기, 목줄·입마개 같은
+            필수 사항을 볼 수 있어요.
+          </p>
+          <p>
+            일부 구역만 동반 가능한 곳이 많고 조건은 바뀔 수 있어요.
+            {kind === 'stay' ? ' 객실 동반 여부와 추가 요금은 예약 전에' : ' 방문 전'} 꼭 확인해
+            주세요.
+          </p>
+        </div>
+      </details>
+    )
   return (
     <details className="rounded-2xl border border-secondary-200 bg-point-50 px-4 py-3 text-neutral-850">
       <summary className="cursor-pointer text-sm font-semibold">

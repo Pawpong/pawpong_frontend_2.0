@@ -1,6 +1,15 @@
-import type { CareCoordinates, CarePlaceKind, CarePlaceSearch } from '@/entities/care-place'
+import type {
+  CareCoordinates,
+  CareDirectoryKind,
+  CarePlaceKind,
+  CarePlaceSearch,
+} from '@/entities/care-place'
 
 export const DEFAULT_CARE_CENTER = { latitude: 37.5665, longitude: 126.978 }
+
+/** 공공 등록자료(전국 목록)가 있는 종류인지 — 동반 카페·여행지·숙소는 주변 검색만 있다 */
+export const hasCareDirectory = (kind: CarePlaceKind): kind is CareDirectoryKind =>
+  kind === 'hospital' || kind === 'shelter'
 export type NearbyOrigin = 'location' | 'map'
 
 interface CareSearchState {
@@ -28,13 +37,14 @@ export function createCareSearchState(kind: CarePlaceKind): CareSearchState {
       ...DEFAULT_CARE_CENTER,
       kind,
       query: '',
-      radius: kind === 'shelter' ? 20000 : 5000,
-      // 애견동반카페는 공공 등록자료(전국 목록)가 없어 지도 중심 주변 검색으로 시작한다
-      scope: kind === 'cafe' ? 'nearby' : 'directory',
+      // 보호센터·여행지·숙소는 드문드문 있어 넓게 시작한다
+      radius: kind === 'shelter' || kind === 'travel' || kind === 'stay' ? 20000 : 5000,
+      // 전국 목록이 없는 종류는 지도 중심 주변 검색으로 시작한다
+      scope: hasCareDirectory(kind) ? 'directory' : 'nearby',
       region: 'all',
       referralOnly: false,
     },
-    nearbyOrigin: kind === 'cafe' ? 'map' : 'location',
+    nearbyOrigin: hasCareDirectory(kind) ? 'location' : 'map',
     page: 1,
     selectedId: null,
   }
@@ -54,8 +64,8 @@ export function careSearchReducer(
   })
   switch (action.type) {
     case 'kind':
-      // 전국 목록을 보다가 카페로 바꾸면 목록이 없으니 지금 지도 중심 주변 검색으로 옮긴다
-      if (action.kind === 'cafe' && search.scope === 'directory')
+      // 전국 목록을 보다가 목록이 없는 종류로 바꾸면 지금 지도 중심 주변 검색으로 옮긴다
+      if (!hasCareDirectory(action.kind) && search.scope === 'directory')
         return {
           ...change({ kind: action.kind, referralOnly: false, scope: 'nearby' }),
           nearbyOrigin: 'map',

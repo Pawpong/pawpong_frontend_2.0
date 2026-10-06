@@ -427,6 +427,18 @@
     font-size: 20px;
   }
 }
+/* 종류 다섯 개를 한 줄에 — '애견동반카페'가 줄바꿈되지 않게 카드 안쪽을 조금 줄인다 */
+@media (min-width: 1024px) {
+  .care-map-counts {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+  .care-map-category {
+    padding: 14px;
+  }
+  .care-map-category-heading {
+    font-size: 17px;
+  }
+}
 
 .care-map-directions-overlay {
   position: fixed;
