@@ -12,6 +12,9 @@ import { usePurchases } from '@/features/in-app-purchase'
 import { getAccessToken } from '@/shared/api/token'
 import { isAuthSessionCurrent } from '@/shared/lib/authSessionLifecycle'
 import type { CommunityPostDetail } from '@/shared/types'
+import Link from 'next/link'
+import { communityQueries } from '@/entities/community'
+import { useInfiniteQuery } from '@tanstack/react-query'
 
 export function CommunityExperiencePanel({
   post,
@@ -39,6 +42,22 @@ export function CommunityExperiencePanel({
           </span>
         ))}
       </div>
+      {!!post.experience.tags?.length && (
+        <div className="flex flex-wrap gap-2">
+          {post.experience.tags.map((tag) => (
+            <Link
+              key={tag}
+              href={`/community?tags=${encodeURIComponent(tag)}`}
+              className="text-xs font-semibold text-primary-700 underline"
+            >
+              #{tag}
+            </Link>
+          ))}
+        </div>
+      )}
+      {!!post.experience.tags?.length && post.visibility === 'public' && (
+        <RelatedExperiences postId={post.postId} tag={post.experience.tags[0]} />
+      )}
       {post.experience.route.length > 0 && (
         <div className="space-y-2">
           <h3 className="text-sm font-bold">함께 가볼 공개 장소</h3>
@@ -66,6 +85,37 @@ export function CommunityExperiencePanel({
         />
       )}
     </section>
+  )
+}
+
+function RelatedExperiences({ postId, tag }: { postId: string; tag: string }) {
+  const result = useInfiniteQuery(
+    communityQueries.posts('latest', undefined, undefined, undefined, 6, undefined, {
+      tags: [tag],
+    }),
+  )
+  const posts =
+    result.data?.pages
+      .flatMap((page) => page.items)
+      .filter((post) => post.postId !== postId)
+      .slice(0, 3) ?? []
+  if (!posts.length || result.isError) return null
+  return (
+    <aside className="rounded-xl bg-white p-3" aria-label="관련 태그 경험">
+      <h3 className="text-xs font-bold">#{tag} · 함께 읽을 경험</h3>
+      <ul className="mt-2 space-y-2">
+        {posts.map((post) => (
+          <li key={post.postId}>
+            <Link
+              className="block truncate text-sm underline"
+              href={`/community/post/${post.postId}`}
+            >
+              {post.title || post.bodyExcerpt}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </aside>
   )
 }
 

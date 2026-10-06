@@ -2,7 +2,11 @@
 import { useState } from 'react'
 import { searchCarePlaces, type CarePlace } from '@/entities/care-place'
 import { SharedRouteMap } from '@/features/care-map'
-import type { CommunityExperience, CommunityExperienceConfig } from '@/entities/community'
+import {
+  normalizeCommunityTags,
+  type CommunityExperience,
+  type CommunityExperienceConfig,
+} from '@/entities/community'
 import { Button } from '@/shared/ui'
 const empty: CommunityExperience = {
   topics: [],
@@ -27,6 +31,7 @@ export function CommunityExperienceEditor({
   const [places, setPlaces] = useState<CarePlace[]>([])
   const [searching, setSearching] = useState(false)
   const [error, setError] = useState('')
+  const [tags, setTags] = useState(current.tags?.join(', ') ?? '')
   const update = (patch: Partial<CommunityExperience>) => onChange({ ...current, ...patch })
   const search = async () => {
     if (!query.trim() || searching) return
@@ -90,6 +95,23 @@ export function CommunityExperienceEditor({
           })}
         </div>
       </div>
+      <label className="block text-sm font-bold">
+        경험 태그 · 최대 5개
+        <input
+          value={tags}
+          onChange={(event) => {
+            setTags(event.target.value)
+            update({ tags: normalizeCommunityTags(event.target.value) })
+          }}
+          maxLength={120}
+          placeholder="노령견, 산책 적응, 제주 동반여행"
+          className="mt-2 block w-full rounded-lg border border-neutral-200 bg-white p-3 text-sm"
+        />
+        <span className="mt-2 block text-xs font-normal text-neutral-600">
+          쉼표로 구분하며 한글·영문·숫자와 공백을 사용할 수 있어요. 이름·전화번호·개인 주소는 적지
+          마세요.
+        </span>
+      </label>
       <label className="flex items-center gap-2 text-sm">
         <input
           type="checkbox"

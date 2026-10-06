@@ -3,9 +3,9 @@
 import { useState } from 'react'
 import { ActivityBadgeRow } from '@/entities/gamification'
 import { ActivityEntry, usePublicActivityBadges } from '@/features/gamification'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
-import { communityExperienceConfigOptions } from '@/entities/community'
+import { communityExperienceConfigOptions, normalizeCommunityTags } from '@/entities/community'
 import {
   Button,
   DeleteConfirmModal,
@@ -30,8 +30,9 @@ import { useLoginGuard, useMe } from '@/features/auth'
 import { FeedFollowButton } from './FeedFollowButton'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import { cn } from '@/shared/lib/cn'
-import type { CommunityPetType, CommunitySortType } from '@/shared/types'
+import type { CommunityPetType, CommunitySortType, CommunityDiscoveryFilters } from '@/shared/types'
 import { COMMUNITY_SORT_OPTIONS } from './constants'
+import { CommunityDiscovery } from './CommunityDiscovery'
 
 const PET_OPTIONS = [
   { value: '', label: '전체 이야기', shortLabel: '전체' },
@@ -42,10 +43,13 @@ const PET_OPTIONS = [
 
 const CommunityContent = () => {
   const router = useRouter()
+  const parameters = useSearchParams()
   const [petType, setPetType] = useState<CommunityPetType | ''>('')
   const [sort, setSort] = useState<CommunitySortType>('latest')
   const [appliedSearch, setAppliedSearch] = useState('')
-  const [topic, setTopic] = useState('')
+  const [discovery, setDiscovery] = useState<CommunityDiscoveryFilters>(() => ({
+    tags: normalizeCommunityTags(parameters.get('tags') ?? ''),
+  }))
   const experience = useQuery(communityExperienceConfigOptions)
   const { guard, isPromptOpen, setPromptOpen } = useLoginGuard()
   const { me } = useMe()
@@ -66,7 +70,14 @@ const CommunityContent = () => {
       undefined,
       appliedSearch || undefined,
       15,
-      experience.data?.enabled && !experience.isError ? topic || undefined : undefined,
+      undefined,
+      experience.data?.enabled &&
+        !experience.isError &&
+        Object.values(discovery).some((value) =>
+          Array.isArray(value) ? value.length > 0 : !!value,
+        )
+        ? discovery
+        : undefined,
     ),
   )
   const posts = flattenPages(data)
@@ -137,27 +148,11 @@ const CommunityContent = () => {
               <ActivityEntry />
             </div>
             {experience.data?.enabled && !experience.isError && (
-              <div className="mb-5">
-                <label htmlFor="community-topic" className="mb-2 block text-sm font-bold">
-                  어떤 경험을 찾고 있나요?
-                </label>
-                <select
-                  id="community-topic"
-                  value={topic}
-                  onChange={(event) => setTopic(event.target.value)}
-                  className="w-full rounded-xl border border-primary-200 bg-point-50 p-3 text-sm"
-                >
-                  <option value="">모든 주제</option>
-                  {experience.data.topics.map((value) => (
-                    <option key={value.key} value={value.key}>
-                      {value.label}
-                    </option>
-                  ))}
-                </select>
-                <p className="mt-2 text-xs text-neutral-600">
-                  동물 종류·주제·검색어를 함께 골라 찾아보세요.
-                </p>
-              </div>
+              <CommunityDiscovery
+                config={experience.data}
+                value={discovery}
+                onChange={setDiscovery}
+              />
             )}
             <SearchBar
               key={appliedSearch}

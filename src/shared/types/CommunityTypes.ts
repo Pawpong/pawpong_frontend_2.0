@@ -91,7 +91,7 @@ export interface CommunityPostDetail {
 }
 
 /** 게시글 목록 조회 파라미터 */
-export interface CommunityPostListParams {
+export interface CommunityPostListParams extends CommunityDiscoveryFilters {
   topic?: string
   petType?: CommunityPetType
   category?: string
@@ -225,8 +225,18 @@ export interface CommunityRoutePoint {
   longitude: number
 }
 export interface CommunityExperience {
+  tags?: string[]
   topics: string[]
   question: boolean
   route: CommunityRoutePoint[]
   publicPlaceConfirmed: boolean
+}
+
+export interface CommunityDiscoveryFilters {
+  topics?: string[]
+  topicMatch?: 'any' | 'all'
+  tags?: string[]
+  kind?: 'question' | 'story'
+  media?: 'photos' | 'map'
+  period?: 'week' | 'month'
 }

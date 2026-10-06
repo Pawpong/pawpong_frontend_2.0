@@ -13,5 +13,6 @@ export { COMMUNITY_CAROUSEL_STYLE, COMMUNITY_LOGIN_PROMPT } from './model/commun
 export type { CommunityPreviewAuthor, CommunityPreviewProps } from './model/communityPreview'
 export { formatHallOfFamePeriod } from './model/hallOfFamePeriod'
 export * from './model/communityExperience'
+export * from './model/discovery'
 export type { CommunityExperience, CommunityRoutePoint } from '@/shared/types'
 export * from './api/communityExperience.api'
