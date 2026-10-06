@@ -1,8 +1,4 @@
-import {
-  PET_COLLECTION_LABELS,
-  PET_SLOT_LABELS,
-  PET_SLOTS,
-} from '@/entities/playground-pet/model/room'
+import { PET_COLLECTION_LABELS } from '@/entities/playground-pet/model/room'
 import type {
   PetCatalogFilters as Filters,
   PetCatalogMode,
@@ -36,19 +32,6 @@ export function PetCatalogFilters({
           onChange={(event) => onChange({ query: event.target.value })}
         />
       </label>
-      <div className={styles.slots} aria-label="가구 종류">
-        {(['all', ...PET_SLOTS] as const).map((id) => (
-          <button
-            key={id}
-            className={styles.slotButton}
-            aria-pressed={filters.slot === id}
-            disabled={disabled}
-            onClick={() => onChange({ slot: id })}
-          >
-            {id === 'all' ? '전체' : PET_SLOT_LABELS[id]}
-          </button>
-        ))}
-      </div>
       <div className={styles.catalogSelects}>
         <label htmlFor={`${prefix}-theme`}>
           <span>방 테마</span>

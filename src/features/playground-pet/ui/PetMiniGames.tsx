@@ -13,7 +13,11 @@ import type {
   SnackLane,
 } from '@/entities/playground-pet'
 import type { PetCommandResult } from '@/entities/playground-pet/model/commandQueue'
-import { nextSnackInput, previewSnack } from '@/entities/playground-pet/model/snack'
+import {
+  nextSnackInput,
+  previewSnack,
+  snackTapDirection,
+} from '@/entities/playground-pet/model/snack'
 import { petRequestKey } from '../lib/useServerClock'
 import type { PetStageSnapshot } from '../lib/petGameEngine'
 import { PetGlyph } from './PetGlyph'
@@ -33,11 +37,14 @@ export function PetMemoryBoard({
   session,
   now,
   disabled,
+  pending = null,
   onFlip,
 }: {
   session: PetMemorySession
   now: number
   disabled: boolean
+  /** 서버 응답을 기다리는 카드. 그림은 서버가 공개한 뒤에만 보인다. */
+  pending?: number | null
   onFlip: (index: number) => void
 }) {
   const locked = Boolean(session.lockUntil && now < Date.parse(session.lockUntil))
@@ -49,7 +56,9 @@ export function PetMemoryBoard({
         return (
           <button
             key={index}
-            className={`${styles.memoryCard} ${matched ? styles.matchedCard : ''}`}
+            className={`${styles.memoryCard} ${matched ? styles.matchedCard : ''} ${symbol ? styles.revealedCard : ''} ${locked && symbol && !matched ? styles.mismatchCard : ''}`}
+            data-pending={pending === index && !symbol}
+            aria-busy={pending === index && !symbol}
             disabled={
               disabled || locked || matched || Boolean(symbol) || session.status !== 'active'
             }
@@ -82,6 +91,7 @@ export function PetMiniGames({
   characterReady,
   onPrepareGame,
   gameSurface,
+  stageOverlay = null,
   onCommand,
   onRefresh,
   onSnack,
@@ -95,6 +105,8 @@ export function PetMiniGames({
   characterReady: boolean
   onPrepareGame: (kind: PetGameKind) => Promise<boolean>
   gameSurface: HTMLElement | null
+  /** 방 화면 위 투명 조작층. 간식 게임의 좌/우 터치에 쓴다. */
+  stageOverlay?: HTMLElement | null
   onCommand: (command: PetCommand) => Promise<PetCommandResult | undefined>
   onRefresh: () => void
   onSnack: (snack: PetStageSnapshot['snack']) => void
@@ -112,6 +124,7 @@ export function PetMiniGames({
       : null)
   const [cancelConfirm, setCancelConfirm] = useState(false)
   const [finishing, setFinishing] = useState(false)
+  const [pendingCard, setPendingCard] = useState<number | null>(null)
   const finishLocked = useRef(false)
   const startLocked = useRef(false)
   const [starting, setStarting] = useState(false)
@@ -135,7 +148,8 @@ export function PetMiniGames({
 
   useEffect(() => {
     if (!runningHere || interruptedHere) return
-    const timer = window.setInterval(() => setTick(performance.now()), 50)
+    // 낙하물은 엔진이 프레임마다 그린다. 여기서는 남은 시간·점수 표시만 갱신한다.
+    const timer = window.setInterval(() => setTick(performance.now()), 100)
     return () => window.clearInterval(timer)
   }, [runningHere, interruptedHere, activeId])
 
@@ -171,8 +185,8 @@ export function PetMiniGames({
 
   const snackSnapshot = useMemo<PetStageSnapshot['snack']>(() => {
     if (active?.game !== 'snack' || !snackRun || interruptedHere || expired) return null
-    return { session: active, elapsed, lane: snackRun.lane }
-  }, [active, snackRun, elapsed, interruptedHere, expired])
+    return { session: active, elapsed: 0, origin: snackRun.origin, lane: snackRun.lane }
+  }, [active, snackRun, interruptedHere, expired])
   useEffect(() => {
     onSnack(snackSnapshot)
   }, [onSnack, snackSnapshot])
@@ -307,7 +321,8 @@ export function PetMiniGames({
   }
   const preview =
     active?.game === 'snack' && snackRun ? previewSnack(active, snackRun.inputs, elapsed) : null
-  const flip = (session: PetGameSession, index: number) =>
+  const flip = (session: PetGameSession, index: number) => {
+    setPendingCard(index)
     void send({
       kind: 'games/memory/flip',
       body: {
@@ -316,7 +331,30 @@ export function PetMiniGames({
         expectedRevision: revision,
         idempotencyKey: petRequestKey(),
       },
-    })
+    }).finally(() => setPendingCard(null))
+  }
+  const snackPlaying =
+    active?.game === 'snack' &&
+    Boolean(snackRun) &&
+    !interruptedHere &&
+    !expired &&
+    elapsed < 30_000
+  const snackTouch = snackPlaying ? (
+    <div
+      className={styles.snackTouch}
+      aria-hidden="true"
+      onPointerDown={(event) => {
+        const box = event.currentTarget.getBoundingClientRect()
+        if (!box.width) return
+        event.preventDefault()
+        move(snackTapDirection((event.clientX - box.left) / box.width))
+      }}
+    >
+      {elapsed < 2000 && <span className={styles.snackReady}>준비! 화면 좌우를 눌러 이동해요</span>}
+      <i data-side="left">←</i>
+      <i data-side="right">→</i>
+    </div>
+  ) : null
 
   const activeContent = active ? (
     <div
@@ -342,6 +380,7 @@ export function PetMiniGames({
             session={active}
             now={now}
             disabled={disabled}
+            pending={pendingCard}
             onFlip={(index) => flip(active, index)}
           />
           <p role="status" className={styles.hint}>
@@ -373,7 +412,8 @@ export function PetMiniGames({
             aria-label="간식 게임 진행 시간"
           />
           <p className={styles.hint}>
-            ← → 방향키 또는 아래 버튼 · {['왼쪽', '가운데', '오른쪽'][snackRun?.lane ?? 1]} 칸
+            화면 좌우 터치 · ← → 방향키 · 아래 버튼 ·{' '}
+            {['왼쪽', '가운데', '오른쪽'][snackRun?.lane ?? 1]} 칸
           </p>
           <div className={styles.snackControls}>
             <button
@@ -517,6 +557,7 @@ export function PetMiniGames({
         </>
       )}
       {activeContent && (gameSurface ? createPortal(activeContent, gameSurface) : activeContent)}
+      {snackTouch && stageOverlay && createPortal(snackTouch, stageOverlay)}
       {!active && terminal && (
         <div className={styles.gameResult} role="status">
           <PetGlyph kind="star" />
