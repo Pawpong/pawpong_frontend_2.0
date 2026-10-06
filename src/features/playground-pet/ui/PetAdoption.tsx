@@ -51,12 +51,12 @@ export function PetAdoption({
       className="rounded-2xl border border-secondary-200 bg-base-white p-5 tab:p-8"
     >
       <h2 id="adopt-heading" className="font-cafe24 text-xl text-neutral-850 tab:text-2xl">
-        {connectRevision ? '우리 아이의 전신 캐릭터 고르기' : '함께할 전신 도트 친구를 골라 주세요'}
+        {connectRevision ? '우리 아이의 캐릭터 고르기' : '함께할 캐릭터를 골라 주세요'}
       </h2>
       <ol className="mt-4 grid gap-2 text-sm text-neutral-700 tab:grid-cols-3">
         {(connectRevision
-          ? ['전신 캐릭터 고르기', '그림 확인하고 연결', '기록 그대로 돌보기']
-          : ['전신 캐릭터 고르기', '이름 지어 주기', '매일 돌보기']
+          ? ['캐릭터 고르기', '그림 확인하고 연결', '기록 그대로 돌보기']
+          : ['캐릭터 고르기', '이름 지어 주기', '매일 돌보기']
         ).map((step, index) => (
           <li key={step} className="flex items-center gap-2">
             <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-point-100 text-xs font-semibold text-brand">
@@ -86,16 +86,16 @@ export function PetAdoption({
         <div className="mt-6 rounded-xl bg-point-50 px-5 py-9 text-center">
           <PawPrintIcon aria-hidden className="mx-auto size-12 text-secondary-500" />
           <h3 className="mt-4 font-cafe24 text-lg text-neutral-850">
-            먼저 우리 아이의 전신 캐릭터를 만들어요
+            먼저 우리 아이의 캐릭터를 만들어요
           </h3>
           <p className="mt-2 text-sm leading-6 text-neutral-700">
-            아직 연결할 전신 캐릭터가 없어요. 우리 아이 사진으로
+            아직 연결할 캐릭터가 없어요. 우리 아이 사진이나 이미 만든 AI 사진으로
             <br />
             게임 캐릭터를 완성하면 이곳에서 골라 키울 수 있어요.
           </p>
           <div className="mt-5">
             <Link href="/ai-filter?purpose=pet-sprite-v1" className={buttonVariants()}>
-              전신 게임 캐릭터 만들기
+              캐릭터 만들기
             </Link>
           </div>
           <p className="mt-3 text-xs leading-5 text-neutral-700">
@@ -208,7 +208,7 @@ export function PetAdoption({
                 </div>
                 <p className="text-sm leading-6 text-neutral-850">
                   {connectRevision ? (
-                    '이 전신 캐릭터를 우리 아이의 게임 모습으로 연결해요.'
+                    '이 캐릭터를 우리 아이의 게임 모습으로 연결해요.'
                   ) : (
                     <>
                       <strong>{normalizePetName(name) || '우리 아이'}</strong>의 첫날을 시작해요.

@@ -651,6 +651,13 @@ function studioMarkup(phase, canResume = true, props = {}) {
     },
     '@/shared/ui/PhotoUploadField': { PhotoUploadField: () => null },
     '../lib/aiImageFile': {},
+    '../lib/useAiSourcePhoto': {
+      useAiSourcePhoto: () => ({
+        preparing: false,
+        selectPhoto: async () => true,
+        clearPhoto() {},
+      }),
+    },
     '../lib/pendingCommunityPhoto': {},
     './AiPostShareChoice': {},
     '../lib/useAiPixelFilter': {

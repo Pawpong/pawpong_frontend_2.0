@@ -251,9 +251,9 @@ export function PetRoom({
           )}
           {game && !fullBody && !active && (
             <div className={styles.stageStatus}>
-              <p>우리 아이의 전신 캐릭터를 연결하면 이 방에서 함께 놀 수 있어요.</p>
+              <p>우리 아이의 캐릭터를 연결하면 이 방에서 함께 놀 수 있어요.</p>
               <a className={styles.smallButton} href="#pet-character-connection">
-                전신 캐릭터 연결하기
+                캐릭터 연결하기
               </a>
             </div>
           )}
@@ -368,12 +368,12 @@ export function PetRoom({
           <section
             id="pet-character-connection"
             className={styles.panel}
-            aria-label="전신 캐릭터 연결 안내"
+            aria-label="캐릭터 연결 안내"
           >
-            <h2>우리 아이에게 작은 전신 캐릭터를 연결해요</h2>
+            <h2>우리 아이의 게임 캐릭터를 연결해요</h2>
             <p className={styles.hint}>
               {fullBody
-                ? '새 전신 그림을 확인하고 직접 연결해 주세요.'
+                ? '새 캐릭터를 확인하고 직접 연결해 주세요.'
                 : '기존 그림은 사진용 초상화예요.'}{' '}
               돌봄·이름·성장 기록·별사탕은 그대로 유지돼요. 자동으로 새 그림을 만들거나 이용 횟수를
               쓰지 않아요.
