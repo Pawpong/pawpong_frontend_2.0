@@ -75,3 +75,17 @@ export function previewSnack(
   }
   return { score, catches, hazards, misses }
 }
+
+/** 화면 연출 전용: landing 시점의 lane으로 받음/빨간 공/놓침을 구분한다. 점수는 서버가 확정한다. */
+export function snackDropResult(
+  drop: { lane: SnackLane; kind: 'snack' | 'hazard' },
+  lane: SnackLane,
+): 'catch' | 'hazard' | 'miss' | 'dodge' {
+  if (drop.lane === lane) return drop.kind === 'snack' ? 'catch' : 'hazard'
+  return drop.kind === 'snack' ? 'miss' : 'dodge'
+}
+
+/** 화면 좌/우 절반 터치를 한 칸 이동으로 바꾼다. */
+export function snackTapDirection(ratioX: number): -1 | 1 {
+  return ratioX < 0.5 ? -1 : 1
+}

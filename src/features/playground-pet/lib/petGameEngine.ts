@@ -7,10 +7,10 @@ import type {
   PetAction,
   PetGameKind,
 } from '@/entities/playground-pet'
-import { PET_SLOT_POSITIONS } from '@/entities/playground-pet/model/room'
-import { SNACK_LANE_X } from '@/entities/playground-pet/model/snack'
+import { PET_SLOT_AREAS, PET_SLOT_POSITIONS } from '@/entities/playground-pet/model/room'
+import { SNACK_LANE_X, snackDropResult } from '@/entities/playground-pet/model/snack'
 import { petAsset, type PetAssetManifest } from './gameAssets'
-import { advancePetMotion, initialPetMotion, petMotionPose } from './petMotion'
+import { advancePetMotion, callPetTo, initialPetMotion, petMotionPose } from './petMotion'
 import { PET_ROOM_MOTION } from '../constants/pet-motion'
 
 export type PetStageSnapshot = {
@@ -21,14 +21,41 @@ export type PetStageSnapshot = {
   reaction: number
   feedback: { action: PetAction | 'adopt' | null; stars: number; xp: number }
   reducedMotion: boolean
-  snack: { session: PetSnackSession; elapsed: number; lane: SnackLane } | null
+  /** origin(performance.now 기준)이 있으면 엔진이 매 프레임 경과 시간을 직접 계산한다. */
+  snack: { session: PetSnackSession; elapsed: number; lane: SnackLane; origin?: number } | null
+  /** 서버 수치에서 읽은 표시용 기분. 말풍선 그림만 바꾼다. */
+  mood?: 'hungry' | 'sleepy' | 'bored' | 'happy' | 'resting' | null
+  /** 꾸미기 미리보기 중인 슬롯을 방 안에서 강조한다. */
+  highlight?: keyof PetRoomState | null
 }
 export type PetGameHandle = {
   sync: (snapshot: PetStageSnapshot) => void
   prepareGame: (kind: PetGameKind) => Promise<boolean>
   retry: () => void
+  /** 방 좌표를 누른다. 캐릭터면 'pet', 바닥이면 'call'(걸어옴), 반응할 수 없으면 null. 보상은 없다. */
+  poke: (x: number, y: number) => 'pet' | 'call' | null
   destroy: () => void
 }
+
+// 1칸=1 논리 픽셀인 연출용 도트. 새 래스터 파일 없이 기존 팔레트로 그린다.
+const FX_BITMAPS = {
+  heart: ['0110110', '1111111', '1111111', '0111110', '0011100', '0001000'],
+  bone: ['1100011', '1111111', '1111111', '1100011'],
+  ball: ['01110', '11111', '11111', '11111', '01110'],
+  zed: ['11111', '00010', '00100', '01000', '11111'],
+  star: ['00100', '01110', '11111', '01110', '00100'],
+  cross: ['10001', '01010', '00100', '01010', '10001'],
+} as const
+const FX_COLORS = {
+  heart: 0xe9778a,
+  bone: 0xfff5d8,
+  ball: 0xf2b84b,
+  zed: 0x6f7fb5,
+  star: 0xe7ba4b,
+  cross: 0xb3443c,
+} as const
+const MOOD_ICON = { hungry: 'bone', sleepy: 'zed', bored: 'ball', happy: 'heart' } as const
+const SNACK_FALL_MS = 1700
 
 export function createPetGame(
   parent: HTMLElement,
@@ -49,6 +76,8 @@ export function createPetGame(
   let keySerial = 0
   let reactionAt = 0,
     lastReaction = initial.reaction
+  let sceneTime = 0,
+    pokeAt = -Infinity
 
   function requiredAssets(state: PetStageSnapshot) {
     const ids = Object.values(state.room ?? {}).filter((id): id is string => Boolean(id))
@@ -170,6 +199,73 @@ export function createPetGame(
     private dropSession = ''
     private sparks!: Phaser.GameObjects.Graphics
     private motion = initialPetMotion()
+    private dropResults: (ReturnType<typeof snackDropResult> | null)[] = []
+    private dropResolvedAt: number[] = []
+
+    heroPoint() {
+      return { x: this.hero.x, y: this.hero.y }
+    }
+    callTo(point: { x: number; y: number }) {
+      const next = callPetTo(this.motion, point)
+      const moved = next !== this.motion
+      this.motion = next
+      return moved
+    }
+
+    private stamp(
+      kind: keyof typeof FX_BITMAPS,
+      x: number,
+      y: number,
+      alpha = 1,
+      color: number = FX_COLORS[kind],
+    ) {
+      const rows = FX_BITMAPS[kind]
+      // 2×2 논리 픽셀 한 칸: 휴대폰 화면에서도 읽히는 크기.
+      const left = Math.round(x - rows[0].length),
+        top = Math.round(y - rows.length)
+      this.sparks.fillStyle(color, Math.max(0, Math.min(1, alpha)))
+      rows.forEach((row, dy) => {
+        for (let dx = 0; dx < row.length; dx++)
+          if (row[dx] === '1') this.sparks.fillRect(left + dx * 2, top + dy * 2, 2, 2)
+      })
+    }
+
+    private bubble(kind: keyof typeof FX_BITMAPS, x: number, y: number) {
+      const left = Math.round(x - 11),
+        top = Math.round(y - 10)
+      this.sparks.fillStyle(0x765640, 1)
+      this.sparks.fillRect(left + 1, top, 20, 20).fillRect(left, top + 1, 22, 18)
+      this.sparks.fillRect(left + 4, top + 20, 4, 3)
+      this.sparks.fillStyle(0xfffdf5, 1)
+      this.sparks.fillRect(left + 2, top + 1, 18, 18).fillRect(left + 1, top + 2, 20, 16)
+      this.sparks.fillRect(left + 5, top + 19, 2, 3)
+      this.stamp(kind, left + 11, top + 10, 1, kind === 'bone' ? 0xb56822 : FX_COLORS[kind])
+    }
+
+    private frame(area: { x: number; y: number; width: number; height: number }) {
+      const { x, y, width, height } = area
+      const arm = 6
+      this.sparks.fillStyle(0xfffdf5, 1)
+      for (const [cx, cy, sx, sy] of [
+        [x, y, 1, 1],
+        [x + width, y, -1, 1],
+        [x, y + height, 1, -1],
+        [x + width, y + height, -1, -1],
+      ] as const) {
+        this.sparks.fillRect(Math.min(cx, cx + sx * arm), cy - 1, arm, 3)
+        this.sparks.fillRect(cx - 1, Math.min(cy, cy + sy * arm), 3, arm)
+      }
+      this.sparks.fillStyle(0x765640, 1)
+      for (const [cx, cy, sx, sy] of [
+        [x, y, 1, 1],
+        [x + width, y, -1, 1],
+        [x, y + height, 1, -1],
+        [x + width, y + height, -1, -1],
+      ] as const) {
+        this.sparks.fillRect(Math.min(cx, cx + sx * (arm - 1)), cy, arm - 1, 1)
+        this.sparks.fillRect(cx, Math.min(cy, cy + sy * (arm - 1)), 1, arm - 1)
+      }
+    }
 
     create() {
       scene = this
@@ -250,6 +346,8 @@ export function createPetGame(
             asset?.logicalHeight ?? position.height,
           )
       }
+      // 방의 장난감이 떨어지는 간식·공과 헷갈리지 않게 게임 동안만 치운다.
+      if (snapshot.snack) this.furniture.get('toy')?.setVisible(false)
       this.hero.setVisible(Boolean(characterKey))
       if (characterKey)
         this.hero
@@ -263,6 +361,8 @@ export function createPetGame(
         this.drops.forEach((drop) => drop.destroy())
         this.drops = []
         this.dropSession = snack?.session.sessionId ?? ''
+        this.dropResults = []
+        this.dropResolvedAt = []
         if (snack)
           this.drops = snack.session.drops.map((drop) => {
             const image = this.add
@@ -282,14 +382,24 @@ export function createPetGame(
     }
 
     update(time: number, delta = 1000 / 30) {
+      sceneTime = time
       if (!alive || !characterKey || !ready) return
       if (snapshot.reaction !== lastReaction) {
         lastReaction = snapshot.reaction
         reactionAt = time
       }
       const snack = snapshot.snack
-      const reacting = time - reactionAt < 700 && reactionAt > 0
+      const poked = !snack && !snapshot.resting && time - pokeAt < PET_ROOM_MOTION.pokeDuration
+      const reacting = (time - reactionAt < 700 && reactionAt > 0) || poked
+      const room = snapshot.room
       this.motion = advancePetMotion(this.motion, {
+        visits: room
+          ? (['toy', 'plant'] as const).flatMap((slot) =>
+              room[slot]
+                ? [{ x: PET_SLOT_POSITIONS[slot].x + (slot === 'plant' ? 44 : -34), y: 190 }]
+                : [],
+            )
+          : [],
         time,
         delta,
         reacting,
@@ -306,7 +416,7 @@ export function createPetGame(
         snapshot.resting && !this.motion.walking
           ? 5
           : reacting
-            ? snapshot.feedback.action === 'play'
+            ? snapshot.feedback.action === 'play' && !poked
               ? 4
               : snapshot.reducedMotion
                 ? 2
@@ -320,11 +430,23 @@ export function createPetGame(
           PET_ROOM_MOTION.displaySize + pose.width,
           PET_ROOM_MOTION.displaySize + pose.height,
         )
-        .setPosition(this.motion.x, this.motion.y - pose.bob)
+        .setPosition(
+          this.motion.x,
+          this.motion.y -
+            pose.bob -
+            (poked && !snapshot.reducedMotion
+              ? Math.round(Math.sin(((time - pokeAt) / PET_ROOM_MOTION.pokeDuration) * Math.PI) * 6)
+              : 0),
+        )
         .setFlipX(this.motion.facingLeft)
         .setAngle(pose.angle)
       this.sparks.clear()
-      if (reacting && snapshot.feedback.stars > 0 && !snapshot.reducedMotion) {
+      if (
+        reactionAt > 0 &&
+        time - reactionAt < 700 &&
+        snapshot.feedback.stars > 0 &&
+        !snapshot.reducedMotion
+      ) {
         const progress = (time - reactionAt) / 700
         this.sparks.fillStyle(0xe7ba4b, 1 - progress)
         for (let index = 0; index < 7; index++) {
@@ -337,14 +459,111 @@ export function createPetGame(
           )
         }
       }
+      const still = snapshot.reducedMotion
+      const headY = this.hero.y - 58
+      if (!snack) {
+        const area = snapshot.highlight ? PET_SLOT_AREAS[snapshot.highlight] : null
+        if (area && (still || Math.floor(time / 400) % 2 === 0)) this.frame(area)
+        const since = time - reactionAt
+        const action = snapshot.feedback.action
+        if (!still && reactionAt > 0 && since < 1100 && !poked) {
+          const progress = since / 1100
+          if (action === 'greet')
+            for (let index = 0; index < 3; index++)
+              this.stamp(
+                'heart',
+                this.hero.x + (index - 1) * 14,
+                headY + 8 - progress * 22 - index * 4,
+                1 - progress,
+              )
+          else if (action === 'feed') {
+            if (progress < 0.55)
+              this.stamp('bone', this.hero.x, headY - 20 + (progress / 0.55) * 38)
+            else
+              for (let index = 0; index < 4; index++)
+                this.stamp(
+                  'star',
+                  this.hero.x + (index - 1.5) * 9,
+                  this.hero.y - 30 - (progress - 0.55) * 20,
+                  1 - progress,
+                  0xfff5d8,
+                )
+          } else if (action === 'play')
+            this.stamp(
+              'ball',
+              this.hero.x + (this.motion.facingLeft ? -1 : 1) * (22 + progress * 12),
+              this.hero.y - 8 - Math.abs(Math.sin(progress * Math.PI * 2)) * 26,
+            )
+        }
+        if (poked && !still) {
+          const progress = (time - pokeAt) / PET_ROOM_MOTION.pokeDuration
+          this.stamp('heart', this.hero.x + 12, headY + 6 - progress * 16, 1 - progress)
+        }
+        const mood = snapshot.mood
+        if (mood === 'resting' || snapshot.resting) {
+          if (!this.motion.walking && !still)
+            for (let index = 0; index < 2; index++) {
+              const phase = (((time / 1800 + index * 0.5) % 1) + 1) % 1
+              this.stamp('zed', this.hero.x + 14 + phase * 10, headY + 14 - phase * 18, 1 - phase)
+            }
+        } else if (mood && !reacting && !still && Math.floor(time / 1000) % 8 < 3)
+          this.bubble(MOOD_ICON[mood], this.hero.x + 6, headY - 8)
+      }
       if (snack) {
+        const duration = snack.session.durationMs ?? 30_000
+        const elapsed =
+          snack.origin === undefined
+            ? snack.elapsed
+            : Math.max(0, Math.min(duration, performance.now() - snack.origin))
+        if (!still) {
+          // lane 안내: 지금 서 있는 칸을 밝게 표시한다.
+          SNACK_LANE_X.forEach((x, lane) => {
+            this.sparks.fillStyle(0xfffdf5, lane === snack.lane ? 0.55 : 0.22)
+            this.sparks.fillRect(x - 26, 216, 52, 3)
+          })
+        }
         this.drops.forEach((image, index) => {
           const drop = snack.session.drops[index]
-          const remaining = drop.landingAtMs - snack.elapsed
-          const visible = remaining >= 0 && remaining <= 1700
+          const remaining = drop.landingAtMs - elapsed
+          if (remaining < 0 && this.dropResults[index] == null) {
+            // 오래 전에 지난 낙하물(복원·탭 복귀)은 연출하지 않는다.
+            this.dropResults[index] = snackDropResult(drop, snack.lane)
+            this.dropResolvedAt[index] = remaining > -250 ? time : -Infinity
+          }
+          const result = this.dropResults[index]
+          const passed = result === 'miss' || result === 'dodge'
+          const visible =
+            remaining <= SNACK_FALL_MS && (remaining >= 0 || (passed && remaining > -220))
           image.setVisible(visible)
-          if (visible) image.setY(Math.round(22 + (1 - remaining / 1700) * 166))
+          if (visible) image.setY(Math.round(22 + (1 - remaining / SNACK_FALL_MS) * 166))
+          const age = time - (this.dropResolvedAt[index] ?? -Infinity)
+          if (
+            !still &&
+            result &&
+            age >= 0 &&
+            age < 450 &&
+            (result === 'catch' || result === 'hazard')
+          ) {
+            const progress = age / 450
+            const x = SNACK_LANE_X[drop.lane]
+            if (result === 'catch')
+              for (let spark = 0; spark < 5; spark++) {
+                const angle = (spark * Math.PI * 2) / 5 - Math.PI / 2
+                this.stamp(
+                  'star',
+                  x + Math.cos(angle) * (8 + progress * 18),
+                  176 + Math.sin(angle) * (6 + progress * 14),
+                  1 - progress,
+                )
+              }
+            else this.stamp('cross', x, 170 - progress * 8, 1 - progress)
+          }
         })
+        const hit = this.dropResults.some(
+          (result, index) =>
+            result === 'hazard' && time - (this.dropResolvedAt[index] ?? -Infinity) < 300,
+        )
+        if (hit && !still) this.hero.setAngle(Math.floor(time / 60) % 2 ? 6 : -6)
       }
       this.shadow.setPosition(this.motion.x, this.motion.y - 4)
     }
@@ -382,6 +601,17 @@ export function createPetGame(
     },
     retry: () => {
       void loadSnapshot()
+    },
+    poke(x, y) {
+      if (!alive || !scene || !ready || !characterKey || snapshot.snack || snapshot.resting)
+        return null
+      const hero = scene.heroPoint()
+      if (Math.hypot(x - hero.x, y - (hero.y - 28)) <= PET_ROOM_MOTION.pokeRadius) {
+        pokeAt = sceneTime
+        return 'pet'
+      }
+      if (y < 150 || snapshot.reducedMotion) return null
+      return scene.callTo({ x, y }) ? 'call' : null
     },
     destroy() {
       if (!alive) return

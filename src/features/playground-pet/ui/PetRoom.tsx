@@ -7,15 +7,24 @@ import {
   petLevelProgress,
   remainingSeconds,
   formatPetWait,
+  formatPetCountdown,
+  petMood,
+  petLevelUp,
   type PetAction,
   type PetCatalogItem,
   type PetCommand,
   type PetView,
   type PetGameOutcome,
   type PetGameKind,
+  type PetRoomSlot,
 } from '@/entities/playground-pet'
 import type { PetCommandResult } from '@/entities/playground-pet/model/commandQueue'
-import { PET_SLOT_LABELS, PET_SLOTS, previewPetRoom } from '@/entities/playground-pet/model/room'
+import {
+  PET_SLOT_AREAS,
+  PET_SLOT_LABELS,
+  PET_SLOTS,
+  previewPetRoom,
+} from '@/entities/playground-pet/model/room'
 import { useServerClock } from '../lib/useServerClock'
 import { usePetCharacter } from '../lib/usePetCharacter'
 import { usePetAssets } from '../lib/usePetAssets'
@@ -112,6 +121,20 @@ export function PetRoom({
     [],
   )
   const [gameSurface, setGameSurface] = useState<HTMLDivElement | null>(null)
+  const [stageOverlay, setStageOverlay] = useState<HTMLDivElement | null>(null)
+  const [slotRequest, setSlotRequest] = useState<{ slot: PetRoomSlot; serial: number } | null>(null)
+  const [pokeNotice, setPokeNotice] = useState('')
+  const [popDone, setPopDone] = useState(reaction)
+  const [online, setOnline] = useState(
+    () => typeof navigator === 'undefined' || navigator.onLine !== false,
+  )
+  const [growth, setGrowth] = useState<{ id: string; level: number; banner: number | null }>({
+    id: pet.id,
+    level: pet.level,
+    banner: null,
+  })
+  if (growth.id !== pet.id || growth.level !== pet.level)
+    setGrowth({ id: pet.id, level: pet.level, banner: petLevelUp(growth, pet) })
   const [selectedItem, setItem] = useState<PetCatalogItem | null>(null)
   const [snack, setSnack] = useState<PetStageSnapshot['snack']>(null)
   const [reducedMotion, setReducedMotion] = useState(false)
@@ -131,6 +154,27 @@ export function PetRoom({
     }
   }, [reaction, sound, feedback.stars])
   const now = useServerClock(view.serverTime)
+  const resting = Boolean(pet.restEndsAt && now < Date.parse(pet.restEndsAt))
+  const mood = petMood(pet.stats, resting)
+  const rewardPop = reaction !== popDone && (feedback.xp > 0 || feedback.stars > 0)
+  useEffect(() => {
+    if (reaction === popDone) return
+    const timer = window.setTimeout(() => setPopDone(reaction), 1800)
+    return () => window.clearTimeout(timer)
+  }, [reaction, popDone])
+  useEffect(() => {
+    if (growth.banner === null) return
+    const timer = window.setTimeout(
+      () => setGrowth((current) => ({ ...current, banner: null })),
+      5000,
+    )
+    return () => window.clearTimeout(timer)
+  }, [growth.banner])
+  useEffect(() => {
+    if (!pokeNotice) return
+    const timer = window.setTimeout(() => setPokeNotice(''), 2500)
+    return () => window.clearTimeout(timer)
+  }, [pokeNotice])
   const lastRefresh = useRef('')
   const refresh = useCallback(() => onRefresh(), [onRefresh])
   const tab = active ? 'games' : availableTabs.some(({ id }) => id === menu.tab) ? menu.tab : 'room'
@@ -146,6 +190,19 @@ export function PetRoom({
     }
   }, [deadline, disabled, now, refresh, view.serverTime])
   useEffect(() => {
+    // 연결이 돌아오면 저장된 화면을 믿지 않고 서버 상태를 다시 읽는다.
+    const update = () => {
+      setOnline(navigator.onLine)
+      if (navigator.onLine) refresh()
+    }
+    window.addEventListener('online', update)
+    window.addEventListener('offline', update)
+    return () => {
+      window.removeEventListener('online', update)
+      window.removeEventListener('offline', update)
+    }
+  }, [refresh])
+  useEffect(() => {
     const media = window.matchMedia('(prefers-reduced-motion: reduce)')
     const update = () => setReducedMotion(media.matches)
     update()
@@ -159,7 +216,9 @@ export function PetRoom({
       room,
       manifest: assets.manifest,
       characterUrl: fullBody ? character.url : null,
-      resting: Boolean(pet.restEndsAt && now < Date.parse(pet.restEndsAt)),
+      resting,
+      mood: mood?.kind ?? null,
+      highlight: previewing && selectedItem ? selectedItem.slot : null,
       reaction,
       feedback,
       reducedMotion,
@@ -170,8 +229,10 @@ export function PetRoom({
       assets.manifest,
       character.url,
       fullBody,
-      pet.restEndsAt,
-      now,
+      resting,
+      mood?.kind,
+      previewing,
+      selectedItem,
       reaction,
       feedback,
       reducedMotion,
@@ -212,7 +273,11 @@ export function PetRoom({
     </div>
   )
   return (
-    <div className={styles.gameLayout} data-active-game={Boolean(active)}>
+    <div
+      className={styles.gameLayout}
+      data-active-game={Boolean(active)}
+      data-compact={previewing && !active}
+    >
       <section
         data-pet-device
         className={styles.device}
@@ -246,7 +311,54 @@ export function PetRoom({
               name={pet.name}
               onReady={setCanvasReady}
               onGame={setGameHandle}
-            />
+              onPoke={(result) =>
+                setPokeNotice(
+                  result === 'pet'
+                    ? `쓰다듬어 줬어요. ${pet.name} 기분이 좋아 보여요!`
+                    : `${pet.name}, 이리 와!`,
+                )
+              }
+            >
+              <div ref={setStageOverlay} className={styles.stageOverlay} />
+              {previewing &&
+                !active &&
+                PET_SLOTS.map((slot) => {
+                  const area = PET_SLOT_AREAS[slot]
+                  return (
+                    <button
+                      key={slot}
+                      className={styles.hotspot}
+                      style={{
+                        left: `${((area.x + area.width / 2) / 320) * 100}%`,
+                        top: `${((area.y + area.height / 2) / 224) * 100}%`,
+                      }}
+                      aria-pressed={slotRequest?.slot === slot}
+                      aria-label={`${PET_SLOT_LABELS[slot]} 소품 고르기`}
+                      onClick={() => {
+                        setItem(null)
+                        setSlotRequest((current) => ({ slot, serial: (current?.serial ?? 0) + 1 }))
+                      }}
+                    >
+                      {PET_SLOT_LABELS[slot]}
+                    </button>
+                  )
+                })}
+              {rewardPop && !active && (
+                <p className={styles.rewardPop} aria-hidden="true">
+                  {feedback.xp > 0 && <span>+{feedback.xp} EXP</span>}
+                  {feedback.stars > 0 && (
+                    <span>
+                      <PetGlyph kind="star" /> +{feedback.stars}
+                    </span>
+                  )}
+                </p>
+              )}
+              {growth.banner !== null && !active && (
+                <p className={styles.levelUp} role="status">
+                  <PetGlyph kind="star" /> Lv.{growth.banner} 달성! {pet.name} 한 뼘 자랐어요
+                </p>
+              )}
+            </PetStage>
           ) : (
             <div className={styles.carePortrait}>
               <PetImage src={pet.imageUrl} alt={`${pet.name}의 도트 초상화`} />
@@ -282,13 +394,28 @@ export function PetRoom({
           {previewing && selectedItem && (
             <p className={styles.previewLabel}>미리보기 · {selectedItem.name}</p>
           )}
-          {pet.restEndsAt && now < Date.parse(pet.restEndsAt) && !active && (
+          {resting && !active && (
             <p className={styles.restLabel}>
-              쉬는 중 · {Math.ceil(remainingSeconds(pet.restEndsAt, now) / 60)}분
+              쉬는 중 · {formatPetCountdown(remainingSeconds(pet.restEndsAt, now))}
             </p>
           )}
         </div>
         {active && operationNotice}
+        {!online && (
+          <p className={styles.offline} role="alert">
+            인터넷 연결이 끊겼어요. 연결되면 최신 상태를 다시 불러올게요.
+          </p>
+        )}
+        {!active && fullBody && (
+          <p className={styles.moodLine} role="status" aria-live="polite">
+            {pokeNotice ||
+              (mood
+                ? `${pet.name} · ${mood.label}${
+                    mood.action ? ` → ${PET_ACTION_LABELS[mood.action]}` : ''
+                  }`
+                : `방을 눌러 ${pet.name} 불러 보세요. 쓰다듬어 줄 수도 있어요.`)}
+          </p>
+        )}
         <div ref={setGameSurface} className={styles.deviceGameSurface} hidden={!active} />
         <div className={styles.stats} aria-label="우리 아이 상태">
           {STATS.map(({ id, label, icon }) => (
@@ -319,6 +446,7 @@ export function PetRoom({
               <button
                 key={action}
                 className={styles.careButton}
+                data-suggested={mood?.action === action && Boolean(availability?.allowed)}
                 disabled={disabled || Boolean(active) || !availability?.allowed}
                 title={hint}
                 aria-label={`${PET_ACTION_LABELS[action]}, ${hint}`}
@@ -409,6 +537,17 @@ export function PetRoom({
               {pet.name}와 {view.week.daysTogether}일째 함께하고 있어요. 돌봄으로 자라고, 별사탕으로
               방을 꾸며요.
             </p>
+            <div className={styles.questProgress}>
+              <span>
+                오늘의 돌봄 {view.daily.quests.filter((quest) => quest.completed).length} /{' '}
+                {view.daily.quests.length}
+              </span>
+              <progress
+                value={view.daily.xp}
+                max={Math.max(1, view.daily.maxXp)}
+                aria-label={`오늘 성장 EXP ${view.daily.xp} / ${view.daily.maxXp}`}
+              />
+            </div>
             <div className={styles.questList}>
               {view.daily.quests.map((quest) => (
                 <div key={quest.id}>
@@ -475,6 +614,7 @@ export function PetRoom({
               manifest={assets.manifest}
               selected={selectedItem}
               onSelect={setItem}
+              slotRequest={slotRequest}
               onCommand={onCommand}
               onOpenShop={() => setTab('shop')}
             />
@@ -496,6 +636,7 @@ export function PetRoom({
               manifest={assets.manifest}
               selected={selectedItem}
               onSelect={setItem}
+              slotRequest={slotRequest}
               onCommand={onCommand}
             />
           )}
@@ -517,6 +658,7 @@ export function PetRoom({
               characterReady={stageReady}
               onPrepareGame={prepareGame}
               gameSurface={gameSurface}
+              stageOverlay={stageOverlay}
               onCommand={onCommand}
               onRefresh={refresh}
               onSnack={setSnack}

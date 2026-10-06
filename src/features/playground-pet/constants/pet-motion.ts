@@ -14,4 +14,7 @@ export const PET_ROOM_MOTION = {
   breathDuration: 3200,
   pauseMin: 2800,
   pauseRange: 3600,
+  visitChance: 0.35,
+  pokeRadius: 34,
+  pokeDuration: 650,
 } as const
