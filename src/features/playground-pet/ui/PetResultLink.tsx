@@ -6,9 +6,16 @@ import { isEligiblePetImage } from '@/entities/playground-pet'
 import { buttonVariants } from '@/shared/ui/Button'
 import { inPetSession, usePetSession } from '../lib/usePetSession'
 import { petConfigOptions } from '../lib/usePetController'
+import { cn } from '@/shared/lib/cn'
 
 /** 생성 필터 이름이나 클라이언트 픽셀 판정은 사용하지 않는다. */
-export function PetResultLink({ sourceJobId }: { sourceJobId: string }) {
+export function PetResultLink({
+  sourceJobId,
+  className,
+}: {
+  sourceJobId: string
+  className?: string
+}) {
   const session = usePetSession()
   const config = useQuery(petConfigOptions)
   const eligibility = useQuery({
@@ -32,7 +39,7 @@ export function PetResultLink({ sourceJobId }: { sourceJobId: string }) {
     return null
   const eligible = eligibility.data
   return (
-    <div className="mt-3">
+    <div className={cn('mt-3', className)}>
       <Link
         href={
           eligible
