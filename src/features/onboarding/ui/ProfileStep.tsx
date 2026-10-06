@@ -17,22 +17,34 @@ const ProfileStep = () => {
     userType === 'general' &&
     (isTermsError || (activeTerms !== undefined && !hasAllRequiredAdopterTerms(activeTerms)))
 
-  const { register, control, handleSubmit, setValue, onSubmit, firstErrorMessage, goBack } =
-    useStepForm('profile', profileSchema, {
-      email: '',
-      phone: '',
-      verificationCode: '',
-      phoneVerified: false,
-      serviceAgreed: false,
-      privacyAgreed: false,
-      marketingAgreed: false,
-      isOver14: false,
-    })
+  const {
+    register,
+    control,
+    handleSubmit,
+    setValue,
+    getValues,
+    onSubmit,
+    firstErrorMessage,
+    goBack,
+  } = useStepForm('profile', profileSchema, {
+    email: '',
+    phone: '',
+    verificationCode: '',
+    phoneVerified: false,
+    verificationMethod: 'phone',
+    phoneFailureCount: 0,
+    emailVerificationCode: '',
+    emailVerified: false,
+    serviceAgreed: false,
+    privacyAgreed: false,
+    marketingAgreed: false,
+    isOver14: false,
+  })
 
   return (
     <StepContainer
       title="계정 정보를 입력해주세요"
-      subtitle="문자 미수신 시 [인증번호 재전송] 버튼을 눌러주세요"
+      subtitle="문자 인증이 반복해서 실패하면 이메일로 이어갈 수 있어요"
       onNext={() => handleSubmit(onSubmit)()}
       onBack={goBack}
       navError={
@@ -42,7 +54,12 @@ const ProfileStep = () => {
           : undefined)
       }
     >
-      <PhoneVerificationSection control={control} register={register} setValue={setValue} />
+      <PhoneVerificationSection
+        control={control}
+        register={register}
+        setValue={setValue}
+        getValues={getValues}
+      />
       <AgreementSection control={control} setValue={setValue} activeTerms={activeTerms} />
     </StepContainer>
   )

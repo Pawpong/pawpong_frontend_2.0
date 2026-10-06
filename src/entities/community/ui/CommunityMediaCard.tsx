@@ -5,8 +5,11 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { FavoriteIcon, PawPrintIcon, PixelMessageIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
+import type { CommunityPostReview } from '@/shared/types'
+import { CommunityReviewLabel } from './CommunityReviewLabel'
 
 interface CommunityMediaCardProps {
+  aiReview?: CommunityPostReview
   href: string
   imageUrl?: string
   imageCount: number
@@ -28,6 +31,7 @@ interface CommunityMediaCardProps {
  */
 const CommunityMediaCard = ({
   href,
+  aiReview,
   imageUrl,
   imageCount,
   alt,
@@ -76,6 +80,11 @@ const CommunityMediaCard = ({
         </span>
       ) : null}
 
+      {aiReview?.state === 'held' && (
+        <span className="absolute right-1 bottom-1 left-1">
+          <CommunityReviewLabel review={aiReview} />
+        </span>
+      )}
       {imageCount > 1 && (
         <span className="absolute top-1 right-1 flex h-[1.375rem] min-w-10 items-center justify-center rounded-full bg-neutral-850/90 px-2 text-[0.625rem] leading-[1.5] font-semibold text-white pc:top-2.5 pc:right-3">
           {imageCount}장

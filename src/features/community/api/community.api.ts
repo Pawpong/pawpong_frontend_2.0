@@ -1,4 +1,9 @@
 import { apiClient, API_VERSION, unwrap, unwrapVoid } from '@/shared/api'
+import { mapCommunityPostDetail, type RawCommunityPostDetail } from '@/entities/community'
+import {
+  captureCommunityWriteSession,
+  communityWriteRequestOptions,
+} from '../lib/communityWriteSession'
 import type {
   ApiResponseFull,
   CommunityPostDetail,
@@ -28,24 +33,32 @@ export const unlikeCommunityPost = async (postId: string): Promise<void> => {
 /** 게시글 작성 */
 export const createCommunityPost = async (
   data: CreateCommunityPostRequest,
+  signal?: AbortSignal,
 ): Promise<CommunityPostDetail> => {
-  const response = await apiClient.post<ApiResponseFull<CommunityPostDetail>>(
+  const assertCurrent = captureCommunityWriteSession(signal)
+  const response = await apiClient.post<ApiResponseFull<RawCommunityPostDetail>>(
     `${API_VERSION}/community/posts`,
     data,
+    communityWriteRequestOptions(signal, data.aiReviewConsent !== undefined),
   )
-  return unwrap(response, '게시글 작성에 실패했습니다.')
+  assertCurrent()
+  return mapCommunityPostDetail(unwrap(response, '게시글 작성에 실패했습니다.'))
 }
 
 /** 게시글 수정 */
 export const updateCommunityPost = async (
   postId: string,
   data: UpdateCommunityPostRequest,
+  signal?: AbortSignal,
 ): Promise<CommunityPostDetail> => {
-  const response = await apiClient.patch<ApiResponseFull<CommunityPostDetail>>(
+  const assertCurrent = captureCommunityWriteSession(signal)
+  const response = await apiClient.patch<ApiResponseFull<RawCommunityPostDetail>>(
     `${API_VERSION}/community/posts/${postId}`,
     data,
+    communityWriteRequestOptions(signal, data.aiReviewConsent !== undefined),
   )
-  return unwrap(response, '게시글 수정에 실패했습니다.')
+  assertCurrent()
+  return mapCommunityPostDetail(unwrap(response, '게시글 수정에 실패했습니다.'))
 }
 
 /** 게시글 삭제 (소프트) */

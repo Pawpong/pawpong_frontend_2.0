@@ -65,7 +65,12 @@ export const uploadSingleFile = (file: File, folder?: string) => {
     .then(unwrap)
 }
 
-export const uploadMultipleFiles = (files: File[], folder?: string) => {
+export const uploadMultipleFiles = (
+  files: File[],
+  folder?: string,
+  signal?: AbortSignal,
+  skipAuthRefresh = false,
+) => {
   const formData = new FormData()
   files.forEach((file) => formData.append('files', file))
   if (folder) formData.append('folder', folder)
@@ -74,7 +79,10 @@ export const uploadMultipleFiles = (files: File[], folder?: string) => {
       success: boolean
       data: UploadResponse[]
       message?: string
-    }>(`${API_VERSION}/upload/multiple`, formData, { timeout: UPLOAD_TIMEOUT })
+    }>(`${API_VERSION}/upload/multiple`, formData, {
+      timeout: UPLOAD_TIMEOUT,
+      ...(signal ? { signal, skipAuthRefresh } : {}),
+    })
     .then(unwrap)
 }
 

@@ -69,6 +69,7 @@ const HomePostGrid = ({
             {posts.map((post) => (
               <CommunityMediaCard
                 key={post.postId}
+                aiReview={post.aiReview}
                 href={`/community/post/${post.postId}`}
                 imageUrl={post.primaryPhotoUrl ?? post.photoUrls[0]}
                 imageCount={post.photoUrls.length}

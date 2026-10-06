@@ -22,14 +22,17 @@ export const buildAdopterRegistrationRequest = ({
 }: BuildAdopterRegistrationRequestParams): RegisterAdopterRequest => {
   const nickname = info.nickname.trim()
   const selfIntroduction = survey.selfIntro?.trim()
+  const emailMethod = profile?.verificationMethod === 'email'
 
   return {
     tempId: social.tempId,
-    email: social.email || profile?.email || '',
+    email: emailMethod ? profile.email.trim().toLowerCase() : social.email || profile?.email || '',
+    verificationMethod: emailMethod ? 'email' : 'phone',
+    emailVerificationToken: emailMethod ? profile.emailVerificationToken : undefined,
     nickname,
     bio: info.introduction?.trim() || undefined,
     realName: social.name || nickname,
-    phone: profile?.phone,
+    phone: emailMethod ? undefined : profile?.phone,
     profileImage: info.profileImage?.filename,
     counselDefaultProfile:
       !skipped && selfIntroduction

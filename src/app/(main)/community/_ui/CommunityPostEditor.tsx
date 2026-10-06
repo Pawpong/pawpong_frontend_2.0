@@ -1,9 +1,22 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { communityQueries } from '@/entities/community'
+import { communityQueries, communityReviewConfigOptions } from '@/entities/community'
+import { useAuthSessionGeneration } from '@/shared/lib/useAuthSessionGeneration'
+import { getAuthSessionGeneration, isAuthSessionCurrent } from '@/shared/lib/authSessionLifecycle'
+import { CommunityReviewConsent } from './CommunityReviewConsent'
+import {
+  communityExperienceConfigOptions,
+  communityWritingPrompt,
+  initialCommunityExperience,
+  isCommunityExperienceEmpty,
+  prepareCommunityExperience,
+  validateCommunityExperience,
+  type CommunityExperience,
+} from '@/entities/community'
+import { CommunityExperienceEditor } from './CommunityExperienceEditor'
 import { profileQueries } from '@/entities/profile'
 import Link from 'next/link'
 import {
@@ -11,7 +24,15 @@ import {
   PostAiComparisonEditor,
   usePostAiComparison,
 } from '@/features/ai-image'
-import { PetCategorySuggestion, useSubmitCommunityPostForm } from '@/features/community'
+import {
+  PetCategorySuggestion,
+  communityCreateSignature,
+  diffCommunityAutoApplied,
+  nextCommunityCreateAttempt,
+  rememberCommunityAutoApplied,
+  useSubmitCommunityPostForm,
+  type CommunityCreateAttempt,
+} from '@/features/community'
 import { useExitGuard } from '@/shared/lib/useExitGuard'
 import { RetryButton, Container, CtaModal, NavigationBar } from '@/shared/ui'
 import {
@@ -25,10 +46,13 @@ import type { CommunityPetType, CommunityPostDetail, CommunityPostStatus } from 
 interface CommunityPostEditorProps {
   /** 전달하면 수정 모드 — 기존 게시글로 폼을 채운다 */
   postId?: string
+  /** 새 글에서 처음 열어 둘 기록 틀 (walk | clinic | daily) */
+  initialRecord?: string
 }
 
 interface PostFormProps {
   postId?: string
+  initialRecord?: string
   post?: CommunityPostDetail
 }
 
@@ -38,7 +62,7 @@ const FORM_TEXT = {
   edit: { title: '글 수정', mobileTitle: '게시글 수정', submitLabel: '수정 완료' },
 } as const
 
-const PostForm = ({ postId, post }: PostFormProps) => {
+const PostForm = ({ postId, post, initialRecord }: PostFormProps) => {
   const router = useRouter()
   // 임시저장 이어쓰기는 '수정'이 아니라 작성의 연장 — 문구·임시저장 버튼을 작성 화면과 동일하게 둔다
   const isDraft = post?.status === 'draft'
@@ -48,7 +72,7 @@ const PostForm = ({ postId, post }: PostFormProps) => {
   const [handoff] = useState(() => (post ? null : takePendingCommunityPost()))
   const initialComparison = post?.aiComparison ?? handoff?.aiComparison
   const form = usePostForm({
-    maxImages: initialComparison ? 11 : 10,
+    maxImages: 10,
     initialText: post?.body ?? '',
     initialImages: post?.photoUrls ?? [],
     initialFiles: handoff?.files,
@@ -70,10 +94,26 @@ const PostForm = ({ postId, post }: PostFormProps) => {
   const [visibility, setVisibility] = useState<VisibilityType>(initialVisibility)
   const initialPetType = post?.petType ?? ''
   const [petType, setPetType] = useState<CommunityPetType | ''>(initialPetType)
+  const experienceConfig = useQuery(communityExperienceConfigOptions)
+  const reviewConfig = useQuery(communityReviewConfigOptions)
+  const reviewEnabled = reviewConfig.data?.enabled === true && !reviewConfig.isError
+  const [aiReviewConsent, setAiReviewConsent] = useState(false)
+  // 수정·임시저장 이어쓰기는 저장된 값을 쓰고, 새 글만 링크가 고른 기록 틀로 시작한다.
+  const [startExperience] = useState<CommunityExperience | null | undefined>(() =>
+    post ? post.experience : initialCommunityExperience(initialRecord),
+  )
+  const [experience, setExperience] = useState(startExperience)
+  const experienceEnabled = experienceConfig.data?.enabled === true && !experienceConfig.isError
+  const experienceNotice =
+    experienceEnabled && experience ? validateCommunityExperience(experience) : null
+  const experienceValid = !experienceNotice
   const { submit, isSubmitting, error } = useSubmitCommunityPostForm(postId)
+  // 같은 내용으로 다시 올리면 같은 저장 식별자를 써서 글이 두 번 생기지 않게 한다.
+  const createAttempt = useRef<CommunityCreateAttempt | null>(null)
   const hasChanges =
     form.hasChanges ||
     comparison.hasChanges ||
+    JSON.stringify(experience) !== JSON.stringify(startExperience) ||
     visibility !== initialVisibility ||
     petType !== initialPetType
   const { showGuard, requestExit, confirmExit, cancelExit } = useExitGuard({
@@ -83,12 +123,14 @@ const PostForm = ({ postId, post }: PostFormProps) => {
   // 발행(published)은 본문이 필수, 임시저장(draft)은 본문 없이 사진만으로도 가능 (백엔드 계약)
   const hasBody = form.text.trim().length > 0
   const canPublish =
+    experienceValid &&
     hasBody &&
     !isSubmitting &&
     !form.isProcessingPhotos &&
     !comparison.busy &&
     !comparison.submission.error
   const canSaveDraft =
+    experienceValid &&
     (hasBody || form.images.length > 0) &&
     !isSubmitting &&
     !form.isProcessingPhotos &&
@@ -103,18 +145,56 @@ const PostForm = ({ postId, post }: PostFormProps) => {
       (status === 'published' ? !canPublish : !canSaveDraft)
     )
       return
-    const savedId = await submit({
+    const generation = getAuthSessionGeneration()
+    // 비운 경험은 새 글에서는 보내지 않고, 고치는 글에서는 지웠다고 알린다.
+    const submittedExperience =
+      !experienceEnabled || experience === undefined
+        ? undefined
+        : experience && !isCommunityExperienceEmpty(experience)
+          ? prepareCommunityExperience(experience)
+          : post?.experience
+            ? null
+            : undefined
+    const petTypeToSend = petType || (postId ? null : undefined)
+    if (!postId && reviewEnabled && status === 'published')
+      createAttempt.current = nextCommunityCreateAttempt(
+        createAttempt.current,
+        communityCreateSignature(
+          [
+            form.text.trim(),
+            visibility,
+            petTypeToSend,
+            aiReviewConsent,
+            submittedExperience,
+            comparison.submission.aiComparison,
+            comparison.submission.keptImageUrls,
+          ],
+          comparison.submission.files,
+        ),
+      )
+    const saved = await submit({
+      ...(!postId && reviewEnabled && status === 'published' && createAttempt.current
+        ? { createAttempt: createAttempt.current }
+        : {}),
+      ...(reviewEnabled ? { useOwnedPhotoUpload: true } : {}),
+      ...(reviewEnabled && status === 'published' ? { aiReviewConsent } : {}),
+      ...(submittedExperience !== undefined ? { experience: submittedExperience } : {}),
       text: form.text,
       files: comparison.submission.files,
       visibility,
       status,
-      petType: petType || (postId ? null : undefined),
+      petType: petTypeToSend,
       aiComparison: comparison.submission.aiComparison,
       keptImageUrls: comparison.submission.keptImageUrls,
     })
-    if (savedId) {
+    if (saved && isAuthSessionCurrent(generation)) {
+      if (status === 'published')
+        rememberCommunityAutoApplied(
+          saved.postId,
+          diffCommunityAutoApplied(submittedExperience ?? post?.experience, saved.experience),
+        )
       cancelExit()
-      router.push('/home')
+      router.push(saved.aiReview ? `/community/post/${saved.postId}` : '/home')
     }
   }
 
@@ -134,11 +214,18 @@ const PostForm = ({ postId, post }: PostFormProps) => {
         form={visibleForm}
         introTitle={isEdit ? '우리 아이의 이야기를 다듬어주세요' : '우리 아이의 일상을 나눠주세요'}
         introDescription="함께 웃고, 궁금한 것을 묻고, 반려동물과의 소중한 순간을 기록해요."
-        placeholder="오늘 우리 아이는 어떤 하루를 보냈나요?"
+        placeholder={
+          (experienceEnabled && communityWritingPrompt(experience)) ||
+          '오늘 우리 아이는 어떤 하루를 보냈나요?'
+        }
         error={error}
         onBack={handleClose}
         cta={{
-          submitLabel: formText.submitLabel,
+          submitLabel: reviewEnabled
+            ? aiReviewConsent
+              ? '심사 후 이야기 올리기'
+              : '나만 확인하며 저장하기'
+            : formText.submitLabel,
           onSubmit: handleSubmit,
           isValid: canPublish,
           // 이미 발행된 글을 임시저장으로 되돌리지는 않는다 (작성 중 / 임시저장 이어쓰기에서만 노출)
@@ -148,6 +235,24 @@ const PostForm = ({ postId, post }: PostFormProps) => {
         }}
         belowContent={
           <div className="flex flex-col gap-4">
+            {reviewEnabled && reviewConfig.data && (
+              <CommunityReviewConsent
+                config={reviewConfig.data}
+                consent={aiReviewConsent}
+                onChange={setAiReviewConsent}
+                disabled={isSubmitting || form.isProcessingPhotos}
+              />
+            )}
+            {experienceEnabled && experienceConfig.data && (
+              <CommunityExperienceEditor
+                value={experience}
+                onChange={setExperience}
+                config={experienceConfig.data}
+                disabled={isSubmitting || form.isProcessingPhotos}
+                autoTagging={reviewEnabled ? (aiReviewConsent ? 'on' : 'consent') : 'off'}
+                error={experienceNotice}
+              />
+            )}
             <Link
               href="/ai-filter"
               className="flex items-center justify-between gap-3 rounded-xl border border-primary-200 bg-point-50 p-4 focus-ring transition-colors hover:bg-point-100"
@@ -170,6 +275,11 @@ const PostForm = ({ postId, post }: PostFormProps) => {
               disabled={isSubmitting || form.isProcessingPhotos}
             />
             <PetCategorySuggestion
+              automaticAllowed={
+                !reviewConfig.isPending &&
+                !reviewConfig.isError &&
+                (!reviewEnabled || aiReviewConsent)
+              }
               text={form.text}
               photo={form.files[0]}
               value={petType}
@@ -231,8 +341,9 @@ const PostForm = ({ postId, post }: PostFormProps) => {
  * 수정 모드는 조회가 끝난 뒤에 폼을 마운트해 초기값을 시드한다(로드 후 setState 하는 effect 불필요).
  * 남의 글 ID 로 직접 들어오면 폼을 열지 않고 상세로 되돌린다(최종 차단은 백엔드).
  */
-const CommunityPostEditor = ({ postId }: CommunityPostEditorProps) => {
+const CommunityPostEditor = ({ postId, initialRecord }: CommunityPostEditorProps) => {
   const router = useRouter()
+  const generation = useAuthSessionGeneration()
   const postQuery = useQuery({
     ...communityQueries.detail(postId ?? ''),
     enabled: !!postId,
@@ -257,7 +368,7 @@ const CommunityPostEditor = ({ postId }: CommunityPostEditorProps) => {
     if (postId && post && meFetched && !isOwner) router.replace(`/community/post/${postId}`)
   }, [postId, post, meFetched, isOwner, router])
 
-  if (!postId) return <PostForm />
+  if (!postId) return <PostForm key={generation} initialRecord={initialRecord} />
   if (postQuery.isPending || meQuery.isPending) {
     return (
       <div className="flex min-h-screen flex-col bg-white">
@@ -291,7 +402,7 @@ const CommunityPostEditor = ({ postId }: CommunityPostEditorProps) => {
   }
   if (!isOwner) return null
 
-  return <PostForm postId={postId} post={post} />
+  return <PostForm key={`${postId}:${generation}`} postId={postId} post={post} />
 }
 
 export { CommunityPostEditor }
