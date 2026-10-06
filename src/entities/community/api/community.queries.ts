@@ -1,8 +1,9 @@
 import { createInfiniteQuery, createQuery, STALE_TIME } from '@/shared/api'
-import type { CommunitySortType, CommunityPetType } from '@/shared/types'
+import type { CommunitySortType, CommunityPetType, CommunityDiscoveryFilters } from '@/shared/types'
 import {
   getCommunityPosts,
   getCommunityPostDetail,
+  getRelatedCommunityPosts,
   getCommunityComments,
   getMyBookmarkedPosts,
   getMyDraftPosts,
@@ -21,10 +22,31 @@ export const communityQueries = {
     category?: string,
     search?: string,
     pageSize = 15,
+    topic?: string,
+    discovery?: CommunityDiscoveryFilters,
   ) =>
     createInfiniteQuery({
-      queryKey: [...communityQueries.postsAll(), sort, petType, category, search, pageSize],
-      queryFn: (page) => getCommunityPosts({ sort, petType, category, search, page, pageSize }),
+      queryKey: [
+        ...communityQueries.postsAll(),
+        sort,
+        petType,
+        category,
+        search,
+        pageSize,
+        ...(topic ? [topic] : []),
+        ...(discovery ? [discovery] : []),
+      ],
+      queryFn: (page) =>
+        getCommunityPosts({
+          sort,
+          petType,
+          category,
+          search,
+          page,
+          pageSize,
+          ...(topic ? { topic } : {}),
+          ...(discovery ?? {}),
+        }),
       staleTime: STALE_TIME.DEFAULT,
     }),
 
@@ -39,6 +61,18 @@ export const communityQueries = {
       enabled: !!postId,
       staleTime: STALE_TIME.DEFAULT,
     }),
+
+  // 상세 캐시를 통째로 고치는 낙관적 갱신에 섞이지 않게 별도 키를 쓴다.
+  related: (postId: string, enabled = true, pageSize = 6) => ({
+    queryKey: [...communityQueries.all(), 'related', postId, pageSize] as const,
+    queryFn: ({ signal }: { signal: AbortSignal }) =>
+      getRelatedCommunityPosts(postId, pageSize, signal),
+    enabled: enabled && !!postId,
+    retry: false,
+    // 곁들이는 영역이라 실패해도 글 화면을 오류 경계로 넘기지 않는다.
+    throwOnError: false,
+    staleTime: 60_000,
+  }),
 
   myPostsAll: () => [...communityQueries.all(), 'myPosts'] as const,
 

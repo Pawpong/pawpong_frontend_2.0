@@ -18,22 +18,34 @@ interface Props {
   value: CommunityPetType | ''
   onChange: (value: CommunityPetType | '') => void
   disabled?: boolean
+  automaticAllowed?: boolean
 }
 
-export function PetCategorySuggestion({ text, photo, value, onChange, disabled }: Props) {
+export function PetCategorySuggestion({
+  text,
+  photo,
+  value,
+  onChange,
+  disabled,
+  automaticAllowed = true,
+}: Props) {
   // 수정 화면의 기존 분류와 사용자가 직접 고른 분류는 자동 결과로 덮어쓰지 않는다.
   const [manual, setManual] = useState(() => Boolean(value))
-  const { state, retry, dismiss } = usePetCategorySuggestion(text, photo, !manual && !disabled)
+  const { state, retry, dismiss } = usePetCategorySuggestion(
+    text,
+    photo,
+    !manual && !disabled && automaticAllowed,
+  )
   const suggestion =
     state?.result?.subject === 'animal'
       ? OPTIONS.find((option) => option.value === state.result?.petType)
       : undefined
 
   useEffect(() => {
-    if (manual || disabled) return
+    if (manual || disabled || !automaticAllowed) return
     const next = suggestion?.value ?? ''
     if (next !== value) onChange(next)
-  }, [manual, disabled, suggestion?.value, value, onChange])
+  }, [manual, disabled, automaticAllowed, suggestion?.value, value, onChange])
 
   const choose = (next: CommunityPetType | '') => {
     dismiss()
@@ -63,7 +75,9 @@ export function PetCategorySuggestion({ text, photo, value, onChange, disabled }
           포퐁 AI 자동 분류
         </div>
         <div aria-live="polite" className="mt-2 text-sm leading-relaxed text-neutral-700">
-          {manual ? (
+          {!automaticAllowed ? (
+            <p>AI 자동 분류를 시작하지 않았어요. 카테고리는 직접 고를 수 있어요.</p>
+          ) : manual ? (
             <p>직접 고른 카테고리를 사용해요. 선택하지 않으면 전체 이야기에 올라가요.</p>
           ) : suggestion ? (
             <p>
@@ -82,7 +96,7 @@ export function PetCategorySuggestion({ text, photo, value, onChange, disabled }
             <p>글을 쓰거나 사진을 올리면 어울리는 카테고리를 자동으로 골라 드려요.</p>
           )}
         </div>
-        {(manual || state?.phase === 'error') && (
+        {automaticAllowed && (manual || state?.phase === 'error') && (
           <Button
             type="button"
             size="sm"
