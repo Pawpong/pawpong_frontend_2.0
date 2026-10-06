@@ -9,6 +9,7 @@ import { SIGNUP_ERROR } from './signupErrors' // [refactored]
 import type { DocumentsFormData } from './schema'
 import { buildBreederRegistrationRequest } from './buildBreederRegistrationRequest'
 import { getBreederDocumentsSignature, getSelectedBreederDocuments } from './breederDocuments'
+import { hasContactVerification } from './contactVerification'
 
 /**
  * 브리더 가입 완료 (서류 업로드 → POST /auth/register/breeder → bio PATCH)
@@ -44,7 +45,8 @@ export const useBreederSignup = () => {
     const profile = formData.profile
 
     // 폼의 이메일은 소셜 세션 값을 그대로 채운 것 — 세션이 우선, 없으면 폼 값
-    const email = social.email || profile?.email || ''
+    const email =
+      profile?.verificationMethod === 'email' ? profile.email : social.email || profile?.email || ''
     const breeds = kennel?.selectedBreeds ?? []
 
     // 백엔드 필수값 사전 검증 (FE 스키마상 optional 이지만 register/breeder 에서 필수)
@@ -65,8 +67,8 @@ export const useBreederSignup = () => {
       setError('품종을 1개 이상 선택해주세요. (브리더 정보 단계)')
       return
     }
-    if (!profile?.phone || !profile.phoneVerified) {
-      setError(SIGNUP_ERROR.phoneUnverified)
+    if (!profile || !hasContactVerification(profile)) {
+      setError(SIGNUP_ERROR.contactUnverified)
       return
     }
     if (!email) {

@@ -22,6 +22,8 @@ export interface CounselDefaultProfile {
 }
 
 export interface RegisterAdopterRequest {
+  verificationMethod?: 'phone' | 'email'
+  emailVerificationToken?: string
   tempId: string
   email: string
   nickname: string
@@ -43,8 +45,10 @@ export interface RegisterBreederAgreements {
 }
 
 export interface RegisterBreederRequest {
+  verificationMethod?: 'phone' | 'email'
+  emailVerificationToken?: string
   email: string
-  phoneNumber: string
+  phoneNumber?: string
   breederName: string
   breederLocation: { city: string; district?: string }
   animal: 'cat' | 'dog' | 'reptile'

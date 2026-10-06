@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { getStepsAfter } from './onboardingFlow'
 import type { FormStepId, OnboardingFormData, UserType } from './types'
+import { hasEmailVerification } from './contactVerification'
 
 /**
  * 가입 중 입력값 저장소 (sessionStorage)
@@ -23,6 +24,7 @@ interface OnboardingFormStore {
   status: 'editing' | 'completed'
   hasHydrated: boolean
   markHydrated: () => void
+  invalidateExpiredEmailVerification: () => void
   /** 입력 중인 값 보관 (이전 단계로 이동할 때). 완료 표시는 하지 않는다 */
   saveDraft: <K extends FormStepId>(stepId: K, value: OnboardingFormData[K]) => void
   /** 스텝 검증 통과 — 값 저장 + 완료 표시 */
@@ -48,6 +50,28 @@ export const useOnboardingForm = create<OnboardingFormStore>()(
       ...EMPTY_PROGRESS,
       hasHydrated: false,
       markHydrated: () => set({ hasHydrated: true }),
+      invalidateExpiredEmailVerification: () =>
+        set((state) => {
+          const profile = state.drafts.profile
+          if (profile?.verificationMethod !== 'email' || hasEmailVerification(profile)) return state
+          const stale = new Set<FormStepId>([
+            'profile',
+            ...getStepsAfter('general', 'profile'),
+            ...getStepsAfter('breeder', 'profile'),
+          ])
+          return {
+            drafts: {
+              ...state.drafts,
+              profile: {
+                ...profile,
+                emailVerified: false,
+                emailVerificationToken: '',
+                emailVerificationExpiresAt: '',
+              },
+            },
+            completedSteps: state.completedSteps.filter((id) => !stale.has(id)),
+          }
+        }),
 
       saveDraft: (stepId, value) =>
         set((state) => ({ drafts: { ...state.drafts, [stepId]: value } })),
@@ -89,7 +113,10 @@ export const useOnboardingForm = create<OnboardingFormStore>()(
       // 서버 렌더 시점엔 복원하지 않는다 — 하이드레이션 직후 Provider 가 rehydrate 를 호출한다
       skipHydration: true,
       // 복원이 끝나야 라우터 가드가 판정할 수 있다 (그전에 판정하면 전원 1단계로 튕긴다)
-      onRehydrateStorage: () => (state) => state?.markHydrated(),
+      onRehydrateStorage: () => (state) => {
+        state?.invalidateExpiredEmailVerification()
+        state?.markHydrated()
+      },
       // documents 는 File 객체라 JSON 으로 살아남지 못한다 — 새로고침 시 파일은 다시 선택받는다
       partialize: (state) => ({
         ownerTempId: state.ownerTempId,
@@ -99,7 +126,7 @@ export const useOnboardingForm = create<OnboardingFormStore>()(
           ...state.drafts,
           // 인증번호와 File 객체는 저장하지 않는다. 인증 완료 여부와 전화번호만 같은 세션에 유지한다.
           profile: state.drafts.profile
-            ? { ...state.drafts.profile, verificationCode: '' }
+            ? { ...state.drafts.profile, verificationCode: '', emailVerificationCode: '' }
             : undefined,
           documents: undefined,
         },
