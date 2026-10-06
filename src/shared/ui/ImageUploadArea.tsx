@@ -197,6 +197,7 @@ const ImageUploadArea = ({
                 src={src}
                 alt={`업로드 이미지 ${index + 1}`}
                 fill
+                loading={index === 0 ? 'eager' : 'lazy'}
                 sizes={
                   isComposer || size === 'post'
                     ? '(min-width: 1440px) 180px, 100px'
