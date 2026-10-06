@@ -188,6 +188,14 @@
   gap: 12px;
   margin: 20px 3px 24px 0;
 }
+/* 모바일 2열에서 남는 세 번째 종류(애견동반카페)는 한 줄을 다 쓴다 */
+.care-map-category:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+/* 카페는 지역 선택이 없어 검색창 하나만 남는다 */
+.care-map-search-fields > :only-child {
+  grid-column: 1 / -1;
+}
 .care-map-count {
   display: flex;
   flex-wrap: wrap;
@@ -405,6 +413,12 @@
 @media (min-width: 768px) {
   .care-map-search-fields {
     grid-template-columns: minmax(160px, 1fr) minmax(0, 3fr);
+  }
+  .care-map-counts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .care-map-category:last-child:nth-child(odd) {
+    grid-column: auto;
   }
   .care-map-category {
     padding: 16px 20px;

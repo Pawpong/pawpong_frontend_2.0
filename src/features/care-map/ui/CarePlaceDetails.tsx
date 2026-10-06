@@ -13,9 +13,11 @@ export function CarePlaceDetails({ place, onClose }: { place: CarePlace; onClose
           <p className="mb-1 text-xs font-semibold text-primary-500">
             {place.kind === 'hospital'
               ? '동물병원'
-              : place.registration
-                ? '등록 동물보호센터'
-                : '보호·입양시설'}
+              : place.kind === 'cafe'
+                ? '애견동반카페'
+                : place.registration
+                  ? '등록 동물보호센터'
+                  : '보호·입양시설'}
           </p>
           <h2 className="text-lg font-bold break-keep text-neutral-850">{place.name}</h2>
         </div>
@@ -65,6 +67,11 @@ export function CarePlaceDetails({ place, onClose }: { place: CarePlace; onClose
       {place.kind === 'shelter' && (
         <p className="mt-3 text-xs leading-5 text-neutral-700">
           방문 예약과 보호 중인 동물의 입양 상담은 센터에 먼저 연락해 주세요.
+        </p>
+      )}
+      {place.kind === 'cafe' && (
+        <p className="mt-3 text-xs leading-5 text-neutral-700">
+          반려동물 동반 가능 여부와 조건(크기·실내 동반 등)은 방문 전에 매장에 확인해 주세요.
         </p>
       )}
       {!!place.registration?.jurisdictions.length && (

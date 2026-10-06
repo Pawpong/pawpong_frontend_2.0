@@ -101,6 +101,35 @@ test('facility type retains area/query/radius, and shelters never receive a hosp
   }
 })
 
+test('pet cafes have no nationwide directory, so they start and switch into a map-centred nearby search', () => {
+  const initial = createCareSearchState('cafe')
+  assert.equal(initial.search.scope, 'nearby')
+  assert.equal(initial.search.radius, 5000)
+  assert.equal(initial.nearbyOrigin, 'map')
+
+  const fromDirectory = apply(
+    { type: 'region', region: 'seoul' },
+    { type: 'referral', enabled: true },
+    { type: 'query', query: '성수' },
+    { type: 'kind', kind: 'cafe' },
+  )
+  assert.equal(fromDirectory.search.kind, 'cafe')
+  assert.equal(fromDirectory.search.scope, 'nearby')
+  assert.equal(fromDirectory.nearbyOrigin, 'map')
+  assert.equal(fromDirectory.search.referralOnly, false)
+  assert.equal(fromDirectory.search.query, '성수')
+
+  const fromNearby = apply(
+    { type: 'nearby', center, origin: 'location' },
+    { type: 'kind', kind: 'cafe' },
+  )
+  assert.equal(fromNearby.search.scope, 'nearby')
+  assert.equal(fromNearby.nearbyOrigin, 'location')
+  assert.equal(fromNearby.search.latitude, center.latitude)
+
+  assert.deepEqual(careSearchReducer(fromDirectory, { type: 'reset' }), initial)
+})
+
 test('changing a condition clears pagination and selected facility; paging retains all conditions', () => {
   const initial = apply(
     { type: 'nearby', center, origin: 'location' },

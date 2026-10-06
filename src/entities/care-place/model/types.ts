@@ -1,4 +1,6 @@
-export type CarePlaceKind = 'hospital' | 'shelter'
+export type CarePlaceKind = 'hospital' | 'shelter' | 'cafe'
+/** 공공 등록자료(전국 목록)가 있는 종류 — 애견동반카페는 카카오 장소 검색에만 있다 */
+export type CareDirectoryKind = Exclude<CarePlaceKind, 'cafe'>
 
 export interface CareCoordinates {
   latitude: number
@@ -51,6 +53,6 @@ export interface CareDirectorySummary {
   shelterCount: number
   shelterRegistrations: number
   referralCount: number
-  sourceUrls: Record<CarePlaceKind, string>
+  sourceUrls: Record<CareDirectoryKind, string>
   regions: { id: string; label: string }[]
 }
