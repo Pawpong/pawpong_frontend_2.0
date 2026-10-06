@@ -11,10 +11,10 @@ import { PawPrintIcon } from '@/shared/assets'
 import { PLAYGROUND_BILLING_ENABLED } from '@/shared/config/playground'
 import { cafe24Proup } from '@/shared/lib/fonts'
 import { cn } from '@/shared/lib/cn'
-import { preparePhoto } from '@/shared/lib/preparePhoto'
 import { Button, ComposerSectionHeading, buttonVariants } from '@/shared/ui'
 import { PhotoUploadField } from '@/shared/ui/PhotoUploadField'
 import { saveAiImageFile } from '../lib/aiImageFile'
+import { useAiSourcePhoto } from '../lib/useAiSourcePhoto'
 import { setPendingCommunityPhoto } from '../lib/pendingCommunityPhoto'
 import { AiPostShareChoice } from './AiPostShareChoice'
 import { useAiPixelFilter } from '../lib/useAiPixelFilter'
@@ -49,6 +49,8 @@ const useElapsedSeconds = (running: boolean) => {
 
 interface AiFilterStudioProps {
   gameCharacter?: boolean
+  sourceJobId?: string
+  sessionGeneration: number
   isLoggedIn: boolean
   allowance?: { remaining: number; freeRemaining: number; dailyFreeLimit: number; enabled: boolean }
   quotaError?: boolean
@@ -63,6 +65,8 @@ interface AiFilterStudioProps {
  */
 export function AiFilterStudio({
   gameCharacter = false,
+  sourceJobId,
+  sessionGeneration,
   isLoggedIn,
   allowance,
   quotaError,
@@ -73,39 +77,35 @@ export function AiFilterStudio({
   const queryClient = useQueryClient()
   const ai = useAiPixelFilter(gameCharacter)
   const elapsed = useElapsedSeconds(ai.isWorking)
-  const [photo, setPhoto] = useState<{ file: File; url: string }>()
-  const [preparing, setPreparing] = useState(false)
-  const [photoError, setPhotoError] = useState<string | null>(null)
+  const {
+    photo,
+    preparing,
+    error: photoError,
+    selectPhoto: prepareSelectedPhoto,
+    clearPhoto,
+  } = useAiSourcePhoto({
+    sourceJobId: gameCharacter ? sourceJobId : undefined,
+    enabled: isLoggedIn,
+    generation: sessionGeneration,
+  })
   const [saving, setSaving] = useState(false)
   const [shareComparison, setShareComparison] = useState(false)
   const resultRef = useRef<HTMLDivElement>(null)
-
-  useEffect(
-    () => () => {
-      if (photo) URL.revokeObjectURL(photo.url)
-    },
-    [photo],
-  )
 
   const remaining = allowance?.remaining
   const canGenerate = Boolean(allowance?.enabled && remaining && remaining > 0)
   const selectedFilter = ai.filters.find((filter) => filter.filterId === ai.selectedFilterId)
   const result = ai.result
   const awaitingResult = ai.phase === 'pending'
+  const returnUrl = gameCharacter
+    ? `/ai-filter?purpose=pet-sprite-v1${sourceJobId ? `&sourceJobId=${encodeURIComponent(sourceJobId)}` : ''}`
+    : '/ai-filter'
 
   const selectPhoto = async (files: FileList) => {
     if (!files.length || preparing || ai.isWorking) return
-    setPreparing(true)
-    setPhotoError(null)
-    try {
-      const file = await preparePhoto(files[0])
+    if (await prepareSelectedPhoto(files[0])) {
       ai.reset()
       setShareComparison(false)
-      setPhoto({ file, url: URL.createObjectURL(file) })
-    } catch (error) {
-      setPhotoError(error instanceof Error ? error.message : '사진을 준비하지 못했어요.')
-    } finally {
-      setPreparing(false)
     }
   }
 
@@ -153,7 +153,7 @@ export function AiFilterStudio({
           <div>
             <p className="flex items-center gap-1.5 text-xs font-semibold text-primary-700">
               <PawPrintIcon aria-hidden className="size-4 rotate-30 text-secondary-500" />
-              {gameCharacter ? '우리 아이 게임 캐릭터' : '포퐁 AI 필터'}
+              {gameCharacter ? '캐릭터 만들기' : '포퐁 AI 필터'}
             </p>
             <h1
               className={cn(
@@ -161,11 +161,11 @@ export function AiFilterStudio({
                 'mt-2 font-cafe24 text-2xl leading-snug font-bold text-neutral-850 tab:text-3xl',
               )}
             >
-              {gameCharacter ? '작고 귀여운 전신 도트 친구' : '우리 아이, 오늘은 어떤 모습?'}
+              {gameCharacter ? '우리 아이를 게임 속 친구로' : '우리 아이, 오늘은 어떤 모습?'}
             </h1>
             <p className="mt-2 text-sm leading-relaxed text-neutral-700">
               {gameCharacter
-                ? '사진 속 털색·무늬·귀 모양을 살려 몸과 발·꼬리가 보이는 게임 친구를 만들어요. 완성된 그림을 직접 골라 연결하면 기존 아이의 이름과 성장 기록은 그대로예요.'
+                ? '우리 아이 사진이나 이미 만든 AI 사진으로 캐릭터를 만들어요. 털색·무늬·귀 모양을 살려 몸과 발·꼬리까지 그려요. 완성된 캐릭터를 직접 연결하면 이름과 성장 기록은 그대로예요.'
                 : '사진 한 장이면 도트 그림부터 스티커·수채화까지. 마음에 들면 저장하거나 커뮤니티에 자랑해 보세요.'}
             </p>
           </div>
@@ -202,7 +202,7 @@ export function AiFilterStudio({
         {/* 1. 사진 */}
         <section aria-labelledby="ai-photo-heading" className="min-w-0">
           <ComposerSectionHeading id="ai-photo-heading" step={1} required>
-            우리 아이 사진
+            {gameCharacter ? '캐릭터로 만들 사진' : '우리 아이 사진'}
           </ComposerSectionHeading>
           {isLoggedIn ? (
             <>
@@ -213,7 +213,7 @@ export function AiFilterStudio({
                 onSelect={(files) => void selectPhoto(files)}
                 onRemove={() => {
                   ai.reset()
-                  setPhoto(undefined)
+                  clearPhoto()
                 }}
               />
               {photoError && (
@@ -223,9 +223,22 @@ export function AiFilterStudio({
               )}
               <p className="mt-2 text-xs text-neutral-700">
                 {gameCharacter
-                  ? '몸과 꼬리까지 잘 보이는 사진을 권해요. 얼굴 사진도 전신 캐릭터로 그리지만 몸의 무늬는 추정될 수 있어요.'
+                  ? '몸과 꼬리까지 잘 보이는 사진을 권해요. 얼굴만 보이는 사진은 몸의 무늬를 AI가 추정해요.'
                   : '얼굴이 잘 보이는 정면 사진일수록 우리 아이와 닮게 나와요.'}
               </p>
+              {gameCharacter && (
+                <Link
+                  href="#ai-archive-heading"
+                  className="mt-3 inline-block text-sm font-semibold text-primary-700 underline"
+                >
+                  내 AI 사진에서 고르기
+                </Link>
+              )}
+              {gameCharacter && photo?.fromArchive && (
+                <p className="mt-2 text-xs text-neutral-700">
+                  보관함의 AI 사진을 가져왔어요. 원래 사진은 그대로 보관돼요.
+                </p>
+              )}
             </>
           ) : (
             <div className="flex aspect-square w-full flex-col items-center justify-center gap-4 rounded-xl border border-primary-200 bg-point-50 p-6 text-center">
@@ -233,7 +246,7 @@ export function AiFilterStudio({
                 로그인하면 우리 아이 사진으로 바로 만들어 볼 수 있어요
               </p>
               <Link
-                href={`/login?returnUrl=${encodeURIComponent(gameCharacter ? '/ai-filter?purpose=pet-sprite-v1' : '/ai-filter')}`}
+                href={`/login?returnUrl=${encodeURIComponent(returnUrl)}`}
                 className={buttonVariants()}
               >
                 로그인하고 시작하기
@@ -245,7 +258,7 @@ export function AiFilterStudio({
         {/* 2. 필터 */}
         <section aria-labelledby="ai-filter-heading" className="min-w-0">
           <ComposerSectionHeading id="ai-filter-heading" step={2} required>
-            {gameCharacter ? '게임 캐릭터로 만들기' : '필터 고르기'}
+            {gameCharacter ? '캐릭터 만들기' : '필터 고르기'}
           </ComposerSectionHeading>
           {ai.filters.length === 0 ? (
             <p className="rounded-xl bg-neutral-50 p-5 text-sm text-neutral-700">
@@ -253,7 +266,7 @@ export function AiFilterStudio({
             </p>
           ) : gameCharacter ? (
             <div className="rounded-xl border-2 border-primary-200 bg-point-50 p-5 text-sm leading-6 text-neutral-850">
-              <strong>전신 도트 캐릭터</strong>
+              <strong>게임 속 도트 친구</strong>
               <p>
                 작은 머리와 통통한 몸, 발·꼬리가 또렷한 고전 게임 모습이에요. 배경 없이 우리 아이만
                 그려요.
@@ -381,7 +394,7 @@ export function AiFilterStudio({
                   intent="link"
                   onClick={() => {
                     ai.reset()
-                    setPhoto(undefined)
+                    clearPhoto()
                   }}
                 >
                   새 사진 선택
@@ -396,13 +409,14 @@ export function AiFilterStudio({
                   'mb-3 text-center font-cafe24 text-xl font-bold text-primary-500',
                 )}
               >
-                짜잔! {gameCharacter ? '전신 도트 친구' : (selectedFilter?.name ?? 'AI 필터')} 완성
+                짜잔! {gameCharacter ? '우리 아이 캐릭터' : (selectedFilter?.name ?? 'AI 필터')}{' '}
+                완성
               </h2>
               {gameCharacter ? (
                 <div className="rounded-xl border-2 border-primary-200 bg-point-50 p-6">
                   <Image
                     src={result.imageUrl}
-                    alt="몸과 발·꼬리가 보이는 완성된 전신 도트 캐릭터"
+                    alt="완성된 우리 아이 게임 캐릭터"
                     width={288}
                     height={288}
                     unoptimized
@@ -465,7 +479,7 @@ export function AiFilterStudio({
                         : '오늘 만들 수 있는 횟수를 모두 사용했어요'
                       : selectedFilter
                         ? gameCharacter
-                          ? '전신 게임 캐릭터 만들기 · 1회 사용'
+                          ? '캐릭터 만들기 · 1회 사용'
                           : `${selectedFilter.name} 씌우기`
                         : '필터를 골라 주세요'}
               </Button>

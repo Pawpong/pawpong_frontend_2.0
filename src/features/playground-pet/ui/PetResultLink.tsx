@@ -25,18 +25,29 @@ export function PetResultLink({ sourceJobId }: { sourceJobId: string }) {
     !config.data?.enabled ||
     config.isError ||
     !session ||
-    !eligibility.data ||
-    eligibility.isError
+    eligibility.isPending ||
+    eligibility.isError ||
+    typeof eligibility.data !== 'boolean'
   )
     return null
+  const eligible = eligibility.data
   return (
     <div className="mt-3">
       <Link
-        href={`/playground/pet?sourceJobId=${encodeURIComponent(sourceJobId)}`}
+        href={
+          eligible
+            ? `/playground/pet?sourceJobId=${encodeURIComponent(sourceJobId)}`
+            : `/ai-filter?purpose=pet-sprite-v1&sourceJobId=${encodeURIComponent(sourceJobId)}`
+        }
         className={buttonVariants({ intent: 'secondary', width: 'full' })}
       >
-        이 전신 캐릭터 확인하고 키우기
+        {eligible ? '이 캐릭터로 시작하기' : '이 사진으로 캐릭터 만들기'}
       </Link>
+      {!eligible && (
+        <p className="mt-2 text-center text-xs text-neutral-700">
+          사진을 고른 뒤 만들기를 누르면 AI 이용 횟수 1회를 사용해요.
+        </p>
+      )}
     </div>
   )
 }

@@ -1,8 +1,11 @@
 import { getAiImageGenerationImage, getAiImageGenerationSourceImage } from '@/entities/ai-image'
 
 /** 결과 PNG 를 사진 파일로 받는다 (버킷 CORS 가 없어 API 로 받는다) */
-export const fetchAiImageFile = async (jobId: string, name = `pawpong-${jobId}.png`) =>
-  new File([await getAiImageGenerationImage(jobId)], name, { type: 'image/png' })
+export const fetchAiImageFile = async (
+  jobId: string,
+  name = `pawpong-${jobId}.png`,
+  signal?: AbortSignal,
+) => new File([await getAiImageGenerationImage(jobId, { signal })], name, { type: 'image/png' })
 
 /**
  * 폰 앨범에 저장하기.
