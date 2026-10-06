@@ -83,6 +83,7 @@ const PostForm = ({ postId, post, initialRecord, photoSource }: PostFormProps) =
       return card ? { files: [card], aiComparison: null, jobId: undefined } : null
     return aiPhoto
   })
+  const isMemoryCardHandoff = photoSource === 'memory-card' && !!handoff
   const initialComparison = post?.aiComparison ?? handoff?.aiComparison
   const form = usePostForm({
     maxImages: 10,
@@ -266,27 +267,38 @@ const PostForm = ({ postId, post, initialRecord, photoSource }: PostFormProps) =
                 error={experienceNotice}
               />
             )}
-            <Link
-              href="/ai-filter"
-              className="flex items-center justify-between gap-3 rounded-xl border border-primary-200 bg-point-50 p-4 focus-ring transition-colors hover:bg-point-100"
-            >
-              <span>
-                <span className="block text-sm font-bold text-primary-700">
-                  {handoff ? 'AI 필터로 만든 사진을 담았어요' : 'AI 필터로 사진 꾸미기'}
+            {isMemoryCardHandoff ? (
+              <div className="rounded-xl border border-primary-200 bg-point-50 p-4">
+                <p className="text-sm font-bold text-primary-700">완성한 추억 카드를 담았어요</p>
+                <p className="mt-1 text-xs text-neutral-700">
+                  카드와 함께 기억하고 싶은 오늘의 이야기를 남겨 주세요.
+                </p>
+              </div>
+            ) : (
+              <Link
+                href="/ai-filter"
+                className="flex items-center justify-between gap-3 rounded-xl border border-primary-200 bg-point-50 p-4 focus-ring transition-colors hover:bg-point-100"
+              >
+                <span>
+                  <span className="block text-sm font-bold text-primary-700">
+                    {handoff ? 'AI 필터로 만든 사진을 담았어요' : 'AI 필터로 사진 꾸미기'}
+                  </span>
+                  <span className="mt-0.5 block text-xs text-neutral-700">
+                    도트 그림·스티커·수채화로 바꿔 올리면 좋아요를 더 받을지도 몰라요
+                  </span>
                 </span>
-                <span className="mt-0.5 block text-xs text-neutral-700">
-                  도트 그림·스티커·수채화로 바꿔 올리면 좋아요를 더 받을지도 몰라요
+                <span aria-hidden className="text-lg text-primary-700">
+                  →
                 </span>
-              </span>
-              <span aria-hidden className="text-lg text-primary-700">
-                →
-              </span>
-            </Link>
-            <PostAiComparisonEditor
-              editor={comparison}
-              photos={currentPhotos}
-              disabled={isSubmitting || form.isProcessingPhotos}
-            />
+              </Link>
+            )}
+            {!isMemoryCardHandoff && (
+              <PostAiComparisonEditor
+                editor={comparison}
+                photos={currentPhotos}
+                disabled={isSubmitting || form.isProcessingPhotos}
+              />
+            )}
             <PetCategorySuggestion
               automaticAllowed={
                 !reviewConfig.isPending &&
