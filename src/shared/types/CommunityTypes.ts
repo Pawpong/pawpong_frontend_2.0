@@ -110,6 +110,8 @@ export interface CommunityPostListParams extends CommunityDiscoveryFilters {
 /** 게시글 작성 요청 */
 export interface CreateCommunityPostRequest {
   aiReviewConsent?: boolean
+  /** 같은 내용의 저장 재시도를 한 글로 묶는 UUID v4. 심사가 켜진 새 글 발행에만 보낸다 */
+  clientRequestId?: string
   experience?: CommunityExperience | null
   aiComparison?: CommunityAiComparison | null
   /** 발행(published) 시 필수, 임시저장(draft) 시 비어 있어도 됨 */

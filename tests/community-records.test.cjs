@@ -266,3 +266,79 @@ test('피드 카드의 기록·주제·태그 줄은 같은 조건의 필터를 
     '',
   )
 })
+
+test('같은 내용의 저장 재시도는 같은 식별자와 이미 올린 사진을 다시 쓴다', async () => {
+  const attempts = load(
+    'src/features/community/lib/communityCreateAttempt.ts',
+    {},
+    { crypto: require('node:crypto').webcrypto },
+  )
+  const file = { name: 'a.jpg', size: 10, lastModified: 1 }
+  const signature = attempts.communityCreateSignature(['본문', 'public'], [file])
+  const first = attempts.nextCommunityCreateAttempt(null, signature)
+  assert.match(
+    first.clientRequestId,
+    /^[a-f\d]{8}-[a-f\d]{4}-4[a-f\d]{3}-[89ab][a-f\d]{3}-[a-f\d]{12}$/,
+  )
+  assert.equal(attempts.nextCommunityCreateAttempt(first, signature), first)
+  const changed = attempts.nextCommunityCreateAttempt(
+    first,
+    attempts.communityCreateSignature(['본문 고침', 'public'], [file]),
+  )
+  assert.notEqual(changed.clientRequestId, first.clientRequestId)
+  assert.equal(changed.uploaded, undefined)
+
+  const calls = { uploads: 0, created: [], updated: [] }
+  let failCreate = true
+  const { submitCommunityPostForm } = load(
+    'src/features/community/lib/submitCommunityPostForm.ts',
+    {
+      '@/shared/api': { uploadMultipleFiles: async () => [] },
+      '../api/community.api': {
+        createCommunityPost: async (data) => {
+          calls.created.push(data)
+          if (failCreate) throw new Error('응답을 받지 못했어요.')
+          return { postId: 'post-1' }
+        },
+        updateCommunityPost: async (_id, data) => {
+          calls.updated.push(data)
+          return { postId: 'post-1' }
+        },
+      },
+      '../api/communityReviewPhotos.api': {
+        uploadCommunityReviewPhotos: async () => {
+          calls.uploads += 1
+          return [{ fileName: `owned-${calls.uploads}.jpg` }]
+        },
+      },
+      './communityWriteSession': { captureCommunityWriteSession: () => () => {} },
+      './communityPhotoFileName': {
+        COMMUNITY_UPLOAD_FOLDER: 'community',
+        toCommunityPhotoFileName: (value) => value,
+      },
+    },
+  )
+  const input = {
+    text: '본문',
+    files: [file],
+    visibility: 'public',
+    status: 'published',
+    aiReviewConsent: true,
+    useOwnedPhotoUpload: true,
+    createAttempt: first,
+  }
+  await assert.rejects(submitCommunityPostForm(input))
+  failCreate = false
+  await submitCommunityPostForm(input)
+  assert.equal(calls.uploads, 1)
+  assert.deepEqual(
+    calls.created.map((data) => [data.clientRequestId, data.photos]),
+    [
+      [first.clientRequestId, ['owned-1.jpg']],
+      [first.clientRequestId, ['owned-1.jpg']],
+    ],
+  )
+  await submitCommunityPostForm(input, 'post-1')
+  assert.equal(Object.hasOwn(calls.updated[0], 'clientRequestId'), false)
+  assert.equal(calls.uploads, 2)
+})

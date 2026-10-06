@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { communityQueries, communityReviewConfigOptions } from '@/entities/community'
@@ -25,9 +25,12 @@ import {
 } from '@/features/ai-image'
 import {
   PetCategorySuggestion,
+  communityCreateSignature,
   diffCommunityAutoApplied,
+  nextCommunityCreateAttempt,
   rememberCommunityAutoApplied,
   useSubmitCommunityPostForm,
+  type CommunityCreateAttempt,
 } from '@/features/community'
 import { useExitGuard } from '@/shared/lib/useExitGuard'
 import { RetryButton, Container, CtaModal, NavigationBar } from '@/shared/ui'
@@ -99,6 +102,8 @@ const PostForm = ({ postId, post }: PostFormProps) => {
     experienceEnabled && experience ? validateCommunityExperience(experience) : null
   const experienceValid = !experienceNotice
   const { submit, isSubmitting, error } = useSubmitCommunityPostForm(postId)
+  // 같은 내용으로 다시 올리면 같은 저장 식별자를 써서 글이 두 번 생기지 않게 한다.
+  const createAttempt = useRef<CommunityCreateAttempt | null>(null)
   const hasChanges =
     form.hasChanges ||
     comparison.hasChanges ||
@@ -144,7 +149,27 @@ const PostForm = ({ postId, post }: PostFormProps) => {
           : post?.experience
             ? null
             : undefined
+    const petTypeToSend = petType || (postId ? null : undefined)
+    if (!postId && reviewEnabled && status === 'published')
+      createAttempt.current = nextCommunityCreateAttempt(
+        createAttempt.current,
+        communityCreateSignature(
+          [
+            form.text.trim(),
+            visibility,
+            petTypeToSend,
+            aiReviewConsent,
+            submittedExperience,
+            comparison.submission.aiComparison,
+            comparison.submission.keptImageUrls,
+          ],
+          comparison.submission.files,
+        ),
+      )
     const saved = await submit({
+      ...(!postId && reviewEnabled && status === 'published' && createAttempt.current
+        ? { createAttempt: createAttempt.current }
+        : {}),
       ...(reviewEnabled ? { useOwnedPhotoUpload: true } : {}),
       ...(reviewEnabled && status === 'published' ? { aiReviewConsent } : {}),
       ...(submittedExperience !== undefined ? { experience: submittedExperience } : {}),
@@ -152,7 +177,7 @@ const PostForm = ({ postId, post }: PostFormProps) => {
       files: comparison.submission.files,
       visibility,
       status,
-      petType: petType || (postId ? null : undefined),
+      petType: petTypeToSend,
       aiComparison: comparison.submission.aiComparison,
       keptImageUrls: comparison.submission.keptImageUrls,
     })
