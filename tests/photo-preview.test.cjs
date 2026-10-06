@@ -14,8 +14,23 @@ function photoModule() {
   class Image {
     naturalWidth = 400
     naturalHeight = 200
-    async decode() {
-      const blob = blobs.get(this.src)
+    set src(value) {
+      this.value = value
+      if (value)
+        this.load(value).then(
+          () => this.onload?.(),
+          () => this.onerror?.(),
+        )
+    }
+    get src() {
+      return this.value
+    }
+    // Deliberately unresolved: photo preparation must complete from load/error.
+    decode() {
+      return new Promise(() => {})
+    }
+    async load(value) {
+      const blob = blobs.get(value)
       if (!blob || (await blob.text()) === 'corrupt') throw new Error('decode failure')
       const bytes = await blob.slice(0, 64).text()
       if (

@@ -3,7 +3,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { communityQueries, communityReviewConfigOptions } from '@/entities/community'
+import {
+  communityQueries,
+  communityReviewConfigOptions,
+  takePendingCommunityCard,
+} from '@/entities/community'
 import { useAuthSessionGeneration } from '@/shared/lib/useAuthSessionGeneration'
 import { getAuthSessionGeneration, isAuthSessionCurrent } from '@/shared/lib/authSessionLifecycle'
 import { CommunityReviewConsent } from './CommunityReviewConsent'
@@ -48,11 +52,13 @@ interface CommunityPostEditorProps {
   postId?: string
   /** 새 글에서 처음 열어 둘 기록 틀 (walk | clinic | daily) */
   initialRecord?: string
+  photoSource?: 'memory-card'
 }
 
 interface PostFormProps {
   postId?: string
   initialRecord?: string
+  photoSource?: 'memory-card'
   post?: CommunityPostDetail
 }
 
@@ -62,14 +68,21 @@ const FORM_TEXT = {
   edit: { title: '글 수정', mobileTitle: '게시글 수정', submitLabel: '수정 완료' },
 } as const
 
-const PostForm = ({ postId, post, initialRecord }: PostFormProps) => {
+const PostForm = ({ postId, post, initialRecord, photoSource }: PostFormProps) => {
   const router = useRouter()
   // 임시저장 이어쓰기는 '수정'이 아니라 작성의 연장 — 문구·임시저장 버튼을 작성 화면과 동일하게 둔다
   const isDraft = post?.status === 'draft'
   const isEdit = !!postId && !isDraft
   const formText = FORM_TEXT[isEdit ? 'edit' : 'create']
-  // AI 필터에서 '커뮤니티에 자랑하기'로 넘어온 사진은 새 글의 첫 사진으로 채운다 (한 번만 꺼낸다)
-  const [handoff] = useState(() => (post ? null : takePendingCommunityPost()))
+  // 명시적으로 넘긴 사진만 새 글에 한 번 붙인다. 기존 글·초안을 덮어쓰지 않는다.
+  const [handoff] = useState(() => {
+    if (post) return null
+    const aiPhoto = takePendingCommunityPost()
+    const card = takePendingCommunityCard(photoSource)
+    if (photoSource === 'memory-card')
+      return card ? { files: [card], aiComparison: null, jobId: undefined } : null
+    return aiPhoto
+  })
   const initialComparison = post?.aiComparison ?? handoff?.aiComparison
   const form = usePostForm({
     maxImages: 10,
@@ -341,7 +354,7 @@ const PostForm = ({ postId, post, initialRecord }: PostFormProps) => {
  * 수정 모드는 조회가 끝난 뒤에 폼을 마운트해 초기값을 시드한다(로드 후 setState 하는 effect 불필요).
  * 남의 글 ID 로 직접 들어오면 폼을 열지 않고 상세로 되돌린다(최종 차단은 백엔드).
  */
-const CommunityPostEditor = ({ postId, initialRecord }: CommunityPostEditorProps) => {
+const CommunityPostEditor = ({ postId, initialRecord, photoSource }: CommunityPostEditorProps) => {
   const router = useRouter()
   const generation = useAuthSessionGeneration()
   const postQuery = useQuery({
@@ -368,7 +381,8 @@ const CommunityPostEditor = ({ postId, initialRecord }: CommunityPostEditorProps
     if (postId && post && meFetched && !isOwner) router.replace(`/community/post/${postId}`)
   }, [postId, post, meFetched, isOwner, router])
 
-  if (!postId) return <PostForm key={generation} initialRecord={initialRecord} />
+  if (!postId)
+    return <PostForm key={generation} initialRecord={initialRecord} photoSource={photoSource} />
   if (postQuery.isPending || meQuery.isPending) {
     return (
       <div className="flex min-h-screen flex-col bg-white">

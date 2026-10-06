@@ -32,13 +32,39 @@ export async function isHeifPhoto(blob: Blob): Promise<boolean> {
   return false
 }
 
+/** A loaded image is canvas-ready. Some embedded/background browsers leave
+ * Image.decode() pending even after load, so do not gate uploads on that promise. */
+export function loadPhotoImage(url: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const image = new Image()
+    const finish = (error?: Error) => {
+      clearTimeout(timeout)
+      image.onload = null
+      image.onerror = null
+      if (error) {
+        image.src = ''
+        reject(error)
+      } else resolve(image)
+    }
+    const timeout = setTimeout(
+      () => finish(new Error('사진 준비가 오래 걸리고 있어요. 다시 선택해 주세요.')),
+      30_000,
+    )
+    image.onload = () =>
+      finish(
+        image.naturalWidth > 0 && image.naturalHeight > 0
+          ? undefined
+          : new Error('사진의 크기를 읽을 수 없습니다.'),
+      )
+    image.onerror = () => finish(new Error('사진을 불러오지 못했습니다.'))
+    image.src = url
+  })
+}
+
 async function decodePhoto(blob: Blob): Promise<HTMLImageElement> {
   const url = URL.createObjectURL(blob)
   try {
-    const image = new Image()
-    image.src = url
-    await image.decode()
-    return image
+    return await loadPhotoImage(url)
   } finally {
     URL.revokeObjectURL(url)
   }
