@@ -104,6 +104,8 @@ const CommunityContent = () => {
   )
   const firstPhotoPostId = getFirstPhotoPostId(posts)
   const writePost = guard(() => router.push('/community/write'))
+  // 하단 탭으로 오가는 최상위 화면이라 링크로 바로 열면 돌아갈 기록이 없다 — 그때는 홈으로 보낸다
+  const goBack = () => (window.history.length > 1 ? router.back() : router.push('/'))
   const selectedLabel = PET_OPTIONS.find((option) => option.value === petType)?.label
 
   return (
@@ -111,13 +113,18 @@ const CommunityContent = () => {
       <NavigationBar
         title="커뮤니티"
         titleVariant="page"
+        onBack={goBack}
         right={
-          // PC 는 사이드바 글쓰기 버튼이 맡는다
-          <div className="flex pc:hidden">
-            <IconButton tone="brand" aria-label="커뮤니티 글쓰기" onClick={writePost}>
-              <PlusIcon aria-hidden className="size-7.5" />
-            </IconButton>
-          </div>
+          <>
+            {/* PC 는 사이드바 글쓰기 버튼이 맡는다 */}
+            <div className="flex pc:hidden">
+              <IconButton tone="brand" aria-label="커뮤니티 글쓰기" onClick={writePost}>
+                <PlusIcon aria-hidden className="size-7.5" />
+              </IconButton>
+            </div>
+            {/* PC 에서 + 버튼이 빠진 자리를 뒤로가기 폭만큼 채워 제목을 가운데에 둔다 */}
+            <div aria-hidden className="hidden size-6 pc:block" />
+          </>
         }
       />
 
