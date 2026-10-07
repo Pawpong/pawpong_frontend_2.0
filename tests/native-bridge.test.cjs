@@ -142,3 +142,17 @@ test('aborted payment requests release listeners and cannot accept late receipts
   )
   assert.equal(app.messages.length, 1)
 })
+
+test('app badge goes only to apps that advertise it and its reply frees the listener', async () => {
+  const old = setup({ nativeShare: true })
+  old.setNativeAppBadge(3)
+  assert.equal(old.messages.length, 0)
+  const app = setup({ appBadge: true })
+  app.setNativeAppBadge(3)
+  assert.deepEqual(
+    { ...app.messages[0], requestId: undefined },
+    { type: 'SET_APP_BADGE', count: 3, requestId: undefined },
+  )
+  app.respond({ type: 'APP_BADGE_RESULT', requestId: app.messages[0].requestId, status: 'set' })
+  assert.equal(app.timers.size, 0)
+})
