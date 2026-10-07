@@ -6,7 +6,9 @@ import {
   getRelatedCommunityPosts,
   getCommunityComments,
   getMyBookmarkedPosts,
+  getMyCommentedPosts,
   getMyDraftPosts,
+  getMyLikedPosts,
   getCurrentCommunityHallOfFame,
   getCommunityHallOfFameHistory,
 } from './community.api'
@@ -125,6 +127,25 @@ export const communityQueries = {
     createInfiniteQuery({
       queryKey: [...communityQueries.myBookmarksAll(), pageSize],
       queryFn: (page) => getMyBookmarkedPosts({ page, pageSize }),
+      staleTime: STALE_TIME.DEFAULT,
+    }),
+
+  // 마이홈 '내가 쓴 글' 탭의 '좋아요한 글' · '댓글 단 글' 칩. 사진 그리드 3·4열에 맞춰 24개씩
+  myLikedAll: () => [...communityQueries.all(), 'myLiked'] as const,
+
+  myLiked: (pageSize = 24) =>
+    createInfiniteQuery({
+      queryKey: [...communityQueries.myLikedAll(), pageSize],
+      queryFn: (page) => getMyLikedPosts({ page, pageSize }),
+      staleTime: STALE_TIME.DEFAULT,
+    }),
+
+  myCommentedAll: () => [...communityQueries.all(), 'myCommented'] as const,
+
+  myCommented: (pageSize = 24) =>
+    createInfiniteQuery({
+      queryKey: [...communityQueries.myCommentedAll(), pageSize],
+      queryFn: (page) => getMyCommentedPosts({ page, pageSize }),
       staleTime: STALE_TIME.DEFAULT,
     }),
 

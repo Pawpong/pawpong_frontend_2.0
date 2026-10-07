@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { Container, InfiniteScrollTrigger, ListState } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { BREAKPOINTS } from '@/shared/lib/useBreakpoint'
@@ -26,6 +26,8 @@ interface HomePostGridProps {
   className?: string
   /** 열 수·폭 상한 조정 — 컬럼이 좁아지면 고정폭 4열이 넘쳐 밖으로 삐져나간다 */
   gridClassName?: string
+  /** 그리드 위 보조 영역 (마이홈 보기 전환 칩) — 모바일 고정폭 그리드와 같은 폭에 맞춘다 */
+  header?: ReactNode
 }
 
 /** 모든 홈 화면에서 같은 카드 크기·상세 동작을 보장하는 게시글 그리드. */
@@ -41,6 +43,7 @@ const HomePostGrid = ({
   pagination,
   className,
   gridClassName,
+  header,
 }: HomePostGridProps) => {
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null)
   const firstPhotoPostId = getFirstPhotoPostId(posts)
@@ -50,6 +53,9 @@ const HomePostGrid = ({
       <Container
         className={cn('px-0 py-5 tab:pt-6 tab:pb-10 pc:page-gutter-x pc:py-10', className)}
       >
+        {header && (
+          <div className="mx-auto mb-4 w-full max-w-[23.4375rem] tab:max-w-none">{header}</div>
+        )}
         <ListState
           isPending={isPending}
           isError={isError}
