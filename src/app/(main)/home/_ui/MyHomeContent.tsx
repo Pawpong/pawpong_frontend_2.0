@@ -9,7 +9,6 @@ import { cn } from '@/shared/lib/cn'
 import { transientQueryRecoveryOptions } from '@/shared/api'
 import { profileQueries } from '@/entities/profile'
 import { AiPhotoArchive } from '@/features/ai-image'
-import { communityQueries } from '@/entities/community'
 // [refactored] 분양 페이지와 동일한 목록 블록 — 위젯으로 공유
 import { MyPetPostingList } from '@/widgets/my-pet-postings'
 import { toMyProfileCardProps } from '../_lib/toMyProfileCardProps'
@@ -18,7 +17,7 @@ import { MyHomeActionMenu } from './MyHomeActionMenu'
 import { BreederIntroduction } from './BreederIntroduction'
 import { HomeTabs, TabsContent } from './HomeTabs'
 import { FavoriteBreedersContent } from './FavoriteBreedersContent'
-import { HomePostGrid } from './HomePostGrid'
+import { MyPostsTab } from './MyPostsTab'
 import {
   MY_HOME_TABS,
   BREEDER_MY_HOME_TABS,
@@ -41,14 +40,6 @@ const MyHomeContent = () => {
   const myProfile = profileQuery.data
   const isBreeder = myProfile?.role === 'breeder'
 
-  // 마이홈 '게시글' 탭 — 내가 작성한 커뮤니티 글을 백엔드에서 조회 (profile 로드 후 활성화)
-  const postsQuery = useQuery({
-    ...communityQueries.myPosts(!!myProfile),
-    refetchOnMount: 'always',
-    throwOnError: false,
-  })
-  const myPostsData = postsQuery.data
-
   // [refactored] navbar 는 2단(tab+)에서 숨고 sticky 도 아니라 높이를 잴 이유가 없어졌다.
   // sticky 기준은 GNB 하나뿐이고, 그건 HomeTabs 가 스스로 읽는다.
   const tabs = isBreeder ? BREEDER_MY_HOME_TABS : MY_HOME_TABS
@@ -59,7 +50,6 @@ const MyHomeContent = () => {
   const requestedTab = useSearchParams().get('tab')
   const [selectedTab, setSelectedTab] = useState<string | null>(requestedTab)
   const activeTab = tabs.find((tab) => tab.id === selectedTab)?.id ?? defaultTab
-  const posts = myPostsData?.items ?? []
   const profileCardProps = myProfile ? toMyProfileCardProps(myProfile) : null
 
   if (!profileCardProps) {
@@ -153,17 +143,8 @@ const MyHomeContent = () => {
 
         {/* Figma 4145:721426 — 모바일·태블릿 3열, PC 4열의 정사각 미디어 그리드 */}
         <TabsContent value="posts" className="mt-0">
-          <HomePostGrid
-            posts={posts}
-            isPending={postsQuery.isPending}
-            isError={postsQuery.isError}
-            onRetry={() => void postsQuery.refetch()}
-            isRetrying={postsQuery.isFetching}
-            loadingText="내가 쓴 글을 불러오는 중입니다."
-            errorText="내가 쓴 글을 불러오지 못했습니다."
-            emptyText="내가 쓴 글이 없습니다."
-            gridClassName={PHOTO_GRID}
-          />
+          {/* 작성한 글 / 댓글 단 글 / 좋아요한 글 칩 전환 — 내 글 조회는 profile 로드 후 활성화 */}
+          <MyPostsTab enabled={!!myProfile} gridClassName={PHOTO_GRID} />
         </TabsContent>
 
         <TabsContent value="ai-photos" className="mt-0">

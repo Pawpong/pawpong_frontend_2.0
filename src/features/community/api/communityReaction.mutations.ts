@@ -103,6 +103,8 @@ export const useToggleCommunityPostLike = (postId: string, isLiked: boolean) => 
       isLiked: nextLiked,
       likeCount: Math.max(0, post.likeCount + (nextLiked ? 1 : -1)),
     }),
+    // '좋아요한 글' 목록은 좋아요한 글만 담으므로 해제·추가가 바로 반영되게 재조회한다
+    refetchKey: communityQueries.myLikedAll(),
   })
 
   return { isPending, toggleLike: toggle }
