@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { MenuIcon } from '@/shared/assets'
 import { RESPONSIVE_SHELL_CLASS } from '@/shared/config'
 import { cn } from '@/shared/lib/cn'
+import { AppBadgeSync } from './AppBadgeSync'
 import { AuthActions } from './AuthActions'
 import { LogoButton } from './LogoButton'
 import { NavBar } from './NavBar'
@@ -64,6 +65,7 @@ const Gnb = () => {
       </header>
 
       <MobileMenu open={menuOpen} onOpenChange={setMenuOpen} />
+      <AppBadgeSync />
     </>
   )
 }
