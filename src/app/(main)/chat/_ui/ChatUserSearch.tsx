@@ -6,13 +6,14 @@ import { useCreateOrGetChatRoom } from '@/features/send-message'
 import { normalizeApiError } from '@/shared/api'
 import type { ChatRoomResponseDto } from '@/shared/types'
 import {
-  Button,
   Dialog,
   DialogContent,
   DialogTitle,
   DialogDescription,
+  IconButton,
   ProfileAvatar,
 } from '@/shared/ui'
+import { PlusIcon } from '@/shared/assets'
 import { searchChatUsers } from '@/features/chat-directory'
 
 /** 역할과 관계없이 닉네임으로 상대를 선택하고 기존 방 또는 새 대화를 연다. */
@@ -45,9 +46,10 @@ export function ChatUserSearch({
   }
   return (
     <>
-      <Button size="sm" intent="secondary" onClick={() => changeOpen(true)}>
-        새 채팅
-      </Button>
+      {/* 커뮤니티 글쓰기와 같은 상단바 + 버튼 */}
+      <IconButton tone="brand" aria-label="새 채팅" onClick={() => changeOpen(true)}>
+        <PlusIcon aria-hidden className="size-7.5" />
+      </IconButton>
       <Dialog open={open} onOpenChange={changeOpen}>
         <DialogContent
           className="max-h-[85dvh] overflow-y-auto"
