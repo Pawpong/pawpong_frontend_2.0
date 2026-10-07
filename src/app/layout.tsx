@@ -26,7 +26,8 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
       className={`${pretendard.variable} ${cafe24Proup.variable}`}
       suppressHydrationWarning
     >
-      <head>
+      {/* 브라우저 확장(LocatorJS 등)이 hydrate 전에 head 속성을 붙여 생기는 경고만 막는다 — 이 태그 속성에만 적용 */}
+      <head suppressHydrationWarning>
         <script dangerouslySetInnerHTML={{ __html: APP_DETECT_SCRIPT }} />
       </head>
       <body className="min-w-0 bg-base-white text-neutral-850">
