@@ -3,6 +3,7 @@ type NativeCapability =
   | 'nativeShare'
   | 'notificationPermission'
   | 'notificationSettings'
+  | 'appBadge'
   | 'inAppPurchase'
 type NativeWindow = Window & {
   ReactNativeWebView?: { postMessage: (message: string) => void }
@@ -113,6 +114,11 @@ export async function getNativeNotificationPermission(): Promise<boolean> {
   )
   if (typeof response.granted !== 'boolean') throw new Error('알림 권한을 확인하지 못했습니다.')
   return response.granted
+}
+
+/** 지원하는 앱에서만 앱 아이콘 숫자를 맞춘다. 실패해도 화면에는 영향이 없어 결과를 기다리지 않는다. */
+export function setNativeAppBadge(count: number): void {
+  requestNative('appBadge', 'SET_APP_BADGE', 'APP_BADGE_RESULT', { count }, 5_000).catch(() => {})
 }
 
 /** 지원하는 앱에서만 포퐁의 OS 설정 화면을 연다. */
