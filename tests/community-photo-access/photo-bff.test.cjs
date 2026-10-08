@@ -66,7 +66,7 @@ test('운영 호스트와 외부 출처 및 임의 경로는 서버 호출 전�
 })
 
 test('서버 오류와 리디렉션은 내부 본문과 헤더 없이 반환한다', async () => {
-  for (const status of [401, 403, 404, 429, 302, 500]) {
+  for (const status of [401, 403, 404, 429, 503, 302, 500]) {
     const app = fixture(
       () =>
         new Response('synthetic-private-detail', {
@@ -75,7 +75,7 @@ test('서버 오류와 리디렉션은 내부 본문과 헤더 없이 반환한�
         }),
     )
     const response = await app.request()
-    assert.equal(response.status, [401, 403, 404, 429].includes(status) ? status : 502)
+    assert.equal(response.status, [401, 403, 404, 429, 503].includes(status) ? status : 502)
     assert.equal(await response.text(), '')
     assert.match(response.headers.get('cache-control'), /no-store/)
     assert.equal(response.headers.get('location'), null)

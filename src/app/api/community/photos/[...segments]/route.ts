@@ -39,7 +39,7 @@ export async function GET(
     })
     if (response.status !== 200) {
       await response.body?.cancel()
-      return fail([401, 403, 404, 429].includes(response.status) ? response.status : 502)
+      return fail([401, 403, 404, 429, 503].includes(response.status) ? response.status : 502)
     }
     const { bytes, contentType } = await readCommunityPhotoBody(response, signal)
     signal.throwIfAborted()
