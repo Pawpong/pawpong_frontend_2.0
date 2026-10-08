@@ -5,14 +5,15 @@ import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import {
   communityQueries,
-  communityReviewConfigOptions,
+  communityEditorExitHref,
+  communitySavedPostHref,
   takePendingCommunityCard,
 } from '@/entities/community'
 import { useAuthSessionGeneration } from '@/shared/lib/useAuthSessionGeneration'
 import { getAuthSessionGeneration, isAuthSessionCurrent } from '@/shared/lib/authSessionLifecycle'
 import { CommunityReviewConsent } from './CommunityReviewConsent'
+import { CommunityEditorExitDialog } from './CommunityEditorExitDialog'
 import {
-  communityExperienceConfigOptions,
   communityWritingPrompt,
   initialCommunityExperience,
   isCommunityExperienceEmpty,
@@ -39,9 +40,10 @@ import {
   prepareCommunityPhoto,
   getCommunityPhotoLocation,
   reindexCommunityRoutePhotos,
+  useCommunityEditorConfig,
+  useCommunityEditorNavigation,
 } from '@/features/community'
-import { useExitGuard } from '@/shared/lib/useExitGuard'
-import { RetryButton, Container, CtaModal, NavigationBar } from '@/shared/ui'
+import { RetryButton, Container, NavigationBar } from '@/shared/ui'
 import {
   usePostForm,
   PostFormLayout,
@@ -56,12 +58,14 @@ interface CommunityPostEditorProps {
   /** 새 글에서 처음 열어 둘 기록 틀 (walk | clinic | daily) */
   initialRecord?: string
   photoSource?: 'memory-card'
+  returnTo?: string
 }
 
 interface PostFormProps {
   postId?: string
   initialRecord?: string
   photoSource?: 'memory-card'
+  returnTo?: string
   post?: CommunityPostDetail
 }
 
@@ -71,8 +75,7 @@ const FORM_TEXT = {
   edit: { title: '글 수정', mobileTitle: '게시글 수정', submitLabel: '수정 완료' },
 } as const
 
-const PostForm = ({ postId, post, initialRecord, photoSource }: PostFormProps) => {
-  const router = useRouter()
+const PostForm = ({ postId, post, initialRecord, photoSource, returnTo }: PostFormProps) => {
   // 임시저장 이어쓰기는 '수정'이 아니라 작성의 연장 — 문구·임시저장 버튼을 작성 화면과 동일하게 둔다
   const isDraft = post?.status === 'draft'
   const isEdit = !!postId && !isDraft
@@ -125,8 +128,8 @@ const PostForm = ({ postId, post, initialRecord, photoSource }: PostFormProps) =
   const [visibility, setVisibility] = useState<VisibilityType>(initialVisibility)
   const initialPetType = post?.petType ?? ''
   const [petType, setPetType] = useState<CommunityPetType | ''>(initialPetType)
-  const experienceConfig = useQuery(communityExperienceConfigOptions)
-  const reviewConfig = useQuery(communityReviewConfigOptions)
+  const config = useCommunityEditorConfig()
+  const { experience: experienceConfig, review: reviewConfig } = config
   const reviewEnabled = reviewConfig.data?.enabled === true && !reviewConfig.isError
   const [aiReviewConsent, setAiReviewConsent] = useState(false)
   // 수정·임시저장 이어쓰기는 저장된 값을 쓰고, 새 글만 링크가 고른 기록 틀로 시작한다.
@@ -147,13 +150,16 @@ const PostForm = ({ postId, post, initialRecord, photoSource }: PostFormProps) =
     JSON.stringify(experience) !== JSON.stringify(startExperience) ||
     visibility !== initialVisibility ||
     petType !== initialPetType
-  const { showGuard, requestExit, confirmExit, cancelExit } = useExitGuard({
-    hasChanges,
-  })
+  const navigation = useCommunityEditorNavigation(
+    hasChanges || isSubmitting,
+    communityEditorExitHref({ postId, status: post?.status, returnTo }),
+  )
 
   // 발행(published)은 본문이 필수, 임시저장(draft)은 본문 없이 사진만으로도 가능 (백엔드 계약)
   const hasBody = form.text.trim().length > 0
   const canPublish =
+    config.ready &&
+    !navigation.isLeaving &&
     experienceValid &&
     hasBody &&
     !isSubmitting &&
@@ -161,6 +167,8 @@ const PostForm = ({ postId, post, initialRecord, photoSource }: PostFormProps) =
     !comparison.busy &&
     !comparison.submission.error
   const canSaveDraft =
+    config.ready &&
+    !navigation.isLeaving &&
     experienceValid &&
     (hasBody || form.images.length > 0) &&
     !isSubmitting &&
@@ -168,7 +176,6 @@ const PostForm = ({ postId, post, initialRecord, photoSource }: PostFormProps) =
     !comparison.busy &&
     !comparison.submission.error
 
-  // 발행/임시저장 모두 저장 후 마이홈으로 이동 (status 만 다름)
   const save = async (status: CommunityPostStatus) => {
     if (
       form.hasPendingPhotos() ||
@@ -230,18 +237,12 @@ const PostForm = ({ postId, post, initialRecord, photoSource }: PostFormProps) =
           saved.postId,
           diffCommunityAutoApplied(submittedExperience ?? post?.experience, saved.experience),
         )
-      cancelExit()
-      router.push(saved.aiReview ? `/community/post/${saved.postId}` : '/home')
+      navigation.saved(communitySavedPostHref(status, saved.postId))
     }
   }
 
   const handleSubmit = () => save('published')
   const handleSaveDraft = () => save('draft')
-  const exitHref = postId ? `/community/post/${postId}` : '/home'
-  const handleClose = () => {
-    if (requestExit()) router.push(exitHref)
-  }
-  const handleExitConfirm = () => confirmExit(() => router.push(exitHref))
 
   return (
     <>
@@ -256,7 +257,7 @@ const PostForm = ({ postId, post, initialRecord, photoSource }: PostFormProps) =
           '오늘 우리 아이는 어떤 하루를 보냈나요?'
         }
         error={error}
-        onBack={handleClose}
+        onBack={navigation.close}
         cta={{
           submitLabel: reviewEnabled
             ? aiReviewConsent
@@ -272,6 +273,21 @@ const PostForm = ({ postId, post, initialRecord, photoSource }: PostFormProps) =
         }}
         belowContent={
           <div className="flex flex-col gap-4">
+            {!config.ready && (
+              <div
+                role={config.failed ? 'alert' : 'status'}
+                className="flex flex-col items-start gap-3 rounded-xl bg-neutral-50 p-4 text-sm text-neutral-700"
+              >
+                <p>
+                  {config.failed
+                    ? '작성 설정을 불러오지 못했어요. 입력한 내용은 그대로예요.'
+                    : '안전하게 저장할 수 있도록 작성 설정을 확인하고 있어요.'}
+                </p>
+                {config.failed && (
+                  <RetryButton onRetry={config.retry} isRetrying={config.retrying} />
+                )}
+              </div>
+            )}
             {reviewEnabled && reviewConfig.data && (
               <CommunityReviewConsent
                 config={reviewConfig.data}
@@ -313,7 +329,7 @@ const PostForm = ({ postId, post, initialRecord, photoSource }: PostFormProps) =
                     {handoff ? 'AI 필터로 만든 사진을 담았어요' : 'AI 필터로 사진 꾸미기'}
                   </span>
                   <span className="mt-0.5 block text-xs text-neutral-700">
-                    도트 그림·스티커·수채화로 바꿔 올리면 좋아요를 더 받을지도 몰라요
+                    도트 그림·스티커·수채화로 꾸며보세요. 작성 중인 글은 임시저장할 수 있어요.
                   </span>
                 </span>
                 <span aria-hidden className="text-lg text-primary-700">
@@ -359,32 +375,16 @@ const PostForm = ({ postId, post, initialRecord, photoSource }: PostFormProps) =
         }
       />
 
-      <CtaModal
-        open={showGuard}
-        onOpenChange={(open) => !open && cancelExit()}
-        title={isEdit ? '게시글 수정을 그만하시겠어요?' : '게시글 작성을 그만하시겠어요?'}
-        description={
-          isEdit ? '수정한 내용은 저장되지 않아요.' : '임시저장하면 나중에 이어서 작성할 수 있어요.'
-        }
-        actions={[
-          ...(!isEdit
-            ? [
-                {
-                  label: '임시저장',
-                  intent: 'primary' as const,
-                  onClick: handleSaveDraft,
-                  disabled: !canSaveDraft || isSubmitting,
-                },
-              ]
-            : []),
-          {
-            label: isEdit ? '수정 그만하기' : '게시글 작성 그만하기',
-            intent: 'secondary',
-            onClick: handleExitConfirm,
-            disabled: isSubmitting,
-          },
-          { label: '닫기', intent: 'ghost', onClick: cancelExit, disabled: isSubmitting },
-        ]}
+      <CommunityEditorExitDialog
+        open={navigation.showGuard}
+        isEdit={isEdit}
+        isSubmitting={isSubmitting}
+        configReady={config.ready}
+        canSaveDraft={canSaveDraft}
+        error={error}
+        onCancel={navigation.cancel}
+        onDiscard={navigation.discard}
+        onSaveDraft={handleSaveDraft}
       />
     </>
   )
@@ -395,7 +395,12 @@ const PostForm = ({ postId, post, initialRecord, photoSource }: PostFormProps) =
  * 수정 모드는 조회가 끝난 뒤에 폼을 마운트해 초기값을 시드한다(로드 후 setState 하는 effect 불필요).
  * 남의 글 ID 로 직접 들어오면 폼을 열지 않고 상세로 되돌린다(최종 차단은 백엔드).
  */
-const CommunityPostEditor = ({ postId, initialRecord, photoSource }: CommunityPostEditorProps) => {
+const CommunityPostEditor = ({
+  postId,
+  initialRecord,
+  photoSource,
+  returnTo,
+}: CommunityPostEditorProps) => {
   const router = useRouter()
   const generation = useAuthSessionGeneration()
   const postQuery = useQuery({
@@ -423,7 +428,14 @@ const CommunityPostEditor = ({ postId, initialRecord, photoSource }: CommunityPo
   }, [postId, post, meFetched, isOwner, router])
 
   if (!postId)
-    return <PostForm key={generation} initialRecord={initialRecord} photoSource={photoSource} />
+    return (
+      <PostForm
+        key={generation}
+        initialRecord={initialRecord}
+        photoSource={photoSource}
+        returnTo={returnTo}
+      />
+    )
   if (postQuery.isPending || meQuery.isPending) {
     return (
       <div className="flex min-h-screen flex-col bg-white">

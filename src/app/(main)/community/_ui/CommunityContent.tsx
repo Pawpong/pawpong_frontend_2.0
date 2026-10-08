@@ -110,7 +110,14 @@ const CommunityContent = () => {
   )
   const firstPhotoPostId = getFirstPhotoPostId(posts)
   const writeEntry = communityWriteEntry(experienceEnabled ? discovery : {})
-  const writePost = guard(() => router.push(writeEntry.href))
+  const writePost = guard(() => {
+    const entry = new URL(writeEntry.href, window.location.origin)
+    entry.searchParams.set(
+      'returnTo',
+      communityFeedHref({ discovery, petType, sort, search: appliedSearch }),
+    )
+    router.push(`${entry.pathname}${entry.search}`)
+  })
   // 하단 탭으로 오가는 최상위 화면이라 링크로 바로 열면 돌아갈 기록이 없다 — 그때는 홈으로 보낸다
   const goBack = () => (window.history.length > 1 ? router.back() : router.push('/'))
   const selectedLabel = PET_OPTIONS.find((option) => option.value === petType)?.label
