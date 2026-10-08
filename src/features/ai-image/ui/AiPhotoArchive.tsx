@@ -113,7 +113,7 @@ function AiArchiveContent({
         action={
           <Link
             href="/ai-filter"
-            className="text-sm font-semibold text-primary-700 underline underline-offset-4"
+            className="inline-flex min-h-11 items-center text-sm font-semibold text-primary-700 underline underline-offset-4 focus-ring"
           >
             AI 필터 써 보기
           </Link>
@@ -181,7 +181,7 @@ function AiArchiveContent({
       {limit && items.length > limit && moreHref && (
         <Link
           href={moreHref}
-          className="mt-3 inline-block text-sm font-semibold text-primary-700 underline underline-offset-4"
+          className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-primary-700 underline underline-offset-4 focus-ring"
         >
           보관함 전체 보기 ({items.length})
         </Link>

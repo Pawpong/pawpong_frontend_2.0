@@ -208,7 +208,7 @@ export function AiFilterStudio({
               {PLAYGROUND_BILLING_ENABLED && (
                 <Link
                   href="/playground"
-                  className="text-sm font-semibold text-primary-700 underline"
+                  className="inline-flex min-h-11 items-center text-sm font-semibold text-primary-700 underline focus-ring"
                 >
                   놀이터 이용권 확인하기
                 </Link>
@@ -548,8 +548,11 @@ export function AiFilterStudio({
             <h2 id="ai-archive-heading" className="scroll-mt-24 text-lg font-bold text-neutral-850">
               내 AI 사진
             </h2>
-            <Link href="/home?tab=ai-photos" className="text-sm font-semibold text-primary-700">
-              보관함 →
+            <Link
+              href="/home?tab=ai-photos"
+              className="inline-flex min-h-11 items-center text-sm font-semibold text-primary-700 focus-ring"
+            >
+              보관함 <span aria-hidden>→</span>
             </Link>
           </div>
           <AiPhotoArchive enabled={isLoggedIn} limit={8} moreHref="/home?tab=ai-photos" />

@@ -34,3 +34,14 @@ test('원본 비교 편집은 오류 색 토큰과 공통 재시도 블록과 44
   )
   assert.match(editor, /min-h-11 cursor-pointer[^"]*focus-within:outline-primary-500/)
 })
+
+test('AI 사진 화면의 글자 링크는 포커스 표시와 44px 높이를 갖고 화살표 기호를 읽지 않음', () => {
+  const archive = source('src/features/ai-image/ui/AiPhotoArchive.tsx')
+  assert.equal((archive.match(/inline-flex min-h-11 items-center[^"]*focus-ring/g) ?? []).length, 2)
+  const studio = source('src/features/ai-image/ui/AiFilterStudio.tsx')
+  assert.match(studio, /보관함 <span aria-hidden>→<\/span>/)
+  assert.match(
+    studio,
+    /min-h-11 items-center text-sm font-semibold text-primary-700 underline focus-ring/,
+  )
+})
