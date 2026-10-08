@@ -11,11 +11,18 @@ interface CommentItemProps {
   currentUserId?: string
   /** 답글 달기 클릭 시 대상 댓글 전달 */
   onReply?: (comment: CommunityComment) => void
+  replyDisabled?: boolean
   /** 답글(대댓글)이면 들여쓰기 */
   isReply?: boolean
 }
 
-const CommentItem = ({ comment, currentUserId, onReply, isReply }: CommentItemProps) => {
+const CommentItem = ({
+  comment,
+  currentUserId,
+  onReply,
+  isReply,
+  replyDisabled,
+}: CommentItemProps) => {
   const isOwner = !!currentUserId && currentUserId === comment.authorId
 
   const updateComment = useUpdateCommunityComment(comment.commentId, comment.postId)
@@ -85,7 +92,12 @@ const CommentItem = ({ comment, currentUserId, onReply, isReply }: CommentItemPr
               </p>
             )}
             {!isEditing && onReply && (
-              <Button intent="ghost" size="inline" onClick={() => onReply(comment)}>
+              <Button
+                intent="ghost"
+                size="inline"
+                disabled={replyDisabled}
+                onClick={() => onReply(comment)}
+              >
                 답글 달기
               </Button>
             )}
