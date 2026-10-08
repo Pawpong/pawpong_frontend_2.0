@@ -56,7 +56,7 @@ export function AppliedFilters({
   ]
   if (!items.length) return null
   return (
-    <div className="mt-3 flex flex-wrap items-center gap-1.5" aria-label="선택한 조건">
+    <div className="mt-3 flex flex-wrap items-center gap-1.5" role="group" aria-label="선택한 조건">
       {items.map((item) => (
         <button
           key={item.key}

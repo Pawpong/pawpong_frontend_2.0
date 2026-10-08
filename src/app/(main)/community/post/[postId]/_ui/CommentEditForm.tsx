@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { Button } from '@/shared/ui'
+import { Button, Textarea } from '@/shared/ui'
 import type { CommentActionsController } from './useCommentActions'
 
 export function CommentEditForm({
@@ -26,7 +26,7 @@ export function CommentEditForm({
         void actions.submit()
       }}
     >
-      <textarea
+      <Textarea
         ref={field}
         aria-label="댓글 수정 내용"
         value={action.draft}
@@ -34,7 +34,7 @@ export function CommentEditForm({
         disabled={actions.isBusy}
         maxLength={1000}
         rows={3}
-        className="w-full resize-none rounded-lg border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-text-primary disabled:bg-neutral-50"
+        state={action.draft ? 'fill' : 'default'}
       />
       {currentBody !== undefined && currentBody !== action.comment.body && (
         <p className="text-xs leading-relaxed break-words text-neutral-600">

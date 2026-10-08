@@ -8,6 +8,7 @@ import {
   type CommunityExperienceConfig,
 } from '@/entities/community'
 import type { CommunityDiscoveryFilters } from '@/shared/types'
+import { Button } from '@/shared/ui/Button'
 import { Dialog, DialogContent, DialogTrigger } from '@/shared/ui/Dialog'
 import { CommunityDiscoveryPanel } from './discovery/CommunityDiscoveryPanel'
 import { AppliedFilters } from './discovery/AppliedFilters'
@@ -31,6 +32,7 @@ export function CommunityDiscovery({
       <div className="flex items-start gap-2">
         <div
           className="flex min-w-0 flex-1 gap-2 overflow-x-auto pb-1 tab:flex-wrap"
+          role="group"
           aria-label="빠른 탐색"
         >
           {RECORD_KINDS.map((kind) => (
@@ -66,17 +68,14 @@ export function CommunityDiscovery({
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <button
-              type="button"
-              className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-xl border border-neutral-300 bg-white px-3 text-sm font-semibold text-neutral-850 focus-ring hover:bg-neutral-50"
-            >
+            <Button intent="secondary" size="md">
               상세 필터
               {count > 0 && (
                 <span className="flex size-5 items-center justify-center rounded-full bg-primary-700 text-[0.6875rem] text-white">
                   {count}
                 </span>
               )}
-            </button>
+            </Button>
           </DialogTrigger>
           <DialogContent className="top-auto bottom-0 flex max-h-[90dvh] w-full max-w-none translate-y-0 flex-col gap-0 overflow-hidden rounded-t-3xl rounded-b-none p-0 tab:top-1/2 tab:bottom-auto tab:max-h-[85dvh] tab:w-[calc(100%-3rem)] tab:max-w-[42rem] tab:-translate-y-1/2 tab:rounded-2xl tab:p-0">
             {open && (
