@@ -2,13 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import {
+  PET_ACTION_ICONS,
   PET_ACTION_LABELS,
   petActionHint,
   petDaysTogether,
   petLevelProgress,
   petWaitShort,
   remainingSeconds,
-  formatPetWait,
   formatPetCountdown,
   petMood,
   petLevelUp,
@@ -43,6 +43,8 @@ import { usePetDeviceViewport } from '../lib/usePetDeviceViewport'
 import { PetMiniGames } from './PetMiniGames'
 import { PetGlyph } from './PetGlyph'
 import { PetAdoption } from './PetAdoption'
+import { PetRecords } from './PetRecords'
+import { PetRoomSummary } from './PetRoomSummary'
 import { usePetNavigation } from '../lib/usePetNavigation'
 import styles from './PetRoom.module.css'
 
@@ -51,20 +53,6 @@ const STATS = [
   { id: 'mood', label: '기분', icon: 'heart' },
   { id: 'energy', label: '에너지', icon: 'rest' },
 ] as const
-const ACTION_ICONS = { greet: 'paw', feed: 'bone', play: 'play', rest: 'rest' } as const
-const RECORD_LABELS = {
-  adopted: '처음 만난 날',
-  first_meal: '첫 식사를 함께했어요',
-  level_up: '우리 아이가 자랐어요',
-  unlock: '새로운 추억이 열렸어요',
-  seven_days: '일곱 날을 함께했어요',
-}
-const formatDate = (iso: string) =>
-  new Intl.DateTimeFormat('ko-KR', {
-    timeZone: 'Asia/Seoul',
-    month: 'long',
-    day: 'numeric',
-  }).format(new Date(iso))
 
 export function PetRoom({
   view,
@@ -488,7 +476,7 @@ export function PetRoom({
                 aria-label={`${PET_ACTION_LABELS[action]}, ${hint}`}
                 onClick={() => onAction(action)}
               >
-                <PetGlyph kind={ACTION_ICONS[action]} />
+                <PetGlyph kind={PET_ACTION_ICONS[action]} />
                 <span>{PET_ACTION_LABELS[action]}</span>
                 {availability && petWaitShort(availability, now) && (
                   <small>{petWaitShort(availability, now)}</small>
@@ -561,79 +549,13 @@ export function PetRoom({
           aria-labelledby="pet-tab-room"
           hidden={tab !== 'room'}
         >
-          <section className={styles.panel}>
-            <div className={styles.panelHeading}>
-              <div>
-                <p className={styles.eyebrow}>오늘도 함께하는 작은 일상</p>
-                <h2>우리 아이의 방</h2>
-              </div>
-              <PetGlyph kind="paw" />
-            </div>
-            <p className={styles.hint}>
-              {daysTogether !== null && `${pet.name}와 함께한 지 ${daysTogether}일째예요. `}
-              {view.week.daysTogether > 0 && `이번 주에는 ${view.week.daysTogether}일 만났어요. `}
-              돌봄으로 자라고, 별사탕으로 방을 꾸며요.
-            </p>
-            <div className={styles.questProgress}>
-              <span>
-                오늘의 돌봄 {view.daily.quests.filter((quest) => quest.completed).length} /{' '}
-                {view.daily.quests.length}
-              </span>
-              <progress
-                value={view.daily.quests.filter((quest) => quest.completed).length}
-                max={Math.max(1, view.daily.quests.length)}
-                aria-label={`오늘의 돌봄 ${view.daily.quests.filter((quest) => quest.completed).length} / ${view.daily.quests.length}`}
-              />
-            </div>
-            <div className={styles.questList}>
-              {view.daily.quests.map((quest) => (
-                <div key={quest.id}>
-                  <span>
-                    <PetGlyph kind={ACTION_ICONS[quest.id]} /> {PET_ACTION_LABELS[quest.id]}
-                  </span>
-                  <strong>{quest.completed ? '완료 ✓' : `+${quest.rewardXp} EXP`}</strong>
-                </div>
-              ))}
-            </div>
-            <p className={styles.finePrint}>
-              오늘 성장 EXP {view.daily.xp} / {view.daily.maxXp} · 친밀도 {pet.stats.affinity}
-            </p>
-            {game ? (
-              <>
-                <div className={styles.roomInventory}>
-                  {PET_SLOTS.map((slot) => (
-                    <div key={slot}>
-                      <span>{PET_SLOT_LABELS[slot]}</span>
-                      <strong>
-                        {game.catalog.find((item) => item.id === game.room[slot])?.name ??
-                          '비어 있음'}
-                      </strong>
-                    </div>
-                  ))}
-                </div>
-                <div className={styles.buttonRow}>
-                  <button className={styles.primaryButton} onClick={() => openTab('decorate')}>
-                    우리 아이 방 꾸미기
-                  </button>
-                  <button className={styles.smallButton} onClick={() => openTab('games')}>
-                    미니게임 하기
-                  </button>
-                  <button className={styles.smallButton} onClick={() => openTab('shop')}>
-                    별사탕 상점
-                  </button>
-                </div>
-              </>
-            ) : (
-              <p role="status" className={styles.hint}>
-                새 게임 기능을 준비하고 있어요. 돌봄은 계속할 수 있어요.
-              </p>
-            )}
-            {pet.restEndsAt && (
-              <p className={styles.hint}>
-                휴식 {formatPetWait(remainingSeconds(pet.restEndsAt, now))}
-              </p>
-            )}
-          </section>
+          <PetRoomSummary
+            pet={pet}
+            view={view}
+            daysTogether={daysTogether}
+            now={now}
+            onOpenTab={openTab}
+          />
         </div>
         <div
           id="pet-panel-decorate"
@@ -720,60 +642,7 @@ export function PetRoom({
           aria-labelledby="pet-tab-records"
           hidden={tab !== 'records'}
         >
-          <section className={styles.panel}>
-            <div className={styles.panelHeading}>
-              <div>
-                <p className={styles.eyebrow}>같이 쌓은 작은 추억</p>
-                <h2>성장 기록</h2>
-              </div>
-              <PetGlyph kind="star" />
-            </div>
-            {game && (
-              <ul className={styles.achievements}>
-                {game.achievements.map((achievement) => (
-                  <li
-                    key={achievement.id}
-                    className={achievement.completed ? styles.achievementDone : undefined}
-                  >
-                    <PetGlyph kind={achievement.completed ? 'star' : 'paw'} />
-                    <div>
-                      <strong>{achievement.label}</strong>
-                      <progress
-                        max={achievement.target}
-                        value={achievement.progress}
-                        aria-label={`${achievement.label} 진행`}
-                      />
-                    </div>
-                    <span>
-                      {achievement.completed
-                        ? '완료'
-                        : `${achievement.progress}/${achievement.target}`}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-            <ul className={styles.records}>
-              {/* 레벨이 오를 때 서버가 남기는 unlock 기록은 실제로 열리는 콘텐츠가 없어 보여주지 않는다. */}
-              {view.records
-                .filter((record) => record.type !== 'unlock')
-                .map((record) => (
-                  <li key={record.id}>
-                    <time dateTime={record.at}>{formatDate(record.at)}</time>
-                    <span>
-                      {RECORD_LABELS[record.type]}
-                      {record.level ? ` · Lv.${record.level}` : ''}
-                    </span>
-                  </li>
-                ))}
-            </ul>
-            <details className={styles.hint}>
-              <summary>처음 함께한 그림 보기</summary>
-              <div className={styles.portrait}>
-                <PetImage src={pet.imageUrl} alt={`${pet.name}의 처음 함께한 그림`} />
-              </div>
-            </details>
-          </section>
+          <PetRecords pet={pet} game={game} records={view.records} />
         </div>
       </div>
     </div>

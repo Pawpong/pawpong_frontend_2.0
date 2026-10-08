@@ -68,6 +68,8 @@ function roomUiHarness() {
     './PetDecorations': { PetDecorations: () => null },
     './PetMiniGames': { PetMiniGames: Games },
     './PetGlyph': { PetGlyph: () => null },
+    './PetRoomSummary': { PetRoomSummary: () => null },
+    './PetRecords': { PetRecords: () => null },
     './PetRoom.module.css': { default: new Proxy({}, { get: (_, key) => String(key) }) },
   })
   function nodes(node) {
