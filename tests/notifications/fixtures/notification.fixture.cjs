@@ -21,9 +21,13 @@ function notificationFixture(get = async () => ({ data: { unreadCount: 7 } })) {
     },
   })
   const { ApiError } = load('src/shared/api/unwrap.ts')
-  const { withAuthReadSession } = load('src/shared/api/authReadRequest.ts', {
+  const retryError = load('src/shared/api/authWriteRetryRequiredError.ts', {
+    './unwrap': { ApiError },
+  })
+  const requestDeps = {
     './token': { getAccessToken: () => state.token },
     './unwrap': { ApiError },
+    './authWriteRetryRequiredError': retryError,
     '../lib/authReadSession': session,
     '../lib/authStateEvents': { notifyAuthStateChanged: () => state.notices++ },
     '../lib/authSessionRecovery': {
@@ -33,7 +37,9 @@ function notificationFixture(get = async () => ({ data: { unreadCount: 7 } })) {
         return state.token
       },
     },
-  })
+  }
+  const { withAuthReadSession } = load('src/shared/api/authReadRequest.ts', requestDeps)
+  const { withAuthWriteSession } = load('src/shared/api/authWriteRequest.ts', requestDeps)
   const api = load('src/entities/notification/api/notification.api.ts', {
     '@/shared/api': {
       apiClient: { get },
@@ -44,7 +50,7 @@ function notificationFixture(get = async () => ({ data: { unreadCount: 7 } })) {
     '@/shared/api/unwrap': { ApiError },
     '@/shared/lib/authReadSession': session,
   })
-  return { state, session, api, ApiError, withAuthReadSession }
+  return { state, session, api, ApiError, ...retryError, withAuthReadSession, withAuthWriteSession }
 }
 
 module.exports = { load, token, deferred, notificationFixture }

@@ -124,18 +124,18 @@ export const useAiPixelTransform = () => {
         let generationRequested = !input
         try {
           if (input) {
-            const { inputObjectKey } = await uploadAiImageSource(input.file, { signal })
+            const { inputObjectKey } = await uploadAiImageSource(input.file, { signal, session })
             if (!isCurrent()) return null
             setPhase('checking')
             generationRequested = true
-            // Never replay this POST: a lost response does not mean the job was rejected.
+            // 응답 유실은 작업 거절을 뜻하지 않으므로 생성 쓰기를 자동으로 반복하지 않는다.
             const accepted = await requestAiImageGeneration(
               {
                 filterId: input.filterId,
                 inputObjectKey,
                 ...(input.generationPurpose ? { generationPurpose: input.generationPurpose } : {}),
               },
-              { signal },
+              { signal, session },
             )
             if (!isCurrent()) return null
             pendingJob.current = accepted

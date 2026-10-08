@@ -3,6 +3,7 @@ import {
   API_VERSION,
   unwrap,
   withAuthReadSession,
+  withAuthWriteSession,
   getAuthReadSession,
   getAccessToken,
   ApiError,
@@ -27,6 +28,10 @@ interface AiImageRequestOptions {
   timeout?: number
 }
 
+interface AiImageWriteOptions extends AiImageRequestOptions {
+  session?: AuthReadSession | null
+}
+
 /** 활성 AI 필터 목록 (정렬 순서대로) */
 export const getAiImageFilters = async (): Promise<AiImageFilter[]> => {
   const response = await apiClient.get<ApiResponseFull<AiImageFilter[]>>(
@@ -41,29 +46,41 @@ export const getAiImageFilters = async (): Promise<AiImageFilter[]> => {
  */
 export const uploadAiImageSource = async (
   file: File,
-  options: AiImageRequestOptions = {},
+  { session = getAuthReadSession(), ...options }: AiImageWriteOptions = {},
 ): Promise<AiImageSourceUpload> => {
   const formData = new FormData()
   formData.append('file', file)
-  const response = await apiClient.post<ApiResponseFull<AiImageSourceUpload>>(
-    `${API_VERSION}/ai-image/source`,
-    formData,
-    { timeout: UPLOAD_TIMEOUT, ...options },
+  return withAuthWriteSession(
+    async (config) => {
+      const response = await apiClient.post<ApiResponseFull<AiImageSourceUpload>>(
+        `${API_VERSION}/ai-image/source`,
+        formData,
+        { timeout: UPLOAD_TIMEOUT, ...options, ...config },
+      )
+      return unwrap(response, '사진을 올리지 못했습니다.')
+    },
+    session,
+    options.signal,
   )
-  return unwrap(response, '사진을 올리지 못했습니다.')
 }
 
 /** 생성 요청 — 결과는 getAiImageGeneration 으로 폴링한다 */
 export const requestAiImageGeneration = async (
   data: AiImageGenerationRequest,
-  options: AiImageRequestOptions = {},
+  { session = getAuthReadSession(), ...options }: AiImageWriteOptions = {},
 ): Promise<AiImageGeneration> => {
-  const response = await apiClient.post<ApiResponseFull<AiImageGeneration>>(
-    `${API_VERSION}/ai-image/generation`,
-    data,
-    options,
+  return withAuthWriteSession(
+    async (config) => {
+      const response = await apiClient.post<ApiResponseFull<AiImageGeneration>>(
+        `${API_VERSION}/ai-image/generation`,
+        data,
+        { ...options, ...config },
+      )
+      return unwrap(response, 'AI 변환을 시작하지 못했습니다.')
+    },
+    session,
+    options.signal,
   )
-  return unwrap(response, 'AI 변환을 시작하지 못했습니다.')
 }
 
 /** 생성 상태 조회 (본인 작업만) */

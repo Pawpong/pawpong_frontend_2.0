@@ -10,6 +10,7 @@ import { getAuthSessionGeneration, isAuthSessionCurrent } from '@/shared/lib/aut
 import { refreshAuthSession } from '@/shared/lib/authSessionRecovery'
 import { getApiBaseUrl } from '@/shared/config/apiBaseUrl'
 import { API_DIAGNOSTIC_ROUTES } from '@/shared/config/apiDiagnosticRoutes'
+import { captureRequestAuthScope } from './requestAuthScope'
 
 export interface ApiRequestConfig extends AxiosRequestConfig {
   skipAuth?: boolean
@@ -19,6 +20,15 @@ export interface ApiRequestConfig extends AxiosRequestConfig {
    */
   skipAuthRefresh?: boolean
 }
+
+type SessionRequestConfig = InternalAxiosRequestConfig & {
+  _retry?: boolean
+  _authScope?: ReturnType<typeof captureRequestAuthScope>
+  skipAuth?: boolean
+  skipAuthRefresh?: boolean
+}
+
+const changedSessionError = () => new ApiError('요청하는 계정이 변경되었습니다.', 401)
 
 const setAuthorizationHeader = (config: InternalAxiosRequestConfig, accessToken: string) => {
   config.headers['Authorization'] = `Bearer ${accessToken}`
@@ -59,31 +69,48 @@ function createApiClient(): AxiosInstance {
     timeout: 30000,
   })
 
-  instance.interceptors.request.use((config) => {
-    // FormData(멀티파트) 업로드는 axios 기본 JSON Content-Type을 제거해
-    // 브라우저가 `multipart/form-data; boundary=...`를 직접 설정하도록 한다.
-    // 제거하지 않으면 axios가 FormData를 JSON으로 직렬화해 File이 {}로 깨진다.
-    if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
-      config.headers.delete('Content-Type')
-    }
+  instance.interceptors.request.use(
+    (request) => {
+      const config = request as SessionRequestConfig
+      // FormData(멀티파트) 업로드는 axios 기본 JSON Content-Type을 제거해
+      // 브라우저가 `multipart/form-data; boundary=...`를 직접 설정하도록 한다.
+      // 제거하지 않으면 axios가 FormData를 JSON으로 직렬화해 File이 {}로 깨진다.
+      if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
+        config.headers.delete('Content-Type')
+      }
 
-    if ((config as InternalAxiosRequestConfig & { skipAuth?: boolean }).skipAuth) return config
+      if (config.skipAuth) return config
 
-    const accessToken = getAccessToken()
-    if (accessToken && !config.headers['Authorization']) {
-      config.headers['Authorization'] = `Bearer ${accessToken}`
-    }
-    return config
-  })
+      const accessToken = getAccessToken()
+      if (accessToken && !config.headers['Authorization']) {
+        config.headers['Authorization'] = `Bearer ${accessToken}`
+      }
+      const authorization = config.headers.get('Authorization')
+      const requestToken =
+        typeof authorization === 'string' && authorization.startsWith('Bearer ')
+          ? authorization.slice(7)
+          : accessToken
+      config._authScope ??= captureRequestAuthScope(requestToken)
+      if (!config._authScope.isCurrent()) throw changedSessionError()
+      return config
+    },
+    (error) => {
+      throw error
+    },
+    { synchronous: true },
+  )
 
   instance.interceptors.response.use(
-    (res) => res,
+    (res) => {
+      const scope = (res.config as SessionRequestConfig)._authScope
+      if (scope && !scope.isCurrent()) throw changedSessionError()
+      return res
+    },
     async (error: AxiosError) => {
-      const originalRequest = (error.config ?? {}) as InternalAxiosRequestConfig & {
-        _retry?: boolean
-        skipAuth?: boolean
-        skipAuthRefresh?: boolean
-      }
+      if (error instanceof ApiError) return Promise.reject(error)
+      const originalRequest = (error.config ?? {}) as SessionRequestConfig
+      const scope = originalRequest._authScope
+      if (scope && !scope.isCurrent()) return Promise.reject(changedSessionError())
 
       const errorData = error.response?.data
       const errorMessage =
@@ -100,7 +127,12 @@ function createApiClient(): AxiosInstance {
       }
 
       // 로그아웃 등 세션 복구를 원치 않는 요청은 refresh 인터셉터를 타지 않고 그대로 실패시킨다.
-      if (error.response?.status === 401 && originalRequest.skipAuthRefresh) {
+      if (
+        error.response?.status === 401 &&
+        (originalRequest.skipAuthRefresh ||
+          originalRequest.skipAuth ||
+          originalRequest.signal?.aborted)
+      ) {
         return Promise.reject(new ApiError(errorMessage || '인증이 필요합니다.', 401))
       }
 
@@ -115,12 +147,17 @@ function createApiClient(): AxiosInstance {
         originalRequest._retry = true
         try {
           const accessToken = await refreshAuthSession()
-          if (!isAuthSessionCurrent(generation))
+          if (!isAuthSessionCurrent(generation) || (scope && !scope.acceptRefresh(accessToken)))
             throw new ApiError('인증 세션이 변경되었습니다.', 401)
           setAuthorizationHeader(originalRequest, accessToken)
           return instance(originalRequest)
         } catch (refreshError) {
-          if (!isAuthSessionCurrent(generation)) return Promise.reject(refreshError)
+          if (
+            !isAuthSessionCurrent(generation) ||
+            (scope && !scope.isCurrent() && getAccessToken() !== null) ||
+            originalRequest.signal?.aborted
+          )
+            return Promise.reject(refreshError)
           // 오프라인·5xx에서는 세션을 보존한다. refresh가 401로 거절됐을 때만 로그인으로 간다.
           if (
             refreshError instanceof ApiError &&

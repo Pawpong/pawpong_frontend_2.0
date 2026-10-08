@@ -6,7 +6,10 @@ function transformSessionFixture(overrides = {}) {
   const react = hookFixture()
   const calls = { upload: [], request: [], status: [], image: [] }
   const recovery = load('src/features/ai-image/lib/aiImageRecovery.ts', {
-    '@/shared/api/unwrap': { ApiError: h.ApiError },
+    '@/shared/api': {
+      ApiError: h.ApiError,
+      AuthWriteRetryRequiredError: h.AuthWriteRetryRequiredError,
+    },
   })
   const job = {
     jobId: 'fixture-job',

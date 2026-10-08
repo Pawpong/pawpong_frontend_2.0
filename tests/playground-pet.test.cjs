@@ -1,5 +1,6 @@
 const { test } = require('node:test')
 const assert = require('node:assert/strict')
+const { requestAuthFixture } = require('./fixtures/request-auth.fixture.cjs')
 const fs = require('node:fs')
 const ts = require('typescript')
 
@@ -44,7 +45,7 @@ const view = (revision) => ({
   serverTime: '2026-10-03T12:00:00.000Z',
 })
 
-test('dev host and explicit localhost are allowed without relying on NODE_ENV', () => {
+test('개발 호스트와 명시적 로컬 환경은 실행 모드와 무관하게 허용함', () => {
   for (const hostname of [
     'dev.pawpong.kr',
     'localhost:3033',
@@ -55,7 +56,7 @@ test('dev host and explicit localhost are allowed without relying on NODE_ENV', 
     assert.equal(isPetEnvironmentAllowed({ ...env, hostname }), true)
   }
 })
-test('production deployment, branches, unknown hosts and missing flags stay closed', () => {
+test('운영 배포와 미허용 브랜치 및 알 수 없는 호스트와 누락된 설정은 닫아 둠', () => {
   for (const patch of [
     { deploymentEnv: 'production' },
     { branch: 'main' },
@@ -74,7 +75,7 @@ test('production deployment, branches, unknown hosts and missing flags stay clos
     assert.equal(isPetEnvironmentAllowed({ ...env, ...patch }), false, JSON.stringify(patch))
   }
 })
-test('only the real production deployment and canonical host can query the public release gate', () => {
+test('실제 운영 배포와 대표 호스트만 공개 승인 상태를 조회할 수 있음', () => {
   const production = {
     appEnv: 'production',
     deploymentEnv: 'production',
@@ -95,26 +96,26 @@ test('only the real production deployment and canonical host can query the publi
   ])
     assert.equal(petExposureMode({ ...production, ...patch }), null)
 })
-test('NFC names accept 1–12 codepoints but reject blank, controls and invisible format characters', () => {
+test('이름은 정규화 후 한 글자부터 열두 글자를 허용하고 공백과 제어 문자를 거부함', () => {
   assert.equal(presentation.normalizePetName('  도토리  '), '도토리')
-  for (const name of ['도', '도토리', '가'.repeat(12), '🐶'.repeat(12)])
+  for (const name of ['도', '도토리', '가'.repeat(12), '\u{1F436}'.repeat(12)])
     assert.equal(presentation.isValidPetName(name), true)
   for (const name of ['', '  ', '가'.repeat(13), '도\n토리', '도\u200b토리'])
     assert.equal(presentation.isValidPetName(name), false)
 })
-test('level display uses server thresholds and capped level 10', () => {
+test('성장 표시는 서버 기준값과 최대 레벨을 사용함', () => {
   assert.equal(presentation.petLevelProgress(view(1).pet), 3)
   assert.equal(presentation.petLevelProgress({ ...view(1).pet, totalXp: 9000 }), 100)
   assert.equal(presentation.petLevelProgress({ ...view(1).pet, totalXp: 0 }), 0)
   assert.equal(presentation.petLevelProgress({ ...view(1).pet, xpForNextLevel: null }), 100)
 })
-test('old idempotency receipts cannot overwrite newer state; new revisions replace it', () => {
+test('이전 멱등 응답은 최신 상태를 덮지 않고 더 큰 수정 번호만 반영함', () => {
   const current = view(9)
   assert.equal(presentation.latestPetView(current, view(2)), current)
   assert.equal(presentation.latestPetView(current, view(10)).pet.revision, 10)
   assert.equal(presentation.latestPetView(undefined, view(2)).pet.revision, 2)
 })
-test('expired display time does not manufacture permission and no-reward actions are explicit', () => {
+test('표시 시간이 끝나도 권한을 임의로 만들지 않고 보상 없는 돌봄을 안내함', () => {
   assert.equal(
     presentation.remainingSeconds('2026-10-03T12:01:30Z', Date.parse('2026-10-03T12:00:00Z')),
     90,
@@ -138,7 +139,7 @@ test('expired display time does not manufacture permission and no-reward actions
     /경험치 없이/,
   )
 })
-test('duplicate click sends one request while the original is pending', async () => {
+test('처리 중 연속 클릭은 요청을 한 번만 전송함', async () => {
   let resolve,
     count = 0
   const queue = new PetCommandQueue(() => {
@@ -154,7 +155,7 @@ test('duplicate click sends one request while the original is pending', async ()
   assert.equal((await first).type, 'success')
   assert.equal(queue.isRunning, false)
 })
-test('lost response is retried with identical key/body and blocks replacing the command', async () => {
+test('응답 유실 재시도는 같은 식별자와 본문을 유지하고 명령 교체를 막음', async () => {
   const calls = []
   const queue = new PetCommandQueue(async (request) => {
     calls.push(structuredClone(request))
@@ -170,7 +171,7 @@ test('lost response is retried with identical key/body and blocks replacing the 
   assert.equal((await queue.run()).data.outcome.xpAwarded, 10)
   assert.deepEqual(calls[1], calls[0])
 })
-test('5xx retains the original command; a definite 409 allows a fresh revision/key', async () => {
+test('서버 장애는 원래 명령을 보존하고 확정 충돌은 새 수정 번호와 식별자를 허용함', async () => {
   const calls = []
   const queue = new PetCommandQueue(async (request) => {
     calls.push(request)
@@ -187,7 +188,7 @@ test('5xx retains the original command; a definite 409 allows a fresh revision/k
   assert.equal((await queue.run(fresh)).type, 'success')
   assert.equal(calls[2], fresh)
 })
-test('API sends the documented URLs and exact mutation body without client rewards or image URL', async () => {
+test('API는 계약된 경로와 본문만 전송하고 클라이언트 보상과 사진 주소를 제외함', async () => {
   const calls = []
   const response = { data: { success: true, data: view(8) } }
   const api = load('src/entities/playground-pet/api/pet.api.ts', {
@@ -221,7 +222,7 @@ test('API sends the documented URLs and exact mutation body without client rewar
   assert.deepEqual(calls[2].slice(0, 3), ['POST', '/api/v2/playground/pet/actions', command.body])
   assert.deepEqual(calls[3].slice(0, 3), ['POST', '/api/v2/playground/pet/adopt', adopt.body])
 })
-test('eligibility follows server cursor pages and never trusts an input URL or filter name', async () => {
+test('캐릭터 자격은 서버 커서로 조회하고 입력 주소와 필터 이름을 신뢰하지 않음', async () => {
   const cursors = []
   const api = load('src/entities/playground-pet/api/pet.api.ts', {
     '@/shared/api/client': {
@@ -247,7 +248,7 @@ test('eligibility follows server cursor pages and never trusts an input URL or f
   assert.deepEqual(cursors, [null, 'page2'])
   assert.equal(await api.isEligiblePetImage('arbitrary-url'), false)
 })
-test('a session change while awaiting a private response rejects the old account data', async () => {
+test('개인 응답 대기 중 세션이 바뀌면 이전 계정 자료를 거부함', async () => {
   let token = 'first-session'
   const auth = load('src/features/playground-pet/lib/usePetSession.ts', {
     react: {},
@@ -295,6 +296,7 @@ function petSessionHarness() {
     axios: require('axios'),
     './unwrap': { ApiError },
     './token': token,
+    './requestAuthScope': requestAuthFixture(token, lifecycle),
     '@/shared/lib/authSessionLifecycle': lifecycle,
     '@/shared/lib/authSessionRecovery': recovery,
     '@/shared/config/apiBaseUrl': { getApiBaseUrl: () => 'http://fixture.invalid' },
@@ -325,7 +327,7 @@ function petSessionHarness() {
   }
 }
 
-test('a delayed 401 never refreshes and replays an old pet mutation under the new account', async () => {
+test('늦은 인증 실패는 새 계정에서 이전 돌봄 명령을 갱신하거나 재전송하지 않음', async () => {
   const { state, apiClient, api, auth, session } = petSessionHarness()
   const owners = []
   let rejectFirst, announceStarted
@@ -355,7 +357,7 @@ test('a delayed 401 never refreshes and replays an old pet mutation under the ne
   assert.equal(state.refreshes, 0)
 })
 
-test('a queued Axios request stays bound to its owner when the account changes before dispatch', async () => {
+test('요청 직후 계정이 바뀌면 원래 인증만 사용하고 세션 변경을 알림', async () => {
   const { state, apiClient, api, auth, session } = petSessionHarness()
   const owners = []
   apiClient.defaults.adapter = async (config) => {
@@ -370,7 +372,7 @@ test('a queued Axios request stays bound to its owner when the account changes b
   assert.equal(state.notifications, 1)
 })
 
-test('a current-account 401 recovers credentials without replaying the rejected command', async () => {
+test('현재 계정의 인증 만료는 인증만 복구하고 거절된 명령을 재전송하지 않음', async () => {
   const { state, apiClient, api, auth, session, recovery } = petSessionHarness()
   const calls = []
   recovery.refreshAuthSession = async () => {
@@ -404,7 +406,7 @@ test('a current-account 401 recovers credentials without replaying the rejected 
   )
 })
 
-test('a rejected refresh invalidates the current session without replaying its pet request', async () => {
+test('인증 갱신 거절은 현재 세션을 종료하고 돌봄 요청을 재전송하지 않음', async () => {
   const { state, apiClient, api, auth, session, recovery } = petSessionHarness()
   let sent = 0
   recovery.refreshAuthSession = async () => {
@@ -430,7 +432,7 @@ test('a rejected refresh invalidates the current session without replaying its p
   assert.equal(sent, 1)
 })
 
-test('all eligibility cursor pages use one originating session and discard data after an account switch', async () => {
+test('캐릭터 후보 조회 중 계정이 바뀌면 결과를 폐기하고 다음 페이지를 요청하지 않음', async () => {
   const { state, apiClient, api, auth, session } = petSessionHarness()
   const owners = []
   apiClient.defaults.adapter = async (config) => {
@@ -458,10 +460,10 @@ test('all eligibility cursor pages use one originating session and discard data 
       status: 401,
     },
   )
-  assert.deepEqual(owners, ['a', 'a'])
+  assert.deepEqual(owners, ['a'])
 })
 
-test('silent cookie expiry releases the care controls and notifies the session without sending a mutation', async () => {
+test('쿠키가 조용히 만료되면 돌봄 쓰기 없이 조작 잠금을 해제하고 세션 변경을 알림', async () => {
   const { state, auth, session } = petSessionHarness()
   const slots = []
   let cursor = 0,
@@ -514,7 +516,7 @@ test('silent cookie expiry releases the care controls and notifies the session w
   assert.equal(state.notifications, 1)
 })
 
-test('config route does not contact any backend when the frontend environment is closed', async () => {
+test('프런트엔드 환경이 닫혀 있으면 설정 경로가 백엔드에 접속하지 않음', async () => {
   const originalFetch = global.fetch
   let calls = 0
   global.fetch = async () => {
@@ -531,7 +533,7 @@ test('config route does not contact any backend when the frontend environment is
         },
       }),
     })
-    // A reverse proxy may expose an internal localhost URL with a production Host.
+    // 프록시 내부 주소가 로컬이어도 운영 호스트 헤더의 공개 제한을 유지한다.
     const response = await GET({
       nextUrl: new URL('http://localhost/api/playground/pet/config'),
       headers: new Headers({ host: 'pawpong.kr' }),
@@ -543,7 +545,7 @@ test('config route does not contact any backend when the frontend environment is
     global.fetch = originalFetch
   }
 })
-test('same-token login generations get separate caches and logout immediately closes the session', () => {
+test('같은 토큰이어도 새 로그인은 캐시를 분리하고 로그아웃은 세션을 즉시 닫음', () => {
   let generation = 1
   let current = true
   const token = `header.${Buffer.from(JSON.stringify({ sub: 'owner', role: 'adopter', iat: 1, exp: 9 })).toString('base64url')}.signature`
@@ -570,7 +572,7 @@ test('same-token login generations get separate caches and logout immediately cl
   current = false
   assert.equal(auth.usePetSession(), null)
 })
-test('backend 404 is a safe disabled config; backend failures are retryable 503', async () => {
+test('백엔드 미제공 응답은 설정 비활성으로 처리하고 장애는 재시도 가능하게 반환함', async () => {
   const originalFetch = global.fetch
   const oldBase = process.env.NEXT_PUBLIC_API_BASE_URL
   process.env.NEXT_PUBLIC_API_BASE_URL = 'https://dev-api.example.test'
@@ -595,7 +597,7 @@ test('backend 404 is a safe disabled config; backend failures are retryable 503'
   }
 })
 
-test('production rejects developer preview and defaults; only explicit public server approval opens', async () => {
+test('운영은 개발 미리보기와 기본값을 거부하고 명시적인 서버 공개 승인만 허용함', async () => {
   const oldFetch = global.fetch
   const oldBase = process.env.NEXT_PUBLIC_API_BASE_URL
   process.env.NEXT_PUBLIC_API_BASE_URL = 'https://production-api.example.test'
@@ -652,7 +654,7 @@ test('production rejects developer preview and defaults; only explicit public se
   }
 })
 
-test('existing development config remains a private preview while its public release is off', async () => {
+test('개발 설정은 운영 공개가 꺼진 동안 비공개 미리보기를 유지함', async () => {
   const oldFetch = global.fetch
   const oldBase = process.env.NEXT_PUBLIC_API_BASE_URL
   process.env.NEXT_PUBLIC_API_BASE_URL = 'https://dev-api.example.test'

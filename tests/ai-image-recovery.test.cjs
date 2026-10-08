@@ -3,6 +3,7 @@ const assert = require('node:assert/strict')
 const fs = require('node:fs')
 const ts = require('typescript')
 const { notificationFixture } = require('./notifications/fixtures/notification.fixture.cjs')
+const { requestAuthFixture } = require('./fixtures/request-auth.fixture.cjs')
 const auth = notificationFixture()
 
 function load(file, dependencies = {}) {
@@ -23,9 +24,11 @@ function load(file, dependencies = {}) {
     if (name === '@/shared/api')
       return {
         withAuthReadSession: auth.withAuthReadSession,
-      getAuthReadSession: auth.session.getAuthReadSession,
-      getAccessToken: () => auth.state.token,
-      ApiError: dependencies['@/shared/api/unwrap']?.ApiError ?? auth.ApiError,
+        withAuthWriteSession: auth.withAuthWriteSession,
+        AuthWriteRetryRequiredError: auth.AuthWriteRetryRequiredError,
+        getAuthReadSession: auth.session.getAuthReadSession,
+        getAccessToken: () => auth.state.token,
+        ApiError: dependencies['@/shared/api/unwrap']?.ApiError ?? auth.ApiError,
         ...dependencies[name],
       }
     if (name === '@/shared/config/apiDiagnosticRoutes') {
@@ -593,7 +596,11 @@ test(
       const { apiClient } = load('src/shared/api/client.ts', {
         axios,
         './unwrap': { ApiError },
-        './token': { getAccessToken: () => null },
+        './token': { getAccessToken: () => auth.state.token },
+        './requestAuthScope': requestAuthFixture(
+          { getAccessToken: () => auth.state.token },
+          { getAuthSessionGeneration: () => 1 },
+        ),
         '@/shared/lib/authSessionLifecycle': {
           getAuthSessionGeneration: () => 1,
           isAuthSessionCurrent: () => true,
