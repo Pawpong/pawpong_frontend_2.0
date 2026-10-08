@@ -66,9 +66,10 @@ const HomePostGrid = ({
           onRetry={onRetry}
           isRetrying={isRetrying}
         >
+          {/* 모바일 3열은 375px 시안의 122px 정사각을 그대로 두고, 더 좁은 폰(360px 등)에서만 열이 줄어 가로로 넘치지 않게 한다 */}
           <div
             className={cn(
-              'mx-auto grid w-full max-w-[23.4375rem] grid-cols-[repeat(3,7.625rem)] justify-between gap-y-3 tab:max-w-[48rem] tab:grid-cols-3 tab:gap-3 pc:max-w-[80rem] pc:grid-cols-[repeat(4,18.75rem)] pc:justify-center pc:gap-5',
+              'mx-auto grid w-full max-w-[23.4375rem] grid-cols-[repeat(3,minmax(0,7.625rem))] justify-between gap-x-1 gap-y-3 tab:max-w-[48rem] tab:grid-cols-3 tab:gap-3 pc:max-w-[80rem] pc:grid-cols-[repeat(4,18.75rem)] pc:justify-center pc:gap-5',
               gridClassName,
             )}
           >
