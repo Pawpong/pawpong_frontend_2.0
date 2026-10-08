@@ -219,7 +219,8 @@ const CommunityContent = () => {
 
             <nav
               aria-label="동물별 이야기"
-              className="mb-6 flex gap-2 overflow-x-auto pb-1 pc:hidden"
+              // 칩 터치 영역(44px)이 가로 스크롤에 잘리지 않게 위아래 여유를 두고 바깥 간격은 유지한다.
+              className="-mt-2 mb-5 flex gap-2 overflow-x-auto pt-2 pb-2 pc:hidden"
             >
               {PET_OPTIONS.map((option) => (
                 <Chip

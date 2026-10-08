@@ -8,7 +8,7 @@ import {
 import type { CommunityDiscoveryFilters } from '@/shared/types'
 
 const CHIP =
-  'inline-flex min-h-8 max-w-full items-center gap-1.5 rounded-full border px-3 text-xs font-semibold focus-ring transition-colors'
+  'relative inline-flex min-h-8 max-w-full items-center gap-1.5 rounded-full border px-3 text-xs font-semibold focus-ring touch-target transition-colors'
 
 /** 피드 카드의 기록·주제·태그 줄 — 누르면 같은 조건의 글만 모아 본다. */
 export function CommunityFeedMeta({
