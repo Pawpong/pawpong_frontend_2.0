@@ -206,6 +206,7 @@ function dashboardHarness(api) {
     '@/entities/gamification': api,
     '@/shared/ui': {
       Button: ({ children, ...props }) => React.createElement('button', props, children),
+      DetailLink: ({ href, label }) => React.createElement('a', { href }, label),
     },
     '@/shared/lib/fonts': { cafe24Proup: { className: '' } },
     './activity.module.css': { default: {} },

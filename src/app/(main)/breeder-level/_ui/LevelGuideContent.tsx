@@ -1,6 +1,5 @@
 'use client'
 import { useQuery } from '@tanstack/react-query'
-import Link from 'next/link'
 import {
   activityConfigOptions,
   getActivityCatalog,
@@ -8,6 +7,11 @@ import {
   ACTIVITY_LABELS,
   LEVEL_NOTICE,
 } from '@/entities/gamification'
+import { AsyncState, DetailLink } from '@/shared/ui'
+import { FeatureIntro } from '@/shared/ui/FeatureIntro'
+
+// 레이아웃의 main 안에 들어가므로 랜드마크를 겹치지 않게 div로 감싼다.
+const PAGE = 'mx-auto w-full max-w-4xl space-y-8 px-5 pt-6 pb-16 tab:px-8 tab:pt-10'
 export function LevelGuideContent() {
   const config = useQuery(activityConfigOptions)
   const catalog = useQuery({
@@ -17,13 +21,30 @@ export function LevelGuideContent() {
     retry: false,
     throwOnError: false,
   })
-  if (!config.data?.enabled || config.isError || catalog.isError) return null
+  // 빈 화면 대신 불러오는 중·실패·준비 중을 공통 상태 블록으로 알린다.
+  const state =
+    config.isPending || (config.data?.enabled && catalog.isPending) ? (
+      <AsyncState status="loading" message="활동 단계 안내를 불러오고 있어요." />
+    ) : config.isError || catalog.isError ? (
+      <AsyncState
+        status="error"
+        message="활동 단계 안내를 불러오지 못했어요."
+        onRetry={() => void (config.isError ? config.refetch() : catalog.refetch())}
+        isRetrying={config.isFetching || catalog.isFetching}
+      />
+    ) : !config.data?.enabled ? (
+      <AsyncState
+        status="empty"
+        message="지금은 활동 단계 안내를 볼 수 없어요."
+        action={<DetailLink href="/home" label="홈으로 가기" className="min-h-11" />}
+      />
+    ) : null
+  if (state) return <div className={PAGE}>{state}</div>
   return (
-    <main className="mx-auto max-w-4xl space-y-8 px-4 py-10">
-      <header>
-        <h1 className="font-cafe24 text-3xl">포퐁 활동 단계</h1>
-        <p className="mt-4 text-sm leading-6">{LEVEL_NOTICE}</p>
-      </header>
+    <div className={PAGE}>
+      <FeatureIntro eyebrow="포퐁 활동" title="포퐁 활동 단계">
+        {LEVEL_NOTICE}
+      </FeatureIntro>
       <section>
         <h2 className="mb-4 text-xl font-semibold">30단계와 누적 EXP</h2>
         <div className="grid grid-cols-2 gap-3 tab:grid-cols-3">
@@ -78,13 +99,9 @@ export function LevelGuideContent() {
           수 있어요.
         </p>
         <p>레벨/EXP 이의 제기는 1:1 문의로 보내 주세요. 목표 처리 기한은 영업일 5일이에요.</p>
-        <Link className="underline" href="/faq">
-          레벨/EXP 문의하기
-        </Link>
+        <DetailLink href="/faq" label="레벨/EXP 문의하기" className="min-h-11" />
       </section>
-      <Link className="inline-block underline" href="/home?tab=activity">
-        마이홈에서 내 활동 보기
-      </Link>
-    </main>
+      <DetailLink href="/home?tab=activity" label="마이홈에서 내 활동 보기" className="min-h-11" />
+    </div>
   )
 }

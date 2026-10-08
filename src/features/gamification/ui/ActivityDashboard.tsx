@@ -1,6 +1,5 @@
 'use client'
 import { useIsMutating, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import Link from 'next/link'
 import {
   getActivity,
   synchronizeActivity,
@@ -11,7 +10,7 @@ import {
   ACTIVITY_LABELS,
   getActivityCatalog,
 } from '@/entities/gamification'
-import { Button } from '@/shared/ui'
+import { Button, DetailLink } from '@/shared/ui'
 import { cafe24Proup } from '@/shared/lib/fonts'
 import styles from './activity.module.css'
 
@@ -239,13 +238,13 @@ export function ActivityDashboard({ session }: { session: ActivitySession }) {
           삭제·비공개 등으로 활동이 무효가 되면 EXP가 회수되고 레벨도 내려갈 수 있어요.
         </p>
       </section>
-      <div className="mt-6 flex flex-wrap gap-4 text-sm font-bold">
-        <Link href="/breeder-level">활동 단계 안내</Link>
-        <Link href="/faq">레벨/EXP 문의 · 목표 처리 영업일 5일</Link>
-        <Link href="/community/write">첫 이야기 나누기</Link>
-        <Link href="/profile/edit">프로필 완성하기</Link>
-        <Link href="/community">커뮤니티로 돌아가기</Link>
-      </div>
+      <nav aria-label="활동 바로가기" className="mt-6 flex flex-wrap gap-x-4">
+        <DetailLink href="/breeder-level" label="활동 단계 안내" className="min-h-11" />
+        <DetailLink href="/faq" label="레벨/EXP 문의 · 목표 처리 영업일 5일" className="min-h-11" />
+        <DetailLink href="/community/write" label="첫 이야기 나누기" className="min-h-11" />
+        <DetailLink href="/profile/edit" label="프로필 완성하기" className="min-h-11" />
+        <DetailLink href="/community" label="커뮤니티로 돌아가기" className="min-h-11" />
+      </nav>
     </div>
   )
 }
