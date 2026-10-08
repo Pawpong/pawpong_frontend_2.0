@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import Image from 'next/image'
+import { SessionImage as Image } from './SessionImage'
 import { cn } from '@/shared/lib/cn'
 import { IconButton } from './IconButton'
 

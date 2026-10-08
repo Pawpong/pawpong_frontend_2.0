@@ -9,6 +9,7 @@ function communitySessionFixture(get) {
       getAuthReadSession: h.session.getAuthReadSession,
     },
     '../model/communityReview': load('src/entities/community/model/communityReview.ts'),
+    '../model/communityPhoto': load('src/entities/community/model/communityPhoto.ts'),
   })
   const { communityQueries } = load('src/entities/community/api/community.queries.ts', {
     '@/shared/api': {

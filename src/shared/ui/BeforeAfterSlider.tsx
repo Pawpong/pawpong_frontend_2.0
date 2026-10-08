@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
+import { SessionImage as Image } from './SessionImage'
 import { cn } from '@/shared/lib/cn'
 
 interface BeforeAfterSliderProps {

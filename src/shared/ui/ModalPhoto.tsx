@@ -1,6 +1,6 @@
 'use client'
 
-import Image from 'next/image'
+import { SessionImage as Image } from './SessionImage'
 import { PixelArrowRightIcon } from '@/shared/assets'
 import { IconButton } from './IconButton'
 

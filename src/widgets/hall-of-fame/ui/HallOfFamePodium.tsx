@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
+import { SessionImage as Image } from '@/shared/ui/SessionImage'
+import { useAuthReadSession } from '@/shared/lib/useAuthReadSession'
+import { isSessionImageSource, sessionImageSource } from '@/shared/lib/sessionImageSource'
 import Link from 'next/link'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import type { CommunityHallOfFameWinner } from '@/shared/types'
@@ -107,7 +109,11 @@ const PawPattern = ({ variant, className }: { variant: PawPatternSize; className
 const PixelFrame = ({ winner, rank }: { winner?: CommunityHallOfFameWinner; rank: 1 | 2 | 3 }) => {
   const [failedPhotoUrl, setFailedPhotoUrl] = useState<string>()
   const photoUrl = winner?.photoUrl
-  const showPhoto = Boolean(photoUrl) && failedPhotoUrl !== photoUrl
+  const session = useAuthReadSession()
+  const photoIdentity = isSessionImageSource(photoUrl)
+    ? sessionImageSource(photoUrl, session?.scope ?? 'anonymous')
+    : photoUrl
+  const showPhoto = Boolean(photoUrl) && failedPhotoUrl !== photoIdentity
 
   const photo = showPhoto ? (
     <Image
@@ -117,7 +123,7 @@ const PixelFrame = ({ winner, rank }: { winner?: CommunityHallOfFameWinner; rank
       sizes="(min-width: 1440px) 211px, 122px"
       loading="eager"
       fetchPriority={rank === 1 ? 'high' : 'auto'}
-      onError={() => setFailedPhotoUrl(photoUrl!)}
+      onError={() => setFailedPhotoUrl(photoIdentity!)}
       className="object-cover"
     />
   ) : (

@@ -178,6 +178,7 @@ test('기록 필터와 관련 글은 계약한 서버 경로만 호출한다', a
       API_VERSION: '/v2',
     },
     '../model/communityReview': { parseCommunityPostReview: () => undefined },
+    '../model/communityPhoto': load('src/entities/community/model/communityPhoto.ts'),
   })
   await api.getCommunityPosts({ record: 'walk', tags: ['노령견'] })
   assert.match(calls[0][0], /record=walk/)

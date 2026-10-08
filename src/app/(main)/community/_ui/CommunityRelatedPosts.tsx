@@ -1,6 +1,6 @@
 'use client'
 
-import Image from 'next/image'
+import { SessionImage as Image } from '@/shared/ui/SessionImage'
 import Link from 'next/link'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { communityQueries } from '@/entities/community'

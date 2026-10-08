@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, type ReactNode } from 'react'
-import Image from 'next/image'
+import { SessionImage as Image } from '@/shared/ui/SessionImage'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { BeforeAfterSlider, ImageCarousel, OwnerActionsMenu, ProfileAvatar } from '@/shared/ui'
