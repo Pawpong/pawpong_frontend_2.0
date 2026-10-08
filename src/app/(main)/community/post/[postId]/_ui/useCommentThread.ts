@@ -3,7 +3,11 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { communityQueries } from '@/entities/community'
-import { useCreateCommunityComment } from '@/features/community'
+import {
+  useCreateCommunityComment,
+  nextCommunityCreateAttempt,
+  type CommunityCreateAttempt,
+} from '@/features/community'
 import { useLoginGuard, useMe } from '@/features/auth'
 import { ApiError } from '@/shared/api'
 import { useAuthReadSession } from '@/shared/lib/useAuthReadSession'
@@ -41,6 +45,7 @@ const useCommentThread = (postId: string, enabled = true) => {
   const [reply, setReply] = useState<{ key: string; target: CommentReplyTarget } | null>(null)
   const [sendingKey, setSendingKey] = useState<string | null>(null)
   const inFlight = useRef<{ key: string } | null>(null)
+  const retryAttempt = useRef<CommunityCreateAttempt | null>(null)
   const replyTarget = reply?.key === composerKey ? reply.target : null
   const isSubmitting = sendingKey === composerKey || createComment.isPending
   const busy = () => inFlight.current?.key === composerKey || isSubmitting
@@ -72,12 +77,22 @@ const useCommentThread = (postId: string, enabled = true) => {
         '답글 대상을 확인할 수 없어요. 댓글 목록을 다시 확인하거나 답글을 취소해 주세요.',
       )
     const attempt = { key: composerKey }
+    const request = nextCommunityCreateAttempt(
+      retryAttempt.current,
+      JSON.stringify([composerKey, body.trim(), replyTarget?.commentId ?? null]),
+    )
+    retryAttempt.current = request
     inFlight.current = attempt
     setSendingKey(composerKey)
     try {
-      await createComment.mutateAsync({ body, parentCommentId: replyTarget?.commentId })
+      await createComment.mutateAsync({
+        body,
+        parentCommentId: replyTarget?.commentId,
+        clientRequestId: request.clientRequestId,
+      })
       if (!isAuthReadSessionCurrent(session) || currentContext.current !== composerKey)
         throw new ApiError('로그인 상태가 변경되었습니다.', 401)
+      if (retryAttempt.current === request) retryAttempt.current = null
       setReply((current) => (current === reply ? null : current))
     } finally {
       if (inFlight.current === attempt) {
