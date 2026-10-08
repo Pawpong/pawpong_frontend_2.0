@@ -14,6 +14,7 @@ export type { CommunityPreviewAuthor, CommunityPreviewProps } from './model/comm
 export { formatHallOfFamePeriod } from './model/hallOfFamePeriod'
 export * from './model/communityExperience'
 export * from './model/discovery'
+export * from './model/feed-navigation'
 export * from './model/communityRecords'
 export { CommunityPixelIcon, type CommunityPixelIconName } from './ui/CommunityPixelIcon'
 export { CommunityRecordCard } from './ui/CommunityRecordCard'

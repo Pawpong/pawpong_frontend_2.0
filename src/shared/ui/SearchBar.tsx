@@ -13,6 +13,7 @@ interface SearchBarProps {
   }
   /** 초기 입력값 — 탐색 페이지처럼 URL에 검색어가 이미 있는 경우 */
   defaultValue?: string
+  maxLength?: number
   /** 제출 시 동작. 미지정이면 탐색 페이지로 이동한다 */
   onSubmit?: (keyword: string) => void
   /** 타이핑마다 실시간으로 필요한 화면(채팅 목록 필터 등)에서만 넘긴다 */
@@ -31,6 +32,7 @@ const INPUT_NAME = 'keyword'
 export const SearchBar = ({
   placeholder,
   defaultValue,
+  maxLength,
   onSubmit,
   onChange,
   className,
@@ -72,6 +74,8 @@ export const SearchBar = ({
         type="text"
         name={INPUT_NAME}
         defaultValue={defaultValue}
+        maxLength={maxLength}
+        aria-label={resolvedPlaceholder.desktop}
         onChange={onChange ? (event) => onChange(event.target.value) : undefined}
         placeholder={isTablet ? resolvedPlaceholder.desktop : resolvedPlaceholder.mobile}
         className="min-w-0 flex-1 bg-transparent text-base leading-[1.5] font-medium text-neutral-850 outline-none placeholder:text-sm placeholder:text-neutral-500 tab:placeholder:text-base"

@@ -357,10 +357,12 @@ const TEMPLATE_BY_QUERY: Record<string, CommunityTemplateKey> = {
   walk: 'walk',
   clinic: 'clinic',
   daily: 'life',
+  question: 'question',
+  travel: 'travel',
 }
 
 /**
- * /community/write?experience=walk|clinic|daily 로 들어온 새 글의 처음 기록 선택.
+ * 작성 링크로 들어온 새 글에만 기록 틀을 선택한다.
  * 날짜만 오늘로 채우고 수치는 비워 둔다. 모르는 값이면 undefined.
  */
 export function initialCommunityExperience(
