@@ -1,23 +1,29 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 export const dynamic = 'force-dynamic'
-export async function GET(request: NextRequest) {
-  const host = (request.headers.get('host') ?? '').split(':')[0].toLowerCase()
+const DISABLED = { enabled: false, breederLevelPublic: false }
+
+/** 켜짐 여부는 환경이 아니라 백엔드 플래그(GAMIFICATION_ENABLED·BREEDER_LEVEL_PUBLIC)가 정한다. */
+export async function GET() {
   const headers = { 'Cache-Control': 'no-store' }
-  const development =
-    host === 'dev.pawpong.kr' ||
-    (['localhost', '127.0.0.1'].includes(host) && process.env.NEXT_PUBLIC_APP_ENV === 'development')
-  if (!development) return NextResponse.json({ enabled: false }, { headers })
+  const base = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/+$/, '')
+  if (!base) return NextResponse.json(DISABLED, { headers })
   try {
-    const response = await fetch('https://dev-api.pawpong.kr/api/v2/gamification/config', {
+    const response = await fetch(`${base}/api/v2/gamification/config`, {
       cache: 'no-store',
       signal: AbortSignal.timeout(5000),
     })
     // 백엔드의 선택 배포 전에는 엔드포인트가 없을 수 있다. 기존 화면은 계속 이용한다.
-    if (response.status === 404) return NextResponse.json({ enabled: false }, { headers })
+    if (response.status === 404) return NextResponse.json(DISABLED, { headers })
     const payload = await response.json()
     if (!response.ok || !payload.success) throw new Error('unavailable')
-    return NextResponse.json({ enabled: payload.data?.enabled === true }, { headers })
+    return NextResponse.json(
+      {
+        enabled: payload.data?.enabled === true,
+        breederLevelPublic: payload.data?.breederLevelPublic === true,
+      },
+      { headers },
+    )
   } catch {
-    return NextResponse.json({ enabled: false }, { status: 503, headers })
+    return NextResponse.json(DISABLED, { status: 503, headers })
   }
 }

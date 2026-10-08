@@ -169,7 +169,7 @@ test('보류 상세는 두 레이아웃 모두 댓글 작성과 반응 및 공�
     './CommunityPostReviewPanel': {
       CommunityPostReviewPanel: () => createElement('section', null, '심사 안내'),
     },
-    '@/entities/gamification': { ActivityBadgeRow: () => null },
+    '@/entities/gamification': { ActivityBadgeRow: () => null, BreederLevelBadge: () => null },
     '@/features/gamification': { usePublicActivityBadges: () => [] },
   }).PostDetailPanel
   for (const layout of ['stacked', 'side-by-side']) {

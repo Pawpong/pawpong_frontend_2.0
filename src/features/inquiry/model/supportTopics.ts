@@ -30,6 +30,14 @@ export const SUPPORT_TOPICS = [
     placeholder: '불편했던 점이나 바라는 기능을 알려주세요',
     suggestions: ['이런 기능이 있으면 좋겠어요', '사용하면서 불편한 점이 있어요'],
   },
+  {
+    id: 'level_exp',
+    label: '레벨/EXP',
+    greeting:
+      '레벨이나 EXP 변경에 대해 알려주세요. 관련 활동과 변경 내용을 남겨주시면 운영팀 확인을 요청할 수 있어요. 목표 처리 기한은 영업일 5일이에요.',
+    placeholder: '확인이 필요한 활동과 변경 내용을 적어주세요',
+    suggestions: ['EXP가 회수된 이유가 궁금해요', '활동이 레벨에 반영되지 않았어요'],
+  },
 ] as const
 
 export type SupportTopic = (typeof SUPPORT_TOPICS)[number]['id']
