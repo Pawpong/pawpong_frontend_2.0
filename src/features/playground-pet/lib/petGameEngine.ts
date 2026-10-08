@@ -10,6 +10,7 @@ import type {
 import { PET_SLOT_AREAS, PET_SLOT_POSITIONS } from '@/entities/playground-pet/model/room'
 import { SNACK_LANE_X, snackDropResult } from '@/entities/playground-pet/model/snack'
 import { petAsset, type PetAssetManifest } from './gameAssets'
+import { loadPetAssetImage } from './petAssetImage'
 import { advancePetMotion, callPetTo, initialPetMotion, petMotionPose } from './petMotion'
 import { PET_ROOM_MOTION } from '../constants/pet-motion'
 
@@ -31,6 +32,7 @@ export type PetStageSnapshot = {
 export type PetGameHandle = {
   sync: (snapshot: PetStageSnapshot) => void
   prepareGame: (kind: PetGameKind) => Promise<boolean>
+  cancelPreparation: () => void
   retry: () => void
   /** 방 좌표를 누른다. 캐릭터면 'pet', 바닥이면 'call'(걸어옴), 반응할 수 없으면 null. 보상은 없다. */
   poke: (x: number, y: number) => 'pet' | 'call' | null
@@ -69,7 +71,7 @@ export function createPetGame(
   let scene: RoomScene | null = null
   let loadVersion = 0
   let preparedGame: PetGameKind | null = null
-  const pendingImages = new Set<HTMLImageElement>()
+  const lifetime = new AbortController()
   const assetTextures = new Map<string, string>()
   const loading = new Map<string, Promise<void>>()
   const loadedImages = new Map<string, HTMLImageElement>()
@@ -88,27 +90,10 @@ export function createPetGame(
   function imageFor(url: string): Promise<HTMLImageElement> {
     const existing = loadedImages.get(url)
     if (existing) return Promise.resolve(existing)
-    return new Promise((resolve, reject) => {
-      const img = new Image()
-      pendingImages.add(img)
-      img.onload = () => {
-        pendingImages.delete(img)
-        img.onload = null
-        img.onerror = null
-        if (!alive) {
-          reject(new Error('disposed'))
-          return
-        }
-        loadedImages.set(url, img)
-        resolve(img)
-      }
-      img.onerror = () => {
-        pendingImages.delete(img)
-        img.onload = null
-        img.onerror = null
-        reject(new Error('asset unavailable'))
-      }
-      img.src = url
+    return loadPetAssetImage(url, lifetime.signal).then((img) => {
+      if (!alive) throw new Error('disposed')
+      loadedImages.set(url, img)
+      return img
     })
   }
 
@@ -590,6 +575,12 @@ export function createPetGame(
       preparedGame = kind
       return loadSnapshot()
     },
+    cancelPreparation() {
+      if (!preparedGame || snapshot.snack) return
+      preparedGame = null
+      // 이전 그림은 제한 시간 안에서 캐시될 수 있지만 선택 취소 후 방을 막지 않는다.
+      void loadSnapshot()
+    },
     sync(next) {
       const reload =
         next.characterUrl !== snapshot.characterUrl ||
@@ -617,12 +608,7 @@ export function createPetGame(
       if (!alive) return
       alive = false
       loadVersion++
-      for (const img of pendingImages) {
-        img.onload = null
-        img.onerror = null
-        img.src = ''
-      }
-      pendingImages.clear()
+      lifetime.abort()
       loadedImages.clear()
       loading.clear()
       game.destroy(true)

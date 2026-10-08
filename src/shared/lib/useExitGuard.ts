@@ -24,6 +24,7 @@ const useExitGuard = ({
   const allowNavigationRef = useRef(false)
   const hasChangesRef = useRef(false)
   const isGuardSeededRef = useRef(false)
+  const finishNavigationRef = useRef<(() => void) | null>(null)
 
   const checkHasChanges = useCallback(
     () => (typeof hasChanges === 'function' ? hasChanges() : hasChanges),
@@ -37,10 +38,23 @@ const useExitGuard = ({
   // 브라우저 뒤로가기/새로고침 가드
   useEffect(() => {
     if (!enabled) return
+    const guardedHref = window.location.href
 
     if (!isGuardSeededRef.current) {
       window.history.pushState(window.history.state, '', window.location.href)
       isGuardSeededRef.current = true
+    }
+
+    const handleCompletedExit = (event: PopStateEvent) => {
+      const finish = finishNavigationRef.current
+      if (!finish) return
+      finishNavigationRef.current = null
+      isGuardSeededRef.current = false
+      // 연속 뒤로가기로 다른 화면에 도달했다면 사용자의 이동을 덮어쓰지 않는다.
+      if (window.location.href !== guardedHref) return
+      // 가드가 만든 같은 URL 기록만 제거한다. Next가 작성 화면을 다시 복원하지 않게 한다.
+      event.stopImmediatePropagation()
+      finish()
     }
 
     const handlePopState = (event: PopStateEvent) => {
@@ -64,12 +78,15 @@ const useExitGuard = ({
       event.returnValue = ''
     }
 
+    window.addEventListener('popstate', handleCompletedExit, true)
     window.addEventListener('popstate', handlePopState)
     window.addEventListener('beforeunload', handleBeforeUnload)
 
     return () => {
       window.removeEventListener('popstate', handlePopState)
+      window.removeEventListener('popstate', handleCompletedExit, true)
       window.removeEventListener('beforeunload', handleBeforeUnload)
+      finishNavigationRef.current = null
     }
   }, [enabled])
 
@@ -104,11 +121,24 @@ const useExitGuard = ({
     sourceRef.current = null
   }, [])
 
+  /** 저장/확인 후 이동할 때 가드용 기록을 먼저 걷어내 중복 작성 화면으로 돌아가지 않는다. */
+  const completeExit = useCallback((navigate: () => void) => {
+    if (finishNavigationRef.current) return
+    allowNavigationRef.current = true
+    sourceRef.current = null
+    setShowGuard(false)
+    if (isGuardSeededRef.current) {
+      finishNavigationRef.current = navigate
+      window.history.back()
+    } else navigate()
+  }, [])
+
   return {
     showGuard,
     requestExit,
     confirmExit,
     cancelExit,
+    completeExit,
   }
 }
 

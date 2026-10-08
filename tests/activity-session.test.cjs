@@ -4,6 +4,7 @@ const React = require('react')
 const { QueryClient, MutationObserver } = require('@tanstack/react-query')
 const { AxiosError } = require('axios')
 const { loadTypescript: load } = require('./helpers/load-typescript.cjs')
+const { requestAuthFixture } = require('./fixtures/request-auth.fixture.cjs')
 
 const jwt = (sub, revision) =>
   `fixture.${Buffer.from(JSON.stringify({ sub, role: 'adopter', iat: revision })).toString('base64url')}.fixture`
@@ -36,6 +37,7 @@ function apiHarness() {
   const { apiClient, API_VERSION } = load('src/shared/api/client.ts', {
     './unwrap': unwrap,
     './token': tokens,
+    './requestAuthScope': requestAuthFixture(tokens, auth),
     '@/shared/lib/authSessionLifecycle': auth,
     '@/shared/lib/authSessionRecovery': recovery,
     '@/shared/config/apiBaseUrl': { getApiBaseUrl: () => 'https://api.invalid' },

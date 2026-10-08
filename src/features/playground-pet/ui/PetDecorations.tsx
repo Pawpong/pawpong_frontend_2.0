@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import Image from 'next/image'
 import type {
   PetCatalogItem,
   PetCommand,
@@ -22,30 +21,12 @@ import type {
 } from '@/entities/playground-pet/model/shop.types'
 import { PET_CATALOG_DEFAULT_FILTERS } from '../constants/pet-shop'
 import { petRequestKey } from '../lib/useServerClock'
-import { petAsset, type PetAssetManifest } from '../lib/gameAssets'
+import type { PetAssetManifest } from '../lib/gameAssets'
 import { PetGlyph } from './PetGlyph'
 import { PetCatalogFilters } from './PetCatalogFilters'
 import { PetPurchaseDialog } from './PetPurchaseDialog'
+import { PetAssetThumbnail } from './PetAssetThumbnail'
 import styles from './PetRoom.module.css'
-
-export function PetAssetThumbnail({
-  item,
-  manifest,
-}: {
-  item: PetCatalogItem
-  manifest: PetAssetManifest | null
-}) {
-  const asset = petAsset(manifest, item.assetKey)
-  return (
-    <div className={`${styles.itemArt} ${item.slot === 'floor' ? styles.floorArt : ''}`}>
-      {asset ? (
-        <Image src={asset.url} alt="" width={asset.width} height={asset.height} unoptimized />
-      ) : (
-        <span className={styles.artUnavailable}>그림 준비 중</span>
-      )}
-    </div>
-  )
-}
 
 export function PetDecorations({
   mode,
@@ -59,6 +40,8 @@ export function PetDecorations({
   slotRequest,
   onCommand,
   onOpenShop,
+  onReloadImages,
+  loadingImages = false,
 }: {
   mode: PetCatalogMode
   game: PetGameState
@@ -72,6 +55,8 @@ export function PetDecorations({
   slotRequest?: { slot: PetRoomSlot; serial: number } | null
   onCommand: (command: PetCommand) => Promise<PetCommandResult | undefined>
   onOpenShop?: () => void
+  onReloadImages?: () => void
+  loadingImages?: boolean
 }) {
   const [filters, setFilters] = useState<Filters>({ ...PET_CATALOG_DEFAULT_FILTERS })
   const [appliedRequest, setAppliedRequest] = useState(0)
@@ -82,6 +67,9 @@ export function PetDecorations({
   const [confirm, setConfirm] = useState(false)
   const [moreOpen, setMoreOpen] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [imageAttempt, setImageAttempt] = useState(0)
+  const [purchasedItemId, setPurchasedItemId] = useState<string | null>(null)
+  const applyButton = useRef<HTMLButtonElement>(null)
   const pending = useRef(false)
   const mounted = useRef(true)
   useEffect(() => {
@@ -95,8 +83,13 @@ export function PetDecorations({
   const collections = petCollectionProgress(game)
   const ownedCount = game.catalog.filter((item) => game.inventory.includes(item.id)).length
   const availability = selected ? itemAvailability(game, selected, level) : null
+  useEffect(() => {
+    if (!busy && purchasedItemId === selected?.id && availability?.owned && !availability.equipped)
+      applyButton.current?.focus()
+  }, [busy, purchasedItemId, selected?.id, availability?.owned, availability?.equipped])
   const select = (item: PetCatalogItem | null) => {
     setConfirm(false)
+    setPurchasedItemId(null)
     onSelect(item)
   }
   const changeFilters = (patch: Partial<Filters>) => {
@@ -128,6 +121,8 @@ export function PetDecorations({
     try {
       const result = await onCommand(command)
       if (!mounted.current) return
+      if (kind === 'items/purchase' && (result?.type === 'success' || result?.type === 'uncertain'))
+        setPurchasedItemId(item.id)
       if (result?.type === 'success') {
         setConfirm(false)
         if (kind === 'room') onSelect(null)
@@ -178,9 +173,22 @@ export function PetDecorations({
           )
         })}
       </div>
-      <p className={styles.catalogCount} role="status">
-        {items.length}개 소품
-      </p>
+      <div className={styles.catalogToolbar}>
+        <p className={styles.catalogCount} role="status">
+          {items.length}개 소품
+        </p>
+        <button
+          type="button"
+          className={styles.smallButton}
+          disabled={busy || loadingImages}
+          onClick={() => {
+            setImageAttempt((value) => value + 1)
+            onReloadImages?.()
+          }}
+        >
+          {loadingImages ? '소품 그림 확인 중...' : '소품 그림 다시 보기'}
+        </button>
+      </div>
       <div className={styles.itemGrid}>
         {items.map((item) => {
           const state = itemAvailability(game, item, level)
@@ -192,7 +200,11 @@ export function PetDecorations({
               disabled={busy}
               onClick={() => select(item)}
             >
-              <PetAssetThumbnail item={item} manifest={manifest} />
+              <PetAssetThumbnail
+                key={`${item.id}:${imageAttempt}`}
+                item={item}
+                manifest={manifest}
+              />
               <strong>{item.name}</strong>
               <span className={styles.itemCollection}>
                 {PET_COLLECTION_LABELS[item.collection]}
@@ -239,6 +251,11 @@ export function PetDecorations({
           </p>
           <h3>{selected.name}</h3>
           <p>{selected.description}</p>
+          {purchasedItemId === selected.id && availability.owned && !availability.equipped && (
+            <p className={styles.purchaseStatus} role="status">
+              인벤토리에 저장했어요. 아래의 내 방에 적용을 누르면 방이 바뀌어요.
+            </p>
+          )}
           <ul className={styles.itemFacts}>
             <li data-state={availability.owned ? 'ok' : 'todo'}>
               {availability.equipped
@@ -270,6 +287,7 @@ export function PetDecorations({
           <div className={styles.buttonRow}>
             {availability.owned ? (
               <button
+                ref={applyButton}
                 className={styles.primaryButton}
                 disabled={busy || availability.equipped}
                 onClick={() => void mutate('room', selected)}
@@ -342,6 +360,7 @@ export function PetDecorations({
           open={confirm}
           stars={game.wallet.stars}
           disabled={busy || !availability?.purchasable}
+          pending={saving}
           onClose={() => setConfirm(false)}
           onConfirm={() => {
             if (selected) void mutate('items/purchase', selected)

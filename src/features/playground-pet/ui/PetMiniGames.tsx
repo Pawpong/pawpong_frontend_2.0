@@ -19,6 +19,7 @@ import {
   snackTapDirection,
 } from '@/entities/playground-pet/model/snack'
 import { petRequestKey } from '../lib/useServerClock'
+import { usePetStartIntent } from '../lib/usePetStartIntent'
 import type { PetStageSnapshot } from '../lib/petGameEngine'
 import { PetGlyph } from './PetGlyph'
 import styles from './PetRoom.module.css'
@@ -88,8 +89,10 @@ export function PetMiniGames({
   serverTime,
   now,
   disabled,
+  selected = true,
   characterReady,
   onPrepareGame,
+  onCancelPreparation,
   gameSurface,
   stageOverlay = null,
   onCommand,
@@ -102,8 +105,10 @@ export function PetMiniGames({
   serverTime: string
   now: number
   disabled: boolean
+  selected?: boolean
   characterReady: boolean
   onPrepareGame: (kind: PetGameKind) => Promise<boolean>
+  onCancelPreparation?: () => void
   gameSurface: HTMLElement | null
   /** 방 화면 위 투명 조작층. 간식 게임의 좌/우 터치에 쓴다. */
   stageOverlay?: HTMLElement | null
@@ -126,13 +131,19 @@ export function PetMiniGames({
   const [finishing, setFinishing] = useState(false)
   const [pendingCard, setPendingCard] = useState<number | null>(null)
   const finishLocked = useRef(false)
-  const startLocked = useRef(false)
-  const [starting, setStarting] = useState(false)
+  const [preparationFailed, setPreparationFailed] = useState(false)
   const hiddenGeneration = useRef(0)
   const lastLockRefresh = useRef('')
   const panel = useRef<HTMLElement>(null)
   const activePanel = useRef<HTMLDivElement>(null)
   const activeId = active?.sessionId ?? ''
+  const {
+    intent: startIntent,
+    phase: startPhase,
+    cancelled: preparationCancelled,
+    cancelPreparation,
+  } = usePetStartIntent({ selected, disabled, revision, activeId }, onCancelPreparation)
+  const starting = startPhase !== null
   const runningHere = active?.game === 'snack' && run?.sessionId === activeId
   const snackRun = runningHere ? run : null
   const elapsed = snackRun ? Math.min(30_000, Math.max(0, tick - snackRun.origin)) : 0
@@ -209,25 +220,32 @@ export function PetMiniGames({
   }
 
   async function start(kind: PetGameKind) {
-    if (disabled || !characterReady || active || startLocked.current) return
-    startLocked.current = true
-    setStarting(true)
+    if (!characterReady || document.hidden) return
+    const attempt = startIntent.begin()
+    if (!attempt) return
+    setPreparationFailed(false)
     const visibilityAtStart = hiddenGeneration.current
     const startedHidden = document.hidden
     try {
       // Prepare the chosen game's textures before starting the server's timed session.
-      if (
-        !(await onPrepareGame(kind)) ||
-        startedHidden ||
-        document.hidden ||
-        hiddenGeneration.current !== visibilityAtStart
-      )
+      let prepared = false
+      try {
+        prepared = await onPrepareGame(kind)
+      } catch {
+        prepared = false
+      }
+      if (!startIntent.isCurrent(attempt)) return
+      if (!prepared) {
+        setPreparationFailed(true)
         return
+      }
+      if (startedHidden || document.hidden || hiddenGeneration.current !== visibilityAtStart) return
+      if (!startIntent.markSending(attempt)) return
       const result = await send({
         kind: 'games/start',
-        body: { game: kind, expectedRevision: revision, idempotencyKey: petRequestKey() },
+        body: { game: kind, expectedRevision: attempt.revision, idempotencyKey: petRequestKey() },
       })
-      if (result?.type !== 'success') return
+      if (!startIntent.isCurrent(attempt) || result?.type !== 'success') return
       setTerminal(null)
       setDismissedResult(gameOutcome?.sessionId ?? null)
       const session = result.data.game?.games.active
@@ -255,8 +273,7 @@ export function PetMiniGames({
       }
       activePanel.current?.focus({ preventScroll: true })
     } finally {
-      startLocked.current = false
-      setStarting(false)
+      startIntent.finish(attempt)
     }
   }
 
@@ -548,8 +565,49 @@ export function PetMiniGames({
           </div>
           {starting && (
             <p role="status" className={styles.hint}>
-              게임 그림을 준비하고 있어요…
+              {startPhase === 'preparing'
+                ? '게임 그림을 준비하고 있어요…'
+                : '게임 시작을 확인하고 있어요…'}
             </p>
+          )}
+          {startPhase === 'preparing' && (
+            <button
+              type="button"
+              className={styles.smallButton}
+              onClick={() => {
+                cancelPreparation()
+                panel.current?.focus({ preventScroll: true })
+              }}
+            >
+              준비 취소
+            </button>
+          )}
+          {preparationCancelled && (
+            <p role="status" className={styles.hint}>
+              게임 준비를 멈췄어요. 원할 때 다시 시작해 주세요.
+            </p>
+          )}
+          {preparationFailed && !starting && (
+            <div role={characterReady ? 'status' : 'alert'} className={styles.hint}>
+              <p>
+                {characterReady
+                  ? '그림을 다시 준비했어요. 시작 버튼을 눌러 새 게임을 시작해 주세요.'
+                  : '게임 그림을 준비하지 못했어요. 방 화면에서 다시 준비한 뒤 시작해 주세요.'}
+              </p>
+              {!characterReady && (
+                <button
+                  type="button"
+                  className={styles.smallButton}
+                  onClick={() => {
+                    const device = gameSurface?.closest<HTMLElement>('[data-pet-device]')
+                    device?.scrollIntoView({ block: 'start' })
+                    device?.focus({ preventScroll: true })
+                  }}
+                >
+                  방 화면으로 이동
+                </button>
+              )}
+            </div>
           )}
           {!characterReady && (
             <p className={styles.hint}>우리 아이의 게임 캐릭터를 준비한 뒤 시작할 수 있어요.</p>

@@ -1,112 +1,139 @@
 'use client'
 
-import { useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { communityQueries } from '@/entities/community'
-import { useCreateCommunityComment } from '@/features/community'
-import { useMe } from '@/features/auth'
+import {
+  useCreateCommunityComment,
+  nextCommunityCreateAttempt,
+  type CommunityCreateAttempt,
+} from '@/features/community'
+import { useLoginGuard, useMe } from '@/features/auth'
+import { ApiError } from '@/shared/api'
+import { useAuthReadSession } from '@/shared/lib/useAuthReadSession'
+import { isAuthReadSessionCurrent } from '@/shared/lib/authReadSession'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import type { CommunityComment } from '@/shared/types'
+import { buildCommentTree, CommentIntentError, type CommentReplyTarget } from './commentThread'
+import { useCommentActions } from './useCommentActions'
 
-/** 최상위 댓글 하나와 그 답글들. root가 null이면 삭제된 댓글 자리. */
-interface CommentThread {
-  parentId: string
-  root: CommunityComment | null
-  replies: CommunityComment[]
-  createdAt: string
-}
-
-/** 로드된 댓글로 1단계 스레드(최상위 + 답글) 구성 */
-const buildCommentTree = (comments: CommunityComment[]) => {
-  const repliesByParent = comments.reduce<Record<string, CommunityComment[]>>((acc, c) => {
-    if (c.parentCommentId) (acc[c.parentCommentId] ??= []).push(c)
-    return acc
-  }, {})
-  const loadedIds = new Set(comments.map((c) => c.commentId))
-
-  const threads: CommentThread[] = comments
-    .filter((c) => !c.parentCommentId)
-    .map((root) => ({
-      parentId: root.commentId,
-      root,
-      replies: repliesByParent[root.commentId] ?? [],
-      createdAt: root.createdAt,
-    }))
-
-  // 댓글은 작성순(asc)이라 답글이 로드됐으면 부모도 로드돼 있다. 그런데도 부모가 없으면 삭제된 것
-  // (서버는 소프트 삭제한 댓글을 응답에서 빼버린다) → 답글이 사라지지 않게 '삭제된 댓글' 자리를 만든다.
-  Object.entries(repliesByParent).forEach(([parentId, replies]) => {
-    if (loadedIds.has(parentId)) return
-    threads.push({ parentId, root: null, replies, createdAt: replies[0].createdAt })
+const useCommentThread = (postId: string, enabled = true) => {
+  const { isLoggedIn, me: profile } = useMe()
+  const login = useLoginGuard()
+  const session = useAuthReadSession()
+  const composerKey = JSON.stringify([postId, session?.scope])
+  const currentContext = useRef<string | null>(composerKey)
+  useLayoutEffect(() => {
+    currentContext.current = composerKey
+    return () => {
+      currentContext.current = null
+    }
+  }, [composerKey])
+  const [draft, setDraft] = useState<{ key: string; value: string } | null>(null)
+  const commentBody = draft?.key === composerKey ? draft.value : ''
+  const setCommentBody = (value: string) => {
+    if (currentContext.current === composerKey) setDraft({ key: composerKey, value })
+  }
+  const me =
+    session?.identity === JSON.stringify([profile?.role, profile?.userId]) ? profile : undefined
+  const query = useInfiniteQuery({
+    ...communityQueries.comments(postId, 20, session),
+    enabled,
+    retry: false,
+    throwOnError: false,
+  })
+  const createComment = useCreateCommunityComment(postId, session)
+  const [reply, setReply] = useState<{ key: string; target: CommentReplyTarget } | null>(null)
+  const [sendingKey, setSendingKey] = useState<string | null>(null)
+  const inFlight = useRef<{ key: string } | null>(null)
+  const retryAttempt = useRef<CommunityCreateAttempt | null>(null)
+  const replyTarget = reply?.key === composerKey ? reply.target : null
+  const isSubmitting = sendingKey === composerKey || createComment.isPending
+  const busy = () => inFlight.current?.key === composerKey || isSubmitting
+  const { threads, loadedIds } = buildCommentTree(flattenPages(query.data))
+  const actions = useCommentActions(postId, session, enabled, async () => {
+    const result = await query.refetch({ throwOnError: true })
+    return flattenPages(result.data)
   })
 
-  threads.sort((a, b) => a.createdAt.localeCompare(b.createdAt))
-
-  return { threads, loadedIds }
-}
-
-/**
- * 댓글 목록·작성·답글 대상을 한 곳에서 관리한다.
- * 목록(CommentList)과 입력창(CommentComposerBar)이 상세 레이아웃에서 서로 떨어진 자리에
- * 배치되므로, 각자 훅을 부르지 않고 부모가 한 번 호출해 결과를 내려준다.
- */
-const useCommentThread = (postId: string, enabled = true) => {
-  // [refactored] useAuthStatus + profileQueries.me 조합을 useMe로
-  // (상세와 같은 queryKey라 네트워크 요청은 1건으로 합쳐진다)
-  const { isLoggedIn, me } = useMe()
-  const {
-    data: commentsData,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isPending,
-    isError,
-  } = useInfiniteQuery({ ...communityQueries.comments(postId), enabled })
-  const createComment = useCreateCommunityComment(postId)
-
-  // 답글 대상 (parentCommentId 는 최상위 댓글로 고정 — 1단계 스레드)
-  const [replyTarget, setReplyTarget] = useState<{ commentId: string; nickname: string } | null>(
-    null,
-  )
-
-  const { threads, loadedIds } = buildCommentTree(flattenPages(commentsData))
-
   const handleReply = (comment: CommunityComment) => {
-    // 답글의 답글도 최상위 댓글에 매달아 1단계 스레드를 유지
-    setReplyTarget({
-      commentId: comment.parentCommentId ?? comment.commentId,
-      nickname: comment.authorNickname,
+    if (!enabled || busy()) return
+    if (!isLoggedIn || !session) return login.openPrompt()
+    setReply({
+      key: composerKey,
+      target: {
+        commentId: comment.parentCommentId ?? comment.commentId,
+        nickname: comment.authorNickname,
+      },
     })
   }
-
+  const cancelReply = () => {
+    if (!busy()) setReply(null)
+  }
   const handleSubmitComment = async (body: string) => {
-    if (!enabled) throw new Error('공개 보류 중에는 댓글을 작성할 수 없어요.')
-    // 답글 쓰는 사이 대상 댓글이 삭제됐으면 없는 parentCommentId를 보내지 않고 최상위로 작성한다
-    const parentCommentId =
-      replyTarget && loadedIds.has(replyTarget.commentId) ? replyTarget.commentId : undefined
-
-    await createComment.mutateAsync({ body, parentCommentId })
-    setReplyTarget(null)
+    if (!enabled) throw new CommentIntentError('공개 보류 중에는 댓글을 작성할 수 없어요.')
+    if (!session || !isAuthReadSessionCurrent(session))
+      throw new ApiError('로그인 상태가 변경되었습니다.', 401)
+    if (busy()) throw new CommentIntentError('댓글을 게시하고 있어요. 잠시 기다려 주세요.')
+    if (replyTarget && (query.isPending || query.isError))
+      throw new CommentIntentError('댓글 목록을 다시 확인한 뒤 답글을 게시해 주세요.')
+    if (replyTarget && !loadedIds.has(replyTarget.commentId))
+      throw new CommentIntentError(
+        '답글 대상을 확인할 수 없어요. 댓글 목록을 다시 확인하거나 답글을 취소해 주세요.',
+      )
+    const attempt = { key: composerKey }
+    const request = nextCommunityCreateAttempt(
+      retryAttempt.current,
+      JSON.stringify([composerKey, body.trim(), replyTarget?.commentId ?? null]),
+    )
+    retryAttempt.current = request
+    inFlight.current = attempt
+    setSendingKey(composerKey)
+    try {
+      await createComment.mutateAsync({
+        body,
+        parentCommentId: replyTarget?.commentId,
+        clientRequestId: request.clientRequestId,
+      })
+      if (!isAuthReadSessionCurrent(session) || currentContext.current !== composerKey)
+        throw new ApiError('로그인 상태가 변경되었습니다.', 401)
+      if (retryAttempt.current === request) retryAttempt.current = null
+      setReply((current) => (current === reply ? null : current))
+    } finally {
+      if (inFlight.current === attempt) {
+        inFlight.current = null
+        setSendingKey(null)
+      }
+    }
   }
 
   return {
-    isLoggedIn,
+    actions,
+    isLoggedIn: isLoggedIn && Boolean(session),
     me,
+    login,
+    composerKey,
+    commentBody,
+    setCommentBody,
     threads,
-    isPending,
-    isError,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
+    isPending: query.isPending,
+    isError: query.isError,
+    isFetching: query.isFetching,
+    isFetchNextPageError: query.isFetchNextPageError,
+    refetch: query.refetch,
+    fetchNextPage: query.fetchNextPage,
+    hasNextPage: query.hasNextPage,
+    isFetchingNextPage: query.isFetchingNextPage,
     createComment,
+    isSubmitting,
     replyTarget,
-    cancelReply: () => setReplyTarget(null),
+    cancelReply,
     handleReply,
     handleSubmitComment,
   }
 }
 
 type CommentThreadController = ReturnType<typeof useCommentThread>
-
 export { useCommentThread }
-export type { CommentThread, CommentThreadController }
+export type { CommentThreadController }
+export type { CommentThread } from './commentThread'

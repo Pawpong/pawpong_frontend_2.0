@@ -1,41 +1,26 @@
 'use client'
 
-import { useState } from 'react'
-import { AuthorInfo, Button, DeleteConfirmModal, OwnerActionsMenu } from '@/shared/ui'
+import { AuthorInfo, Button, OwnerActionsMenu } from '@/shared/ui'
 import type { CommunityComment } from '@/shared/types'
-import { useDeleteCommunityComment, useUpdateCommunityComment } from '@/features/community'
+import type { CommentActionsController } from './useCommentActions'
+import { CommentEditForm } from './CommentEditForm'
+import { commentActionTriggerId } from './commentAction'
 
 interface CommentItemProps {
   comment: CommunityComment
-  /** 현재 로그인 사용자 ID — 본인 댓글이면 수정/삭제 메뉴 노출 */
-  currentUserId?: string
-  /** 답글 달기 클릭 시 대상 댓글 전달 */
+  actions: CommentActionsController
   onReply?: (comment: CommunityComment) => void
-  /** 답글(대댓글)이면 들여쓰기 */
+  replyDisabled?: boolean
   isReply?: boolean
 }
 
-const CommentItem = ({ comment, currentUserId, onReply, isReply }: CommentItemProps) => {
-  const isOwner = !!currentUserId && currentUserId === comment.authorId
-
-  const updateComment = useUpdateCommunityComment(comment.commentId, comment.postId)
-  const deleteComment = useDeleteCommunityComment(comment.postId)
-
-  const [isEditing, setIsEditing] = useState(false)
-  const [editValue, setEditValue] = useState(comment.body)
-  const [confirmDelete, setConfirmDelete] = useState(false)
-
-  const handleSaveEdit = () => {
-    const trimmed = editValue.trim()
-    if (!trimmed || updateComment.isPending) return
-    updateComment.mutate({ body: trimmed }, { onSuccess: () => setIsEditing(false) })
-  }
-
+const CommentItem = ({ comment, actions, onReply, isReply, replyDisabled }: CommentItemProps) => {
+  const isEditing =
+    actions.active?.mode === 'edit' && actions.active.comment.commentId === comment.commentId
   return (
     <div className={`flex items-start gap-2 py-3 ${isReply ? 'pl-12' : ''}`}>
       <AuthorInfo
         size="sm"
-        // 남는 가로를 댓글이 차지해야 ⋯ 메뉴가 오른쪽 끝으로 밀린다
         className="flex min-w-0 flex-1 items-start gap-2"
         authorId={comment.authorId}
         nickname={comment.authorNickname}
@@ -44,77 +29,32 @@ const CommentItem = ({ comment, currentUserId, onReply, isReply }: CommentItemPr
         contentSlot={
           <>
             {isEditing ? (
-              <div className="mt-1 flex flex-col gap-2">
-                <textarea
-                  value={editValue}
-                  onChange={(event) => setEditValue(event.target.value)}
-                  maxLength={1000}
-                  rows={2}
-                  className="w-full resize-none rounded-lg border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-text-primary"
-                />
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    onClick={handleSaveEdit}
-                    disabled={!editValue.trim() || updateComment.isPending}
-                  >
-                    {updateComment.isPending ? '저장 중' : '저장'}
-                  </Button>
-                  <Button
-                    intent="secondary"
-                    size="sm"
-                    onClick={() => {
-                      setIsEditing(false)
-                      setEditValue(comment.body)
-                      updateComment.reset()
-                    }}
-                    disabled={updateComment.isPending}
-                  >
-                    취소
-                  </Button>
-                </div>
-                {updateComment.isError && (
-                  <p role="alert" className="text-xs text-error-700">
-                    댓글 수정에 실패했습니다. 다시 시도해주세요.
-                  </p>
-                )}
-              </div>
+              <CommentEditForm actions={actions} currentBody={comment.body} />
             ) : (
               <p className="mt-1.5 text-body-lg font-normal break-words whitespace-pre-wrap text-neutral-850">
                 {comment.body}
               </p>
             )}
             {!isEditing && onReply && (
-              <Button intent="ghost" size="inline" onClick={() => onReply(comment)}>
+              <Button
+                intent="ghost"
+                size="inline"
+                disabled={replyDisabled}
+                onClick={() => onReply(comment)}
+              >
                 답글 달기
               </Button>
             )}
           </>
         }
       />
-
-      {/* 본인 댓글에서만 ⋮ → 수정/삭제 메뉴 노출 */}
-      {isOwner && !isEditing && (
+      {actions.canManage(comment) && !isEditing && (
         <OwnerActionsMenu
-          onEdit={() => {
-            setEditValue(comment.body)
-            updateComment.reset()
-            setIsEditing(true)
-          }}
-          onDelete={() => setConfirmDelete(true)}
-        />
-      )}
-
-      {isOwner && (
-        <DeleteConfirmModal
-          open={confirmDelete}
-          onOpenChange={setConfirmDelete}
-          target="댓글"
-          // 삭제 성공 후에만 닫고, 갱신된 댓글 목록과 댓글 수는 mutation 훅이 다시 조회한다.
-          onConfirm={() =>
-            deleteComment.mutate(comment.commentId, { onSuccess: () => setConfirmDelete(false) })
-          }
-          isPending={deleteComment.isPending}
+          ariaLabel="댓글 더보기"
+          triggerId={commentActionTriggerId(comment.commentId)}
+          disabled={Boolean(actions.active) || actions.isBusy}
+          onEdit={() => actions.start(comment, 'edit')}
+          onDelete={() => actions.start(comment, 'delete')}
         />
       )}
     </div>

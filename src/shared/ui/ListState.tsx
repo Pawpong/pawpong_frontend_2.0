@@ -10,6 +10,7 @@ interface ListStateProps {
   loadingText: ReactNode
   errorText: ReactNode
   emptyText: ReactNode
+  emptyAction?: ReactNode
   /** 오류 상태에서 같은 자리에서 재시도할 수 있는 액션. */
   errorAction?: ReactNode
   onRetry?: () => void
@@ -27,6 +28,7 @@ const ListState = ({
   loadingText,
   errorText,
   emptyText,
+  emptyAction,
   errorAction,
   onRetry,
   isRetrying,
@@ -47,6 +49,7 @@ const ListState = ({
     return (
       <AsyncState
         status="empty"
+        action={emptyAction}
         message={
           appPublicContent ? <AppPublicEmptyMessage>{emptyText}</AppPublicEmptyMessage> : emptyText
         }

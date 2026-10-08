@@ -360,6 +360,6 @@ test('기록 남기기 링크는 새 글의 기록 틀만 열고 수치는 비�
     activity: 'other',
   })
   assert.deepEqual(start('daily', '2026-10-07').topics, ['daily'])
-  for (const value of ['life', 'travel', 'question', 'constructor', '', null, undefined])
+  for (const value of ['life', 'unknown', 'constructor', '', null, undefined])
     assert.equal(start(value), undefined)
 })

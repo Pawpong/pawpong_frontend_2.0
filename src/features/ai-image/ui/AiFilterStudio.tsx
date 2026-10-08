@@ -11,6 +11,7 @@ import { PawPrintIcon } from '@/shared/assets'
 import { PLAYGROUND_BILLING_ENABLED } from '@/shared/config/playground'
 import { cafe24Proup } from '@/shared/lib/fonts'
 import { cn } from '@/shared/lib/cn'
+import { isAuthReadSessionCurrent } from '@/shared/lib/authReadSession'
 import { Button, ComposerSectionHeading, buttonVariants } from '@/shared/ui'
 import { PhotoUploadField } from '@/shared/ui/PhotoUploadField'
 import { saveAiImageFile } from '../lib/aiImageFile'
@@ -90,6 +91,7 @@ export function AiFilterStudio({
   })
   const [saving, setSaving] = useState(false)
   const [shareComparison, setShareComparison] = useState(false)
+  const [shareError, setShareError] = useState<string | null>(null)
   const resultRef = useRef<HTMLDivElement>(null)
 
   const remaining = allowance?.remaining
@@ -106,6 +108,7 @@ export function AiFilterStudio({
     if (await prepareSelectedPhoto(files[0])) {
       ai.reset()
       setShareComparison(false)
+      setShareError(null)
     }
   }
 
@@ -125,10 +128,17 @@ export function AiFilterStudio({
   }
 
   const save = async () => {
-    if (!result) return
+    if (!result || saving) return
+    if (!isAuthReadSessionCurrent(result.session)) {
+      setShareError('로그인 정보를 확인한 뒤 보관함에서 사진을 다시 선택해 주세요.')
+      return
+    }
+    setShareError(null)
     setSaving(true)
     try {
       await saveAiImageFile(result.file)
+    } catch {
+      setShareError('사진을 저장하지 못했어요. 다시 시도해 주세요.')
     } finally {
       setSaving(false)
     }
@@ -136,8 +146,18 @@ export function AiFilterStudio({
 
   const postToCommunity = () => {
     if (!result) return
-    setPendingCommunityPhoto(result.file, shareComparison ? photo?.file : undefined, result.jobId)
-    router.push('/community/write')
+    setShareError(null)
+    try {
+      setPendingCommunityPhoto(
+        result.file,
+        shareComparison ? photo?.file : undefined,
+        result.jobId,
+        result.session,
+      )
+      router.push('/community/write?source=ai-photo')
+    } catch {
+      setShareError('로그인 정보를 확인한 뒤 보관함에서 사진을 다시 선택해 주세요.')
+    }
   }
 
   const filledBlocks =
@@ -432,6 +452,11 @@ export function AiFilterStudio({
                 onChange={setShareComparison}
                 disabled={saving}
               />
+              {shareError && (
+                <p role="alert" className="text-sm text-error-500">
+                  {shareError}
+                </p>
+              )}
               <p className="text-center text-xs leading-relaxed text-neutral-700">
                 {gameCharacter
                   ? '우리 아이와 닮았는지 확인해 주세요. 보관함에도 저장됐어요.'

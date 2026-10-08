@@ -2,11 +2,13 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { isApiError } from '@/shared/api'
 import { Button, Input } from '@/shared/ui'
 import { CommentComposerShell } from './CommentComposerShell'
+import { commentSubmitFeedback } from './commentSubmitFeedback'
 
 interface CommentComposerProps {
+  draft: string
+  onDraftChange: (value: string) => void
   onSubmit: (body: string) => void | Promise<void>
   isSubmitting?: boolean
   hasSubmitError: boolean
@@ -17,6 +19,8 @@ interface CommentComposerProps {
   /** 답글 대상 닉네임 — 있으면 답글 모드 배너 표시 */
   replyingToNickname?: string | null
   onCancelReply?: () => void
+  onCheckComments?: () => void
+  isCheckingComments?: boolean
 }
 
 /**
@@ -24,6 +28,8 @@ interface CommentComposerProps {
  * 답글 모드에서는 대상 닉네임 배너 + 취소를 노출한다. 제출 성공 후 입력값을 비운다.
  */
 const CommentComposer = ({
+  draft: value,
+  onDraftChange: setValue,
   onSubmit,
   isSubmitting = false,
   hasSubmitError,
@@ -32,14 +38,15 @@ const CommentComposer = ({
   profileImageUrl,
   replyingToNickname,
   onCancelReply,
+  onCheckComments,
+  isCheckingComments,
 }: CommentComposerProps) => {
-  const [value, setValue] = useState('')
   const trimmed = value.trim()
   const inputRef = useRef<HTMLInputElement>(null)
   const submittingRef = useRef(false)
   const composingRef = useRef(false)
   const [submitting, setSubmitting] = useState(false)
-  const [localError, setLocalError] = useState(false)
+  const [localError, setLocalError] = useState<unknown>(null)
   const [submitted, setSubmitted] = useState(false)
   const busy = isSubmitting || submitting
 
@@ -48,56 +55,64 @@ const CommentComposer = ({
     if (replyingToNickname) inputRef.current?.focus()
   }, [replyingToNickname])
 
-  // 실패해도 입력값은 남기고 재시도할 수 있게 — 오류 상태는 호출부 mutation을 단일 출처로 쓴다
+  // 서버 응답을 확인한 뒤에만 초안을 지운다. 사전 검증 실패도 입력과 함께 표시한다.
   const handleSubmit = async () => {
     const body = inputRef.current?.value.trim() ?? trimmed
     if (!body || isSubmitting || submittingRef.current) return
     submittingRef.current = true
     setSubmitting(true)
-    setLocalError(false)
+    setLocalError(null)
     setSubmitted(false)
     if (hasSubmitError) onClearSubmitError()
     try {
       await onSubmit(body)
       setValue('')
       setSubmitted(true)
-    } catch {
+    } catch (error) {
       // mutation 전에 실패해도 아무 반응 없는 상태가 되지 않도록 입력값과 오류를 남긴다.
-      setLocalError(true)
+      setLocalError(error ?? new Error('댓글 등록을 확인하지 못했습니다.'))
     } finally {
       submittingRef.current = false
       setSubmitting(false)
     }
   }
 
-  // [refactored] py-3 래퍼·아바타 마크업을 CommentComposerShell로 위임
   const banner = replyingToNickname && (
     <div className="flex items-center justify-between gap-2 rounded-lg bg-action-subtle px-3 py-2 text-body-md text-neutral-850">
       <span className="min-w-0 font-semibold break-words">@{replyingToNickname}에게 답글</span>
-      <Button intent="link" size="inline" onClick={onCancelReply}>
-        취소
+      <Button
+        intent="link"
+        size="inline"
+        disabled={busy}
+        onClick={() => {
+          onCancelReply?.()
+          setLocalError(null)
+          if (hasSubmitError) onClearSubmitError()
+        }}
+      >
+        답글 취소
       </Button>
     </div>
   )
 
-  const needsConsent =
-    isApiError(submitError) &&
-    submitError.status === 403 &&
-    typeof submitError.message === 'string' &&
-    submitError.message.includes('앱 표시 동의')
-  const error = (hasSubmitError || localError) && (
+  const feedbackMessage = commentSubmitFeedback(localError ?? submitError)
+  const error = (hasSubmitError || localError !== null) && (
     <div role="alert" className="text-body-sm text-error-700">
-      <p>
-        {needsConsent
-          ? '앱에서 댓글을 남기려면 게시물 표시 동의가 필요해요.'
-          : isApiError(submitError) && submitError.status === 401
-            ? '로그인이 만료됐어요. 다시 로그인해 주세요.'
-            : '댓글 등록에 실패했습니다. 입력한 글은 남아 있으니 다시 시도해주세요.'}
-      </p>
-      {needsConsent && (
+      <p>{feedbackMessage.message}</p>
+      {feedbackMessage.needsConsent && (
         <Link href="/account/content-rights" className="font-semibold underline">
           앱 표시 동의하기
         </Link>
+      )}
+      {feedbackMessage.canCheck && onCheckComments && (
+        <button
+          type="button"
+          className="min-h-11 rounded font-semibold underline focus-ring disabled:opacity-40"
+          disabled={isCheckingComments || busy}
+          onClick={onCheckComments}
+        >
+          {isCheckingComments ? '댓글 확인 중…' : '댓글 목록 다시 확인'}
+        </button>
       )}
     </div>
   )
@@ -130,7 +145,7 @@ const CommentComposer = ({
           enterKeyHint="send"
           onChange={(e) => {
             setValue(e.target.value)
-            setLocalError(false)
+            setLocalError(null)
             setSubmitted(false)
             if (hasSubmitError) onClearSubmitError()
           }}

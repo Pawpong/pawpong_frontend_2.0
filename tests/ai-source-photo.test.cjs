@@ -57,7 +57,11 @@ function mount(t, overrides = {}, initial = {}) {
   }
   const { useAiSourcePhoto } = loadModule('src/features/ai-image/lib/useAiSourcePhoto.ts', {
     react: hooks,
-    '@/shared/api/token': { getAccessToken: () => token },
+    '@/shared/lib/authReadSession': {
+      getAuthReadSession: () => ({ identity: token.split(':')[0], generation }),
+      isAuthReadSessionCurrent: (session) =>
+        session.identity === token.split(':')[0] && session.generation === generation,
+    },
     '@/shared/lib/authSessionLifecycle': { isAuthSessionCurrent: (value) => value === generation },
     '@/shared/lib/preparePhoto': {
       preparePhoto: async (file) => {
@@ -91,6 +95,9 @@ function mount(t, overrides = {}, initial = {}) {
     },
     changeToken() {
       token = 'new-token'
+    },
+    refreshToken() {
+      token = 'owner-token:refreshed'
     },
   }
 }
@@ -156,6 +163,17 @@ test('이미지 준비 도중 계정이 바뀌어도 이전 사진의 미리보�
   waiting.resolve(archivedFile)
   await flush()
   assert.deepEqual(hook.calls.create, [])
+})
+
+test('같은 작성자의 인증 갱신은 보관함 사진을 버리지 않고 표시함', async (t) => {
+  const waiting = deferred()
+  const hook = mount(t, { fetch: () => waiting.promise })
+  hook.render()
+  hook.refreshToken()
+  waiting.resolve(archivedFile)
+  await flush()
+  assert.equal(hook.render().photo.file, archivedFile)
+  assert.equal(hook.render().preparing, false)
 })
 
 test('보관함 조회 실패는 안전하게 안내하고 새 사진 선택으로 복구함', async (t) => {

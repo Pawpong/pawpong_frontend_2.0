@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import {
@@ -32,19 +32,51 @@ export function PetAdoption({
 }) {
   const [selectedId, setSelectedId] = useState(initialSourceJobId ?? '')
   const [name, setName] = useState('')
+  const [imageAttempt, setImageAttempt] = useState(0)
+  const retryingImages = useRef(false)
   const candidates = useInfiniteQuery({
     queryKey: [...petPrivateKey(session), 'eligible'],
     queryFn: ({ pageParam, signal }) =>
       inPetSession(session, () => getEligiblePetImages(pageParam, signal)),
     initialPageParam: null as string | null,
-    getNextPageParam: (last) => last.nextCursor ?? undefined,
+    getNextPageParam: (last, _pages, _previous, cursors) =>
+      last.nextCursor && !cursors.includes(last.nextCursor) ? last.nextCursor : undefined,
     retry: false,
     throwOnError: false,
     gcTime: 0,
   })
-  const images = candidates.data?.pages.flatMap((page) => page.images) ?? []
+  const loaded = [
+    ...new Map(
+      (candidates.data?.pages.flatMap((page) => page.images) ?? []).map((image) => [
+        image.sourceJobId,
+        image,
+      ]),
+    ).values(),
+  ]
+  const requested = loaded.find((image) => image.sourceJobId === initialSourceJobId)
+  const images = requested
+    ? [requested, ...loaded.filter((image) => image.sourceJobId !== requested.sourceJobId)]
+    : loaded
   const selected = images.find((image) => image.sourceJobId === selectedId)
+  const needsRequested = Boolean(
+    initialSourceJobId && selectedId === initialSourceJobId && !selected,
+  )
+  const { fetchNextPage, hasNextPage, isFetching, isError } = candidates
+  useEffect(() => {
+    // 링크가 고른 그림을 찾는 읽기만 이어 간다. 다른 그림을 고르면 자동 탐색을 멈춘다.
+    if (needsRequested && hasNextPage && !isFetching && !isError) void fetchNextPage()
+  }, [needsRequested, hasNextPage, isFetching, isError, fetchNextPage])
   const nameValid = isValidPetName(name)
+  const retryImages = async () => {
+    if (disabled || candidates.isFetching || retryingImages.current) return
+    retryingImages.current = true
+    try {
+      await candidates.refetch().catch(() => undefined)
+    } finally {
+      retryingImages.current = false
+      setImageAttempt((value) => value + 1)
+    }
+  }
   return (
     <section
       aria-labelledby="adopt-heading"
@@ -71,11 +103,26 @@ export function PetAdoption({
           ? '연결할 그림을 직접 골라 주세요. 기존 그림·이름·성장·별사탕은 그대로 유지돼요. 연결에는 AI 이용 횟수를 쓰지 않아요.'
           : '내 AI 보관함에서 몸과 발·꼬리가 보이는 게임 캐릭터를 골라 주세요. 사진용 초상화는 보관함에 그대로 있어요.'}
       </p>
+      {needsRequested && !candidates.isError && (
+        <p
+          role="status"
+          className="mt-4 rounded-xl bg-point-50 p-4 text-sm leading-6 text-neutral-700"
+        >
+          {candidates.isPending || candidates.hasNextPage || candidates.isFetchingNextPage
+            ? '선택한 캐릭터를 찾고 있어요. 다른 캐릭터를 먼저 골라도 괜찮아요.'
+            : '연결할 캐릭터를 찾지 못했어요. 아래에서 다른 그림을 고르거나 AI 보관함에서 다시 확인해 주세요.'}
+        </p>
+      )}
+      {initialSourceJobId && requested && selectedId === initialSourceJobId && (
+        <p role="status" className="mt-4 text-sm font-semibold text-primary-700">
+          선택한 캐릭터를 불러왔어요. 그림을 확인한 뒤 직접 연결해 주세요.
+        </p>
+      )}
       {candidates.isPending ? (
         <p role="status" className="py-12 text-center text-neutral-700">
           완성된 도트 그림을 불러오고 있어요…
         </p>
-      ) : candidates.isError ? (
+      ) : candidates.isError && images.length === 0 ? (
         <div role="alert" className="space-y-4 py-8">
           <p>선택할 수 있는 그림을 불러오지 못했어요.</p>
           <Button intent="secondary" onClick={() => void candidates.refetch()}>
@@ -134,6 +181,12 @@ export function PetAdoption({
             <legend className="mb-3 text-sm font-semibold text-neutral-850">
               1. 키우고 싶은 도트 그림
             </legend>
+            {candidates.isError && (
+              <p role="alert" className="mb-4 rounded-xl bg-point-50 p-4 text-sm text-neutral-700">
+                최신 그림 목록을 확인하지 못했어요. 고른 캐릭터와 이름은 그대로 두었어요. 연결을
+                확인한 뒤 그림을 다시 불러와 주세요.
+              </p>
+            )}
             <div className="grid grid-cols-2 gap-3 tab:grid-cols-3 pc:grid-cols-4">
               {images.map((image, index) => (
                 <label key={image.sourceJobId} className="relative cursor-pointer">
@@ -148,7 +201,7 @@ export function PetAdoption({
                   />
                   <span className="block aspect-square overflow-hidden rounded-xl border-2 border-secondary-100 bg-point-50 p-3 peer-checked:border-brand peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-brand peer-disabled:opacity-60">
                     <PetImage
-                      key={image.imageUrl}
+                      key={`${image.imageUrl}:${imageAttempt}`}
                       src={image.imageUrl}
                       alt={`선택 가능한 ${index + 1}번째 도트 그림`}
                       compact
@@ -162,6 +215,19 @@ export function PetAdoption({
                   )}
                 </label>
               ))}
+            </div>
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <Button
+                type="button"
+                intent="secondary"
+                disabled={disabled || candidates.isFetching}
+                onClick={() => void retryImages()}
+              >
+                {candidates.isFetching ? '그림 확인하는 중...' : '그림 다시 불러오기'}
+              </Button>
+              <p className="text-xs leading-5 text-neutral-700">
+                그림이 보이지 않으면 다시 불러오세요. AI 이용 횟수는 사용하지 않아요.
+              </p>
             </div>
             {candidates.hasNextPage && (
               <div className="mt-4">
@@ -200,7 +266,7 @@ export function PetAdoption({
               <div className="mt-6 flex items-center gap-4 rounded-xl bg-point-50 p-4">
                 <div className="size-20 shrink-0">
                   <PetImage
-                    key={selected.imageUrl}
+                    key={`${selected.imageUrl}:${imageAttempt}`}
                     src={selected.imageUrl}
                     alt="키울 반려동물 미리보기"
                     compact

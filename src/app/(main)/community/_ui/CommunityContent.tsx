@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { ActivityBadgeRow } from '@/entities/gamification'
 import { ActivityEntry, usePublicActivityBadges } from '@/features/gamification'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -8,8 +8,11 @@ import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import {
   communityExperienceConfigOptions,
   countCommunityDiscovery,
-  parseCommunityDiscovery,
-  toCommunityDiscoveryQuery,
+  parseCommunityFeedNavigation,
+  communityFeedHref,
+  communityWriteEntry,
+  COMMUNITY_SEARCH_MAX_LENGTH,
+  type CommunityFeedNavigation,
 } from '@/entities/community'
 import {
   Button,
@@ -36,7 +39,7 @@ import { useLoginGuard, useMe } from '@/features/auth'
 import { FeedFollowButton } from './FeedFollowButton'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import { cn } from '@/shared/lib/cn'
-import type { CommunityPetType, CommunitySortType, CommunityDiscoveryFilters } from '@/shared/types'
+import type { CommunityDiscoveryFilters } from '@/shared/types'
 import { COMMUNITY_SORT_OPTIONS } from './constants'
 import { CommunityDiscovery } from './CommunityDiscovery'
 import { CommunityFeedMeta } from './CommunityFeedMeta'
@@ -51,21 +54,22 @@ const PET_OPTIONS = [
 const CommunityContent = () => {
   const router = useRouter()
   const parameters = useSearchParams()
-  const [petType, setPetType] = useState<CommunityPetType | ''>('')
-  const [sort, setSort] = useState<CommunitySortType>('latest')
-  const [appliedSearch, setAppliedSearch] = useState('')
-  // 필터는 주소가 원본이다 — 상세의 태그 링크, 뒤로 가기, 공유한 주소가 같은 목록을 연다.
-  const discoveryQuery = toCommunityDiscoveryQuery(parseCommunityDiscovery(parameters))
-  const discovery = useMemo(
-    () => parseCommunityDiscovery(new URLSearchParams(discoveryQuery)),
-    [discoveryQuery],
+  const query = parameters.toString()
+  const navigation = useMemo(
+    () => parseCommunityFeedNavigation(new URLSearchParams(query)),
+    [query],
   )
-  const setDiscovery = (next: CommunityDiscoveryFilters) => {
-    const query = toCommunityDiscoveryQuery(next)
-    router.replace(query ? `/community?${query}` : '/community', { scroll: false })
+  const { petType, sort, search: appliedSearch, discovery } = navigation
+  const changeNavigation = (next: Partial<CommunityFeedNavigation>) => {
+    router.replace(communityFeedHref({ ...navigation, ...next }), { scroll: false })
   }
-  const experience = useQuery(communityExperienceConfigOptions)
+  const setDiscovery = (next: CommunityDiscoveryFilters) => {
+    changeNavigation({ discovery: next })
+  }
+  const experience = useQuery({ ...communityExperienceConfigOptions, throwOnError: false })
   const experienceEnabled = experience.data?.enabled === true && !experience.isError
+  const hasDiscovery = countCommunityDiscovery(discovery) > 0
+  const filterUnavailable = hasDiscovery && experience.isError
   const filtered = experienceEnabled && countCommunityDiscovery(discovery) > 0
   const topicLabel = (key: string) =>
     experience.data?.topics.find((topic) => topic.key === key)?.label ?? key
@@ -81,8 +85,8 @@ const CommunityContent = () => {
     isError,
     refetch,
     isFetching: isRetrying,
-  } = useInfiniteQuery(
-    communityQueries.posts(
+  } = useInfiniteQuery({
+    ...communityQueries.posts(
       sort,
       petType || undefined,
       undefined,
@@ -91,7 +95,9 @@ const CommunityContent = () => {
       undefined,
       filtered ? discovery : undefined,
     ),
-  )
+    enabled: !hasDiscovery || (!experience.isPending && !experience.isError),
+    throwOnError: false,
+  })
   const posts = flattenPages(data)
   const authorBadges = usePublicActivityBadges(
     posts.map((post) => ({
@@ -103,7 +109,15 @@ const CommunityContent = () => {
     authorBadges.map((owner) => [`${owner.role}:${owner.ownerId}`, owner.badges]),
   )
   const firstPhotoPostId = getFirstPhotoPostId(posts)
-  const writePost = guard(() => router.push('/community/write'))
+  const writeEntry = communityWriteEntry(experienceEnabled ? discovery : {})
+  const writePost = guard(() => {
+    const entry = new URL(writeEntry.href, window.location.origin)
+    entry.searchParams.set(
+      'returnTo',
+      communityFeedHref({ discovery, petType, sort, search: appliedSearch }),
+    )
+    router.push(`${entry.pathname}${entry.search}`)
+  })
   // 하단 탭으로 오가는 최상위 화면이라 링크로 바로 열면 돌아갈 기록이 없다 — 그때는 홈으로 보낸다
   const goBack = () => (window.history.length > 1 ? router.back() : router.push('/'))
   const selectedLabel = PET_OPTIONS.find((option) => option.value === petType)?.label
@@ -137,7 +151,7 @@ const CommunityContent = () => {
                   key={option.value}
                   type="button"
                   aria-pressed={petType === option.value}
-                  onClick={() => setPetType(option.value)}
+                  onClick={() => changeNavigation({ petType: option.value })}
                   className={cn(
                     'flex min-h-12 items-center justify-between rounded-xl px-4 text-left text-[0.9375rem] focus-ring transition-colors',
                     petType === option.value
@@ -155,7 +169,7 @@ const CommunityContent = () => {
             <div className="mt-6 border-t border-neutral-100 pt-6">
               <ActivityEntry />
               <Button onClick={writePost} width="full" size="lg">
-                글쓰기
+                {writeEntry.label}
               </Button>
               <p className="mt-3 px-1 text-xs leading-relaxed text-neutral-500">
                 작은 일상도, 궁금한 것도
@@ -177,7 +191,8 @@ const CommunityContent = () => {
                 desktop: '궁금한 이야기를 검색해보세요',
               }}
               defaultValue={appliedSearch}
-              onSubmit={setAppliedSearch}
+              maxLength={COMMUNITY_SEARCH_MAX_LENGTH}
+              onSubmit={(search) => changeNavigation({ search })}
             />
             {experienceEnabled && experience.data && (
               <CommunityDiscovery
@@ -185,6 +200,21 @@ const CommunityContent = () => {
                 value={discovery}
                 onChange={setDiscovery}
               />
+            )}
+            {hasDiscovery && !experience.isPending && !experience.isError && !experienceEnabled && (
+              <p
+                role="status"
+                className="mb-4 rounded-xl bg-neutral-50 p-3 text-xs leading-relaxed text-neutral-700"
+              >
+                이 환경에서는 상세 필터를 사용할 수 없어 기본 이야기를 보여드려요.
+                <button
+                  type="button"
+                  onClick={() => setDiscovery({})}
+                  className="ml-2 min-h-8 font-semibold underline focus-ring"
+                >
+                  상세 조건 해제
+                </button>
+              </p>
             )}
 
             <nav
@@ -195,7 +225,7 @@ const CommunityContent = () => {
                 <Chip
                   key={option.value}
                   selected={petType === option.value}
-                  onClick={() => setPetType(option.value)}
+                  onClick={() => changeNavigation({ petType: option.value })}
                 >
                   {option.shortLabel}
                 </Chip>
@@ -210,18 +240,18 @@ const CommunityContent = () => {
                 ariaLabel="게시글 정렬"
                 options={COMMUNITY_SORT_OPTIONS}
                 value={sort}
-                onValueChange={setSort}
+                onValueChange={(sort) => changeNavigation({ sort })}
               />
             </div>
             {appliedSearch && (
               <div className="flex items-center justify-between gap-3 border-b border-neutral-100 py-3 text-sm">
                 <p className="min-w-0 truncate text-neutral-700">“{appliedSearch}” 검색 결과</p>
-                <Button intent="ghost" size="sm" onClick={() => setAppliedSearch('')}>
+                <Button intent="ghost" size="sm" onClick={() => changeNavigation({ search: '' })}>
                   검색 해제
                 </Button>
               </div>
             )}
-            {isPending && (
+            {isPending && !filterUnavailable && (
               <div>
                 {[0, 1, 2].map((i) => (
                   <CommunityFeedCardSkeleton key={i} wide />
@@ -231,18 +261,38 @@ const CommunityContent = () => {
             <ListState
               appPublicContent={!appliedSearch && !filtered}
               isPending={false}
-              isError={isError}
-              isEmpty={!isPending && posts.length === 0}
+              isError={isError || filterUnavailable}
+              isEmpty={filterUnavailable || (!isPending && posts.length === 0)}
               loadingText="게시글을 불러오는 중입니다."
-              errorText="이야기를 불러오지 못했어요."
-              onRetry={() => void refetch()}
-              isRetrying={isRetrying}
+              errorText={
+                filterUnavailable
+                  ? '탐색 조건을 확인하지 못했어요. 조건은 그대로 보관하고 있어요.'
+                  : '이야기를 불러오지 못했어요.'
+              }
+              onRetry={() => (filterUnavailable ? void experience.refetch() : void refetch())}
+              isRetrying={filterUnavailable ? experience.isFetching : isRetrying}
               emptyText={
                 appliedSearch
                   ? '검색 결과가 없어요. 다른 검색어로 찾아보세요.'
                   : filtered
                     ? '조건에 맞는 이야기가 아직 없어요. 필터를 줄여 보세요.'
                     : '아직 이야기가 없어요. 첫 이야기를 들려주세요.'
+              }
+              emptyAction={
+                <div className="flex flex-wrap justify-center gap-2">
+                  {(appliedSearch || filtered || petType) && (
+                    <Button
+                      intent="secondary"
+                      size="sm"
+                      onClick={() => router.replace('/community', { scroll: false })}
+                    >
+                      전체 이야기 보기
+                    </Button>
+                  )}
+                  <Button size="sm" onClick={writePost}>
+                    {writeEntry.label}
+                  </Button>
+                </div>
               }
             >
               <div>

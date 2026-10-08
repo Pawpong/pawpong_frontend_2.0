@@ -496,6 +496,17 @@
   font-size: 11px;
   color: var(--muted);
 }
+.catalogToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-block: 14px 10px;
+}
+.catalogToolbar .catalogCount {
+  margin: 0;
+}
 .catalogEmpty {
   display: flex;
   flex-wrap: wrap;
@@ -653,6 +664,15 @@
 }
 .dialog::backdrop {
   background: rgb(55 39 24 / 0.5);
+}
+.purchaseStatus {
+  margin-block: 12px;
+  padding: 10px 12px;
+  border-left: 3px solid #7f8e4d;
+  background: #edf0d9;
+  color: #42502e;
+  font-size: 12px;
+  line-height: 1.6;
 }
 .gameChoices {
   display: grid;
@@ -1266,6 +1286,9 @@
   margin-top: 8px;
 }
 @media (max-width: 767px) {
+  .gameLayout[data-compact='true'] .contentPanels :is(button, input, select, a, summary) {
+    scroll-margin-top: calc(var(--pet-sticky-top, 56px) + var(--pet-device-height, 360px) + 16px);
+  }
   .gameLayout[data-compact='true'] .device {
     position: sticky;
     top: var(--pet-sticky-top, 56px);
