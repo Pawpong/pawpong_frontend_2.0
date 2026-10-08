@@ -14,7 +14,13 @@ export function usePublicActivityBadges(owners: ActivityBadgeOwner[]) {
     enabled: config.data?.enabled === true && !config.isError && owners.length > 0,
     retry: false,
     staleTime: 30_000,
+    refetchInterval: 30_000,
     throwOnError: false,
   })
-  return config.data?.enabled && !config.isError && !badges.isError ? (badges.data ?? []) : []
+  return config.data?.enabled && !config.isError && !badges.isError
+    ? (badges.data ?? []).map((owner) => ({
+        ...owner,
+        level: config.data?.breederLevelPublic ? owner.level : null,
+      }))
+    : []
 }

@@ -1,5 +1,6 @@
 'use client'
 
+import { PublicActivityLevel } from '@/features/gamification'
 import { useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import {
@@ -319,6 +320,11 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip', menu }: Profile
               </p>
               <div className={cn(isSidebar && 'tab:hidden')}>{profileActions}</div>
             </div>
+            {isVisitor && (
+              <PublicActivityLevel
+                owner={{ ownerId: profileUserId, role: breederProfile ? 'breeder' : 'adopter' }}
+              />
+            )}
             {/* 위치 → 카운트 순으로 이름 아래에 각각 한 줄씩 (같은 줄에 묶지 않는다) */}
             {locationText && <LocationText location={locationText} />}
             <div className="flex">

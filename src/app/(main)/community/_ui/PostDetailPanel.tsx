@@ -1,7 +1,7 @@
 'use client'
 
 import { BeforeAfterSlider } from '@/shared/ui'
-import { ActivityBadgeRow } from '@/entities/gamification'
+import { ActivityBadgeRow, BreederLevelBadge } from '@/entities/gamification'
 import { usePublicActivityBadges } from '@/features/gamification'
 
 import type { ReactNode } from 'react'
@@ -117,7 +117,7 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
         />
         <span className="min-w-0">
           <span className="block truncate text-body-lg font-semibold text-neutral-850">
-            {post.authorNickname}
+            {post.authorNickname} <BreederLevelBadge level={badges[0]?.level} />
           </span>
           <ActivityBadgeRow
             badges={

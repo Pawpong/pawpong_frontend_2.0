@@ -10,6 +10,7 @@ const { CommentList } = load('src/app/(main)/community/post/[postId]/_ui/Comment
     ListState: 'list-state',
     InfiniteScrollTrigger: 'trigger',
   },
+  '@/features/gamification': { usePublicActivityBadges: () => [] },
   './CommentItem': { CommentItem: 'comment' },
   './CommentEditForm': { CommentEditForm: 'edit' },
   './CommentActionFeedback': { CommentActionFeedback: 'feedback' },

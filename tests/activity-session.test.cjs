@@ -190,7 +190,9 @@ function dashboardHarness(api) {
     '@tanstack/react-query': {
       useQueryClient: () => client,
       useIsMutating: (filter) => client.isMutating(filter),
+      // 대시보드는 활동 조회와 레벨표(catalog) 조회를 함께 쓴다. 레벨표는 아직 오지 않은 상태로 둔다.
       useQuery: (options) => {
+        if (options.queryKey[1] === 'catalog') return { data: undefined }
         queryOptions = options
         return view
       },
@@ -298,22 +300,20 @@ test('동기화와 배지 저장 오류는 조회 복구 성공 뒤 모두 사�
   h.client.clear()
 })
 
-test('정상 토큰 회전은 ActivityContent의 대시보드 key를 바꿔 재조회한다', () => {
+test('정상 토큰 회전은 마이홈 활동 탭의 대시보드 key를 바꿔 재조회한다', () => {
   const h = apiHarness()
-  const { ActivityContent } = load('src/app/(main)/my-activity/_ui/ActivityContent.tsx', {
+  const { MyHomeActivity } = load('src/features/gamification/ui/MyHomeActivity.tsx', {
     '@tanstack/react-query': { useQuery: () => ({ data: { enabled: true } }) },
-    '@/features/auth': { useMe: () => ({ isLoggedIn: true, me: { userId: 'account-a' } }) },
     '@/entities/gamification': { activityConfigOptions: {} },
-    '@/features/gamification': {
-      useActivitySession: h.sessions.getActivitySession,
-      ActivityDashboard: () => null,
-    },
+    '../lib/useActivitySession': { useActivitySession: h.sessions.getActivitySession },
+    './ActivityDashboard': { ActivityDashboard: () => null },
   })
-  const first = ActivityContent()
+  const first = MyHomeActivity({ userId: 'account-a' })
   h.setToken(jwt('account-a', 2))
-  const second = ActivityContent()
+  const second = MyHomeActivity({ userId: 'account-a' })
   assert.notEqual(first.key, second.key)
   assert.equal(second.props.session.ownerId, 'account-a')
   h.setToken(jwt('account-b', 2))
-  assert.equal(ActivityContent().type, 'p') // stale useMe cannot mount account B under A's UI
+  // 아직 A의 프로필을 보고 있는 마이홈에 B의 활동을 붙이지 않는다.
+  assert.equal(MyHomeActivity({ userId: 'account-a' }), null)
 })

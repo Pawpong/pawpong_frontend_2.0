@@ -89,6 +89,7 @@ test('목록이 비어도 수정 중 초안을 별도 복구 영역에 남긴다
       ListState: 'list',
       InfiniteScrollTrigger: 'scroll',
     },
+    '@/features/gamification': { usePublicActivityBadges: () => [] },
     './CommentItem': { CommentItem: 'comment' },
     './CommentEditForm': { CommentEditForm: 'edit' },
     './CommentActionFeedback': { CommentActionFeedback: 'feedback' },

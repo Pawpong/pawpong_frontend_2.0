@@ -5,7 +5,7 @@ export type SupportAudience = 'adopter' | 'breeder'
 
 export const supportConversationSchema = z.object({
   conversationId: z.string().uuid(),
-  category: z.enum(['usage', 'error', 'account', 'feedback']),
+  category: z.enum(['usage', 'error', 'account', 'feedback', 'level_exp']),
   userType: z.enum(['adopter', 'breeder']),
   revision: z.number().int().nonnegative(),
   completedRequestIds: z.array(z.string()).default([]),

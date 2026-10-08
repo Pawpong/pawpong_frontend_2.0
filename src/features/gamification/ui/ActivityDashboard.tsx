@@ -7,19 +7,14 @@ import {
   displayActivityBadges,
   type ActivitySession,
   PixelActivityBadge,
+  BreederLevelBadge,
+  ACTIVITY_LABELS,
+  getActivityCatalog,
 } from '@/entities/gamification'
 import { Button } from '@/shared/ui'
 import { cafe24Proup } from '@/shared/lib/fonts'
 import styles from './activity.module.css'
 
-const LABELS: Record<string, string> = {
-  profile: '프로필 완성',
-  post: '공개 이야기',
-  comment: '댓글 교류',
-  listing: '분양 소개',
-  contest: '콘테스트 출품',
-  winner: '명예의 전당',
-}
 export function ActivityDashboard({ session }: { session: ActivitySession }) {
   const client = useQueryClient()
   const key = ['gamification', 'private', session.scope]
@@ -27,7 +22,8 @@ export function ActivityDashboard({ session }: { session: ActivitySession }) {
   const writing = useIsMutating({ mutationKey }) > 0
   const view = useQuery({
     queryKey: key,
-    queryFn: ({ signal }) => getActivity(session, signal),
+    queryFn: ({ signal }) => synchronizeActivity(session, signal),
+    refetchOnMount: 'always',
     enabled: !writing,
     retry: false,
     throwOnError: false,
@@ -53,7 +49,19 @@ export function ActivityDashboard({ session }: { session: ActivitySession }) {
     onMutate: cancelReads,
     onSuccess: saveView,
   })
+  const catalog = useQuery({
+    queryKey: ['gamification', 'catalog'],
+    queryFn: ({ signal }) => getActivityCatalog(signal),
+    retry: false,
+    throwOnError: false,
+  })
   const data = view.data
+  const floor = catalog.data?.levels.find((level) => level.value === data?.level?.value)?.exp
+  const ceiling = data?.level?.nextExp
+  const progress =
+    floor !== undefined && ceiling != null
+      ? Math.max(0, Math.min(100, (((data?.totalExp ?? 0) - floor) / (ceiling - floor)) * 100))
+      : 0
   const busy = writing || sync.isPending || display.isPending
   const earned = data?.badges.filter((badge) => badge.state === 'earned') ?? []
   const error = view.error ?? sync.error ?? display.error
@@ -66,6 +74,35 @@ export function ActivityDashboard({ session }: { session: ActivitySession }) {
           우리 아이와 함께한 활동을 모아요. 경험을 나누고 업적을 채우면 도트 배지가 생겨요. 대표
           배지는 커뮤니티에서 나를 소개해요.
         </p>
+        {data?.level && (
+          <div className="my-5 space-y-3">
+            <BreederLevelBadge level={data.level} showFamily interactive />
+            {ceiling != null ? (
+              <>
+                <p>
+                  {ceiling.toLocaleString()} EXP까지{' '}
+                  {Math.max(0, ceiling - data.totalExp).toLocaleString()} 남음
+                </p>
+                {floor !== undefined && (
+                  <progress
+                    className="w-full accent-primary-500"
+                    value={progress}
+                    max={100}
+                    aria-label="다음 활동 단계 진행도"
+                  />
+                )}
+              </>
+            ) : (
+              <p>마지막 활동 단계에 도달했어요.</p>
+            )}
+            {data.previousLevel != null && data.previousLevel > data.level.value && (
+              <p className="text-sm text-neutral-700">
+                활동 변경으로 Lv.{data.previousLevel}에서 Lv.{data.level.value}로 변경됐어요. 아래
+                회수 이력에서 해당 활동을 확인해 주세요.
+              </p>
+            )}
+          </div>
+        )}
         <div className={styles.stats}>
           <div className={styles.stat}>
             <strong>{data?.totalExp ?? '—'}</strong>확인된 EXP
@@ -83,7 +120,7 @@ export function ActivityDashboard({ session }: { session: ActivitySession }) {
               : '내 활동 확인하고 시작하기'}
         </Button>
         <p className="mt-3 text-xs">
-          개발용 실험 정책이에요. EXP와 배지는 인증·진료 전문성·입양 안전을 보증하지 않아요.
+          포퐁 안에서 쌓은 활동을 보여주는 단계예요. 브리더 자격이나 아이의 건강을 보증하지 않아요.
         </p>
       </section>
       {view.isPending && (
@@ -180,12 +217,14 @@ export function ActivityDashboard({ session }: { session: ActivitySession }) {
             {data.history.map((entry, index) => (
               <li key={`${entry.at}:${index}`}>
                 <span>
-                  {LABELS[entry.kind] ?? '활동'} ·{' '}
+                  {ACTIVITY_LABELS[entry.kind] ?? '활동'} ·{' '}
                   {entry.reason === 'revoked'
                     ? '회수'
-                    : entry.reason === 'restored'
-                      ? '복원'
-                      : '적립'}
+                    : entry.reason === 'adjusted'
+                      ? '운영 정정'
+                      : entry.reason === 'restored'
+                        ? '복원'
+                        : '적립'}
                 </span>
                 <strong>
                   {entry.delta > 0 ? '+' : ''}
@@ -196,11 +235,13 @@ export function ActivityDashboard({ session }: { session: ActivitySession }) {
           </ol>
         )}
         <p className="mt-4 text-xs">
-          서울 시간 기준으로 글은 일 2건·월 20건, 댓글은 일 5건·월 50건까지 적립해요. 삭제·비공개
-          전환은 원장을 역분개해요. 양측 확인 상담·입양·후기는 아직 보상하지 않아요.
+          서울 시간 기준 글은 일 2건·월 20건, 댓글과 공감받음은 각각 일 10건·월 100건까지 적립해요.
+          삭제·비공개 등으로 활동이 무효가 되면 EXP가 회수되고 레벨도 내려갈 수 있어요.
         </p>
       </section>
       <div className="mt-6 flex flex-wrap gap-4 text-sm font-bold">
+        <Link href="/breeder-level">활동 단계 안내</Link>
+        <Link href="/faq">레벨/EXP 문의 · 목표 처리 영업일 5일</Link>
         <Link href="/community/write">첫 이야기 나누기</Link>
         <Link href="/profile/edit">프로필 완성하기</Link>
         <Link href="/community">커뮤니티로 돌아가기</Link>

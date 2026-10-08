@@ -75,6 +75,27 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
   )
 
   useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | undefined
+    const unsubscribe = queryClient.getMutationCache().subscribe((event) => {
+      if (
+        event.type !== 'updated' ||
+        event.action.type !== 'success' ||
+        event.mutation.options.mutationKey?.[0] === 'gamification'
+      )
+        return
+      clearTimeout(timer)
+      timer = setTimeout(() => {
+        void queryClient.invalidateQueries({ queryKey: ['gamification', 'private'] })
+        void queryClient.invalidateQueries({ queryKey: ['gamification', 'public'] })
+      }, 1500)
+    })
+    return () => {
+      unsubscribe()
+      clearTimeout(timer)
+    }
+  }, [queryClient])
+
+  useEffect(() => {
     let scheduledFrame: number | null = null
     const handleIdentityChange = createAuthQueryBoundary(queryClient)
 

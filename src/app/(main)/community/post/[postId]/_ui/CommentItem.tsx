@@ -1,5 +1,6 @@
 'use client'
 
+import { BreederLevelBadge, type BreederLevel } from '@/entities/gamification'
 import { AuthorInfo, Button, OwnerActionsMenu } from '@/shared/ui'
 import type { CommunityComment } from '@/shared/types'
 import type { CommentActionsController } from './useCommentActions'
@@ -7,6 +8,7 @@ import { CommentEditForm } from './CommentEditForm'
 import { commentActionTriggerId } from './commentAction'
 
 interface CommentItemProps {
+  level?: BreederLevel | null
   comment: CommunityComment
   actions: CommentActionsController
   onReply?: (comment: CommunityComment) => void
@@ -14,13 +16,21 @@ interface CommentItemProps {
   isReply?: boolean
 }
 
-const CommentItem = ({ comment, actions, onReply, isReply, replyDisabled }: CommentItemProps) => {
+const CommentItem = ({
+  comment,
+  level,
+  actions,
+  onReply,
+  isReply,
+  replyDisabled,
+}: CommentItemProps) => {
   const isEditing =
     actions.active?.mode === 'edit' && actions.active.comment.commentId === comment.commentId
   return (
     <div className={`flex items-start gap-2 py-3 ${isReply ? 'pl-12' : ''}`}>
       <AuthorInfo
         size="sm"
+        badgeSlot={<BreederLevelBadge level={level} />}
         className="flex min-w-0 flex-1 items-start gap-2"
         authorId={comment.authorId}
         nickname={comment.authorNickname}
