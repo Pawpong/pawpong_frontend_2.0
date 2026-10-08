@@ -2,10 +2,15 @@
 
 import { useEffect } from 'react'
 import { clearAuthCookies, restoreAuthSession } from './authSessionRecovery'
-import { canResumeAuthCookieClear, hasPendingLogout } from './authSessionLifecycle'
+import { AUTH_INTENT_KEY, canResumeAuthCookieClear, hasPendingLogout } from './authSessionLifecycle'
+import { AUTH_STATE_CHANGED } from './authStateEvents'
 
 export function SessionRecoveryBridge() {
   useEffect(() => {
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === AUTH_INTENT_KEY || event.key === AUTH_STATE_CHANGED)
+        window.dispatchEvent(new Event(AUTH_STATE_CHANGED))
+    }
     const recover = () => {
       if (document.visibilityState === 'hidden') return
       if (hasPendingLogout()) {
@@ -20,11 +25,13 @@ export function SessionRecoveryBridge() {
     window.addEventListener('online', recover)
     window.addEventListener('pageshow', recover)
     window.addEventListener('pawpong:app-active', recover)
+    window.addEventListener('storage', onStorage)
     document.addEventListener('visibilitychange', recover)
     return () => {
       window.removeEventListener('online', recover)
       window.removeEventListener('pageshow', recover)
       window.removeEventListener('pawpong:app-active', recover)
+      window.removeEventListener('storage', onStorage)
       document.removeEventListener('visibilitychange', recover)
     }
   }, [])

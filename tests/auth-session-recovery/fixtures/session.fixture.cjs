@@ -1,5 +1,6 @@
 const fs = require('node:fs')
 const ts = require('typescript')
+const { authCookieFixture } = require('../../fixtures/auth-cookie.fixture.cjs')
 
 function load(file, dependencies, globals = {}) {
   const code = ts.transpileModule(fs.readFileSync(file, 'utf8'), {
@@ -32,6 +33,18 @@ function setup(handler, storage = new Map(), timers = {}) {
   }
   const lifecycle = load('src/shared/lib/authSessionLifecycle.ts', {}, { localStorage })
   const { ApiError } = load('src/shared/api/unwrap.ts', {})
+  const boundary = authCookieFixture(
+    { getAccessToken: () => cookie.get('accessToken') || null },
+    lifecycle,
+  )
+  const fetch = async (url, options) => {
+    calls.push(url)
+    if (url.endsWith('set-cookie')) {
+      cookie.set('accessToken', JSON.parse(options.body).accessToken)
+      return Response.json({ ok: true })
+    }
+    return handler(url, options)
+  }
   const recovery = load(
     'src/shared/lib/authSessionRecovery.ts',
     {
@@ -40,19 +53,13 @@ function setup(handler, storage = new Map(), timers = {}) {
       './authTokenIdentity': load('src/shared/lib/authTokenIdentity.ts', {}),
       './authStateEvents': { notifyAuthStateChanged: () => notifications++ },
       './authSessionLifecycle': lifecycle,
+      './authCookieLock': boundary.lock,
+      './authCookieScope': boundary.scope,
+      './authFetch': load('src/shared/lib/authFetch.ts', {}, { fetch, ...timers }),
     },
     {
       document,
       window: { location: { hostname: 'dev.pawpong.kr' } },
-      fetch: async (url, options) => {
-        calls.push(url)
-        if (url.endsWith('set-cookie')) {
-          cookie.set('accessToken', JSON.parse(options.body).accessToken)
-          return Response.json({ ok: true })
-        }
-        return handler(url, options)
-      },
-      ...timers,
     },
   )
   return { ...recovery, ...lifecycle, calls, cookie, storage, notifications: () => notifications }
@@ -68,7 +75,9 @@ function refreshed(accessToken) {
 
 function deferred() {
   let resolve
-  const promise = new Promise((done) => { resolve = done })
+  const promise = new Promise((done) => {
+    resolve = done
+  })
   return { promise, resolve }
 }
 

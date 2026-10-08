@@ -1,5 +1,6 @@
 const { test } = require('node:test')
 const assert = require('node:assert/strict')
+const { authCookieFixture } = require('../fixtures/auth-cookie.fixture.cjs')
 const { load, policy, credentials, session, setupRoute, setupClient, NextRequest } = require('./fixtures/session.fixture.cjs')
 
 test('심사 로그인 실패와 취소가 오프라인 로그아웃을 유지하고 이전 계정 복구를 차단함', async () => {
@@ -22,6 +23,7 @@ test('심사 로그인 실패와 취소가 오프라인 로그아웃을 유지�
     assert.equal(app.getAuthSessionGeneration(), generation)
     assert.equal(app.isAuthSessionCurrent(), false)
     assert.equal(app.saved.length, 0)
+    const boundary = authCookieFixture({ getAccessToken: () => null }, app)
     const recovery = load(
       'src/shared/lib/authSessionRecovery.ts',
       {
@@ -30,6 +32,9 @@ test('심사 로그인 실패와 취소가 오프라인 로그아웃을 유지�
         './authStateEvents': { notifyAuthStateChanged: () => {} },
         './authSessionLifecycle': app,
         './authTokenIdentity': load('src/shared/lib/authTokenIdentity.ts'),
+        './authCookieLock': boundary.lock,
+        './authCookieScope': boundary.scope,
+        './authFetch': load('src/shared/lib/authFetch.ts'),
       },
       { fetch: async () => assert.fail('must not refresh logged-out account') },
     )

@@ -3,6 +3,7 @@ const assert = require('node:assert/strict')
 const fs = require('node:fs')
 const ts = require('typescript')
 const { NextRequest } = require('next/server')
+const { authCookieFixture } = require('./fixtures/auth-cookie.fixture.cjs')
 
 function load(file, overrides = {}, globals = {}) {
   const source = ts.transpileModule(fs.readFileSync(file, 'utf8'), {
@@ -81,7 +82,7 @@ function setup(upstream = async () => Response.json(accepted)) {
   }
 }
 
-test('deletion BFF requires explicit confirmation/current cookie, never caller-supplied user or token', async () => {
+test('탈퇴 BFF가 명시적 확인과 현재 쿠키를 요구하고 전달받은 사용자나 토큰을 신뢰하지 않음', async () => {
   const app = setup()
   for (const value of [{}, { confirmation: 'DELETE' }, null])
     assert.equal((await app.POST(app.request(value))).status, 400)
@@ -105,7 +106,7 @@ test('deletion BFF requires explicit confirmation/current cookie, never caller-s
   assert.equal(options.cache, 'no-store')
 })
 
-test('receipt secret remains HttpOnly/secure/path-scoped, while response expires all auth cookie variants', async () => {
+test('조회 비밀값의 쿠키 범위를 보호하고 응답에서 모든 인증 쿠키 변형을 만료함', async () => {
   const app = setup()
   const prepared = await app.prepare(app.request({}, { cookie: authCookie }, '/prepare'))
   const receipt = prepared.headers
@@ -134,7 +135,7 @@ test('receipt secret remains HttpOnly/secure/path-scoped, while response expires
   }
 })
 
-test('request/status/receipt cleanup all reject CSRF before backend or cookie mutation', async () => {
+test('탈퇴 요청과 상태 조회 및 영수증 정리가 백엔드 호출과 쿠키 변경 전에 위조 요청을 거부함', async () => {
   for (const headers of [
     { origin: 'https://evil.example' },
     { origin: 'null' },
@@ -150,7 +151,7 @@ test('request/status/receipt cleanup all reject CSRF before backend or cookie mu
   }
 })
 
-test('fresh browser status requires receipt; credentials in body or URL do not grant access', async () => {
+test('새 브라우저의 상태 조회는 영수증을 요구하고 본문이나 주소의 인증값을 허용하지 않음', async () => {
   const app = setup()
   assert.equal(
     (
@@ -173,7 +174,7 @@ test('fresh browser status requires receipt; credentials in body or URL do not g
 })
 
 for (const state of ['pending', 'processing', 'retryable', 'review_required', 'completed']) {
-  test(`status ${state} works without login after refresh and never exposes receipt/user fields`, async () => {
+  test(`${state} 상태를 로그인 없이 다시 조회할 수 있으며 비밀값과 사용자 필드를 노출하지 않음`, async () => {
     const app = setup(async () =>
       Response.json({
         success: true,
@@ -202,7 +203,7 @@ for (const state of ['pending', 'processing', 'retryable', 'review_required', 'c
   })
 }
 
-test('status mismatch/malformed upstream is rejected; failed deletion never clears session or replaces receipt', async () => {
+test('맞지 않거나 잘못된 상태 응답을 거부하고 탈퇴 실패 시 세션과 영수증을 유지함', async () => {
   for (const data of [{}, { ...status, requestId: '7250e6f9-5b8c-4bdf-ac0c-66d9d11b006b' }]) {
     const app = setup(async () => Response.json({ success: true, data }))
     const response = await app.status(app.request({}, { cookie: receiptCookie }, '/status'))
@@ -219,7 +220,7 @@ test('status mismatch/malformed upstream is rejected; failed deletion never clea
   }
 })
 
-test('network failure is generic; closing browser receipt never cancels backend deletion', async () => {
+test('통신 오류를 일반화하고 브라우저 조회 기록을 닫아도 서버 탈퇴를 취소하지 않음', async () => {
   const app = setup(async () => {
     throw new Error(receiptToken)
   })
@@ -233,7 +234,7 @@ test('network failure is generic; closing browser receipt never cancels backend 
   assert.equal(app.calls.length, before)
 })
 
-test('ordinary logout uses the same cookie expiration policy for local and forwarded production hosts', async () => {
+test('일반 로그아웃이 로컬과 전달된 운영 호스트에서 같은 쿠키 만료 정책을 사용함', async () => {
   const route = load('src/app/api/auth/clear-cookie/route.ts', {
     '@/shared/lib/server/authCookies': cookiePolicy,
   })
@@ -256,15 +257,20 @@ function setupClient(
   prepare = async () => Response.json({ success: true, prepared: true }),
 ) {
   const events = []
+  const lifecycle = {
+    beginLogout: () => events.push('logout-intent'),
+    beginLogin: () => events.push('restore-session'),
+    waitForAuthCookieWrites: async () => events.push('wait-cookie-writes'),
+    getAuthSessionGeneration: () => 0,
+  }
+  const boundary = authCookieFixture({ getAccessToken: () => 'synthetic-session' }, lifecycle)
   const client = load(
     'src/features/account-deletion/api/accountDeletion.ts',
     {
       '@/shared/lib/accountDeletion': policy,
-      '@/shared/lib/authSessionLifecycle': {
-        beginLogout: () => events.push('logout-intent'),
-        beginLogin: () => events.push('restore-session'),
-        waitForAuthCookieWrites: async () => events.push('wait-cookie-writes'),
-      },
+      '@/shared/lib/authSessionLifecycle': lifecycle,
+      '@/shared/lib/authCookieLock': boundary.lock,
+      '@/shared/lib/authCookieScope': boundary.scope,
       '@/shared/lib/authStateEvents': { notifyAuthStateChanged: () => events.push('notify-auth') },
       '@/shared/lib/authSessionRecovery': {
         clearAuthCookies: async () => {
@@ -287,7 +293,7 @@ function setupClient(
   return { ...client, events }
 }
 
-test('client unbinds native before authenticated deletion, then clears local session/cache without protected logout API', async () => {
+test('클라이언트가 인증된 탈퇴 전에 네이티브 연결을 해제하고 추가 로그아웃 없이 세션과 캐시를 정리함', async () => {
   const app = setupClient()
   assert.deepEqual(
     await app.requestAccountDeletion(() => app.events.push('clear-query-cache')),
@@ -307,7 +313,7 @@ test('client unbinds native before authenticated deletion, then clears local ses
   ])
 })
 
-test('BFF already clears cookies, so local clear-cookie outage cannot erase accepted receipt or skip cache cleanup', async () => {
+test('쿠키 정리 장애에도 이미 접수된 영수증을 유지하고 캐시 정리를 수행함', async () => {
   const app = setupClient(async (url) => {
     if (url.includes('clear-cookie')) throw new Error('offline')
     return Response.json({ success: true, data: status })
@@ -320,7 +326,7 @@ test('BFF already clears cookies, so local clear-cookie outage cannot erase acce
   assert.equal(app.events.includes('restore-session'), false)
 })
 
-test('failed deletion never claims acceptance, and releases local logout guard for retry', async () => {
+test('탈퇴 실패를 접수 성공으로 처리하지 않고 로그아웃 가드를 해제해 재시도를 허용함', async () => {
   for (const upstream of [
     async () => Response.json({ message: receiptToken }, { status: 409 }),
     async () => {
@@ -338,7 +344,7 @@ test('failed deletion never claims acceptance, and releases local logout guard f
   }
 })
 
-test('prepare keeps existing receipt across retries and does not mutate account or contact backend', async () => {
+test('사전 확인 재시도는 기존 영수증을 유지하고 계정 변경이나 백엔드 호출을 수행하지 않음', async () => {
   const app = setup()
   const response = await app.prepare(app.request({}, {}, '/prepare'))
   const cookie = response.headers.getSetCookie()[0]
@@ -349,13 +355,13 @@ test('prepare keeps existing receipt across retries and does not mutate account 
   assert.equal(app.calls.length, 0)
 })
 
-test('prepare failure leaves authentication and push untouched', async () => {
+test('사전 확인 실패는 인증과 푸시 연결을 변경하지 않음', async () => {
   const app = setupClient(undefined, async () => Response.json({ success: false }, { status: 401 }))
   await assert.rejects(app.requestAccountDeletion(() => app.events.push('clear-query-cache')))
   assert.deepEqual(app.events, ['/api/account-deletion/prepare'])
 })
 
-test('lost deletion response recovers accepted receipt before cleaning session, without a second deletion request', async () => {
+test('탈퇴 응답이 유실되면 재요청 없이 영수증을 복구한 뒤 세션을 정리함', async () => {
   const app = setupClient(async (url) => {
     if (url === '/api/account-deletion') throw new Error('connection reset after server accepted')
     return Response.json({ success: true, data: status })

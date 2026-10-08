@@ -2,6 +2,13 @@ import { getAccessToken } from '@/shared/api/token'
 import { ApiError } from '@/shared/api/unwrap'
 import { notifyAuthStateChanged } from './authStateEvents'
 import { authTokenIdentity } from './authTokenIdentity'
+import { authFetch } from './authFetch'
+import { withAuthCookieLock, type AuthCookieLease } from './authCookieLock'
+import {
+  captureAuthCookieScope,
+  isAuthCookieScopeCurrent,
+  type AuthCookieScope,
+} from './authCookieScope'
 import {
   getAuthSessionGeneration,
   finishAuthCookieClear,
@@ -13,42 +20,28 @@ import {
 let refresh: { generation: number; identity: string | null; promise: Promise<string> } | null = null
 let anonymousGeneration: number | null = null
 
-/** WebView가 오프라인이어도 인증 작업이 끝없이 대기하지 않게 한다. */
-async function authFetch<T>(
-  path: string,
-  options: RequestInit,
-  readResponse: (response: Response) => Promise<T>,
-): Promise<T> {
-  const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), 10_000)
-  try {
-    const response = await fetch(path, {
-      ...options,
-      credentials: 'include',
-      signal: controller.signal,
-    })
-    return await readResponse(response)
-  } finally {
-    clearTimeout(timeout)
-  }
-}
-
-/** 서버 통신이 실패해도 JS가 읽는 로그인 상태는 즉시 제거한다. */
-export async function clearAuthCookies(): Promise<void> {
-  const generation = getAuthSessionGeneration()
-  finishLogoutRequest()
-  document.cookie = 'accessToken=; path=/; max-age=0'
-  document.cookie = 'userRole=; path=/; max-age=0'
-  // 이전 운영 Domain 쿠키도 남아 있으면 getAccessToken이 다시 읽을 수 있다.
-  if (/^(www\.)?pawpong\.kr$/.test(window.location.hostname)) {
-    document.cookie = 'accessToken=; path=/; domain=.pawpong.kr; max-age=0; secure'
-    document.cookie = 'userRole=; path=/; domain=.pawpong.kr; max-age=0; secure'
-  }
-  const response = await trackAuthCookieWrite(
-    authFetch('/api/auth/clear-cookie', { method: 'POST' }, async (response) => response),
-  ).catch(() => null)
-  if (response?.ok && generation === getAuthSessionGeneration()) finishAuthCookieClear()
-  notifyAuthStateChanged()
+/** 쿠키 변경 잠금 안에서 로컬 상태를 먼저 지우고 서버 정리를 시도한다. */
+export async function clearAuthCookies(
+  scope: AuthCookieScope = captureAuthCookieScope(),
+  lease?: AuthCookieLease,
+): Promise<void> {
+  return withAuthCookieLock(async () => {
+    if (!isAuthCookieScopeCurrent(scope, true)) return
+    const { generation } = scope
+    finishLogoutRequest()
+    document.cookie = 'accessToken=; path=/; max-age=0'
+    document.cookie = 'userRole=; path=/; max-age=0'
+    // 이전 운영 Domain 쿠키도 남아 있으면 getAccessToken이 다시 읽을 수 있다.
+    if (/^(www\.)?pawpong\.kr$/.test(window.location.hostname)) {
+      document.cookie = 'accessToken=; path=/; domain=.pawpong.kr; max-age=0; secure'
+      document.cookie = 'userRole=; path=/; domain=.pawpong.kr; max-age=0; secure'
+    }
+    const response = await trackAuthCookieWrite(
+      authFetch('/api/auth/clear-cookie', { method: 'POST' }, async (response) => response),
+    ).catch(() => null)
+    if (response?.ok && generation === getAuthSessionGeneration()) finishAuthCookieClear()
+    notifyAuthStateChanged()
+  }, lease)
 }
 
 /** API 401, 앱 복귀, 로그인 화면이 하나의 refresh 요청과 쿠키 저장을 공유한다. */
@@ -83,7 +76,7 @@ export function refreshAuthSession(): Promise<string> {
       assertCurrentOwner()
       if (response.status === 401) {
         anonymousGeneration = generation
-        await clearAuthCookies()
+        await clearAuthCookies({ generation, identity })
         throw new ApiError('세션이 만료되었습니다. 다시 로그인해주세요.', 401)
       }
       if (!response.ok) throw new ApiError('로그인 상태를 확인하지 못했습니다.', response.status)
@@ -94,17 +87,20 @@ export function refreshAuthSession(): Promise<string> {
       if (identity !== null && authTokenIdentity(accessToken) !== identity)
         throw new ApiError('로그인 상태를 확인하지 못했습니다.', 503)
       assertCurrentOwner()
-      const saved = await trackAuthCookieWrite(
-        authFetch(
-          '/api/auth/set-cookie',
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ accessToken, refreshToken }),
-          },
-          async (response) => response,
-        ),
-      )
+      const saved = await withAuthCookieLock(async () => {
+        assertCurrentOwner()
+        return trackAuthCookieWrite(
+          authFetch(
+            '/api/auth/set-cookie',
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ accessToken, refreshToken }),
+            },
+            async (response) => response,
+          ),
+        )
+      })
       if (!isAuthSessionCurrent(generation)) throw new ApiError('인증 세션이 변경되었습니다.', 401)
       if (!saved.ok || !accessToken || getAccessToken() !== accessToken)
         throw new ApiError('로그인 정보를 저장하지 못했습니다.', 503)

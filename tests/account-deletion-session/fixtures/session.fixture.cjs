@@ -1,6 +1,7 @@
 const assert = require('node:assert/strict')
 const fs = require('node:fs')
 const ts = require('typescript')
+const { authCookieFixture } = require('../../fixtures/auth-cookie.fixture.cjs')
 
 function load(file, dependencies = {}, globals = {}) {
   const code = ts.transpileModule(fs.readFileSync(file, 'utf8'), {
@@ -43,6 +44,7 @@ function setup({ rejectDeletion = false, loseResponse = false, offlineClear = fa
     removeItem: (key) => storage.delete(key),
   }
   const lifecycle = load('src/shared/lib/authSessionLifecycle.ts', {}, { localStorage })
+  const boundary = authCookieFixture({ getAccessToken: () => cookie.get('accessToken') ?? null }, lifecycle)
   const authEvents = {
     AUTH_STATE_CHANGED: 'auth',
     notifyAuthStateChanged: () => window.dispatchEvent(new Event('auth')),
@@ -75,6 +77,9 @@ function setup({ rejectDeletion = false, loseResponse = false, offlineClear = fa
       './authStateEvents': authEvents,
       './authSessionLifecycle': lifecycle,
       './authTokenIdentity': load('src/shared/lib/authTokenIdentity.ts'),
+      './authCookieLock': boundary.lock,
+      './authCookieScope': boundary.scope,
+      './authFetch': load('src/shared/lib/authFetch.ts', {}, { fetch }),
     },
     { window, document, fetch },
   )
@@ -85,6 +90,7 @@ function setup({ rejectDeletion = false, loseResponse = false, offlineClear = fa
       react: { useEffect: (effect) => (cleanup = effect()) },
       './authSessionRecovery': recovery,
       './authSessionLifecycle': lifecycle,
+      './authStateEvents': authEvents,
     },
     { window, document },
   )
@@ -98,6 +104,8 @@ function setup({ rejectDeletion = false, loseResponse = false, offlineClear = fa
       '@/shared/lib/accountDeletion': load('src/shared/lib/accountDeletion.ts'),
       '@/shared/lib/authSessionLifecycle': lifecycle,
       '@/shared/lib/authSessionRecovery': recovery,
+      '@/shared/lib/authCookieLock': boundary.lock,
+      '@/shared/lib/authCookieScope': boundary.scope,
       '@/shared/lib/authStateEvents': authEvents,
       '@/shared/lib/nativePushSession': {
         unregisterNativePushSession: () => {
