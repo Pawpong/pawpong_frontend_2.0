@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
+import { useAuthStatus } from '@/features/auth'
 import {
   communityQueries,
   communityEditorExitHref,
@@ -13,6 +14,7 @@ import { useAuthSessionGeneration } from '@/shared/lib/useAuthSessionGeneration'
 import { getAuthSessionGeneration, isAuthSessionCurrent } from '@/shared/lib/authSessionLifecycle'
 import { CommunityReviewConsent } from './CommunityReviewConsent'
 import { CommunityEditorExitDialog } from './CommunityEditorExitDialog'
+import { CommunityPhotoRecovery } from './CommunityPhotoRecovery'
 import {
   communityWritingPrompt,
   initialCommunityExperience,
@@ -312,6 +314,9 @@ const PostForm = ({ postId, post, initialRecord, photoSource, returnTo }: PostFo
                 }))}
               />
             )}
+            {photoSource && !post && !handoff && form.images.length === 0 && (
+              <CommunityPhotoRecovery source={photoSource} />
+            )}
             {isMemoryCardHandoff ? (
               <div className="rounded-xl border border-primary-200 bg-point-50 p-4">
                 <p className="text-sm font-bold text-primary-700">완성한 추억 카드를 담았어요</p>
@@ -402,6 +407,7 @@ const CommunityPostEditor = ({
   returnTo,
 }: CommunityPostEditorProps) => {
   const router = useRouter()
+  const { isReady } = useAuthStatus()
   const generation = useAuthSessionGeneration()
   const postQuery = useQuery({
     ...communityQueries.detail(postId ?? ''),
@@ -426,6 +432,16 @@ const CommunityPostEditor = ({
     // 판정이 끝났는데 내 글이 아니면 수정 화면을 노출하지 않고 상세로 되돌린다
     if (postId && post && meFetched && !isOwner) router.replace(`/community/post/${postId}`)
   }, [postId, post, meFetched, isOwner, router])
+
+  // 이벤트가 연결되기 전 입력한 내용이 하이드레이션으로 사라지지 않게 한다.
+  if (!isReady)
+    return (
+      <Container className="py-10">
+        <p role="status" className="text-sm text-neutral-700">
+          작성 화면을 준비하고 있어요.
+        </p>
+      </Container>
+    )
 
   if (!postId)
     return (
