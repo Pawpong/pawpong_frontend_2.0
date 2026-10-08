@@ -7,16 +7,6 @@ export const PET_ACTION_LABELS = {
   rest: '쉬게 하기',
 } as const
 
-export const PET_UNLOCK_LABELS: Record<string, string> = {
-  room_basic: '포근한 방',
-  greeting_reaction: '새로운 인사',
-  background_meadow: '초록 들판',
-  growth_card: '성장 기록 카드',
-  background_starry: '별빛 방',
-  pixel_decoration: '도트 장식',
-  max_level_card: '만렙 기념 카드',
-}
-
 export function normalizePetName(value: string): string {
   return value.trim().normalize('NFC')
 }
@@ -105,8 +95,9 @@ export function petErrorMessage(status?: number, code?: string): string {
     return '선택한 그림을 불러올 수 없어요. 사용 가능한 그림을 다시 확인해 주세요.'
   if (code === 'PET_ALREADY_EXISTS')
     return '이미 키우고 있는 반려동물이 있어요. 우리 아이의 방을 다시 불러왔어요.'
+  // 화면이 최신 상태를 다시 불러오는 사이에도 생길 수 있어 다른 기기 사용으로 단정하지 않는다.
   if (code === 'REVISION_CONFLICT')
-    return '다른 화면에서 상태가 바뀌었어요. 최신 상태를 확인한 뒤 다시 눌러 주세요.'
+    return '방금 우리 아이 상태가 새로 고쳐졌어요. 최신 상태를 확인한 뒤 다시 눌러 주세요.'
   if (code === 'COOLDOWN' || code === 'RESTING')
     return '아직 쉬어 갈 시간이에요. 다음 돌봄 시간을 확인해 주세요.'
   if (code === 'DAILY_LIMIT') return '오늘의 돌봄 보상을 모두 받았어요.'

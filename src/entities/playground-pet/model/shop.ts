@@ -54,6 +54,15 @@ export function filterPetCatalog(
     })
 }
 
+/** 아직 다 모으지 못한 모음 중 남은 별사탕이 가장 적은 것. 모두 모았으면 null. */
+export function nextPetCollection(game: PetGameState) {
+  return (
+    petCollectionProgress(game)
+      .filter((collection) => collection.owned < collection.total)
+      .sort((a, b) => a.remainingPrice - b.remainingPrice || a.id.localeCompare(b.id))[0] ?? null
+  )
+}
+
 export function petCollectionProgress(game: PetGameState) {
   return Object.entries(PET_COLLECTION_LABELS)
     .map(([id, label]) => {

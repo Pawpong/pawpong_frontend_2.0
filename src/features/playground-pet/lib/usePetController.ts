@@ -114,7 +114,9 @@ export function usePetController(session: PetSession) {
                     ? `게임 완료! ${gameOutcome.score ?? 0}점 · 별사탕 ${gameOutcome.starsDelta}개를 받았어요.`
                     : gameOutcome.kind === 'start'
                       ? '게임을 시작했어요!'
-                      : '',
+                      : gameOutcome.kind === 'character'
+                        ? '우리 아이 캐릭터를 연결했어요. 이제 방에서 함께 놀 수 있어요.'
+                        : '',
           )
         } else if (outcome) {
           const { action, xpAwarded, starsAwarded = 0 } = outcome
