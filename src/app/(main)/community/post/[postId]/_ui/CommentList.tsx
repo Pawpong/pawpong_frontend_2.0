@@ -1,9 +1,11 @@
 'use client'
 
-import { Button, InfiniteScrollTrigger, ListState } from '@/shared/ui'
+import { Button, DeleteConfirmModal, InfiniteScrollTrigger, ListState } from '@/shared/ui'
 import type { CommunityComment } from '@/shared/types'
 import { CommentItem } from './CommentItem'
 import type { CommentThreadController } from './useCommentThread'
+import { CommentEditForm } from './CommentEditForm'
+import { CommentActionFeedback } from './CommentActionFeedback'
 
 interface CommentListProps {
   thread: CommentThreadController
@@ -12,7 +14,7 @@ interface CommentListProps {
 /** 1단계 스레드 목록 + 무한스크롤. 입력창은 CommentComposerBar가 따로 담당한다. */
 const CommentList = ({ thread }: CommentListProps) => {
   const {
-    me,
+    actions,
     threads,
     isPending,
     isError,
@@ -28,7 +30,7 @@ const CommentList = ({ thread }: CommentListProps) => {
       <CommentItem
         key={reply.commentId}
         comment={reply}
-        currentUserId={me?.userId}
+        actions={actions}
         onReply={canReply ? handleReply : undefined}
         replyDisabled={thread.isSubmitting}
         isReply
@@ -37,6 +39,38 @@ const CommentList = ({ thread }: CommentListProps) => {
 
   return (
     <>
+      <CommentActionFeedback notice={actions.notice} />
+      {actions.active?.mode === 'edit' &&
+        (isPending ||
+          !threads.some(
+            (item) =>
+              item.root?.commentId === actions.active?.comment.commentId ||
+              item.replies.some((reply) => reply.commentId === actions.active?.comment.commentId),
+          )) && (
+          <section className="mb-3 rounded-xl border border-neutral-200 p-3">
+            <p className="text-sm font-semibold">수정 중인 댓글</p>
+            <p className="mt-1 text-xs text-neutral-600">
+              목록을 확인하는 동안에도 입력한 내용은 유지돼요.
+            </p>
+            <CommentEditForm actions={actions} />
+          </section>
+        )}
+      <DeleteConfirmModal
+        open={actions.active?.mode === 'delete'}
+        target="댓글"
+        onOpenChange={(open) => {
+          if (!open) actions.cancel()
+        }}
+        onConfirm={() => void actions.submit()}
+        isPending={actions.isBusy && !actions.isChecking}
+        isChecking={actions.isChecking}
+        errorMessage={actions.active?.mode === 'delete' ? actions.active.error : undefined}
+        onCheck={
+          actions.active?.mode === 'delete' && actions.active.error
+            ? () => void actions.recheck()
+            : undefined
+        }
+      />
       <ListState
         isPending={isPending}
         isError={isError}
@@ -53,7 +87,7 @@ const CommentList = ({ thread }: CommentListProps) => {
             {item.root ? (
               <CommentItem
                 comment={item.root}
-                currentUserId={me?.userId}
+                actions={actions}
                 onReply={handleReply}
                 replyDisabled={thread.isSubmitting}
               />

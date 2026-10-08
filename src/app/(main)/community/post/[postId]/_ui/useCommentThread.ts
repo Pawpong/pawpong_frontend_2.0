@@ -15,6 +15,7 @@ import { isAuthReadSessionCurrent } from '@/shared/lib/authReadSession'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import type { CommunityComment } from '@/shared/types'
 import { buildCommentTree, CommentIntentError, type CommentReplyTarget } from './commentThread'
+import { useCommentActions } from './useCommentActions'
 
 const useCommentThread = (postId: string, enabled = true) => {
   const { isLoggedIn, me: profile } = useMe()
@@ -50,6 +51,10 @@ const useCommentThread = (postId: string, enabled = true) => {
   const isSubmitting = sendingKey === composerKey || createComment.isPending
   const busy = () => inFlight.current?.key === composerKey || isSubmitting
   const { threads, loadedIds } = buildCommentTree(flattenPages(query.data))
+  const actions = useCommentActions(postId, session, enabled, async () => {
+    const result = await query.refetch({ throwOnError: true })
+    return flattenPages(result.data)
+  })
 
   const handleReply = (comment: CommunityComment) => {
     if (!enabled || busy()) return
@@ -103,6 +108,7 @@ const useCommentThread = (postId: string, enabled = true) => {
   }
 
   return {
+    actions,
     isLoggedIn: isLoggedIn && Boolean(session),
     me,
     login,
