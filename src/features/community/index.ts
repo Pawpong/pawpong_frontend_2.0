@@ -17,6 +17,8 @@ export { ConnectedCommunityBox, ConnectedFeedCard, ConnectedPostCard } from './u
 export { PostList } from './ui/PostList'
 export { ReportPostAction } from './ui/ReportPostAction'
 export { useSubmitCommunityPostForm } from './lib/useSubmitCommunityPostForm'
+export { useCommunityEditorNavigation } from './lib/useCommunityEditorNavigation'
+export { useCommunityEditorConfig } from './lib/useCommunityEditorConfig'
 export { prepareCommunityPhoto } from './lib/prepareCommunityPhoto'
 export { getCommunityPhotoLocation } from './lib/communityPhotoLocation'
 export { reindexCommunityRoutePhotos } from './lib/communityRoutePhotos'
