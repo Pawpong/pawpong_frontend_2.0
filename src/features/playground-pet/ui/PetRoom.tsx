@@ -103,9 +103,17 @@ export function PetRoom({
     ? PET_ROOM_TABS
     : PET_ROOM_TABS.filter(({ id }) => id === 'room' || id === 'records')
   const navigation = usePetNavigation(active?.sessionId)
+  const [slotRequest, setSlotRequest] = useState<{ slot: PetRoomSlot; serial: number } | null>(null)
+  // 탭을 옮기면 방 위에서 고른 자리 요청을 지워 다시 열 때 예전 자리로 좁혀지지 않게 한다.
   function setTab(tab: PetTab) {
     navigation.selectTab(tab)
     setItem(null)
+    setSlotRequest(null)
+  }
+  /** 패널 안 바로가기는 눌린 버튼이 사라지므로 새로 고른 탭으로 포커스를 옮긴다. */
+  function openTab(tab: PetTab) {
+    setTab(tab)
+    window.requestAnimationFrame(() => document.getElementById(`pet-tab-${tab}`)?.focus())
   }
   const [canvasReady, setCanvasReady] = useState(false)
   const gameHandle = useRef<PetGameHandle | null>(null)
@@ -121,7 +129,6 @@ export function PetRoom({
   }, [])
   const [gameSurface, setGameSurface] = useState<HTMLDivElement | null>(null)
   const [stageOverlay, setStageOverlay] = useState<HTMLDivElement | null>(null)
-  const [slotRequest, setSlotRequest] = useState<{ slot: PetRoomSlot; serial: number } | null>(null)
   const [pokeNotice, setPokeNotice] = useState('')
   const [popDone, setPopDone] = useState(reaction)
   const [online, setOnline] = useState(
@@ -593,13 +600,13 @@ export function PetRoom({
                   ))}
                 </div>
                 <div className={styles.buttonRow}>
-                  <button className={styles.primaryButton} onClick={() => setTab('decorate')}>
+                  <button className={styles.primaryButton} onClick={() => openTab('decorate')}>
                     우리 아이 방 꾸미기
                   </button>
-                  <button className={styles.smallButton} onClick={() => setTab('games')}>
+                  <button className={styles.smallButton} onClick={() => openTab('games')}>
                     미니게임 하기
                   </button>
-                  <button className={styles.smallButton} onClick={() => setTab('shop')}>
+                  <button className={styles.smallButton} onClick={() => openTab('shop')}>
                     별사탕 상점
                   </button>
                 </div>
@@ -634,7 +641,12 @@ export function PetRoom({
               onSelect={setItem}
               slotRequest={slotRequest}
               onCommand={onCommand}
-              onOpenShop={() => setTab('shop')}
+              onOpenShop={(slot) => {
+                openTab('shop')
+                // 보던 자리는 상점에서도 그대로 좁혀 보여준다.
+                if (slot)
+                  setSlotRequest((current) => ({ slot, serial: (current?.serial ?? 0) + 1 }))
+              }}
               onReloadImages={assets.retry}
               loadingImages={!assets.manifest && !assets.error}
             />
