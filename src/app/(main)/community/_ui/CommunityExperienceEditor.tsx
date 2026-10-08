@@ -156,7 +156,7 @@ export function CommunityExperienceEditor({
               type="button"
               aria-expanded={showPlace}
               onClick={() => setPlaceOpen(!placeOpen)}
-              className="min-h-9 rounded-lg px-2 text-sm font-semibold text-primary-700 underline focus-ring"
+              className="touch-target relative min-h-9 rounded-lg px-2 text-sm font-semibold text-primary-700 underline focus-ring"
             >
               {showPlace ? '지도 접기' : '지도에서 담기'}
             </button>
@@ -235,7 +235,7 @@ export function CommunityExperienceEditor({
                             })
                           }
                           className={cn(
-                            'min-h-9 rounded-full border px-3 text-sm focus-ring transition-colors disabled:opacity-40',
+                            'touch-target relative min-h-9 rounded-full border px-3 text-sm focus-ring transition-colors disabled:opacity-40',
                             selected
                               ? 'border-primary-500 bg-secondary-200 font-bold text-primary-700'
                               : 'border-neutral-200 bg-white font-medium text-neutral-700 hover:bg-secondary-50',

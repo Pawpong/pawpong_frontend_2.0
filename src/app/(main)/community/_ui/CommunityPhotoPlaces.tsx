@@ -59,9 +59,10 @@ export function CommunityPhotoPlaces({
   const located = photos.filter((photo) => photo.location)
   const fresh = photos.filter((photo) => !photo.saved)
   const appHint = inApp && (
+    // 앱의 사진 선택기는 기기에 따라 위치 정보를 지워 전달한다. 사진 권한 설정으로 해결되지 않으므로 지도 선택을 안내한다.
     <span className="mt-1 block">
-      앱에서 고른 사진은 기기 설정에 따라 촬영 위치가 빠질 수 있어요. 사진을 고를 수 없다면 기기
-      설정에서 포퐁 앱의 사진 접근을 허용해 주세요.
+      앱에서 고른 사진은 휴대폰과 사진 선택 방식에 따라 촬영 위치가 빠진 채 전달될 수 있어요. 위치가
+      없으면 지도에서 다녀온 장소를 직접 골라 주세요.
     </span>
   )
   if (!photos.length)

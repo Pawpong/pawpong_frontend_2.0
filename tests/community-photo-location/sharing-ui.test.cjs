@@ -41,7 +41,9 @@ test('이미 올린 사진과 위치 없는 새 사진과 앱 화면을 구분�
   const places = read(`${ui}/CommunityPhotoPlaces.tsx`)
   assert.match(places, /위치를 추측하지 않으니 지도에서/)
   assert.match(places, /이미 올린 사진은 위치 정보를 지운 사본만/)
-  assert.match(places, /포퐁 앱의 사진 접근을 허용해 주세요/)
+  // 앱 사진 선택기는 위치를 지워 전달할 수 있고 사진 권한으로 해결되지 않으므로 권한 설정을 권하지 않는다
+  assert.match(places, /촬영 위치가 빠진 채 전달될 수 있어요/)
+  assert.doesNotMatch(places, /사진 접근을 허용/)
   assert.match(places, /나만 보여요/)
   const editor = read(`${ui}/CommunityPostEditor.tsx`)
   assert.match(editor, /\{ photoIndex, previewUrl: form\.images\[photoIndex\], saved: true \}/)

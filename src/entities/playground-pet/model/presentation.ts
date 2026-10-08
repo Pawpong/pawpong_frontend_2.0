@@ -60,6 +60,31 @@ export function formatPetWait(seconds: number): string {
   return `${Math.floor(minutes / 60)}시간${minutes % 60 ? ` ${minutes % 60}분` : ''} 뒤에 만나요`
 }
 
+const KST_OFFSET = 9 * 60 * 60 * 1000
+const DAY = 24 * 60 * 60 * 1000
+const kstDay = (time: number) => Math.floor((time + KST_OFFSET) / DAY)
+
+/** 처음 함께한 날을 1일째로 세는 한국 날짜 기준 함께한 날 수. 날짜를 읽을 수 없으면 null. */
+export function petDaysTogether(createdAt: string, serverTime: string): number | null {
+  const start = Date.parse(createdAt)
+  const now = Date.parse(serverTime)
+  if (!Number.isFinite(start) || !Number.isFinite(now) || now < start) return null
+  return kstDay(now) - kstDay(start) + 1
+}
+
+/** 돌봄 버튼 아래에 짧게 보여줄 다음 가능 시점. 기다릴 필요가 없으면 null. */
+export function petWaitShort(availability: PetAvailability, serverNow: number): string | null {
+  if (availability.allowed) return null
+  if (availability.reason === 'LOW_ENERGY') return '쉬고 나서'
+  const seconds = remainingSeconds(availability.nextAvailableAt, serverNow)
+  if (seconds <= 0) return availability.reason === 'DAILY_LIMIT' ? '내일' : null
+  const minutes = Math.ceil(seconds / 60)
+  if (minutes < 60) return `${minutes}분 뒤`
+  const hours = Math.floor(minutes / 60)
+  const rest = minutes % 60
+  return rest ? `${hours}시간 ${rest}분 뒤` : `${hours}시간 뒤`
+}
+
 export function petActionHint(availability: PetAvailability, serverNow: number): string {
   // 인사는 보상 시간을 기다리는 동안에도 서버가 허용할 수 있다.
   if (availability.allowed)

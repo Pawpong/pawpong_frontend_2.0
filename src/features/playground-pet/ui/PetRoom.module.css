@@ -266,8 +266,9 @@
   height: 22px;
 }
 .careButton small {
-  font-size: 9px;
-  line-height: 1;
+  /* 기다리는 시간은 읽을 수 있는 크기로 보인다. */
+  font-size: 11px;
+  line-height: 1.2;
 }
 .careButton:active:not(:disabled),
 .primaryButton:active:not(:disabled),

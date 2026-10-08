@@ -31,7 +31,8 @@ export function CommunityDiscovery({
     <section aria-label="이야기 찾기" className="mb-5">
       <div className="flex items-start gap-2">
         <div
-          className="flex min-w-0 flex-1 gap-2 overflow-x-auto pb-1 tab:flex-wrap"
+          // 가로 스크롤이 터치 영역을 자르지 않도록 위로 2px 여유를 두되 배치는 그대로 둔다.
+          className="-mt-0.5 flex min-w-0 flex-1 gap-2 overflow-x-auto pt-0.5 pb-1 tab:flex-wrap"
           role="group"
           aria-label="빠른 탐색"
         >

@@ -71,6 +71,12 @@ export function requestNative(
   })
 }
 
+/** 포퐁 앱의 WebView 안에서 열린 화면인지. 앱 준비 신호 전에도 브리지 객체로 판단한다. */
+export function inNativeAppWebView(): boolean {
+  if (typeof window === 'undefined') return false
+  return Boolean((window as NativeWindow).ReactNativeWebView) || getNativePlatform() !== null
+}
+
 export function getNativePlatform(): 'ios' | 'android' | null {
   if (typeof window === 'undefined') return null
   const platform = (window as NativeWindow).__PAWPONG_APP__?.platform

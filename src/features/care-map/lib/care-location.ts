@@ -83,9 +83,12 @@ export function startCareLocation(
   return cancel
 }
 
-export function careLocationFailureMessage(reason: LocationFailure): string {
+/** inApp이면 앱 WebView라서 브라우저가 아니라 휴대폰 설정의 앱 권한을 안내한다. */
+export function careLocationFailureMessage(reason: LocationFailure, inApp = false): string {
   if (reason === 'outside-korea') return '국내 시설을 제공하고 있어요. 찾으실 지역을 선택해 주세요.'
   if (reason === 'denied')
-    return '위치 권한이 꺼져 있어요. 지역을 선택하거나 브라우저에서 위치 권한을 켜 주세요.'
+    return inApp
+      ? '위치 권한이 꺼져 있어요. 지역을 선택하거나 휴대폰 설정에서 포퐁 앱의 위치 권한을 켜 주세요.'
+      : '위치 권한이 꺼져 있어요. 지역을 선택하거나 브라우저에서 위치 권한을 켜 주세요.'
   return '현재 위치를 확인하지 못했어요. 지역을 선택하거나 다시 시도해 주세요.'
 }

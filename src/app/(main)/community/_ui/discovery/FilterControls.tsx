@@ -2,7 +2,7 @@ import { cn } from '@/shared/lib/cn'
 
 export const filterPill = (selected: boolean) =>
   cn(
-    'inline-flex min-h-10 shrink-0 items-center justify-center gap-1.5 rounded-full border px-3 text-sm whitespace-nowrap focus-ring transition-colors',
+    'relative inline-flex min-h-10 shrink-0 items-center justify-center gap-1.5 rounded-full border px-3 text-sm whitespace-nowrap focus-ring touch-target transition-colors',
     selected
       ? 'border-primary-500 bg-secondary-200 font-bold text-primary-700'
       : 'border-neutral-200 bg-white font-medium text-neutral-700 hover:bg-secondary-50',

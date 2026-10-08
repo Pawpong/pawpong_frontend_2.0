@@ -7,6 +7,7 @@ import { normalizeApiError } from '@/shared/api'
 import { Button, CtaModal, Textarea } from '@/shared/ui'
 import { LocationPinIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
+import { inNativeAppWebView } from '@/shared/lib/nativeBridge'
 import { isPhotoFile, preparePhoto } from '@/shared/lib/preparePhoto'
 import type { ChatMessageType } from '@/shared/types'
 import { CHAT_CONTENT_WIDTH, CHAT_GUTTER_X } from '../_lib/constants'
@@ -42,7 +43,9 @@ const roundCoordinate = (value: number) => Math.round(value * 100_000) / 100_000
 
 const getLocationErrorMessage = (error: GeolocationPositionError) => {
   if (error.code === error.PERMISSION_DENIED) {
-    return '위치 권한이 꺼져 있습니다. 브라우저 설정에서 위치 권한을 허용해주세요.'
+    return inNativeAppWebView()
+      ? '위치 권한이 꺼져 있습니다. 휴대폰 설정에서 포퐁 앱의 위치 권한을 허용해주세요.'
+      : '위치 권한이 꺼져 있습니다. 브라우저 설정에서 위치 권한을 허용해주세요.'
   }
   if (error.code === error.POSITION_UNAVAILABLE) {
     return '현재 위치를 확인할 수 없습니다. 잠시 후 다시 시도해주세요.'

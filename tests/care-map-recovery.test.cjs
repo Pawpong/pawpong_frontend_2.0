@@ -38,6 +38,7 @@ function renderer(getResult) {
     '@/entities/care-place': {},
     '@/shared/lib/fonts': { cafe24Proup: { className: 'test-font' } },
     '../lib/care-location': {},
+    '@/shared/lib/nativeBridge': { inNativeAppWebView: () => false },
     '../lib/care-search-state': searchState,
     '@/shared/ui/FeatureIntro': {
       FeatureIntro: ({ children }) => React.createElement('header', null, children),
@@ -86,7 +87,7 @@ const page = {
   locationUnavailable: true,
 }
 
-test('a failed location retry retains loaded facilities and offers retry, then recovers', async () => {
+test('위치 재시도가 실패해도 불러온 시설을 유지하고 다시 시도로 복구함', async () => {
   let fail = false
   const client = new QueryClient()
   const observer = new QueryObserver(client, {
@@ -124,7 +125,7 @@ test('a failed location retry retains loaded facilities and offers retry, then r
   }
 })
 
-test('an initial failure with no loaded records shows a recoverable error', async () => {
+test('처음 불러오기에 실패해 시설이 없으면 다시 시도할 수 있는 오류를 보여줌', async () => {
   const client = new QueryClient()
   const observer = new QueryObserver(client, {
     queryKey: ['care-places', 'initial-failure'],

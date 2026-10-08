@@ -206,7 +206,7 @@ function ChoiceGroup<T extends string>({
             aria-pressed={selected(key)}
             onClick={() => onToggle(key)}
             className={cn(
-              'min-h-9 rounded-full border px-3 text-sm focus-ring transition-colors',
+              'touch-target relative min-h-9 rounded-full border px-3 text-sm focus-ring transition-colors',
               selected(key)
                 ? 'border-primary-500 bg-secondary-200 font-bold text-primary-700'
                 : 'border-neutral-200 bg-white font-medium text-neutral-700 hover:bg-secondary-50',

@@ -4,7 +4,7 @@ import { tv, type VariantProps } from '@/shared/lib/tv'
 // 선택형 알약 칩 (Figma label-badge 975-19584) — 필터·키워드·상태 트리거 공용.
 // 선택 시 point 채움, 크기는 sm(h-24·10px) / md(h-29·14px) / responsive(모바일 h-28·13px → tab+ md).
 const chipStyles = tv({
-  base: 'focus-ring inline-flex shrink-0 items-center gap-1 rounded-full border border-brand px-2 font-semibold whitespace-nowrap text-brand transition-colors hover:bg-action-primary-hover',
+  base: 'focus-ring touch-target relative inline-flex shrink-0 items-center gap-1 rounded-full border border-brand px-2 font-semibold whitespace-nowrap text-brand transition-colors hover:bg-action-primary-hover',
   variants: {
     selected: {
       true: 'bg-action-primary',

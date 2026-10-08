@@ -18,7 +18,7 @@ import { CommunityAnswer } from './CommunityAiAnswer'
 import { CommunityRelatedPosts } from './CommunityRelatedPosts'
 
 const CHIP =
-  'inline-flex min-h-8 items-center rounded-full border px-3 text-xs font-semibold focus-ring transition-colors'
+  'relative inline-flex min-h-8 items-center rounded-full border px-3 text-xs font-semibold focus-ring touch-target transition-colors'
 
 export function CommunityExperiencePanel({
   post,

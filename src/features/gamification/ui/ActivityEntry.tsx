@@ -8,7 +8,7 @@ export function ActivityEntry() {
   return (
     <Link
       href="/home?tab=activity"
-      className="mb-4 inline-flex rounded-lg bg-emerald-50 px-3 py-2 text-sm font-bold text-emerald-900 focus-ring"
+      className="touch-target relative mb-4 inline-flex rounded-lg bg-emerald-50 px-3 py-2 text-sm font-bold text-emerald-900 focus-ring"
     >
       나의 활동 단계
     </Link>
