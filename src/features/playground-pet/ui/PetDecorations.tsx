@@ -82,6 +82,8 @@ export function PetDecorations({
   const [confirm, setConfirm] = useState(false)
   const [moreOpen, setMoreOpen] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [purchasedItemId, setPurchasedItemId] = useState<string | null>(null)
+  const applyButton = useRef<HTMLButtonElement>(null)
   const pending = useRef(false)
   const mounted = useRef(true)
   useEffect(() => {
@@ -95,8 +97,13 @@ export function PetDecorations({
   const collections = petCollectionProgress(game)
   const ownedCount = game.catalog.filter((item) => game.inventory.includes(item.id)).length
   const availability = selected ? itemAvailability(game, selected, level) : null
+  useEffect(() => {
+    if (!busy && purchasedItemId === selected?.id && availability?.owned && !availability.equipped)
+      applyButton.current?.focus()
+  }, [busy, purchasedItemId, selected?.id, availability?.owned, availability?.equipped])
   const select = (item: PetCatalogItem | null) => {
     setConfirm(false)
+    setPurchasedItemId(null)
     onSelect(item)
   }
   const changeFilters = (patch: Partial<Filters>) => {
@@ -128,6 +135,8 @@ export function PetDecorations({
     try {
       const result = await onCommand(command)
       if (!mounted.current) return
+      if (kind === 'items/purchase' && (result?.type === 'success' || result?.type === 'uncertain'))
+        setPurchasedItemId(item.id)
       if (result?.type === 'success') {
         setConfirm(false)
         if (kind === 'room') onSelect(null)
@@ -239,6 +248,11 @@ export function PetDecorations({
           </p>
           <h3>{selected.name}</h3>
           <p>{selected.description}</p>
+          {purchasedItemId === selected.id && availability.owned && !availability.equipped && (
+            <p className={styles.purchaseStatus} role="status">
+              인벤토리에 저장했어요. 아래의 내 방에 적용을 누르면 방이 바뀌어요.
+            </p>
+          )}
           <ul className={styles.itemFacts}>
             <li data-state={availability.owned ? 'ok' : 'todo'}>
               {availability.equipped
@@ -270,6 +284,7 @@ export function PetDecorations({
           <div className={styles.buttonRow}>
             {availability.owned ? (
               <button
+                ref={applyButton}
                 className={styles.primaryButton}
                 disabled={busy || availability.equipped}
                 onClick={() => void mutate('room', selected)}
@@ -342,6 +357,7 @@ export function PetDecorations({
           open={confirm}
           stars={game.wallet.stars}
           disabled={busy || !availability?.purchasable}
+          pending={saving}
           onClose={() => setConfirm(false)}
           onConfirm={() => {
             if (selected) void mutate('items/purchase', selected)

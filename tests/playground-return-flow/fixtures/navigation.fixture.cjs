@@ -1,5 +1,5 @@
 const { loadTypescript: load } = require('../../helpers/load-typescript.cjs')
-const { hooks } = require('../../fixtures/pet-shop.fixture.cjs')
+const { hooks } = require('../../fixtures/react-hooks.fixture.cjs')
 const navigation = load('src/entities/playground-pet/model/navigation.ts')
 
 function navigationFixture(href = '/playground/pet') {

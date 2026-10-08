@@ -1,5 +1,5 @@
 const { load } = require('./navigation.fixture.cjs')
-const { hooks, nodes } = require('../../fixtures/pet-shop.fixture.cjs')
+const { hooks, nodes } = require('../../fixtures/react-hooks.fixture.cjs')
 
 function selectionFixture(initialSourceJobId = 'requested') {
   const runtime = hooks(),
