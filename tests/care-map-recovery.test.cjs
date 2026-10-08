@@ -38,6 +38,7 @@ function renderer(getResult) {
     '@/entities/care-place': {},
     '@/shared/lib/fonts': { cafe24Proup: { className: 'test-font' } },
     '../lib/care-location': {},
+    '@/shared/lib/nativeBridge': { inNativeAppWebView: () => false },
     '../lib/care-search-state': searchState,
     '@/shared/ui/FeatureIntro': {
       FeatureIntro: ({ children }) => React.createElement('header', null, children),

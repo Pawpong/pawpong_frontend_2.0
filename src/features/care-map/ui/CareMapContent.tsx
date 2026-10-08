@@ -26,6 +26,7 @@ import { CareMapIcon } from './CareMapIcon'
 import { CarePlaceDetails } from './CarePlaceDetails'
 import { CareMapGuide } from './CareMapGuide'
 import { careLocationFailureMessage, startCareLocation } from '../lib/care-location'
+import { inNativeAppWebView } from '@/shared/lib/nativeBridge'
 import {
   careSearchReducer,
   createCareSearchState,
@@ -78,7 +79,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
       },
       onFailure: (reason) => {
         setLocating(false)
-        setLocationMessage(careLocationFailureMessage(reason))
+        setLocationMessage(careLocationFailureMessage(reason, inNativeAppWebView()))
       },
     })
     cancelLocation.current = cancel
@@ -188,7 +189,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
       },
       onFailure: (reason) => {
         setLocating(false)
-        setLocationMessage(careLocationFailureMessage(reason))
+        setLocationMessage(careLocationFailureMessage(reason, inNativeAppWebView()))
       },
     })
   }
