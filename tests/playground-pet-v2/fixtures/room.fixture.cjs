@@ -36,6 +36,9 @@ function roomUiHarness() {
     'react/jsx-runtime': require('react/jsx-runtime'),
     '@/entities/playground-pet': presentation,
     '@/entities/playground-pet/model/room': room,
+    '@/entities/playground-pet/model/shop': load('src/entities/playground-pet/model/shop.ts', {
+      './room': room,
+    }),
     '../lib/useServerClock': { useServerClock: (iso) => Date.parse(iso) },
     '../lib/usePetCharacter': {
       usePetCharacter: (_session, _pet, _source, enabled) => {
