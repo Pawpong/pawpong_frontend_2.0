@@ -19,7 +19,8 @@
   outline: 3px solid #ad7040;
   outline-offset: 4px;
 }
-.gameLayout button:disabled {
+.gameLayout button:disabled,
+.careButton[aria-disabled='true'] {
   cursor: default;
   opacity: 0.55;
 }
@@ -270,7 +271,7 @@
   font-size: 11px;
   line-height: 1.2;
 }
-.careButton:active:not(:disabled),
+.careButton:active:not(:disabled):not([aria-disabled='true']),
 .primaryButton:active:not(:disabled),
 .smallButton:active:not(:disabled) {
   transform: translateY(2px);
