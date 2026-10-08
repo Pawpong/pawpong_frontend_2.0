@@ -1,4 +1,11 @@
-import { apiClient, API_VERSION, unwrap } from '@/shared/api'
+import {
+  apiClient,
+  API_VERSION,
+  unwrap,
+  withAuthReadSession,
+  getAuthReadSession,
+  type AuthReadSession,
+} from '@/shared/api'
 import { parseCommunityPostReview } from '../model/communityReview'
 import type {
   ApiResponseFull,
@@ -226,25 +233,47 @@ const getMyActivityPosts = async (
   path: 'liked' | 'commented',
   params: CommunityBookmarkListParams,
   errorMessage: string,
+  session: AuthReadSession | null,
+  signal?: AbortSignal,
 ): Promise<PaginationResponse<CommunityPostCard>> => {
   const query = new URLSearchParams()
   if (params.page) query.set('page', String(params.page))
   if (params.pageSize) query.set('pageSize', String(params.pageSize))
 
-  const response = await apiClient.get<ApiResponseFull<PaginationResponse<RawCommunityPostCard>>>(
-    `${API_VERSION}/community/posts/me/${path}?${query.toString()}`,
+  const response = await withAuthReadSession(
+    (config) =>
+      apiClient.get<ApiResponseFull<PaginationResponse<RawCommunityPostCard>>>(
+        `${API_VERSION}/community/posts/me/${path}?${query.toString()}`,
+        config,
+      ),
+    session,
+    signal,
   )
   const page = unwrap(response, errorMessage)
   return { ...page, items: page.items.map(mapCard) }
 }
 
 /** 내가 좋아요한 게시글 목록 — 좋아요한 시각 최신순 */
-export const getMyLikedPosts = (params: CommunityBookmarkListParams = {}) =>
-  getMyActivityPosts('liked', params, '좋아요한 게시글 목록 조회에 실패했습니다.')
+export const getMyLikedPosts = (
+  params: CommunityBookmarkListParams = {},
+  session: AuthReadSession | null = getAuthReadSession(),
+  signal?: AbortSignal,
+) =>
+  getMyActivityPosts('liked', params, '좋아요한 게시글 목록 조회에 실패했습니다.', session, signal)
 
 /** 내가 댓글 단 게시글 목록 — 글당 한 번, 최근 댓글 순 */
-export const getMyCommentedPosts = (params: CommunityBookmarkListParams = {}) =>
-  getMyActivityPosts('commented', params, '댓글 단 게시글 목록 조회에 실패했습니다.')
+export const getMyCommentedPosts = (
+  params: CommunityBookmarkListParams = {},
+  session: AuthReadSession | null = getAuthReadSession(),
+  signal?: AbortSignal,
+) =>
+  getMyActivityPosts(
+    'commented',
+    params,
+    '댓글 단 게시글 목록 조회에 실패했습니다.',
+    session,
+    signal,
+  )
 
 /** 내가 임시저장(draft) 한 게시글 목록 — 본인에게만 노출, 최신순 */
 export const getMyDraftPosts = async (

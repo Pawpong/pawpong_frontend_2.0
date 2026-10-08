@@ -6,6 +6,8 @@ import { communityQueries } from '@/entities/community'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import { Chip } from '@/shared/ui'
+import { useAuthReadSession } from '@/shared/lib/useAuthReadSession'
+import type { AuthReadSession } from '@/shared/api'
 import { HomePostGrid } from './HomePostGrid'
 
 const POST_FILTERS = [
@@ -71,11 +73,19 @@ const WrittenPosts = ({
 /** 댓글 단 글 · 좋아요한 글 — 서버 페이지네이션 무한 스크롤 */
 const ActivityPosts = ({
   filter,
+  enabled,
+  session,
   header,
   gridClassName,
-}: PostsViewProps & { filter: Exclude<PostFilter, 'written'> }) => {
+}: PostsViewProps & {
+  filter: Exclude<PostFilter, 'written'>
+  enabled: boolean
+  session: AuthReadSession | null
+}) => {
   const query = useInfiniteQuery({
-    ...(filter === 'liked' ? communityQueries.myLiked() : communityQueries.myCommented()),
+    ...(filter === 'liked'
+      ? communityQueries.myLiked(24, enabled, session)
+      : communityQueries.myCommented(24, enabled, session)),
     throwOnError: false,
   })
   const posts = useMemo(
@@ -104,6 +114,7 @@ const ActivityPosts = ({
 
 /** 마이홈 '내가 쓴 글' 탭 — 작성한 글 / 댓글 단 글 / 좋아요한 글을 칩으로 전환한다 */
 const MyPostsTab = ({ enabled, gridClassName }: { enabled: boolean; gridClassName?: string }) => {
+  const session = useAuthReadSession()
   const [filter, setFilter] = useState<PostFilter>('written')
 
   const header = (
@@ -124,7 +135,14 @@ const MyPostsTab = ({ enabled, gridClassName }: { enabled: boolean; gridClassNam
   return filter === 'written' ? (
     <WrittenPosts enabled={enabled} header={header} gridClassName={gridClassName} />
   ) : (
-    <ActivityPosts key={filter} filter={filter} header={header} gridClassName={gridClassName} />
+    <ActivityPosts
+      key={filter}
+      filter={filter}
+      enabled={enabled}
+      session={session}
+      header={header}
+      gridClassName={gridClassName}
+    />
   )
 }
 
