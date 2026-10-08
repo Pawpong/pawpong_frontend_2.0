@@ -14,7 +14,11 @@ import { cn } from '@/shared/lib/cn'
 import { isAuthReadSessionCurrent } from '@/shared/lib/authReadSession'
 import { AsyncState, Button, ComposerSectionHeading, buttonVariants } from '@/shared/ui'
 import { PhotoUploadField } from '@/shared/ui/PhotoUploadField'
-import { saveAiImageFile } from '../lib/aiImageFile'
+import {
+  AI_IMAGE_SAVE_UNSUPPORTED,
+  AI_IMAGE_SAVE_UNSUPPORTED_MESSAGE,
+  saveAiImageFile,
+} from '../lib/aiImageFile'
 import { useAiSourcePhoto } from '../lib/useAiSourcePhoto'
 import { setPendingCommunityPhoto } from '../lib/pendingCommunityPhoto'
 import { AiPostShareChoice } from './AiPostShareChoice'
@@ -137,8 +141,12 @@ export function AiFilterStudio({
     setSaving(true)
     try {
       await saveAiImageFile(result.file)
-    } catch {
-      setShareError('사진을 저장하지 못했어요. 다시 시도해 주세요.')
+    } catch (error) {
+      setShareError(
+        error instanceof Error && error.name === AI_IMAGE_SAVE_UNSUPPORTED
+          ? AI_IMAGE_SAVE_UNSUPPORTED_MESSAGE
+          : '사진을 저장하지 못했어요. 다시 시도해 주세요.',
+      )
     } finally {
       setSaving(false)
     }

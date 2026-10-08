@@ -5,7 +5,13 @@ import { useRouter } from 'next/navigation'
 import { useQueryClient } from '@tanstack/react-query'
 import { aiImageQueries, hideAiImageGeneration } from '@/entities/ai-image'
 import { isAuthReadSessionCurrent, type AuthReadSession } from '@/shared/lib/authReadSession'
-import { fetchAiImageFile, fetchAiSourceFile, saveAiImageFile } from './aiImageFile'
+import {
+  AI_IMAGE_SAVE_UNSUPPORTED,
+  AI_IMAGE_SAVE_UNSUPPORTED_MESSAGE,
+  fetchAiImageFile,
+  fetchAiSourceFile,
+  saveAiImageFile,
+} from './aiImageFile'
 import { setPendingCommunityPhoto } from './pendingCommunityPhoto'
 
 type ArchiveAction = 'save' | 'post' | 'hide'
@@ -62,12 +68,14 @@ export function useAiArchiveAction(session: AuthReadSession | null, jobId: strin
         router.push('/community/write?source=ai-photo')
       }
       return current()
-    } catch {
+    } catch (failure) {
       if (current())
         setError(
           action === 'hide'
             ? '사진을 보관함에서 지우지 못했어요. 다시 시도해 주세요.'
-            : '사진을 가져오지 못했어요. 로그인 상태와 연결을 확인한 뒤 다시 시도해 주세요.',
+            : failure instanceof Error && failure.name === AI_IMAGE_SAVE_UNSUPPORTED
+              ? AI_IMAGE_SAVE_UNSUPPORTED_MESSAGE
+              : '사진을 가져오지 못했어요. 로그인 상태와 연결을 확인한 뒤 다시 시도해 주세요.',
         )
       return false
     } finally {

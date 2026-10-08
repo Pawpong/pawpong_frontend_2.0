@@ -215,6 +215,7 @@ test('사진 파일 도우미는 취소 신호를 전달하고 기존 파일명�
   const signal = new AbortController().signal
   const calls = []
   const { fetchAiImageFile } = loadModule('src/features/ai-image/lib/aiImageFile.ts', {
+    '@/shared/lib/nativeBridge': { inNativeAppWebView: () => false },
     '@/entities/ai-image': {
       getAiImageGenerationImage: async (...args) => {
         calls.push(args)
