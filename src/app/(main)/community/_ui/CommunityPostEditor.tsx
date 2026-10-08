@@ -57,14 +57,14 @@ interface CommunityPostEditorProps {
   postId?: string
   /** 새 글에서 처음 열어 둘 기록 틀 (walk | clinic | daily) */
   initialRecord?: string
-  photoSource?: 'memory-card'
+  photoSource?: 'memory-card' | 'ai-photo'
   returnTo?: string
 }
 
 interface PostFormProps {
   postId?: string
   initialRecord?: string
-  photoSource?: 'memory-card'
+  photoSource?: 'memory-card' | 'ai-photo'
   returnTo?: string
   post?: CommunityPostDetail
 }
@@ -83,7 +83,7 @@ const PostForm = ({ postId, post, initialRecord, photoSource, returnTo }: PostFo
   // 명시적으로 넘긴 사진만 새 글에 한 번 붙인다. 기존 글·초안을 덮어쓰지 않는다.
   const [handoff] = useState(() => {
     if (post) return null
-    const aiPhoto = takePendingCommunityPost()
+    const aiPhoto = takePendingCommunityPost(photoSource)
     const card = takePendingCommunityCard(photoSource)
     if (photoSource === 'memory-card')
       return card ? { files: [card], aiComparison: null, jobId: undefined } : null

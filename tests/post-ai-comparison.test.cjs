@@ -20,7 +20,7 @@ const choice = (before, after, enabled = true, privateBefore = false) => ({
   privateBefore,
 })
 
-test('turning comparison off excludes the original from the upload, not only the metadata', () => {
+test('비교 공개를 끄면 메타데이터뿐 아니라 업로드에서도 원본을 제외함', () => {
   const before = file('original'),
     after = file('result')
   const result = prepareComparisonPost([after, before], choice(before, after, false))
@@ -28,7 +28,7 @@ test('turning comparison off excludes the original from the upload, not only the
   assert.equal(result.aiComparison, null)
   assert.equal(result.error, null)
 })
-test('editing a comparison to result-only removes the public original and keeps unrelated photos', () => {
+test('비교 글을 결과 전용으로 바꾸면 공개 원본을 제거하고 다른 사진은 유지함', () => {
   const result = prepareComparisonPost(
     ['original', 'extra', 'result'],
     choice('original', 'result', false),
@@ -36,7 +36,7 @@ test('editing a comparison to result-only removes the public original and keeps 
   assert.deepEqual(result.keptImageUrls, ['extra', 'result'])
   assert.equal(result.aiComparison, null)
 })
-test('a privately fetched original remains private until enabled, and indices follow API upload order', () => {
+test('비공개 원본은 동의 전까지 공개하지 않고 사진 인덱스는 업로드 순서를 따름', () => {
   const before = file('original'),
     after = file('result')
   const hidden = prepareComparisonPost(['extra', after], choice(before, after, false, true))
@@ -45,11 +45,11 @@ test('a privately fetched original remains private until enabled, and indices fo
   assert.deepEqual(shared.files, [after, before])
   assert.deepEqual(shared.aiComparison, { beforePhotoIndex: 2, afterPhotoIndex: 1 })
 })
-test('reindexing after photo deletion still points at the same before and after photos', () => {
+test('사진 삭제 후 인덱스를 바꾸어도 같은 원본과 결과 사진을 가리킴', () => {
   const result = prepareComparisonPost(['result', 'original'], choice('original', 'result'))
   assert.deepEqual(result.aiComparison, { beforePhotoIndex: 1, afterPhotoIndex: 0 })
 })
-test('removing either comparison photo blocks publishing a misleading pair', () => {
+test('비교 사진 중 하나를 제거하면 잘못된 비교 쌍을 발행하지 않음', () => {
   for (const photos of [['result'], ['original']]) {
     const result = prepareComparisonPost(photos, choice('original', 'result'))
     assert.ok(result.error)
@@ -57,26 +57,27 @@ test('removing either comparison photo blocks publishing a misleading pair', () 
     assert.ok(!result.keptImageUrls.includes('original'))
   }
 })
-test('replacing the original never leaves the previous original in the public gallery', () => {
+test('원본을 교체하면 이전 원본을 공개 갤러리에 남기지 않음', () => {
   const next = file('new-original')
   const selected = { ...choice(next, 'result', true, true), sources: ['old-original', next] }
   const result = prepareComparisonPost(['old-original', 'result'], selected)
   assert.deepEqual(result.keptImageUrls, ['result'])
   assert.deepEqual(result.files, [next])
 })
-test('the ten-photo limit includes the optional original', () => {
+test('사진 열 장 제한에는 선택적으로 공개한 원본도 포함함', () => {
   const photos = Array.from({ length: 10 }, (_, i) => 'photo-' + i)
   const result = prepareComparisonPost(photos, choice(file('original'), photos[0], true, true))
   assert.ok(result.error.includes('10장'))
 })
-test('handoff keeps the job reference without fetching or including a private original', () => {
-  const handoff = load('src/features/ai-image/lib/pendingCommunityPhoto.ts')
+test('원본을 자동 조회하지 않고 결과와 작업 식별자만 한 번 전달함', () => {
+  const { handoffFixture } = require('./ai-community-handoff/fixtures/handoff.fixture.cjs')
+  const handoff = handoffFixture()
   const result = file('result')
-  handoff.setPendingCommunityPhoto(result, undefined, 'owned-job')
-  assert.deepEqual(handoff.takePendingCommunityPost(), {
+  handoff.setPendingCommunityPhoto(result, undefined, 'owned-job', handoff.session)
+  assert.deepEqual(handoff.takePendingCommunityPost('ai-photo'), {
     files: [result],
     aiComparison: null,
     jobId: 'owned-job',
   })
-  assert.equal(handoff.takePendingCommunityPost(), null)
+  assert.equal(handoff.takePendingCommunityPost('ai-photo'), null)
 })

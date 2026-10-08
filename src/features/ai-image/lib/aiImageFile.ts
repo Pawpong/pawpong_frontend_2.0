@@ -30,8 +30,8 @@ export const saveAiImageFile = async (file: File) => {
 }
 
 /** 본인이 비교 공개를 선택했을 때만 인증한 원본을 받는다. */
-export const fetchAiSourceFile = async (jobId: string) => {
-  const blob = await getAiImageGenerationSourceImage(jobId)
+export const fetchAiSourceFile = async (jobId: string, signal?: AbortSignal) => {
+  const blob = await getAiImageGenerationSourceImage(jobId, signal)
   const ext = blob.type === 'image/webp' ? 'webp' : blob.type === 'image/jpeg' ? 'jpg' : 'png'
   return new File([blob], `pawpong-${jobId}-original.${ext}`, { type: blob.type || 'image/png' })
 }

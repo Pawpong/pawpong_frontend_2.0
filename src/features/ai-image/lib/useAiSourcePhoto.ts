@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { getAccessToken } from '@/shared/api/token'
+import { getAuthReadSession, isAuthReadSessionCurrent } from '@/shared/lib/authReadSession'
 import { isAuthSessionCurrent } from '@/shared/lib/authSessionLifecycle'
 import { preparePhoto } from '@/shared/lib/preparePhoto'
 import { fetchAiImageFile } from './aiImageFile'
@@ -23,14 +23,14 @@ export function useAiSourcePhoto({
   useEffect(() => {
     const controller = new AbortController()
     lifetime.current = controller
-    const token = getAccessToken()
+    const session = getAuthReadSession()
     const active = () => !controller.signal.aborted && isAuthSessionCurrent(generation)
-    const current = () => active() && getAccessToken() === token
+    const current = () => active() && !!session && isAuthReadSessionCurrent(session)
 
     if (enabled && sourceJobId) {
       // 보관한 결과만 인증해서 가져온다. 생성과 횟수 차감은 만들기 버튼에서 시작한다.
       void (async () => {
-        if (!token || !current()) {
+        if (!current()) {
           if (active()) setPreparing(false)
           return
         }
@@ -59,10 +59,10 @@ export function useAiSourcePhoto({
 
   const selectPhoto = async (file: File) => {
     const controller = lifetime.current
-    const token = getAccessToken()
+    const session = getAuthReadSession()
     const active = () =>
       enabled && controller && !controller.signal.aborted && isAuthSessionCurrent(generation)
-    const current = () => active() && getAccessToken() === token
+    const current = () => active() && !!session && isAuthReadSessionCurrent(session)
     if (preparing || !current()) return false
     setPreparing(true)
     setError(null)

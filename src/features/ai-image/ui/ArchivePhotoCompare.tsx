@@ -97,7 +97,7 @@ export function ArchivePhotoCompare({
         )}
       </div>
       <p className="text-center text-xs text-neutral-600">
-        저장하거나 커뮤니티에 올릴 때는 AI 사진이 사용돼요.
+        원본은 아래에서 비교 공개를 선택한 경우에만 게시글에 함께 올라가요.
       </p>
     </div>
   )

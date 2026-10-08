@@ -86,6 +86,7 @@ test('제작 페이지는 캐릭터 모드의 올바른 작업 ID만 사진 선�
 
 test('제작 화면은 사진과 계정 세션별로 분리하고 공개 잠금을 유지함', () => {
   let config = { data: { enabled: true } }
+  let scope = 'owner-session'
   const billing = { memberId: 'owner', generation: 3, refresh: async () => {}, account: {} }
   const { AiFilterContent } = loadModule('src/app/(main)/ai-filter/_ui/AiFilterContent.tsx', {
     react: { useEffect() {} },
@@ -96,11 +97,15 @@ test('제작 화면은 사진과 계정 세션별로 분리하고 공개 잠금�
     '@/features/in-app-purchase': { usePurchases: () => billing },
     '@/entities/iap': { featureAllowance: () => undefined },
     '@/entities/playground-pet': { petConfigOptions: {} },
+    '@/shared/lib/useAuthReadSession': { useAuthReadSession: () => ({ scope }) },
   })
   const props = { gameCharacter: true, sourceJobId }
   const first = AiFilterContent(props)
   assert.equal(first.props.sourceJobId, sourceJobId)
   assert.equal(first.props.sessionGeneration, 3)
+  scope = 'new-session'
+  assert.notEqual(AiFilterContent(props).key, first.key)
+  scope = 'owner-session'
   billing.generation++
   assert.notEqual(AiFilterContent(props).key, first.key)
   billing.memberId = 'other-owner'
@@ -133,6 +138,7 @@ function studio(remaining = 1, isLoggedIn = true) {
     '@/shared/config/playground': { PLAYGROUND_BILLING_ENABLED: false },
     '@/shared/lib/fonts': { cafe24Proup: { className: '' } },
     '@/shared/lib/cn': { cn: (...args) => args.join(' ') },
+    '@/shared/lib/authReadSession': { isAuthReadSessionCurrent: () => true },
     '@/shared/ui': { Button, ComposerSectionHeading: () => null, buttonVariants: () => '' },
     '@/shared/ui/PhotoUploadField': { PhotoUploadField: () => null },
     '../lib/aiImageFile': {},
