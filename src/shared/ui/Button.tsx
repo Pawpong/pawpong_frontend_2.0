@@ -13,7 +13,7 @@ export const BUTTON_WIDTH_CLASSES = {
 
 // 버튼의 모양은 여기서만 정의한다. 최대폭·여백·위치·노출은 부모 레이아웃의 책임.
 const buttonStyles = tv({
-  base: 'focus-ring inline-flex rounded-lg shrink-0 items-center justify-center gap-1 leading-[1.5] font-semibold whitespace-nowrap transition-colors disabled:cursor-not-allowed disabled:text-action-disabled-fg motion-reduce:transition-none',
+  base: 'focus-ring touch-target relative inline-flex rounded-lg shrink-0 items-center justify-center gap-1 leading-[1.5] font-semibold whitespace-nowrap transition-colors disabled:cursor-not-allowed disabled:text-action-disabled-fg motion-reduce:transition-none',
   variants: {
     intent: {
       // Figma BaseButton — default point-500 / hover point-300 / press point-600

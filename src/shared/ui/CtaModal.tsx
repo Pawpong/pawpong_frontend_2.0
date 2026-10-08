@@ -100,7 +100,7 @@ const CtaModal = ({
             {showClose && (
               <DialogPrimitive.Close
                 aria-label="닫기"
-                className="flex size-6 items-center justify-center text-neutral-700"
+                className="touch-target relative flex size-6 items-center justify-center text-neutral-700"
               >
                 <CloseIcon className="size-[1.125rem]" />
               </DialogPrimitive.Close>

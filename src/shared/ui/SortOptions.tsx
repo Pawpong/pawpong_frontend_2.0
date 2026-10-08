@@ -26,7 +26,7 @@ const SortOptions = <Value extends string>({
         aria-pressed={value === option.value}
         onClick={() => onValueChange(option.value)}
         className={cn(
-          'min-h-10 rounded px-1 whitespace-nowrap focus-ring',
+          'touch-target relative min-h-10 rounded px-1 whitespace-nowrap focus-ring',
           compact ? 'text-xs' : 'text-sm',
           value === option.value
             ? compact
