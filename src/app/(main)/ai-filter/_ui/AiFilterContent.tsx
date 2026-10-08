@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { AiFilterStudio } from '@/features/ai-image'
+import { PetResultLink } from '@/features/playground-pet'
 import { useMe } from '@/features/auth'
 import { usePurchases } from '@/features/in-app-purchase'
 import { featureAllowance } from '@/entities/iap'
@@ -55,6 +56,9 @@ export const AiFilterContent = ({
       quotaError={billing.account.isError}
       onRefreshQuota={() => void billing.refresh()}
       onGenerationSettled={() => void billing.refresh()}
+      renderResultAction={(jobId, className) => (
+        <PetResultLink sourceJobId={jobId} className={className} />
+      )}
     />
   )
 }

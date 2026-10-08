@@ -1,13 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import { aiImageQueries } from '@/entities/ai-image'
 import { useAuthReadSession } from '@/shared/lib/useAuthReadSession'
 import type { AuthReadSession } from '@/shared/lib/authReadSession'
-import { PetResultLink } from '@/features/playground-pet/ui/PetResultLink'
 import { cn } from '@/shared/lib/cn'
 import {
   RetryButton,
@@ -31,6 +30,8 @@ interface AiPhotoArchiveProps {
   /** limit 로 잘렸을 때 전체 보기 링크 */
   moreHref?: string
   gridClassName?: string
+  /** 크게 본 사진 아래 붙일 이어가기 버튼(예: 반려동물 캐릭터 만들기). 다른 기능은 화면 조립 계층에서 넣는다. */
+  renderResultAction?: (jobId: string, className?: string) => ReactNode
 }
 
 const formatDate = (iso: string) =>
@@ -47,7 +48,13 @@ const formatDate = (iso: string) =>
  * 사진을 누르면 크게 보고 저장·커뮤니티에 올리기·보관함에서 지우기를 할 수 있다.
  * 실패한 변환은 보여주지 않고, 진행 중인 것은 '만드는 중' 칸으로 둔다.
  */
-export function AiPhotoArchive({ enabled, limit, moreHref, gridClassName }: AiPhotoArchiveProps) {
+export function AiPhotoArchive({
+  enabled,
+  limit,
+  moreHref,
+  gridClassName,
+  renderResultAction,
+}: AiPhotoArchiveProps) {
   const session = useAuthReadSession()
   if (!enabled || !session) return null
   return (
@@ -57,6 +64,7 @@ export function AiPhotoArchive({ enabled, limit, moreHref, gridClassName }: AiPh
       limit={limit}
       moreHref={moreHref}
       gridClassName={gridClassName}
+      renderResultAction={renderResultAction}
     />
   )
 }
@@ -66,6 +74,7 @@ function AiArchiveContent({
   limit,
   moreHref,
   gridClassName,
+  renderResultAction,
 }: Omit<AiPhotoArchiveProps, 'enabled'> & { session: AuthReadSession }) {
   const generationsQuery = useQuery(aiImageQueries.myGenerations(true, session))
   const filtersQuery = useQuery(aiImageQueries.filters())
@@ -208,7 +217,7 @@ function AiArchiveContent({
               onChange={setShareComparison}
               disabled={!!action.busy}
             />
-            <PetResultLink sourceJobId={opened.jobId} />
+            {renderResultAction?.(opened.jobId)}
             {action.error && (
               <p role="alert" className="text-sm text-error-500">
                 {action.error}
