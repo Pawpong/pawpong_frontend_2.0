@@ -58,7 +58,8 @@ export function PetDecorations({
   /** 방 위 핫스팟에서 고른 슬롯. serial이 바뀔 때마다 그 슬롯으로 좁힌다. */
   slotRequest?: { slot: PetRoomSlot; serial: number } | null
   onCommand: (command: PetCommand) => Promise<PetCommandResult | undefined>
-  onOpenShop?: () => void
+  /** 보유 목록이 비었을 때 상점으로 가며 지금 보던 자리를 함께 넘긴다. */
+  onOpenShop?: (slot?: PetRoomSlot) => void
   onReloadImages?: () => void
   loadingImages?: boolean
 }) {
@@ -248,7 +249,11 @@ export function PetDecorations({
             필터 초기화
           </button>
           {mode === 'inventory' && (
-            <button className={styles.smallButton} disabled={busy} onClick={onOpenShop}>
+            <button
+              className={styles.smallButton}
+              disabled={busy}
+              onClick={() => onOpenShop?.(filters.slot === 'all' ? undefined : filters.slot)}
+            >
               상점 둘러보기
             </button>
           )}
