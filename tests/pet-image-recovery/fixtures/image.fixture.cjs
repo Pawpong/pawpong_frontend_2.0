@@ -37,7 +37,7 @@ function assetFixture() {
     react: { useState: (...args) => active.react.useState(...args) },
     'react/jsx-runtime': jsx,
     'next/image': { default: 'image' },
-    '../lib/gameAssets': load('src/features/playground-pet/lib/gameAssets.ts'),
+    '../lib/gameAssets': require('../../fixtures/pet-assets.fixture.cjs').assets,
     './PetRoom.module.css': css,
   })
   return {

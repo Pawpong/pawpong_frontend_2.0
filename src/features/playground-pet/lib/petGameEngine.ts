@@ -10,6 +10,7 @@ import type {
 import { PET_SLOT_AREAS, PET_SLOT_POSITIONS } from '@/entities/playground-pet/model/room'
 import { SNACK_LANE_X, snackDropResult } from '@/entities/playground-pet/model/snack'
 import { petAsset, type PetAssetManifest } from './gameAssets'
+import { loadPetAssetImage } from './petAssetImage'
 import { advancePetMotion, callPetTo, initialPetMotion, petMotionPose } from './petMotion'
 import { PET_ROOM_MOTION } from '../constants/pet-motion'
 
@@ -69,7 +70,7 @@ export function createPetGame(
   let scene: RoomScene | null = null
   let loadVersion = 0
   let preparedGame: PetGameKind | null = null
-  const pendingImages = new Set<HTMLImageElement>()
+  const lifetime = new AbortController()
   const assetTextures = new Map<string, string>()
   const loading = new Map<string, Promise<void>>()
   const loadedImages = new Map<string, HTMLImageElement>()
@@ -88,27 +89,10 @@ export function createPetGame(
   function imageFor(url: string): Promise<HTMLImageElement> {
     const existing = loadedImages.get(url)
     if (existing) return Promise.resolve(existing)
-    return new Promise((resolve, reject) => {
-      const img = new Image()
-      pendingImages.add(img)
-      img.onload = () => {
-        pendingImages.delete(img)
-        img.onload = null
-        img.onerror = null
-        if (!alive) {
-          reject(new Error('disposed'))
-          return
-        }
-        loadedImages.set(url, img)
-        resolve(img)
-      }
-      img.onerror = () => {
-        pendingImages.delete(img)
-        img.onload = null
-        img.onerror = null
-        reject(new Error('asset unavailable'))
-      }
-      img.src = url
+    return loadPetAssetImage(url, lifetime.signal).then((img) => {
+      if (!alive) throw new Error('disposed')
+      loadedImages.set(url, img)
+      return img
     })
   }
 
@@ -617,12 +601,7 @@ export function createPetGame(
       if (!alive) return
       alive = false
       loadVersion++
-      for (const img of pendingImages) {
-        img.onload = null
-        img.onerror = null
-        img.src = ''
-      }
-      pendingImages.clear()
+      lifetime.abort()
       loadedImages.clear()
       loading.clear()
       game.destroy(true)

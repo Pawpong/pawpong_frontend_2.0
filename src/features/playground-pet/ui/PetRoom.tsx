@@ -275,6 +275,8 @@ export function PetRoom({
     >
       <section
         data-pet-device
+        id="pet-game-screen"
+        tabIndex={-1}
         className={styles.device}
         aria-label={`${pet.name}의 휴대형 반려동물 게임`}
       >
