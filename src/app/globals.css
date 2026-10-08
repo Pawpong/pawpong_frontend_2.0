@@ -294,6 +294,12 @@
   }
 }
 
+/* iOS 앱에는 사진 보관함 저장 권한 문구(NSPhotoLibraryAddUsageDescription)가 없어
+   이미지를 길게 눌러 저장하면 앱이 종료될 수 있다. 새 앱 빌드에 문구를 넣기 전까지 앱 안 이미지의 길게 누르기 메뉴를 끈다. */
+html[data-native-viewport] img {
+  -webkit-touch-callout: none;
+}
+
 /* Shared discovery-card feedback; preserve geometry and avoid sticky touch hover. */
 @utility card-interactive {
   transition: box-shadow 160ms ease-out;
