@@ -13,9 +13,11 @@ import {
 export function SharedRouteMap({
   points,
   onAdd,
+  focusPoint,
 }: {
   points: CommunityRoutePoint[]
   onAdd?: (point: CommunityRoutePoint) => void
+  focusPoint?: CommunityRoutePoint
 }) {
   const config = useQuery({
     queryKey: ['care-map', 'config'],
@@ -93,7 +95,7 @@ export function SharedRouteMap({
             strokeWeight: 4,
             strokeColor: '#29815b',
             strokeOpacity: 0.8,
-            strokeStyle: 'solid',
+            strokeStyle: 'shortdash',
           })
         : null
     if (!onAdd && path.length) {
@@ -108,6 +110,11 @@ export function SharedRouteMap({
     }
   }, [points, view, onAdd])
   const unavailable = error || config.isError || (config.isFetched && !key)
+  useEffect(() => {
+    if (!view || !focusPoint) return
+    view.map.setCenter(new view.maps.LatLng(focusPoint.latitude, focusPoint.longitude))
+    view.map.setLevel(4)
+  }, [view, focusPoint])
   return (
     <div className="relative h-64 overflow-hidden rounded-xl border border-primary-200">
       <div ref={container} className="absolute inset-0" aria-label="공유 장소 지도" />

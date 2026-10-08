@@ -13,7 +13,8 @@ import {
   type CommunityExperienceConfig,
 } from '@/entities/community'
 import { cn } from '@/shared/lib/cn'
-import { CommunityClinicSearch } from './CommunityClinicSearch'
+import type { CommunityPhotoLocationOption } from '@/features/community'
+import { CommunityPlaceSearch } from './CommunityPlaceSearch'
 import { ClinicRecordFields, LifeRecordFields, WalkRecordFields } from './CommunityRecordFields'
 import { CommunityRoutePicker } from './CommunityRoutePicker'
 import { CommunityTagField } from './CommunityTagField'
@@ -43,6 +44,7 @@ export function CommunityExperienceEditor({
   disabled,
   autoTagging,
   error,
+  photos = [],
 }: {
   value?: CommunityExperience | null
   onChange: (value: CommunityExperience) => void
@@ -51,6 +53,7 @@ export function CommunityExperienceEditor({
   autoTagging: CommunityAutoTagging
   /** 저장하려면 마저 채워야 하는 기록 칸 안내 */
   error?: string | null
+  photos?: CommunityPhotoLocationOption[]
 }) {
   const current = value ?? EMPTY_COMMUNITY_EXPERIENCE
   const update = (patch: Partial<CommunityExperience>) => onChange({ ...current, ...patch })
@@ -59,7 +62,7 @@ export function CommunityExperienceEditor({
       ['walk', 'travel'].includes(template.key) && isCommunityTemplateActive(current, template),
   )
   const [placeOpen, setPlaceOpen] = useState(current.route.length > 0)
-  const showPlace = placeOpen || current.route.length > 0
+  const showPlace = placeOpen || current.route.length > 0 || photos.some((photo) => photo.location)
   const label = (key: string) => config.topics.find((topic) => topic.key === key)?.label
   const autoCopy = AUTO_TAG_COPY[autoTagging]
 
@@ -118,7 +121,7 @@ export function CommunityExperienceEditor({
           value={current.clinic}
           onChange={(clinic) => update({ clinic })}
           search={
-            <CommunityClinicSearch
+            <CommunityPlaceSearch
               label="병원 이름 찾아 채우기"
               disabled={disabled}
               onPick={(place) =>
@@ -146,7 +149,7 @@ export function CommunityExperienceEditor({
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h3 className="flex items-center gap-2 text-sm font-bold text-neutral-850">
             <CommunityPixelIcon name="travel" className="text-primary-500" />
-            코스·장소 {current.route.length > 0 && `· ${current.route.length}곳`}
+            산책 코스·다녀온 장소 {current.route.length > 0 && `· ${current.route.length}곳`}
           </h3>
           {current.route.length === 0 && (
             <button
@@ -161,7 +164,12 @@ export function CommunityExperienceEditor({
         </div>
         {showPlace ? (
           <div className="mt-3">
-            <CommunityRoutePicker value={current} onChange={update} disabled={disabled} />
+            <CommunityRoutePicker
+              value={current}
+              onChange={update}
+              disabled={disabled}
+              photos={photos}
+            />
           </div>
         ) : (
           <p className="mt-1 text-xs leading-relaxed text-neutral-700">

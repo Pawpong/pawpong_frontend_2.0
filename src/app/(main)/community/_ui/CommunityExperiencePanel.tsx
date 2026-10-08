@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useQuery } from '@tanstack/react-query'
 import {
   CommunityPixelIcon,
@@ -114,12 +115,31 @@ export function CommunityExperiencePanel({
         <div className="space-y-2">
           <h3 className="flex items-center gap-2 font-cafe24 text-sm text-primary-700">
             <CommunityPixelIcon name="travel" className="text-primary-500" />
-            함께 가 볼 공개 장소
+            {experience?.walk ? '함께 걸은 산책 코스' : '다녀온 장소'}
           </h3>
           <SharedRouteMap points={route} />
-          <ol className="list-inside list-decimal space-y-0.5 text-sm text-neutral-850">
+          <ol className="space-y-2 text-sm text-neutral-850">
             {route.map((point, index) => (
-              <li key={index}>{point.name}</li>
+              <li
+                key={index}
+                className="flex items-center gap-3 rounded-xl border border-primary-100 bg-white p-3"
+              >
+                {point.photoIndex !== undefined && post.photoUrls[point.photoIndex] && (
+                  <div className="relative size-16 shrink-0 overflow-hidden rounded-lg">
+                    <Image
+                      src={post.photoUrls[point.photoIndex]}
+                      alt={`${point.name}에서 공유한 사진`}
+                      fill
+                      unoptimized
+                      className="object-cover"
+                    />
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <span className="text-xs font-bold text-primary-500">{index + 1}번째 장소</span>
+                  <p className="font-semibold break-words">{point.name}</p>
+                </div>
+              </li>
             ))}
           </ol>
           <p className="text-xs leading-relaxed text-neutral-600">

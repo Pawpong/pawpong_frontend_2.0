@@ -17,6 +17,7 @@ export const EMPTY_COMMUNITY_EXPERIENCE: CommunityExperience = {
 
 export const COMMUNITY_MAX_TOPICS = 3
 export const COMMUNITY_MAX_TAGS = 5
+export const COMMUNITY_MAX_ROUTE_POINTS = 8
 
 export const WALK_DIFFICULTY_LABELS: Record<
   NonNullable<CommunityWalkRecord['difficulty']>,

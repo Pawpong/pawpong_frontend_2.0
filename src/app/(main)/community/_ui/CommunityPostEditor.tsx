@@ -36,6 +36,9 @@ import {
   rememberCommunityAutoApplied,
   useSubmitCommunityPostForm,
   type CommunityCreateAttempt,
+  prepareCommunityPhoto,
+  getCommunityPhotoLocation,
+  reindexCommunityRoutePhotos,
 } from '@/features/community'
 import { useExitGuard } from '@/shared/lib/useExitGuard'
 import { RetryButton, Container, CtaModal, NavigationBar } from '@/shared/ui'
@@ -90,6 +93,7 @@ const PostForm = ({ postId, post, initialRecord, photoSource }: PostFormProps) =
     initialText: post?.body ?? '',
     initialImages: post?.photoUrls ?? [],
     initialFiles: handoff?.files,
+    prepareSelectedPhoto: prepareCommunityPhoto,
   })
   const currentPhotos: (string | File)[] = [...form.uploadedImages, ...form.files]
   const comparison = usePostAiComparison(currentPhotos, initialComparison, handoff?.jobId)
@@ -101,7 +105,20 @@ const PostForm = ({ postId, post, initialRecord, photoSource }: PostFormProps) =
     ...form,
     images: visiblePhotoIndexes.map((index) => form.images[index]),
     maxImages: comparison.choice.enabled ? 9 : 10,
-    handleRemoveImage: (index: number) => form.handleRemoveImage(visiblePhotoIndexes[index]),
+    handleRemoveImage: (index: number) => {
+      if (form.hasPendingPhotos()) return
+      const actualIndex = visiblePhotoIndexes[index]
+      if (experience)
+        setExperience({
+          ...experience,
+          route: reindexCommunityRoutePhotos(
+            experience.route,
+            currentPhotos,
+            currentPhotos.filter((_, i) => i !== actualIndex),
+          ),
+        })
+      form.handleRemoveImage(actualIndex)
+    },
   }
 
   const initialVisibility = post?.visibility ?? 'public'
@@ -165,7 +182,13 @@ const PostForm = ({ postId, post, initialRecord, photoSource }: PostFormProps) =
       !experienceEnabled || experience === undefined
         ? undefined
         : experience && !isCommunityExperienceEmpty(experience)
-          ? prepareCommunityExperience(experience)
+          ? prepareCommunityExperience({
+              ...experience,
+              route: reindexCommunityRoutePhotos(experience.route, currentPhotos, [
+                ...(comparison.submission.keptImageUrls ?? []),
+                ...comparison.submission.files,
+              ]),
+            })
           : post?.experience
             ? null
             : undefined
@@ -265,6 +288,12 @@ const PostForm = ({ postId, post, initialRecord, photoSource }: PostFormProps) =
                 disabled={isSubmitting || form.isProcessingPhotos}
                 autoTagging={reviewEnabled ? (aiReviewConsent ? 'on' : 'consent') : 'off'}
                 error={experienceNotice}
+                photos={currentPhotos.map((photo, photoIndex) => ({
+                  photoIndex,
+                  previewUrl: form.images[photoIndex],
+                  location:
+                    typeof photo === 'string' ? undefined : getCommunityPhotoLocation(photo),
+                }))}
               />
             )}
             {isMemoryCardHandoff ? (

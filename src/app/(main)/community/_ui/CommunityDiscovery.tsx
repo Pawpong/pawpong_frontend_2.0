@@ -16,7 +16,7 @@ import type { CommunityDiscoveryFilters, CommunityRecordKind } from '@/shared/ty
 import { cn } from '@/shared/lib/cn'
 
 const KIND_LABELS = { question: '질문', story: '경험·후기' } as const
-const MEDIA_LABELS = { photos: '사진 있는 글', map: '지도 있는 글' } as const
+const MEDIA_LABELS = { photos: '사진 이야기', map: '산책 코스·장소' } as const
 const PERIOD_LABELS = { week: '최근 7일', month: '최근 30일' } as const
 const RECORD_KINDS: CommunityRecordKind[] = ['walk', 'clinic', 'life']
 
@@ -178,7 +178,7 @@ export function CommunityDiscovery({
           selected={value.media === 'map'}
           onClick={() => patch({ media: value.media === 'map' ? undefined : 'map' })}
         >
-          지도 있는 글
+          산책 코스·장소
         </QuickFilter>
         <button
           type="button"

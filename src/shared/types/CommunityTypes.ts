@@ -228,6 +228,8 @@ export interface CommunityHallOfFame {
   winners: CommunityHallOfFameWinner[]
 }
 export interface CommunityRoutePoint {
+  /** 이 장소와 함께 공유한 사진의 게시물 내 순서 */
+  photoIndex?: number
   name: string
   latitude: number
   longitude: number
