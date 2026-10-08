@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 import { aiImageQueries } from '@/entities/ai-image'
 import { PlaygroundBilling } from '@/features/in-app-purchase'
 import { PetEntryCard } from '@/features/playground-pet/ui/PetEntryCard'
-import { PlaygroundToolShelf } from '@/features/playground-tools'
+import { PlaygroundCareShelf, PlaygroundPlayShelf } from '@/features/playground-tools'
 import { PawPrintIcon, PixelArrowRightIcon } from '@/shared/assets'
 import { PLAYGROUND_BILLING_ENABLED } from '@/shared/config/playground'
 import { buttonVariants } from '@/shared/ui/Button'
@@ -20,11 +20,11 @@ export function PlaygroundContent() {
   return (
     <div className="mx-auto w-full max-w-[68rem] space-y-8 px-5 pt-6 pb-16 tab:px-8 tab:pt-10 pc:px-10">
       <FeatureIntro eyebrow="우리 아이와 함께" title="포퐁 놀이터">
-        산책을 준비하고, 사진으로 놀고, 하루를 기록해요.
+        놀이 카드를 뽑고, 사진으로 남기고, 방에서 함께 놀아요.
         <br className="tab:hidden" /> 우리 아이와 함께할 작은 즐거움을 찾아보세요.
       </FeatureIntro>
 
-      <PlaygroundToolShelf />
+      <PlaygroundPlayShelf />
 
       <section
         aria-labelledby="playground-ai"
@@ -47,11 +47,22 @@ export function PlaygroundContent() {
               <br />
               우리 아이에게 어울리는 모습을 골라보세요.
             </p>
-            <div className="mt-5 inline-flex">
-              <Link href="/ai-filter" className={buttonVariants()}>
-                우리 아이 사진 만들기
-                <PixelArrowRightIcon aria-hidden className="ml-2 size-4" />
-              </Link>
+            <div className="mt-5 flex flex-col gap-3 tab:flex-row">
+              {/* 모바일은 꽉 채우고 태블릿부터 글자 폭에 맞춘다. 버튼 계약상 폭은 감싸는 칸이 정한다. */}
+              <div>
+                <Link href="/ai-filter" className={buttonVariants({ width: 'full' })}>
+                  우리 아이 사진 만들기
+                  <PixelArrowRightIcon aria-hidden className="ml-2 size-4" />
+                </Link>
+              </div>
+              <div>
+                <Link
+                  href="/playground/memory-card"
+                  className={buttonVariants({ intent: 'secondary', width: 'full' })}
+                >
+                  추억 카드 꾸미기
+                </Link>
+              </div>
             </div>
           </div>
 
@@ -102,6 +113,7 @@ export function PlaygroundContent() {
       </section>
 
       <PetEntryCard />
+      <PlaygroundCareShelf />
       {PLAYGROUND_BILLING_ENABLED && <PlaygroundBilling />}
     </div>
   )

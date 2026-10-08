@@ -13,7 +13,7 @@ test('수정 입력은 이름과 길이 제한이 있고 저장 중에는 잠긴
   const runtime = hooks()
   const { CommentEditForm } = load(directory + 'CommentEditForm.tsx', {
     react: runtime.react,
-    '@/shared/ui': { Button: 'button' },
+    '@/shared/ui': { Button: 'button', Textarea: 'textarea' },
   })
   let submits = 0
   const actions = {
@@ -37,7 +37,7 @@ test('새로 조회한 댓글이 달라져도 수정 중 초안은 유지하며 
   const runtime = hooks()
   const { CommentEditForm } = load(directory + 'CommentEditForm.tsx', {
     react: runtime.react,
-    '@/shared/ui': { Button: 'button' },
+    '@/shared/ui': { Button: 'button', Textarea: 'textarea' },
   })
   const tree = nodes(
     runtime.render(() =>

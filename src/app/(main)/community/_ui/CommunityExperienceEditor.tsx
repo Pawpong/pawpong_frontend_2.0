@@ -145,11 +145,11 @@ export function CommunityExperienceEditor({
         </p>
       )}
 
-      <section aria-label="산책 코스와 방문 장소">
+      <section aria-label="다녀온 장소 연결">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h3 className="flex items-center gap-2 text-sm font-bold text-neutral-850">
             <CommunityPixelIcon name="travel" className="text-primary-500" />
-            산책 코스·다녀온 장소 {current.route.length > 0 && `· ${current.route.length}곳`}
+            다녀온 장소 연결 {current.route.length > 0 && `· ${current.route.length}곳`}
           </h3>
           {current.route.length === 0 && (
             <button
@@ -174,7 +174,7 @@ export function CommunityExperienceEditor({
         ) : (
           <p className="mt-1 text-xs leading-relaxed text-neutral-700">
             {wantsPlace
-              ? '다녀온 코스를 지도에 담으면 다른 보호자가 따라가 보기 쉬워요.'
+              ? '다녀온 장소를 지도에 담으면 다른 보호자가 찾아가 보기 쉬워요. 사진 위치는 확인한 것만 담겨요.'
               : '함께 가 볼 만한 공개 장소가 있다면 지도에 담아 보세요.'}
           </p>
         )}

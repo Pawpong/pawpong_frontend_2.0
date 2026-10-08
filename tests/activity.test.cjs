@@ -245,7 +245,10 @@ test('배지함은 획득한 배지만 선택하며 3개 한도에서 추가 선
       BreederLevelBadge: () => null,
       ACTIVITY_LABELS: { comment: '댓글' },
     },
-    '@/shared/ui': { Button: (props) => createElement('button', props) },
+    '@/shared/ui': {
+      Button: (props) => createElement('button', props),
+      DetailLink: ({ href, label, className }) => createElement('a', { href, className }, label),
+    },
     '@/shared/lib/fonts': { cafe24Proup: { className: '' } },
     './activity.module.css': { default: {} },
   })

@@ -19,7 +19,7 @@ export function CommentActionFeedback({ notice }: { notice: CommentActionsContro
       ref={feedback}
       role="status"
       tabIndex={-1}
-      className="rounded-lg bg-neutral-50 p-3 text-sm text-neutral-700 outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+      className="rounded-lg bg-neutral-50 p-3 text-sm text-neutral-700 focus-ring"
     >
       {notice.message}
     </p>

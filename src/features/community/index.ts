@@ -20,9 +20,19 @@ export { useSubmitCommunityPostForm } from './lib/useSubmitCommunityPostForm'
 export { useCommunityEditorNavigation } from './lib/useCommunityEditorNavigation'
 export { useCommunityEditorConfig } from './lib/useCommunityEditorConfig'
 export { prepareCommunityPhoto } from './lib/prepareCommunityPhoto'
-export { getCommunityPhotoLocation } from './lib/communityPhotoLocation'
+export { getCommunityPhotoLocation, getCommunityPhotoTakenAt } from './lib/communityPhotoLocation'
 export { reindexCommunityRoutePhotos } from './lib/communityRoutePhotos'
-export type { CommunityPhotoLocationOption } from './model/community-photo-location.type'
+export {
+  applyPhotoPlacePrecision,
+  canSortRouteByPhotoTime,
+  communityPhotoPlace,
+  photoPlacePrecisionOf,
+  sortRouteByPhotoTime,
+} from './lib/communityPhotoPlace'
+export type {
+  CommunityPhotoLocationOption,
+  CommunityPhotoPlacePrecision,
+} from './model/community-photo-location.type'
 export { useDeletePostConfirm } from './lib/useDeletePostConfirm'
 export { PetCategorySuggestion } from './ui/PetCategorySuggestion'
 export { useCommunityReviewRequest } from './lib/useCommunityReviewRequest'

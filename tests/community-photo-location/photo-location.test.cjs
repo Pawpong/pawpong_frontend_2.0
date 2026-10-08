@@ -74,7 +74,12 @@ test('원본에서 위치를 읽고 메타데이터를 제거한 업로드 사�
 })
 
 test('사진 재정렬과 삭제 및 비교 원본 제외 후에도 장소는 같은 사진을 가리킴', () => {
-  const { reindexCommunityRoutePhotos } = load('src/features/community/lib/communityRoutePhotos.ts')
+  const { reindexCommunityRoutePhotos } = load(
+    'src/features/community/lib/communityRoutePhotos.ts',
+    {
+      './communityPhotoPlace': load('src/features/community/lib/communityPhotoPlace.ts'),
+    },
+  )
   const a = new File(['첫째'], '같은이름.jpg'),
     b = new File(['둘째'], '같은이름.jpg')
   const place = { name: '공개 공원', latitude: 37.5, longitude: 127, photoIndex: 1 }

@@ -1,3 +1,6 @@
 export { OutingChecklist } from './ui/OutingChecklist'
 export { MemoryCard } from './ui/MemoryCard'
-export { PlaygroundToolShelf } from './ui/PlaygroundToolShelf'
+export { OutingDiscovery } from './ui/OutingDiscovery'
+export { PetTasteDiscovery } from './ui/PetTasteDiscovery'
+export { PlaygroundPlayShelf } from './ui/PlaygroundPlayShelf'
+export { PlaygroundCareShelf } from './ui/PlaygroundCareShelf'

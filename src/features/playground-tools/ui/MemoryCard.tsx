@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { setPendingCommunityCard } from '@/entities/community'
 import { Button, buttonVariants } from '@/shared/ui/Button'
 import { CameraIcon, ShareIcon, PixelArrowRightIcon } from '@/shared/assets'
@@ -16,6 +16,7 @@ import {
   memoryCardExportMode,
   type MemoryCardInput,
 } from '../model/memoryCard'
+import { memoryCardSeed } from '../model/discovery'
 import { currentToolOwner, useToolOwner } from '../model/useToolOwner'
 import { cardBlob, drawMemoryCard, loadCardImage } from '../lib/drawMemoryCard'
 import { ToolPage } from './ToolPage'
@@ -31,18 +32,20 @@ function canShareFile(file: File) {
   }
 }
 
-function CardMaker({ owner }: { owner: string }) {
+function CardMaker({ owner, playId }: { owner: string; playId: string | null }) {
   const router = useRouter()
   const canvas = useRef<HTMLCanvasElement>(null)
   const fileInput = useRef<HTMLInputElement>(null)
   const alive = useRef(true)
   const sequence = useRef(0)
   const busy = useRef(false)
+  // 놀이 카드에서 넘어오면 고정 목록의 문구와 색만 미리 채운다.
+  const [seed] = useState(() => memoryCardSeed(playId))
   const [input, setInput] = useState<MemoryCardInput>(() => ({
     name: '',
-    message: '',
+    message: seed?.message ?? '',
     date: todayLocalDate(),
-    theme: 'butter',
+    theme: seed?.theme ?? 'butter',
     zoom: 1,
     offsetX: 50,
     offsetY: 50,
@@ -285,6 +288,11 @@ function CardMaker({ owner }: { owner: string }) {
         <h2 id="memory-make" className={styles.sectionTitle}>
           우리 아이의 하루를 담아요
         </h2>
+        {seed && (
+          <p className={styles.hint}>
+            ‘{seed.title}’ 놀이 카드의 문구와 색을 미리 넣어 두었어요. 자유롭게 바꿔도 돼요.
+          </p>
+        )}
         <fieldset disabled={exporting} className={styles.fields}>
           <legend className="sr-only">카드 꾸미기</legend>
           <label htmlFor="memory-name">
@@ -402,7 +410,7 @@ function CardMaker({ owner }: { owner: string }) {
             <>
               <p>로그인 후 카드를 만들면 이야기에 바로 붙일 수 있어요.</p>
               <Link
-                href="/login?returnUrl=%2Fplayground%2Fmemory-card"
+                href={`/login?returnUrl=${encodeURIComponent(seed && playId ? `/playground/memory-card?play=${encodeURIComponent(playId)}` : '/playground/memory-card')}`}
                 className={buttonVariants({ intent: 'secondary', width: 'full' })}
               >
                 로그인하고 이야기 쓰기
@@ -411,7 +419,7 @@ function CardMaker({ owner }: { owner: string }) {
           ) : (
             <Button
               intent="secondary"
-              width="fill"
+              width="full"
               disabled={!cardReady}
               onClick={() => void writeStory()}
             >
@@ -424,18 +432,24 @@ function CardMaker({ owner }: { owner: string }) {
     </div>
   )
 }
-export function MemoryCard() {
+function MemoryCardBody() {
   const owner = useToolOwner()
+  const playId = useSearchParams().get('play')
+  return owner === null ? (
+    <p role="status">카드 꾸미기를 열고 있어요.</p>
+  ) : (
+    <CardMaker key={`${owner}:${playId ?? ''}`} owner={owner} playId={playId} />
+  )
+}
+export function MemoryCard() {
   return (
     <ToolPage
       title="오늘의 추억 카드"
       description="좋아하는 사진 한 장을, 오래 간직하고 싶은 한 장으로."
     >
-      {owner === null ? (
-        <p role="status">카드 꾸미기를 열고 있어요.</p>
-      ) : (
-        <CardMaker key={owner} owner={owner} />
-      )}
+      <Suspense fallback={<p role="status">카드 꾸미기를 열고 있어요.</p>}>
+        <MemoryCardBody />
+      </Suspense>
     </ToolPage>
   )
 }

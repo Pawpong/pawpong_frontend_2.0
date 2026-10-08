@@ -1,0 +1,169 @@
+/* 놀이 카드 전용 도트 연출. 레이아웃·버튼·선택지는 공통 컴포넌트와 Tailwind 토큰을 쓴다. */
+
+.scene {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  border: 3px solid var(--color-primary-500, #ad651d);
+  border-radius: 0.5rem;
+  background: var(--color-point-100, #fffbd2);
+  box-shadow: 4px 4px 0 var(--color-secondary-200, #eddbc6);
+  image-rendering: pixelated;
+}
+.taste {
+  background: #eaf3ff;
+}
+.sun {
+  position: absolute;
+  top: 14%;
+  right: 12%;
+  width: 14%;
+  aspect-ratio: 1;
+  background: var(--color-point-500, #ffff70);
+  box-shadow:
+    0 0 0 4px #ffe08a,
+    6px 6px 0 4px #f5c95c;
+}
+.cloud {
+  position: absolute;
+  top: 22%;
+  left: 10%;
+  width: 22%;
+  height: 10%;
+  background: white;
+  box-shadow:
+    8px -8px 0 0 white,
+    20px 0 0 0 white;
+}
+.hill {
+  position: absolute;
+  inset: auto -5% -18% -5%;
+  height: 48%;
+  background: #b8d7a0;
+  border-top: 4px solid #7ea766;
+  border-radius: 45% 55% 0 0;
+}
+.trail {
+  position: absolute;
+  bottom: 12%;
+  left: 18%;
+  width: 64%;
+  height: 4px;
+  /* 실제 경로가 아니라 장식용 점선임을 분명히 하기 위해 끊긴 점으로 그린다. */
+  background: repeating-linear-gradient(90deg, #ad651d 0 8px, transparent 8px 16px);
+}
+.pixelCard {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  display: grid;
+  place-items: center;
+  width: 22%;
+  aspect-ratio: 3 / 4;
+  transform: translate(-50%, -50%) rotate(-4deg);
+  border: 3px solid var(--color-primary-500, #ad651d);
+  background: var(--color-point-500, #ffff70);
+  color: var(--color-primary-600, #94591f);
+  box-shadow: 4px 4px 0 #c4a86c;
+  animation: bob 2.6s steps(4) infinite;
+}
+.pixelCard svg {
+  width: 55%;
+  height: auto;
+}
+.sceneTag {
+  position: absolute;
+  left: 0.75rem;
+  bottom: 0.6rem;
+  padding: 0.2rem 0.55rem;
+  border: 2px solid var(--color-primary-500, #ad651d);
+  background: white;
+  color: var(--color-primary-600, #94591f);
+  font:
+    0.75rem/1.4 var(--font-cafe24proup),
+    sans-serif;
+}
+
+/* 결과 카드: 티켓 모양의 도트 카드 */
+.ticket {
+  --accent: #fff3b8;
+  --accent-edge: #ad651d;
+  position: relative;
+  border: 3px solid var(--accent-edge);
+  border-radius: 0.5rem;
+  background: var(--color-base-white, #fff);
+  box-shadow: 6px 6px 0 var(--accent);
+}
+.ticket[data-accent='green'] {
+  --accent: #cfe6c3;
+  --accent-edge: #55784d;
+}
+.ticket[data-accent='peach'] {
+  --accent: #ffd9c2;
+  --accent-edge: #b86a3c;
+}
+.ticket[data-accent='blue'] {
+  --accent: #d6e4fb;
+  --accent-edge: #4f6f9f;
+}
+.ticketTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  background: var(--accent);
+  color: var(--accent-edge);
+  font:
+    0.75rem/1.4 var(--font-cafe24proup),
+    sans-serif;
+  letter-spacing: 0.04em;
+}
+.ticketBottom {
+  border-top: 2px dashed var(--accent-edge);
+  padding: 0.7rem 1rem;
+  color: var(--color-neutral-700, #727272);
+  font-size: 0.75rem;
+  line-height: 1.6;
+  word-break: keep-all;
+}
+.momentNumber {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  min-width: 1.75rem;
+  height: 1.5rem;
+  border: 2px solid var(--accent-edge);
+  background: var(--accent);
+  color: var(--accent-edge);
+  font:
+    0.7rem/1 var(--font-cafe24proup),
+    sans-serif;
+}
+
+/* 카드가 뒤집히며 도착하는 연출. 채움 모드를 두지 않아 연출이 멈춰도 끝난 뒤에는 원래 모습으로 보인다. */
+.reveal {
+  animation: flip-in 420ms steps(6);
+  transform-origin: 50% 0;
+}
+@keyframes flip-in {
+  from {
+    opacity: 0;
+    transform: perspective(600px) rotateX(-70deg) translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes bob {
+  50% {
+    transform: translate(-50%, -56%) rotate(3deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .pixelCard {
+    animation: none;
+  }
+}

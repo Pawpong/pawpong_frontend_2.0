@@ -21,6 +21,8 @@ interface RadioCardGroupProps {
   onChange: (value: string) => void
   onBlur?: () => void
   error?: string
+  // 기본은 신청서 계약대로 '필수'를 표시한다. 놀이처럼 강제하지 않는 선택에서만 끈다.
+  required?: boolean
 }
 
 export const RadioCardGroup = ({
@@ -31,12 +33,13 @@ export const RadioCardGroup = ({
   onChange,
   onBlur,
   error,
+  required = true,
 }: RadioCardGroupProps) => {
   const id = useId()
   return (
     <fieldset aria-describedby={error ? `${id}-error` : undefined}>
       <legend className="mb-3 text-sm font-semibold text-neutral-850">
-        {label} <span className="font-normal text-primary-600">필수</span>
+        {label} {required && <span className="font-normal text-primary-600">필수</span>}
       </legend>
       <div className="grid gap-3 tab:grid-cols-2">
         {options.map((option) => (

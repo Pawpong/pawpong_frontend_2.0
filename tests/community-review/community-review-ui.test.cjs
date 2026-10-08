@@ -48,6 +48,18 @@ function panel(config = { enabled: true, dailyLimit: 10, notice: 'OpenAI 처리 
     '@/shared/lib/useAuthSessionGeneration': { useAuthSessionGeneration: () => 1 },
     'next/link': { default: Link },
     './CommunityReviewConsent': consent,
+    '@/shared/ui/Button': {
+      Button: ({ intent: _intent, size: _size, width: _width, ...props }) =>
+        createElement('button', { type: 'button', ...props }),
+    },
+    '@/shared/ui/RetryButton': {
+      RetryButton: ({ onRetry, isRetrying, ...props }) =>
+        createElement(
+          'button',
+          { type: 'button', onClick: onRetry, disabled: isRetrying, ...props },
+          '다시 시도',
+        ),
+    },
   }).CommunityPostReviewPanel
   return { component, calls: () => calls }
 }
