@@ -61,7 +61,7 @@ export function CommunityDiscovery({
             className={filterPill(value.media === 'map')}
           >
             <CommunityPixelIcon name="travel" className="text-primary-500" />
-            장소·코스
+            장소 지도
           </button>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>

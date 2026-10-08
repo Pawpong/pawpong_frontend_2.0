@@ -113,7 +113,7 @@ export function CommunityExperiencePanel({
         <div className="space-y-2">
           <h3 className="flex items-center gap-2 font-cafe24 text-sm text-primary-700">
             <CommunityPixelIcon name="travel" className="text-primary-500" />
-            {experience?.walk ? '함께 걸은 산책 코스' : '다녀온 장소'}
+            {experience?.walk ? '산책하며 다녀온 장소' : '다녀온 장소'}
           </h3>
           <SharedRouteMap points={route} />
           <ol className="space-y-2 text-sm text-neutral-850">
@@ -141,7 +141,8 @@ export function CommunityExperiencePanel({
             ))}
           </ol>
           <p className="text-xs leading-relaxed text-neutral-600">
-            작성자가 고른 장소를 순서대로 이은 지도예요. 실제 길 안내는 아니에요.
+            작성자가 공개하기로 고른 장소를 방문 순서대로 이은 참고선이에요. 실제 걸은 길이나 거리,
+            길 안내가 아니며 일부 장소는 동네 정도로만 표시될 수 있어요.
           </p>
         </div>
       )}
