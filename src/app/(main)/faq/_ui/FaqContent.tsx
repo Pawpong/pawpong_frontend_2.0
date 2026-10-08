@@ -15,6 +15,7 @@ import {
   CtaBanner,
   ListState,
   Tabs,
+  TabsContent,
   TabsList,
   TabsTrigger,
 } from '@/shared/ui'
@@ -82,33 +83,26 @@ const FaqHero = ({ onInquiryClick }: { onInquiryClick: () => void }) => (
 )
 
 // [refactored] 유형 탭 토글을 별도 컴포넌트로 추출 (Figma 3395:638598 — 배지형 필, 언더라인 탭 아님)
-const FaqAudienceTabs = ({
-  value,
-  onChange,
-}: {
-  value: FaqAudience
-  onChange: (value: FaqAudience) => void
-}) => (
+// 탭이 가리키는 질문 목록 패널이 같은 Tabs 안에 있어야 하므로 Tabs 루트는 FaqContent가 둔다.
+const FaqAudienceTabs = ({ value }: { value: FaqAudience }) => (
   <div className="flex flex-col items-start gap-3">
     <p className={cn(cafe24Proup.className, 'text-base leading-[1.5] text-primary-500')}>
       자주 묻는 질문
     </p>
-    <Tabs value={value} onValueChange={(next) => onChange(next as FaqAudience)}>
-      <TabsList aria-label="FAQ 이용자 유형" className="gap-2">
-        {FAQ_TABS.map((tab) => (
-          <TabsTrigger
-            key={tab.value}
-            value={tab.value}
-            className={badgeVariants({
-              variant: value === tab.value ? 'primaryFilled' : 'primaryOutline',
-              size: 'lg',
-            })}
-          >
-            {tab.label}
-          </TabsTrigger>
-        ))}
-      </TabsList>
-    </Tabs>
+    <TabsList aria-label="FAQ 이용자 유형" className="gap-2">
+      {FAQ_TABS.map((tab) => (
+        <TabsTrigger
+          key={tab.value}
+          value={tab.value}
+          className={badgeVariants({
+            variant: value === tab.value ? 'primaryFilled' : 'primaryOutline',
+            size: 'lg',
+          })}
+        >
+          {tab.label}
+        </TabsTrigger>
+      ))}
+    </TabsList>
   </div>
 )
 
@@ -130,26 +124,32 @@ const FaqContent = () => {
         {/* FAQ 프레임도 배너와 같은 1134px 열 — 태블릿·모바일은 Container 거터가 이미
             Figma 실측(672/343px)과 같아 별도 상한이 필요 없다 */}
         <div className="mx-auto w-full pc:max-w-[70.875rem]">
-          <FaqAudienceTabs value={audience} onChange={setAudience} />
+          <Tabs value={audience} onValueChange={(next) => setAudience(next as FaqAudience)}>
+            <FaqAudienceTabs value={audience} />
 
-          <div className="mt-7">
-            <ListState
-              isPending={query.isPending}
-              isError={query.isError}
-              isEmpty={faqs.length === 0}
-              loadingText="자주 묻는 질문을 불러오는 중입니다."
-              errorText="자주 묻는 질문을 불러오지 못했습니다."
-              emptyText="등록된 질문이 없습니다."
-              onRetry={() => void query.refetch()}
-              isRetrying={query.isFetching}
-            >
-              <div>
-                {faqs.map((faq) => (
-                  <FaqItem key={faq.faqId} faq={faq} onInquiryClick={() => setInquiryOpen(true)} />
-                ))}
-              </div>
-            </ListState>
-          </div>
+            <TabsContent value={audience} className="mt-7">
+              <ListState
+                isPending={query.isPending}
+                isError={query.isError}
+                isEmpty={faqs.length === 0}
+                loadingText="자주 묻는 질문을 불러오는 중입니다."
+                errorText="자주 묻는 질문을 불러오지 못했습니다."
+                emptyText="등록된 질문이 없습니다."
+                onRetry={() => void query.refetch()}
+                isRetrying={query.isFetching}
+              >
+                <div>
+                  {faqs.map((faq) => (
+                    <FaqItem
+                      key={faq.faqId}
+                      faq={faq}
+                      onInquiryClick={() => setInquiryOpen(true)}
+                    />
+                  ))}
+                </div>
+              </ListState>
+            </TabsContent>
+          </Tabs>
         </div>
       </Container>
 
