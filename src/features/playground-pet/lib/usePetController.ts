@@ -18,6 +18,8 @@ import { inPetSession, petSessionIsCurrent, type PetSession } from './usePetSess
 
 export { petConfigOptions }
 
+export const PET_SUCCESS_NOTICE_MS = 4000
+
 export const petPrivateKey = (session: PetSession) =>
   ['playground-pet', 'private', session.scope] as const
 
@@ -35,6 +37,20 @@ export function usePetController(session: PetSession) {
     xp: number
   }>({ action: null, stars: 0, xp: 0 })
   const requestLocked = useRef(false)
+  // 성공 안내는 방 아래를 오래 가리지 않게 잠시 뒤 지운다. 오류와 결과 확인 안내는 남긴다.
+  const successNotice = useRef('')
+  useEffect(() => {
+    if (!notice || notice !== successNotice.current) return
+    const timer = window.setTimeout(
+      () => setNotice((current) => (current === successNotice.current ? '' : current)),
+      PET_SUCCESS_NOTICE_MS,
+    )
+    return () => window.clearTimeout(timer)
+  }, [notice])
+  const showSuccess = (text: string) => {
+    successNotice.current = text
+    setNotice(text)
+  }
   // PetPage가 scope마다 다시 마운트되어 이전 계정의 명령을 재사용하지 않는다.
   const [queue] = useState(
     () =>
@@ -70,6 +86,7 @@ export function usePetController(session: PetSession) {
     requestLocked.current = true
     try {
       setBusy(true)
+      successNotice.current = ''
       setNotice('')
       await client.cancelQueries({ queryKey })
       const result = await queue.run(command)
@@ -86,7 +103,7 @@ export function usePetController(session: PetSession) {
         })
         if (gameOutcome) {
           setGameOutcome(gameOutcome)
-          setNotice(
+          showSuccess(
             gameOutcome.kind === 'purchase'
               ? '새 소품을 인벤토리에 넣었어요.'
               : gameOutcome.kind === 'equip'
@@ -101,7 +118,7 @@ export function usePetController(session: PetSession) {
           )
         } else if (outcome) {
           const { action, xpAwarded, starsAwarded = 0 } = outcome
-          setNotice(
+          showSuccess(
             action === 'adopt'
               ? '함께하는 첫날이에요! 인사부터 나눠 볼까요?'
               : action === 'rest'

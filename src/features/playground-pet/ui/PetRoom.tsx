@@ -4,7 +4,9 @@ import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent }
 import {
   PET_ACTION_LABELS,
   petActionHint,
+  petDaysTogether,
   petLevelProgress,
+  petWaitShort,
   remainingSeconds,
   formatPetWait,
   formatPetCountdown,
@@ -153,6 +155,11 @@ export function PetRoom({
   const now = useServerClock(view.serverTime)
   const resting = Boolean(pet.restEndsAt && now < Date.parse(pet.restEndsAt))
   const mood = petMood(pet.stats, resting)
+  // 지금 할 수 없는 돌봄을 계속 권하지 않도록 서버가 알려준 가능 여부를 함께 본다.
+  const moodAvailability = mood?.action ? view.actions?.[mood.action] : undefined
+  const moodWait = moodAvailability ? petWaitShort(moodAvailability, now) : null
+  const moodPossible = !mood?.action || Boolean(moodAvailability?.allowed)
+  const daysTogether = petDaysTogether(pet.createdAt, view.serverTime)
   const rewardPop = reaction !== popDone && (feedback.xp > 0 || feedback.stars > 0)
   useEffect(() => {
     if (reaction === popDone) return
@@ -214,7 +221,7 @@ export function PetRoom({
       manifest: assets.manifest,
       characterUrl: fullBody ? character.url : null,
       resting,
-      mood: mood?.kind ?? null,
+      mood: moodPossible ? (mood?.kind ?? null) : null,
       highlight: previewing && selectedItem ? selectedItem.slot : null,
       reaction,
       feedback,
@@ -228,6 +235,7 @@ export function PetRoom({
       fullBody,
       resting,
       mood?.kind,
+      moodPossible,
       previewing,
       selectedItem,
       reaction,
@@ -411,7 +419,11 @@ export function PetRoom({
             {pokeNotice ||
               (mood
                 ? `${pet.name} · ${mood.label}${
-                    mood.action ? ` → ${PET_ACTION_LABELS[mood.action]}` : ''
+                    !mood.action
+                      ? ''
+                      : moodPossible
+                        ? ` → ${PET_ACTION_LABELS[mood.action]}`
+                        : ` · ${PET_ACTION_LABELS[mood.action]}는 ${moodWait ?? '조금 뒤'} 할 수 있어요`
                   }`
                 : `방을 눌러 ${pet.name} 불러 보세요. 쓰다듬어 줄 수도 있어요.`)}
           </p>
@@ -454,14 +466,8 @@ export function PetRoom({
               >
                 <PetGlyph kind={ACTION_ICONS[action]} />
                 <span>{PET_ACTION_LABELS[action]}</span>
-                {!availability?.allowed && availability?.nextAvailableAt && (
-                  <small>
-                    {Math.max(
-                      1,
-                      Math.ceil(remainingSeconds(availability.nextAvailableAt, now) / 60),
-                    )}
-                    분
-                  </small>
+                {availability && petWaitShort(availability, now) && (
+                  <small>{petWaitShort(availability, now)}</small>
                 )}
               </button>
             )
@@ -540,8 +546,9 @@ export function PetRoom({
               <PetGlyph kind="paw" />
             </div>
             <p className={styles.hint}>
-              {pet.name}와 {view.week.daysTogether}일째 함께하고 있어요. 돌봄으로 자라고, 별사탕으로
-              방을 꾸며요.
+              {daysTogether !== null && `${pet.name}와 함께한 지 ${daysTogether}일째예요. `}
+              {view.week.daysTogether > 0 && `이번 주에는 ${view.week.daysTogether}일 만났어요. `}
+              돌봄으로 자라고, 별사탕으로 방을 꾸며요.
             </p>
             <div className={styles.questProgress}>
               <span>
@@ -549,9 +556,9 @@ export function PetRoom({
                 {view.daily.quests.length}
               </span>
               <progress
-                value={view.daily.xp}
-                max={Math.max(1, view.daily.maxXp)}
-                aria-label={`오늘 성장 EXP ${view.daily.xp} / ${view.daily.maxXp}`}
+                value={view.daily.quests.filter((quest) => quest.completed).length}
+                max={Math.max(1, view.daily.quests.length)}
+                aria-label={`오늘의 돌봄 ${view.daily.quests.filter((quest) => quest.completed).length} / ${view.daily.quests.length}`}
               />
             </div>
             <div className={styles.questList}>
@@ -718,15 +725,18 @@ export function PetRoom({
               </ul>
             )}
             <ul className={styles.records}>
-              {view.records.map((record) => (
-                <li key={record.id}>
-                  <time dateTime={record.at}>{formatDate(record.at)}</time>
-                  <span>
-                    {RECORD_LABELS[record.type]}
-                    {record.level ? ` · Lv.${record.level}` : ''}
-                  </span>
-                </li>
-              ))}
+              {/* 레벨이 오를 때 서버가 남기는 unlock 기록은 실제로 열리는 콘텐츠가 없어 보여주지 않는다. */}
+              {view.records
+                .filter((record) => record.type !== 'unlock')
+                .map((record) => (
+                  <li key={record.id}>
+                    <time dateTime={record.at}>{formatDate(record.at)}</time>
+                    <span>
+                      {RECORD_LABELS[record.type]}
+                      {record.level ? ` · Lv.${record.level}` : ''}
+                    </span>
+                  </li>
+                ))}
             </ul>
             <details className={styles.hint}>
               <summary>처음 함께한 그림 보기</summary>
