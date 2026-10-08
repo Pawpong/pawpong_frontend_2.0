@@ -61,6 +61,22 @@ test('계정 전환 후의 업로드와 일부 사진 또는 구 키 응답은 �
   await assert.rejects(api.uploadCommunityReviewPhotos(files), /로그인 또는 화면/)
 })
 
+test('새 비공개 저장소 사진 키도 기존 응답 계약으로 게시글에 연결한다', async () => {
+  const { session } = sessionFixture()
+  const privateKey = key.replace('review-', 'review-private-')
+  const api = load('src/features/community/api/communityReviewPhotos.api.ts', {
+    '@/shared/api': {
+      apiClient: { post: async () => ({ data: [{ fileName: privateKey }] }) },
+      API_VERSION: '/api/v2',
+      unwrap: (value) => value.data,
+      ApiError: load('src/shared/api/unwrap.ts').ApiError,
+    },
+    '../lib/communityWriteSession': session,
+  })
+  const result = await api.uploadCommunityReviewPhotos([new File(['photo'], 'source.png')])
+  assert.equal(result[0].fileName, privateKey)
+})
+
 test('개발 심사 발행과 임시저장은 인증 사진을 쓰며 운영 구 요청은 범용 계약을 유지함', async () => {
   const { session } = sessionFixture()
   const uploads = [],

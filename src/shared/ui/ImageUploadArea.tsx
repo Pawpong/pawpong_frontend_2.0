@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import Image from 'next/image'
+import { SessionImage as Image } from './SessionImage'
 import { tv, type VariantProps } from '@/shared/lib/tv'
 import { CameraIcon, ImageIcon, CloseIcon } from '@/shared/assets'
 import { BREAKPOINTS } from '@/shared/lib/useBreakpoint'

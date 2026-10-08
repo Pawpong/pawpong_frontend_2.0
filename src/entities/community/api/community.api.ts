@@ -8,6 +8,7 @@ import {
   type AuthReadSession,
 } from '@/shared/api'
 import { parseCommunityPostReview } from '../model/communityReview'
+import { toCommunityPhotoProxyUrl } from '../model/communityPhoto'
 import type {
   ApiResponseFull,
   PaginationResponse,
@@ -108,8 +109,10 @@ const mapCard = (raw: RawCommunityPostCard): CommunityPostCard => ({
   authorModel: raw.authorModel,
   title: raw.title,
   bodyExcerpt: raw.bodyExcerpt,
-  primaryPhotoUrl: raw.primaryPhotoUrl,
-  photoUrls: raw.photoUrls,
+  primaryPhotoUrl: raw.primaryPhotoUrl
+    ? toCommunityPhotoProxyUrl(raw.primaryPhotoUrl)
+    : raw.primaryPhotoUrl,
+  photoUrls: raw.photoUrls.map(toCommunityPhotoProxyUrl),
   aiComparison: raw.aiComparison,
   petType: raw.petType,
   category: raw.category,
@@ -144,7 +147,7 @@ export const mapCommunityPostDetail = (raw: RawCommunityPostDetail): CommunityPo
   authorModel: raw.authorModel,
   title: raw.title,
   body: raw.body,
-  photoUrls: raw.photoUrls,
+  photoUrls: raw.photoUrls.map(toCommunityPhotoProxyUrl),
   aiComparison: raw.aiComparison,
   petType: raw.petType,
   category: raw.category,
@@ -316,12 +319,20 @@ export const getCommunityComments = async (
   return { ...page, items: page.items.map(mapComment) }
 }
 
+const mapHallOfFame = (round: CommunityHallOfFame): CommunityHallOfFame => ({
+  ...round,
+  winners: round.winners.map((winner) => ({
+    ...winner,
+    photoUrl: winner.photoUrl ? toCommunityPhotoProxyUrl(winner.photoUrl) : winner.photoUrl,
+  })),
+})
+
 /** 명예의 전당 현재 회차 */
 export const getCurrentCommunityHallOfFame = async (): Promise<CommunityHallOfFame> => {
   const response = await apiClient.get<ApiResponseFull<CommunityHallOfFame>>(
     `${API_VERSION}/community/hall-of-fame/current`,
   )
-  return unwrap(response, '명예의 전당 조회에 실패했습니다.')
+  return mapHallOfFame(unwrap(response, '명예의 전당 조회에 실패했습니다.'))
 }
 
 /** 명예의 전당 지난 회차 목록 (확정분만, 최신순) */
@@ -335,5 +346,6 @@ export const getCommunityHallOfFameHistory = async (
   const response = await apiClient.get<ApiResponseFull<PaginationResponse<CommunityHallOfFame>>>(
     `${API_VERSION}/community/hall-of-fame?${query.toString()}`,
   )
-  return unwrap(response, '지난 명예의 전당 조회에 실패했습니다.')
+  const page = unwrap(response, '지난 명예의 전당 조회에 실패했습니다.')
+  return { ...page, items: page.items.map(mapHallOfFame) }
 }

@@ -23,7 +23,7 @@ export async function uploadCommunityReviewPhotos(files: File[], signal?: AbortS
       (file) =>
         !file ||
         typeof file.fileName !== 'string' ||
-        !/^community\/review-[a-f\d-]{36}\.(?:jpg|png|webp)$/.test(file.fileName),
+        !/^community\/review-(?:private-)?[a-f\d-]{36}\.(?:jpg|png|webp)$/.test(file.fileName),
     )
   )
     throw new ApiError('내 계정의 업로드 사진을 확인하지 못했어요. 다시 첨부해 주세요.', 502)

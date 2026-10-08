@@ -1,19 +1,29 @@
-const { notificationFixture, load, token, deferred } = require('../../notifications/fixtures/notification.fixture.cjs')
+const {
+  notificationFixture,
+  load,
+  token,
+  deferred,
+} = require('../../notifications/fixtures/notification.fixture.cjs')
 
 function communitySessionFixture(get) {
   const h = notificationFixture(get)
   const api = load('src/entities/community/api/community.api.ts', {
     '@/shared/api': {
-      apiClient: { get }, API_VERSION: '/api/v2', unwrap: value => value.data,
+      apiClient: { get },
+      API_VERSION: '/api/v2',
+      unwrap: (value) => value.data,
       withAuthReadSession: h.withAuthReadSession,
       getAuthReadSession: h.session.getAuthReadSession,
     },
     '../model/communityReview': load('src/entities/community/model/communityReview.ts'),
+    '../model/communityPhoto': load('src/entities/community/model/communityPhoto.ts'),
   })
   const { communityQueries } = load('src/entities/community/api/community.queries.ts', {
     '@/shared/api': {
-      createQuery: options => options, createInfiniteQuery: options => options,
-      STALE_TIME: { DEFAULT: 300_000 }, getAuthReadSession: h.session.getAuthReadSession,
+      createQuery: (options) => options,
+      createInfiniteQuery: (options) => options,
+      STALE_TIME: { DEFAULT: 300_000 },
+      getAuthReadSession: h.session.getAuthReadSession,
     },
     './community.api': api,
   })

@@ -46,6 +46,7 @@ function entityApi(get = async () => ({ data: post() })) {
   return load('src/entities/community/api/community.api.ts', {
     '@/shared/api': { apiClient: { get }, API_VERSION: '/api/v2', unwrap: (value) => value.data },
     '../model/communityReview': model,
+    '../model/communityPhoto': load('src/entities/community/model/communityPhoto.ts'),
   })
 }
 const deferred = () => {

@@ -42,9 +42,12 @@ export default defineConfig([
     },
   },
   {
-    // 상담 BFF는 inquiry/server 공개 API와 shared/lib/server의 Origin 검사만 쓴다.
+    // 상담과 사진 BFF는 각 도메인의 server 공개 API와 shared/lib/server 검사만 쓴다.
     // UI를 노출하는 클라이언트 배럴과 서버 전용 진입점을 합치지 않기 위한 경로 한정 예외다.
-    files: ['./src/app/api/support/conversations/**/route.ts'],
+    files: [
+      './src/app/api/support/conversations/**/route.ts',
+      './src/app/api/community/photos/**/route.ts',
+    ],
     rules: {
       'fsd/no-public-api-sidestep': 'off',
     },

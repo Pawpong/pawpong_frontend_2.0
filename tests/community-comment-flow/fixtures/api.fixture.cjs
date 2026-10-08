@@ -10,6 +10,7 @@ function commentApiFixture() {
   const read = load('src/entities/community/api/community.api.ts', {
     '@/shared/api': h.sharedApi,
     '../model/communityReview': load('src/entities/community/model/communityReview.ts'),
+    '../model/communityPhoto': load('src/entities/community/model/communityPhoto.ts'),
   })
   const { communityQueries } = load('src/entities/community/api/community.queries.ts', {
     '@/shared/api': {

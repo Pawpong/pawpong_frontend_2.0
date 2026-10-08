@@ -39,6 +39,13 @@ const nextConfig: NextConfig = {
     ]
   },
   images: {
+    // 쿠키로 권한을 확인하는 API 이미지는 공유 최적화 캐시에 저장하지 않는다.
+    localPatterns: [
+      { pathname: '/images/**' },
+      { pathname: '/playground/**' },
+      { pathname: '/_next/static/media/**' },
+      { pathname: '/*.svg' },
+    ],
     // 글자가 포함된 홈 배너는 압축 품질을 별도로 높인다.
     qualities: [75, 100],
     remotePatterns: [

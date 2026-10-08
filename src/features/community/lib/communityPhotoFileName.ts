@@ -1,3 +1,5 @@
+import { communityProtectedPhotoFileName } from '@/entities/community'
+
 /** 게시글 이미지가 업로드되는 스토리지 폴더 */
 export const COMMUNITY_UPLOAD_FOLDER = 'community'
 
@@ -14,6 +16,13 @@ const FILE_NAME_PATTERN = new RegExp(`(?:^|/)(${COMMUNITY_UPLOAD_FOLDER}/.+)$`)
  * 예상 밖의 형태면 null 을 돌려주고, 호출부는 사진 목록 전송을 건너뛴다(기존 사진 유지).
  */
 export const toCommunityPhotoFileName = (url: string): string | null => {
-  const path = new URL(url, window.location.origin).pathname
-  return path.match(FILE_NAME_PATTERN)?.[1] ?? null
+  const protectedFileName = communityProtectedPhotoFileName(url)
+  if (protectedFileName) return protectedFileName
+  try {
+    const path = new URL(url, window.location.origin).pathname
+    if (path.startsWith('/api/')) return null
+    return path.match(FILE_NAME_PATTERN)?.[1] ?? null
+  } catch {
+    return null
+  }
 }

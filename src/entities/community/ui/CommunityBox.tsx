@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react'
 
-import Image from 'next/image'
+import { SessionImage as Image } from '@/shared/ui/SessionImage'
 import Link from 'next/link'
 import { BeforeAfterSlider } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'

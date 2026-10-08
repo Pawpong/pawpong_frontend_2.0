@@ -1,10 +1,12 @@
 'use client'
 
 import { useState, type MouseEventHandler } from 'react'
-import Image from 'next/image'
+import { SessionImage as Image } from '@/shared/ui/SessionImage'
 import Link from 'next/link'
 import { FavoriteIcon, PawPrintIcon, PixelMessageIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
+import { useAuthReadSession } from '@/shared/lib/useAuthReadSession'
+import { isSessionImageSource, sessionImageSource } from '@/shared/lib/sessionImageSource'
 import type { CommunityPostReview } from '@/shared/types'
 import { CommunityReviewLabel } from './CommunityReviewLabel'
 
@@ -43,7 +45,11 @@ const CommunityMediaCard = ({
   className,
 }: CommunityMediaCardProps) => {
   const [failedImageUrl, setFailedImageUrl] = useState<string>()
-  const showImage = Boolean(imageUrl) && failedImageUrl !== imageUrl
+  const session = useAuthReadSession()
+  const imageIdentity = isSessionImageSource(imageUrl)
+    ? sessionImageSource(imageUrl, session?.scope ?? 'anonymous')
+    : imageUrl
+  const showImage = Boolean(imageUrl) && failedImageUrl !== imageIdentity
   const isProfileGrid = variant === 'profileGrid'
 
   return (
@@ -68,7 +74,7 @@ const CommunityMediaCard = ({
           sizes="(min-width: 768px) 20vw, 122px"
           loading={preload ? 'eager' : 'lazy'}
           fetchPriority={preload ? 'high' : 'auto'}
-          onError={() => setFailedImageUrl(imageUrl)}
+          onError={() => setFailedImageUrl(imageIdentity)}
           className="object-cover"
         />
       ) : !isProfileGrid ? (
