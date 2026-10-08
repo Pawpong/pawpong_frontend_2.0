@@ -97,15 +97,29 @@ export const createCommunityComment = async (
 export const updateCommunityComment = async (
   commentId: string,
   data: UpdateCommunityCommentRequest,
+  session: AuthReadSession | null = getAuthReadSession(),
 ): Promise<void> => {
-  const response = await apiClient.patch(`${API_VERSION}/community/comments/${commentId}`, data)
-  unwrapVoid(response, '댓글 수정에 실패했습니다.')
+  return withAuthWriteSession(async (config) => {
+    const response = await apiClient.patch(`${API_VERSION}/community/comments/${commentId}`, data, {
+      ...config,
+      timeout: 15_000,
+    })
+    unwrapVoid(response, '댓글 수정에 실패했습니다.')
+  }, session)
 }
 
 /** 댓글 삭제 */
-export const deleteCommunityComment = async (commentId: string): Promise<void> => {
-  const response = await apiClient.delete(`${API_VERSION}/community/comments/${commentId}`)
-  unwrapVoid(response, '댓글 삭제에 실패했습니다.')
+export const deleteCommunityComment = async (
+  commentId: string,
+  session: AuthReadSession | null = getAuthReadSession(),
+): Promise<void> => {
+  return withAuthWriteSession(async (config) => {
+    const response = await apiClient.delete(`${API_VERSION}/community/comments/${commentId}`, {
+      ...config,
+      timeout: 15_000,
+    })
+    unwrapVoid(response, '댓글 삭제에 실패했습니다.')
+  }, session)
 }
 
 /** 게시글 북마크 */

@@ -51,6 +51,7 @@ function threadFixture(write = async () => {}) {
         flattenPages: (data) => data.pages.flatMap((page) => page.items),
       },
       './commentThread': load('src/app/(main)/community/post/[postId]/_ui/commentThread.ts'),
+      './useCommentActions': { useCommentActions: () => ({ active: null, notice: null }) },
     },
   )
   return {

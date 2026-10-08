@@ -26,6 +26,7 @@ export type { CommunityPhotoLocationOption } from './model/community-photo-locat
 export { useDeletePostConfirm } from './lib/useDeletePostConfirm'
 export { PetCategorySuggestion } from './ui/PetCategorySuggestion'
 export { useCommunityReviewRequest } from './lib/useCommunityReviewRequest'
+export { invalidateCommunityPostData } from './api/community.cache'
 export {
   diffCommunityAutoApplied,
   readCommunityAutoApplied,

@@ -27,18 +27,32 @@ export const useCreateCommunityComment = (
   })
 }
 
-export const useUpdateCommunityComment = (commentId: string, postId: string) => {
+export const useUpdateCommunityComment = (
+  commentId: string,
+  postId: string,
+  session: AuthReadSession | null = getAuthReadSession(),
+) => {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (data: UpdateCommunityCommentRequest) => updateCommunityComment(commentId, data),
-    onSuccess: () => invalidateCommunityPostSurface(qc, postId),
+    mutationKey: ['community-comment-update', postId, commentId, session?.scope ?? 'guest'],
+    mutationFn: (data: UpdateCommunityCommentRequest) =>
+      updateCommunityComment(commentId, data, session),
+    onSuccess: () => {
+      void invalidateCommunityPostSurface(qc, postId)
+    },
   })
 }
 
-export const useDeleteCommunityComment = (postId: string) => {
+export const useDeleteCommunityComment = (
+  postId: string,
+  session: AuthReadSession | null = getAuthReadSession(),
+) => {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (commentId: string) => deleteCommunityComment(commentId),
-    onSuccess: () => invalidateCommunityPostSurface(qc, postId),
+    mutationKey: ['community-comment-delete', postId, session?.scope ?? 'guest'],
+    mutationFn: (commentId: string) => deleteCommunityComment(commentId, session),
+    onSuccess: () => {
+      void invalidateCommunityPostSurface(qc, postId)
+    },
   })
 }
