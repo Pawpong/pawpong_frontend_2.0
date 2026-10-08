@@ -40,3 +40,7 @@ test('작은 닫기 버튼과 정렬 버튼과 로고 링크도 같은 터치 �
     assert.match(code, /\brelative\b/, file)
   }
 })
+
+test('터치 영역 유틸리티는 클래스 스캔 캐시와 무관하게 항상 CSS로 만들어짐', () => {
+  assert.match(read('src/app/globals.css'), /@source inline\(['"]touch-target['"]\);/)
+})
