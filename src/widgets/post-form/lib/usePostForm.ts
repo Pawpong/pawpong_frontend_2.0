@@ -9,6 +9,7 @@ interface UsePostFormOptions {
   initialImages?: string[]
   /** 작성 화면 초기값 — 다른 화면(AI 필터 등)에서 넘겨받은 새 사진. 제출 때 함께 업로드된다 */
   initialFiles?: File[]
+  prepareSelectedPhoto?: (file: File) => Promise<File>
 }
 
 const usePostForm = ({
@@ -16,6 +17,7 @@ const usePostForm = ({
   initialText = '',
   initialImages = [],
   initialFiles,
+  prepareSelectedPhoto = preparePhotoForPreview,
 }: UsePostFormOptions = {}) => {
   // 수정 기준값은 이 폼 인스턴스가 처음 열린 시점으로 고정한다.
   const [initialTextValue] = useState(initialText)
@@ -72,7 +74,7 @@ const usePostForm = ({
       // Process in selection order and avoid decoding ten large photos simultaneously.
       for (const file of added) {
         try {
-          prepared.push(await preparePhotoForPreview(file))
+          prepared.push(await prepareSelectedPhoto(file))
         } catch (error) {
           failures.push(
             `${file.name}: ${error instanceof Error ? error.message : '사진을 처리하지 못했습니다.'}`,
@@ -90,7 +92,7 @@ const usePostForm = ({
       processingRef.current = false
       setIsProcessingPhotos(false)
     },
-    [maxImages],
+    [maxImages, prepareSelectedPhoto],
   )
 
   const cancelPhotoProcessing = useCallback(() => {

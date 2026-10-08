@@ -1,21 +1,24 @@
 'use client'
 
 import { useEffect, useId, useRef, useState } from 'react'
-import { searchCarePlaces, type CarePlace } from '@/entities/care-place'
+import { searchCarePlaces, type CarePlace, type CarePlaceKind } from '@/entities/care-place'
 
-/** 돌봄 지도의 병원 검색을 그대로 써서 공개 상호를 고르게 한다. */
-export function CommunityClinicSearch({
+/** 돌봄 지도와 같은 공개 장소 목록에서 방문한 곳을 고른다. */
+export function CommunityPlaceSearch({
   label,
+  kind = 'hospital',
   disabled,
   canPick = () => true,
   onPick,
 }: {
   label: string
+  kind?: CarePlaceKind
   disabled?: boolean
   canPick?: (place: CarePlace) => boolean
   onPick: (place: CarePlace) => void
 }) {
   const id = useId()
+  const noun = kind === 'hospital' ? '병원' : '장소'
   const [query, setQuery] = useState('')
   const [places, setPlaces] = useState<CarePlace[] | null>(null)
   const [searching, setSearching] = useState(false)
@@ -36,7 +39,7 @@ export function CommunityClinicSearch({
         {
           latitude: 37.5665,
           longitude: 126.978,
-          kind: 'hospital',
+          kind,
           query: keyword,
           radius: 20000,
           scope: 'keyword',
@@ -50,7 +53,7 @@ export function CommunityClinicSearch({
     } catch {
       if (!controller.signal.aborted) {
         setPlaces(null)
-        setError('병원을 찾지 못했어요. 잠시 뒤 다시 찾거나 이름을 직접 적어 주세요.')
+        setError('장소 검색을 완료하지 못했어요. 잠시 뒤 다시 시도해 주세요.')
       }
     } finally {
       if (active.current === controller) {
@@ -73,7 +76,7 @@ export function CommunityClinicSearch({
           maxLength={50}
           enterKeyHint="search"
           autoComplete="off"
-          placeholder="지역과 병원 이름"
+          placeholder={`지역과 ${noun} 이름`}
           onChange={(event) => setQuery(event.target.value)}
           onKeyDown={(event) => {
             if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
@@ -99,7 +102,7 @@ export function CommunityClinicSearch({
       )}
       {places && places.length === 0 && (
         <p role="status" className="mt-2 text-xs text-neutral-700">
-          찾은 병원이 없어요. 지역 이름을 함께 넣어 보세요.
+          검색 결과가 없어요. 지역 이름을 함께 넣어 보세요.
         </p>
       )}
       {places && places.length > 0 && (
