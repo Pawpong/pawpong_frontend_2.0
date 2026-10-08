@@ -114,6 +114,9 @@ export function PetRoom({
     (kind: PetGameKind) => gameHandle.current?.prepareGame(kind) ?? Promise.resolve(false),
     [],
   )
+  const cancelGamePreparation = useCallback(() => {
+    gameHandle.current?.cancelPreparation()
+  }, [])
   const [gameSurface, setGameSurface] = useState<HTMLDivElement | null>(null)
   const [stageOverlay, setStageOverlay] = useState<HTMLDivElement | null>(null)
   const [slotRequest, setSlotRequest] = useState<{ slot: PetRoomSlot; serial: number } | null>(null)
@@ -656,14 +659,17 @@ export function PetRoom({
         >
           {game && (
             <PetMiniGames
+              key={pet.id}
               game={game}
               gameOutcome={gameOutcome}
               revision={pet.revision}
               serverTime={view.serverTime}
               now={now}
               disabled={disabled}
+              selected={tab === 'games'}
               characterReady={stageReady}
               onPrepareGame={prepareGame}
+              onCancelPreparation={cancelGamePreparation}
               gameSurface={gameSurface}
               stageOverlay={stageOverlay}
               onCommand={onCommand}

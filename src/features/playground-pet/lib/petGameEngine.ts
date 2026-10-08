@@ -32,6 +32,7 @@ export type PetStageSnapshot = {
 export type PetGameHandle = {
   sync: (snapshot: PetStageSnapshot) => void
   prepareGame: (kind: PetGameKind) => Promise<boolean>
+  cancelPreparation: () => void
   retry: () => void
   /** 방 좌표를 누른다. 캐릭터면 'pet', 바닥이면 'call'(걸어옴), 반응할 수 없으면 null. 보상은 없다. */
   poke: (x: number, y: number) => 'pet' | 'call' | null
@@ -573,6 +574,12 @@ export function createPetGame(
     prepareGame(kind) {
       preparedGame = kind
       return loadSnapshot()
+    },
+    cancelPreparation() {
+      if (!preparedGame || snapshot.snack) return
+      preparedGame = null
+      // 이전 그림은 제한 시간 안에서 캐시될 수 있지만 선택 취소 후 방을 막지 않는다.
+      void loadSnapshot()
     },
     sync(next) {
       const reload =
