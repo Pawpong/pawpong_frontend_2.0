@@ -3,7 +3,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams, usePathname } from 'next/navigation'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { Container, InfiniteScrollTrigger, ListState, TabBar } from '@/shared/ui'
+import {
+  Container,
+  InfiniteScrollTrigger,
+  ListState,
+  TabBarList,
+  Tabs,
+  TabsContent,
+} from '@/shared/ui'
 import { CATEGORY_TO_PET_TYPE } from '@/shared/lib/petCategory'
 import { adoptionQueries } from '@/entities/adoption'
 import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
@@ -167,13 +174,16 @@ const ExploreContent = () => {
   }, [stickyBarTop])
 
   return (
-    <>
+    // 탭이 가리키는 목록 패널이 같은 Tabs 안에 있어야 하므로 Tabs 루트가 sticky 머리와 목록을 함께 감싼다.
+    <Tabs
+      value={selectedType}
+      onValueChange={(value) => handleTypeChange(value as ExploreType)}
+      className="w-full"
+    >
       {/* 탭과 필터를 하나의 sticky 영역에 묶어 스크롤 중에도 서로 붙어 있게 한다. */}
       <div ref={headerRef} className="sticky z-sticky bg-white" style={{ top: stickyHeaderTop }}>
-        <TabBar
+        <TabBarList
           items={EXPLORE_TABS.map((tab) => ({ value: tab.type, label: tab.label }))}
-          value={selectedType}
-          onValueChange={(value) => handleTypeChange(value as ExploreType)}
           ariaLabel="탐색 유형"
         />
         <div className={cn('absolute top-full right-0 left-0 hidden bg-white', isStuck && 'block')}>
@@ -188,58 +198,60 @@ const ExploreContent = () => {
         </div>
       </div>
 
-      {/* ══════ 콘텐츠 영역 — 섹션별로 각자 Container를 갖도록 분리 (전역 px 제거) ══════ */}
-      {/* //QA: 상단 카테고리 수정 — 모바일도 4개 한 줄 가운데 정렬, 스크롤 시 컴팩트 칩바로 전환한다. */}
-      <div>
-        <CategorySection selected={selectedCategory} onChange={handleCategoryChange} />
-        {/* 검색바: 홈과 동작 공유 — 화면별 placeholder와 스타일은 SearchSection variant로 분리한다. */}
-        <SearchSection
-          placeholder={SEARCH_PLACEHOLDERS[selectedType]}
-          defaultValue={keyword}
-          onSubmit={handleSearch}
-          showPopularKeywords
-        />
-      </div>
-      {/* 스크롤 트리거 sentinel (상단 영역 끝) */}
-      <div ref={sentinelRef} aria-hidden />
+      <TabsContent value={selectedType} className="mt-0">
+        {/* ══════ 콘텐츠 영역 — 섹션별로 각자 Container를 갖도록 분리 (전역 px 제거) ══════ */}
+        {/* //QA: 상단 카테고리 수정 — 모바일도 4개 한 줄 가운데 정렬, 스크롤 시 컴팩트 칩바로 전환한다. */}
+        <div>
+          <CategorySection selected={selectedCategory} onChange={handleCategoryChange} />
+          {/* 검색바: 홈과 동작 공유 — 화면별 placeholder와 스타일은 SearchSection variant로 분리한다. */}
+          <SearchSection
+            placeholder={SEARCH_PLACEHOLDERS[selectedType]}
+            defaultValue={keyword}
+            onSubmit={handleSearch}
+            showPopularKeywords
+          />
+        </div>
+        {/* 스크롤 트리거 sentinel (상단 영역 끝) */}
+        <div ref={sentinelRef} aria-hidden />
 
-      {selectedType === 'breeder' ? (
-        <BreederExploreContent category={selectedCategory} keyword={keyword} />
-      ) : (
-        <>
-          <Container className={EXPLORE_SECTION_CONTAINER}>
-            <TitledSection
-              title={`전체 분양 소식 ${totalCount}`}
-              titleClassName={EXPLORE_SECTION_TITLE_CLASS}
-              headerSlot={
-                <ExploreListFilters
-                  value={adoptionListFilter}
-                  onChange={setAdoptionListFilter}
-                  ariaLabel="분양 소식 필터"
-                />
-              }
-            >
-              <ListState
-                appPublicContent
-                isPending={isPending}
-                isError={isError}
-                isEmpty={listings.length === 0}
-                loadingText="분양글을 불러오는 중입니다."
-                errorText="분양글을 불러오지 못했습니다."
-                emptyText="등록된 분양글이 없습니다."
+        {selectedType === 'breeder' ? (
+          <BreederExploreContent category={selectedCategory} keyword={keyword} />
+        ) : (
+          <>
+            <Container className={EXPLORE_SECTION_CONTAINER}>
+              <TitledSection
+                title={`전체 분양 소식 ${totalCount}`}
+                titleClassName={EXPLORE_SECTION_TITLE_CLASS}
+                headerSlot={
+                  <ExploreListFilters
+                    value={adoptionListFilter}
+                    onChange={setAdoptionListFilter}
+                    ariaLabel="분양 소식 필터"
+                  />
+                }
               >
-                <AdoptionCardGrid listings={listings} />
-              </ListState>
-            </TitledSection>
-            <InfiniteScrollTrigger
-              onIntersect={fetchNextPage}
-              hasNextPage={hasNextPage ?? false}
-              isFetchingNextPage={isFetchingNextPage}
-            />
-          </Container>
-        </>
-      )}
-    </>
+                <ListState
+                  appPublicContent
+                  isPending={isPending}
+                  isError={isError}
+                  isEmpty={listings.length === 0}
+                  loadingText="분양글을 불러오는 중입니다."
+                  errorText="분양글을 불러오지 못했습니다."
+                  emptyText="등록된 분양글이 없습니다."
+                >
+                  <AdoptionCardGrid listings={listings} />
+                </ListState>
+              </TitledSection>
+              <InfiniteScrollTrigger
+                onIntersect={fetchNextPage}
+                hasNextPage={hasNextPage ?? false}
+                isFetchingNextPage={isFetchingNextPage}
+              />
+            </Container>
+          </>
+        )}
+      </TabsContent>
+    </Tabs>
   )
 }
 
