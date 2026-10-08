@@ -466,15 +466,20 @@ export function PetRoom({
           {(Object.keys(PET_ACTION_LABELS) as PetAction[]).map((action) => {
             const availability = view.actions?.[action]
             const hint = availability ? petActionHint(availability, now) : '상태를 불러오는 중'
+            // 기다리는 돌봄도 키보드로 닿아 남은 시간을 들을 수 있게 disabled 대신 aria-disabled로 막는다.
+            const blocked = disabled || Boolean(active) || !availability?.allowed
             return (
               <button
                 key={action}
+                type="button"
                 className={styles.careButton}
                 data-suggested={mood?.action === action && Boolean(availability?.allowed)}
-                disabled={disabled || Boolean(active) || !availability?.allowed}
+                aria-disabled={blocked}
                 title={hint}
                 aria-label={`${PET_ACTION_LABELS[action]}, ${hint}`}
-                onClick={() => onAction(action)}
+                onClick={() => {
+                  if (!blocked) onAction(action)
+                }}
               >
                 <PetGlyph kind={PET_ACTION_ICONS[action]} />
                 <span>{PET_ACTION_LABELS[action]}</span>
