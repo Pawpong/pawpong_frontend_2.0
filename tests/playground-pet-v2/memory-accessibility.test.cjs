@@ -19,6 +19,8 @@ test('기억 게임은 공개된 그림만 표시하고 키보드 버튼과 오�
     'react/jsx-runtime': jsx,
     '@/entities/playground-pet/model/snack': snack,
     '../lib/useServerClock': { petRequestKey() {} },
+    '../lib/usePetStartIntent':
+      require('../pet-start-intent/fixtures/intent.fixture.cjs').intentHookFixture(React),
     './PetGlyph': { PetGlyph },
     './PetRoom.module.css': { default: new Proxy({}, { get: (_, key) => String(key) }) },
   })

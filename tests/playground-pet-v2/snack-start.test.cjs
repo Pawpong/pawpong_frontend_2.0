@@ -36,7 +36,9 @@ test('간식 시작은 준비 완료를 기다리고 중복 클릭과 실패 및
         focus: (options) => moves.push(options),
       }),
     }
-    h.render().find((n) => n.props.children === '방 화면으로 이동').props.onClick()
+    h.render()
+      .find((n) => n.props.children === '방 화면으로 이동')
+      .props.onClick()
     assert.deepEqual(moves, [{ block: 'start' }, { preventScroll: true }])
     h.props.characterReady = true
     assert.ok(

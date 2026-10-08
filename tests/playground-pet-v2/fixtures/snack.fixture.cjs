@@ -43,6 +43,10 @@ function snackUiHarness() {
     'react/jsx-runtime': require('react/jsx-runtime'),
     '@/entities/playground-pet/model/snack': snack,
     '../lib/useServerClock': { petRequestKey: () => `explicit-key-${++key}` },
+    '../lib/usePetStartIntent':
+      require('../../pet-start-intent/fixtures/intent.fixture.cjs').intentHookFixture(
+        runtime.react,
+      ),
     './PetGlyph': { PetGlyph: () => null },
     './PetRoom.module.css': { default: new Proxy({}, { get: (_, name) => String(name) }) },
   })
@@ -75,6 +79,7 @@ function snackUiHarness() {
     serverTime: stamp,
     now: Date.parse(stamp),
     disabled: false,
+    selected: true,
     characterReady: true,
     gameSurface: null,
     onRefresh() {},
@@ -94,6 +99,7 @@ function snackUiHarness() {
     timers,
     listeners,
     snapshots,
+    unmount: runtime.unmount,
     activate() {
       props.game = { ...props.game, games: { ...props.game.games, active: session } }
     },
