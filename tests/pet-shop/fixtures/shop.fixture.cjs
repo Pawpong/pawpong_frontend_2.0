@@ -73,9 +73,15 @@ function decorations(runtime = React) {
   })
   const { PetPurchaseDialog } = load('src/features/playground-pet/ui/PetPurchaseDialog.tsx', common)
   const { PetGlyph } = load('src/features/playground-pet/ui/PetGlyph.tsx', common)
+  const { PetAssetThumbnail } = load('src/features/playground-pet/ui/PetAssetThumbnail.tsx', {
+    ...common,
+    'next/image': { default: (props) => React.createElement('img', props) },
+    '../lib/gameAssets': { petAsset: () => null },
+  })
   return {
     PetCatalogFilters,
     PetPurchaseDialog,
+    PetAssetThumbnail,
     ...load('src/features/playground-pet/ui/PetDecorations.tsx', {
       ...common,
       'next/image': { default: (props) => React.createElement('img', props) },
@@ -87,6 +93,7 @@ function decorations(runtime = React) {
       './PetGlyph': { PetGlyph },
       './PetCatalogFilters': { PetCatalogFilters },
       './PetPurchaseDialog': { PetPurchaseDialog },
+      './PetAssetThumbnail': { PetAssetThumbnail },
     }),
   }
 }

@@ -38,7 +38,11 @@ test('후보 링크는 부적격 또는 다른 계정의 그림을 전송하지 
   const calls = []
   const noop = () => null
   const { PetAdoption } = load('src/features/playground-pet/ui/PetAdoption.tsx', {
-    react: { useState: (initial) => [initial, () => {}], useEffect() {} },
+    react: {
+      useState: (initial) => [initial, () => {}],
+      useRef: (current) => ({ current }),
+      useEffect() {},
+    },
     'react/jsx-runtime': require('react/jsx-runtime'),
     'next/link': { default: noop },
     '@tanstack/react-query': {

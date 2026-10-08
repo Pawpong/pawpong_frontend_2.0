@@ -36,6 +36,7 @@ import type { PetGameHandle, PetStageSnapshot } from '../lib/petGameEngine'
 import { PetImage } from './PetImage'
 import { PetStage } from './PetStage'
 import { PetDecorations } from './PetDecorations'
+import { usePetDeviceViewport } from '../lib/usePetDeviceViewport'
 import { PetMiniGames } from './PetMiniGames'
 import { PetGlyph } from './PetGlyph'
 import { PetAdoption } from './PetAdoption'
@@ -88,6 +89,7 @@ export function PetRoom({
   initialCharacterSourceId?: string
 }) {
   const pet = view.pet!
+  const viewport = usePetDeviceViewport()
   const game = view.game
   const fullBody = pet.character?.format === 'pet-sprite-v1'
   const requestedSourceId = initialCharacterSourceId?.toLowerCase()
@@ -266,6 +268,7 @@ export function PetRoom({
   )
   return (
     <div
+      ref={viewport}
       className={styles.gameLayout}
       data-active-game={Boolean(active)}
       data-compact={previewing && !active}
@@ -615,6 +618,8 @@ export function PetRoom({
               slotRequest={slotRequest}
               onCommand={onCommand}
               onOpenShop={() => setTab('shop')}
+              onReloadImages={assets.retry}
+              loadingImages={!assets.manifest && !assets.error}
             />
           )}
         </div>
@@ -636,6 +641,8 @@ export function PetRoom({
               onSelect={setItem}
               slotRequest={slotRequest}
               onCommand={onCommand}
+              onReloadImages={assets.retry}
+              loadingImages={!assets.manifest && !assets.error}
             />
           )}
         </div>
