@@ -46,6 +46,7 @@ function roomUiHarness() {
     },
     '../lib/usePetAssets': { usePetAssets: () => ({ manifest: { assets: {} }, error: null }) },
     '../lib/usePetSound': { usePetSound: () => ({ play() {}, toggle() {}, enabled: false }) },
+    '../lib/usePetDeviceViewport': { usePetDeviceViewport: () => ({ current: null }) },
     '../lib/usePetNavigation': {
       usePetNavigation: (active) => {
         if (active) selectedTab = 'games'
