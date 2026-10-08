@@ -26,7 +26,9 @@ const BannerLink = ({ banner, children }: { banner: BannerDto; children: React.R
 
 //QA: 배너 컴포넌트 분리 — API 이미지/링크 렌더링은 BannerSlide가 담당하고,
 //QA: 슬라이드 이동과 양옆 미리보기 배치는 부모 Banner가 담당한다.
-const BannerSlide = ({ banner }: { banner: BannerDto }) => {
+// 첫 화면 슬라이드만 이미지 요청 우선순위를 높인다. <picture>라 preload 대신 fetchPriority만 써서
+// 데스크톱에서 쓰지 않는 모바일 원본을 미리 받지 않게 한다.
+const BannerSlide = ({ banner, first = false }: { banner: BannerDto; first?: boolean }) => {
   const [failedMobileImageUrl, setFailedMobileImageUrl] = useState<string | null>(null)
   const mobileImageUrl =
     banner.mobileImageUrl && failedMobileImageUrl !== banner.mobileImageUrl
@@ -73,6 +75,7 @@ const BannerSlide = ({ banner }: { banner: BannerDto }) => {
                 }
               }}
               loading="eager"
+              fetchPriority={first ? 'high' : 'low'}
             />
           </picture>
           {banner.textOverlay && <BannerCopy copy={banner.textOverlay} />}

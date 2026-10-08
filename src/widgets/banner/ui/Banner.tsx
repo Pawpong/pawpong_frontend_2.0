@@ -105,12 +105,12 @@ const Banner = () => {
         onRealIndexChange={(swiper) => setActiveIndex(normalizeIndex(swiper.realIndex))}
         className="banner-swiper mx-auto h-auto w-full max-w-full py-0 tab:py-[clamp(0.75rem,1.09375vw,1.09375rem)]"
       >
-        {carouselBanners.map(({ banner }) => (
+        {carouselBanners.map(({ banner }, index) => (
           <SwiperSlide
             key={banner.bannerId}
             className="!h-auto !w-full tab:!w-[min(70.875rem,78.75vw)]"
           >
-            <BannerSlide banner={banner} />
+            <BannerSlide banner={banner} first={index === 0} />
           </SwiperSlide>
         ))}
       </Swiper>
