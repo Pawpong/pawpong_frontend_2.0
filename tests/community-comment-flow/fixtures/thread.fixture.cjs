@@ -31,6 +31,7 @@ function threadFixture(write = async () => {}) {
       },
       '@/entities/community': { communityQueries: { comments: () => ({}) } },
       '@/features/community': {
+        ...load('src/features/community/lib/communityCreateAttempt.ts'),
         useCreateCommunityComment: () => ({
           mutateAsync: async (data) => {
             state.writes.push(data)

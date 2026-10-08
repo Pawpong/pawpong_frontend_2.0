@@ -190,6 +190,7 @@ export interface UpdateCommunityCommentRequest {
 
 /** 댓글 작성 요청 */
 export interface CreateCommunityCommentRequest {
+  clientRequestId?: string
   body: string
   /** 답글 대상 댓글 ID (없으면 최상위 댓글) */
   parentCommentId?: string

@@ -61,7 +61,10 @@ test('실패 후 답글 대상을 유지하고 명시적 취소 후에만 일반
   await assert.rejects(h.render().handleSubmitComment('답글'))
   h.render().cancelReply()
   await h.render().handleSubmitComment('답글')
-  assert.deepEqual(h.input.writes, [{ body: '답글', parentCommentId: undefined }])
+  assert.equal(h.input.writes.length, 1)
+  assert.equal(h.input.writes[0].body, '답글')
+  assert.equal(h.input.writes[0].parentCommentId, undefined)
+  assert.equal(typeof h.input.writes[0].clientRequestId, 'string')
 })
 
 test('다른 게시글로 이동한 뒤 이전 완료가 새 답글 대상을 지우지 않는다', async () => {
