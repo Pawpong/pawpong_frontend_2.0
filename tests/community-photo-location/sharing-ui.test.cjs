@@ -49,3 +49,15 @@ test('이미 올린 사진과 위치 없는 새 사진과 앱 화면을 구분�
   assert.match(editor, /\{ photoIndex, previewUrl: form\.images\[photoIndex\], saved: true \}/)
   assert.match(editor, /takenAt: getCommunityPhotoTakenAt\(photo\)/)
 })
+
+test('장소 한 줄은 보여주기만 하고 공개 확인 규칙은 목록 선택기가 지킴', () => {
+  const picker = read(`${ui}/CommunityRoutePicker.tsx`)
+  const item = read(`${ui}/CommunityRoutePlaceItem.tsx`)
+  assert.match(picker, /<CommunityRoutePlaceItem/)
+  // 이름·연결 사진만 바꾸면 좌표가 같아 확인을 유지하고, 빼기·순서 변경은 setRoute로 확인을 다시 받는다
+  assert.equal((picker.match(/publicPlaceConfirmed: value\.publicPlaceConfirmed/g) ?? []).length, 2)
+  assert.match(picker, /onRemove=\{\(\) => setRoute\(/)
+  assert.match(picker, /onMove=\{\(step\) => \{[\s\S]*?setRoute\(next\)/)
+  assert.doesNotMatch(item, /onChange\(\{|publicPlaceConfirmed/)
+  assert.ok(picker.split('\n').length < 260)
+})
