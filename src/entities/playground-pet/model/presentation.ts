@@ -7,6 +7,9 @@ export const PET_ACTION_LABELS = {
   rest: '쉬게 하기',
 } as const
 
+/** 돌봄 버튼과 오늘의 돌봄 목록이 함께 쓰는 아이콘 이름. */
+export const PET_ACTION_ICONS = { greet: 'paw', feed: 'bone', play: 'play', rest: 'rest' } as const
+
 export function normalizePetName(value: string): string {
   return value.trim().normalize('NFC')
 }

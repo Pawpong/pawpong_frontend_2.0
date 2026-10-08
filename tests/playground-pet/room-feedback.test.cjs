@@ -1,7 +1,11 @@
 const fs = require('node:fs')
 const { test, assert, presentation } = require('./fixtures/core.fixture.cjs')
 
-const room = () => fs.readFileSync('src/features/playground-pet/ui/PetRoom.tsx', 'utf8')
+// 방 화면 원문은 PetRoom과 거기서 나눈 방 요약·기록 패널을 함께 본다.
+const room = () =>
+  ['PetRoom', 'PetRoomSummary', 'PetRecords']
+    .map((name) => fs.readFileSync(`src/features/playground-pet/ui/${name}.tsx`, 'utf8'))
+    .join('\n')
 const at = (iso) => Date.parse(iso)
 
 test('함께한 날은 입양한 한국 날짜를 1일째로 세고 이번 주 방문 수와 섞지 않음', () => {
