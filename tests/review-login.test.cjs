@@ -94,7 +94,7 @@ function setupClient(upstream) {
 }
 
 for (const role of ['adopter', 'breeder']) {
-  test(`BFF preserves authenticated ${role} from backend and strips unexpected fields`, async () => {
+  test(`BFF가 백엔드의 ${role} 인증을 유지하고 예상하지 않은 필드를 제거함`, async () => {
     const result = structuredClone(session)
     result.data.user.role = role
     result.data.password = 'never forward'
@@ -124,7 +124,7 @@ for (const role of ['adopter', 'breeder']) {
   })
 }
 
-test('BFF rejects cross-origin / cross-site requests before contacting backend', async () => {
+test('BFF가 백엔드 호출 전에 다른 출처와 사이트의 요청을 거부함', async () => {
   for (const headers of [
     { origin: 'https://attacker.example' },
     { origin: 'null' },
@@ -138,14 +138,14 @@ test('BFF rejects cross-origin / cross-site requests before contacting backend',
   }
 })
 
-test('BFF accepts same-origin JSON without optional Origin header', async () => {
+test('BFF가 선택적인 Origin 헤더가 없어도 동일 출처 JSON 요청을 허용함', async () => {
   const app = setupRoute()
   const request = app.request()
   request.headers.delete('origin')
   assert.equal((await app.POST(request)).status, 200)
 })
 
-test('BFF rejects malformed/oversized input and bcrypt UTF-8 truncation before fetch', async () => {
+test('BFF가 호출 전에 잘못되거나 과도한 입력과 bcrypt 바이트 초과를 거부함', async () => {
   const bodies = [
     '{',
     null,
@@ -174,7 +174,7 @@ test('BFF rejects malformed/oversized input and bcrypt UTF-8 truncation before f
 })
 
 for (const status of [400, 401, 429, 503, 500, 302]) {
-  test(`BFF sanitizes upstream ${status} without exposing raw errors/password`, async () => {
+  test(`BFF가 상위 서버의 ${status} 오류에서 내부 내용과 비밀번호를 노출하지 않음`, async () => {
     const app = setupRoute(async () =>
       Response.json(
         { message: credentials.password, accessToken: 'leaked', database: 'internal' },
@@ -191,7 +191,7 @@ for (const status of [400, 401, 429, 503, 500, 302]) {
   })
 }
 
-test('BFF rejects a success response without tokens or with unsupported role', async () => {
+test('BFF가 토큰이 없거나 지원하지 않는 역할의 성공 응답을 거부함', async () => {
   for (const body of [
     { success: true },
     { ...session, success: false },
@@ -204,7 +204,7 @@ test('BFF rejects a success response without tokens or with unsupported role', a
   }
 })
 
-test('BFF handles timeout/network errors and non-JSON success without forwarding secrets', async () => {
+test('BFF가 시간 초과와 통신 오류 및 JSON이 아닌 응답에서도 비밀값을 노출하지 않음', async () => {
   for (const upstream of [
     async () => {
       throw new Error(credentials.password)
@@ -218,7 +218,7 @@ test('BFF handles timeout/network errors and non-JSON success without forwarding
   }
 })
 
-test('BFF forwards request cancellation to the fixed upstream request', async () => {
+test('BFF가 요청 취소를 고정된 상위 서버 요청에 전달함', async () => {
   const app = setupRoute(async (_, options) => {
     assert.equal(options.signal.aborted, true)
     throw options.signal.reason
@@ -234,7 +234,7 @@ test('BFF forwards request cancellation to the fixed upstream request', async ()
   assert.equal((await app.POST(request)).status, 503)
 })
 
-test('client sends password only in POST body then uses existing cookie writer', async () => {
+test('클라이언트가 비밀번호를 POST 본문으로만 전달하고 공통 쿠키 저장을 사용함', async () => {
   const app = setupClient(async () => Response.json(session))
   assert.equal(await app.signInReviewAccount(credentials, new AbortController().signal), true)
   assert.equal(app.calls[0][0], '/api/auth/review-login')
@@ -244,7 +244,7 @@ test('client sends password only in POST body then uses existing cookie writer',
   assert.equal(app.saved[0].accessToken, session.data.accessToken)
 })
 
-test('client prevents cancelled/logout/superseded authentication from writing cookies', async () => {
+test('클라이언트가 취소와 로그아웃 및 대체된 인증의 쿠키 저장을 차단함', async () => {
   for (const invalidate of ['cancel', 'logout', 'new-login']) {
     let resolve
     const app = setupClient(
@@ -264,7 +264,7 @@ test('client prevents cancelled/logout/superseded authentication from writing co
   }
 })
 
-test('client does not write cookies for errors or malformed success responses', async () => {
+test('클라이언트가 실패하거나 잘못된 성공 응답으로 쿠키를 저장하지 않음', async () => {
   for (const upstream of [
     async () => Response.json({ message: credentials.password }, { status: 401 }),
     async () => Response.json({ success: true }),
@@ -281,14 +281,14 @@ test('client does not write cookies for errors or malformed success responses', 
   }
 })
 
-test('return URL keeps protected internal destination and rejects an external redirect', () => {
+test('복귀 주소가 보호된 내부 목적지를 유지하고 외부 이동을 거부함', () => {
   const { normalizeReturnUrl } = load('src/shared/lib/normalizeReturnUrl.ts')
   assert.equal(normalizeReturnUrl('/account/delete'), '/account/delete')
   for (const path of ['//evil.example', 'https://evil.example', '/\\evil.example'])
     assert.equal(normalizeReturnUrl(path), '/')
 })
 
-test('failed or cancelled review login preserves offline logout and cannot refresh the previous account', async () => {
+test('심사 로그인 실패와 취소가 오프라인 로그아웃을 유지하고 이전 계정 복구를 차단함', async () => {
   for (const outcome of ['offline', 'rejected', 'cancelled']) {
     const controller = new AbortController()
     const app = setupClient(async () => {
@@ -315,6 +315,7 @@ test('failed or cancelled review login preserves offline logout and cannot refre
         '@/shared/api/unwrap': load('src/shared/api/unwrap.ts'),
         './authStateEvents': { notifyAuthStateChanged: () => {} },
         './authSessionLifecycle': app,
+        './authTokenIdentity': load('src/shared/lib/authTokenIdentity.ts'),
       },
       { fetch: async () => assert.fail('must not refresh logged-out account') },
     )
@@ -322,7 +323,7 @@ test('failed or cancelled review login preserves offline logout and cannot refre
   }
 })
 
-test('a newer review login attempt supersedes the earlier credential response', async () => {
+test('새 심사 로그인 시도가 이전 인증 응답을 대체함', async () => {
   const replies = []
   const app = setupClient(() => new Promise((resolve) => replies.push(resolve)))
   const first = app.signInReviewAccount(credentials, new AbortController().signal)
@@ -335,7 +336,7 @@ test('a newer review login attempt supersedes the earlier credential response', 
   assert.equal(app.saved.length, 1)
 })
 
-test('verified review credentials can reach the cookie writer after an explicit logout', async () => {
+test('명시적 로그아웃 후에도 검증된 심사 인증 결과는 쿠키를 저장할 수 있음', async () => {
   const app = setupClient(async () => Response.json(session))
   app.beginLogout()
   assert.equal(await app.signInReviewAccount(credentials, new AbortController().signal), true)

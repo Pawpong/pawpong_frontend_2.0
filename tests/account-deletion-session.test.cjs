@@ -75,6 +75,7 @@ function setup({ rejectDeletion = false, loseResponse = false, offlineClear = fa
       '@/shared/api/unwrap': load('src/shared/api/unwrap.ts'),
       './authStateEvents': authEvents,
       './authSessionLifecycle': lifecycle,
+      './authTokenIdentity': load('src/shared/lib/authTokenIdentity.ts'),
     },
     { window, document, fetch },
   )
@@ -124,7 +125,7 @@ function setup({ rejectDeletion = false, loseResponse = false, offlineClear = fa
   }
 }
 
-test('app resume while waiting for native deletion ACK preserves auth until the protected request finishes', async () => {
+test('네이티브 탈퇴 확인 대기 중 앱이 복귀해도 보호 요청이 끝날 때까지 인증을 유지함', async () => {
   const app = setup()
   let cacheCleared = false
   const pending = app.requestAccountDeletion(() => (cacheCleared = true))
@@ -143,7 +144,7 @@ test('app resume while waiting for native deletion ACK preserves auth until the 
   app.cleanup()
 })
 
-test('failed deletion after app resume restores the same session for native push rebind', async () => {
+test('앱 복귀 후 탈퇴에 실패하면 같은 세션으로 네이티브 푸시를 다시 연결함', async () => {
   const app = setup({ rejectDeletion: true })
   const pending = app.requestAccountDeletion(() => assert.fail('must not clear cache'))
   await app.nativeStarted
@@ -157,7 +158,7 @@ test('failed deletion after app resume restores the same session for native push
   app.cleanup()
 })
 
-test('lost accepted response plus offline cookie cleanup clears visible auth and permits cleanup retry after reload', async () => {
+test('탈퇴 응답 유실과 오프라인 정리 실패 후에도 보이는 인증을 지우고 재접속 시 정리를 재시도함', async () => {
   const app = setup({ loseResponse: true, offlineClear: true })
   const pending = app.requestAccountDeletion(() => {})
   await app.nativeStarted

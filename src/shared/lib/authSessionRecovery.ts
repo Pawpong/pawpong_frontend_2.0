@@ -1,6 +1,7 @@
 import { getAccessToken } from '@/shared/api/token'
 import { ApiError } from '@/shared/api/unwrap'
 import { notifyAuthStateChanged } from './authStateEvents'
+import { authTokenIdentity } from './authTokenIdentity'
 import {
   getAuthSessionGeneration,
   finishAuthCookieClear,
@@ -9,7 +10,7 @@ import {
   trackAuthCookieWrite,
 } from './authSessionLifecycle'
 
-let refresh: { generation: number; promise: Promise<string> } | null = null
+let refresh: { generation: number; identity: string | null; promise: Promise<string> } | null = null
 let anonymousGeneration: number | null = null
 
 /** WebView가 오프라인이어도 인증 작업이 끝없이 대기하지 않게 한다. */
@@ -53,9 +54,18 @@ export async function clearAuthCookies(): Promise<void> {
 /** API 401, 앱 복귀, 로그인 화면이 하나의 refresh 요청과 쿠키 저장을 공유한다. */
 export function refreshAuthSession(): Promise<string> {
   const generation = getAuthSessionGeneration()
+  const identity = authTokenIdentity(getAccessToken())
   if (!isAuthSessionCurrent(generation))
     return Promise.reject(new ApiError('인증 세션이 변경되었습니다.', 401))
-  if (refresh?.generation === generation) return refresh.promise
+  if (refresh?.generation === generation && refresh.identity === identity) return refresh.promise
+
+  const assertCurrentOwner = () => {
+    // 다른 탭의 로그인은 현재 문서의 generation을 바꾸지 않을 수 있다.
+    if (!isAuthSessionCurrent(generation) || authTokenIdentity(getAccessToken()) !== identity) {
+      notifyAuthStateChanged()
+      throw new ApiError('인증 세션이 변경되었습니다.', 401)
+    }
+  }
 
   const promise = (async () => {
     try {
@@ -70,7 +80,7 @@ export function refreshAuthSession(): Promise<string> {
           } | null,
         }),
       )
-      if (!isAuthSessionCurrent(generation)) throw new ApiError('인증 세션이 변경되었습니다.', 401)
+      assertCurrentOwner()
       if (response.status === 401) {
         anonymousGeneration = generation
         await clearAuthCookies()
@@ -81,7 +91,9 @@ export function refreshAuthSession(): Promise<string> {
       const refreshToken = data?.data?.refreshToken
       if (!data?.success || typeof accessToken !== 'string' || typeof refreshToken !== 'string')
         throw new ApiError('로그인 상태를 확인하지 못했습니다.', 503)
-      if (!isAuthSessionCurrent(generation)) throw new ApiError('인증 세션이 변경되었습니다.', 401)
+      if (identity !== null && authTokenIdentity(accessToken) !== identity)
+        throw new ApiError('로그인 상태를 확인하지 못했습니다.', 503)
+      assertCurrentOwner()
       const saved = await trackAuthCookieWrite(
         authFetch(
           '/api/auth/set-cookie',
@@ -105,7 +117,7 @@ export function refreshAuthSession(): Promise<string> {
       throw new ApiError('연결을 확인한 뒤 다시 시도해주세요.', 503)
     }
   })()
-  refresh = { generation, promise }
+  refresh = { generation, identity, promise }
   const release = () => {
     if (refresh?.promise === promise) refresh = null
   }
