@@ -1,12 +1,11 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useQueryClient } from '@tanstack/react-query'
 import { aiImageQueries } from '@/entities/ai-image'
-import { PetResultLink } from '@/features/playground-pet/ui/PetResultLink'
 import { PawPrintIcon } from '@/shared/assets'
 import { PLAYGROUND_BILLING_ENABLED } from '@/shared/config/playground'
 import { cafe24Proup } from '@/shared/lib/fonts'
@@ -61,6 +60,8 @@ interface AiFilterStudioProps {
   quotaError?: boolean
   onRefreshQuota?: () => void
   onGenerationSettled?: () => void
+  /** 결과 사진 아래 붙일 이어가기 버튼(예: 반려동물 캐릭터 만들기). 다른 기능은 화면 조립 계층에서 넣는다. */
+  renderResultAction?: (jobId: string, className?: string) => ReactNode
 }
 
 /**
@@ -77,6 +78,7 @@ export function AiFilterStudio({
   quotaError,
   onRefreshQuota,
   onGenerationSettled,
+  renderResultAction,
 }: AiFilterStudioProps) {
   const router = useRouter()
   const queryClient = useQueryClient()
@@ -464,7 +466,7 @@ export function AiFilterStudio({
               ) : (
                 <BeforeAfterCompare beforeSrc={photo.url} afterSrc={result.imageUrl} />
               )}
-              <PetResultLink sourceJobId={result.jobId} className="mt-0" />
+              {renderResultAction?.(result.jobId, 'mt-0')}
               <AiPostShareChoice
                 checked={shareComparison}
                 onChange={setShareComparison}
@@ -563,7 +565,12 @@ export function AiFilterStudio({
               보관함 <span aria-hidden>→</span>
             </Link>
           </div>
-          <AiPhotoArchive enabled={isLoggedIn} limit={8} moreHref="/home?tab=ai-photos" />
+          <AiPhotoArchive
+            enabled={isLoggedIn}
+            limit={8}
+            moreHref="/home?tab=ai-photos"
+            renderResultAction={renderResultAction}
+          />
         </section>
       )}
     </div>

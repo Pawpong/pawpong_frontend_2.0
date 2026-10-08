@@ -93,6 +93,7 @@ test('제작 화면은 사진과 계정 세션별로 분리하고 공개 잠금�
     'react/jsx-runtime': jsx,
     '@tanstack/react-query': { useQuery: () => config },
     '@/features/ai-image': { AiFilterStudio: () => null },
+    '@/features/playground-pet': { PetResultLink: () => null },
     '@/features/auth': { useMe: () => ({ isLoggedIn: true }) },
     '@/features/in-app-purchase': { usePurchases: () => billing },
     '@/entities/iap': { featureAllowance: () => undefined },

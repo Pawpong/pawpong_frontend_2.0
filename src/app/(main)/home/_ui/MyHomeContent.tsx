@@ -11,6 +11,7 @@ import { cn } from '@/shared/lib/cn'
 import { transientQueryRecoveryOptions } from '@/shared/api'
 import { profileQueries } from '@/entities/profile'
 import { AiPhotoArchive } from '@/features/ai-image'
+import { PetResultLink } from '@/features/playground-pet'
 // [refactored] 분양 페이지와 동일한 목록 블록 — 위젯으로 공유
 import { MyPetPostingList } from '@/widgets/my-pet-postings'
 import { toMyProfileCardProps } from '../_lib/toMyProfileCardProps'
@@ -159,7 +160,10 @@ const MyHomeContent = () => {
 
         <TabsContent value="ai-photos" className="mt-0">
           <div className="px-4 pt-4 tab:px-0">
-            <AiPhotoArchive enabled={!!myProfile} />
+            <AiPhotoArchive
+              enabled={!!myProfile}
+              renderResultAction={(jobId) => <PetResultLink sourceJobId={jobId} />}
+            />
           </div>
         </TabsContent>
 
