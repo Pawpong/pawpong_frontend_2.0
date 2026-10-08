@@ -305,3 +305,37 @@ test('마이홈 활동 탭은 비활성·설정 오류·다른 계정 세션에�
     '<p>dashboard:fixture-user</p>',
   )
 })
+
+test('마이홈 이름 옆 내 레벨은 설정이 켜지고 세션 소유자가 프로필과 같을 때만 활동 탭과 같은 key 로 보인다', () => {
+  const render = ({ config, session = fixtureSession, userId = 'fixture-user' }) => {
+    const queries = []
+    const { MyLevelBadge } = load('src/features/gamification/ui/MyLevelBadge.tsx', {
+      '@tanstack/react-query': {
+        useQuery: (options) => {
+          queries.push(options)
+          return options.queryKey[1] === 'config' ? config : { data: { level: { value: 3 } } }
+        },
+      },
+      '@/entities/gamification': {
+        activityConfigOptions: { queryKey: ['gamification', 'config'] },
+        getActivity: async () => ({}),
+        BreederLevelBadge: ({ level }) => createElement('b', null, `Lv.${level.value}`),
+      },
+      '../lib/useActivitySession': { useActivitySession: () => session },
+    })
+    return { html: renderToStaticMarkup(createElement(MyLevelBadge, { userId })), queries }
+  }
+  for (const scenario of [
+    { config: { data: { enabled: false } } },
+    { config: { data: { enabled: true }, isError: true } },
+    { config: { data: { enabled: true } }, session: null },
+    { config: { data: { enabled: true } }, userId: 'previous-account' },
+  ]) {
+    const { html, queries } = render(scenario)
+    assert.equal(html, '')
+    assert.equal(queries[1].enabled, false)
+  }
+  const { html, queries } = render({ config: { data: { enabled: true } } })
+  assert.equal(html, '<b>Lv.3</b>')
+  assert.deepEqual(queries[1].queryKey, ['gamification', 'private', fixtureSession.scope])
+})

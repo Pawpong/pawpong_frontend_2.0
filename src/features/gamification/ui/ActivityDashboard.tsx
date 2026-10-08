@@ -6,11 +6,10 @@ import {
   displayActivityBadges,
   type ActivitySession,
   PixelActivityBadge,
-  BreederLevelBadge,
   ACTIVITY_LABELS,
   getActivityCatalog,
 } from '@/entities/gamification'
-import { Button, DetailLink } from '@/shared/ui'
+import { Button, DetailLink, PixelProgressBar } from '@/shared/ui'
 import { cafe24Proup } from '@/shared/lib/fonts'
 import styles from './activity.module.css'
 
@@ -75,20 +74,20 @@ export function ActivityDashboard({ session }: { session: ActivitySession }) {
         </p>
         {data?.level && (
           <div className="my-5 space-y-3">
-            <BreederLevelBadge level={data.level} showFamily interactive />
+            {/* 레벨 배지는 마이홈 이름 옆에 있다. 여기는 다음 레벨까지의 진행만 보여준다 */}
             {ceiling != null ? (
               <>
-                <p>
-                  {ceiling.toLocaleString()} EXP까지{' '}
-                  {Math.max(0, ceiling - data.totalExp).toLocaleString()} 남음
+                <p className={cafe24Proup.className}>
+                  Lv.{data.level.nextValue}까지{' '}
+                  {Math.max(0, ceiling - data.totalExp).toLocaleString()} EXP 남음
                 </p>
                 {floor !== undefined && (
-                  <progress
-                    className="w-full accent-primary-500"
-                    value={progress}
-                    max={100}
-                    aria-label="다음 활동 단계 진행도"
-                  />
+                  <div className="h-5 w-full">
+                    <PixelProgressBar
+                      percent={Math.round(progress)}
+                      label={`다음 활동 단계 진행도 ${Math.round(progress)}%`}
+                    />
+                  </div>
                 )}
               </>
             ) : (
@@ -239,8 +238,12 @@ export function ActivityDashboard({ session }: { session: ActivitySession }) {
         </p>
       </section>
       <nav aria-label="활동 바로가기" className="mt-6 flex flex-wrap gap-x-4">
-        <DetailLink href="/breeder-level" label="활동 단계 안내" className="min-h-11" />
-        <DetailLink href="/faq" label="레벨/EXP 문의 · 목표 처리 영업일 5일" className="min-h-11" />
+        <DetailLink href="/level" label="활동 단계 안내" className="min-h-11" />
+        <DetailLink
+          href="/level#inquiry"
+          label="레벨/EXP 문의 · 목표 처리 영업일 5일"
+          className="min-h-11"
+        />
         <DetailLink href="/community/write" label="첫 이야기 나누기" className="min-h-11" />
         <DetailLink href="/profile/edit" label="프로필 완성하기" className="min-h-11" />
         <DetailLink href="/community" label="커뮤니티로 돌아가기" className="min-h-11" />
