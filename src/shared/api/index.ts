@@ -1,5 +1,8 @@
 export { apiClient, API_VERSION } from './client'
 export type { ApiRequestConfig } from './client'
+export { withAuthReadSession } from './authReadRequest'
+export { getAuthReadSession } from '../lib/authReadSession'
+export type { AuthReadSession } from '../lib/authReadSession'
 export { getAccessToken } from './token'
 export {
   ApiError,

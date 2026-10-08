@@ -1,13 +1,6 @@
-import { apiClient, API_VERSION, unwrap, type ApiRequestConfig } from '@/shared/api'
-import { getAccessToken } from '@/shared/api/token'
+import { apiClient, API_VERSION, unwrap, withAuthReadSession } from '@/shared/api'
 import { ApiError } from '@/shared/api/unwrap'
-import {
-  getAuthReadSession,
-  isAuthReadSessionCurrent,
-  type AuthReadSession,
-} from '@/shared/lib/authReadSession'
-import { notifyAuthStateChanged } from '@/shared/lib/authStateEvents'
-import { refreshAuthSession } from '@/shared/lib/authSessionRecovery'
+import { getAuthReadSession, type AuthReadSession } from '@/shared/lib/authReadSession'
 import type {
   ApiResponseFull,
   NotificationListFilter,
@@ -36,38 +29,18 @@ export const getUnreadCount = async (
   session: AuthReadSession | null = getAuthReadSession(),
   signal?: AbortSignal,
 ): Promise<number> => {
-  if (!session) throw new ApiError('로그인이 필요합니다.', 401)
-  const assertCurrent = () => {
-    if (!isAuthReadSessionCurrent(session)) {
-      notifyAuthStateChanged()
-      throw new ApiError('알림을 조회하는 계정이 변경되었습니다.', 401)
-    }
-  }
-  const read = async () => {
-    assertCurrent()
-    const config: ApiRequestConfig = {
-      signal,
-      headers: { Authorization: `Bearer ${getAccessToken()}` },
-      skipAuth: true,
-      skipAuthRefresh: true,
-    }
-    const res = await apiClient.get<ApiResponseFull<{ unreadCount: number }>>(
-      `${API_VERSION}/notification/unread-count`,
-      config,
-    )
-    assertCurrent()
-    const count = unwrap(res, '읽지 않은 알림 수를 불러오는데 실패했습니다.').unreadCount
-    if (!Number.isSafeInteger(count) || count < 0)
-      throw new ApiError('알림 개수를 확인하지 못했습니다.', 502)
-    return count
-  }
-  try {
-    return await read()
-  } catch (error) {
-    assertCurrent()
-    if (!(error instanceof ApiError) || error.status !== 401 || signal?.aborted) throw error
-    await refreshAuthSession()
-    assertCurrent()
-    return read()
-  }
+  return withAuthReadSession(
+    async (config) => {
+      const res = await apiClient.get<ApiResponseFull<{ unreadCount: number }>>(
+        `${API_VERSION}/notification/unread-count`,
+        config,
+      )
+      const count = unwrap(res, '읽지 않은 알림 수를 불러오는데 실패했습니다.').unreadCount
+      if (!Number.isSafeInteger(count) || count < 0)
+        throw new ApiError('알림 개수를 확인하지 못했습니다.', 502)
+      return count
+    },
+    session,
+    signal,
+  )
 }

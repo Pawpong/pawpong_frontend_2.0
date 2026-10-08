@@ -21,17 +21,12 @@ function notificationFixture(get = async () => ({ data: { unreadCount: 7 } })) {
     },
   })
   const { ApiError } = load('src/shared/api/unwrap.ts')
-  const api = load('src/entities/notification/api/notification.api.ts', {
-    '@/shared/api': {
-      apiClient: { get },
-      API_VERSION: '/api/v2',
-      unwrap: (response) => response.data,
-    },
-    '@/shared/api/token': { getAccessToken: () => state.token },
-    '@/shared/api/unwrap': { ApiError },
-    '@/shared/lib/authReadSession': session,
-    '@/shared/lib/authStateEvents': { notifyAuthStateChanged: () => state.notices++ },
-    '@/shared/lib/authSessionRecovery': {
+  const { withAuthReadSession } = load('src/shared/api/authReadRequest.ts', {
+    './token': { getAccessToken: () => state.token },
+    './unwrap': { ApiError },
+    '../lib/authReadSession': session,
+    '../lib/authStateEvents': { notifyAuthStateChanged: () => state.notices++ },
+    '../lib/authSessionRecovery': {
       refreshAuthSession: async () => {
         state.refreshes++
         state.token = token('account-a', 2)
@@ -39,7 +34,17 @@ function notificationFixture(get = async () => ({ data: { unreadCount: 7 } })) {
       },
     },
   })
-  return { state, session, api, ApiError }
+  const api = load('src/entities/notification/api/notification.api.ts', {
+    '@/shared/api': {
+      apiClient: { get },
+      API_VERSION: '/api/v2',
+      unwrap: (response) => response.data,
+      withAuthReadSession,
+    },
+    '@/shared/api/unwrap': { ApiError },
+    '@/shared/lib/authReadSession': session,
+  })
+  return { state, session, api, ApiError, withAuthReadSession }
 }
 
 module.exports = { load, token, deferred, notificationFixture }

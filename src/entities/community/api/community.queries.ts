@@ -1,4 +1,10 @@
-import { createInfiniteQuery, createQuery, STALE_TIME } from '@/shared/api'
+import {
+  createInfiniteQuery,
+  createQuery,
+  STALE_TIME,
+  getAuthReadSession,
+  type AuthReadSession,
+} from '@/shared/api'
 import type { CommunitySortType, CommunityPetType, CommunityDiscoveryFilters } from '@/shared/types'
 import {
   getCommunityPosts,
@@ -133,19 +139,29 @@ export const communityQueries = {
   // 마이홈 '내가 쓴 글' 탭의 '좋아요한 글' · '댓글 단 글' 칩. 사진 그리드 3·4열에 맞춰 24개씩
   myLikedAll: () => [...communityQueries.all(), 'myLiked'] as const,
 
-  myLiked: (pageSize = 24) =>
+  myLiked: (
+    pageSize = 24,
+    enabled = true,
+    session: AuthReadSession | null = getAuthReadSession(),
+  ) =>
     createInfiniteQuery({
-      queryKey: [...communityQueries.myLikedAll(), pageSize],
-      queryFn: (page) => getMyLikedPosts({ page, pageSize }),
+      queryKey: [...communityQueries.myLikedAll(), session?.scope ?? 'guest', pageSize],
+      queryFn: (page, signal) => getMyLikedPosts({ page, pageSize }, session, signal),
+      enabled: enabled && Boolean(session),
       staleTime: STALE_TIME.DEFAULT,
     }),
 
   myCommentedAll: () => [...communityQueries.all(), 'myCommented'] as const,
 
-  myCommented: (pageSize = 24) =>
+  myCommented: (
+    pageSize = 24,
+    enabled = true,
+    session: AuthReadSession | null = getAuthReadSession(),
+  ) =>
     createInfiniteQuery({
-      queryKey: [...communityQueries.myCommentedAll(), pageSize],
-      queryFn: (page) => getMyCommentedPosts({ page, pageSize }),
+      queryKey: [...communityQueries.myCommentedAll(), session?.scope ?? 'guest', pageSize],
+      queryFn: (page, signal) => getMyCommentedPosts({ page, pageSize }, session, signal),
+      enabled: enabled && Boolean(session),
       staleTime: STALE_TIME.DEFAULT,
     }),
 
