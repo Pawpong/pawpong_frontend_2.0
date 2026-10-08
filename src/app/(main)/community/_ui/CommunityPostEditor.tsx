@@ -41,6 +41,7 @@ import {
   type CommunityCreateAttempt,
   prepareCommunityPhoto,
   getCommunityPhotoLocation,
+  getCommunityPhotoTakenAt,
   reindexCommunityRoutePhotos,
   useCommunityEditorConfig,
   useCommunityEditorNavigation,
@@ -306,12 +307,16 @@ const PostForm = ({ postId, post, initialRecord, photoSource, returnTo }: PostFo
                 disabled={isSubmitting || form.isProcessingPhotos}
                 autoTagging={reviewEnabled ? (aiReviewConsent ? 'on' : 'consent') : 'off'}
                 error={experienceNotice}
-                photos={currentPhotos.map((photo, photoIndex) => ({
-                  photoIndex,
-                  previewUrl: form.images[photoIndex],
-                  location:
-                    typeof photo === 'string' ? undefined : getCommunityPhotoLocation(photo),
-                }))}
+                photos={currentPhotos.map((photo, photoIndex) =>
+                  typeof photo === 'string'
+                    ? { photoIndex, previewUrl: form.images[photoIndex], saved: true }
+                    : {
+                        photoIndex,
+                        previewUrl: form.images[photoIndex],
+                        location: getCommunityPhotoLocation(photo),
+                        takenAt: getCommunityPhotoTakenAt(photo),
+                      },
+                )}
               />
             )}
             {photoSource && !post && !handoff && form.images.length === 0 && (
