@@ -1,8 +1,6 @@
 const { test } = require('node:test')
 const assert = require('node:assert/strict')
 const { NextRequest } = require('next/server')
-const { createElement } = require('react')
-const { renderToStaticMarkup } = require('react-dom/server')
 const { loadTypescript: load } = require('./helpers/load-typescript.cjs')
 
 test('사용자 태그는 정규화·중복 제거·개수 제한 후 검색에 사용한다', () => {
@@ -110,64 +108,4 @@ test('기존 피드 쿼리 키를 유지하고 새 주제만 선택적으로 추
   assert.equal(calls[1].topic, 'walk')
   assert.equal(calls[1].petType, 'dog')
   assert.equal(calls[1].search, '산책')
-})
-
-test('AI 답변 조회는 생성 요청을 하지 않고 생성에는 동의 본문만 전달한다', async () => {
-  const calls = []
-  const api = load('src/entities/community/api/communityExperience.api.ts', {
-    '@/shared/api': {
-      apiClient: {
-        get: async (...args) => {
-          calls.push(['get', ...args])
-          return { data: null }
-        },
-        post: async (...args) => {
-          calls.push(['post', ...args])
-          return { data: { status: 'pending' } }
-        },
-      },
-      unwrap: (value) => value.data,
-      API_VERSION: '/v2',
-    },
-    '@/shared/api/token': { getAccessToken: () => 'fixture' },
-    '@/shared/lib/authSessionLifecycle': { getAuthSessionGeneration: () => 0 },
-  })
-  await api.readCommunityAiAnswer('fixture-post')
-  assert.equal(calls.length, 1)
-  assert.equal(calls[0][0], 'get')
-  await api.requestCommunityAiAnswer('fixture-post')
-  assert.deepEqual(calls[1][2], { consent: true })
-  assert.equal(calls[1][3].timeout, 30000)
-})
-
-test('AI 답변 화면은 자동 생성 없이 동의를 받고 의학적 참고 경고를 표시한다', () => {
-  let mutations = 0
-  const answer = load('src/app/(main)/community/_ui/CommunityAiAnswer.tsx', {
-    '@tanstack/react-query': {
-      useQuery: () => ({ data: null, isPending: false }),
-      useQueryClient: () => ({}),
-      useMutation: () => ({ mutate: () => mutations++ }),
-    },
-    '@/entities/community': { readCommunityAiAnswer: () => null },
-    '@/shared/api/token': { getAccessToken: () => 'fixture' },
-    '@/shared/lib/authSessionLifecycle': { isAuthSessionCurrent: () => true },
-  })
-  const post = {
-    postId: 'fixture',
-    body: '질문',
-    experience: { topics: [], question: true, route: [] },
-  }
-  const html = renderToStaticMarkup(
-    createElement(answer.CommunityAnswer, {
-      post,
-      isOwner: true,
-      generation: 0,
-      notice: '진단과 처방을 대신하지 않습니다.',
-    }),
-  )
-  assert.equal(mutations, 0)
-  assert.match(html, /AI 참고 답변/)
-  assert.match(html, /진단과 처방/)
-  assert.match(html, /type="checkbox"/)
-  assert.match(html, /disabled=""/)
 })

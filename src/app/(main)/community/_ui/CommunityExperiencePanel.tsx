@@ -13,7 +13,6 @@ import {
 } from '@/entities/community'
 import { SharedRouteMap } from '@/features/care-map'
 import { useCommunityAutoApplied } from '@/features/community'
-import { usePurchases } from '@/features/in-app-purchase'
 import type { CommunityPostDetail } from '@/shared/types'
 import { CommunityAnswer } from './CommunityAiAnswer'
 import { CommunityRelatedPosts } from './CommunityRelatedPosts'
@@ -29,7 +28,6 @@ export function CommunityExperiencePanel({
   isOwner: boolean
 }) {
   const config = useQuery(communityExperienceConfigOptions)
-  const { generation } = usePurchases()
   const autoApplied = useCommunityAutoApplied(post.postId, isOwner)
   const active = config.data?.enabled === true && !config.isError
   if (!active) return null
@@ -154,13 +152,7 @@ export function CommunityExperiencePanel({
         </p>
       )}
       {experience?.question && config.data?.aiEnabled && !held && (
-        <CommunityAnswer
-          key={`${post.postId}:${post.body}:${generation}`}
-          post={post}
-          isOwner={isOwner}
-          generation={generation}
-          notice={config.data.aiNotice}
-        />
+        <CommunityAnswer post={post} isOwner={isOwner} notice={config.data.aiNotice} />
       )}
 
       {published && (
