@@ -35,6 +35,7 @@ import { usePetAssets } from '../lib/usePetAssets'
 import { usePetSound } from '../lib/usePetSound'
 import type { PetSession } from '../lib/usePetSession'
 import type { PetGameHandle, PetStageSnapshot } from '../lib/petGameEngine'
+import { newlyAvailablePetItems } from '@/entities/playground-pet/model/shop'
 import { PetImage } from './PetImage'
 import { PetStage } from './PetStage'
 import { PetDecorations } from './PetDecorations'
@@ -134,13 +135,22 @@ export function PetRoom({
   const [online, setOnline] = useState(
     () => typeof navigator === 'undefined' || navigator.onLine !== false,
   )
-  const [growth, setGrowth] = useState<{ id: string; level: number; banner: number | null }>({
+  const [growth, setGrowth] = useState<{
+    id: string
+    level: number
+    banner: number | null
+    from: number
+  }>({
     id: pet.id,
     level: pet.level,
     banner: null,
+    from: pet.level,
   })
   if (growth.id !== pet.id || growth.level !== pet.level)
-    setGrowth({ id: pet.id, level: pet.level, banner: petLevelUp(growth, pet) })
+    setGrowth({ id: pet.id, level: pet.level, banner: petLevelUp(growth, pet), from: growth.level })
+  // 레벨이 오르며 실제로 새로 고를 수 있게 된 소품만 알린다. 서버 카탈로그의 minLevel 기준이다.
+  const unlockedItems =
+    growth.banner !== null && game ? newlyAvailablePetItems(game, growth.from, growth.banner) : []
   const [selectedItem, setItem] = useState<PetCatalogItem | null>(null)
   const [snack, setSnack] = useState<PetStageSnapshot['snack']>(null)
   const [reducedMotion, setReducedMotion] = useState(false)
@@ -376,6 +386,8 @@ export function PetRoom({
               {growth.banner !== null && !active && (
                 <p className={styles.levelUp} role="status">
                   <PetGlyph kind="star" /> Lv.{growth.banner} 달성! {pet.name} 한 뼘 자랐어요
+                  {unlockedItems.length > 0 &&
+                    ` · 새 소품 ${unlockedItems.length}개를 상점에서 고를 수 있어요`}
                 </p>
               )}
             </PetStage>

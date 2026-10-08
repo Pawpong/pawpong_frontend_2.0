@@ -54,6 +54,15 @@ export function filterPetCatalog(
     })
 }
 
+/** 레벨이 from에서 to로 오르며 새로 고를 수 있게 된 미보유 소품. 가격이 낮은 순. */
+export function newlyAvailablePetItems(game: PetGameState, from: number, to: number) {
+  return game.catalog
+    .filter(
+      (item) => item.minLevel > from && item.minLevel <= to && !game.inventory.includes(item.id),
+    )
+    .sort((a, b) => a.price - b.price || a.id.localeCompare(b.id))
+}
+
 /** 아직 다 모으지 못한 모음 중 남은 별사탕이 가장 적은 것. 모두 모았으면 null. */
 export function nextPetCollection(game: PetGameState) {
   return (
