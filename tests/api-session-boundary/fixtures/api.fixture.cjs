@@ -75,19 +75,31 @@ function apiFixture() {
   }
   const reads = load('src/shared/api/authReadRequest.ts', deps)
   const writes = load('src/shared/api/authWriteRequest.ts', deps)
+  const sharedApi = {
+    apiClient,
+    API_VERSION: '/api/v2',
+    ...unwrap,
+    ...reads,
+    ...writes,
+    ...session,
+    ...tokens,
+    ...deps['./authWriteRetryRequiredError'],
+  }
   const api = load('src/entities/ai-image/api/aiImage.api.ts', {
-    '@/shared/api': {
-      apiClient,
-      API_VERSION: '/api/v2',
-      ...unwrap,
-      ...reads,
-      ...writes,
-      ...session,
-      ...tokens,
-    },
+    '@/shared/api': sharedApi,
     '@/shared/lib/authReadSession': session,
   })
-  return { state, apiClient, api, session, recovery, ApiError: unwrap.ApiError }
+  return {
+    state,
+    apiClient,
+    api,
+    session,
+    recovery,
+    sharedApi,
+    tokens,
+    lifecycle,
+    ApiError: unwrap.ApiError,
+  }
 }
 function unauthorized(config) {
   throw new axios.AxiosError('인증 만료', 'ERR_BAD_REQUEST', config, null, {
