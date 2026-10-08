@@ -1,4 +1,12 @@
-import { apiClient, API_VERSION, unwrap, unwrapVoid } from '@/shared/api'
+import {
+  apiClient,
+  API_VERSION,
+  unwrap,
+  unwrapVoid,
+  withAuthWriteSession,
+  getAuthReadSession,
+  type AuthReadSession,
+} from '@/shared/api'
 import { mapCommunityPostDetail, type RawCommunityPostDetail } from '@/entities/community'
 import {
   captureCommunityWriteSession,
@@ -73,13 +81,16 @@ export const deleteCommunityPost = async (postId: string): Promise<CommunityPost
 export const createCommunityComment = async (
   postId: string,
   data: CreateCommunityCommentRequest,
+  session: AuthReadSession | null = getAuthReadSession(),
 ): Promise<{ commentId: string }> => {
-  const response = await apiClient.post<ApiResponseFull<{ commentId: string }>>(
-    `${API_VERSION}/community/posts/${postId}/comments`,
-    data,
-    { timeout: 15_000 },
-  )
-  return unwrap(response, '댓글 작성에 실패했습니다.')
+  return withAuthWriteSession(async (config) => {
+    const response = await apiClient.post<ApiResponseFull<{ commentId: string }>>(
+      `${API_VERSION}/community/posts/${postId}/comments`,
+      data,
+      { ...config, timeout: 15_000 },
+    )
+    return unwrap(response, '댓글 작성에 실패했습니다.')
+  }, session)
 }
 
 /** 댓글 수정 */

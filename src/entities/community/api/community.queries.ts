@@ -119,10 +119,14 @@ export const communityQueries = {
 
   commentsForPost: (postId: string) => [...communityQueries.commentsAll(), postId] as const,
 
-  comments: (postId: string, pageSize = 20) =>
+  comments: (
+    postId: string,
+    pageSize = 20,
+    session: AuthReadSession | null = getAuthReadSession(),
+  ) =>
     createInfiniteQuery({
-      queryKey: [...communityQueries.commentsForPost(postId), pageSize],
-      queryFn: (page) => getCommunityComments(postId, { page, pageSize }),
+      queryKey: [...communityQueries.commentsForPost(postId), pageSize, session?.scope ?? 'guest'],
+      queryFn: (page, signal) => getCommunityComments(postId, { page, pageSize }, signal, session),
       enabled: !!postId,
       staleTime: STALE_TIME.DEFAULT,
     }),

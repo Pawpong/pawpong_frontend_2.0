@@ -4,6 +4,7 @@ import {
   unwrap,
   withAuthReadSession,
   getAuthReadSession,
+  ApiError,
   type AuthReadSession,
 } from '@/shared/api'
 import { parseCommunityPostReview } from '../model/communityReview'
@@ -294,15 +295,23 @@ export const getMyDraftPosts = async (
 export const getCommunityComments = async (
   postId: string,
   params: { page?: number; pageSize?: number } = {},
+  signal?: AbortSignal,
+  session: AuthReadSession | null = getAuthReadSession(),
 ): Promise<PaginationResponse<CommunityComment>> => {
+  const assertCurrent = () => {
+    if (getAuthReadSession() !== session) throw new ApiError('조회하는 계정이 변경되었습니다.', 401)
+  }
+  assertCurrent()
   const query = new URLSearchParams()
   if (params.page) query.set('page', String(params.page))
   if (params.pageSize) query.set('pageSize', String(params.pageSize))
 
   const response = await apiClient.get<ApiResponseFull<PaginationResponse<RawCommunityComment>>>(
     `${API_VERSION}/community/posts/${postId}/comments?${query.toString()}`,
+    { signal },
   )
 
+  assertCurrent()
   const page = unwrap(response, '댓글 목록 조회에 실패했습니다.')
   return { ...page, items: page.items.map(mapComment) }
 }
