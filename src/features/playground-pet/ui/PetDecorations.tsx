@@ -14,7 +14,11 @@ import {
   PET_SLOT_LABELS,
   PET_SLOTS,
 } from '@/entities/playground-pet/model/room'
-import { filterPetCatalog, petCollectionProgress } from '@/entities/playground-pet/model/shop'
+import {
+  filterPetCatalog,
+  nextPetCollection,
+  petCollectionProgress,
+} from '@/entities/playground-pet/model/shop'
 import type {
   PetCatalogFilters as Filters,
   PetCatalogMode,
@@ -81,6 +85,7 @@ export function PetDecorations({
   const busy = disabled || saving
   const items = filterPetCatalog(game, level, mode, filters)
   const collections = petCollectionProgress(game)
+  const nextCollection = mode === 'shop' ? nextPetCollection(game) : null
   const ownedCount = game.catalog.filter((item) => game.inventory.includes(item.id)).length
   const availability = selected ? itemAvailability(game, selected, level) : null
   useEffect(() => {
@@ -155,6 +160,12 @@ export function PetDecorations({
             ? '마음에 드는 소품을 방에서 미리 보고 골라요.'
             : '이미 가진 소품으로 우리 아이의 방을 꾸며요.'}
         </p>
+        {nextCollection && (
+          <p>
+            {`'${nextCollection.label}' 모음까지 ${nextCollection.total - nextCollection.owned}개 남았어요 · 별사탕 ${nextCollection.remainingPrice.toLocaleString('ko-KR')}개`}
+            {game.wallet.stars >= nextCollection.remainingPrice && ' (지금 모두 모을 수 있어요)'}
+          </p>
+        )}
       </div>
       <div className={styles.slots} role="group" aria-label="방의 자리 고르기">
         {PET_SLOTS.map((slot) => {

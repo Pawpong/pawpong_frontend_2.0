@@ -152,6 +152,11 @@ export function PetRoom({
       sound.play(feedback.stars > 0)
     }
   }, [reaction, sound, feedback.stars])
+  // 캐릭터를 연결하면 포커스를 갖고 있던 연결 안내가 사라지므로 방 화면으로 포커스를 옮긴다.
+  useEffect(() => {
+    if (gameOutcome?.kind !== 'character') return
+    document.getElementById('pet-game-screen')?.focus({ preventScroll: false })
+  }, [gameOutcome])
   const now = useServerClock(view.serverTime)
   const resting = Boolean(pet.restEndsAt && now < Date.parse(pet.restEndsAt))
   const mood = petMood(pet.stats, resting)

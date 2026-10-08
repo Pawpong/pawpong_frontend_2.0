@@ -1,14 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
 import { COMMUNITY_MAX_ROUTE_POINTS } from '@/entities/community'
 import { SharedRouteMap } from '@/features/care-map'
 import {
   applyPhotoPlacePrecision,
   canSortRouteByPhotoTime,
   communityPhotoPlace,
-  photoPlacePrecisionOf,
   sortRouteByPhotoTime,
   type CommunityPhotoLocationOption,
   type CommunityPhotoPlacePrecision,
@@ -17,6 +15,7 @@ import type { CommunityExperience, CommunityRoutePoint } from '@/shared/types'
 import { CommunityPlaceSearch } from './CommunityPlaceSearch'
 import type { CarePlaceKind } from '@/entities/care-place'
 import { CommunityPhotoPlaces } from './CommunityPhotoPlaces'
+import { CommunityRoutePlaceItem } from './CommunityRoutePlaceItem'
 
 /** 다녀온 장소 연결 — 작성자가 직접 고른 공개 장소만 방문 순서대로 담는다. */
 export function CommunityRoutePicker({
@@ -50,8 +49,6 @@ export function CommunityRoutePicker({
     setCleared(null)
     onChange({ route: next, publicPlaceConfirmed: false })
   }
-  const photoOf = (point: CommunityRoutePoint) =>
-    photos.find((photo) => photo.photoIndex === point.photoIndex)
   return (
     <div className="space-y-3">
       <CommunityPhotoPlaces
@@ -189,136 +186,42 @@ export function CommunityRoutePicker({
       {route.length > 0 && (
         <ol className="space-y-2">
           {route.map((point, index) => (
-            <li key={index} className="rounded-xl border border-primary-100 bg-white p-3">
-              <div className="flex items-center gap-2">
-                <span
-                  aria-hidden
-                  className="flex size-7 shrink-0 items-center justify-center rounded-full bg-secondary-200 text-xs font-bold text-primary-700"
-                >
-                  {index + 1}
-                </span>
-                {photoOf(point) && (
-                  <span className="relative size-11 shrink-0 overflow-hidden rounded-lg bg-neutral-50">
-                    <Image
-                      src={photoOf(point)!.previewUrl}
-                      alt={`${index + 1}번 장소에 연결한 사진 ${point.photoIndex! + 1}`}
-                      fill
-                      unoptimized
-                      className="object-cover"
-                    />
-                  </span>
-                )}
-                <input
-                  aria-label={`${index + 1}번 장소 이름`}
-                  value={point.name}
-                  maxLength={60}
-                  disabled={disabled}
-                  onChange={(event) =>
-                    // 이름만 고칠 때는 좌표가 그대로라 확인을 유지한다.
-                    onChange({
-                      route: route.map((row, i) =>
-                        i === index ? { ...row, name: event.target.value } : row,
-                      ),
-                      publicPlaceConfirmed: value.publicPlaceConfirmed,
-                    })
-                  }
-                  className="min-h-11 min-w-0 flex-1 rounded-lg border border-neutral-200 bg-white px-3 text-base focus-ring tab:text-sm"
-                />
-                <button
-                  type="button"
-                  disabled={disabled}
-                  aria-label={`${index + 1}번 장소 빼기`}
-                  onClick={() => setRoute(route.filter((_, i) => i !== index))}
-                  className="min-h-11 shrink-0 rounded-lg px-3 text-sm font-semibold text-neutral-700 focus-ring hover:bg-neutral-50"
-                >
-                  빼기
-                </button>
-              </div>
-              {photoPlacePrecisionOf(point, photos) && (
-                <p className="mt-1 text-xs text-neutral-600">
-                  {photoPlacePrecisionOf(point, photos) === 'area'
-                    ? '사진 위치를 동네 정도로 흐려서 담았어요.'
-                    : '사진 위치 그대로 담았어요.'}
-                </p>
-              )}
-              <div className="mt-2 flex flex-wrap items-center gap-1">
-                <button
-                  type="button"
-                  disabled={disabled}
-                  onClick={() => setFocusPoint(point)}
-                  className="min-h-11 rounded-lg px-2 text-xs font-semibold text-primary-700 focus-ring"
-                >
-                  지도에서 보기
-                </button>
-                <button
-                  type="button"
-                  disabled={disabled}
-                  aria-label={`${index + 1}번 장소 위치 바꾸기`}
-                  onClick={() => {
-                    setEditingIndex(index)
-                    setFocusPoint(point)
-                  }}
-                  className="min-h-11 rounded-lg px-2 text-xs font-semibold text-primary-700 focus-ring"
-                >
-                  위치 바꾸기
-                </button>
-                <button
-                  type="button"
-                  disabled={disabled || index === 0}
-                  aria-label={`${index + 1}번 장소를 앞으로`}
-                  onClick={() => {
-                    const next = [...route]
-                    ;[next[index - 1], next[index]] = [next[index], next[index - 1]]
-                    setRoute(next)
-                  }}
-                  className="min-h-11 rounded-lg px-2 text-xs focus-ring disabled:opacity-40"
-                >
-                  앞으로
-                </button>
-                <button
-                  type="button"
-                  disabled={disabled || index === route.length - 1}
-                  aria-label={`${index + 1}번 장소를 뒤로`}
-                  onClick={() => {
-                    const next = [...route]
-                    ;[next[index], next[index + 1]] = [next[index + 1], next[index]]
-                    setRoute(next)
-                  }}
-                  className="min-h-11 rounded-lg px-2 text-xs focus-ring disabled:opacity-40"
-                >
-                  뒤로
-                </button>
-                {photos.length > 0 && (
-                  <select
-                    aria-label={`${index + 1}번 장소에 연결할 사진`}
-                    value={point.photoIndex ?? ''}
-                    disabled={disabled}
-                    onChange={(event) => {
-                      const { photoIndex: _photoIndex, ...place } = point
-                      const selected = event.target.value
-                      onChange({
-                        route: route.map((row, i) =>
-                          i !== index
-                            ? row
-                            : selected === ''
-                              ? place
-                              : { ...place, photoIndex: Number(selected) },
-                        ),
-                        publicPlaceConfirmed: value.publicPlaceConfirmed,
-                      })
-                    }}
-                    className="min-h-11 min-w-0 rounded-lg border border-neutral-200 bg-white px-2 text-xs focus-ring"
-                  >
-                    <option value="">사진 연결 안 함</option>
-                    {photos.map((photo) => (
-                      <option key={photo.photoIndex} value={photo.photoIndex}>
-                        사진 {photo.photoIndex + 1}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              </div>
-            </li>
+            <CommunityRoutePlaceItem
+              key={index}
+              point={point}
+              index={index}
+              count={route.length}
+              photos={photos}
+              disabled={disabled}
+              // 이름이나 연결 사진만 바꿀 때는 좌표가 그대로라 공개 장소 확인을 유지한다.
+              onRename={(name) =>
+                onChange({
+                  route: route.map((row, i) => (i === index ? { ...row, name } : row)),
+                  publicPlaceConfirmed: value.publicPlaceConfirmed,
+                })
+              }
+              onLinkPhoto={(photoIndex) =>
+                onChange({
+                  route: route.map((row, i) => {
+                    if (i !== index) return row
+                    const { photoIndex: _photoIndex, ...place } = row
+                    return photoIndex === undefined ? place : { ...place, photoIndex }
+                  }),
+                  publicPlaceConfirmed: value.publicPlaceConfirmed,
+                })
+              }
+              onRemove={() => setRoute(route.filter((_, i) => i !== index))}
+              onShow={() => setFocusPoint(point)}
+              onEditLocation={() => {
+                setEditingIndex(index)
+                setFocusPoint(point)
+              }}
+              onMove={(step) => {
+                const next = [...route]
+                ;[next[index], next[index + step]] = [next[index + step], next[index]]
+                setRoute(next)
+              }}
+            />
           ))}
         </ol>
       )}
