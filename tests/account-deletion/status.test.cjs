@@ -1,6 +1,15 @@
 const { test } = require('node:test')
 const assert = require('node:assert/strict')
-const { load, cookiePolicy, status, receiptToken, body, receiptCookie, setup, NextRequest } = require('./fixtures/deletion.fixture.cjs')
+const {
+  load,
+  cookiePolicy,
+  status,
+  receiptToken,
+  body,
+  receiptCookie,
+  setup,
+  NextRequest,
+} = require('./fixtures/deletion.fixture.cjs')
 
 for (const state of ['pending', 'processing', 'retryable', 'review_required', 'completed']) {
   test(`${state} 상태를 로그인 없이 다시 조회할 수 있으며 비밀값과 사용자 필드를 노출하지 않음`, async () => {
@@ -66,6 +75,8 @@ test('통신 오류를 일반화하고 브라우저 조회 기록을 닫아도 �
 test('일반 로그아웃이 로컬과 전달된 운영 호스트에서 같은 쿠키 만료 정책을 사용함', async () => {
   const route = load('src/app/api/auth/clear-cookie/route.ts', {
     '@/shared/lib/server/authCookies': cookiePolicy,
+    '@/shared/lib/server': load('src/shared/lib/server/sameOrigin.ts'),
+    '../_constants/auth-bff': load('src/app/api/auth/_constants/auth-bff.ts'),
   })
   for (const [host, forwarded, count] of [
     ['localhost:3000', '', 3],
