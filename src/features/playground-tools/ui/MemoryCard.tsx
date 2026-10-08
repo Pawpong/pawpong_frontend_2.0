@@ -410,7 +410,7 @@ function CardMaker({ owner, playId }: { owner: string; playId: string | null }) 
             <>
               <p>로그인 후 카드를 만들면 이야기에 바로 붙일 수 있어요.</p>
               <Link
-                href="/login?returnUrl=%2Fplayground%2Fmemory-card"
+                href={`/login?returnUrl=${encodeURIComponent(seed && playId ? `/playground/memory-card?play=${encodeURIComponent(playId)}` : '/playground/memory-card')}`}
                 className={buttonVariants({ intent: 'secondary', width: 'full' })}
               >
                 로그인하고 이야기 쓰기
@@ -419,7 +419,7 @@ function CardMaker({ owner, playId }: { owner: string; playId: string | null }) 
           ) : (
             <Button
               intent="secondary"
-              width="fill"
+              width="full"
               disabled={!cardReady}
               onClick={() => void writeStory()}
             >

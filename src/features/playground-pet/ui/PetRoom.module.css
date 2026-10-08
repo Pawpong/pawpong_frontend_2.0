@@ -910,6 +910,10 @@
 .device {
   scroll-margin-top: 76px;
 }
+/* 캐릭터 연결 안내처럼 주소 조각으로 이동하는 패널도 고정 헤더 아래에서 시작하게 한다. */
+.contentPanels > section[id] {
+  scroll-margin-top: 76px;
+}
 .deviceGameSurface:empty {
   display: none;
 }
@@ -1286,7 +1290,8 @@
   margin-top: 8px;
 }
 @media (max-width: 767px) {
-  .gameLayout[data-compact='true'] .contentPanels :is(button, input, select, a, summary) {
+  .gameLayout[data-compact='true'] .contentPanels :is(button, input, select, a, summary),
+  .gameLayout[data-compact='true'] .contentPanels > section[id] {
     scroll-margin-top: calc(var(--pet-sticky-top, 56px) + var(--pet-device-height, 360px) + 16px);
   }
   .gameLayout[data-compact='true'] .device {

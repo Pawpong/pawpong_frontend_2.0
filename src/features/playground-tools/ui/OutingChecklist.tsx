@@ -3,6 +3,7 @@
 import { useEffect, useState, useSyncExternalStore, type FormEvent } from 'react'
 import Link from 'next/link'
 import { Button, buttonVariants } from '@/shared/ui/Button'
+import { IconButton } from '@/shared/ui/IconButton'
 import {
   PixelCheckIcon,
   PixelArrowRightIcon,
@@ -92,7 +93,7 @@ function Checklist({ owner }: { owner: string }) {
         <h2 id="outing-pick" className={styles.sectionTitle}>
           오늘은 어디로 갈까요?
         </h2>
-        <div className={styles.purposeGrid} aria-label="외출 목적">
+        <div className={styles.purposeGrid} role="group" aria-label="외출 목적">
           {OUTING_TEMPLATES.map((t) => (
             <button
               key={t.id}
@@ -141,14 +142,14 @@ function Checklist({ owner }: { owner: string }) {
                 {item.custom && <small>직접 추가</small>}
               </label>
               {item.custom && (
-                <button
-                  type="button"
-                  className={styles.iconButton}
+                <IconButton
+                  size="touch"
+                  tone="danger"
                   aria-label={`${item.label} 준비물 삭제`}
                   onClick={() => dispatch({ type: 'remove', outing: data.selected, id: item.id })}
                 >
                   <CloseIcon aria-hidden className="size-4" />
-                </button>
+                </IconButton>
               )}
             </li>
           ))}
@@ -255,7 +256,9 @@ function Checklist({ owner }: { owner: string }) {
         </section>
         <Link href="/playground/memory-card" className={styles.smallCard}>
           <span className={styles.eyebrow}>사진 한 장의 기념품</span>
-          <h2>오늘의 추억 카드 만들기 ↗</h2>
+          <h2>
+            오늘의 추억 카드 만들기 <span aria-hidden>↗</span>
+          </h2>
           <p>좋아하는 사진을 골라 따뜻한 카드로 남겨보세요.</p>
         </Link>
       </aside>

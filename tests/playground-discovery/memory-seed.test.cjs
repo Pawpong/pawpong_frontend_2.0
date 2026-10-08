@@ -45,3 +45,12 @@ test('추억 카드는 화면 이동 직후에도 주소의 놀이 식별자를 
   assert.match(code, /<Suspense fallback=/)
   assert.match(code, /key=\{`\$\{owner\}:\$\{playId \?\? ''\}`\}/)
 })
+
+test('로그인하러 가도 확인된 놀이 카드 식별자만 돌아올 주소에 남김', () => {
+  const code = source('src/features/playground-tools/ui/MemoryCard.tsx')
+  assert.match(
+    code,
+    /seed && playId\s*\?\s*`\/playground\/memory-card\?play=\$\{encodeURIComponent\(playId\)\}`\s*:\s*'\/playground\/memory-card'/,
+  )
+  assert.doesNotMatch(code, /returnUrl=%2Fplayground%2Fmemory-card"/)
+})

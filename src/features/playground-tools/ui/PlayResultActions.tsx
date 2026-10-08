@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { cn } from '@/shared/lib/cn'
 import { CameraIcon, PixelArrowRightIcon, ShareIcon } from '@/shared/assets'
 import { Button, buttonVariants } from '@/shared/ui/Button'
 import { Textarea } from '@/shared/ui/Textarea'
@@ -83,14 +82,13 @@ export function PlayResultActions({
     <div className="mt-5 space-y-5">
       <div>
         <div className="flex flex-col gap-3 tab:flex-row">
-          <Link
-            href={memoryCardHref(card)}
-            className={cn(buttonVariants({ width: 'full' }), 'tab:w-auto')}
-          >
-            <CameraIcon aria-hidden className="mr-2 size-5" />
-            추억 카드로 남기기
-          </Link>
-          <div className="tab:w-auto">
+          <div>
+            <Link href={memoryCardHref(card)} className={buttonVariants({ width: 'full' })}>
+              <CameraIcon aria-hidden className="mr-2 size-5" />
+              추억 카드로 남기기
+            </Link>
+          </div>
+          <div>
             <Button intent="secondary" width="full" onClick={() => void share()} disabled={pending}>
               <ShareIcon aria-hidden className="mr-2 size-4" />
               {pending ? '공유 준비 중' : '카드 공유하기'}

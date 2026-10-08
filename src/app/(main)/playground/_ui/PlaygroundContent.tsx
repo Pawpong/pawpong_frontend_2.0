@@ -2,7 +2,6 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { cn } from '@/shared/lib/cn'
 import { useQuery } from '@tanstack/react-query'
 import { aiImageQueries } from '@/entities/ai-image'
 import { PlaygroundBilling } from '@/features/in-app-purchase'
@@ -49,19 +48,21 @@ export function PlaygroundContent() {
               우리 아이에게 어울리는 모습을 골라보세요.
             </p>
             <div className="mt-5 flex flex-col gap-3 tab:flex-row">
-              <Link
-                href="/ai-filter"
-                className={cn(buttonVariants({ width: 'full' }), 'tab:w-auto')}
-              >
-                우리 아이 사진 만들기
-                <PixelArrowRightIcon aria-hidden className="ml-2 size-4" />
-              </Link>
-              <Link
-                href="/playground/memory-card"
-                className={cn(buttonVariants({ intent: 'secondary', width: 'full' }), 'tab:w-auto')}
-              >
-                추억 카드 꾸미기
-              </Link>
+              {/* 모바일은 꽉 채우고 태블릿부터 글자 폭에 맞춘다. 버튼 계약상 폭은 감싸는 칸이 정한다. */}
+              <div>
+                <Link href="/ai-filter" className={buttonVariants({ width: 'full' })}>
+                  우리 아이 사진 만들기
+                  <PixelArrowRightIcon aria-hidden className="ml-2 size-4" />
+                </Link>
+              </div>
+              <div>
+                <Link
+                  href="/playground/memory-card"
+                  className={buttonVariants({ intent: 'secondary', width: 'full' })}
+                >
+                  추억 카드 꾸미기
+                </Link>
+              </div>
             </div>
           </div>
 
