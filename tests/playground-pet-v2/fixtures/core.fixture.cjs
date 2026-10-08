@@ -5,6 +5,7 @@ const ts = require('typescript')
 const axios = require('axios')
 const React = require('react')
 const { renderToStaticMarkup } = require('react-dom/server')
+const { requestAuthFixture } = require('../../fixtures/request-auth.fixture.cjs')
 
 function load(file, deps = {}) {
   const exports = {}
@@ -55,6 +56,7 @@ function sessionHarness() {
     axios,
     './unwrap': { ApiError },
     './token': token,
+    './requestAuthScope': requestAuthFixture(token, lifecycle),
     '@/shared/lib/authSessionLifecycle': lifecycle,
     '@/shared/lib/authSessionRecovery': recovery,
     '@/shared/config/apiBaseUrl': { getApiBaseUrl: () => 'http://fixture.invalid' },
