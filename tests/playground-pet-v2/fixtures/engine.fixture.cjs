@@ -8,7 +8,7 @@ const {
   motionSettings,
 } = require('./core.fixture.cjs')
 
-function engineFixture() {
+function engineFixture(imageBehavior) {
   const previousImage = global.Image
   let instance,
     instances = 0,
@@ -103,6 +103,7 @@ function engineFixture() {
   }
   global.Image = class {
     set src(value) {
+      if (imageBehavior) return imageBehavior(this, value)
       if (!value.includes('slow-unselected'))
         queueMicrotask(() => (value.includes('unavailable') ? this.onerror?.() : this.onload?.()))
     }
@@ -121,6 +122,7 @@ function engineFixture() {
     '@/entities/playground-pet/model/room': room,
     '@/entities/playground-pet/model/snack': snack,
     './gameAssets': { petAsset },
+    './petAssetImage': require('../../fixtures/pet-assets.fixture.cjs').image,
     './petMotion': motion,
     '../constants/pet-motion': motionSettings,
   })

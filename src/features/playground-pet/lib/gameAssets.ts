@@ -1,4 +1,5 @@
 import type { PetRoomSlot } from '@/entities/playground-pet'
+import { withPetAssetDeadline } from './petAssetDeadline'
 
 export type PetAsset = {
   url: string
@@ -34,9 +35,14 @@ export const PET_LAYER_SIZE: Record<PetRoomSlot, { width: number; height: number
 }
 
 export async function loadPetAssets(signal: AbortSignal): Promise<PetAssetManifest> {
-  const response = await fetch(`${PET_ASSET_BASE}/manifest.json`, { signal, cache: 'no-cache' })
-  if (!response.ok) throw new Error('방 그림을 준비하지 못했어요.')
-  const manifest = (await response.json()) as PetAssetManifest
+  const manifest = await withPetAssetDeadline(signal, async (request) => {
+    const response = await fetch(`${PET_ASSET_BASE}/manifest.json`, {
+      signal: request,
+      cache: 'no-cache',
+    })
+    if (!response.ok) throw new Error('방 그림을 준비하지 못했어요.')
+    return (await response.json()) as PetAssetManifest
+  })
   if (
     !manifest.assets ||
     Object.keys(manifest.assets).length !== 24 ||

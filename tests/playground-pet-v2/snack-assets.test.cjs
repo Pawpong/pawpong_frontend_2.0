@@ -107,6 +107,7 @@ test('간식 에셋 실패는 같은 세션에서 다시 읽고 선택한 게임
       '@/entities/playground-pet/model/room': room,
       '@/entities/playground-pet/model/snack': snack,
       './gameAssets': { petAsset },
+      './petAssetImage': require('../fixtures/pet-assets.fixture.cjs').image,
       './petMotion': motion,
       '../constants/pet-motion': motionSettings,
     })

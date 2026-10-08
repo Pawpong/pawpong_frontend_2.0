@@ -32,7 +32,7 @@ const room = load('src/entities/playground-pet/model/room.ts')
 const { PetCharacterResource, validatePetSheetPixels } = load(
   'src/features/playground-pet/lib/characterResource.ts',
 )
-const { petAsset, loadPetAssets } = load('src/features/playground-pet/lib/gameAssets.ts')
+const { petAsset, loadPetAssets } = require('../../fixtures/pet-assets.fixture.cjs').assets
 const motionSettings = load('src/features/playground-pet/constants/pet-motion.ts')
 const motion = load('src/features/playground-pet/lib/petMotion.ts', {
   '../constants/pet-motion': motionSettings,
