@@ -32,7 +32,12 @@ test('중복 제출은 한 번만 실행하고 화면 이탈 후 완료는 캐�
   const hook = load('src/features/community/lib/useSubmitCommunityPostForm.ts', {
     react: {
       useRef: (value) => ({ current: value }),
-      useState: () => [null, (value) => errors.push(value)],
+      useState: (initial) => [
+        initial,
+        (value) => {
+          if (initial === null) errors.push(value)
+        },
+      ],
       useEffect: (effect) => cleanups.push(effect()),
     },
     '@tanstack/react-query': {

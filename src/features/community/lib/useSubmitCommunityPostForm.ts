@@ -14,6 +14,7 @@ export const useSubmitCommunityPostForm = (postId?: string) => {
   const mounted = useRef(true)
   const inFlight = useRef<AbortController | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const mutation = useMutation({
     mutationFn: ({ input, signal }: { input: CommunityPostFormInput; signal: AbortSignal }) =>
       submitCommunityPostForm(input, postId, signal),
@@ -31,6 +32,7 @@ export const useSubmitCommunityPostForm = (postId?: string) => {
     const controller = new AbortController()
     inFlight.current = controller
     setError(null)
+    setIsSubmitting(true)
     try {
       const assertCurrent = captureCommunityWriteSession(controller.signal)
       const post = await mutation.mutateAsync({ input, signal: controller.signal })
@@ -48,8 +50,11 @@ export const useSubmitCommunityPostForm = (postId?: string) => {
         )
       return null
     } finally {
-      if (inFlight.current === controller) inFlight.current = null
+      if (inFlight.current === controller) {
+        inFlight.current = null
+        if (mounted.current) setIsSubmitting(false)
+      }
     }
   }
-  return { submit, isSubmitting: mutation.isPending, error }
+  return { submit, isSubmitting, error }
 }
