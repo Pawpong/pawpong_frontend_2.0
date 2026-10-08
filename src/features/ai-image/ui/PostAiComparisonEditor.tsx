@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { useQuery } from '@tanstack/react-query'
 import { aiImageQueries } from '@/entities/ai-image'
-import { BeforeAfterSlider, Button } from '@/shared/ui'
+import { AsyncState, BeforeAfterSlider, Button } from '@/shared/ui'
 import { PHOTO_ACCEPT } from '@/shared/lib/preparePhoto'
 import type { ComparisonPhoto } from '../lib/postAiComparison'
 import type { PostAiComparisonEditorState } from '../lib/usePostAiComparison'
@@ -70,7 +70,7 @@ export function PostAiComparisonEditor({
             </p>
           )}
           {editor.error && (
-            <p role="alert" className="text-sm text-red-500">
+            <p role="alert" className="text-sm text-error-500">
               {editor.error}
             </p>
           )}
@@ -89,7 +89,7 @@ export function PostAiComparisonEditor({
             >
               보관함에서 원본 찾기
             </Button>
-            <label className="rounded-lg border border-neutral-200 px-3 py-2 text-sm focus-within:ring-2 focus-within:ring-primary-500">
+            <label className="flex min-h-11 cursor-pointer items-center rounded-lg border border-neutral-200 px-3 text-sm focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-primary-500">
               원본 사진 선택
               <input
                 type="file"
@@ -114,9 +114,12 @@ export function PostAiComparisonEditor({
                   보관함을 불러오고 있어요…
                 </p>
               ) : archive.isError ? (
-                <Button type="button" size="sm" onClick={() => void archive.refetch()}>
-                  보관함 다시 불러오기
-                </Button>
+                <AsyncState
+                  status="error"
+                  message="보관함을 불러오지 못했어요. 글과 사진은 그대로 있어요."
+                  onRetry={() => void archive.refetch()}
+                  isRetrying={archive.isFetching}
+                />
               ) : (
                 <div className="grid max-h-72 grid-cols-3 gap-2 overflow-y-auto">
                   {(archive.data ?? [])

@@ -12,7 +12,7 @@ import { PLAYGROUND_BILLING_ENABLED } from '@/shared/config/playground'
 import { cafe24Proup } from '@/shared/lib/fonts'
 import { cn } from '@/shared/lib/cn'
 import { isAuthReadSessionCurrent } from '@/shared/lib/authReadSession'
-import { Button, ComposerSectionHeading, buttonVariants } from '@/shared/ui'
+import { AsyncState, Button, ComposerSectionHeading, buttonVariants } from '@/shared/ui'
 import { PhotoUploadField } from '@/shared/ui/PhotoUploadField'
 import { saveAiImageFile } from '../lib/aiImageFile'
 import { useAiSourcePhoto } from '../lib/useAiSourcePhoto'
@@ -249,7 +249,7 @@ export function AiFilterStudio({
               {gameCharacter && (
                 <Link
                   href="#ai-archive-heading"
-                  className="mt-3 inline-block text-sm font-semibold text-primary-700 underline"
+                  className="mt-3 inline-block text-sm font-semibold text-primary-700 underline focus-ring"
                 >
                   내 AI 사진에서 고르기
                 </Link>
@@ -276,11 +276,21 @@ export function AiFilterStudio({
         </section>
 
         {/* 2. 필터 */}
-        <section aria-labelledby="ai-filter-heading" className="min-w-0">
+        {/* 고정 헤더 아래로 숨지 않도록 이동 위치를 헤더 높이만큼 띄운다. */}
+        <section aria-labelledby="ai-filter-heading" className="min-w-0 scroll-mt-24">
           <ComposerSectionHeading id="ai-filter-heading" step={2} required>
             {gameCharacter ? '캐릭터 만들기' : '필터 고르기'}
           </ComposerSectionHeading>
-          {ai.filters.length === 0 ? (
+          {ai.filtersState === 'loading' ? (
+            <AsyncState status="loading" message="필터 목록을 불러오고 있어요." />
+          ) : ai.filtersState === 'error' ? (
+            <AsyncState
+              status="error"
+              message="필터 목록을 불러오지 못했어요. 고른 사진은 그대로 있어요."
+              onRetry={ai.retryFilters}
+              isRetrying={ai.isRetryingFilters}
+            />
+          ) : ai.filters.length === 0 ? (
             <p className="rounded-xl bg-neutral-50 p-5 text-sm text-neutral-700">
               지금은 쓸 수 있는 필터가 없어요. 곧 새 필터로 찾아올게요!
             </p>
@@ -479,6 +489,7 @@ export function AiFilterStudio({
                     ai.reset()
                     document
                       .getElementById('ai-filter-heading')
+                      ?.closest('section')
                       ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
                   }}
                 >
@@ -534,7 +545,7 @@ export function AiFilterStudio({
       {isLoggedIn && (
         <section aria-labelledby="ai-archive-heading" className="mt-14">
           <div className="mb-3 flex items-end justify-between">
-            <h2 id="ai-archive-heading" className="text-lg font-bold text-neutral-850">
+            <h2 id="ai-archive-heading" className="scroll-mt-24 text-lg font-bold text-neutral-850">
               내 AI 사진
             </h2>
             <Link href="/home?tab=ai-photos" className="text-sm font-semibold text-primary-700">
