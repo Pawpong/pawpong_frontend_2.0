@@ -1,4 +1,15 @@
-import { apiClient, API_VERSION, unwrap } from '@/shared/api'
+import {
+  apiClient,
+  API_VERSION,
+  unwrap,
+  withAuthReadSession,
+  getAuthReadSession,
+  getAccessToken,
+  ApiError,
+  type AuthReadSession,
+  type ApiRequestConfig,
+} from '@/shared/api'
+import { isAuthReadSessionCurrent } from '@/shared/lib/authReadSession'
 import type {
   AiImageFilter,
   AiImageGeneration,
@@ -60,11 +71,17 @@ export const getAiImageGeneration = async (
   jobId: string,
   options: AiImageRequestOptions = {},
 ): Promise<AiImageGeneration> => {
-  const response = await apiClient.get<ApiResponseFull<AiImageGeneration>>(
-    `${API_VERSION}/ai-image/generation/${jobId}`,
-    { timeout: STATUS_TIMEOUT, ...options },
+  return withAuthReadSession(
+    async (config) => {
+      const response = await apiClient.get<ApiResponseFull<AiImageGeneration>>(
+        `${API_VERSION}/ai-image/generation/${jobId}`,
+        { timeout: STATUS_TIMEOUT, ...options, ...config },
+      )
+      return unwrap(response, 'AI 변환 상태를 확인하지 못했습니다.')
+    },
+    getAuthReadSession(),
+    options.signal,
   )
-  return unwrap(response, 'AI 변환 상태를 확인하지 못했습니다.')
 }
 
 /**
@@ -76,12 +93,22 @@ export const getAiImageGenerationImage = async (
   jobId: string,
   options: AiImageRequestOptions = {},
 ): Promise<Blob> => {
-  const response = await apiClient.get<Blob>(`${API_VERSION}/ai-image/generation/${jobId}/image`, {
-    responseType: 'blob',
-    timeout: UPLOAD_TIMEOUT,
-    ...options,
-  })
-  return response.data
+  return withAuthReadSession(
+    async (config) => {
+      const response = await apiClient.get<Blob>(
+        `${API_VERSION}/ai-image/generation/${jobId}/image`,
+        {
+          responseType: 'blob',
+          timeout: UPLOAD_TIMEOUT,
+          ...options,
+          ...config,
+        },
+      )
+      return response.data
+    },
+    getAuthReadSession(),
+    options.signal,
+  )
 }
 
 /** 원본은 소유자 인증 후 조회한다. 모달이 닫히면 요청도 취소할 수 있다. */
@@ -89,29 +116,60 @@ export const getAiImageGenerationSourceImage = async (
   jobId: string,
   signal?: AbortSignal,
 ): Promise<Blob> => {
-  const response = await apiClient.get<Blob>(
-    `${API_VERSION}/ai-image/generation/${jobId}/source-image`,
-    {
-      responseType: 'blob',
-      timeout: UPLOAD_TIMEOUT,
-      signal,
+  return withAuthReadSession(
+    async (config) => {
+      const response = await apiClient.get<Blob>(
+        `${API_VERSION}/ai-image/generation/${jobId}/source-image`,
+        {
+          responseType: 'blob',
+          timeout: UPLOAD_TIMEOUT,
+          ...config,
+        },
+      )
+      return response.data
     },
+    getAuthReadSession(),
+    signal,
   )
-  return response.data
 }
 
 /** 내 AI 사진 보관함 (최신순, 최대 60건 — 진행 중·실패 포함) */
-export const getMyAiImageGenerations = async (): Promise<AiImageGeneration[]> => {
-  const response = await apiClient.get<ApiResponseFull<AiImageGeneration[]>>(
-    `${API_VERSION}/ai-image/generations`,
+export const getMyAiImageGenerations = async (
+  session: AuthReadSession | null = getAuthReadSession(),
+  signal?: AbortSignal,
+): Promise<AiImageGeneration[]> => {
+  return withAuthReadSession(
+    async (config) => {
+      const response = await apiClient.get<ApiResponseFull<AiImageGeneration[]>>(
+        `${API_VERSION}/ai-image/generations`,
+        config,
+      )
+      return unwrap(response, 'AI 사진 보관함을 불러오지 못했습니다.')
+    },
+    session,
+    signal,
   )
-  return unwrap(response, 'AI 사진 보관함을 불러오지 못했습니다.')
 }
 
 /** 보관함에서 지우기 (기록은 남아 하루 횟수에는 포함된다) */
-export const hideAiImageGeneration = async (jobId: string): Promise<void> => {
+export const hideAiImageGeneration = async (
+  jobId: string,
+  signal?: AbortSignal,
+  session: AuthReadSession | null = getAuthReadSession(),
+): Promise<void> => {
+  if (!session || !isAuthReadSessionCurrent(session) || signal?.aborted)
+    throw new ApiError('로그인 정보를 확인한 뒤 다시 시도해 주세요.', 401)
+  const config: ApiRequestConfig = {
+    signal,
+    headers: { Authorization: `Bearer ${getAccessToken()}` },
+    skipAuth: true,
+    skipAuthRefresh: true,
+  }
   const response = await apiClient.delete<ApiResponseFull<{ jobId: string; hidden: boolean }>>(
     `${API_VERSION}/ai-image/generation/${jobId}`,
+    config,
   )
+  if (!isAuthReadSessionCurrent(session) || signal?.aborted)
+    throw new DOMException('보관함 작업이 취소되었습니다.', 'AbortError')
   unwrap(response, '보관함에서 지우지 못했습니다.')
 }

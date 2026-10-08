@@ -7,6 +7,7 @@ import { usePurchases } from '@/features/in-app-purchase'
 import { featureAllowance } from '@/entities/iap'
 import { useQuery } from '@tanstack/react-query'
 import { petConfigOptions } from '@/entities/playground-pet'
+import { useAuthReadSession } from '@/shared/lib/useAuthReadSession'
 
 /** 로그인 상태는 여기서 읽어 넘긴다 — 기능 슬라이스끼리 직접 참조하지 않도록 */
 export const AiFilterContent = ({
@@ -17,6 +18,7 @@ export const AiFilterContent = ({
   sourceJobId?: string
 }) => {
   const { isLoggedIn } = useMe()
+  const session = useAuthReadSession()
   const billing = usePurchases()
   const { refresh } = billing
   const petConfig = useQuery({
@@ -36,11 +38,17 @@ export const AiFilterContent = ({
     )
   return (
     <AiFilterStudio
-      key={JSON.stringify([gameCharacter, sourceJobId, billing.memberId, billing.generation])}
+      key={JSON.stringify([
+        gameCharacter,
+        sourceJobId,
+        session?.scope,
+        billing.memberId,
+        billing.generation,
+      ])}
       gameCharacter={gameCharacter}
       sourceJobId={gameCharacter ? sourceJobId : undefined}
       sessionGeneration={billing.generation}
-      isLoggedIn={isLoggedIn}
+      isLoggedIn={isLoggedIn && !!session}
       allowance={
         billing.account.isError ? undefined : featureAllowance(billing.account.data, 'ai_image')
       }

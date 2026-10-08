@@ -17,7 +17,7 @@ const CommunityWritePage = async ({
   return (
     <CommunityPostEditor
       initialRecord={typeof experience === 'string' ? experience : undefined}
-      photoSource={source === 'memory-card' ? 'memory-card' : undefined}
+      photoSource={source === 'memory-card' || source === 'ai-photo' ? source : undefined}
       returnTo={typeof returnTo === 'string' ? returnTo : undefined}
     />
   )

@@ -2,6 +2,8 @@ const { test } = require('node:test')
 const assert = require('node:assert/strict')
 const fs = require('node:fs')
 const ts = require('typescript')
+const { notificationFixture } = require('./notifications/fixtures/notification.fixture.cjs')
+const auth = notificationFixture()
 
 function load(file, dependencies = {}) {
   const code = ts.transpileModule(fs.readFileSync(file, 'utf8'), {
@@ -13,6 +15,19 @@ function load(file, dependencies = {}) {
   }).outputText
   const output = {}
   new Function('exports', 'require', code)(output, (name) => {
+    if (name === '@/shared/lib/authReadSession') return auth.session
+    if (name === '@/shared/lib/useAuthReadSession')
+      return { useAuthReadSession: auth.session.getAuthReadSession }
+    if (name === '@/shared/api/token') return { getAccessToken: () => auth.state.token }
+    if (name === '@/shared/api/unwrap') return dependencies[name] ?? { ApiError: auth.ApiError }
+    if (name === '@/shared/api')
+      return {
+        withAuthReadSession: auth.withAuthReadSession,
+      getAuthReadSession: auth.session.getAuthReadSession,
+      getAccessToken: () => auth.state.token,
+      ApiError: dependencies['@/shared/api/unwrap']?.ApiError ?? auth.ApiError,
+        ...dependencies[name],
+      }
     if (name === '@/shared/config/apiDiagnosticRoutes') {
       return load('src/shared/config/apiDiagnosticRoutes.ts')
     }
@@ -37,7 +52,7 @@ const job = (status = 'queued', jobId = 'fixture-job') => ({
   completedAt: null,
 })
 const input = { file: new File(['fixture'], 'pet.png'), filterId: 'fixture-filter' }
-test('game generation fails closed after config refetch error even with enabled cached data; photo studio stays usable', () => {
+test('캐시된 설정이 활성화여도 재조회 실패 시 캐릭터 생성을 잠그고 일반 사진은 유지함', () => {
   let config = { data: { enabled: true }, isPending: false, isError: true }
   const options = []
   const studio = () => null
@@ -72,7 +87,7 @@ test('game generation fails closed after config refetch error even with enabled 
   config = { ...config, isError: false }
   assert.equal(AiFilterContent({ gameCharacter: true }).type, studio)
 })
-test('game generation shares live config polling and stale-focus refresh, including cached-data errors', async (t) => {
+test('캐릭터 생성은 설정 폴링과 화면 복귀 갱신 및 캐시된 설정의 오류를 공유함', async (t) => {
   const previousWindow = global.window
   global.window = { addEventListener() {}, removeEventListener() {} }
   const { QueryClient, QueryObserver, focusManager } = require('@tanstack/react-query')
@@ -232,7 +247,7 @@ function mount(overrides = {}) {
   }
 }
 
-test('only an explicit game generation sends its purpose; both paths keep one normal result download', async () => {
+test('명시적인 캐릭터 생성에만 목적을 전달하고 결과 사진은 한 번 내려받음', async () => {
   for (const purpose of [undefined, 'pet-sprite-v1']) {
     const hook = mount({ request: () => job('succeeded') })
     const result = await hook
@@ -251,7 +266,7 @@ test('only an explicit game generation sends its purpose; both paths keep one no
   }
 })
 
-test('a polling timeout recovers the same job without replaying the generation POST', async (t) => {
+test('폴링 시간 초과는 생성 요청을 반복하지 않고 같은 작업을 복구함', async (t) => {
   clock(t)
   let attempts = 0
   const hook = mount({
@@ -278,7 +293,7 @@ test('a polling timeout recovers the same job without replaying the generation P
   assert.equal(hook.calls.status[0][1].timeout, 10000)
 })
 
-test('same-tick clicks share one upload and generation request', async (t) => {
+test('연속 클릭은 하나의 업로드와 생성 요청을 공유함', async (t) => {
   clock(t)
   const accepted = deferred()
   const hook = mount({ request: () => accepted.promise })
@@ -295,7 +310,7 @@ test('same-tick clicks share one upload and generation request', async (t) => {
   await first
 })
 
-test('a four-minute wait is pending, and resume only reads the original job', async (t) => {
+test('네 분 대기는 확인 대기 상태가 되고 재확인은 기존 작업만 조회함', async (t) => {
   clock(t)
   const hook = mount()
   const work = hook.render().transform(input)
@@ -313,7 +328,7 @@ test('a four-minute wait is pending, and resume only reads the original job', as
   assert.equal(hook.calls.upload.length, 1)
 })
 
-test('lost generation acknowledgement is not retried and directs the user to the archive', async () => {
+test('생성 접수 응답이 유실되면 재요청하지 않고 보관함으로 안내함', async () => {
   const hook = mount({
     request: () => {
       throw new ApiError('timeout of 30000ms exceeded')
@@ -328,7 +343,7 @@ test('lost generation acknowledgement is not retried and directs the user to the
   assert.equal(hook.calls.status.length, 0)
 })
 
-test('a failed source upload never sends a generation request or displays raw technical errors', async () => {
+test('원본 업로드 실패 시 생성을 요청하거나 내부 오류를 노출하지 않음', async () => {
   const hook = mount({
     upload: () => {
       throw new ApiError('Network Error')
@@ -341,7 +356,7 @@ test('a failed source upload never sends a generation request or displays raw te
   assert.equal(hook.calls.request.length, 0)
 })
 
-test('rejected animal classification preserves its actionable message without retrying', async () => {
+test('동물 분류 거절은 재시도하지 않고 조치 가능한 안내를 유지함', async () => {
   const hook = mount({
     request: () => {
       throw new ApiError('동물이 잘 보이는 사진을 올려 주세요.', 400)
@@ -354,7 +369,7 @@ test('rejected animal classification preserves its actionable message without re
   assert.equal(hook.calls.request.length, 1)
 })
 
-test('an authoritative failed job is not mislabelled as a connection interruption', async (t) => {
+test('서버에서 실패한 작업을 연결 중단으로 잘못 안내하지 않음', async (t) => {
   clock(t)
   const hook = mount({ status: () => ({ ...job('failed'), errorCode: 'INPUT_DOWNLOAD_FAILED' }) })
   const work = hook.render().transform(input)
@@ -366,7 +381,7 @@ test('an authoritative failed job is not mislabelled as a connection interruptio
   assert.equal(hook.calls.image.length, 0)
 })
 
-test('a transient result download failure retries the completed job instead of generating again', async (t) => {
+test('일시적인 결과 다운로드 실패는 새 생성 없이 완성된 작업만 재조회함', async (t) => {
   clock(t)
   let downloads = 0
   const hook = mount({
@@ -385,7 +400,7 @@ test('a transient result download failure retries the completed job instead of g
   assert.equal(hook.calls.image.length, 2)
 })
 
-test('a long download interruption retains a completed job for quota-free resume', async (t) => {
+test('다운로드가 오래 중단되어도 횟수 차감 없이 다시 확인하도록 완성 작업을 유지함', async (t) => {
   clock(t)
   let offline = true
   const hook = mount({
@@ -408,7 +423,7 @@ test('a long download interruption retains a completed job for quota-free resume
   assert.equal(hook.calls.status.length, 1)
 })
 
-test('authentication errors stop polling rather than retrying forever', async (t) => {
+test('인증 오류는 무한 재시도하지 않고 폴링을 중단함', async (t) => {
   clock(t)
   const hook = mount({
     status: () => {
@@ -424,7 +439,7 @@ test('authentication errors stop polling rather than retrying forever', async (t
   assert.equal(hook.calls.status.length, 1)
 })
 
-test('reset aborts the request and an old acknowledgement cannot replace the new job', async (t) => {
+test('초기화는 요청을 취소하고 오래된 접수 응답이 새 작업을 덮어쓰지 못하게 함', async (t) => {
   clock(t)
   const old = deferred()
   let requests = 0
@@ -448,7 +463,7 @@ test('reset aborts the request and an old acknowledgement cannot replace the new
   )
 })
 
-test('unmount cancels a retry wait without sending further requests', async (t) => {
+test('화면 종료는 재시도 대기를 취소하고 추가 요청을 보내지 않음', async (t) => {
   clock(t)
   const hook = mount({
     status: () => {
@@ -465,7 +480,7 @@ test('unmount cancels a retry wait without sending further requests', async (t) 
   assert.equal(hook.calls.status[0][1].signal.aborted, true)
 })
 
-test('only transient API failures are retryable, and unknown errors are not exposed', () => {
+test('일시적인 API 실패만 재시도하고 알 수 없는 오류는 노출하지 않음', () => {
   for (const status of [undefined, 408, 429, 500, 502, 503, 504])
     assert.equal(recovery.isRetryableAiImageError(new ApiError('fixture', status)), true)
   for (const status of [200, 400, 401, 403, 404, 409, 422])
@@ -481,7 +496,7 @@ test('only transient API failures are retryable, and unknown errors are not expo
     )
 })
 
-test('a read deadline bounds the next request and stops additional reads', async (t) => {
+test('조회 제한 시간은 다음 요청의 시간을 제한하고 추가 조회를 중단함', async (t) => {
   clock(t)
   let remaining,
     reads = 0
@@ -501,7 +516,7 @@ test('a read deadline bounds the next request and stops additional reads', async
   assert.equal(reads, 1)
 })
 
-test('API wrappers pass cancellation and bounded read timeouts without auto-retrying writes', async () => {
+test('API는 취소 신호와 조회 제한 시간을 전달하고 쓰기를 자동 재실행하지 않음', async () => {
   const calls = []
   const apiClient = {
     post: async (...args) => {
@@ -533,7 +548,7 @@ test('API wrappers pass cancellation and bounded read timeouts without auto-retr
   assert.equal(calls[4][2].responseType, 'blob')
 })
 
-test('archive refreshes only while pending jobs exist and never enables anonymous reads', () => {
+test('보관함은 대기 작업이 있을 때만 갱신하고 익명 조회를 허용하지 않음', () => {
   const { aiImageQueries } = load('src/entities/ai-image/api/aiImage.queries.ts', {
     '@tanstack/react-query': { queryOptions: (config) => config },
     '@/shared/api': { createQuery: (config) => config, STALE_TIME: { REALTIME: 0 } },
@@ -548,7 +563,7 @@ test('archive refreshes only while pending jobs exist and never enables anonymou
 })
 
 test(
-  'the actual Axios client recovers a timed-out HTTP status response without a second POST',
+  '실제 Axios 클라이언트는 추가 생성 없이 시간 초과된 HTTP 상태 응답을 복구함',
   { timeout: 12000 },
   async () => {
     const http = require('node:http')
@@ -676,7 +691,7 @@ function studioMarkup(phase, canResume = true, props = {}) {
   return renderToStaticMarkup(React.createElement(AiFilterStudio, { isLoggedIn: true, ...props }))
 }
 
-test('pending feedback offers read-only recovery and the archive instead of another generation button', () => {
+test('확인 대기 안내는 새 생성 대신 읽기 전용 재확인과 보관함을 제공함', () => {
   const markup = studioMarkup('pending')
   assert.match(markup, /결과 다시 확인/)
   assert.match(markup, /보관함 확인/)
@@ -685,14 +700,14 @@ test('pending feedback offers read-only recovery and the archive instead of anot
   assert.doesNotMatch(studioMarkup('pending', false), /결과 다시 확인/)
 })
 
-test('reconnecting feedback explains the existing job and does not claim a generation failure', () => {
+test('재연결 안내는 기존 작업을 설명하고 생성 실패로 표시하지 않음', () => {
   const markup = studioMarkup('reconnecting')
   assert.match(markup, /같은 사진의 결과를 다시 확인/)
   assert.match(markup, /생성 횟수를 추가로 쓰지 않/)
   assert.doesNotMatch(markup, /timeout of|role="alert"/)
 })
 
-test('before billing launch the studio shows the free allowance without credit purchase navigation', () => {
+test('결제 출시 전에는 이용권 구매 이동 없이 무료 횟수만 표시함', () => {
   const markup = studioMarkup('idle', true, {
     allowance: { remaining: 0, freeRemaining: 0, dailyFreeLimit: 3, enabled: true },
   })
