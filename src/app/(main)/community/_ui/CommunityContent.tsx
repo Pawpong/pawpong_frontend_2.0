@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { ActivityBadgeRow } from '@/entities/gamification'
+import { ActivityBadgeRow, BreederLevelBadge } from '@/entities/gamification'
 import { ActivityEntry, usePublicActivityBadges } from '@/features/gamification'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
@@ -305,13 +305,25 @@ const CommunityContent = () => {
                       preload={post.postId === firstPhotoPostId}
                       guard={guard}
                       badgeSlot={
-                        <ActivityBadgeRow
-                          badges={
-                            badgesByOwner.get(
-                              `${post.authorModel === 'Breeder' ? 'breeder' : 'adopter'}:${post.authorId}`,
-                            ) ?? []
-                          }
-                        />
+                        <>
+                          <BreederLevelBadge
+                            level={
+                              authorBadges.find(
+                                (owner) =>
+                                  owner.ownerId === post.authorId &&
+                                  owner.role ===
+                                    (post.authorModel === 'Breeder' ? 'breeder' : 'adopter'),
+                              )?.level
+                            }
+                          />
+                          <ActivityBadgeRow
+                            badges={
+                              badgesByOwner.get(
+                                `${post.authorModel === 'Breeder' ? 'breeder' : 'adopter'}:${post.authorId}`,
+                              ) ?? []
+                            }
+                          />
+                        </>
                       }
                       metaSlot={
                         experienceEnabled ? (

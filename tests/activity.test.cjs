@@ -1,57 +1,38 @@
 const { test } = require('node:test')
 const assert = require('node:assert/strict')
-const { NextRequest } = require('next/server')
 const { createElement } = require('react')
 const { renderToStaticMarkup } = require('react-dom/server')
 const { loadTypescript: load } = require('./helpers/load-typescript.cjs')
 
-test('활동 설정은 정확한 개발 호스트에서만 조회하고 운영은 외부 호출 없이 닫는다', async () => {
-  let calls = 0
-  const route = load(
+const configRoute = (fetch, base = 'https://api.example.test/') =>
+  load(
     'src/app/api/gamification/config/route.ts',
     {},
-    {
-      process: { env: { NEXT_PUBLIC_APP_ENV: 'development' } },
-      fetch: async () => {
-        calls++
-        return Response.json({ success: true, data: { enabled: true } })
-      },
-    },
+    { process: { env: base ? { NEXT_PUBLIC_API_BASE_URL: base } : {} }, fetch },
   )
-  for (const host of ['pawpong.kr', 'dev.pawpong.kr.example.test', 'preview.vercel.app']) {
-    const response = await route.GET(
-      new NextRequest(`https://${host}/api/gamification/config`, { headers: { host } }),
-    )
-    assert.equal((await response.json()).enabled, false)
-    assert.match(response.headers.get('cache-control'), /no-store/)
+
+test('활동 설정은 API 주소가 없으면 외부 호출 없이 닫고, 있으면 백엔드 플래그를 그대로 전달한다', async () => {
+  const urls = []
+  const fetch = async (url) => {
+    urls.push(url)
+    return Response.json({ success: true, data: { enabled: true, breederLevelPublic: true } })
   }
-  assert.equal(calls, 0)
-  const response = await route.GET(
-    new NextRequest('https://dev.pawpong.kr/api/gamification/config', {
-      headers: { host: 'dev.pawpong.kr' },
-    }),
-  )
-  assert.equal((await response.json()).enabled, true)
-  assert.equal(calls, 1)
+  const closed = await configRoute(fetch, '').GET()
+  assert.deepEqual(await closed.json(), { enabled: false, breederLevelPublic: false })
+  assert.match(closed.headers.get('cache-control'), /no-store/)
+  assert.equal(urls.length, 0)
+  const open = await configRoute(fetch).GET()
+  assert.deepEqual(await open.json(), { enabled: true, breederLevelPublic: true })
+  assert.match(open.headers.get('cache-control'), /no-store/)
+  assert.deepEqual(urls, ['https://api.example.test/api/v2/gamification/config'])
 })
 
 test('설정 조회 실패는 활동 UI를 열지 않는다', async () => {
-  const route = load(
-    'src/app/api/gamification/config/route.ts',
-    {},
-    {
-      fetch: async () => {
-        throw new Error('fixture unavailable')
-      },
-    },
-  )
-  const response = await route.GET(
-    new NextRequest('https://dev.pawpong.kr/api/gamification/config', {
-      headers: { host: 'dev.pawpong.kr' },
-    }),
-  )
+  const response = await configRoute(async () => {
+    throw new Error('fixture unavailable')
+  }).GET()
   assert.equal(response.status, 503)
-  assert.equal((await response.json()).enabled, false)
+  assert.deepEqual(await response.json(), { enabled: false, breederLevelPublic: false })
 })
 
 const fixtureSession = {
@@ -145,20 +126,11 @@ test('도트 배지는 접근성 이름을 제공하고 커뮤니티에는 최�
 })
 
 test('선택 배포 전 404는 비활성 설정으로 처리하고 config 오류는 화면 경계로 던지지 않는다', async () => {
-  const route = load(
-    'src/app/api/gamification/config/route.ts',
-    {},
-    {
-      fetch: async () => new Response('not deployed', { status: 404 }),
-    },
-  )
-  const response = await route.GET(
-    new NextRequest('https://dev.pawpong.kr/api/gamification/config', {
-      headers: { host: 'dev.pawpong.kr' },
-    }),
-  )
+  const response = await configRoute(
+    async () => new Response('not deployed', { status: 404 }),
+  ).GET()
   assert.equal(response.status, 200)
-  assert.deepEqual(await response.json(), { enabled: false })
+  assert.deepEqual(await response.json(), { enabled: false, breederLevelPublic: false })
   assert.equal(activityApi().activityConfigOptions.throwOnError, false)
 })
 
@@ -268,7 +240,11 @@ test('배지함은 획득한 배지만 선택하며 3개 한도에서 추가 선
     updatedAt: '2026-10-06',
   })
   const { ActivityDashboard } = load('src/features/gamification/ui/ActivityDashboard.tsx', {
-    '@/entities/gamification': { PixelActivityBadge: () => null },
+    '@/entities/gamification': {
+      PixelActivityBadge: () => null,
+      BreederLevelBadge: () => null,
+      ACTIVITY_LABELS: { comment: '댓글' },
+    },
     '@/shared/ui': { Button: (props) => createElement('button', props) },
     '@/shared/lib/fonts': { cafe24Proup: { className: '' } },
     './activity.module.css': { default: {} },
@@ -289,26 +265,40 @@ test('배지함은 획득한 배지만 선택하며 3개 한도에서 추가 선
   client.clear()
 })
 
-test('배지함 직접 진입은 비활성·설정 오류·비로그인 상태에서 개인 대시보드를 마운트하지 않는다', () => {
+test('마이홈 활동 탭은 비활성·설정 오류·다른 계정 세션에서 개인 대시보드를 마운트하지 않는다', () => {
   const scenarios = [
-    { config: { data: { enabled: false } }, isLoggedIn: true, message: '개발 환경' },
-    { config: { data: { enabled: true }, isError: true }, isLoggedIn: true, message: '개발 환경' },
-    { config: { data: { enabled: true } }, isLoggedIn: false, message: '로그인 후' },
+    { config: { data: { enabled: false } }, session: fixtureSession, userId: 'fixture-user' },
+    {
+      config: { data: { enabled: true }, isError: true },
+      session: fixtureSession,
+      userId: 'fixture-user',
+    },
+    { config: { data: { enabled: true } }, session: null, userId: 'fixture-user' },
+    { config: { data: { enabled: true } }, session: fixtureSession, userId: 'previous-account' },
+    { config: { data: { enabled: true } }, session: fixtureSession, userId: undefined },
   ]
-  for (const scenario of scenarios) {
-    const { ActivityContent } = load('src/app/(main)/my-activity/_ui/ActivityContent.tsx', {
+  const mount = (scenario, dashboard) =>
+    load('src/features/gamification/ui/MyHomeActivity.tsx', {
       '@tanstack/react-query': { useQuery: () => scenario.config },
-      '@/features/auth': {
-        useMe: () => ({ isLoggedIn: scenario.isLoggedIn, me: { userId: 'previous-account' } }),
-      },
       '@/entities/gamification': { activityConfigOptions: {} },
-      '@/features/gamification': {
-        useActivitySession: () => fixtureSession,
-        ActivityDashboard: () => {
-          throw new Error('private dashboard must not mount')
-        },
-      },
+      '../lib/useActivitySession': { useActivitySession: () => scenario.session },
+      './ActivityDashboard': { ActivityDashboard: dashboard },
+    }).MyHomeActivity
+  for (const scenario of scenarios) {
+    const MyHomeActivity = mount(scenario, () => {
+      throw new Error('private dashboard must not mount')
     })
-    assert.match(renderToStaticMarkup(createElement(ActivityContent)), new RegExp(scenario.message))
+    assert.equal(
+      renderToStaticMarkup(createElement(MyHomeActivity, { userId: scenario.userId })),
+      '',
+    )
   }
+  const MyHomeActivity = mount(
+    { config: { data: { enabled: true } }, session: fixtureSession },
+    ({ session }) => createElement('p', null, `dashboard:${session.ownerId}`),
+  )
+  assert.equal(
+    renderToStaticMarkup(createElement(MyHomeActivity, { userId: 'fixture-user' })),
+    '<p>dashboard:fixture-user</p>',
+  )
 })

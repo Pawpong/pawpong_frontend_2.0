@@ -1,5 +1,6 @@
 'use client'
 
+import { usePublicActivityBadges } from '@/features/gamification'
 import { Button, DeleteConfirmModal, InfiniteScrollTrigger, ListState } from '@/shared/ui'
 import type { CommunityComment } from '@/shared/types'
 import { CommentItem } from './CommentItem'
@@ -24,12 +25,27 @@ const CommentList = ({ thread }: CommentListProps) => {
     handleReply,
   } = thread
 
+  const authors = threads.flatMap((item) => [...(item.root ? [item.root] : []), ...item.replies])
+  const levels = usePublicActivityBadges(
+    authors.map((comment) => ({
+      ownerId: comment.authorId,
+      role: comment.authorModel === 'Breeder' ? 'breeder' : 'adopter',
+    })),
+  )
+  const levelFor = (comment: CommunityComment) =>
+    levels.find(
+      (owner) =>
+        owner.ownerId === comment.authorId &&
+        owner.role === (comment.authorModel === 'Breeder' ? 'breeder' : 'adopter'),
+    )?.level
+
   // 삭제된 부모 아래 답글은 답글달기를 막는다 — 이미 없는 parentCommentId로 다시 작성하게 된다
   const renderReplies = (replies: CommunityComment[], canReply: boolean) =>
     replies.map((reply) => (
       <CommentItem
         key={reply.commentId}
         comment={reply}
+        level={levelFor(reply)}
         actions={actions}
         onReply={canReply ? handleReply : undefined}
         replyDisabled={thread.isSubmitting}
@@ -86,6 +102,7 @@ const CommentList = ({ thread }: CommentListProps) => {
             {/* root가 없으면 삭제된 댓글 — 자리만 남기고 답글은 그대로 보여준다 */}
             {item.root ? (
               <CommentItem
+                level={levelFor(item.root)}
                 comment={item.root}
                 actions={actions}
                 onReply={handleReply}

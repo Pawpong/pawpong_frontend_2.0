@@ -1,3 +1,4 @@
+import type { ActivityLevel, BreederLevel } from './levels'
 export interface ActivityBadge {
   key: string
   title: string
@@ -9,6 +10,9 @@ export interface ActivityBadge {
 }
 export interface ActivityView {
   policyVersion: string
+  level: ActivityLevel
+  previousLevel: number | null
+  levelChangedAt: string | null
   totalExp: number
   revision: number
   updatedAt: string | null
@@ -18,7 +22,7 @@ export interface ActivityView {
   history: Array<{
     kind: string
     delta: number
-    reason: 'earned' | 'revoked' | 'restored'
+    reason: 'earned' | 'revoked' | 'restored' | 'adjusted'
     at: string
   }>
 }
@@ -33,5 +37,6 @@ export interface ActivityBadgeOwner {
   role: 'adopter' | 'breeder'
 }
 export interface PublicActivityBadges extends ActivityBadgeOwner {
+  level: BreederLevel | null
   badges: PublicActivityBadge[]
 }

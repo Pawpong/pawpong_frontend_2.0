@@ -43,6 +43,7 @@ const nextConfig: NextConfig = {
     localPatterns: [
       { pathname: '/images/**' },
       { pathname: '/playground/**' },
+      { pathname: '/gamification/**' },
       { pathname: '/_next/static/media/**' },
       { pathname: '/*.svg' },
     ],

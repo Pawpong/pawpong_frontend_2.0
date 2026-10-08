@@ -1,5 +1,6 @@
 'use client'
 
+import { usePublicActivityBadges } from '@/features/gamification'
 import { useMemo, useState } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { Container, InfiniteScrollTrigger, ListState, ListingCardGrid } from '@/shared/ui'
@@ -59,6 +60,9 @@ const BreederExploreContent = ({ category, keyword }: BreederExploreContentProps
     () => dedupeBy(flattenPages(data).map(toBreederCardModel), (breeder) => breeder.id),
     [data],
   )
+  const levels = usePublicActivityBadges(
+    breeders.map((breeder) => ({ ownerId: breeder.id, role: 'breeder' })),
+  )
   const totalCount = getTotalItems(data)
 
   return (
@@ -87,7 +91,11 @@ const BreederExploreContent = ({ category, keyword }: BreederExploreContentProps
             items={breeders}
             getKey={(breeder) => breeder.id}
             renderItem={(breeder, index) => (
-              <BreederCard breeder={breeder} preload={index < 4 && Boolean(breeder.imageUrl)} />
+              <BreederCard
+                level={levels.find((owner) => owner.ownerId === breeder.id)?.level}
+                breeder={breeder}
+                preload={index < 4 && Boolean(breeder.imageUrl)}
+              />
             )}
           />
         </ListState>

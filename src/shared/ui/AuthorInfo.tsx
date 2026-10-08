@@ -12,6 +12,7 @@ interface AuthorInfoProps {
   /** sm: 아바타 37·이름 14 (기본) / md: 아바타 40·이름 16 (커뮤니티 상세·댓글, Figma chat-profile) */
   size?: 'sm' | 'md'
   /** avatar 아래에 추가 콘텐츠 (댓글 본문 등) */
+  badgeSlot?: React.ReactNode
   contentSlot?: React.ReactNode
 }
 
@@ -23,6 +24,7 @@ const AuthorInfo = ({
   className,
   size = 'sm',
   contentSlot,
+  badgeSlot,
 }: AuthorInfoProps) => {
   // ISO 시간은 상대 시간("N시간 전")으로 표시. 목업 문자열은 그대로 통과.
   const displayTime = formatRelativeTime(createdAt)
@@ -43,6 +45,7 @@ const AuthorInfo = ({
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <span className={cn('font-semibold text-text-primary', nameSize)}>{nickname}</span>
+            {badgeSlot}
             <span className="text-xs font-medium text-text-secondary" suppressHydrationWarning>
               {displayTime}
             </span>
@@ -58,6 +61,7 @@ const AuthorInfo = ({
       <Link href={`/home/${authorId}`} className="flex items-center gap-2">
         {avatar}
         <span className={cn('font-semibold text-text-primary', nameSize)}>{nickname}</span>
+        {badgeSlot}
       </Link>
       <span className="text-xs font-medium text-text-secondary" suppressHydrationWarning>
         {displayTime}

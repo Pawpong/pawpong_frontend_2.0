@@ -12,7 +12,11 @@ export const activityConfigOptions = {
   throwOnError: false,
   staleTime: 30_000,
   refetchInterval: 60_000,
-  queryFn: async ({ signal }: { signal: AbortSignal }): Promise<{ enabled: boolean }> => {
+  queryFn: async ({
+    signal,
+  }: {
+    signal: AbortSignal
+  }): Promise<{ enabled: boolean; breederLevelPublic: boolean }> => {
     const response = await fetch('/api/gamification/config', { signal, cache: 'no-store' })
     if (!response.ok) throw new Error('활동 기능 상태를 확인하지 못했어요.')
     return response.json()
@@ -117,4 +121,11 @@ export async function getPublicActivityBadges(
     )
   }
   return result
+}
+
+export async function getActivityCatalog(
+  signal?: AbortSignal,
+): Promise<import('../model/levels').ActivityCatalog> {
+  const config: ApiRequestConfig = { signal, skipAuth: true, skipAuthRefresh: true }
+  return unwrap(await apiClient.get(`${API_VERSION}/gamification/catalog`, config))
 }
