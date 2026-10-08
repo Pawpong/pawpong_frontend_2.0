@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef } from 'react'
+import { Button } from '@/shared/ui/Button'
 import { useAuthReadSession } from '@/shared/lib/useAuthReadSession'
 import type { AuthReadSession } from '@/shared/lib/authReadSession'
 import type { CommunityPostDetail } from '@/shared/types'
@@ -124,17 +125,16 @@ function AnswerContent({
               질문 제목·본문과 주제를 AI에 전달하는 데 동의합니다. 개인정보는 적지 마세요. 사진·지도
               좌표는 전달하지 않습니다.
             </label>
-            <button
-              type="button"
+            <Button
+              width="full"
               disabled={!consent || result.isFetching}
-              className="min-h-11 w-full rounded-lg bg-primary-500 px-4 py-3 text-sm font-bold focus-ring disabled:opacity-40"
               onClick={() => {
                 panel.current?.focus({ preventScroll: true })
                 void request()
               }}
             >
               AI 참고 답변 받기
-            </button>
+            </Button>
             <p className="text-xs leading-relaxed text-neutral-600">
               개발 체험 중이며 하루 최대 3회예요. 접수된 요청은 실패해도 횟수에 포함될 수 있어요.
               AI는 잘못된 답변을 할 수 있어요.

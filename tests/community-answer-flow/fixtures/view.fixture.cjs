@@ -13,6 +13,9 @@ const post = {
   body: '함께 산책한 경험을 나눠 주세요.',
   experience: { question: true, topics: ['walk'] },
 }
+// 공통 버튼은 변형 속성을 빼고 실제 button으로 그려 접근성 이름과 disabled만 검사한다.
+const buttonStub = ({ intent: _intent, size: _size, width: _width, ...props }) =>
+  createElement('button', { type: 'button', ...props })
 function answerViewFixture(overrides = {}, owner = session) {
   let mutations = 0
   const state = {
@@ -26,6 +29,7 @@ function answerViewFixture(overrides = {}, owner = session) {
   }
   const { CommunityAnswer } = load('src/app/(main)/community/_ui/CommunityAiAnswer.tsx', {
     '@/shared/lib/useAuthReadSession': { useAuthReadSession: () => owner },
+    '@/shared/ui/Button': { Button: buttonStub },
     './answer/communityAnswerContext': context,
     './answer/useCommunityAnswer': { useCommunityAnswer: () => state },
   })

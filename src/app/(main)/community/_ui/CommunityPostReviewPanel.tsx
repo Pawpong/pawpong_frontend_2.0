@@ -7,6 +7,8 @@ import { COMMUNITY_REVIEW_NEXT_STEP, communityReviewConfigOptions } from '@/enti
 import { useCommunityReviewRequest } from '@/features/community'
 import { useAuthSessionGeneration } from '@/shared/lib/useAuthSessionGeneration'
 import type { CommunityPostDetail } from '@/shared/types'
+import { Button } from '@/shared/ui/Button'
+import { RetryButton } from '@/shared/ui/RetryButton'
 import { CommunityReviewConsent } from './CommunityReviewConsent'
 
 export function CommunityPostReviewPanel({
@@ -82,25 +84,22 @@ function ReviewForm({ post }: { post: CommunityPostDetail }) {
               지금은 심사 요청을 사용할 수 없어요. 글은 그대로 보관돼요.
             </p>
           )}
-          <button
-            type="button"
+          <Button
+            width="full"
             disabled={!enabled || !consent || request.isPending || !review.canRequestReview}
             onClick={() => request.mutate(consent)}
-            className="min-h-12 w-full rounded-lg bg-action-primary px-4 text-sm font-bold text-action-dark focus-ring hover:bg-action-primary-hover disabled:bg-point-200 disabled:text-neutral-700"
           >
             {request.isPending ? '공개 여부 확인 중' : '동의하고 다시 심사하기'}
-          </button>
+          </Button>
           <p className="text-xs text-neutral-600">
             조회만으로는 다시 심사하거나 횟수를 사용하지 않아요.
           </p>
           {config.isError && (
-            <button
-              type="button"
-              className="text-xs underline"
-              onClick={() => void config.refetch()}
-            >
-              심사 설정 다시 확인하기
-            </button>
+            <RetryButton
+              aria-label="심사 설정 다시 확인하기"
+              isRetrying={config.isFetching}
+              onRetry={() => void config.refetch()}
+            />
           )}
         </>
       )}
