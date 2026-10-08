@@ -10,6 +10,7 @@ import { petRequestKey } from '../lib/useServerClock'
 import { usePetSession, type PetSession } from '../lib/usePetSession'
 import { PetAdoption } from './PetAdoption'
 import { PetRoom } from './PetRoom'
+import { usePetNavigation } from '../lib/usePetNavigation'
 
 function PetSessionContent({
   session,
@@ -83,6 +84,7 @@ function PetSessionContent({
         />
       ) : (
         <PetAdoption
+          key={initialSourceJobId ?? 'choose-character'}
           session={session}
           initialSourceJobId={initialSourceJobId}
           disabled={busy || uncertain}
@@ -127,10 +129,10 @@ function PetSessionContent({
   )
 }
 
-export function PetPage({ initialSourceJobId }: { initialSourceJobId?: string }) {
+export function PetPage() {
   const config = useQuery(petConfigOptions)
   const session = usePetSession()
-  const returnTo = `/playground/pet${initialSourceJobId ? `?sourceJobId=${encodeURIComponent(initialSourceJobId)}` : ''}`
+  const navigation = usePetNavigation()
   return (
     <div className="mx-auto w-full max-w-[68rem] space-y-6 px-5 pt-4 pb-20 tab:px-8 tab:pt-6 pc:px-10">
       <Link
@@ -173,7 +175,7 @@ export function PetPage({ initialSourceJobId }: { initialSourceJobId?: string })
           </p>
           <div className="mt-6">
             <Link
-              href={`/login?returnUrl=${encodeURIComponent(returnTo)}`}
+              href={`/login?returnUrl=${encodeURIComponent(navigation.href)}`}
               className={buttonVariants()}
             >
               로그인하고 시작하기
@@ -184,7 +186,7 @@ export function PetPage({ initialSourceJobId }: { initialSourceJobId?: string })
         <PetSessionContent
           key={session.scope}
           session={session}
-          initialSourceJobId={initialSourceJobId}
+          initialSourceJobId={navigation.sourceJobId}
         />
       )}
     </div>

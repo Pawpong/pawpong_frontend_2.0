@@ -10,6 +10,8 @@ import {
   formatPetCountdown,
   petMood,
   petLevelUp,
+  PET_ROOM_TABS,
+  type PetTab,
   type PetAction,
   type PetCatalogItem,
   type PetCommand,
@@ -37,6 +39,7 @@ import { PetDecorations } from './PetDecorations'
 import { PetMiniGames } from './PetMiniGames'
 import { PetGlyph } from './PetGlyph'
 import { PetAdoption } from './PetAdoption'
+import { usePetNavigation } from '../lib/usePetNavigation'
 import styles from './PetRoom.module.css'
 
 const STATS = [
@@ -45,14 +48,6 @@ const STATS = [
   { id: 'energy', label: '에너지', icon: 'rest' },
 ] as const
 const ACTION_ICONS = { greet: 'paw', feed: 'bone', play: 'play', rest: 'rest' } as const
-const TABS = [
-  { id: 'room', label: '내 방' },
-  { id: 'decorate', label: '꾸미기' },
-  { id: 'shop', label: '상점' },
-  { id: 'games', label: '미니게임' },
-  { id: 'records', label: '기록' },
-] as const
-type PetTab = (typeof TABS)[number]['id']
 const RECORD_LABELS = {
   adopted: '처음 만난 날',
   first_meal: '첫 식사를 함께했어요',
@@ -100,15 +95,12 @@ export function PetRoom({
     fullBody && requestedSourceId && requestedSourceId !== pet.character?.sourceJobId
   const showCharacterSelection = !fullBody || Boolean(replaceCharacter)
   const active = game?.games.active
-  const availableTabs = game ? TABS : TABS.filter(({ id }) => id === 'room' || id === 'records')
-  const [menu, setMenu] = useState<{ tab: PetTab; sessionId: string | null }>(() => ({
-    tab: active ? 'games' : 'room',
-    sessionId: active?.sessionId ?? null,
-  }))
-  if (active && menu.sessionId !== active.sessionId)
-    setMenu({ tab: 'games', sessionId: active.sessionId })
+  const availableTabs = game
+    ? PET_ROOM_TABS
+    : PET_ROOM_TABS.filter(({ id }) => id === 'room' || id === 'records')
+  const navigation = usePetNavigation(active?.sessionId)
   function setTab(tab: PetTab) {
-    setMenu((current) => ({ ...current, tab }))
+    navigation.selectTab(tab)
     setItem(null)
   }
   const [canvasReady, setCanvasReady] = useState(false)
@@ -177,7 +169,7 @@ export function PetRoom({
   }, [pokeNotice])
   const lastRefresh = useRef('')
   const refresh = useCallback(() => onRefresh(), [onRefresh])
-  const tab = active ? 'games' : availableTabs.some(({ id }) => id === menu.tab) ? menu.tab : 'room'
+  const tab = availableTabs.some(({ id }) => id === navigation.tab) ? navigation.tab : 'room'
   const deadlines = Object.values(view.actions ?? {}).flatMap((action) =>
     action.nextAvailableAt ? [Date.parse(action.nextAvailableAt)] : [],
   )
@@ -477,10 +469,7 @@ export function PetRoom({
               aria-controls={`pet-panel-${id}`}
               tabIndex={tab === id ? 0 : -1}
               disabled={Boolean(active) && id !== 'games'}
-              onClick={() => {
-                setTab(id)
-                setItem(null)
-              }}
+              onClick={() => setTab(id)}
             >
               {label}
             </button>
@@ -517,6 +506,15 @@ export function PetRoom({
               disabled={disabled || Boolean(active)}
               onAdopt={(command) => void onCommand(command)}
             />
+            {replaceCharacter && (
+              <button
+                className={styles.smallButton}
+                disabled={disabled || Boolean(active)}
+                onClick={navigation.clearSource}
+              >
+                지금 캐릭터 유지하기
+              </button>
+            )}
           </section>
         )}
         <div

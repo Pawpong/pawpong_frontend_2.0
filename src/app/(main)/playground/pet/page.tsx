@@ -10,13 +10,8 @@ export const metadata = {
 }
 export const dynamic = 'force-dynamic'
 
-export default async function PlaygroundPetPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ sourceJobId?: string }>
-}) {
+export default async function PlaygroundPetPage() {
   const host = (await headers()).get('host') ?? ''
   if (!(await isPetServerEnabled(host))) notFound()
-  const { sourceJobId } = await searchParams
-  return <PetPage initialSourceJobId={typeof sourceJobId === 'string' ? sourceJobId : undefined} />
+  return <PetPage />
 }
