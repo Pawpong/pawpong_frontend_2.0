@@ -1,6 +1,8 @@
 import { beginLogin, beginLogout, waitForAuthCookieWrites } from '@/shared/lib/authSessionLifecycle'
 import { notifyAuthStateChanged } from '@/shared/lib/authStateEvents'
 import { clearAuthCookies } from '@/shared/lib/authSessionRecovery'
+import { withAuthCookieLock } from '@/shared/lib/authCookieLock'
+import { captureAuthCookieScope, assertAuthCookieScopeCurrent } from '@/shared/lib/authCookieScope'
 import { unregisterNativePushSession } from '@/shared/lib/nativePushSession'
 import {
   deletionErrorMessage,
@@ -40,63 +42,73 @@ export async function getDeletionStatus(signal?: AbortSignal): Promise<DeletionS
 
 /** 접수 전에 push를 해제하고, 서버 계정 폐기 후에는 보호된 logout API 없이 로컬 세션을 정리한다. */
 export async function requestAccountDeletion(clearQueries: () => void): Promise<DeletionStatus> {
-  try {
-    const prepared = await withTimeout((signal) =>
-      fetch('/api/account-deletion/prepare', {
-        method: 'POST',
-        credentials: 'same-origin',
-        cache: 'no-store',
-        signal,
-      }),
-    )
-    if (!prepared.ok) throw new DeletionRequestError(deletionErrorMessage(prepared.status))
-    const result = await prepared.json()
-    if (result?.success !== true || result?.prepared !== true)
-      throw new DeletionRequestError(deletionErrorMessage(502))
-  } catch (cause) {
-    throw new Error(
-      cause instanceof DeletionRequestError ? cause.message : deletionErrorMessage(503),
-    )
-  }
-  beginLogout()
-  notifyAuthStateChanged()
-  await unregisterNativePushSession()
-  await waitForAuthCookieWrites()
-  let acceptedStatus: DeletionStatus
-  try {
-    const response = await withTimeout((signal) =>
-      fetch('/api/account-deletion', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'same-origin',
-        cache: 'no-store',
-        body: JSON.stringify({ confirmation: 'DELETE_PERMANENTLY' }),
-        signal,
-      }),
-    )
-    if (!response.ok) throw new DeletionRequestError(deletionErrorMessage(response.status))
-    const result = deletionResponseSchema.safeParse(await response.json())
-    if (!result.success) throw new DeletionRequestError(deletionErrorMessage(502))
-    acceptedStatus = result.data.data
-  } catch (cause) {
-    // 접수 응답만 유실될 수 있으므로 사전 저장한 영수증으로 먼저 조회한다.
-    const recovered = await withTimeout((signal) => getDeletionStatus(signal), 10_000).catch(
-      () => null,
-    )
-    if (!recovered) {
-      // 요청 실패 후 현재 세션이 여전히 유효하면 기존 사용 흐름을 이어갈 수 있다.
-      beginLogin()
-      notifyAuthStateChanged()
+  const originalScope = captureAuthCookieScope()
+  return withAuthCookieLock(async (lease) => {
+    assertAuthCookieScopeCurrent(originalScope)
+    try {
+      const prepared = await withTimeout((signal) =>
+        fetch('/api/account-deletion/prepare', {
+          method: 'POST',
+          credentials: 'same-origin',
+          cache: 'no-store',
+          signal,
+        }),
+      )
+      if (!prepared.ok) throw new DeletionRequestError(deletionErrorMessage(prepared.status))
+      const result = await prepared.json()
+      if (result?.success !== true || result?.prepared !== true)
+        throw new DeletionRequestError(deletionErrorMessage(502))
+    } catch (cause) {
       throw new Error(
         cause instanceof DeletionRequestError ? cause.message : deletionErrorMessage(503),
       )
     }
-    acceptedStatus = recovered
-  }
-  // BFF 접수 응답도 쿠키를 만료한다. 응답 유실로 복구된 경우에도 동일하게 정리한다.
-  await waitForAuthCookieWrites()
-  await clearAuthCookies()
-  clearQueries()
-  notifyAuthStateChanged()
-  return acceptedStatus
+    assertAuthCookieScopeCurrent(originalScope)
+    beginLogout()
+    const scope = captureAuthCookieScope()
+    notifyAuthStateChanged()
+    await unregisterNativePushSession()
+    await waitForAuthCookieWrites()
+    assertAuthCookieScopeCurrent(scope)
+    let acceptedStatus: DeletionStatus
+    try {
+      const response = await withTimeout((signal) =>
+        fetch('/api/account-deletion', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          cache: 'no-store',
+          body: JSON.stringify({ confirmation: 'DELETE_PERMANENTLY' }),
+          signal,
+        }),
+      )
+      if (!response.ok) throw new DeletionRequestError(deletionErrorMessage(response.status))
+      const result = deletionResponseSchema.safeParse(await response.json())
+      if (!result.success) throw new DeletionRequestError(deletionErrorMessage(502))
+      acceptedStatus = result.data.data
+    } catch (cause) {
+      assertAuthCookieScopeCurrent(scope, true)
+      // 접수 응답만 유실될 수 있으므로 사전 저장한 영수증으로 먼저 조회한다.
+      const recovered = await withTimeout((signal) => getDeletionStatus(signal), 10_000).catch(
+        () => null,
+      )
+      assertAuthCookieScopeCurrent(scope, true)
+      if (!recovered) {
+        // 요청 실패 후 현재 세션이 여전히 유효하면 기존 사용 흐름을 이어갈 수 있다.
+        beginLogin()
+        notifyAuthStateChanged()
+        throw new Error(
+          cause instanceof DeletionRequestError ? cause.message : deletionErrorMessage(503),
+        )
+      }
+      acceptedStatus = recovered
+    }
+    // BFF 접수 응답도 쿠키를 만료한다. 응답 유실로 복구된 경우에도 동일하게 정리한다.
+    await waitForAuthCookieWrites()
+    await clearAuthCookies(scope, lease)
+    assertAuthCookieScopeCurrent(scope, true)
+    clearQueries()
+    notifyAuthStateChanged()
+    return acceptedStatus
+  })
 }

@@ -43,7 +43,6 @@ const AuthActions = ({ className, placement = 'header' }: AuthActionsProps) => {
         type="button"
         onClick={logoutAndRedirect}
         disabled={isLoggingOut}
-        // 로그아웃: 요청 성공/실패와 무관하게 이동 직전 쿠키를 다시 지우고 홈으로 하드 내비게이션한다
         className={cn(
           itemClass,
           'disabled:cursor-not-allowed disabled:text-neutral-300',
