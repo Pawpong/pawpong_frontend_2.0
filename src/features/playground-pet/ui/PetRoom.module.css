@@ -654,6 +654,15 @@
 .dialog::backdrop {
   background: rgb(55 39 24 / 0.5);
 }
+.purchaseStatus {
+  margin-block: 12px;
+  padding: 10px 12px;
+  border-left: 3px solid #7f8e4d;
+  background: #edf0d9;
+  color: #42502e;
+  font-size: 12px;
+  line-height: 1.6;
+}
 .gameChoices {
   display: grid;
   gap: 16px;

@@ -3,7 +3,7 @@ const assert = require('node:assert/strict')
 const React = require('react')
 const { renderToStaticMarkup } = require('react-dom/server')
 const { load } = require('./fixtures/navigation.fixture.cjs')
-const { hooks, nodes } = require('../fixtures/pet-shop.fixture.cjs')
+const { hooks, nodes } = require('../fixtures/react-hooks.fixture.cjs')
 
 function recovery(runtime = React) {
   return load('src/app/(main)/community/_ui/CommunityPhotoRecovery.tsx', {
