@@ -52,7 +52,7 @@ const RuleList = ({ title, rules }: { title: string; rules: Array<[string, Rule]
             {ACTIVITY_LABELS[kind] ?? kind}
           </span>
           <span className="flex shrink-0 items-center gap-2">
-            <span className="text-xs text-neutral-600">{limitText(kind, rule)}</span>
+            <span className="text-xs text-neutral-700">{limitText(kind, rule)}</span>
             <Badge variant="primarySoft">+{rule.exp} EXP</Badge>
           </span>
         </li>
@@ -73,7 +73,7 @@ const LevelTable = ({ catalog }: { catalog: ActivityCatalog }) => (
         >
           <div className="flex items-baseline justify-between gap-2">
             <h3 className="font-cafe24 text-lg text-primary-700">{family.name}</h3>
-            <span className="text-xs font-semibold text-neutral-600">
+            <span className="text-xs font-semibold text-neutral-700">
               Lv.{levels[0].value}–{levels[levels.length - 1].value}
             </span>
           </div>
@@ -87,7 +87,7 @@ const LevelTable = ({ catalog }: { catalog: ActivityCatalog }) => (
                   <LevelIcon value={level.value} size={40} />
                 </span>
                 <span className="text-xs font-semibold text-neutral-850">Lv.{level.value}</span>
-                <span className="text-[0.625rem] text-neutral-600">
+                <span className="text-[0.625rem] text-neutral-700">
                   {level.exp.toLocaleString()} EXP
                 </span>
               </li>
@@ -193,7 +193,7 @@ export function LevelGuideContent() {
                       </li>
                     ))}
                   </ul>
-                  <p className="text-xs leading-relaxed text-neutral-600">
+                  <p className="text-xs leading-relaxed text-neutral-700">
                     레벨은 검색 순위·추천·이용 권한과 연결되지 않아요. 누적 EXP와 이력은 나만 볼 수
                     있어요.
                   </p>

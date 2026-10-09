@@ -23,7 +23,7 @@ const ListHeader = ({ title, count, unit = '건', create, children }: ListHeader
     <div className="flex min-w-0 items-center gap-2">
       <h2 className={TEXT.section}>{title}</h2>
       {count !== undefined && (
-        <span className="text-sm font-normal text-neutral-500">
+        <span className="text-sm font-normal text-neutral-700">
           {count.toLocaleString('ko-KR')}
           {unit}
         </span>

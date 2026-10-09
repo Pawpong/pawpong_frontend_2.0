@@ -46,7 +46,7 @@ const PetPostingDraftCard = ({ draft, onDelete }: PetPostingDraftCardProps) => {
           <Badge variant="primarySoft" className="shrink-0">
             작성 중
           </Badge>
-          <span className="truncate text-xs font-medium text-neutral-500">
+          <span className="truncate text-xs font-medium text-neutral-700">
             {formatDate(draft.updatedAt)} 저장
           </span>
         </div>

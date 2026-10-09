@@ -497,7 +497,7 @@ const ProfileEditContent = () => {
           </div>
         )}
         <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 px-5 py-4 tab:px-8">
-          <p className="hidden text-body-md text-neutral-500 tab:block">
+          <p className="hidden text-body-md text-neutral-700 tab:block">
             {isSaving
               ? '프로필을 적용하고 있어요.'
               : isDirty

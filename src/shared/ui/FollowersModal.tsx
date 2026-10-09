@@ -145,7 +145,7 @@ const FollowersModal = ({
                 // [refactored] 라벨·개수가 공유하는 active 스타일을 한 번만 계산
                 const textClass = cn(
                   'text-sm leading-[1.5]',
-                  active ? 'font-semibold text-neutral-850' : 'font-medium text-neutral-500',
+                  active ? 'font-semibold text-neutral-850' : 'font-medium text-neutral-700',
                 )
                 return (
                   <button

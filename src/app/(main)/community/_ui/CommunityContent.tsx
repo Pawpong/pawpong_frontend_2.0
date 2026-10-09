@@ -156,7 +156,7 @@ const CommunityContent = () => {
                     'flex min-h-12 items-center justify-between rounded-xl px-4 text-left text-[0.9375rem] focus-ring transition-colors',
                     petType === option.value
                       ? 'bg-neutral-100 font-semibold text-neutral-850'
-                      : 'font-medium text-neutral-500 hover:bg-neutral-50 hover:text-neutral-850',
+                      : 'font-medium text-neutral-700 hover:bg-neutral-50 hover:text-neutral-850',
                   )}
                 >
                   {option.label}
@@ -171,7 +171,7 @@ const CommunityContent = () => {
               <Button onClick={writePost} width="full" size="lg">
                 {writeEntry.label}
               </Button>
-              <p className="mt-3 px-1 text-xs leading-relaxed text-neutral-500">
+              <p className="mt-3 px-1 text-xs leading-relaxed text-neutral-700">
                 작은 일상도, 궁금한 것도
                 <br />
                 편하게 나눠주세요.

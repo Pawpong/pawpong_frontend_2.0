@@ -211,7 +211,7 @@ const NotificationsContent = () => {
                       className={
                         readFilter === option.value
                           ? 'font-semibold text-primary-600 underline underline-offset-4'
-                          : 'text-neutral-500'
+                          : 'text-neutral-700'
                       }
                     >
                       {option.label}

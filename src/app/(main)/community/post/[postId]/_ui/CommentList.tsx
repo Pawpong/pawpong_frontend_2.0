@@ -65,7 +65,7 @@ const CommentList = ({ thread }: CommentListProps) => {
           )) && (
           <section className="mb-3 rounded-xl border border-neutral-200 p-3">
             <p className="text-sm font-semibold">수정 중인 댓글</p>
-            <p className="mt-1 text-xs text-neutral-600">
+            <p className="mt-1 text-xs text-neutral-700">
               목록을 확인하는 동안에도 입력한 내용은 유지돼요.
             </p>
             <CommentEditForm actions={actions} />
@@ -109,7 +109,7 @@ const CommentList = ({ thread }: CommentListProps) => {
                 replyDisabled={thread.isSubmitting}
               />
             ) : (
-              <p className="py-3 text-sm font-medium text-text-secondary">삭제된 댓글이에요.</p>
+              <p className="py-3 text-sm font-medium text-neutral-700">삭제된 댓글이에요.</p>
             )}
             {renderReplies(item.replies, item.root !== null)}
           </div>

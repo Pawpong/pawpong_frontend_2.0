@@ -37,7 +37,7 @@ export function CommentEditForm({
         state={action.draft ? 'fill' : 'default'}
       />
       {currentBody !== undefined && currentBody !== action.comment.body && (
-        <p className="text-xs leading-relaxed break-words text-neutral-600">
+        <p className="text-xs leading-relaxed break-words text-neutral-700">
           현재 게시된 내용: {currentBody}
         </p>
       )}

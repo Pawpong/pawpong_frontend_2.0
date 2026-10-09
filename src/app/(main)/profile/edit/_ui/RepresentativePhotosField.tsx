@@ -86,7 +86,7 @@ export function RepresentativePhotosField({
                 onClick={() => choosePhotos(index)}
                 disabled={disabled}
                 aria-label="대표사진 추가"
-                className="flex aspect-square items-center justify-center rounded-lg border border-dashed border-neutral-300 bg-white text-neutral-500 focus-ring transition-colors hover:border-primary-500 hover:text-primary-500"
+                className="flex aspect-square items-center justify-center rounded-lg border border-dashed border-neutral-300 bg-white text-neutral-700 focus-ring transition-colors hover:border-primary-500 hover:text-primary-500"
               >
                 <PlusIcon className="size-6" />
               </button>

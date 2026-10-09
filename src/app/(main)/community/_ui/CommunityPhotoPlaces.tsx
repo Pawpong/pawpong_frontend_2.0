@@ -119,7 +119,7 @@ export function CommunityPhotoPlaces({
                       사진 {photo.photoIndex + 1}의 장소
                     </p>
                     {photo.takenAt !== undefined && (
-                      <p className="mt-0.5 text-[0.6875rem] leading-4 text-neutral-600">
+                      <p className="mt-0.5 text-[0.6875rem] leading-4 text-neutral-700">
                         촬영 {takenAtText.format(photo.takenAt)} · 나만 보여요
                       </p>
                     )}

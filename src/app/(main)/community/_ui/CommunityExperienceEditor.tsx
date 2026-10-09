@@ -199,13 +199,13 @@ export function CommunityExperienceEditor({
           <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 rounded-xl px-4 text-sm font-bold text-neutral-850 focus-ring [&::-webkit-details-marker]:hidden">
             <span>
               주제 직접 고르기{' '}
-              <span className="font-medium text-neutral-600">
+              <span className="font-medium text-neutral-700">
                 {current.topics.length}/{COMMUNITY_MAX_TOPICS}
               </span>
             </span>
             <span
               aria-hidden
-              className="text-neutral-500 transition-transform group-open:rotate-180"
+              className="text-neutral-700 transition-transform group-open:rotate-180"
             >
               ▾
             </span>

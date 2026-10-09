@@ -72,7 +72,7 @@ export function AppliedFilters({
       <button
         type="button"
         onClick={() => onChange({})}
-        className="min-h-8 px-2 text-xs font-medium text-neutral-600 underline focus-ring"
+        className="min-h-8 px-2 text-xs font-medium text-neutral-700 underline focus-ring"
       >
         필터 초기화
       </button>

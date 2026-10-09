@@ -43,7 +43,7 @@ export function CommunityTagField({
           <CommunityPixelIcon name="tag" className="text-primary-500" />
           태그
         </label>
-        <span className="text-xs font-medium text-neutral-600">
+        <span className="text-xs font-medium text-neutral-700">
           {value.length}/{COMMUNITY_MAX_TAGS}
         </span>
       </div>
@@ -62,7 +62,7 @@ export function CommunityTagField({
                 className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-primary-300 bg-white px-3 text-sm font-semibold text-primary-700 focus-ring hover:bg-primary-50"
               >
                 #{tag}
-                <span aria-hidden className="text-base leading-none text-neutral-500">
+                <span aria-hidden className="text-base leading-none text-neutral-700">
                   ×
                 </span>
               </button>

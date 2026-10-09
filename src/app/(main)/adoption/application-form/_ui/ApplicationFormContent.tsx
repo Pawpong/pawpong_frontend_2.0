@@ -174,7 +174,7 @@ const ApplicationFormContent = () => {
                 />
                 <p
                   id={`question-count-${row.key}`}
-                  className="mt-2 text-right text-body-sm font-medium text-neutral-500"
+                  className="mt-2 text-right text-body-sm font-medium text-neutral-700"
                 >
                   {row.question.length}/{MAX_LENGTH}
                 </p>
@@ -193,7 +193,7 @@ const ApplicationFormContent = () => {
               <PlusIcon className="size-5" />
               질문 추가하기
             </Button>
-            <p className="text-center text-body-sm font-medium text-neutral-500">
+            <p className="text-center text-body-sm font-medium text-neutral-700">
               {isMaxReached
                 ? '질문 5개를 모두 추가했어요.'
                 : `최대 ${MAX_QUESTIONS}개 · 질문당 ${MIN_LENGTH}~${MAX_LENGTH}자`}
@@ -207,7 +207,7 @@ const ApplicationFormContent = () => {
 
       <div className="fixed inset-x-0 bottom-0 z-sticky border-t border-neutral-100 bg-white pb-[env(safe-area-inset-bottom)]">
         <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 px-5 py-4 tab:px-8">
-          <p role="status" className="hidden text-body-md text-neutral-500 tab:block">
+          <p role="status" className="hidden text-body-md text-neutral-700 tab:block">
             {updateForm.isPending
               ? '질문을 저장하고 있어요.'
               : isDirty
