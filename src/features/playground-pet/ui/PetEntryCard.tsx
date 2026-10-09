@@ -5,16 +5,8 @@ import { useQuery } from '@tanstack/react-query'
 import { PixelArrowRightIcon } from '@/shared/assets'
 import { buttonVariants } from '@/shared/ui/Button'
 import { FeatureShowcase, FeatureShowcaseTiles } from '@/shared/ui/FeatureShowcase'
+import { PET_ROOM_PREVIEWS, PET_STEPS } from '../constants/pet-intro'
 import { petConfigOptions } from '../lib/usePetController'
-
-// 방에 실제로 놓이는 도트 소품으로 키우기 화면을 미리 보여준다.
-const ROOM_PREVIEWS = [
-  { key: 'bed', src: '/playground/pet/v2/bed_basket.png', caption: '포근한 바구니 침대' },
-  { key: 'toy', src: '/playground/pet/v2/toy_ball.png', caption: '함께 노는 공' },
-  { key: 'plant', src: '/playground/pet/v2/plant_flower.png', caption: '방을 채우는 꽃 화분' },
-].map((item) => ({ ...item, alt: `${item.caption} 소품`, pixelated: true }))
-
-const PET_STEPS = ['우리 아이 사진 올리기', '도트 친구 고르고 이름 짓기', '매일 돌보고 방 꾸미기']
 
 export function PetEntryCard() {
   const config = useQuery(petConfigOptions)
@@ -39,7 +31,7 @@ export function PetEntryCard() {
           </Link>
         </div>
       }
-      media={<FeatureShowcaseTiles label="반려동물 방 소품 예시" tiles={ROOM_PREVIEWS} />}
+      media={<FeatureShowcaseTiles label="반려동물 방 소품 예시" tiles={PET_ROOM_PREVIEWS} />}
       steps={PET_STEPS}
     />
   )

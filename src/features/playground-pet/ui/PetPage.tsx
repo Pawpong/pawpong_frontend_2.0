@@ -4,7 +4,10 @@ import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import { ApiError } from '@/shared/api/unwrap'
 import { Button, buttonVariants } from '@/shared/ui/Button'
-import { PawPrintIcon } from '@/shared/assets'
+import { ArrowBackIcon, PixelArrowRightIcon } from '@/shared/assets'
+import { FeatureIntro } from '@/shared/ui/FeatureIntro'
+import { FeatureShowcase, FeatureShowcaseTiles } from '@/shared/ui/FeatureShowcase'
+import { PET_ROOM_PREVIEWS, PET_STEPS } from '../constants/pet-intro'
 import { petConfigOptions, usePetController } from '../lib/usePetController'
 import { petRequestKey } from '../lib/useServerClock'
 import { usePetSession, type PetSession } from '../lib/usePetSession'
@@ -137,14 +140,15 @@ export function PetPage() {
     <div className="mx-auto w-full max-w-[68rem] space-y-6 px-5 pt-4 pb-20 tab:px-8 tab:pt-6 pc:px-10">
       <Link
         href="/playground"
-        className="inline-flex min-h-11 items-center font-semibold text-brand focus-ring"
+        className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-primary-600 focus-ring"
       >
-        ← 놀이터
+        <ArrowBackIcon aria-hidden className="size-4" />
+        놀이터로
       </Link>
-      <div>
-        <h1 className="font-cafe24 text-xl text-neutral-850 tab:text-2xl">내 반려동물 키우기</h1>
-        <p className="mt-2 text-sm text-neutral-700">우리 아이와 함께하는 작은 도트 세상</p>
-      </div>
+      {/* 놀이터 도구 화면과 같은 소개 영역을 쓴다. */}
+      <FeatureIntro eyebrow="사진에서 시작되는 작은 일상" title="내 반려동물 키우기">
+        우리 아이와 함께하는 작은 도트 세상
+      </FeatureIntro>
       {config.isPending ? (
         <p role="status" className="py-10 text-center text-neutral-700">
           우리 아이를 만나러 가는 중…
@@ -161,27 +165,32 @@ export function PetPage() {
           반려동물 키우기를 잠시 이용할 수 없어요. 놀이터에서 다시 만나요.
         </p>
       ) : !session ? (
-        <section className="rounded-2xl border border-secondary-200 bg-point-50 px-5 py-10 text-center">
-          <PawPrintIcon aria-hidden className="mx-auto size-16 text-secondary-500" />
-          <h2 className="mt-5 font-cafe24 text-xl text-neutral-850">
-            우리 아이와 새로운 일상을 시작해요
-          </h2>
-          <p className="mt-3 text-sm leading-6 text-neutral-700">
-            완성된 도트 그림을 고르고 이름을 지어 주세요.
-            <br />
-            인사하고, 밥 주고, 함께 놀며 조금씩 자라요.
-            <br />
-            로그인하면 키우던 반려동물을 언제든 다시 만날 수 있어요.
-          </p>
-          <div className="mt-6">
-            <Link
-              href={`/login?returnUrl=${encodeURIComponent(navigation.href)}`}
-              className={buttonVariants()}
-            >
-              로그인하고 시작하기
-            </Link>
-          </div>
-        </section>
+        <FeatureShowcase
+          headingId="pet-guest"
+          badge="로그인하고 시작해요"
+          title="우리 아이와 새로운 일상을 시작해요"
+          description={
+            <>
+              완성된 도트 그림을 고르고 이름을 지어 주세요. 인사하고, 밥 주고, 함께 놀며 조금씩
+              자라요.
+              <br />
+              로그인하면 키우던 반려동물을 언제든 다시 만날 수 있어요.
+            </>
+          }
+          actions={
+            <div>
+              <Link
+                href={`/login?returnUrl=${encodeURIComponent(navigation.href)}`}
+                className={buttonVariants({ width: 'full' })}
+              >
+                로그인하고 시작하기
+                <PixelArrowRightIcon aria-hidden className="ml-2 size-4" />
+              </Link>
+            </div>
+          }
+          media={<FeatureShowcaseTiles label="반려동물 방 소품 예시" tiles={PET_ROOM_PREVIEWS} />}
+          steps={PET_STEPS}
+        />
       ) : (
         <PetSessionContent
           key={session.scope}
