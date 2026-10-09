@@ -1,159 +1,55 @@
+/* 티켓 틀(테두리·띠·그림자)은 shared/ui/Ticket.module.css 가 맡고, 여기서는 목록과 본문 배치만 그린다. */
 .list {
   display: grid;
-  gap: 16px;
+  gap: 1.25rem;
 }
-.card {
-  position: relative;
-  isolation: isolate;
+
+.body {
   display: grid;
-  gap: 20px;
-  padding: 22px 20px 24px;
-  color: var(--color-primary-700);
+  gap: 1.25rem;
+  padding: 1.25rem;
 }
-.card::before,
-.card::after {
-  position: absolute;
-  z-index: -1;
-  clip-path: polygon(
-    8px 0,
-    calc(100% - 8px) 0,
-    calc(100% - 8px) 4px,
-    calc(100% - 4px) 4px,
-    calc(100% - 4px) 8px,
-    100% 8px,
-    100% calc(100% - 8px),
-    calc(100% - 4px) calc(100% - 8px),
-    calc(100% - 4px) calc(100% - 4px),
-    calc(100% - 8px) calc(100% - 4px),
-    calc(100% - 8px) 100%,
-    8px 100%,
-    8px calc(100% - 4px),
-    4px calc(100% - 4px),
-    4px calc(100% - 8px),
-    0 calc(100% - 8px),
-    0 8px,
-    4px 8px,
-    4px 4px,
-    8px 4px
-  );
-  content: '';
-  pointer-events: none;
-}
-.card::before {
-  inset: 0;
-  background: var(--color-primary-500);
-}
-.card::after {
-  inset: 2px 2px 5px;
-  background: var(--color-point-50);
-}
+
 .intro {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 0.875rem;
   min-width: 0;
 }
+
 .icon {
   flex: none;
-  width: 44px;
-  height: 44px;
+  width: 2.75rem;
+  height: 2.75rem;
   color: var(--color-primary-500);
 }
-.copy {
-  min-width: 0;
-  overflow-wrap: anywhere;
-  word-break: keep-all;
-}
-.eyebrow {
-  margin-bottom: 4px;
-  font-size: 12px;
-  font-weight: 600;
-}
-.title {
-  font-size: 24px;
-  line-height: 1.35;
-}
-.description {
-  margin-top: 6px;
-  font-size: 14px;
-  line-height: 1.65;
-  color: var(--color-neutral-700);
-}
+
 .actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  gap: 0.75rem;
   min-width: 0;
-  padding: 0 3px 3px 0;
 }
-.action {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-  min-width: 0;
-  min-height: 48px;
-  padding: 10px 12px;
-  border: 2px solid var(--color-primary-500);
-  background: var(--color-point-100);
-  box-shadow: 3px 3px 0 var(--color-primary-200);
-  color: var(--color-primary-700);
-  font-size: 14px;
-  line-height: 1.5;
-  overflow-wrap: anywhere;
-  word-break: keep-all;
-}
-.action[data-primary='true'] {
-  background: var(--color-action-primary);
-}
-.action:only-child {
-  grid-column: 1 / -1;
-}
-.action:focus-visible {
-  outline: 3px solid var(--color-primary-700);
-  outline-offset: 4px;
-}
-.arrow {
-  flex: none;
-  width: 16px;
-  height: 16px;
-}
-@media (hover: hover) {
-  .action:hover {
-    background: var(--color-action-primary-hover);
-    color: var(--color-primary-900);
-  }
-}
+
 @media (width >= 48rem) {
-  .card {
-    padding: 26px 28px 28px;
+  .body {
+    padding: 1.5rem 1.75rem;
   }
+
   .intro {
-    gap: 20px;
+    gap: 1.25rem;
   }
+
   .icon {
-    width: 56px;
-    height: 56px;
-  }
-  .title {
-    font-size: 28px;
-  }
-  .actions {
-    max-width: 400px;
-    margin-left: 76px;
-  }
-  .action {
-    font-size: 16px;
+    width: 3.5rem;
+    height: 3.5rem;
   }
 }
+
 @media (width >= 64rem) {
-  .card {
-    grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  .body {
+    grid-template-columns: minmax(0, 1fr) minmax(17.5rem, 22.5rem);
     align-items: center;
-    gap: 28px;
-  }
-  .actions {
-    max-width: none;
-    margin-left: 0;
+    gap: 1.75rem;
   }
 }
