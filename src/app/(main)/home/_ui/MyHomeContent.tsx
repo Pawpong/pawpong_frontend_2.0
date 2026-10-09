@@ -24,7 +24,8 @@ import {
   BREEDER_MY_HOME_TABS,
   MY_HOME_SIDE_LINKS,
   BREEDER_MY_HOME_SIDE_LINKS,
-  PHOTO_GRID,
+  MY_PHOTO_GRID,
+  MY_HOME_TAB_PANEL,
 } from './constants'
 
 const HOME_LISTING_PAGE_SIZE = 16
@@ -122,7 +123,7 @@ const MyHomeContent = () => {
             <BreederIntroduction {...introProps} placement="tab" />
 
             {/* 작성 진입점은 + 메뉴(모바일 상단 바·2단 프로필 카드)가 맡는다 */}
-            <Container className="py-8 tab:py-10">
+            <Container className={MY_HOME_TAB_PANEL}>
               <MyPetPostingList
                 pageSize={HOME_LISTING_PAGE_SIZE}
                 showTotalCount
@@ -141,18 +142,22 @@ const MyHomeContent = () => {
 
         {/* Figma 4145:721426 — 모바일·태블릿 3열, PC 4열의 정사각 미디어 그리드 */}
         <TabsContent value="posts" className="mt-0">
-          {/* 작성한 글 / 댓글 단 글 / 좋아요한 글 칩 전환 — 내 글 조회는 profile 로드 후 활성화 */}
-          <MyPostsTab enabled={!!myProfile} gridClassName={PHOTO_GRID} />
+          {/* 작성한 글 / 댓글 단 글 / 좋아요한 글 / 저장한 글 칩 전환 — 내 글 조회는 profile 로드 후 활성화.
+              분양 목록·AI 사진 탭과 같은 여백이라 제목 줄이 탭을 바꿔도 같은 자리에 온다 */}
+          <Container className={MY_HOME_TAB_PANEL}>
+            <MyPostsTab enabled={!!myProfile} gridClassName={MY_PHOTO_GRID} />
+          </Container>
         </TabsContent>
 
         <TabsContent value="ai-photos" className="mt-0">
-          <div className="px-4 pt-4 tab:px-0">
+          {/* 분양 목록 탭과 같은 여백 — 제목 줄이 탭을 바꿔도 같은 자리에 온다 */}
+          <Container className={MY_HOME_TAB_PANEL}>
             <AiPhotoArchive
               enabled={!!myProfile}
               createHref="/ai-filter"
               renderResultAction={(jobId) => <PetResultLink sourceJobId={jobId} />}
             />
-          </div>
+          </Container>
         </TabsContent>
       </HomeTabs>
     </div>
