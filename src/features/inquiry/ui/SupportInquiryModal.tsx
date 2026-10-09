@@ -29,6 +29,8 @@ interface SupportInquiryModalProps {
   audience: 'adopter' | 'breeder'
   presentation?: 'dialog' | 'sheet'
   trigger?: ReactNode
+  /** 처음 열 때 고를 주제 (레벨 안내의 문의 버튼은 레벨/EXP 로 연다) */
+  initialTopic?: SupportTopic
 }
 
 const SupportChat = ({
@@ -37,6 +39,7 @@ const SupportChat = ({
   audience,
   presentation = 'dialog',
   trigger,
+  initialTopic = 'usage',
 }: SupportInquiryModalProps) => {
   const [controller] = useState(() => new SupportChatController(supportChatApi, audience))
   const sessions = useSyncExternalStore(
@@ -44,7 +47,7 @@ const SupportChat = ({
     controller.getSnapshot,
     controller.getSnapshot,
   )
-  const [topic, setTopic] = useState<SupportTopic>('usage')
+  const [topic, setTopic] = useState<SupportTopic>(initialTopic)
   const [showReset, setShowReset] = useState(false)
   const [showDiscard, setShowDiscard] = useState(false)
   const session = sessions[topic]
