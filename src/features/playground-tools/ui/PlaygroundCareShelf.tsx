@@ -1,11 +1,5 @@
-import Link from 'next/link'
-import {
-  LocationPinIcon,
-  PixelCheckIcon,
-  PixelArrowRightIcon,
-  PixelPencilIcon,
-} from '@/shared/assets'
-import styles from './Discovery.module.css'
+import { LocationPinIcon, PixelCheckIcon, PixelPencilIcon } from '@/shared/assets'
+import { TicketLink } from '@/shared/ui/Ticket'
 
 // 놀이와 분리한 돌봄 도구. 놀이 카드와 같은 티켓 틀을 쓰되, 흔들림 없이 차분한 초록 색으로 구분한다.
 const CARE_TOOLS = [
@@ -45,24 +39,16 @@ export function PlaygroundCareShelf() {
       <ul className="mt-5 grid gap-4 tab:grid-cols-3">
         {CARE_TOOLS.map(({ href, label, title, body, cta, Icon }) => (
           <li key={href}>
-            <Link
+            <TicketLink
               href={href}
-              data-accent="green"
-              className={`${styles.ticket} flex h-full flex-col focus-ring`}
-            >
-              <span className={styles.ticketTop}>
-                <span>{label}</span>
-                <Icon aria-hidden className="size-4" />
-              </span>
-              <span className="flex flex-1 flex-col p-4 tab:p-5">
-                <span className="text-base font-semibold break-keep text-neutral-850">{title}</span>
-                <span className="mt-1.5 text-xs leading-5 break-keep text-neutral-700">{body}</span>
-                <span className="mt-auto inline-flex items-center gap-1.5 pt-3 text-sm font-semibold text-primary-600">
-                  {cta}
-                  <PixelArrowRightIcon aria-hidden className="size-3" />
-                </span>
-              </span>
-            </Link>
+              label={label}
+              icon={<Icon aria-hidden className="size-4" />}
+              accent="green"
+              title={title}
+              body={body}
+              cta={cta}
+              size="sm"
+            />
           </li>
         ))}
       </ul>

@@ -1,19 +1,20 @@
 import { PawPrintIcon } from '@/shared/assets'
 import { PLAY_CARD_NOTICE } from '../constants/discovery'
 import type { PlayCard } from '../model/discovery.types'
+import { TicketStrip, ticketStyles } from '@/shared/ui/Ticket'
 import styles from './Discovery.module.css'
 
 export function PlayResultCard({ card }: { card: PlayCard }) {
   return (
     <article
-      className={styles.ticket}
+      className={ticketStyles.ticket}
       data-accent={card.accent}
       aria-labelledby={`play-${card.id}`}
     >
-      <div className={styles.ticketTop}>
-        <span>PAWPONG PLAY CARD</span>
-        <PawPrintIcon aria-hidden className="size-5" />
-      </div>
+      <TicketStrip
+        label="PAWPONG PLAY CARD"
+        icon={<PawPrintIcon aria-hidden className="size-5" />}
+      />
       <div className="p-5 tab:p-6">
         <span className="text-xs font-semibold text-primary-600">{card.label}</span>
         <h3

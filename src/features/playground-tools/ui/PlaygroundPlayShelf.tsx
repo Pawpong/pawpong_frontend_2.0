@@ -1,6 +1,5 @@
-import Link from 'next/link'
 import { PawPrintIcon, PixelArrowRightIcon, ProfileStarIcon } from '@/shared/assets'
-import styles from './Discovery.module.css'
+import { TicketLink } from '@/shared/ui/Ticket'
 
 const PLAYS = [
   {
@@ -52,27 +51,17 @@ export function PlaygroundPlayShelf() {
       <ul className="mt-5 grid gap-4 tab:grid-cols-2">
         {PLAYS.map(({ href, eyebrow, title, body, cta, accent, Icon }) => (
           <li key={href}>
-            <Link
+            <TicketLink
               href={href}
-              data-accent={accent}
-              className={`${styles.ticket} group flex h-full flex-col focus-ring transition-transform hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0`}
-            >
-              <span className={styles.ticketTop}>
-                <span>PLAY CARD</span>
-                <Icon aria-hidden className="size-5" />
-              </span>
-              <span className="flex flex-1 flex-col p-5 tab:p-6">
-                <span className="text-xs font-semibold text-primary-600">{eyebrow}</span>
-                <span className="mt-1 font-cafe24 text-xl text-neutral-850 tab:text-2xl">
-                  {title}
-                </span>
-                <span className="mt-2 text-sm leading-6 break-keep text-neutral-700">{body}</span>
-                <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary-600">
-                  {cta}
-                  <PixelArrowRightIcon aria-hidden className="size-3" />
-                </span>
-              </span>
-            </Link>
+              label="PLAY CARD"
+              icon={<Icon aria-hidden className="size-5" />}
+              accent={accent}
+              eyebrow={eyebrow}
+              title={title}
+              body={body}
+              cta={cta}
+              lift
+            />
           </li>
         ))}
       </ul>
