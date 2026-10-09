@@ -11,6 +11,7 @@ import { useOpenNotification, useMarkAsRead, useMarkAllAsRead } from '@/features
 import { normalizeApiError } from '@/shared/api'
 import type { NotificationResponseDto } from '@/shared/types'
 import { Button, EmptyState, ActionSheetItem, UnreadCountBadge } from '@/shared/ui'
+import { ListRowsSkeleton } from '@/shared/ui/Skeleton'
 
 // Figma icon/ bell (1596:77455 세트, 1596:97271) — nav 아이콘과 같은 픽셀 글리프라 currentColor 로 그린다.
 // Figma 원본은 속이 찬 실루엣 하나뿐이라, nav 아이콘들처럼 비활성은 외곽선만 남기고
@@ -142,7 +143,7 @@ const NotificationBell = ({ className }: { className?: string }) => {
               </Button>
             )}
           </div>
-          <p className="border-b border-neutral-150 px-4 py-2 text-xs text-neutral-600">
+          <p className="border-b border-neutral-150 px-4 py-2 text-xs text-neutral-700">
             지운 알림도 알림 센터에서 다시 볼 수 있어요.
           </p>
           {clearError && (
@@ -156,7 +157,7 @@ const NotificationBell = ({ className }: { className?: string }) => {
 
           <div className="max-h-[min(26rem,60vh)] overflow-y-auto">
             {isLoading ? (
-              <p className="px-4 py-10 text-center text-sm text-neutral-700">불러오는 중...</p>
+              <ListRowsSkeleton label="알림을 불러오는 중이에요." rows={3} className="px-4" />
             ) : isError ? (
               <p className="px-4 py-10 text-center text-sm text-neutral-700">
                 알림을 불러오지 못했어요.
@@ -177,7 +178,7 @@ const NotificationBell = ({ className }: { className?: string }) => {
                 ))}
                 {hasNextPage && (
                   <ActionSheetItem onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
-                    {isFetchingNextPage ? '불러오는 중...' : '더 보기'}
+                    {isFetchingNextPage ? '불러오는 중…' : '더 보기'}
                   </ActionSheetItem>
                 )}
               </div>
