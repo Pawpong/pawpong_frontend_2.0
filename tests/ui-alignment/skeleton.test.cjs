@@ -122,3 +122,12 @@ test('분양 상세는 불러오는 동안 실제 화면과 같은 틀의 스켈
   assert.match(skeleton, /aspect-\[375\/279\] w-full rounded-none tab:aspect-square/)
   assert.match(skeleton, /lap:w-\[20rem\] lap:shrink-0 pc:w-\[24rem\]/)
 })
+
+test('게시글 상세는 불러오는 동안 두 배치 모두 실제 글 모양의 스켈레톤을 보여주고 빈 글 문구는 해요체', () => {
+  const panel = source('src/app/(main)/community/_ui/PostDetailPanel.tsx')
+  assert.match(panel, /if \(!post && isPending && !isError\) \{/)
+  assert.match(panel, /<SkeletonBlock className="h-full w-\[60%\] shrink-0 rounded-none" \/>/)
+  assert.match(panel, /<SkeletonBlock className="aspect-square w-full shrink-0 rounded-none" \/>/)
+  assert.match(panel, /삭제되었거나 볼 수 없는 게시글이에요\./)
+  assert.doesNotMatch(panel, /게시글입니다/)
+})
