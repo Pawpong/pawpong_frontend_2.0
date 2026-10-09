@@ -8,6 +8,7 @@ import { aiImageQueries } from '@/entities/ai-image'
 import { useAuthReadSession } from '@/shared/lib/useAuthReadSession'
 import type { AuthReadSession } from '@/shared/lib/authReadSession'
 import { cn } from '@/shared/lib/cn'
+import { PixelArrowRightIcon } from '@/shared/assets'
 import {
   RetryButton,
   Button,
@@ -29,6 +30,8 @@ interface AiPhotoArchiveProps {
   limit?: number
   /** limit 로 잘렸을 때 전체 보기 링크 */
   moreHref?: string
+  /** 사진이 있을 때 목록 위에 '새 사진 만들기' 링크를 둔다(마이홈 탭처럼 만들기 화면 밖에서 볼 때). */
+  createHref?: string
   gridClassName?: string
   /** 크게 본 사진 아래 붙일 이어가기 버튼(예: 반려동물 캐릭터 만들기). 다른 기능은 화면 조립 계층에서 넣는다. */
   renderResultAction?: (jobId: string, className?: string) => ReactNode
@@ -52,6 +55,7 @@ export function AiPhotoArchive({
   enabled,
   limit,
   moreHref,
+  createHref,
   gridClassName,
   renderResultAction,
 }: AiPhotoArchiveProps) {
@@ -63,6 +67,7 @@ export function AiPhotoArchive({
       session={session}
       limit={limit}
       moreHref={moreHref}
+      createHref={createHref}
       gridClassName={gridClassName}
       renderResultAction={renderResultAction}
     />
@@ -73,6 +78,7 @@ function AiArchiveContent({
   session,
   limit,
   moreHref,
+  createHref,
   gridClassName,
   renderResultAction,
 }: Omit<AiPhotoArchiveProps, 'enabled'> & { session: AuthReadSession }) {
@@ -143,6 +149,21 @@ function AiArchiveContent({
             onRetry={() => void generationsQuery.refetch()}
             isRetrying={generationsQuery.isFetching}
           />
+        </div>
+      )}
+      {createHref && (
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <p className="text-sm text-neutral-700">
+            만든 사진 <strong className="font-semibold text-neutral-850">{items.length}</strong>장
+          </p>
+          {/* 놀이터 카드의 이어가기 링크와 같은 모양 */}
+          <Link
+            href={createHref}
+            className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-primary-600 focus-ring"
+          >
+            새 사진 만들기
+            <PixelArrowRightIcon aria-hidden className="size-3" />
+          </Link>
         </div>
       )}
       <ul

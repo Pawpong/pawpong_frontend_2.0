@@ -162,6 +162,7 @@ const MyHomeContent = () => {
           <div className="px-4 pt-4 tab:px-0">
             <AiPhotoArchive
               enabled={!!myProfile}
+              createHref="/ai-filter"
               renderResultAction={(jobId) => <PetResultLink sourceJobId={jobId} />}
             />
           </div>
