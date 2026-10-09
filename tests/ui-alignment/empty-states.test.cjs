@@ -47,6 +47,23 @@ test('목록 화면의 로딩·오류·빈 상태 문구는 해요체로 맞춤'
 
 test('링크 티켓은 누르면 그림자 쪽으로 내려앉고 움직임을 줄인 환경에서는 움직이지 않음', () => {
   const css = source('src/shared/ui/Ticket.module.css')
-  assert.match(css, /a\.ticket:active \{\s*translate: 3px 3px;\s*box-shadow: 3px 3px 0 var\(--accent\);/)
-  assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*a\.ticket:active \{\s*translate: none;/)
+  assert.match(
+    css,
+    /a\.ticket:active \{\s*translate: 3px 3px;\s*box-shadow: 3px 3px 0 var\(--accent\);/,
+  )
+  assert.match(
+    css,
+    /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*a\.ticket:active \{\s*translate: none;/,
+  )
+})
+
+test('활동 화면의 이어가기 링크도 글자 화살표 대신 읽지 않는 픽셀 화살표를 씀', () => {
+  for (const file of [
+    'src/app/(main)/activity/applications/[applicationId]/_ui/ApplicationDetailContent.tsx',
+    'src/app/(main)/activity/_ui/ReceivedReviewRow.tsx',
+  ]) {
+    const code = source(file)
+    assert.doesNotMatch(code, /→/, file)
+    assert.match(code, /<PixelArrowRightIcon aria-hidden/, file)
+  }
 })
