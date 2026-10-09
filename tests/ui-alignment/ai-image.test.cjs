@@ -45,3 +45,23 @@ test('AI 사진 화면의 글자 링크는 포커스 표시와 44px 높이를 �
     /min-h-11 items-center text-sm font-semibold text-primary-700 underline focus-ring/,
   )
 })
+
+test('AI 필터는 모바일에서 사진 칸을 낮추고 만들기 버튼이 밀려나면 하단 메뉴 위에 같은 버튼을 띄움', () => {
+  const studio = source('src/features/ai-image/ui/AiFilterStudio.tsx')
+  assert.match(studio, /selectLabel="우리 아이 사진 선택"/)
+  assert.match(studio, /frameClassName="aspect-\[4\/3\] tab:aspect-square"/)
+  assert.match(
+    studio,
+    /const showFloatingCta =\s*isLoggedIn && canConvert && !ctaInView && !ai\.isWorking && !awaitingResult && !result/,
+  )
+  assert.match(studio, /<div ref=\{ctaRef\}>/)
+  assert.match(
+    studio,
+    /fixed inset-x-0 bottom-\[calc\(3\.5rem\+env\(safe-area-inset-bottom\)\)\][^"]*tab:hidden/,
+  )
+  // 두 버튼은 같은 문구와 같은 만들기 동작을 쓴다.
+  assert.equal(studio.match(/\{generateLabel\}/g).length, 2)
+  const field = source('src/shared/ui/PhotoUploadField.tsx')
+  assert.match(field, /selectLabel = '참여 사진 선택'/)
+  assert.match(field, /frameClassName = 'aspect-square'/)
+})

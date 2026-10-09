@@ -11,6 +11,7 @@ import { PLAYGROUND_BILLING_ENABLED } from '@/shared/config/playground'
 import { cafe24Proup } from '@/shared/lib/fonts'
 import { cn } from '@/shared/lib/cn'
 import { isAuthReadSessionCurrent } from '@/shared/lib/authReadSession'
+import { useInView } from '@/shared/lib/useInView'
 import { AsyncState, Button, ComposerSectionHeading, buttonVariants } from '@/shared/ui'
 import { PhotoUploadField } from '@/shared/ui/PhotoUploadField'
 import {
@@ -105,6 +106,24 @@ export function AiFilterStudio({
   const selectedFilter = ai.filters.find((filter) => filter.filterId === ai.selectedFilterId)
   const result = ai.result
   const awaitingResult = ai.phase === 'pending'
+  const canConvert = Boolean(photo && selectedFilter && canGenerate && !preparing)
+  const generateLabel = !allowance
+    ? '이용 가능 횟수를 확인해 주세요'
+    : !allowance.enabled
+      ? '지금은 AI 사진 만들기가 쉬고 있어요'
+      : remaining === 0
+        ? PLAYGROUND_BILLING_ENABLED
+          ? '이용권이 부족해요 · 놀이터에서 확인해 주세요'
+          : '오늘 만들 수 있는 횟수를 모두 사용했어요'
+        : selectedFilter
+          ? gameCharacter
+            ? '캐릭터 만들기 · 1회 사용'
+            : `${selectedFilter.name} 씌우기`
+          : '필터를 골라 주세요'
+  const [ctaRef, ctaInView] = useInView<HTMLDivElement>()
+  // 사진과 필터를 고른 뒤 만들기 버튼이 화면 아래로 밀려나 있으면 모바일 하단에 같은 버튼을 띄운다.
+  const showFloatingCta =
+    isLoggedIn && canConvert && !ctaInView && !ai.isWorking && !awaitingResult && !result
   const returnUrl = gameCharacter
     ? `/ai-filter?purpose=pet-sprite-v1${sourceJobId ? `&sourceJobId=${encodeURIComponent(sourceJobId)}` : ''}`
     : '/ai-filter'
@@ -238,6 +257,9 @@ export function AiFilterStudio({
             <>
               <PhotoUploadField
                 preview={photo?.url}
+                selectLabel="우리 아이 사진 선택"
+                // 모바일에서는 낮은 칸으로 두어 필터 목록이 첫 화면에 더 보이게 한다.
+                frameClassName="aspect-[4/3] tab:aspect-square"
                 processing={preparing}
                 disabled={ai.isWorking || awaitingResult}
                 onSelect={(files) => void selectPhoto(files)}
@@ -516,26 +538,17 @@ export function AiFilterStudio({
             </div>
           ) : (
             <>
-              <Button
-                size="lg"
-                disabled={!photo || !selectedFilter || !canGenerate || preparing}
-                onClick={() => void convert()}
-                width="full"
-              >
-                {!allowance
-                  ? '이용 가능 횟수를 확인해 주세요'
-                  : !allowance.enabled
-                    ? '지금은 AI 사진 만들기가 쉬고 있어요'
-                    : remaining === 0
-                      ? PLAYGROUND_BILLING_ENABLED
-                        ? '이용권이 부족해요 · 놀이터에서 확인해 주세요'
-                        : '오늘 만들 수 있는 횟수를 모두 사용했어요'
-                      : selectedFilter
-                        ? gameCharacter
-                          ? '캐릭터 만들기 · 1회 사용'
-                          : `${selectedFilter.name} 씌우기`
-                        : '필터를 골라 주세요'}
-              </Button>
+              {/* 모바일 하단 고정 버튼은 이 버튼이 화면 밖에 있을 때만 나타난다. */}
+              <div ref={ctaRef}>
+                <Button
+                  size="lg"
+                  disabled={!canConvert}
+                  onClick={() => void convert()}
+                  width="full"
+                >
+                  {generateLabel}
+                </Button>
+              </div>
               {!photo && (
                 <p className="mt-2 text-center text-xs text-neutral-700">
                   먼저 우리 아이 사진을 올려 주세요.
@@ -579,6 +592,22 @@ export function AiFilterStudio({
             renderResultAction={renderResultAction}
           />
         </section>
+      )}
+
+      {showFloatingCta && (
+        // 하단 메뉴 바로 위에 띄운다. 누르면 진행 상황이 보이는 자리로 옮긴 뒤 만든다.
+        <div className="fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-sticky bg-gradient-to-t from-base-white via-base-white/95 to-transparent px-4 pt-6 pb-3 tab:hidden">
+          <Button
+            size="lg"
+            width="full"
+            onClick={() => {
+              resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+              void convert()
+            }}
+          >
+            {generateLabel}
+          </Button>
+        </div>
       )}
     </div>
   )
