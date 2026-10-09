@@ -113,3 +113,12 @@ test('알림센터는 불러오는 동안 알림 행과 같은 틀의 스켈레�
   )
   assert.match(page, /px-4 py-4 tab:px-5 tab:py-5/)
 })
+
+test('분양 상세는 불러오는 동안 실제 화면과 같은 틀의 스켈레톤을 보여줌', () => {
+  const client = source('src/app/(main)/adoption/[id]/_ui/AdoptionDetailPageClient.tsx')
+  assert.match(client, /if \(detailQuery\.isPending\) return <AdoptionDetailSkeleton \/>/)
+  const skeleton = source('src/app/(main)/adoption/[id]/_ui/AdoptionDetailSkeleton.tsx')
+  assert.match(skeleton, /role="status" aria-busy="true"/)
+  assert.match(skeleton, /aspect-\[375\/279\] w-full rounded-none tab:aspect-square/)
+  assert.match(skeleton, /lap:w-\[20rem\] lap:shrink-0 pc:w-\[24rem\]/)
+})
