@@ -144,3 +144,17 @@ test('티켓 띠 글자와 외출 준비함 개수, 푸터 저작권 줄은 작�
     /text-xs font-medium text-neutral-700">\s*Copyright/,
   )
 })
+
+test('진행 중 버튼·안내의 말줄임은 점 세 개 대신 말줄임표 한 글자를 씀', () => {
+  const fs = require('node:fs')
+  const path = require('node:path')
+  const repo = path.resolve(__dirname, '../..')
+  const walk = (dir) =>
+    fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+      const full = path.join(dir, entry.name)
+      return entry.isDirectory() ? walk(full) : /\.tsx$/.test(entry.name) ? [full] : []
+    })
+  for (const file of walk(path.join(repo, 'src')))
+    if (!/chat|hall-of-fame|care-map/.test(file))
+      assert.doesNotMatch(fs.readFileSync(file, 'utf8'), /[가-힣]\.\.\.['"<`]/, file)
+})

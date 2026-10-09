@@ -103,7 +103,7 @@ const ProfileImageUpload = ({ value, onChange, className }: ProfileImageUploadPr
         className="hidden"
         onChange={handleFileChange}
       />
-      {isPending && <p className="text-[0.75rem] text-neutral-700">업로드 중...</p>}
+      {isPending && <p className="text-[0.75rem] text-neutral-700">업로드 중…</p>}
       {error && <HelpMessage status="error">{error}</HelpMessage>}
     </div>
   )

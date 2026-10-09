@@ -64,6 +64,6 @@ test('소품 그림 재시도는 필터와 선택 및 별사탕을 유지하고 
 test('소품 그림을 읽는 동안 재시도 버튼은 비활성화함', () => {
   const app = ui()
   app.props.loadingImages = true
-  const retry = app.render().find((node) => node.props.children === '소품 그림 확인 중...')
+  const retry = app.render().find((node) => node.props.children === '소품 그림 확인 중…')
   assert.equal(retry.props.disabled, true)
 })

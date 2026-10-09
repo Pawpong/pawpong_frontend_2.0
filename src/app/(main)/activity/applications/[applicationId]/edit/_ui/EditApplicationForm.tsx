@@ -84,7 +84,7 @@ const EditApplicationFormFields = ({ applicationId, detail }: EditApplicationFor
           submitLabel="수정 완료"
           submitLabelTab="수정 완료"
           submitLabelPc="수정 완료"
-          pendingLabel="저장 중..."
+          pendingLabel="저장 중…"
         >
           {toast.current && (
             <AlertMessage

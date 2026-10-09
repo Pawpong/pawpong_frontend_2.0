@@ -83,7 +83,7 @@ const SurveyStep = () => {
       title="간단한 조사 양식"
       onNext={() => handleSubmit((data) => submit(data, { skipped: false }))()}
       onBack={goBack}
-      nextLabel={isPending ? '가입 중...' : '다음'}
+      nextLabel={isPending ? '가입 중…' : '다음'}
       nextDisabled={isPending}
       navError={firstErrorMessage ?? error ?? undefined}
     >

@@ -198,7 +198,7 @@ export function PetDecorations({
             onReloadImages?.()
           }}
         >
-          {loadingImages ? '소품 그림 확인 중...' : '소품 그림 다시 보기'}
+          {loadingImages ? '소품 그림 확인 중…' : '소품 그림 다시 보기'}
         </button>
       </div>
       <div className={styles.itemGrid}>
