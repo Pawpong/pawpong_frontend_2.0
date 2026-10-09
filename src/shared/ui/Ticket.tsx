@@ -62,8 +62,8 @@ export function TicketLink({
       className={cn(
         styles.ticket,
         'flex h-full flex-col focus-ring',
-        lift &&
-          'transition-transform hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0',
+        // 움직임 전환은 Ticket.module.css 가 맡는다(누름 반응과 함께).
+        lift && 'hover:-translate-y-0.5 motion-reduce:hover:translate-y-0',
         className,
       )}
     >

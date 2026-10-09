@@ -34,3 +34,22 @@
     sans-serif;
   letter-spacing: 0.04em;
 }
+
+/* 링크 티켓은 누르는 순간 그림자 쪽으로 내려앉아 눌렸다는 걸 바로 알려준다. */
+a.ticket {
+  transition:
+    translate 120ms ease-out,
+    box-shadow 120ms ease-out;
+}
+a.ticket:active {
+  translate: 3px 3px;
+  box-shadow: 3px 3px 0 var(--accent);
+}
+@media (prefers-reduced-motion: reduce) {
+  a.ticket {
+    transition: none;
+  }
+  a.ticket:active {
+    translate: none;
+  }
+}
