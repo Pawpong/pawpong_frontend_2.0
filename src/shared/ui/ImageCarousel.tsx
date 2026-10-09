@@ -78,8 +78,12 @@ const ImageCarousel = ({
     <div className={cn('relative overflow-hidden', bgClassName, className)}>
       <div
         ref={trackRef}
+        // 여러 장이면 키보드로도 트랙에 들어와 좌우 화살표 키로 넘길 수 있게 한다(axe scrollable-region-focusable).
+        tabIndex={hasMultiple ? 0 : undefined}
+        role={hasMultiple ? 'group' : undefined}
+        aria-label={hasMultiple ? `${alt} 사진 ${images.length}장` : undefined}
         // 스크롤바는 감추고(전역 scrollbar-width:none) 스냅으로 한 장씩 정지시킨다
-        className="flex size-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden"
+        className="flex size-full snap-x snap-mandatory overflow-x-auto overflow-y-hidden focus-ring-inset"
       >
         {images.map((src, imageIndex) => (
           <div key={imageIndex} className="relative size-full shrink-0 snap-center">
