@@ -9,16 +9,12 @@ const HOME_TAB = {
   feed: { id: 'posts', label: '피드' },
   reviews: { id: 'reviews', label: '후기' },
   myPosts: { id: 'posts', label: '내가 쓴 글' },
-  favoriteBreeders: { id: 'breeders', label: '즐겨찾는 브리더' },
   aiPhotos: { id: 'ai-photos', label: 'AI 사진' },
 } satisfies Record<string, HomeTabConfig>
 
 // [refactored] 배열은 항목 조합만 담당
-const MY_HOME_TABS: HomeTabConfig[] = [
-  HOME_TAB.myPosts,
-  HOME_TAB.aiPhotos,
-  HOME_TAB.favoriteBreeders,
-]
+// 마이홈 탭은 내가 만든 콘텐츠만 둔다 — 즐겨찾는 브리더는 저장목록, 나의 활동은 /my-activity 로 옮겼다
+const MY_HOME_TABS: HomeTabConfig[] = [HOME_TAB.myPosts, HOME_TAB.aiPhotos]
 
 const BREEDER_HOME_TABS: HomeTabConfig[] = [
   HOME_TAB.publicListings,
@@ -27,12 +23,7 @@ const BREEDER_HOME_TABS: HomeTabConfig[] = [
 ]
 
 // 브리더 마이홈은 시안(3170-825849)이 '게시글' 표기 — 입양자 마이홈의 '내가 쓴 글'과 다르다
-const BREEDER_MY_HOME_TABS: HomeTabConfig[] = [
-  HOME_TAB.listings,
-  HOME_TAB.posts,
-  HOME_TAB.aiPhotos,
-  HOME_TAB.favoriteBreeders,
-]
+const BREEDER_MY_HOME_TABS: HomeTabConfig[] = [HOME_TAB.listings, HOME_TAB.posts, HOME_TAB.aiPhotos]
 
 // 마이홈 사이드바 하단 이동 링크 — 전체메뉴에만 있던 내 계정 화면들을 마이홈에 모은다
 const MY_HOME_SIDE_LINKS = [

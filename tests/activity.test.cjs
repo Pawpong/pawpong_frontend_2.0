@@ -306,10 +306,14 @@ test('마이홈 활동 탭은 비활성·설정 오류·다른 계정 세션에�
   )
 })
 
-test('마이홈 이름 옆 내 레벨은 설정이 켜지고 세션 소유자가 프로필과 같을 때만 활동 탭과 같은 key 로 보인다', () => {
+test('마이홈 이름 옆 내 레벨은 설정이 켜지고 세션 소유자가 프로필과 같을 때만 나의 활동과 같은 key 로 보이고 나의 활동으로 이어진다', () => {
   const render = ({ config, session = fixtureSession, userId = 'fixture-user' }) => {
     const queries = []
     const { MyLevelBadge } = load('src/features/gamification/ui/MyLevelBadge.tsx', {
+      'next/link': {
+        __esModule: true,
+        default: ({ href, children }) => createElement('a', { href }, children),
+      },
       '@tanstack/react-query': {
         useQuery: (options) => {
           queries.push(options)
@@ -336,6 +340,9 @@ test('마이홈 이름 옆 내 레벨은 설정이 켜지고 세션 소유자가
     assert.equal(queries[1].enabled, false)
   }
   const { html, queries } = render({ config: { data: { enabled: true } } })
-  assert.equal(html, '<b>Lv.3</b>')
+  assert.equal(
+    html,
+    '<a href="/my-activity"><b>Lv.3</b><span class="sr-only">나의 활동 보기</span></a>',
+  )
   assert.deepEqual(queries[1].queryKey, ['gamification', 'private', fixtureSession.scope])
 })

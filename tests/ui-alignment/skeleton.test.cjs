@@ -96,7 +96,7 @@ test('관심 입양글·즐겨찾는 브리더·브리더 홈 분양 목록도 �
     /loadingFallback=\{<ListingCardGridSkeleton label="관심 목록을 불러오는 중이에요\." \/>\}/,
   )
   assert.match(
-    source('src/app/(main)/home/_ui/FavoriteBreedersContent.tsx'),
+    source('src/app/(main)/bookmarks/_ui/FavoriteBreedersContent.tsx'),
     /<ListingCardGridSkeleton[\s\S]*?layout="compact"[\s\S]*?className=\{gridClassName\}/,
   )
   assert.match(

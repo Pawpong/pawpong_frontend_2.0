@@ -74,7 +74,7 @@ export function ActivityDashboard({ session }: { session: ActivitySession }) {
         </p>
         {data?.level && (
           <div className="my-5 space-y-3">
-            {/* 레벨 배지는 마이홈 이름 옆에 있다. 여기는 다음 레벨까지의 진행만 보여준다 */}
+            {/* 레벨 배지는 마이홈 이름 앞에 있고 그 배지가 이 화면으로 온다. 여기는 다음 레벨까지의 진행만 보여준다 */}
             {ceiling != null ? (
               <>
                 <p className={cafe24Proup.className}>

@@ -13,7 +13,7 @@ import { cn } from '@/shared/lib/cn'
 import { profileQueries } from '@/entities/profile'
 import type { FavoriteBreederCard } from '@/shared/types'
 import type { FavoriteBreeder } from '@/shared/types'
-import { BreederCard } from './BreederCard'
+import { BreederCard } from '@/app/(main)/home/_ui/BreederCard'
 
 // 백엔드 FavoriteBreederCard → BreederCard 뷰 모델(FavoriteBreeder) 매핑
 // (badges/date는 카드에서 렌더하지 않아 최소값만 채움)

@@ -26,7 +26,7 @@ const REVOKE_CASES = [
   '글·댓글을 지우거나 비공개로 바꾸면 그때 받은 EXP가 회수돼요.',
   '신고로 숨겨진 활동, 정지·탈퇴한 계정이 남긴 공감·후기도 회수돼요.',
   '지우고 다시 쓰거나 같은 사람이 공감을 취소했다 다시 눌러도 또 쌓이지 않아요.',
-  'EXP가 줄면 레벨도 함께 내려갈 수 있어요. 바뀐 이유는 마이홈 활동 이력에서 볼 수 있어요.',
+  'EXP가 줄면 레벨도 함께 내려갈 수 있어요. 바뀐 이유는 나의 활동 이력에서 볼 수 있어요.',
 ]
 
 type Rule = ActivityCatalog['rules'][string]
@@ -113,7 +113,7 @@ export function LevelGuideContent() {
   const { userRole } = useAuthStatus()
   const [inquiryOpen, setInquiryOpen] = useState(false)
 
-  // 마이홈의 '레벨/EXP 문의' 링크(#inquiry)는 내용이 그려진 뒤에야 위치가 생긴다.
+  // 나의 활동의 '레벨/EXP 문의' 링크(#inquiry)는 내용이 그려진 뒤에야 위치가 생긴다.
   // 라우터의 진입 스크롤이 끝난 다음 프레임에 옮겨야 덮어쓰이지 않는다.
   useEffect(() => {
     if (!catalog.isSuccess || window.location.hash !== '#inquiry') return
@@ -127,7 +127,7 @@ export function LevelGuideContent() {
 
   return (
     <div className="flex w-full flex-1 flex-col bg-white pb-12">
-      <NavigationBar title="활동 단계" backHref="/home?tab=activity" />
+      <NavigationBar title="활동 단계" backHref="/my-activity" />
       <Container className="py-6 tab:py-10">
         <div className="mx-auto max-w-4xl space-y-8 tab:space-y-10">
           <FeatureIntro eyebrow="포퐁 활동 단계" title="함께한 활동이 단계가 돼요">
@@ -165,7 +165,7 @@ export function LevelGuideContent() {
                 <section aria-labelledby="level-rules-title" className="space-y-4">
                   <SectionTitle id="level-rules-title">이렇게 쌓여요</SectionTitle>
                   <p className="text-sm leading-relaxed text-neutral-700">
-                    하루·한 달 횟수는 한국 시간 기준이에요. 적립 알림은 따로 보내지 않고, 마이홈
+                    하루·한 달 횟수는 한국 시간 기준이에요. 적립 알림은 따로 보내지 않고,
                     &lsquo;나의 활동&rsquo;에서 확인할 수 있어요.
                   </p>
                   <RuleList
