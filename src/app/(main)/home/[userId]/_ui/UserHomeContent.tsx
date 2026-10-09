@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { AsyncState } from '@/shared/ui'
+import { HomeSkeleton } from '../../_ui/HomeSkeleton'
 import { transientQueryRecoveryOptions } from '@/shared/api'
 import { useGnbHeight } from '@/shared/lib/useGnbHeight'
 import { adopterQueries } from '@/entities/adopter'
@@ -25,13 +26,12 @@ const UserHomeContent = ({ userId }: UserHomeContentProps) => {
   })
   const profile = profileQuery.data
   if (!profile) {
+    if (!profileQuery.isError) return <HomeSkeleton />
     return (
       <AsyncState
-        status={profileQuery.isError ? 'error' : 'loading'}
-        message={
-          profileQuery.isError ? '프로필을 불러오지 못했어요.' : '프로필을 불러오는 중이에요.'
-        }
-        onRetry={profileQuery.isError ? () => void profileQuery.refetch() : undefined}
+        status="error"
+        message="프로필을 불러오지 못했어요."
+        onRetry={() => void profileQuery.refetch()}
         isRetrying={profileQuery.isFetching}
         className="min-h-[calc(100dvh-3.5rem)]"
       />

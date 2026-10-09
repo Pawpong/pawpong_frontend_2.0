@@ -21,7 +21,7 @@ import { BreederIntroduction } from './BreederIntroduction'
 import { HomeTabs, TabsContent } from './HomeTabs'
 import { FavoriteBreedersContent } from './FavoriteBreedersContent'
 import { MyPostsTab } from './MyPostsTab'
-import { MyHomeSkeleton } from './MyHomeSkeleton'
+import { HomeSkeleton } from './HomeSkeleton'
 import {
   MY_HOME_TABS,
   BREEDER_MY_HOME_TABS,
@@ -66,7 +66,7 @@ const MyHomeContent = () => {
       <div className="flex w-full flex-col">
         <NavigationBar title="마이홈" />
         {profileQuery.isPending ? (
-          <MyHomeSkeleton />
+          <HomeSkeleton />
         ) : (
           <Container className="flex min-h-60 items-center justify-center px-4 py-10">
             <div role="alert" className="flex flex-col items-center gap-3 text-center">

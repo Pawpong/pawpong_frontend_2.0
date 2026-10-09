@@ -10,6 +10,7 @@ import { isApiError, transientQueryRecoveryOptions } from '@/shared/api'
 import { AsyncState } from '@/shared/ui'
 import { UserHomeContent } from './UserHomeContent'
 import { BreederHomeContent } from './BreederHomeContent'
+import { HomeSkeleton } from '../../_ui/HomeSkeleton'
 
 interface UserHomeRouterProps {
   userId: string
@@ -85,13 +86,7 @@ const UserHomeRouter = ({ userId }: UserHomeRouterProps) => {
     return <UserHomeContent userId={userId} />
   }
 
-  return (
-    <AsyncState
-      status="loading"
-      message="프로필을 불러오는 중이에요."
-      className="min-h-[calc(100dvh-3.5rem)]"
-    />
-  )
+  return <HomeSkeleton />
 }
 
 export { UserHomeRouter }
