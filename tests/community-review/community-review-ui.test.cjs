@@ -159,6 +159,7 @@ test('보류 상세는 두 레이아웃 모두 댓글 작성과 반응 및 공�
     },
     '@/features/auth': { useLoginGuard: () => ({ guard: (value) => value }) },
     '@/shared/lib/cn': { cn: (...values) => values.filter(Boolean).join(' ') },
+    '@/shared/ui/Skeleton': { SkeletonBlock: () => null },
     '../post/[postId]/_ui/usePostDetail': {
       usePostDetail: () => ({
         post: { ...post(), photoUrls: ['https://example.invalid/community/synthetic.jpg'] },

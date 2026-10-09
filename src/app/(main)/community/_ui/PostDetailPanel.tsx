@@ -20,6 +20,7 @@ import {
 } from '@/entities/community'
 import { useLoginGuard } from '@/features/auth'
 import { cn } from '@/shared/lib/cn'
+import { SkeletonBlock } from '@/shared/ui/Skeleton'
 import { usePostDetail } from '../post/[postId]/_ui/usePostDetail'
 import { useCommentThread } from '../post/[postId]/_ui/useCommentThread'
 import { CommentList } from '../post/[postId]/_ui/CommentList'
@@ -77,18 +78,61 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
   )
 
   // 캐시가 없는 직접 진입에서는 상세 응답 전까지 채울 값이 없다 — 빈 패널 대신 상태를 알린다
+  if (!post && isPending && !isError) {
+    // 실제 글과 같은 배치(좌우 모달은 사진 60%·글 40%, 세로는 정사각 사진 아래 글)로 자리를 잡는다.
+    const sideBySide = layout === 'side-by-side'
+    const lines = (
+      <div className="space-y-3 p-4">
+        <div className="flex items-center gap-2">
+          <SkeletonBlock className="size-8 rounded-full" />
+          <SkeletonBlock className="h-4 w-24 rounded" />
+        </div>
+        <SkeletonBlock className="h-4 w-3/4 rounded" />
+        <SkeletonBlock className="h-4 w-1/2 rounded" />
+      </div>
+    )
+    return (
+      <div
+        role="status"
+        aria-busy="true"
+        className={cn(
+          'flex h-full min-h-0 w-full',
+          sideBySide ? 'flex-row' : 'flex-col',
+          className,
+        )}
+      >
+        <span className="sr-only">게시글을 불러오는 중이에요.</span>
+        {sideBySide ? (
+          <>
+            <SkeletonBlock className="h-full w-[60%] shrink-0 rounded-none" />
+            <div className="flex w-[40%] flex-col">
+              {trailingAction && (
+                <div className="flex shrink-0 items-center justify-end px-4 py-2">
+                  {trailingAction}
+                </div>
+              )}
+              {lines}
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="flex shrink-0 items-center justify-end px-4 py-2">{trailingAction}</div>
+            <SkeletonBlock className="aspect-square w-full shrink-0 rounded-none" />
+            {lines}
+          </>
+        )}
+      </div>
+    )
+  }
+
   if (!post) {
     return (
       <div className={cn('flex h-full min-h-0 w-full flex-col', className)}>
         <div className="flex shrink-0 items-center justify-end px-4 py-2">{trailingAction}</div>
         <AsyncState
-          status={isError ? 'error' : isPending ? 'loading' : 'empty'}
+          status={isError ? 'error' : 'empty'}
           message={
-            isError
-              ? '게시글을 불러오지 못했어요.'
-              : isPending
-                ? '게시글을 불러오는 중이에요.'
-                : '삭제되었거나 볼 수 없는 게시글입니다.'
+            isError ? '게시글을 불러오지 못했어요.' : '삭제되었거나 볼 수 없는 게시글이에요.'
           }
           onRetry={isError ? () => void refetch() : undefined}
           isRetrying={isRetrying}
