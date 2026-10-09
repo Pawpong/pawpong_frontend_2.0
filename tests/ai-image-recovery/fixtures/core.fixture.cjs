@@ -17,7 +17,8 @@ function load(file, dependencies = {}) {
   new Function('exports', 'require', code)(output, (name) => {
     if (name === '@/shared/lib/authReadSession') return auth.session
     // 화면에 보이는지 추적하는 훅은 서버 렌더에서 항상 보이는 것으로 둔다.
-    if (name === '@/shared/lib/useInView') return { useInView: () => [() => {}, true] }
+    if (name === '@/shared/lib/useViewportPosition')
+      return { useViewportPosition: () => [() => {}, 'inside'] }
     if (name === '@/shared/lib/useAuthReadSession')
       return { useAuthReadSession: auth.session.getAuthReadSession }
     if (name === '@/shared/api/token') return { getAccessToken: () => auth.state.token }

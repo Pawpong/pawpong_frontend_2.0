@@ -56,7 +56,7 @@ test('AI 필터는 모바일에서 사진 칸을 낮추고 만들기 버튼이 �
   assert.match(studio, /frameClassName="aspect-\[4\/3\] tab:aspect-square"/)
   assert.match(
     studio,
-    /const showFloatingCta =\s*isLoggedIn && canConvert && !ctaInView && !ai\.isWorking && !awaitingResult && !result/,
+    /const showFloatingCta =\s*isLoggedIn &&\s*canConvert &&\s*ctaPosition === 'below' &&\s*!ai\.isWorking &&\s*!awaitingResult &&\s*!result/,
   )
   assert.match(studio, /<div ref=\{ctaRef\}>/)
   assert.match(

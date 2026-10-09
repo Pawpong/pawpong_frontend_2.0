@@ -32,7 +32,7 @@ function hookRunner() {
   return { react, render }
 }
 
-test('useInView 는 요소가 화면 밖으로 나가면 false, 돌아오거나 요소가 사라지면 true 를 돌려줌', () => {
+test('useViewportPosition 은 요소가 아래·안·위 어디에 있는지 따라가고 요소가 사라지면 안으로 봄', () => {
   const observers = []
   class FakeObserver {
     constructor(callback) {
@@ -49,34 +49,38 @@ test('useInView 는 요소가 화면 밖으로 나가면 false, 돌아오거나 
     }
   }
   const { react, render } = hookRunner()
-  const { useInView } = loadTypescript(
-    'src/shared/lib/useInView.ts',
+  const { useViewportPosition } = loadTypescript(
+    'src/shared/lib/useViewportPosition.ts',
     { react },
     { IntersectionObserver: FakeObserver },
   )
-  const run = () => render(() => useInView())
+  const run = () => render(() => useViewportPosition())
 
-  let [setNode, inView] = run()
-  assert.equal(inView, true)
+  let [setNode, position] = run()
+  assert.equal(position, 'inside')
   assert.equal(observers.length, 0)
 
   const node = { id: 'cta' }
   setNode(node)
-  ;[setNode, inView] = run()
-  assert.equal(observers.length, 1)
+  ;[setNode, position] = run()
   assert.deepEqual(observers[0].observed, [node])
 
-  observers[0].callback([{ isIntersecting: false }])
-  ;[setNode, inView] = run()
-  assert.equal(inView, false)
+  // 아직 화면 아래에 있음 → 모바일 하단 버튼을 띄울 자리
+  observers[0].callback([{ isIntersecting: false, boundingClientRect: { top: 1200 } }])
+  ;[setNode, position] = run()
+  assert.equal(position, 'below')
 
-  observers[0].callback([{ isIntersecting: true }])
-  ;[setNode, inView] = run()
-  assert.equal(inView, true)
+  observers[0].callback([{ isIntersecting: true, boundingClientRect: { top: 300 } }])
+  ;[setNode, position] = run()
+  assert.equal(position, 'inside')
 
-  observers[0].callback([{ isIntersecting: false }])
+  // 버튼을 지나 아래 내용까지 내려감 → 위로 지나감
+  observers[0].callback([{ isIntersecting: false, boundingClientRect: { top: -80 } }])
+  ;[setNode, position] = run()
+  assert.equal(position, 'above')
+
   setNode(null)
-  ;[setNode, inView] = run()
-  assert.equal(inView, true)
+  ;[setNode, position] = run()
+  assert.equal(position, 'inside')
   assert.equal(observers[0].disconnected, true)
 })
