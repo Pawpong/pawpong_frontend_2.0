@@ -41,3 +41,31 @@ export function GridSkeleton({
     </div>
   )
 }
+
+/**
+ * 줄 목록(공지·자주 묻는 질문·임시저장·저장 피드)을 불러오는 동안 같은 자리에 줄 모양 빈 칸을 채운다.
+ * 안내 문구는 화면 낭독기에만 읽힌다.
+ */
+export function ListRowsSkeleton({
+  label,
+  rows = 4,
+  className,
+}: {
+  label: ReactNode
+  rows?: number
+  className?: string
+}) {
+  return (
+    <div role="status" aria-busy="true" className={className}>
+      <span className="sr-only">{label}</span>
+      <div className="divide-y divide-neutral-150">
+        {Array.from({ length: rows }, (_, index) => (
+          <div key={index} className="space-y-2 py-4">
+            <SkeletonBlock className="h-4 w-2/3 rounded" />
+            <SkeletonBlock className="h-3 w-1/3 rounded" />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}

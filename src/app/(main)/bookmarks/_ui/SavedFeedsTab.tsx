@@ -7,6 +7,7 @@ import { PostList } from '@/features/community'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
 import { Container, InfiniteScrollTrigger, ListState } from '@/shared/ui'
 import { EmptyStateLink } from '@/shared/ui/EmptyStateLink'
+import { ListRowsSkeleton } from '@/shared/ui/Skeleton'
 import { flattenPages } from '@/shared/lib/infiniteList'
 
 const SavedFeedsTab = () => {
@@ -23,6 +24,7 @@ const SavedFeedsTab = () => {
         isError={isError}
         isEmpty={feeds.length === 0}
         loadingText="저장 피드를 불러오는 중이에요."
+        loadingFallback={<ListRowsSkeleton label="저장 피드를 불러오는 중이에요." />}
         errorText="저장 피드를 불러오지 못했어요."
         emptyText="아직 저장한 피드가 없어요."
         emptyAction={<EmptyStateLink href="/community">커뮤니티 둘러보기</EmptyStateLink>}

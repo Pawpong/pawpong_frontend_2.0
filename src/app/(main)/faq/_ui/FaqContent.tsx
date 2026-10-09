@@ -19,6 +19,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/shared/ui'
+import { ListRowsSkeleton } from '@/shared/ui/Skeleton'
 
 type FaqAudience = 'adopter' | 'breeder'
 
@@ -133,6 +134,9 @@ const FaqContent = () => {
                 isError={query.isError}
                 isEmpty={faqs.length === 0}
                 loadingText="자주 묻는 질문을 불러오는 중이에요."
+                loadingFallback={
+                  <ListRowsSkeleton label="자주 묻는 질문을 불러오는 중이에요." rows={6} />
+                }
                 errorText="자주 묻는 질문을 불러오지 못했어요."
                 emptyText="등록된 질문이 없어요."
                 onRetry={() => void query.refetch()}

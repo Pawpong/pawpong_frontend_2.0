@@ -2,6 +2,7 @@
 
 import { useId, type ReactNode } from 'react'
 import { Badge, ListState } from '@/shared/ui'
+import { ListRowsSkeleton } from '@/shared/ui/Skeleton'
 import { TEXT } from '@/shared/config'
 
 interface DraftSectionProps {
@@ -46,6 +47,7 @@ const DraftSection = ({
         isError={isError}
         isEmpty={count === 0}
         loadingText={loadingText}
+        loadingFallback={<ListRowsSkeleton label={loadingText} rows={3} />}
         errorText={errorText}
         emptyText={emptyText}
         onRetry={onRetry}

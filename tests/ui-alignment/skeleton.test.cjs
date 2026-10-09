@@ -165,3 +165,33 @@ test('다른 회원 홈(일반·브리더)도 프로필을 불러오는 동안 �
     /return <HomeSkeleton \/>/,
   )
 })
+
+test('공지·자주 묻는 질문·임시저장·저장 피드는 줄 모양 스켈레톤으로 불러오는 자리를 잡음', () => {
+  const { ListRowsSkeleton } = loadTypescript('src/shared/ui/Skeleton.tsx', {
+    '@/shared/lib/cn': { cn },
+  })
+  const html = renderToStaticMarkup(
+    createElement(ListRowsSkeleton, { label: '공지사항을 불러오는 중이에요.', rows: 3 }),
+  )
+  assert.match(html, /role="status" aria-busy="true"/)
+  assert.equal(html.match(/py-4/g).length, 3)
+  for (const [file, pattern] of [
+    [
+      'src/app/(main)/faq/_ui/FaqContent.tsx',
+      /<ListRowsSkeleton label="자주 묻는 질문을 불러오는 중이에요\." rows=\{6\} \/>/,
+    ],
+    [
+      'src/app/(main)/notices/_ui/NoticesContent.tsx',
+      /<ListRowsSkeleton label="공지사항을 불러오는 중이에요\." \/>/,
+    ],
+    [
+      'src/app/(main)/bookmarks/_ui/SavedFeedsTab.tsx',
+      /<ListRowsSkeleton label="저장 피드를 불러오는 중이에요\." \/>/,
+    ],
+    [
+      'src/app/(main)/drafts/_ui/DraftSection.tsx',
+      /<ListRowsSkeleton label=\{loadingText\} rows=\{3\} \/>/,
+    ],
+  ])
+    assert.match(source(file), pattern, file)
+})
