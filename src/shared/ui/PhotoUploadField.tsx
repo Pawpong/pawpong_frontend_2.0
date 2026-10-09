@@ -15,6 +15,10 @@ interface PhotoUploadFieldProps {
   processing?: boolean
   onSelect: (files: FileList) => void
   onRemove: () => void
+  /** 화면 낭독기가 읽는 선택 버튼 이름 */
+  selectLabel?: string
+  /** 선택 칸 비율. 기본은 정사각형 */
+  frameClassName?: string
 }
 
 /** Single-photo selection with replacement, keyboard access and desktop drop support. */
@@ -24,6 +28,8 @@ export function PhotoUploadField({
   processing,
   onSelect,
   onRemove,
+  selectLabel = '참여 사진 선택',
+  frameClassName = 'aspect-square',
 }: PhotoUploadFieldProps) {
   const input = useRef<HTMLInputElement>(null)
   const hintId = useId()
@@ -52,9 +58,12 @@ export function PhotoUploadField({
           type="button"
           disabled={busy}
           onClick={() => input.current?.click()}
-          aria-label={preview ? '사진 바꾸기' : '참여 사진 선택'}
+          aria-label={preview ? '사진 바꾸기' : selectLabel}
           aria-describedby={hintId}
-          className="relative flex aspect-square w-full flex-col items-center justify-center gap-4 p-6 text-center focus-ring-inset disabled:cursor-wait"
+          className={cn(
+            'relative flex w-full flex-col items-center justify-center gap-4 p-6 text-center focus-ring-inset disabled:cursor-wait',
+            frameClassName,
+          )}
         >
           {preview ? (
             <Image

@@ -140,6 +140,7 @@ function studio(remaining = 1, isLoggedIn = true) {
     '@/shared/lib/fonts': { cafe24Proup: { className: '' } },
     '@/shared/lib/cn': { cn: (...args) => args.join(' ') },
     '@/shared/lib/authReadSession': { isAuthReadSessionCurrent: () => true },
+    '@/shared/lib/useInView': { useInView: () => [() => {}, true] },
     '@/shared/ui': { Button, ComposerSectionHeading: () => null, buttonVariants: () => '' },
     '@/shared/ui/PhotoUploadField': { PhotoUploadField: () => null },
     '../lib/aiImageFile': {},
