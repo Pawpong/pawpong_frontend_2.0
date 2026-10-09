@@ -3,11 +3,17 @@ import type { ReactNode } from 'react'
 import { PawPrintIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { SkeletonBlock } from './Skeleton'
+import { TicketStrip, ticketStyles, type TicketAccent } from './Ticket'
 
 interface FeatureShowcaseProps {
   /** 제목 요소 id. 섹션의 aria-labelledby 로 연결한다. */
   headingId: string
-  badge: string
+  /** 윗단 영문 라벨. 예: AI PHOTO */
+  label: string
+  /** 윗단 오른쪽 아이콘. 장식이므로 aria-hidden 으로 넘긴다. */
+  icon?: ReactNode
+  accent?: TicketAccent
+  eyebrow: string
   title: string
   description: ReactNode
   actions: ReactNode
@@ -18,12 +24,15 @@ interface FeatureShowcaseProps {
 }
 
 /**
- * 놀이터 기능 소개 카드 공통 셸.
- * 알약 배지 → 픽셀 제목 → 설명 → 버튼, 오른쪽 예시 타일, 아래 번호 단계 순서를 모든 기능이 같이 쓴다.
+ * 놀이터 기능 소개 카드 공통 셸. PLAY CARD 와 같은 티켓 틀을 크게 쓴다.
+ * 윗단 라벨 → 머리말 → 픽셀 제목 → 설명 → 버튼, 오른쪽 예시 타일, 절취선 아래 번호 단계 순서를 모든 기능이 같이 쓴다.
  */
 export function FeatureShowcase({
   headingId,
-  badge,
+  label,
+  icon,
+  accent = 'butter',
+  eyebrow,
   title,
   description,
   actions,
@@ -34,20 +43,16 @@ export function FeatureShowcase({
   return (
     <section
       aria-labelledby={headingId}
-      className={cn(
-        'overflow-hidden rounded-2xl border border-secondary-200 bg-base-white',
-        className,
-      )}
+      data-accent={accent}
+      className={cn(ticketStyles.ticket, className)}
     >
+      <TicketStrip label={label} icon={icon} />
       <div className="grid items-center gap-7 p-5 tab:p-8 lap:grid-cols-[1fr_1.1fr] lap:gap-10">
         <div>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-point-100 px-3 py-1.5 text-xs font-semibold text-neutral-850">
-            <PawPrintIcon aria-hidden className="size-3.5 text-secondary-600" />
-            {badge}
-          </span>
+          <p className="text-xs font-semibold text-primary-600">{eyebrow}</p>
           <h2
             id={headingId}
-            className="mt-4 font-cafe24 text-2xl leading-snug break-keep text-neutral-850 tab:text-3xl"
+            className="mt-1 font-cafe24 text-2xl leading-snug break-keep text-neutral-850 tab:text-3xl"
           >
             {title}
           </h2>
@@ -59,12 +64,15 @@ export function FeatureShowcase({
       </div>
 
       {steps && steps.length > 0 && (
-        <ol className="grid gap-3 border-t border-secondary-100 bg-secondary-50/50 p-5 text-sm text-neutral-850 tab:grid-cols-3 tab:gap-5 tab:px-8">
+        <ol
+          className={cn(
+            ticketStyles.stub,
+            'grid gap-3 p-5 text-sm text-neutral-850 tab:grid-cols-3 tab:gap-5 tab:px-8',
+          )}
+        >
           {steps.map((step, index) => (
             <li key={step} className="flex items-center gap-2.5">
-              <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-point-200 text-xs font-semibold">
-                {index + 1}
-              </span>
+              <span className={ticketStyles.stubNumber}>{index + 1}</span>
               {step}
             </li>
           ))}

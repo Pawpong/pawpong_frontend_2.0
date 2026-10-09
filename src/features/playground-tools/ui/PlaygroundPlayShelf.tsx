@@ -58,9 +58,10 @@ export function PlaygroundPlayShelf() {
           ))}
         </ol>
       </div>
-      <ul className="mt-5 grid gap-4 tab:grid-cols-2">
+      {/* 노트북부터 한 줄에 놓고, 태블릿 두 칸 줄에서는 홀수 번째 마지막 카드가 혼자 남지 않게 줄을 채운다. */}
+      <ul className="mt-5 grid gap-4 tab:grid-cols-2 lap:grid-cols-3">
         {PLAYS.map(({ href, eyebrow, title, body, cta, accent, Icon }) => (
-          <li key={href}>
+          <li key={href} className="tab:last:odd:col-span-2 lap:last:odd:col-span-1">
             <TicketLink
               href={href}
               label="PLAY CARD"

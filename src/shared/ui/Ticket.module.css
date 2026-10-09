@@ -40,6 +40,26 @@
   letter-spacing: 0.04em;
 }
 
+/* 절취선 아래 아랫단. 순서 안내처럼 본문을 거드는 내용을 띠 색을 옅게 깔아 둔다. */
+.stub {
+  border-top: 2px dashed color-mix(in srgb, var(--accent-edge) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 35%, var(--color-base-white, #fff));
+}
+.stubNumber {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.25rem;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font:
+    0.75rem/1 var(--font-cafe24proup),
+    sans-serif;
+}
+
 /* 링크 티켓은 누르는 순간 그림자 쪽으로 내려앉아 눌렸다는 걸 바로 알려준다. */
 a.ticket {
   transition:
