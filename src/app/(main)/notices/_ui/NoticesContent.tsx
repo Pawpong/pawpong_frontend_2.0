@@ -8,6 +8,7 @@ import { dedupeBy } from '@/shared/lib/dedupeBy'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import { formatDate } from '@/shared/lib/formatDate'
 import { Badge, Container, InfiniteScrollTrigger, ListState, NavigationBar } from '@/shared/ui'
+import { ListRowsSkeleton } from '@/shared/ui/Skeleton'
 import type { Notice } from '@/shared/types'
 
 // 공지 행 — FAQ 목록(FaqItem)과 완전히 같은 규격.
@@ -63,6 +64,7 @@ const NoticesContent = () => {
             isError={isError}
             isEmpty={notices.length === 0}
             loadingText="공지사항을 불러오는 중이에요."
+            loadingFallback={<ListRowsSkeleton label="공지사항을 불러오는 중이에요." />}
             errorText="공지사항을 불러오지 못했어요."
             emptyText="등록된 공지사항이 없어요."
             onRetry={() => void refetch()}
