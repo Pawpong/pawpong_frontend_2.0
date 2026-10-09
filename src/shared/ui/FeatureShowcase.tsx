@@ -2,6 +2,7 @@ import Image from 'next/image'
 import type { ReactNode } from 'react'
 import { PawPrintIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
+import { SkeletonBlock } from './Skeleton'
 
 interface FeatureShowcaseProps {
   /** 제목 요소 id. 섹션의 aria-labelledby 로 연결한다. */
@@ -112,6 +113,21 @@ export function FeatureShowcaseTiles({
             {tile.caption}
           </figcaption>
         </figure>
+      ))}
+    </div>
+  )
+}
+
+/** 예시를 불러오는 동안 같은 3칸 틀에 빈 칸과 이름 자리를 둔다. 다 불러와도 자리가 흔들리지 않는다. */
+export function FeatureShowcaseTilesSkeleton({ label }: { label: string }) {
+  return (
+    <div role="status" aria-busy="true" className="grid min-w-0 grid-cols-3 gap-2 tab:gap-3">
+      <span className="sr-only">{label}</span>
+      {[0, 1, 2].map((index) => (
+        <div key={index} className="min-w-0">
+          <SkeletonBlock className="aspect-square w-full rounded-xl" />
+          <SkeletonBlock className="mx-auto mt-2 h-5 w-3/5 rounded-md" />
+        </div>
       ))}
     </div>
   )
