@@ -14,6 +14,7 @@ import {
   FeatureShowcase,
   FeatureShowcasePlaceholder,
   FeatureShowcaseTiles,
+  FeatureShowcaseTilesSkeleton,
 } from '@/shared/ui/FeatureShowcase'
 
 const AI_STEPS = ['우리 아이 사진 고르기', '마음에 드는 필터 선택', '저장하고 함께 자랑하기']
@@ -62,7 +63,9 @@ export function PlaygroundContent() {
           </>
         }
         media={
-          previews.length > 0 ? (
+          filters.isPending ? (
+            <FeatureShowcaseTilesSkeleton label="AI 필터 예시를 불러오고 있어요." />
+          ) : previews.length > 0 ? (
             <FeatureShowcaseTiles
               label="AI 필터 예시"
               tiles={previews.map((filter) => ({

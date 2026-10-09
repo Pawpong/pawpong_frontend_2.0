@@ -37,3 +37,23 @@ test('마이홈 글 격자와 AI 사진 보관함은 로딩 중에 같은 격자
     /<GridSkeleton\s+label="보관함을 불러오는 중이에요\."/,
   )
 })
+
+test('놀이터 AI 예시는 불러오는 동안 같은 3칸 틀의 스켈레톤을 보여줌', () => {
+  const skeleton = loadTypescript('src/shared/ui/Skeleton.tsx', { '@/shared/lib/cn': { cn } })
+  const { FeatureShowcaseTilesSkeleton } = loadTypescript('src/shared/ui/FeatureShowcase.tsx', {
+    'next/image': () => null,
+    '@/shared/assets': { PawPrintIcon: () => null },
+    '@/shared/lib/cn': { cn },
+    './Skeleton': skeleton,
+  })
+  const html = renderToStaticMarkup(
+    createElement(FeatureShowcaseTilesSkeleton, { label: 'AI 필터 예시를 불러오고 있어요.' }),
+  )
+  assert.match(html, /aria-busy="true"/)
+  assert.match(html, /<span class="sr-only">AI 필터 예시를 불러오고 있어요\.<\/span>/)
+  assert.equal(html.match(/aspect-square/g).length, 3)
+  assert.match(
+    source('src/app/(main)/playground/_ui/PlaygroundContent.tsx'),
+    /filters\.isPending \? \(\s*<FeatureShowcaseTilesSkeleton/,
+  )
+})
