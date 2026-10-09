@@ -62,9 +62,9 @@ const NoticesContent = () => {
             isPending={isPending}
             isError={isError}
             isEmpty={notices.length === 0}
-            loadingText="공지사항을 불러오는 중입니다."
-            errorText="공지사항을 불러오지 못했습니다."
-            emptyText="등록된 공지사항이 없습니다."
+            loadingText="공지사항을 불러오는 중이에요."
+            errorText="공지사항을 불러오지 못했어요."
+            emptyText="등록된 공지사항이 없어요."
             onRetry={() => void refetch()}
             isRetrying={isRetrying}
           >

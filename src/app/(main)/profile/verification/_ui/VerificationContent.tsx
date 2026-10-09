@@ -151,7 +151,7 @@ const VerificationContent = () => {
 
   if (profileQuery.isPending) {
     return (
-      <AsyncState status="loading" message="인증 정보를 불러오는 중입니다." className="min-h-dvh" />
+      <AsyncState status="loading" message="인증 정보를 불러오는 중이에요." className="min-h-dvh" />
     )
   }
 
@@ -159,7 +159,7 @@ const VerificationContent = () => {
     return (
       <AsyncState
         status="error"
-        message="인증 정보를 불러오지 못했습니다."
+        message="인증 정보를 불러오지 못했어요."
         onRetry={() => void profileQuery.refetch()}
         isRetrying={profileQuery.isFetching}
         className="min-h-dvh"

@@ -6,6 +6,7 @@ import { communityQueries } from '@/entities/community'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import { Chip } from '@/shared/ui'
+import { EmptyStateLink } from '@/shared/ui/EmptyStateLink'
 import { useAuthReadSession } from '@/shared/lib/useAuthReadSession'
 import type { AuthReadSession } from '@/shared/api'
 import { HomePostGrid } from './HomePostGrid'
@@ -23,20 +24,27 @@ const STATE_TEXT: Record<
   { loadingText: string; errorText: string; emptyText: string }
 > = {
   written: {
-    loadingText: '내가 쓴 글을 불러오는 중입니다.',
-    errorText: '내가 쓴 글을 불러오지 못했습니다.',
-    emptyText: '내가 쓴 글이 없습니다.',
+    loadingText: '내가 쓴 글을 불러오는 중이에요.',
+    errorText: '내가 쓴 글을 불러오지 못했어요.',
+    emptyText: '아직 쓴 글이 없어요.',
   },
   commented: {
-    loadingText: '댓글 단 글을 불러오는 중입니다.',
-    errorText: '댓글 단 글을 불러오지 못했습니다.',
-    emptyText: '댓글을 단 글이 없습니다.',
+    loadingText: '댓글 단 글을 불러오는 중이에요.',
+    errorText: '댓글 단 글을 불러오지 못했어요.',
+    emptyText: '아직 댓글을 단 글이 없어요.',
   },
   liked: {
-    loadingText: '좋아요한 글을 불러오는 중입니다.',
-    errorText: '좋아요한 글을 불러오지 못했습니다.',
-    emptyText: '좋아요한 글이 없습니다.',
+    loadingText: '좋아요한 글을 불러오는 중이에요.',
+    errorText: '좋아요한 글을 불러오지 못했어요.',
+    emptyText: '아직 좋아요한 글이 없어요.',
   },
+}
+
+// 빈 목록에서 바로 다음 행동으로 잇는다. 쓴 글이 없으면 쓰기로, 반응한 글이 없으면 둘러보기로.
+const EMPTY_ACTION: Record<PostFilter, ReactNode> = {
+  written: <EmptyStateLink href="/community/write">첫 이야기 쓰기</EmptyStateLink>,
+  commented: <EmptyStateLink href="/community">커뮤니티 둘러보기</EmptyStateLink>,
+  liked: <EmptyStateLink href="/community">커뮤니티 둘러보기</EmptyStateLink>,
 }
 
 interface PostsViewProps {
@@ -65,6 +73,7 @@ const WrittenPosts = ({
       isRetrying={query.isFetching}
       header={header}
       gridClassName={gridClassName}
+      emptyAction={EMPTY_ACTION.written}
       {...STATE_TEXT.written}
     />
   )
@@ -107,6 +116,7 @@ const ActivityPosts = ({
       }}
       header={header}
       gridClassName={gridClassName}
+      emptyAction={EMPTY_ACTION[filter]}
       {...STATE_TEXT[filter]}
     />
   )

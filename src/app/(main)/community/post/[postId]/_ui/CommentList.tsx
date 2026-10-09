@@ -91,8 +91,8 @@ const CommentList = ({ thread }: CommentListProps) => {
         isPending={isPending}
         isError={isError}
         isEmpty={threads.length === 0}
-        loadingText="댓글을 불러오는 중입니다."
-        errorText="댓글을 불러오지 못했습니다."
+        loadingText="댓글을 불러오는 중이에요."
+        errorText="댓글을 불러오지 못했어요."
         emptyText="첫 댓글을 남겨보세요."
         onRetry={() => void thread.refetch()}
         isRetrying={thread.isFetching}

@@ -159,10 +159,10 @@ const NotificationBell = ({ className }: { className?: string }) => {
               <p className="px-4 py-10 text-center text-sm text-neutral-700">불러오는 중...</p>
             ) : isError ? (
               <p className="px-4 py-10 text-center text-sm text-neutral-700">
-                알림을 불러오지 못했습니다.
+                알림을 불러오지 못했어요.
               </p>
             ) : notifications.length === 0 ? (
-              <EmptyState message="새 알림이 없습니다." className="py-8" />
+              <EmptyState message="새 알림이 없어요." className="py-8" />
             ) : (
               <div className="flex flex-col divide-y divide-neutral-100">
                 {notifications.map((item) => (

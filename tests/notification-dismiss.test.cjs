@@ -222,7 +222,7 @@ test('clear all includes unloaded pages, disables duplicate actions and preserve
   assert.ok(f.records.every((item) => item.isRead))
   assert.equal(
     h.render().find((node) => node.type === 'EmptyState').props.message,
-    '새 알림이 없습니다.',
+    '새 알림이 없어요.',
   )
 })
 

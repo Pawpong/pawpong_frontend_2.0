@@ -41,9 +41,9 @@ const AdoptionDraftSection = () => {
         isError={isError}
         onRetry={() => void refetch()}
         isRetrying={isRetrying}
-        loadingText="임시저장한 분양글을 불러오는 중입니다."
-        errorText="임시저장한 분양글을 불러오지 못했습니다."
-        emptyText="임시저장한 분양글이 없습니다."
+        loadingText="임시저장한 분양글을 불러오는 중이에요."
+        errorText="임시저장한 분양글을 불러오지 못했어요."
+        emptyText="임시저장한 분양글이 없어요."
       >
         <ul className="overflow-hidden rounded-xl border border-neutral-150 bg-white">
           {drafts.map((draft, index) => (

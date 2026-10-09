@@ -19,6 +19,7 @@ import {
   EmptyState,
   DeleteConfirmModal,
 } from '@/shared/ui'
+import { EmptyStateLink } from '@/shared/ui/EmptyStateLink'
 import { useAiArchiveAction } from '../lib/useAiArchiveAction'
 import { ArchivePhotoCompare } from './ArchivePhotoCompare'
 import { AiPostShareChoice } from './AiPostShareChoice'
@@ -125,14 +126,7 @@ function AiArchiveContent({
     return (
       <EmptyState
         message="아직 만든 AI 사진이 없어요. 첫 작품을 만들어 볼까요?"
-        action={
-          <Link
-            href="/ai-filter"
-            className="inline-flex min-h-11 items-center text-sm font-semibold text-primary-700 underline underline-offset-4 focus-ring"
-          >
-            AI 필터 써 보기
-          </Link>
-        }
+        action={<EmptyStateLink href="/ai-filter">AI 필터 써 보기</EmptyStateLink>}
       />
     )
   }

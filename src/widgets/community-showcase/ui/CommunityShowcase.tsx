@@ -35,9 +35,9 @@ const CommunityShowcase = () => {
         isPending={isPending}
         isError={isError}
         isEmpty={fetched.length === 0}
-        loadingText="커뮤니티 게시글을 불러오는 중입니다."
-        errorText="커뮤니티 게시글을 불러오지 못했습니다."
-        emptyText="아직 등록된 커뮤니티 게시글이 없습니다."
+        loadingText="커뮤니티 게시글을 불러오는 중이에요."
+        errorText="커뮤니티 게시글을 불러오지 못했어요."
+        emptyText="아직 등록된 커뮤니티 게시글이 없어요."
       >
         {/* Figma Community Feed Card-my home:
             mo는 122px 타일을 12px 간격으로 스크롤, tab부터는 화면 폭에 비례해 확대

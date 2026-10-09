@@ -17,7 +17,7 @@ interface PostListProps {
 // 모바일 말단과 태블릿 시작점의 실내용 폭을 672px로 맞추고, PC에서 프로필 카드 폭(948px)까지 넓힌다.
 // 목록형 화면은 어디까지가 한 글인지 바로 보여야 해서 카드 사이에 구분선을 남긴다
 // (gap을 커뮤니티의 절반으로 두어 구분선 포함 간격이 24/32/40으로 같아진다)
-const PostList = ({ posts, emptyText = '게시글이 없습니다.', onEdit, onDelete }: PostListProps) => {
+const PostList = ({ posts, emptyText = '게시글이 없어요.', onEdit, onDelete }: PostListProps) => {
   if (posts.length === 0) {
     return <EmptyState message={emptyText} />
   }

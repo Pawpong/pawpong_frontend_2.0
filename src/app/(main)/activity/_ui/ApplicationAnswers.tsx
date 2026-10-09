@@ -106,7 +106,7 @@ export const ApplicationAnswers = ({
           )}
         </div>
       ) : (
-        <EmptyState message="저장된 신청 답변이 없습니다." className="py-6 text-neutral-500" />
+        <EmptyState message="저장된 신청 답변이 없어요." className="py-6 text-neutral-500" />
       )}
     </section>
   )

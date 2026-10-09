@@ -2,6 +2,7 @@
 
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { Container, InfiniteScrollTrigger, ListState, ListingCardGrid } from '@/shared/ui'
+import { EmptyStateLink } from '@/shared/ui/EmptyStateLink'
 import { cn } from '@/shared/lib/cn'
 import { profileQueries } from '@/entities/profile'
 import type { FavoriteBreederCard } from '@/shared/types'
@@ -49,9 +50,10 @@ const FavoriteBreedersContent = ({
         isPending={isPending}
         isError={isError}
         isEmpty={breeders.length === 0}
-        loadingText="즐겨찾는 브리더를 불러오는 중입니다."
-        errorText="즐겨찾는 브리더를 불러오지 못했습니다."
-        emptyText="즐겨찾는 브리더가 없습니다."
+        loadingText="즐겨찾는 브리더를 불러오는 중이에요."
+        errorText="즐겨찾는 브리더를 불러오지 못했어요."
+        emptyText="아직 즐겨찾는 브리더가 없어요."
+        emptyAction={<EmptyStateLink href="/explore">브리더 둘러보기</EmptyStateLink>}
         onRetry={() => void refetch()}
         isRetrying={isRetrying}
       >

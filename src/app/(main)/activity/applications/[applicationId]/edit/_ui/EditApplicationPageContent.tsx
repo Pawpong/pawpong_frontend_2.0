@@ -19,7 +19,7 @@ const EditApplicationPageContent = ({ applicationId }: { applicationId: string }
     return (
       <AsyncState
         status="loading"
-        message="신청서를 불러오는 중입니다."
+        message="신청서를 불러오는 중이에요."
         className="min-h-[24rem]"
       />
     )
@@ -29,7 +29,7 @@ const EditApplicationPageContent = ({ applicationId }: { applicationId: string }
     return (
       <AsyncState
         status="error"
-        message="신청서를 불러오지 못했습니다."
+        message="신청서를 불러오지 못했어요."
         onRetry={() => void refetch()}
         isRetrying={isRetrying}
         className="min-h-[24rem]"

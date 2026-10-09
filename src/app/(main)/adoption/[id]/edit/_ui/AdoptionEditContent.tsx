@@ -50,7 +50,7 @@ const AdoptionEditContent = ({ petId }: AdoptionEditContentProps) => {
               role={isLoadError ? 'alert' : 'status'}
               className="text-sm font-medium text-neutral-700"
             >
-              {isLoadError ? '분양글을 불러오지 못했습니다.' : '분양글을 불러오는 중입니다.'}
+              {isLoadError ? '분양글을 불러오지 못했어요.' : '분양글을 불러오는 중이에요.'}
             </p>
             {isLoadError && (
               <div className="flex items-center gap-2">

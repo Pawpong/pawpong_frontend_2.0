@@ -300,10 +300,10 @@ const ProfileEditContent = () => {
           status={profileError ? 'error' : 'loading'}
           message={
             profileError
-              ? '프로필을 불러오지 못했습니다.'
+              ? '프로필을 불러오지 못했어요.'
               : profilePending
-                ? '프로필을 불러오는 중입니다.'
-                : '프로필을 확인할 수 없습니다.'
+                ? '프로필을 불러오는 중이에요.'
+                : '프로필을 확인할 수 없어요.'
           }
           onRetry={
             profileError

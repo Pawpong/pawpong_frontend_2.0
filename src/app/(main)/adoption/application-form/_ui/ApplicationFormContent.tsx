@@ -92,7 +92,7 @@ const ApplicationFormContent = () => {
         <AsyncState
           status={formQuery.isError ? 'error' : 'loading'}
           message={
-            formQuery.isError ? '신청서를 불러오지 못했습니다.' : '신청서를 불러오는 중입니다.'
+            formQuery.isError ? '신청서를 불러오지 못했어요.' : '신청서를 불러오는 중이에요.'
           }
           onRetry={formQuery.isError ? () => void formQuery.refetch() : undefined}
           isRetrying={formQuery.isFetching}

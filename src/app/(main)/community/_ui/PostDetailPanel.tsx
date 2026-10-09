@@ -85,9 +85,9 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
           status={isError ? 'error' : isPending ? 'loading' : 'empty'}
           message={
             isError
-              ? '게시글을 불러오지 못했습니다.'
+              ? '게시글을 불러오지 못했어요.'
               : isPending
-                ? '게시글을 불러오는 중입니다.'
+                ? '게시글을 불러오는 중이에요.'
                 : '삭제되었거나 볼 수 없는 게시글입니다.'
           }
           onRetry={isError ? () => void refetch() : undefined}

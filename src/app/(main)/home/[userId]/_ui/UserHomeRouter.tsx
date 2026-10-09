@@ -73,7 +73,7 @@ const UserHomeRouter = ({ userId }: UserHomeRouterProps) => {
     return (
       <AsyncState
         status="error"
-        message="프로필을 불러오지 못했습니다."
+        message="프로필을 불러오지 못했어요."
         onRetry={() => void adopterProfileQuery.refetch()}
         isRetrying={adopterProfileQuery.isFetching}
         className="min-h-[calc(100dvh-3.5rem)]"
@@ -88,7 +88,7 @@ const UserHomeRouter = ({ userId }: UserHomeRouterProps) => {
   return (
     <AsyncState
       status="loading"
-      message="프로필을 불러오는 중입니다."
+      message="프로필을 불러오는 중이에요."
       className="min-h-[calc(100dvh-3.5rem)]"
     />
   )

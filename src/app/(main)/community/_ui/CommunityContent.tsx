@@ -264,7 +264,7 @@ const CommunityContent = () => {
               isPending={false}
               isError={isError || filterUnavailable}
               isEmpty={filterUnavailable || (!isPending && posts.length === 0)}
-              loadingText="게시글을 불러오는 중입니다."
+              loadingText="게시글을 불러오는 중이에요."
               errorText={
                 filterUnavailable
                   ? '탐색 조건을 확인하지 못했어요. 조건은 그대로 보관하고 있어요.'
