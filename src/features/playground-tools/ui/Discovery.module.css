@@ -84,41 +84,7 @@
     sans-serif;
 }
 
-/* 결과 카드: 티켓 모양의 도트 카드 */
-.ticket {
-  --accent: #fff3b8;
-  --accent-edge: #ad651d;
-  position: relative;
-  border: 3px solid var(--accent-edge);
-  border-radius: 0.5rem;
-  background: var(--color-base-white, #fff);
-  box-shadow: 6px 6px 0 var(--accent);
-}
-.ticket[data-accent='green'] {
-  --accent: #cfe6c3;
-  --accent-edge: #55784d;
-}
-.ticket[data-accent='peach'] {
-  --accent: #ffd9c2;
-  --accent-edge: #b86a3c;
-}
-.ticket[data-accent='blue'] {
-  --accent: #d6e4fb;
-  --accent-edge: #4f6f9f;
-}
-.ticketTop {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.6rem 1rem;
-  background: var(--accent);
-  color: var(--accent-edge);
-  font:
-    0.75rem/1.4 var(--font-cafe24proup),
-    sans-serif;
-  letter-spacing: 0.04em;
-}
+/* 결과 카드 아랫단. 티켓 틀과 색 변수(--accent, --accent-edge)는 shared/ui/Ticket.module.css 에서 온다. */
 .ticketBottom {
   border-top: 2px dashed var(--accent-edge);
   padding: 0.7rem 1rem;

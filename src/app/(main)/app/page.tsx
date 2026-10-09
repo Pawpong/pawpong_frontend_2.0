@@ -1,9 +1,16 @@
 import Link from 'next/link'
+import {
+  PawPrintIcon,
+  PixelArrowRightIcon,
+  PixelMessageIcon,
+  PixelPencilIcon,
+} from '@/shared/assets'
 import { MOBILE_APP } from '@/shared/config/mobileApp'
 import { createPageMetadata } from '@/shared/lib/metadata'
 import { createMobileAppStructuredData } from '@/shared/lib/mobileApp'
 import { Container, NavigationBar, buttonVariants } from '@/shared/ui'
 import { FeatureIntro } from '@/shared/ui/FeatureIntro'
+import { TicketLink } from '@/shared/ui/Ticket'
 
 export const metadata = createPageMetadata({
   title: '포퐁 앱 다운로드 · iOS와 Android',
@@ -12,24 +19,34 @@ export const metadata = createPageMetadata({
   path: '/app',
 })
 
+// 놀이터·서비스 소개와 같은 티켓 카드로 앱에서 할 수 있는 일을 잇는다.
 const FEATURES = [
   {
     title: '새로운 가족을 만나요',
     body: '강아지·고양이·파충류와 브리더의 정보를 확인해요.',
     href: '/explore',
     label: '반려동물 탐색하기',
+    tag: 'EXPLORE',
+    accent: 'butter',
+    Icon: PawPrintIcon,
   },
   {
     title: '궁금한 이야기를 나눠요',
     body: '브리더와 채팅으로 건강 상태와 입양 조건을 상담해요.',
     href: '/about',
     label: '포퐁 이용 방법 보기',
+    tag: 'CHAT',
+    accent: 'blue',
+    Icon: PixelMessageIcon,
   },
   {
     title: '우리 아이의 일상을 함께해요',
     body: '커뮤니티에서 반려동물의 사진과 이야기를 나눠요.',
     href: '/community',
     label: '커뮤니티 둘러보기',
+    tag: 'COMMUNITY',
+    accent: 'green',
+    Icon: PixelPencilIcon,
   },
 ] as const
 
@@ -46,11 +63,11 @@ export default function AppDownloadPage() {
 
           <section
             aria-labelledby="app-download-title"
-            className="border border-secondary-300 bg-secondary-50 p-5 tab:p-8"
+            className="rounded-2xl border border-secondary-200 bg-base-white p-5 tab:p-8"
           >
             <h2
               id="app-download-title"
-              className="font-cafe24 text-xl text-primary-700 tab:text-2xl"
+              className="font-cafe24 text-xl text-neutral-850 tab:text-2xl"
             >
               포퐁 앱 다운로드
             </h2>
@@ -62,13 +79,13 @@ export default function AppDownloadPage() {
                 href={MOBILE_APP.ios.storeUrl}
                 className={buttonVariants({ intent: 'primary', width: 'full' })}
               >
-                App Store에서 받기 ↗
+                App Store에서 받기 <span aria-hidden>↗</span>
               </a>
               <a
                 href={MOBILE_APP.android.storeUrl}
                 className={buttonVariants({ intent: 'secondary', width: 'full' })}
               >
-                Google Play에서 받기 ↗
+                Google Play에서 받기 <span aria-hidden>↗</span>
               </a>
             </div>
             <p className="mt-3 text-xs leading-relaxed text-neutral-700">
@@ -83,25 +100,22 @@ export default function AppDownloadPage() {
             >
               포퐁에서 함께하는 하루
             </h2>
-            <div className="mt-4 grid gap-4 lap:grid-cols-3">
-              {FEATURES.map((feature) => (
-                <article
-                  key={feature.href}
-                  className="flex flex-col border border-secondary-200 bg-point-50 p-5"
-                >
-                  <h3 className="font-semibold text-primary-700">{feature.title}</h3>
-                  <p className="mt-2 flex-1 text-sm leading-relaxed text-neutral-700">
-                    {feature.body}
-                  </p>
-                  <Link
-                    href={feature.href}
-                    className="mt-4 flex min-h-11 items-center font-semibold text-primary-600 focus-ring hover:underline"
-                  >
-                    {feature.label} →
-                  </Link>
-                </article>
+            <ul className="mt-4 grid gap-4 lap:grid-cols-3">
+              {FEATURES.map(({ href, tag, accent, Icon, title, body, label }) => (
+                <li key={href}>
+                  <TicketLink
+                    href={href}
+                    label={tag}
+                    icon={<Icon aria-hidden className="size-4" />}
+                    accent={accent}
+                    title={title}
+                    body={body}
+                    cta={label}
+                    size="sm"
+                  />
+                </li>
               ))}
-            </div>
+            </ul>
           </section>
 
           <section
@@ -118,9 +132,10 @@ export default function AppDownloadPage() {
             </p>
             <Link
               href="/faq"
-              className="inline-flex min-h-11 items-center font-semibold text-primary-600 focus-ring hover:underline"
+              className="inline-flex min-h-11 items-center gap-1.5 font-semibold text-primary-600 focus-ring hover:underline"
             >
-              이용에 도움이 필요해요 →
+              이용에 도움이 필요해요
+              <PixelArrowRightIcon aria-hidden className="size-3" />
             </Link>
           </section>
         </div>

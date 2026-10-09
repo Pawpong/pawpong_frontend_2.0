@@ -1,0 +1,36 @@
+/* 놀이터 PLAY CARD 에서 시작한 도트 티켓 틀. 링크 카드와 놀이 결과 카드가 함께 쓴다. */
+.ticket {
+  --accent: #fff3b8;
+  --accent-edge: #ad651d;
+  position: relative;
+  overflow: hidden;
+  border: 3px solid var(--accent-edge);
+  border-radius: 0.5rem;
+  background: var(--color-base-white, #fff);
+  box-shadow: 6px 6px 0 var(--accent);
+}
+.ticket[data-accent='green'] {
+  --accent: #cfe6c3;
+  --accent-edge: #55784d;
+}
+.ticket[data-accent='peach'] {
+  --accent: #ffd9c2;
+  --accent-edge: #b86a3c;
+}
+.ticket[data-accent='blue'] {
+  --accent: #d6e4fb;
+  --accent-edge: #4f6f9f;
+}
+.strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  background: var(--accent);
+  color: var(--accent-edge);
+  font:
+    0.75rem/1.4 var(--font-cafe24proup),
+    sans-serif;
+  letter-spacing: 0.04em;
+}

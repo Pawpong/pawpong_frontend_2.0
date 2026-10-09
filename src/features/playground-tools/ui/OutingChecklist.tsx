@@ -4,6 +4,7 @@ import { useEffect, useState, useSyncExternalStore, type FormEvent } from 'react
 import Link from 'next/link'
 import { Button, buttonVariants } from '@/shared/ui/Button'
 import { IconButton } from '@/shared/ui/IconButton'
+import { TicketLink } from '@/shared/ui/Ticket'
 import {
   PixelCheckIcon,
   PixelArrowRightIcon,
@@ -25,7 +26,6 @@ import {
 import { createChecklistStore } from '../model/checklistStore'
 import { currentToolOwner, useToolOwner } from '../model/useToolOwner'
 import { ToolPage } from './ToolPage'
-import discovery from './Discovery.module.css'
 import styles from './Tools.module.css'
 
 const SIDE_TICKETS = [
@@ -271,25 +271,17 @@ function Checklist({ owner }: { owner: string }) {
         </section>
         {/* 놀이터 첫 화면의 돌봄 도구·놀이 카드와 같은 티켓으로 다음 행동을 잇는다. */}
         {SIDE_TICKETS.map(({ href, accent, label, title, body, cta, Icon }) => (
-          <Link
+          <TicketLink
             key={href}
             href={href}
-            data-accent={accent}
-            className={`${discovery.ticket} flex flex-col focus-ring`}
-          >
-            <span className={discovery.ticketTop}>
-              <span>{label}</span>
-              <Icon aria-hidden className="size-4" />
-            </span>
-            <span className="flex flex-col p-4 tab:p-5">
-              <span className="text-base font-semibold break-keep text-neutral-850">{title}</span>
-              <span className="mt-1.5 text-xs leading-5 break-keep text-neutral-700">{body}</span>
-              <span className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-primary-600">
-                {cta}
-                <PixelArrowRightIcon aria-hidden className="size-3" />
-              </span>
-            </span>
-          </Link>
+            label={label}
+            icon={<Icon aria-hidden className="size-4" />}
+            accent={accent}
+            title={title}
+            body={body}
+            cta={cta}
+            size="sm"
+          />
         ))}
       </aside>
     </div>
