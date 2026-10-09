@@ -110,7 +110,7 @@ export function PetCategorySuggestion({
           </Button>
         )}
         {!manual && (
-          <p className="mt-3 text-xs leading-relaxed text-neutral-600">
+          <p className="mt-3 text-xs leading-relaxed text-neutral-700">
             포퐁 AI가 글 앞부분과 새로 올린 첫 사진의 축소본으로 분류해요. 직접 고르면 자동 분류를
             멈춰요. 연락처 등 개인정보는 빼 주세요.
           </p>

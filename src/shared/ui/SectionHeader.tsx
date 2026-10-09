@@ -83,7 +83,7 @@ const SectionHeader = ({
       </div>
       {subtitle && (
         <div className="flex items-center justify-between">
-          <p className="text-xs font-bold text-[#898989] tab:text-base tab:font-semibold">
+          <p className="text-xs font-bold text-neutral-700 tab:text-base tab:font-semibold">
             {subtitle}
           </p>
           {rightSlot}

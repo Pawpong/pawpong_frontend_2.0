@@ -2,7 +2,7 @@ import { tv, type VariantProps } from '@/shared/lib/tv'
 import { cn } from '@/shared/lib/cn'
 
 const listingStatsVariants = tv({
-  base: 'flex items-center font-medium text-[#8e8e8e]',
+  base: 'flex items-center font-medium text-neutral-700',
   variants: {
     size: {
       sm: 'gap-[0.375rem] text-[0.625rem] leading-[1.286rem]',

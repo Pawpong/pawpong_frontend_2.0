@@ -62,7 +62,7 @@ const ProfileImageUpload = ({ value, onChange, className }: ProfileImageUploadPr
   return (
     // 아바타 100 + 버튼 블록(112) 사이 spacing/32 (Figma 3414-752442)
     <div className={cn('flex w-28 flex-col items-center gap-8', className)}>
-      <div className="flex size-[5rem] items-center justify-center overflow-hidden rounded-full bg-neutral-100 text-neutral-500 tab:size-[6.25rem]">
+      <div className="flex size-[5rem] items-center justify-center overflow-hidden rounded-full bg-neutral-100 text-neutral-700 tab:size-[6.25rem]">
         {shownImage ? (
           // 사용자가 고른 파일(blob)·CDN URL 모두 표시 — next/image는 blob 미지원이라 img 사용
           // eslint-disable-next-line @next/next/no-img-element

@@ -65,7 +65,7 @@ function PhotoWithFallback({ src, alt, sizes, unoptimized }: Props) {
       <div
         role="img"
         aria-label={alt}
-        className="flex size-full items-center justify-center p-2 text-center text-xs text-neutral-500"
+        className="flex size-full items-center justify-center p-2 text-center text-xs text-neutral-700"
       >
         사진을 불러오지 못했어요
       </div>
@@ -87,7 +87,7 @@ function PhotoWithFallback({ src, alt, sizes, unoptimized }: Props) {
       {status === 'converting' && (
         <span
           role="status"
-          className="absolute inset-0 flex items-center justify-center bg-neutral-100 text-xs text-neutral-500"
+          className="absolute inset-0 flex items-center justify-center bg-neutral-100 text-xs text-neutral-700"
         >
           사진을 불러오는 중이에요
         </span>

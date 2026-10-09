@@ -32,7 +32,7 @@ const SortOptions = <Value extends string>({
             ? compact
               ? 'font-medium text-neutral-700'
               : 'font-semibold text-neutral-850'
-            : 'text-neutral-500 hover:text-neutral-850',
+            : 'text-neutral-700 hover:text-neutral-850',
         )}
       >
         {option.label}

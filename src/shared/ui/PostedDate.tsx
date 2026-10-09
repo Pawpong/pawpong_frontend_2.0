@@ -2,7 +2,7 @@ import { tv, type VariantProps } from '@/shared/lib/tv'
 import { cn } from '@/shared/lib/cn'
 
 const postedDateVariants = tv({
-  base: 'flex items-center gap-[0.438rem] text-[#a3a3a3]',
+  base: 'flex items-center gap-[0.438rem] text-neutral-700',
   variants: {
     size: {
       sm: 'text-xs',

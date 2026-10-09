@@ -71,7 +71,7 @@ export function CommunityRoutePlaceItem({
         </button>
       </div>
       {precision && (
-        <p className="mt-1 text-xs text-neutral-600">
+        <p className="mt-1 text-xs text-neutral-700">
           {precision === 'area'
             ? '사진 위치를 동네 정도로 흐려서 담았어요.'
             : '사진 위치 그대로 담았어요.'}

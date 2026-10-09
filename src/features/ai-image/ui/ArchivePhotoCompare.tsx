@@ -96,7 +96,7 @@ export function ArchivePhotoCompare({
           </div>
         )}
       </div>
-      <p className="text-center text-xs text-neutral-600">
+      <p className="text-center text-xs text-neutral-700">
         원본은 아래에서 비교 공개를 선택한 경우에만 게시글에 함께 올라가요.
       </p>
     </div>

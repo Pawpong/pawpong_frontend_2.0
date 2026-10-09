@@ -63,7 +63,7 @@ function ReviewForm({ post }: { post: CommunityPostDetail }) {
           {COMMUNITY_REVIEW_NEXT_STEP[review.reason]}
         </p>
       )}
-      <p className="text-xs text-neutral-600">AI 판정은 전문 자격·의학적 신뢰 인증이 아니에요.</p>
+      <p className="text-xs text-neutral-700">AI 판정은 전문 자격·의학적 신뢰 인증이 아니에요.</p>
       {held && (
         <>
           <Link
@@ -91,7 +91,7 @@ function ReviewForm({ post }: { post: CommunityPostDetail }) {
           >
             {request.isPending ? '공개 여부 확인 중' : '동의하고 다시 심사하기'}
           </Button>
-          <p className="text-xs text-neutral-600">
+          <p className="text-xs text-neutral-700">
             조회만으로는 다시 심사하거나 횟수를 사용하지 않아요.
           </p>
           {config.isError && (

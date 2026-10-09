@@ -19,7 +19,7 @@ export function CommunityRecordCard({ summary }: { summary: CommunityRecordSumma
         <dl className="mt-3 grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1.5 text-sm">
           {summary.facts.map((fact) => (
             <div key={fact.label} className="contents">
-              <dt className="font-medium text-neutral-600">{fact.label}</dt>
+              <dt className="font-medium text-neutral-700">{fact.label}</dt>
               <dd className="min-w-0 font-semibold break-words text-neutral-850">{fact.value}</dd>
             </div>
           ))}
