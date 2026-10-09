@@ -49,15 +49,7 @@ const UserHomeRouter = ({ userId }: UserHomeRouterProps) => {
   }, [isMine, router])
 
   // 로그인 사용자는 본인 여부 판정이 끝나기 전 방문자 액션을 노출하지 않는다.
-  if (isLoggedIn && isMyProfilePending) {
-    return (
-      <AsyncState
-        status="loading"
-        message="프로필을 확인하는 중입니다."
-        className="min-h-[calc(100dvh-3.5rem)]"
-      />
-    )
-  }
+  if (isLoggedIn && isMyProfilePending) return <HomeSkeleton />
   if (isMine) return null
 
   // /profile/me 실패로는 화면을 막지 않는다. 이 값은 '내 홈인지' 판정에만 쓰이는데,

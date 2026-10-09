@@ -224,7 +224,7 @@ const PhoneVerificationSection = ({
           {failures >= PHONE_FAILURE_THRESHOLD && emailConfig.isError && (
             <div aria-live="polite">
               <HelpMessage status="error">
-                이메일 인증 연결을 확인하지 못했습니다. 잠시 후 다시 확인해주세요.
+                이메일 인증 연결을 확인하지 못했어요. 잠시 후 다시 확인해 주세요.
               </HelpMessage>
               <Button
                 size="lg"

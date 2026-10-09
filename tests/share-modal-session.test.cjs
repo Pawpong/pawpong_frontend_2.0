@@ -170,10 +170,10 @@ test('closing unresolved native share releases URL copy immediately after reopen
   app.click('URL 복사')
   await app.settle()
   assert.equal(app.copies.length, 1)
-  assert.equal(app.status(), 'URL을 복사했습니다.')
+  assert.equal(app.status(), 'URL을 복사했어요.')
   app.nativeRequests[0].resolve()
   await app.settle()
-  assert.equal(app.status(), 'URL을 복사했습니다.')
+  assert.equal(app.status(), 'URL을 복사했어요.')
 })
 
 test('external parent close resets pending and old finally cannot unlock a newer copy', async () => {
@@ -192,7 +192,7 @@ test('external parent close resets pending and old finally cannot unlock a newer
   assert.equal(app.copies.length, 1)
   copy.resolve()
   await app.settle()
-  assert.equal(app.status(), 'URL을 복사했습니다.')
+  assert.equal(app.status(), 'URL을 복사했어요.')
   assert.equal(app.button('URL 복사').props['aria-disabled'], false)
 })
 

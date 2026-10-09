@@ -22,7 +22,7 @@ test('최초 조회 중에는 빈 상태나 생성 동의 폼을 표시하지 �
 
 test('접수 재확인 중에는 생성 대신 읽기 상태를 안내한다', () => {
   const html = answerViewFixture({ phase: 'checking' }).render()
-  assert.match(html, /생성 요청은 다시 보내지 않습니다/)
+  assert.match(html, /생성 요청은 다시 보내지 않아요/)
   assert.doesNotMatch(html, /type="checkbox"|아직 AI 답변이 없어요/)
 })
 

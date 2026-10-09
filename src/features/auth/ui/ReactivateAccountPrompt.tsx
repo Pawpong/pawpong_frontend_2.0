@@ -28,10 +28,10 @@ import { useReactivateAccount } from '../api/auth.mutations'
 /** 복구 토큰 유효시간 기본값 — 콜백이 expiresIn 을 안 실어줄 때만 사용 */
 const DEFAULT_EXPIRES_IN_SEC = 600
 
-const EXPIRED_MESSAGE = '복구 요청이 만료되었습니다. 다시 로그인해주세요.'
+const EXPIRED_MESSAGE = '복구 요청 시간이 지났어요. 다시 로그인해 주세요.'
 
 /** 서버에 닿지 못했을 때 — axios 의 'Network Error' 가 그대로 노출되는 것을 막는다 */
-const REQUEST_FAILED_MESSAGE = '계정 복구에 실패했습니다. 잠시 후 다시 시도해주세요.'
+const REQUEST_FAILED_MESSAGE = '계정을 복구하지 못했어요. 잠시 후 다시 시도해 주세요.'
 
 const formatRemaining = (seconds: number) => {
   const m = Math.floor(seconds / 60)
@@ -135,7 +135,7 @@ const ReactivateAccountPrompt = () => {
         description={
           <span className="flex flex-col gap-2">
             <span>
-              {message ?? '탈퇴한 계정입니다. 복구 후 이용하시겠습니까?'}
+              {message ?? '탈퇴한 계정이에요. 복구하고 이용할까요?'}
               <br />
               복구하면 이전에 쓰던 채팅·입양신청·후기가 그대로 살아나요.
             </span>

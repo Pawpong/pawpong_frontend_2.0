@@ -34,7 +34,7 @@ export const ModalPhoto = ({
         />
       ) : (
         <div className="flex h-32 items-center justify-center text-body-md text-neutral-500">
-          표시할 사진이 없습니다.
+          표시할 사진이 없어요.
         </div>
       )}
       {representativeIndex === currentIndex && images.length > 0 && (

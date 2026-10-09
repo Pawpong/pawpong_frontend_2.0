@@ -145,7 +145,7 @@ const VerificationContent = () => {
       setFiles({})
       toast.success('서류를 제출했어요. 심사 결과를 알려드릴게요.')
     } catch (error) {
-      toast.error(normalizeApiError(error, '서류 제출에 실패했습니다.').message)
+      toast.error(normalizeApiError(error, '서류를 제출하지 못했어요.').message)
     }
   }
 

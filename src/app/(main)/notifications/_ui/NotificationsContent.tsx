@@ -126,7 +126,7 @@ const NotificationsContent = () => {
     deleteAllNotifications(bulkDelete, {
       onSuccess: () => setBulkDelete(null),
       onError: (error) =>
-        setDeleteAllError(normalizeApiError(error, '알림 삭제에 실패했습니다.').message),
+        setDeleteAllError(normalizeApiError(error, '알림을 삭제하지 못했어요.').message),
     })
   }
 

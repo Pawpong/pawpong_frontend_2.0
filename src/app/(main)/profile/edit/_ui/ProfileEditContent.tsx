@@ -179,7 +179,7 @@ const ProfileEditContent = () => {
       setPhotoPreview(res.cdnUrl)
       setPhotoFileName(res.fileName)
     } catch (error) {
-      showError(error, '사진 업로드에 실패했습니다.')
+      showError(error, '사진을 올리지 못했어요.')
     }
   }
 
@@ -275,9 +275,9 @@ const ProfileEditContent = () => {
       setPendingPhotos(null)
       // 저장된 값을 새 기준으로 다시 시드한다
       setBreederSeeded(false)
-      toast.success('프로필이 변경되었습니다')
+      toast.success('프로필을 바꿨어요.')
     } catch (error) {
-      showError(error, '프로필 적용에 실패했습니다.')
+      showError(error, '프로필을 적용하지 못했어요.')
     } finally {
       setIsApplying(false)
     }
@@ -413,7 +413,7 @@ const ProfileEditContent = () => {
                 photos={pendingPhotos ?? representativePhotos}
                 disabled={isSaving}
                 onChange={setPendingPhotos}
-                onError={(error) => showError(error, '사진을 선택하지 못했습니다.')}
+                onError={(error) => showError(error, '사진을 선택하지 못했어요.')}
               />
             </ProfileSection>
 

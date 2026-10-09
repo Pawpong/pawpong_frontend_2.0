@@ -86,3 +86,28 @@ test('사진이 여러 장인 캐러셀 트랙은 키보드로 들어와 화살�
   )
   assert.match(carousel, /overflow-x-auto overflow-y-hidden focus-ring-inset/)
 })
+
+test('토스트·안내·확인 문구는 해요체로 맞추고 동의·약관 문장만 합니다체로 둠', () => {
+  const files = [
+    'src/shared/ui/ShareModal.tsx',
+    'src/shared/ui/DeleteConfirmModal.tsx',
+    'src/shared/ui/ReportAction.tsx',
+    'src/features/community/ui/ReportPostAction.tsx',
+    'src/features/report/ui/ReportBreederAction.tsx',
+    'src/app/(main)/notifications/_ui/NotificationsContent.tsx',
+    'src/app/(main)/settings/_ui/SettingsContent.tsx',
+    'src/app/(main)/profile/edit/_ui/ProfileEditContent.tsx',
+    'src/app/(main)/adoption/application-form/_ui/ApplicationFormContent.tsx',
+    'src/features/auth/ui/ReactivateAccountPrompt.tsx',
+    'src/features/onboarding/ui/InfoStep.tsx',
+    'src/features/onboarding/ui/KennelInfoStep.tsx',
+    'src/features/onboarding/ui/EmailVerificationSection.tsx',
+  ]
+  for (const file of files)
+    assert.doesNotMatch(source(file), /(습니다|입니다|됩니다)\.?\s*['`"]/, file)
+  // 법적 동의 문장은 바꾸지 않는다.
+  assert.match(
+    source('src/features/onboarding/ui/AgreementSection.tsx'),
+    /본인은 만 14세 이상입니다\./,
+  )
+})

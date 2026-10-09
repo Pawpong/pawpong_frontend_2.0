@@ -109,7 +109,7 @@ const CommentList = ({ thread }: CommentListProps) => {
                 replyDisabled={thread.isSubmitting}
               />
             ) : (
-              <p className="py-3 text-sm font-medium text-text-secondary">삭제된 댓글입니다.</p>
+              <p className="py-3 text-sm font-medium text-text-secondary">삭제된 댓글이에요.</p>
             )}
             {renderReplies(item.replies, item.root !== null)}
           </div>

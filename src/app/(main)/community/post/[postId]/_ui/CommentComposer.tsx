@@ -70,7 +70,7 @@ const CommentComposer = ({
       setSubmitted(true)
     } catch (error) {
       // mutation 전에 실패해도 아무 반응 없는 상태가 되지 않도록 입력값과 오류를 남긴다.
-      setLocalError(error ?? new Error('댓글 등록을 확인하지 못했습니다.'))
+      setLocalError(error ?? new Error('댓글 등록을 확인하지 못했어요.'))
     } finally {
       submittingRef.current = false
       setSubmitting(false)
