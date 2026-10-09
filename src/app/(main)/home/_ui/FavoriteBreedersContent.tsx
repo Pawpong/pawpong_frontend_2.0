@@ -1,7 +1,13 @@
 'use client'
 
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { Container, InfiniteScrollTrigger, ListState, ListingCardGrid } from '@/shared/ui'
+import {
+  Container,
+  InfiniteScrollTrigger,
+  ListState,
+  ListingCardGrid,
+  ListingCardGridSkeleton,
+} from '@/shared/ui'
 import { EmptyStateLink } from '@/shared/ui/EmptyStateLink'
 import { cn } from '@/shared/lib/cn'
 import { profileQueries } from '@/entities/profile'
@@ -51,6 +57,13 @@ const FavoriteBreedersContent = ({
         isError={isError}
         isEmpty={breeders.length === 0}
         loadingText="즐겨찾는 브리더를 불러오는 중이에요."
+        loadingFallback={
+          <ListingCardGridSkeleton
+            label="즐겨찾는 브리더를 불러오는 중이에요."
+            layout="compact"
+            className={gridClassName}
+          />
+        }
         errorText="즐겨찾는 브리더를 불러오지 못했어요."
         emptyText="아직 즐겨찾는 브리더가 없어요."
         emptyAction={<EmptyStateLink href="/explore">브리더 둘러보기</EmptyStateLink>}

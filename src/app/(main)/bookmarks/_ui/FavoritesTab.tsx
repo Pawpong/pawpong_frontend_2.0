@@ -6,7 +6,14 @@ import { ADOPTION_CARD_STATUS, adoptionQueries } from '@/entities/adoption'
 import { AdoptionCardGrid } from '@/features/adoption'
 import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
-import { Container, Chip, InfiniteScrollTrigger, ListState, SectionHeader } from '@/shared/ui'
+import {
+  Container,
+  Chip,
+  InfiniteScrollTrigger,
+  ListState,
+  ListingCardGridSkeleton,
+  SectionHeader,
+} from '@/shared/ui'
 import { EmptyStateLink } from '@/shared/ui/EmptyStateLink'
 import type { PetStatus } from '@/shared/types'
 import { flattenPages, getTotalItems } from '@/shared/lib/infiniteList'
@@ -63,6 +70,7 @@ const FavoritesTab = () => {
         isError={isError}
         isEmpty={listings.length === 0}
         loadingText="관심 목록을 불러오는 중이에요."
+        loadingFallback={<ListingCardGridSkeleton label="관심 목록을 불러오는 중이에요." />}
         errorText="관심 목록을 불러오지 못했어요."
         emptyText="아직 관심 표시한 입양글이 없어요."
         emptyAction={

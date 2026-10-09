@@ -89,3 +89,18 @@ test('홈 분양·자랑하기 영역은 불러온 카드와 같은 배치의 �
   assert.match(community, /loadingFallback=\{[\s\S]*?<div className=\{ROW_CLASS\} aria-hidden>/)
   for (const code of [adoption, community]) assert.match(code, /role="status" aria-busy="true"/)
 })
+
+test('관심 입양글·즐겨찾는 브리더·브리더 홈 분양 목록도 각자 격자 배치의 카드 스켈레톤을 씀', () => {
+  assert.match(
+    source('src/app/(main)/bookmarks/_ui/FavoritesTab.tsx'),
+    /loadingFallback=\{<ListingCardGridSkeleton label="관심 목록을 불러오는 중이에요\." \/>\}/,
+  )
+  assert.match(
+    source('src/app/(main)/home/_ui/FavoriteBreedersContent.tsx'),
+    /<ListingCardGridSkeleton[\s\S]*?layout="compact"[\s\S]*?className=\{gridClassName\}/,
+  )
+  assert.match(
+    source('src/app/(main)/home/[userId]/_ui/PublicBreederListings.tsx'),
+    /<ListingCardGridSkeleton[\s\S]*?layout="publicBreeder"[\s\S]*?className=\{gridClassName\}/,
+  )
+})
