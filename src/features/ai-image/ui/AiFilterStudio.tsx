@@ -341,6 +341,8 @@ export function AiFilterStudio({
                             alt=""
                             fill
                             unoptimized
+                            // 필터 목록은 첫 화면의 핵심 선택지라 지연 로딩으로 빈 칸이 보이지 않게 한다.
+                            loading="eager"
                             sizes="(min-width: 1024px) 200px, 45vw"
                             className="object-cover"
                           />

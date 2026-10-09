@@ -46,7 +46,7 @@ export function FeatureShowcase({
           </span>
           <h2
             id={headingId}
-            className="mt-4 font-cafe24 text-2xl leading-snug text-neutral-850 tab:text-3xl"
+            className="mt-4 font-cafe24 text-2xl leading-snug break-keep text-neutral-850 tab:text-3xl"
           >
             {title}
           </h2>
