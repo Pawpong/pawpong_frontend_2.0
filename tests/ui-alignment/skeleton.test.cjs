@@ -205,3 +205,20 @@ test('상단 알림 드롭다운도 불러오는 동안 줄 스켈레톤을 쓰�
   assert.doesNotMatch(bell, /불러오는 중\.\.\./)
   assert.match(bell, /text-xs text-neutral-700">\s*지운 알림도/)
 })
+
+test('신청·후기 목록은 줄 스켈레톤으로 불러오고 보낸 신청이 없으면 분양중인 동물로 안내함', () => {
+  const layout = source('src/app/(main)/activity/_ui/ActivityListLayout.tsx')
+  assert.match(
+    layout,
+    /loadingFallback=\{<ListRowsSkeleton label=\{`\$\{title\}을 불러오는 중이에요\.`\} rows=\{3\} \/>\}/,
+  )
+  assert.match(layout, /emptyAction=\{emptyAction\}/)
+  assert.match(
+    source('src/app/(main)/activity/_ui/ActivityInfiniteList.tsx'),
+    /emptyAction=\{emptyAction\}/,
+  )
+  assert.match(
+    source('src/app/(main)/activity/_ui/ApplicationList.tsx'),
+    /<EmptyStateLink href="\/explore\?type=adoption">분양중인 동물 보기<\/EmptyStateLink>/,
+  )
+})

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { PAGE_WIDTH_CLASS, TEXT } from '@/shared/config'
 import { RetryButton, AlertMessage, Container, InfiniteScrollTrigger, ListState } from '@/shared/ui'
+import { ListRowsSkeleton } from '@/shared/ui/Skeleton'
 
 interface ActivityListLayoutProps {
   title: string
@@ -9,6 +10,8 @@ interface ActivityListLayoutProps {
   isError: boolean
   isEmpty: boolean
   emptyText: string
+  /** 빈 목록에서 다음 행동으로 잇는 버튼 */
+  emptyAction?: ReactNode
   hasNextPage: boolean
   isFetchingNextPage: boolean
   onRetry: () => void
@@ -25,6 +28,7 @@ export const ActivityListLayout = ({
   isError,
   isEmpty,
   emptyText,
+  emptyAction,
   hasNextPage,
   isFetchingNextPage,
   onRetry,
@@ -43,8 +47,10 @@ export const ActivityListLayout = ({
         isError={isError}
         isEmpty={isEmpty}
         loadingText={`${title}을 불러오는 중이에요.`}
+        loadingFallback={<ListRowsSkeleton label={`${title}을 불러오는 중이에요.`} rows={3} />}
         errorText={`${title}을 불러오지 못했어요.`}
         emptyText={emptyText}
+        emptyAction={emptyAction}
         onRetry={onRetry}
         isRetrying={isRetrying}
       >
