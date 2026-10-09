@@ -14,6 +14,7 @@ import { isAuthReadSessionCurrent } from '@/shared/lib/authReadSession'
 import { useInView } from '@/shared/lib/useInView'
 import { AsyncState, Button, ComposerSectionHeading, buttonVariants } from '@/shared/ui'
 import { PhotoUploadField } from '@/shared/ui/PhotoUploadField'
+import { SkeletonBlock } from '@/shared/ui/Skeleton'
 import {
   AI_IMAGE_SAVE_UNSUPPORTED,
   AI_IMAGE_SAVE_UNSUPPORTED_MESSAGE,
@@ -314,7 +315,24 @@ export function AiFilterStudio({
             {gameCharacter ? '캐릭터 만들기' : '필터 고르기'}
           </ComposerSectionHeading>
           {ai.filtersState === 'loading' ? (
-            <AsyncState status="loading" message="필터 목록을 불러오고 있어요." />
+            // 실제 필터 카드와 같은 격자·비율의 빈 카드로 자리를 잡아 둔다.
+            <div role="status" aria-busy="true">
+              <span className="sr-only">필터 목록을 불러오고 있어요.</span>
+              <div className="grid grid-cols-2 gap-3 pc:grid-cols-3" aria-hidden>
+                {[0, 1, 2].map((index) => (
+                  <div
+                    key={index}
+                    className="overflow-hidden rounded-xl border-2 border-neutral-150"
+                  >
+                    <SkeletonBlock className="aspect-square w-full rounded-none" />
+                    <div className="space-y-1.5 p-3">
+                      <SkeletonBlock className="h-4 w-2/3 rounded" />
+                      <SkeletonBlock className="h-3 w-full rounded" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           ) : ai.filtersState === 'error' ? (
             <AsyncState
               status="error"

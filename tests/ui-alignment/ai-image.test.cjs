@@ -17,7 +17,9 @@ test('필터 목록을 아직 못 받았거나 실패하면 필터 없음과 구
 
 test('AI 사진 화면은 공통 상태 블록으로 로딩과 실패를 보여주고 이동 위치를 고정 헤더 아래로 둠', () => {
   const studio = source('src/features/ai-image/ui/AiFilterStudio.tsx')
-  assert.match(studio, /<AsyncState status="loading" message="필터 목록을 불러오고 있어요\." \/>/)
+  // 로딩은 필터 카드 모양 스켈레톤으로, 안내 문구는 화면 낭독용으로 둔다.
+  assert.match(studio, /<span className="sr-only">필터 목록을 불러오고 있어요\.<\/span>/)
+  assert.match(studio, /<div role="status" aria-busy="true">/)
   assert.match(studio, /status="error"[\s\S]{0,120}onRetry=\{ai\.retryFilters\}/)
   assert.match(studio, /aria-labelledby="ai-filter-heading" className="min-w-0 scroll-mt-24"/)
   assert.match(studio, /\.closest\('section'\)/)

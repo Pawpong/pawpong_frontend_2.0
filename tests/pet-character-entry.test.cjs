@@ -141,6 +141,7 @@ function studio(remaining = 1, isLoggedIn = true) {
     '@/shared/lib/cn': { cn: (...args) => args.join(' ') },
     '@/shared/lib/authReadSession': { isAuthReadSessionCurrent: () => true },
     '@/shared/lib/useInView': { useInView: () => [() => {}, true] },
+    '@/shared/ui/Skeleton': { SkeletonBlock: () => null },
     '@/shared/ui': { Button, ComposerSectionHeading: () => null, buttonVariants: () => '' },
     '@/shared/ui/PhotoUploadField': { PhotoUploadField: () => null },
     '../lib/aiImageFile': {},
