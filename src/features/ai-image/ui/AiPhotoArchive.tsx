@@ -20,6 +20,7 @@ import {
   DeleteConfirmModal,
 } from '@/shared/ui'
 import { EmptyStateLink } from '@/shared/ui/EmptyStateLink'
+import { GridSkeleton } from '@/shared/ui/Skeleton'
 import { useAiArchiveAction } from '../lib/useAiArchiveAction'
 import { ArchivePhotoCompare } from './ArchivePhotoCompare'
 import { AiPostShareChoice } from './AiPostShareChoice'
@@ -104,7 +105,13 @@ function AiArchiveContent({
     setShareComparison(false)
   }
   if (generationsQuery.isPending) {
-    return <EmptyState message="보관함을 불러오는 중이에요." illustration={false} size="compact" />
+    return (
+      <GridSkeleton
+        label="보관함을 불러오는 중이에요."
+        count={limit ?? 8}
+        className={cn('grid grid-cols-3 gap-1.5 tab:grid-cols-4 tab:gap-3', gridClassName)}
+      />
+    )
   }
   if (generationsQuery.isError && !generationsQuery.data) {
     return (
