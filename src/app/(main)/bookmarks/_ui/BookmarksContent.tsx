@@ -6,6 +6,7 @@ import { BOOKMARK_TABS } from './constants'
 import { FavoritesTab } from './FavoritesTab'
 import { SavedFeedsTab } from './SavedFeedsTab'
 import { AdoptionListTab } from './AdoptionListTab'
+import { FavoriteBreedersContent } from './FavoriteBreedersContent'
 
 // 각 탭이 자기 데이터를 직접 조회한다 — 비활성 탭은 Radix가 언마운트하므로
 // 열린 탭의 API만 호출된다(enabled 분기 불필요).
@@ -33,6 +34,10 @@ const BookmarksContent = ({ initialTab }: { initialTab?: string }) => {
 
         <TabsContent value="adoption-list" className="mt-0">
           <AdoptionListTab />
+        </TabsContent>
+
+        <TabsContent value="breeders" className="mt-0">
+          <FavoriteBreedersContent />
         </TabsContent>
       </TabBar>
     </div>

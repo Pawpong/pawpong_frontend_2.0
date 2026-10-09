@@ -7,7 +7,7 @@ const { source } = require('./fixtures/alignment.fixture.cjs')
 test('개인 목록이 비면 같은 모양의 버튼으로 다음 행동을 안내함', () => {
   const cases = [
     ['src/app/(main)/home/_ui/MyPostsTab.tsx', '/community/write'],
-    ['src/app/(main)/home/_ui/FavoriteBreedersContent.tsx', '/explore'],
+    ['src/app/(main)/bookmarks/_ui/FavoriteBreedersContent.tsx', '/explore'],
     ['src/app/(main)/bookmarks/_ui/FavoritesTab.tsx', '/explore?type=adoption'],
     ['src/app/(main)/bookmarks/_ui/SavedFeedsTab.tsx', '/community'],
     ['src/features/ai-image/ui/AiPhotoArchive.tsx', '/ai-filter'],

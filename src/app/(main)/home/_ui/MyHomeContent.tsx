@@ -1,7 +1,5 @@
 'use client'
 
-import { MyHomeActivity } from '@/features/gamification'
-import { activityConfigOptions } from '@/entities/gamification'
 import { useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
@@ -19,7 +17,6 @@ import { ProfileCard } from './ProfileCard'
 import { MyHomeActionMenu } from './MyHomeActionMenu'
 import { BreederIntroduction } from './BreederIntroduction'
 import { HomeTabs, TabsContent } from './HomeTabs'
-import { FavoriteBreedersContent } from './FavoriteBreedersContent'
 import { MyPostsTab } from './MyPostsTab'
 import { HomeSkeleton } from './HomeSkeleton'
 import {
@@ -27,7 +24,6 @@ import {
   BREEDER_MY_HOME_TABS,
   MY_HOME_SIDE_LINKS,
   BREEDER_MY_HOME_SIDE_LINKS,
-  CARD_GRID,
   PHOTO_GRID,
 } from './constants'
 
@@ -46,12 +42,7 @@ const MyHomeContent = () => {
 
   // [refactored] navbar 는 2단(tab+)에서 숨고 sticky 도 아니라 높이를 잴 이유가 없어졌다.
   // sticky 기준은 GNB 하나뿐이고, 그건 HomeTabs 가 스스로 읽는다.
-  const activityConfig = useQuery(activityConfigOptions)
-  const baseTabs = isBreeder ? BREEDER_MY_HOME_TABS : MY_HOME_TABS
-  const tabs =
-    activityConfig.data?.enabled && !activityConfig.isError
-      ? [...baseTabs, { id: 'activity', label: '나의 활동' }]
-      : baseTabs
+  const tabs = isBreeder ? BREEDER_MY_HOME_TABS : MY_HOME_TABS
   const defaultTab = isBreeder ? 'listings' : 'posts'
   // 프로필 조회 전에는 역할을 모르므로 선택값을 비워두고, 조회 후 역할별 기본 탭을 사용한다.
   // useState(defaultTab)로 바로 시드하면 최초 adopter 기본값('posts')이 브리더에게도 고정된다.
@@ -123,9 +114,6 @@ const MyHomeContent = () => {
         }
         sideLinks={isBreeder ? BREEDER_MY_HOME_SIDE_LINKS : MY_HOME_SIDE_LINKS}
       >
-        <TabsContent value="activity" className="mt-0">
-          <MyHomeActivity userId={myProfile?.userId} />
-        </TabsContent>
         {/* 분양 목록 탭 (브리더만) — 시안 3170-790275: 라벨+필터 -> 카드 그리드.
             standalone /adoption/my-listings 페이지는 이 탭과 완전히 중복이라 제거했다 —
             분양 페이지 진입점은 전부 이 탭(/home)으로 온다 */}
@@ -165,10 +153,6 @@ const MyHomeContent = () => {
               renderResultAction={(jobId) => <PetResultLink sourceJobId={jobId} />}
             />
           </div>
-        </TabsContent>
-
-        <TabsContent value="breeders" className="mt-0">
-          <FavoriteBreedersContent gridClassName={CARD_GRID} />
         </TabsContent>
       </HomeTabs>
     </div>
