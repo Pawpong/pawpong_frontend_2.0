@@ -41,6 +41,11 @@ const BREEDER_MY_HOME_SIDE_LINKS = [
   { label: '설정', href: '/settings' },
 ]
 
+// 마이홈 탭 본문(분양 목록·게시글·AI 사진) 공통 여백 — Container 와 함께 쓴다.
+// 모바일은 위 여백을 Container 좌우 여백(20px)과 같게 둔다.
+// 2단(tab+)은 오른쪽 컬럼이 이미 위 여백을 가져 위를 0으로 둬야 왼쪽 프로필 카드와 윗선이 맞는다
+const MY_HOME_TAB_PANEL = 'py-5 tab:pt-0 tab:pb-10'
+
 // 카드 그리드(분양·브리더). 폭에 맞춰 열 수가 늘도록 모든 구간에서 auto-fill 로 채운다.
 // 원본 변형이 모바일을 max-w-[21.4375rem] 2열로 묶어둬서, 그 상한·정렬·gap 을 함께 푼다.
 // 최소 152px: 320→1열, 375→2열, 710→4열. PC 2단(우측 980px)에서만 4열로 고정해 카드가 더 잘게
@@ -55,12 +60,19 @@ const CARD_GRID =
 const PHOTO_GRID =
   'tab:max-w-none tab:justify-normal tab:gap-x-5 tab:grid-cols-[repeat(auto-fill,minmax(12rem,1fr))] pc:grid-cols-[repeat(auto-fill,minmax(12rem,1fr))]'
 
+// 마이홈 게시글 탭은 분양 목록·AI 사진 탭과 같은 Container 여백 안에 들어가므로
+// 모바일에서도 375px 상한 대신 폭을 꽉 채워 제목 줄과 그리드 양끝을 맞춘다 (AI 사진 그리드와 같은 3열)
+const MY_PHOTO_GRID =
+  'max-w-none grid-cols-3 tab:max-w-none tab:justify-normal tab:gap-x-5 tab:grid-cols-[repeat(auto-fill,minmax(12rem,1fr))] pc:grid-cols-[repeat(auto-fill,minmax(12rem,1fr))]'
+
 export {
   MY_HOME_TABS,
   BREEDER_HOME_TABS,
   BREEDER_MY_HOME_TABS,
   MY_HOME_SIDE_LINKS,
   BREEDER_MY_HOME_SIDE_LINKS,
+  MY_HOME_TAB_PANEL,
   CARD_GRID,
   PHOTO_GRID,
+  MY_PHOTO_GRID,
 }

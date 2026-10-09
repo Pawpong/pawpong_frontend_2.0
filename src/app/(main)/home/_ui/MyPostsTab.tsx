@@ -5,8 +5,8 @@ import { useSearchParams } from 'next/navigation'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { communityQueries } from '@/entities/community'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
-import { flattenPages } from '@/shared/lib/infiniteList'
-import { Chip } from '@/shared/ui'
+import { flattenPages, getTotalItems } from '@/shared/lib/infiniteList'
+import { Chip, ListHeader } from '@/shared/ui'
 import { EmptyStateLink } from '@/shared/ui/EmptyStateLink'
 import { useAuthReadSession } from '@/shared/lib/useAuthReadSession'
 import type { AuthReadSession } from '@/shared/api'
@@ -57,14 +57,15 @@ const EMPTY_ACTION: Record<PostFilter, ReactNode> = {
 }
 
 interface PostsViewProps {
-  header: ReactNode
+  /** 개수는 칩마다 조회 결과에서 나오므로 각 목록이 헤더를 그린다 */
+  renderHeader: (count?: number) => ReactNode
   gridClassName?: string
 }
 
 /** 작성한 글 — 기존 마이홈 '게시글' 목록(authorId=me) 그대로 */
 const WrittenPosts = ({
   enabled,
-  header,
+  renderHeader,
   gridClassName,
 }: PostsViewProps & { enabled: boolean }) => {
   const query = useQuery({
@@ -80,7 +81,7 @@ const WrittenPosts = ({
       isError={query.isError}
       onRetry={() => void query.refetch()}
       isRetrying={query.isFetching}
-      header={header}
+      header={renderHeader(query.data?.pagination.totalItems)}
       gridClassName={gridClassName}
       emptyAction={EMPTY_ACTION.written}
       {...STATE_TEXT.written}
@@ -93,7 +94,7 @@ const ActivityPosts = ({
   filter,
   enabled,
   session,
-  header,
+  renderHeader,
   gridClassName,
 }: PostsViewProps & {
   filter: Exclude<PostFilter, 'written'>
@@ -125,7 +126,7 @@ const ActivityPosts = ({
         hasNextPage: !!query.hasNextPage,
         isFetchingNextPage: query.isFetchingNextPage,
       }}
-      header={header}
+      header={renderHeader(query.data ? getTotalItems(query.data) : undefined)}
       gridClassName={gridClassName}
       emptyAction={EMPTY_ACTION[filter]}
       {...STATE_TEXT[filter]}
@@ -142,30 +143,37 @@ const MyPostsTab = ({ enabled, gridClassName }: { enabled: boolean; gridClassNam
     POST_FILTERS.find((option) => option.value === requestedFilter)?.value ?? 'written',
   )
 
-  const header = (
-    <div role="group" aria-label="내 글 보기" className="flex flex-wrap items-center gap-2">
-      {POST_FILTERS.map((option) => (
-        <Chip
-          key={option.value}
-          size="responsive"
-          selected={filter === option.value}
-          onClick={() => setFilter(option.value)}
-        >
-          {option.label}
-        </Chip>
-      ))}
-    </div>
+  // 분양 목록 탭과 같은 '제목 n건' 줄 + 칩. 새 글은 커뮤니티 글쓰기로 바로 간다
+  const renderHeader = (count?: number) => (
+    <ListHeader
+      title="게시글"
+      count={count}
+      create={{ href: '/community/write', label: '새 글 쓰기' }}
+    >
+      <div role="group" aria-label="내 글 보기" className="flex flex-wrap items-center gap-2">
+        {POST_FILTERS.map((option) => (
+          <Chip
+            key={option.value}
+            size="responsive"
+            selected={filter === option.value}
+            onClick={() => setFilter(option.value)}
+          >
+            {option.label}
+          </Chip>
+        ))}
+      </div>
+    </ListHeader>
   )
 
   return filter === 'written' ? (
-    <WrittenPosts enabled={enabled} header={header} gridClassName={gridClassName} />
+    <WrittenPosts enabled={enabled} renderHeader={renderHeader} gridClassName={gridClassName} />
   ) : (
     <ActivityPosts
       key={filter}
       filter={filter}
       enabled={enabled}
       session={session}
-      header={header}
+      renderHeader={renderHeader}
       gridClassName={gridClassName}
     />
   )
