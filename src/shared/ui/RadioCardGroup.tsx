@@ -56,7 +56,10 @@ export const RadioCardGroup = ({
             <span className="min-w-0 break-keep">
               <span className="block text-sm font-semibold text-neutral-850">{option.label}</span>
               {option.description && (
-                <span className="mt-1 block text-xs leading-relaxed text-neutral-700">
+                // 고른 칸의 옅은 배경 위에서도 4.5:1 이상이 되도록 한 단계 진하게 쓴다.
+                <span
+                  className={`mt-1 block text-xs leading-relaxed ${value === option.value ? 'text-neutral-800' : 'text-neutral-700'}`}
+                >
                   {option.description}
                 </span>
               )}

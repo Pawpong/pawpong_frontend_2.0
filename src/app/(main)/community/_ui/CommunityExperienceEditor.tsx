@@ -101,7 +101,10 @@ export function CommunityExperienceEditor({
                   <CommunityPixelIcon name={template.key} className="text-primary-500" />
                   {template.label}
                 </span>
-                <span className="text-xs text-neutral-700">{template.hint}</span>
+                {/* 고른 칩의 노란 배경 위에서도 4.5:1 이상 */}
+                <span className={cn('text-xs', selected ? 'text-neutral-800' : 'text-neutral-700')}>
+                  {template.hint}
+                </span>
               </button>
             )
           })}

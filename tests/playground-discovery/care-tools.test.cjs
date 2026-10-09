@@ -107,3 +107,14 @@ test('산책·병원 기록 링크로 들어온 새 글은 놀이터와 같은 �
   assert.doesNotMatch(plain, /data-accent/)
   assert.match(plain, /우리 아이의 일상을 나눠주세요/)
 })
+
+test('고른 선택 카드·기록 칩의 작은 설명은 옅은 배경 위에서도 4.5:1 이상인 색을 씀', () => {
+  assert.match(
+    source('src/shared/ui/RadioCardGroup.tsx'),
+    /value === option\.value \? 'text-neutral-800' : 'text-neutral-700'/,
+  )
+  assert.match(
+    source('src/app/(main)/community/_ui/CommunityExperienceEditor.tsx'),
+    /selected \? 'text-neutral-800' : 'text-neutral-700'/,
+  )
+})
