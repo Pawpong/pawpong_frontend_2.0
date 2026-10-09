@@ -35,7 +35,7 @@ const STATUS_ACTIONS: Partial<Record<ApplicationStatus, StatusAction[]>> = {
       intent: 'secondary',
       confirm: {
         title: '신청을 거절할까요?',
-        description: '거절하면 입양자에게 진행 종료로 표시됩니다.',
+        description: '거절하면 입양자에게 진행 종료로 표시돼요.',
       },
     },
   ],
@@ -46,7 +46,7 @@ const STATUS_ACTIONS: Partial<Record<ApplicationStatus, StatusAction[]>> = {
       intent: 'primary',
       confirm: {
         title: '입양을 확정할까요?',
-        description: '확정하면 입양자가 후기를 작성할 수 있게 됩니다.',
+        description: '확정하면 입양자가 후기를 작성할 수 있어요.',
       },
     },
     {
@@ -55,7 +55,7 @@ const STATUS_ACTIONS: Partial<Record<ApplicationStatus, StatusAction[]>> = {
       intent: 'secondary',
       confirm: {
         title: '신청을 거절할까요?',
-        description: '거절하면 입양자에게 진행 종료로 표시됩니다.',
+        description: '거절하면 입양자에게 진행 종료로 표시돼요.',
       },
     },
   ],

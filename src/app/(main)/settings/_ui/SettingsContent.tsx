@@ -109,7 +109,7 @@ const SettingsContent = ({ userRole }: SettingsContentProps) => {
       }
       logoutAndRedirect()
     } catch (error) {
-      toast.error(normalizeApiError(error, '탈퇴 처리에 실패했습니다.').message)
+      toast.error(normalizeApiError(error, '탈퇴를 처리하지 못했어요.').message)
     }
   }
 

@@ -63,7 +63,8 @@ export const EmailVerificationSection = ({
   const verified = hasEmailVerification(profile, clock)
   const proofExpired = Boolean(
     profile.emailVerificationExpiresAt &&
-      Date.parse(profile.emailVerificationExpiresAt) <= clock + (profile.emailServerTimeOffsetMs ?? 0),
+    Date.parse(profile.emailVerificationExpiresAt) <=
+      clock + (profile.emailServerTimeOffsetMs ?? 0),
   )
   const serverNow = clock + (challenge?.offsetMs ?? 0)
   const remaining = challenge
@@ -134,7 +135,7 @@ export const EmailVerificationSection = ({
     }
     if (!input.tempId) {
       setMessage({
-        text: '소셜 가입 정보가 만료되었습니다. 로그인 화면에서 다시 시작해주세요.',
+        text: '소셜 가입 정보 유효 시간이 지났어요. 로그인 화면에서 다시 시작해 주세요.',
         error: true,
       })
       return
@@ -149,7 +150,7 @@ export const EmailVerificationSection = ({
       setChallenge({ ...result, offsetMs: Date.parse(result.serverTime) - Date.now() })
       setClock(Date.now())
       setMessage({
-        text: '인증 메일을 발송했습니다. 받은편지함과 스팸함을 확인해주세요.',
+        text: '인증 메일을 보냈어요. 받은편지함과 스팸함을 확인해 주세요.',
         error: false,
       })
     } catch (error) {
@@ -158,7 +159,7 @@ export const EmailVerificationSection = ({
           text:
             error instanceof Error
               ? error.message
-              : '인증 메일을 발송하지 못했습니다. 다시 시도해주세요.',
+              : '인증 메일을 보내지 못했어요. 다시 시도해 주세요.',
           error: true,
         })
     } finally {
@@ -191,7 +192,7 @@ export const EmailVerificationSection = ({
       setValue('emailVerificationCode', '')
       useOnboardingForm.getState().saveDraft('profile', getValues())
       setClock(Date.now())
-      setMessage({ text: '이메일 인증이 완료되었습니다.', error: false })
+      setMessage({ text: '이메일 인증을 마쳤어요.', error: false })
     } catch (error) {
       if (isCurrent(input))
         setMessage({
@@ -216,7 +217,7 @@ export const EmailVerificationSection = ({
       </div>
       {!supported && (
         <p role="status" className="text-sm text-neutral-700">
-          이메일 인증 연결을 확인하고 있습니다. 사용할 수 없다면 휴대폰 인증으로 돌아가주세요.
+          이메일 인증 연결을 확인하고 있어요. 쓸 수 없다면 휴대폰 인증으로 돌아가 주세요.
         </p>
       )}
       <Button
@@ -272,14 +273,14 @@ export const EmailVerificationSection = ({
           <p className="mt-1 text-xs text-neutral-700">
             {remaining > 0
               ? `남은 시간 ${Math.floor(remaining / 60)}:${String(remaining % 60).padStart(2, '0')}`
-              : '인증번호가 만료되었습니다. 인증 메일을 다시 받아주세요.'}
+              : '인증번호 유효 시간이 지났어요. 인증 메일을 다시 받아 주세요.'}
           </p>
         )}
       </InputField>
       <div id="signup-email-status" aria-live="polite">
         {proofExpired ? (
           <HelpMessage status="error">
-            이메일 인증 유효시간이 끝났습니다. 인증 메일을 다시 받아주세요.
+            이메일 인증 유효 시간이 끝났어요. 인증 메일을 다시 받아 주세요.
           </HelpMessage>
         ) : (
           message && (
@@ -290,7 +291,7 @@ export const EmailVerificationSection = ({
         )}
         {verified && (
           <p className="mt-1 text-xs text-neutral-700">
-            이메일로 가입 인증을 완료했어요. 전화번호는 인증된 연락처로 저장하지 않습니다.
+            이메일로 가입 인증을 완료했어요. 전화번호는 인증된 연락처로 저장하지 않아요.
           </p>
         )}
       </div>

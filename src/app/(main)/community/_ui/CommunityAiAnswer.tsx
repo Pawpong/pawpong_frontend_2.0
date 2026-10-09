@@ -71,12 +71,12 @@ function AnswerContent({
         )}
         {pending && (
           <p role="status" className="text-sm leading-relaxed">
-            참고 답변을 준비하고 있어요. 새 답변 요청은 하지 않고 상태만 확인합니다.
+            참고 답변을 준비하고 있어요. 새 답변 요청은 하지 않고 상태만 확인해요.
           </p>
         )}
         {phase === 'checking' && (
           <p role="status" className="text-sm leading-relaxed">
-            기존 요청의 접수 여부를 확인하고 있어요. 생성 요청은 다시 보내지 않습니다.
+            기존 요청의 접수 여부를 확인하고 있어요. 생성 요청은 다시 보내지 않아요.
           </p>
         )}
         {!busy && answer?.status === 'failed' && (

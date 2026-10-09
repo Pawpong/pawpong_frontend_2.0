@@ -18,7 +18,7 @@ export function AppPublicEmptyMessage({ children }: { children: ReactNode }) {
       <span className="block">이 목록에 표시할 앱 공개 콘텐츠가 없어요.</span>
       <span className="mt-2 block max-w-sm text-xs leading-5 text-neutral-500">
         앱은 작성자가 공개를 허락한 게시물·사진·브리더를 보여드려요. 다른 회원의 콘텐츠는 해당
-        작성자의 허락이 확인된 뒤 표시됩니다.
+        작성자의 허락을 확인한 뒤 표시돼요.
       </span>
     </>
   )

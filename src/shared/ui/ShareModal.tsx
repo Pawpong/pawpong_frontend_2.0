@@ -50,7 +50,7 @@ const SOCIAL_OPTIONS = [
 /** 외부 공유 페이지를 팝업으로 연다. 차단되면 호출부에서 에러 피드백으로 이어진다. */
 const openSharePopup = (shareUrl: string) => {
   const popup = window.open(shareUrl, '_blank', 'popup,width=720,height=640')
-  if (!popup) throw new Error('팝업이 차단되었습니다.')
+  if (!popup) throw new Error('팝업이 차단됐어요.')
   popup.opener = null
 }
 
@@ -70,7 +70,7 @@ const copyToClipboard = async (text: string) => {
   textarea.select()
 
   try {
-    if (!document.execCommand('copy')) throw new Error('URL을 복사하지 못했습니다.')
+    if (!document.execCommand('copy')) throw new Error('URL을 복사하지 못했어요.')
   } finally {
     textarea.remove()
   }
@@ -170,21 +170,21 @@ const ShareModal = ({
         }
         case 'copy': {
           await copyToClipboard(shareUrl)
-          report({ tone: 'success', message: 'URL을 복사했습니다.' })
+          report({ tone: 'success', message: 'URL을 복사했어요.' })
           break
         }
         case 'facebook': {
           openSharePopup(
             `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
           )
-          report({ tone: 'success', message: '페이스북 공유 창을 열었습니다.' })
+          report({ tone: 'success', message: '페이스북 공유 창을 열었어요.' })
           break
         }
         case 'naver': {
           openSharePopup(
             `https://share.naver.com/web/shareView?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(shareTitle)}`,
           )
-          report({ tone: 'success', message: '네이버 공유 창을 열었습니다.' })
+          report({ tone: 'success', message: '네이버 공유 창을 열었어요.' })
           break
         }
         // [refactored] SDK 페이로드 조립은 shared/lib/kakao로 이동. await 없이 동기 호출해야 팝업이 안 막힌다.

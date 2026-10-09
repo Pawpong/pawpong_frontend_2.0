@@ -33,9 +33,9 @@ const KennelInfoStep = () => {
   // 브리더명 중복 검사 (백엔드: POST /api/v2/auth/check-breeder-name)
   const breederNameCheck = useDuplicateCheck(useCheckBreederNameDuplicate(), {
     empty: '브리더명을 입력해주세요.',
-    duplicate: '이미 사용 중인 브리더명입니다.',
-    available: '사용 가능한 브리더명입니다.',
-    fallback: '중복검사에 실패했습니다.',
+    duplicate: '이미 쓰고 있는 브리더명이에요.',
+    available: '쓸 수 있는 브리더명이에요.',
+    fallback: '중복 여부를 확인하지 못했어요.',
     unchecked: '브리더명 중복 확인을 완료해주세요.',
   })
 

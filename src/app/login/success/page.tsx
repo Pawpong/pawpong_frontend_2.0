@@ -47,7 +47,7 @@ const LoginSuccessContent = () => {
       } catch (err) {
         if (cancelled) return
         console.error('로그인 처리 중 오류:', err)
-        setError('로그인 처리 중 오류가 발생했습니다.')
+        setError('로그인을 처리하지 못했어요.')
         setTimeout(() => router.replace('/login'), 2000)
       }
     }
@@ -63,7 +63,7 @@ const LoginSuccessContent = () => {
       {error ? (
         <div className="text-center">
           <p className="text-error-500">{error}</p>
-          <p className="mt-2 text-sm text-neutral-700">로그인 페이지로 이동합니다...</p>
+          <p className="mt-2 text-sm text-neutral-700">로그인 페이지로 이동할게요…</p>
         </div>
       ) : (
         <p className="text-sm text-neutral-700">로그인 처리 중...</p>

@@ -27,9 +27,9 @@ const InfoStep = () => {
   // 닉네임 중복 검사 (백엔드: POST /api/v2/auth/check-nickname)
   const nicknameCheck = useDuplicateCheck(useCheckNicknameDuplicate(), {
     empty: '닉네임을 입력해주세요.',
-    duplicate: '사용 불가능한 별명입니다.',
-    available: '사용 가능한 별명입니다.',
-    fallback: '중복 검사에 실패했습니다.',
+    duplicate: '쓸 수 없는 별명이에요.',
+    available: '쓸 수 있는 별명이에요.',
+    fallback: '중복 여부를 확인하지 못했어요.',
     unchecked: '닉네임 중복 확인을 완료해주세요.',
   })
 

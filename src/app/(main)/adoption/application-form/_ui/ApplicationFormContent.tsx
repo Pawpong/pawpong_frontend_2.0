@@ -65,11 +65,11 @@ const ApplicationFormContent = () => {
 
     const tooShort = valid.some((q) => q.length < MIN_LENGTH)
     if (tooShort) {
-      toast.error(`질문은 최소 ${MIN_LENGTH}자 이상이어야 합니다.`)
+      toast.error(`질문은 ${MIN_LENGTH}자 이상 적어 주세요.`)
       return
     }
     if (new Set(valid).size !== valid.length) {
-      toast.error('중복된 질문이 있습니다. 각 질문은 고유해야 합니다.')
+      toast.error('같은 질문이 있어요. 질문을 서로 다르게 적어 주세요.')
       return
     }
 
@@ -80,9 +80,9 @@ const ApplicationFormContent = () => {
       const saved = toRows(result.customQuestions)
       setRows(saved)
       setSavedRows(saved)
-      toast.success(`커스텀 질문 ${saved.length}개가 저장되었습니다.`)
+      toast.success(`커스텀 질문 ${saved.length}개를 저장했어요.`)
     } catch (error) {
-      toast.error(normalizeApiError(error, '저장에 실패했습니다.').message)
+      toast.error(normalizeApiError(error, '저장하지 못했어요.').message)
     }
   }
 

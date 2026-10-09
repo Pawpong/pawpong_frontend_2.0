@@ -37,12 +37,12 @@ const STATUS_COPY: Record<ApplicationStatus, { title: string; sent: string; rece
   adoption_approved: {
     title: '입양이 확정되었어요',
     sent: '브리더와 남은 일정을 이야기하고 입양 후기를 남겨 보세요.',
-    received: '입양이 확정된 신청입니다. 남은 일정은 신청자와 채팅으로 이야기해 주세요.',
+    received: '입양이 확정된 신청이에요. 남은 일정은 신청자와 채팅으로 이야기해 주세요.',
   },
   adoption_rejected: {
     title: '신청이 종료되었어요',
     sent: '이번 신청은 진행이 종료되었어요. 보냈던 신청 내용은 계속 확인할 수 있어요.',
-    received: '진행이 종료된 신청입니다. 신청서와 상담 기록을 확인할 수 있어요.',
+    received: '진행이 종료된 신청이에요. 신청서와 상담 기록을 확인할 수 있어요.',
   },
 }
 

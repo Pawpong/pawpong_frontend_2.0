@@ -50,7 +50,7 @@ const ProfileImageUpload = ({ value, onChange, className }: ProfileImageUploadPr
       {
         onSuccess: (res) => onChange?.({ filename: res.filename, url: res.url }),
         onError: (err) => {
-          setError(err instanceof Error ? err.message : '이미지 업로드에 실패했습니다.')
+          setError(err instanceof Error ? err.message : '이미지를 올리지 못했어요.')
           setPreviewUrl(null)
         },
       },
