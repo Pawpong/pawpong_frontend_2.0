@@ -1,3 +1,6 @@
+import { MOBILE_APP } from '@/shared/config/mobileApp'
+import { parseMobileStoreUrl } from '@/shared/lib/mobileApp'
+
 const SITE_ORIGIN = 'https://pawpong.kr'
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
@@ -93,22 +96,7 @@ export function parseDeepLink(value: unknown, slug: string): ManagedDeepLink | u
   }
 }
 
-/** 다운로드 주소는 어드민 앱 버전 설정에서만 가져온다. */
-export function parseStoreUrl(value: unknown, platform: 'ios' | 'android'): string | undefined {
-  const safeUrl = httpsUrl(value)
-  if (!safeUrl) return undefined
-  const url = new URL(safeUrl)
-  if (platform === 'ios') {
-    return url.hostname === 'apps.apple.com' && /\/id\d+(?:\/|$)/.test(url.pathname)
-      ? safeUrl
-      : undefined
-  }
-  return url.hostname === 'play.google.com' &&
-    url.pathname === '/store/apps/details' &&
-    url.searchParams.get('id') === 'kr.pawpong.app'
-    ? safeUrl
-    : undefined
-}
+export const parseStoreUrl = parseMobileStoreUrl
 
 function escapeHtml(value: string): string {
   return value.replace(
@@ -142,11 +130,16 @@ export function renderLanding(
   const webUrl = new URL(link.targetPath, origin).href
   // Android Chrome은 사용자가 누른 intent 링크의 fallback을 앱 미설치 시 연다.
   const appUrl = /android/i.test(userAgent)
-    ? `intent://l/${link.slug}#Intent;scheme=pawpong;package=kr.pawpong.app;S.browser_fallback_url=${encodeURIComponent(stores.android ?? webUrl)};end`
+    ? `intent://l/${link.slug}#Intent;scheme=pawpong;package=${MOBILE_APP.android.packageName};S.browser_fallback_url=${encodeURIComponent(stores.android ?? webUrl)};end`
     : `pawpong://l/${link.slug}`
   const description = link.description || '포퐁에서 자세한 내용을 확인해 보세요.'
   const image = link.imageUrl || `${origin}/images/logo/share-logo.png`
-  const metadata = `<link rel="canonical" href="${escapeHtml(canonical)}"><meta property="og:type" content="website"><meta property="og:site_name" content="포퐁"><meta property="og:title" content="${escapeHtml(link.title)}"><meta property="og:description" content="${escapeHtml(description)}"><meta property="og:url" content="${escapeHtml(canonical)}"><meta property="og:image" content="${escapeHtml(image)}"><meta name="twitter:card" content="summary_large_image">`
+  // dev/로컬 링크는 운영 앱에서 열 수 없으므로 운영 원본의 공유 링크에만 앱 메타데이터를 붙인다.
+  const appMetadata =
+    origin === SITE_ORIGIN
+      ? `<meta name="apple-itunes-app" content="app-id=${MOBILE_APP.ios.appId}, app-argument=${escapeHtml(canonical)}"><meta property="al:ios:app_store_id" content="${MOBILE_APP.ios.appId}"><meta property="al:ios:app_name" content="포퐁"><meta property="al:ios:url" content="${escapeHtml(canonical)}"><meta property="al:android:package" content="${MOBILE_APP.android.packageName}"><meta property="al:android:app_name" content="포퐁"><meta property="al:android:url" content="${escapeHtml(canonical)}"><meta property="al:web:url" content="${escapeHtml(webUrl)}"><meta property="al:web:should_fallback" content="true">`
+      : ''
+  const metadata = `<link rel="canonical" href="${escapeHtml(canonical)}"><meta property="og:type" content="website"><meta property="og:site_name" content="포퐁"><meta property="og:title" content="${escapeHtml(link.title)}"><meta property="og:description" content="${escapeHtml(description)}"><meta property="og:url" content="${escapeHtml(canonical)}"><meta property="og:image" content="${escapeHtml(image)}"><meta name="twitter:card" content="summary_large_image">${appMetadata}`
   const storeLinks = [
     stores.ios &&
       `<a class="store-link" href="${escapeHtml(stores.ios)}" rel="noopener noreferrer">App Store에서 받기 ↗</a>`,
