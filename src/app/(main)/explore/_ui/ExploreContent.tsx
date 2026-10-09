@@ -7,6 +7,7 @@ import {
   Container,
   InfiniteScrollTrigger,
   ListState,
+  ListingCardGridSkeleton,
   TabBarList,
   Tabs,
   TabsContent,
@@ -236,6 +237,7 @@ const ExploreContent = () => {
                   isError={isError}
                   isEmpty={listings.length === 0}
                   loadingText="분양글을 불러오는 중이에요."
+                  loadingFallback={<ListingCardGridSkeleton label="분양글을 불러오는 중이에요." />}
                   errorText="분양글을 불러오지 못했어요."
                   emptyText="등록된 분양글이 없어요."
                 >

@@ -57,3 +57,25 @@ test('놀이터 AI 예시는 불러오는 동안 같은 3칸 틀의 스켈레톤
     /filters\.isPending \? \(\s*<FeatureShowcaseTilesSkeleton/,
   )
 })
+
+test('탐색 목록은 불러오는 동안 같은 격자에 카드 모양 스켈레톤을 채움', () => {
+  const skeleton = loadTypescript('src/shared/ui/Skeleton.tsx', { '@/shared/lib/cn': { cn } })
+  const tv = require('tailwind-variants').tv
+  const { ListingCardGridSkeleton } = loadTypescript('src/shared/ui/ListingCardGrid.tsx', {
+    '@/shared/lib/tv': { tv },
+    '@/shared/lib/cn': { cn },
+    './Skeleton': skeleton,
+  })
+  const html = renderToStaticMarkup(
+    createElement(ListingCardGridSkeleton, { label: '분양글을 불러오는 중이에요.', count: 2 }),
+  )
+  assert.match(html, /role="status" aria-busy="true"/)
+  assert.match(html, /<span class="sr-only">분양글을 불러오는 중이에요\.<\/span>/)
+  assert.equal(html.match(/aspect-\[348\/284\]/g).length, 2)
+  assert.match(html, /grid grid-cols-2/)
+  for (const file of [
+    'src/app/(main)/explore/_ui/ExploreContent.tsx',
+    'src/app/(main)/explore/_ui/BreederExploreContent.tsx',
+  ])
+    assert.match(source(file), /loadingFallback=\{<ListingCardGridSkeleton label=/, file)
+})

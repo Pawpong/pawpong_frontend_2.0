@@ -1,6 +1,7 @@
 import { Fragment, type Key, type ReactNode } from 'react'
 import { tv, type VariantProps } from '@/shared/lib/tv'
 import { cn } from '@/shared/lib/cn'
+import { SkeletonBlock } from './Skeleton'
 
 const listingCardGrid = tv({
   base: 'grid grid-cols-2',
@@ -51,4 +52,37 @@ const ListingCardGrid = <T,>({
   </div>
 )
 
-export { ListingCardGrid }
+interface ListingCardGridSkeletonProps extends VariantProps<typeof listingCardGrid> {
+  /** 화면 낭독기에만 읽히는 로딩 안내 */
+  label: ReactNode
+  count?: number
+  className?: string
+}
+
+/**
+ * 카드 목록을 불러오는 동안 같은 격자에 카드 모양(사진 + 두 줄)의 빈 칸을 채운다.
+ * 글자 안내만 보이다 카드가 한꺼번에 나타나며 화면이 출렁이던 것을 없앤다.
+ */
+const ListingCardGridSkeleton = ({
+  label,
+  count = 8,
+  layout,
+  className,
+}: ListingCardGridSkeletonProps) => (
+  <div role="status" aria-busy="true">
+    <span className="sr-only">{label}</span>
+    <div className={cn(listingCardGrid({ layout }), className)} aria-hidden>
+      {Array.from({ length: count }, (_, index) => (
+        <div key={index}>
+          <SkeletonBlock className="aspect-[348/284] w-full rounded pc:rounded-lg" />
+          <div className="space-y-2 p-2 pc:p-3">
+            <SkeletonBlock className="h-4 w-3/4 rounded" />
+            <SkeletonBlock className="h-3 w-1/2 rounded" />
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+)
+
+export { ListingCardGrid, ListingCardGridSkeleton }
