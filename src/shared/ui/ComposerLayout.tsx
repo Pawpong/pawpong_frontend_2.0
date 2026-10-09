@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { PawPrintIcon } from '@/shared/assets'
 import { Container } from './Container'
 import { NavigationBar } from './NavigationBar'
+import { TicketStrip, ticketStyles, type TicketAccent } from './Ticket'
 
 interface ComposerLayoutProps {
   title: string
@@ -9,6 +10,8 @@ interface ComposerLayoutProps {
   category?: string
   introTitle: ReactNode
   description: string
+  /** 놀이터 기록 도구(WALK NOTE 등)에서 들어온 글은 같은 티켓 띠로 머리를 그린다. */
+  introTicket?: { label: string; accent: TicketAccent; icon?: ReactNode }
   onBack: () => void
   children: ReactNode
 }
@@ -20,6 +23,7 @@ export function ComposerLayout({
   category,
   introTitle,
   description,
+  introTicket,
   onBack,
   children,
 }: ComposerLayoutProps) {
@@ -28,24 +32,41 @@ export function ComposerLayout({
       <NavigationBar title={title} mobileTitle={mobileTitle} icon="close" onBack={onBack} />
       <Container className="py-5 pb-10 tab:py-8 pc:py-10">
         <div className="mx-auto max-w-264">
-          <header className="relative mb-6 overflow-hidden rounded-xl bg-point-100 px-5 py-6 tab:mb-8 tab:px-8 tab:py-8">
-            <div className="relative z-10 pc:pr-28">
-              {category && (
-                <p className="mb-3 flex items-center gap-2 text-sm font-semibold text-primary-600">
-                  <PawPrintIcon aria-hidden="true" className="size-6" />
-                  {category}
+          {introTicket ? (
+            <header
+              data-accent={introTicket.accent}
+              className={`${ticketStyles.ticket} mb-6 tab:mb-8`}
+            >
+              <TicketStrip label={introTicket.label} icon={introTicket.icon} />
+              <div className="px-5 py-5 tab:px-8 tab:py-6">
+                <h1 className="font-cafe24 text-xl leading-[1.5] break-keep tab:text-2xl">
+                  {introTitle}
+                </h1>
+                <p className="mt-2 text-sm leading-relaxed break-keep text-neutral-700 tab:text-base">
+                  {description}
                 </p>
-              )}
-              <h1 className="font-cafe24 text-xl leading-[1.5] tab:text-2xl">{introTitle}</h1>
-              <p className="mt-3 text-sm leading-relaxed text-neutral-700 tab:text-base">
-                {description}
-              </p>
-            </div>
-            <PawPrintIcon
-              aria-hidden="true"
-              className="pointer-events-none absolute right-8 bottom-5 hidden size-28 -rotate-12 text-point-300 pc:block"
-            />
-          </header>
+              </div>
+            </header>
+          ) : (
+            <header className="relative mb-6 overflow-hidden rounded-xl bg-point-100 px-5 py-6 tab:mb-8 tab:px-8 tab:py-8">
+              <div className="relative z-10 pc:pr-28">
+                {category && (
+                  <p className="mb-3 flex items-center gap-2 text-sm font-semibold text-primary-600">
+                    <PawPrintIcon aria-hidden="true" className="size-6" />
+                    {category}
+                  </p>
+                )}
+                <h1 className="font-cafe24 text-xl leading-[1.5] tab:text-2xl">{introTitle}</h1>
+                <p className="mt-3 text-sm leading-relaxed text-neutral-700 tab:text-base">
+                  {description}
+                </p>
+              </div>
+              <PawPrintIcon
+                aria-hidden="true"
+                className="pointer-events-none absolute right-8 bottom-5 hidden size-28 -rotate-12 text-point-300 pc:block"
+              />
+            </header>
+          )}
           {children}
         </div>
       </Container>

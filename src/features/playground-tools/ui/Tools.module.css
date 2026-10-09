@@ -45,6 +45,11 @@
   background: white;
   padding: 1.25rem;
 }
+/* 외출 준비함 티켓 본문. 틀·띠는 shared/ui/Ticket.module.css 가 맡는다. */
+.panelBody {
+  min-width: 0;
+  padding: 1.25rem;
+}
 .sectionTitle {
   font:
     1.125rem/1.5 var(--font-cafe24proup),
@@ -61,20 +66,29 @@
   align-items: center;
   justify-content: flex-start;
   gap: 0.5rem;
-  border: 1px solid #e8daca;
-  border-radius: 0.65rem;
-  background: #fffdf6;
+  border: 2px solid var(--color-secondary-200, #eddbc6);
+  border-radius: 0.5rem;
+  background: var(--color-base-white, #fff);
+  box-shadow: 3px 3px 0 var(--color-secondary-100, #f7efe4);
   min-height: 52px;
   padding: 0.8rem;
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
+  transition:
+    translate 120ms ease-out,
+    box-shadow 120ms ease-out;
+}
+.purpose:active {
+  translate: 2px 2px;
+  box-shadow: 1px 1px 0 var(--color-secondary-100, #f7efe4);
 }
 .purpose[aria-pressed='true'] {
-  background: #ffff70;
-  border-color: #ad651d;
-  color: #63451f;
-  box-shadow: 0 3px 0 #ead6b4;
+  background: var(--accent, #cfe6c3);
+  border-color: var(--accent-edge, #55784d);
+  color: var(--accent-ink, #4a6943);
+  box-shadow: 3px 3px 0 color-mix(in srgb, var(--accent-edge, #55784d) 35%, transparent);
+  animation: pop 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .listHeading {
   display: flex;
@@ -106,25 +120,10 @@
   /* 흰 바탕 작은 글자 대비 4.5:1 이상 */
   color: var(--color-neutral-700, #6b6b6b);
 }
+/* 멍냥BTI 질문과 같은 도트 진행 바를 감싸는 칸 */
 .progress {
-  display: block;
   width: 100%;
-  height: 9px;
-  border: none;
-  border-radius: 4px;
-  overflow: hidden;
-  background: #f6efdf;
-  color: #b58238;
-  accent-color: #b58238;
-}
-.progress::-webkit-progress-bar {
-  background: #f6efdf;
-}
-.progress::-webkit-progress-value {
-  background: #b58238;
-}
-.progress::-moz-progress-bar {
-  background: #b58238;
+  height: 1rem;
 }
 .checklist {
   list-style: none;
@@ -155,19 +154,68 @@
   line-height: 1.55;
 }
 .checklist input {
-  width: 21px;
-  height: 21px;
+  display: grid;
+  place-content: center;
+  width: 22px;
+  height: 22px;
   flex-shrink: 0;
-  accent-color: #ad651d;
+  margin: 0;
+  border: 2px solid var(--accent-edge, #55784d);
+  border-radius: 3px;
+  background: var(--color-base-white, #fff);
+  appearance: none;
+  cursor: pointer;
+}
+.checklist input::before {
+  width: 12px;
+  height: 12px;
+  /* 도트 체크 모양 */
+  clip-path: polygon(
+    0 50%,
+    25% 50%,
+    25% 75%,
+    42% 75%,
+    42% 25%,
+    58% 25%,
+    58% 0,
+    100% 0,
+    100% 25%,
+    75% 25%,
+    75% 50%,
+    58% 50%,
+    58% 100%,
+    25% 100%,
+    25% 75%,
+    0 75%
+  );
+  background: var(--color-base-white, #fff);
+  content: '';
+  scale: 0;
+}
+.checklist input:checked {
+  background: var(--accent-ink, #4a6943);
+  border-color: var(--accent-ink, #4a6943);
+  animation: pop 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.checklist input:checked::before {
+  scale: 1;
+}
+.checklist input:focus-visible {
+  outline: 2px solid var(--color-primary-500, #ad651d);
+  outline-offset: 2px;
 }
 .checklist small {
   font-size: 0.625rem;
-  color: #887455;
+  color: var(--color-neutral-700, #6b6b6b);
   white-space: nowrap;
+}
+.checkedRow {
+  animation: row-glow 700ms ease-out;
 }
 .checkedRow label span {
   text-decoration: line-through;
-  color: #8a8176;
+  /* 지운 줄도 읽을 수 있게 4.5:1 이상 */
+  color: var(--color-neutral-700, #6b6b6b);
 }
 .addForm {
   display: flex;
@@ -209,15 +257,37 @@
   cursor: pointer;
 }
 .success {
+  position: relative;
   margin-top: 1rem;
   padding: 0.85rem;
   display: flex;
   gap: 0.5rem;
   align-items: center;
   background: #f0f6de;
-  border-radius: 0.7rem;
+  border: 2px solid var(--accent-edge, #55784d);
+  border-radius: 0.5rem;
   color: #42622c;
   font-size: 0.85rem;
+  font-weight: 600;
+  animation: pop-in 520ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.confetti {
+  position: absolute;
+  top: 50%;
+  left: 1.6rem;
+  width: 6px;
+  height: 6px;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow:
+    0 -26px 0 var(--color-point-500, #ffff70),
+    22px -18px 0 var(--accent-edge, #55784d),
+    30px 4px 0 var(--color-point-500, #ffff70),
+    -22px -18px 0 var(--accent-edge, #55784d),
+    -28px 6px 0 var(--color-point-500, #ffff70),
+    12px 24px 0 var(--accent-edge, #55784d),
+    -12px 24px 0 var(--color-point-500, #ffff70);
+  animation: burst 760ms ease-out 120ms;
 }
 .success svg {
   flex-shrink: 0;
@@ -268,30 +338,22 @@
   display: grid;
   gap: 1.2rem;
 }
-.noteCard {
-  background: #fffde7;
-  border: 1px solid #e8d09f;
-  border-radius: 1.25rem;
-  padding: 1.5rem;
-  box-shadow: 0 5px 0 #f7edda;
+.noteBody {
+  padding: 1.25rem;
 }
-.noteCard h2 {
-  margin: 0.75rem 0;
+.noteBody h2 {
+  margin: 0.6rem 0;
   font:
-    1.4rem/1.5 var(--font-cafe24proup),
+    1.35rem/1.5 var(--font-cafe24proup),
     sans-serif;
-  color: #6d471f;
+  color: var(--color-neutral-850, #3e3e3e);
 }
-.noteCard p {
-  margin: 0.6rem 0 1.3rem;
+.noteBody p {
+  margin: 0.5rem 0 1.2rem;
   font-size: 0.85rem;
-  line-height: 1.85;
-  color: #716557;
+  line-height: 1.8;
+  color: var(--color-neutral-700, #6b6b6b);
   word-break: keep-all;
-}
-.noteCard a {
-  width: 100%;
-  font-size: 0.85rem;
 }
 .previewPanel {
   min-width: 0;
@@ -306,7 +368,7 @@
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 0.9rem;
-  color: #83735e;
+  color: #716557;
   font-size: 0.7rem;
 }
 .previewLabel span:first-child {
@@ -449,6 +511,10 @@
   .panel {
     padding: 1.6rem;
   }
+  .panelBody,
+  .noteBody {
+    padding: 1.5rem;
+  }
   .previewPanel {
     position: sticky;
     top: 6rem;
@@ -462,5 +528,56 @@
     justify-content: center;
     flex-direction: column;
     padding: 0.8rem 0.25rem;
+  }
+}
+
+@keyframes pop {
+  30% {
+    scale: 0.92;
+  }
+  65% {
+    scale: 1.06;
+  }
+}
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    scale: 0.85;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+@keyframes burst {
+  from {
+    opacity: 1;
+    scale: 0.3;
+  }
+  70% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    scale: 1.4;
+  }
+}
+@keyframes row-glow {
+  from {
+    background: color-mix(in srgb, var(--accent, #cfe6c3) 70%, transparent);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .purpose,
+  .purpose[aria-pressed='true'],
+  .checklist input:checked,
+  .checkedRow,
+  .success,
+  .confetti {
+    transition: none;
+    animation: none;
+  }
+  .purpose:active {
+    translate: none;
   }
 }

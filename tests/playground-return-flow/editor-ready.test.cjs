@@ -29,6 +29,7 @@ function editor(isReady) {
     '@/shared/lib/useAuthSessionGeneration': { useAuthSessionGeneration: () => 0 },
     '@/entities/community': { communityQueries: { detail: () => ({}) } },
     '@/entities/profile': { profileQueries: { me: () => ({}) } },
+    './communityRecordIntro': { communityRecordIntro: () => null },
     '@/shared/ui': {
       Container: ({ children }) => React.createElement('main', null, children),
     },
