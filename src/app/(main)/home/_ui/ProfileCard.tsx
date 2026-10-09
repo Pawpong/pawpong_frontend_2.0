@@ -1,6 +1,6 @@
 'use client'
 
-import { PublicActivityLevel } from '@/features/gamification'
+import { MyLevelBadge, PublicActivityLevel } from '@/features/gamification'
 import { useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import {
@@ -315,9 +315,14 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip', menu }: Profile
                 절대배치 대신 이름 줄에 나란히 둬서 자리를 예약할 필요가 없다.
                 2단(tab+)에서는 아바타 줄로 옮겨가 여기선 숨긴다 */}
             <div className="flex items-start gap-1">
-              <p className="min-w-0 flex-1 truncate text-lg leading-[1.5] font-semibold text-neutral-850 pc:text-xl">
-                {profile.nickname}
-              </p>
+              {/* 내 홈은 이름 앞에 내 레벨 배지를 붙인다. 긴 이름은 이름만 줄인다 */}
+              <div className="flex min-w-0 flex-1 items-center gap-1.5">
+                {/* 입양자 'mine'·브리더 'mine-breeder' 모두 내 홈이다 */}
+                {!isVisitor && <MyLevelBadge userId={profileUserId} />}
+                <p className="min-w-0 truncate text-lg leading-[1.5] font-semibold text-neutral-850 pc:text-xl">
+                  {profile.nickname}
+                </p>
+              </div>
               <div className={cn(isSidebar && 'tab:hidden')}>{profileActions}</div>
             </div>
             {isVisitor && (
