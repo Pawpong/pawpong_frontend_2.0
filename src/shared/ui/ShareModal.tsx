@@ -134,9 +134,7 @@ const ShareModal = ({
       })
       .catch((error: unknown) => {
         if (!cancelled)
-          setKakaoError(
-            error instanceof Error ? error.message : '카카오 공유를 불러오지 못했습니다.',
-          )
+          setKakaoError(error instanceof Error ? error.message : '카카오 공유를 불러오지 못했어요.')
       })
 
     return () => {
@@ -207,7 +205,7 @@ const ShareModal = ({
         message:
           error instanceof Error && error.message
             ? error.message
-            : '공유하지 못했습니다. 잠시 후 다시 시도해주세요.',
+            : '공유하지 못했어요. 잠시 후 다시 시도해주세요.',
       })
     } finally {
       // 닫힌 팝업의 늦은 완료가 재열린 팝업의 새 요청을 풀지 않도록 한다.

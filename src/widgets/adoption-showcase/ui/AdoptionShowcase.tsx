@@ -28,9 +28,9 @@ const AdoptionShowcase = () => {
         isPending={isPending}
         isError={isError}
         isEmpty={pets.length === 0}
-        loadingText="분양중인 동물을 불러오는 중입니다."
-        errorText="분양중인 동물을 불러오지 못했습니다."
-        emptyText="현재 분양중인 동물이 없습니다."
+        loadingText="분양중인 동물을 불러오는 중이에요."
+        errorText="분양중인 동물을 불러오지 못했어요."
+        emptyText="현재 분양중인 동물이 없어요."
       >
         {/* Figma: mo 164×2 / tab 164×4에서 시작해 pc 282×4까지 자연스럽게 보간.
             grid에 자체 max-w를 두면 섹션 타이틀(Container 폭 그대로)과 좌우 여백이 어긋난다 —

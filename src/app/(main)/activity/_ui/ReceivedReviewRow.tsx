@@ -102,7 +102,7 @@ export const ReceivedReviewRow = ({
       {deleteReply.isError && (
         <AlertMessage
           status="error"
-          message={normalizeApiError(deleteReply.error, '답글을 삭제하지 못했습니다.').message}
+          message={normalizeApiError(deleteReply.error, '답글을 삭제하지 못했어요.').message}
         />
       )}
       <DeleteConfirmModal

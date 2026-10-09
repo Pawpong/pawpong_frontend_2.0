@@ -235,9 +235,9 @@ const ExploreContent = () => {
                   isPending={isPending}
                   isError={isError}
                   isEmpty={listings.length === 0}
-                  loadingText="분양글을 불러오는 중입니다."
-                  errorText="분양글을 불러오지 못했습니다."
-                  emptyText="등록된 분양글이 없습니다."
+                  loadingText="분양글을 불러오는 중이에요."
+                  errorText="분양글을 불러오지 못했어요."
+                  emptyText="등록된 분양글이 없어요."
                 >
                   <AdoptionCardGrid listings={listings} />
                 </ListState>

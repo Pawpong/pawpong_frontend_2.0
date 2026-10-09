@@ -67,11 +67,11 @@ const MyHomeContent = () => {
         <Container className="flex min-h-60 items-center justify-center px-4 py-10">
           {profileQuery.isPending ? (
             <p role="status" className="text-sm font-medium text-neutral-700">
-              프로필을 불러오는 중입니다.
+              프로필을 불러오는 중이에요.
             </p>
           ) : (
             <div role="alert" className="flex flex-col items-center gap-3 text-center">
-              <p className="text-sm font-medium text-neutral-700">프로필을 불러오지 못했습니다.</p>
+              <p className="text-sm font-medium text-neutral-700">프로필을 불러오지 못했어요.</p>
               <RetryButton
                 onRetry={() => void profileQuery.refetch()}
                 isRetrying={profileQuery.isFetching}

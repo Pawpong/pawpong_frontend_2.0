@@ -72,9 +72,9 @@ const PublicBreederReviews = ({ breederId }: PublicBreederReviewsProps) => {
           isPending={query.isPending}
           isError={query.isError}
           isEmpty={reviews.length === 0}
-          loadingText="후기를 불러오는 중입니다."
-          errorText="후기를 불러오지 못했습니다."
-          emptyText="아직 등록된 후기가 없습니다."
+          loadingText="후기를 불러오는 중이에요."
+          errorText="후기를 불러오지 못했어요."
+          emptyText="아직 등록된 후기가 없어요."
           onRetry={() => void query.refetch()}
           isRetrying={query.isFetching}
         >

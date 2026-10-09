@@ -85,7 +85,7 @@ const StatusActionSection = ({
   }
 
   const errorMessage = updateStatus.isError
-    ? normalizeApiError(updateStatus.error, '상태를 변경하지 못했습니다.').message
+    ? normalizeApiError(updateStatus.error, '상태를 변경하지 못했어요.').message
     : null
 
   return (

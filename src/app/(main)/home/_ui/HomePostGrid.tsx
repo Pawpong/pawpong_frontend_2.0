@@ -17,6 +17,8 @@ interface HomePostGridProps {
   loadingText?: string
   errorText?: string
   emptyText?: string
+  /** 빈 목록에서 다음 행동으로 잇는 버튼 */
+  emptyAction?: ReactNode
   pagination?: {
     onLoadMore: () => void
     hasNextPage: boolean
@@ -37,9 +39,10 @@ const HomePostGrid = ({
   isError,
   onRetry,
   isRetrying,
-  loadingText = '게시글을 불러오는 중입니다.',
-  errorText = '게시글을 불러오지 못했습니다.',
-  emptyText = '게시글이 없습니다.',
+  loadingText = '게시글을 불러오는 중이에요.',
+  errorText = '게시글을 불러오지 못했어요.',
+  emptyText = '게시글이 없어요.',
+  emptyAction,
   pagination,
   className,
   gridClassName,
@@ -63,6 +66,7 @@ const HomePostGrid = ({
           loadingText={loadingText}
           errorText={errorText}
           emptyText={emptyText}
+          emptyAction={emptyAction}
           onRetry={onRetry}
           isRetrying={isRetrying}
         >

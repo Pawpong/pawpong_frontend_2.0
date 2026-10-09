@@ -248,9 +248,9 @@ const NotificationsContent = () => {
             isPending={isPending}
             isError={isError}
             isEmpty={notifications.length === 0}
-            loadingText="알림을 불러오는 중입니다."
-            errorText="알림을 불러오지 못했습니다."
-            emptyText={isFiltered ? '조건에 맞는 알림이 없습니다.' : '아직 도착한 알림이 없습니다.'}
+            loadingText="알림을 불러오는 중이에요."
+            errorText="알림을 불러오지 못했어요."
+            emptyText={isFiltered ? '조건에 맞는 알림이 없어요.' : '아직 도착한 알림이 없어요.'}
             onRetry={() => void refetch()}
             isRetrying={isRetrying}
           >

@@ -83,9 +83,9 @@ const BreederExploreContent = ({ category, keyword }: BreederExploreContentProps
           isPending={isPending}
           isError={isError}
           isEmpty={breeders.length === 0}
-          loadingText="브리더를 불러오는 중입니다."
-          errorText="브리더를 불러오지 못했습니다."
-          emptyText="등록된 브리더가 없습니다."
+          loadingText="브리더를 불러오는 중이에요."
+          errorText="브리더를 불러오지 못했어요."
+          emptyText="등록된 브리더가 없어요."
         >
           <ListingCardGrid
             items={breeders}

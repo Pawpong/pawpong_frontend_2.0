@@ -29,7 +29,7 @@ const UserHomeContent = ({ userId }: UserHomeContentProps) => {
       <AsyncState
         status={profileQuery.isError ? 'error' : 'loading'}
         message={
-          profileQuery.isError ? '프로필을 불러오지 못했습니다.' : '프로필을 불러오는 중입니다.'
+          profileQuery.isError ? '프로필을 불러오지 못했어요.' : '프로필을 불러오는 중이에요.'
         }
         onRetry={profileQuery.isError ? () => void profileQuery.refetch() : undefined}
         isRetrying={profileQuery.isFetching}

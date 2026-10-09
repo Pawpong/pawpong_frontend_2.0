@@ -115,7 +115,7 @@ const ReactivateAccountPrompt = () => {
 
   // 복구 대상이 아닌 차단(정지 계정 등) — 사유만 알린다
   if (isDeletedAccount && !reactivationToken) {
-    return <ErrorNotice text={blockedReason ?? message ?? '이 계정으로는 로그인할 수 없습니다.'} />
+    return <ErrorNotice text={blockedReason ?? message ?? '이 계정으로는 로그인할 수 없어요.'} />
   }
 
   if (!canReactivate) return null

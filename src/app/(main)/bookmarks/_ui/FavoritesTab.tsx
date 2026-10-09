@@ -7,6 +7,7 @@ import { AdoptionCardGrid } from '@/features/adoption'
 import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
 import { Container, Chip, InfiniteScrollTrigger, ListState, SectionHeader } from '@/shared/ui'
+import { EmptyStateLink } from '@/shared/ui/EmptyStateLink'
 import type { PetStatus } from '@/shared/types'
 import { flattenPages, getTotalItems } from '@/shared/lib/infiniteList'
 
@@ -61,9 +62,12 @@ const FavoritesTab = () => {
         isPending={isPending}
         isError={isError}
         isEmpty={listings.length === 0}
-        loadingText="관심 목록을 불러오는 중입니다."
-        errorText="관심 목록을 불러오지 못했습니다."
-        emptyText="관심 표시한 입양글이 없습니다."
+        loadingText="관심 목록을 불러오는 중이에요."
+        errorText="관심 목록을 불러오지 못했어요."
+        emptyText="아직 관심 표시한 입양글이 없어요."
+        emptyAction={
+          <EmptyStateLink href="/explore?type=adoption">분양중인 동물 보기</EmptyStateLink>
+        }
       >
         <AdoptionCardGrid listings={listings} />
       </ListState>

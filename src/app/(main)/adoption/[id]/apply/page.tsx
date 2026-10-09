@@ -23,7 +23,7 @@ const AdoptionApplyPage = () => {
     return (
       <AsyncState
         status="loading"
-        message="분양글을 불러오는 중입니다."
+        message="분양글을 불러오는 중이에요."
         className="min-h-[calc(100dvh-3rem)] tab:min-h-[calc(100dvh-3.5rem)]"
       />
     )
@@ -33,7 +33,7 @@ const AdoptionApplyPage = () => {
     return (
       <AsyncState
         status="error"
-        message="분양글을 불러오지 못했습니다."
+        message="분양글을 불러오지 못했어요."
         onRetry={() => void detailQuery.refetch()}
         isRetrying={detailQuery.isFetching}
         className="min-h-[calc(100dvh-3rem)] tab:min-h-[calc(100dvh-3.5rem)]"

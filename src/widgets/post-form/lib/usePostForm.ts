@@ -77,7 +77,7 @@ const usePostForm = ({
           prepared.push(await prepareSelectedPhoto(file))
         } catch (error) {
           failures.push(
-            `${file.name}: ${error instanceof Error ? error.message : '사진을 처리하지 못했습니다.'}`,
+            `${file.name}: ${error instanceof Error ? error.message : '사진을 처리하지 못했어요.'}`,
           )
         }
         if (!mountedRef.current || id !== selectionId.current) return
