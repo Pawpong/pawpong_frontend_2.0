@@ -2,6 +2,7 @@
 
 import { useState, type ReactNode } from 'react'
 import { Container, InfiniteScrollTrigger, ListState } from '@/shared/ui'
+import { GridSkeleton } from '@/shared/ui/Skeleton'
 import { cn } from '@/shared/lib/cn'
 import { BREAKPOINTS } from '@/shared/lib/useBreakpoint'
 import { CommunityMediaCard, getFirstPhotoPostId } from '@/entities/community'
@@ -49,6 +50,10 @@ const HomePostGrid = ({
   header,
 }: HomePostGridProps) => {
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null)
+  const gridClasses = cn(
+    'mx-auto grid w-full max-w-[23.4375rem] grid-cols-[repeat(3,minmax(0,7.625rem))] justify-between gap-x-1 gap-y-3 tab:max-w-[48rem] tab:grid-cols-3 tab:gap-3 pc:max-w-[80rem] pc:grid-cols-[repeat(4,18.75rem)] pc:justify-center pc:gap-5',
+    gridClassName,
+  )
   const firstPhotoPostId = getFirstPhotoPostId(posts)
 
   return (
@@ -64,6 +69,14 @@ const HomePostGrid = ({
           isError={isError}
           isEmpty={posts.length === 0}
           loadingText={loadingText}
+          loadingFallback={
+            <GridSkeleton
+              label={loadingText}
+              count={6}
+              className={gridClasses}
+              itemClassName="rounded-none pc:rounded-lg"
+            />
+          }
           errorText={errorText}
           emptyText={emptyText}
           emptyAction={emptyAction}
@@ -71,12 +84,7 @@ const HomePostGrid = ({
           isRetrying={isRetrying}
         >
           {/* 모바일 3열은 375px 시안의 122px 정사각을 그대로 두고, 더 좁은 폰(360px 등)에서만 열이 줄어 가로로 넘치지 않게 한다 */}
-          <div
-            className={cn(
-              'mx-auto grid w-full max-w-[23.4375rem] grid-cols-[repeat(3,minmax(0,7.625rem))] justify-between gap-x-1 gap-y-3 tab:max-w-[48rem] tab:grid-cols-3 tab:gap-3 pc:max-w-[80rem] pc:grid-cols-[repeat(4,18.75rem)] pc:justify-center pc:gap-5',
-              gridClassName,
-            )}
-          >
+          <div className={gridClasses}>
             {posts.map((post) => (
               <CommunityMediaCard
                 key={post.postId}

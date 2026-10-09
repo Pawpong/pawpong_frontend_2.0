@@ -8,6 +8,8 @@ interface ListStateProps {
   isError: boolean
   isEmpty: boolean
   loadingText: ReactNode
+  /** 로딩 중 글자 안내 대신 보여줄 자리 모양(스켈레톤). 안내 문구는 스켈레톤이 낭독용으로 함께 둔다. */
+  loadingFallback?: ReactNode
   errorText: ReactNode
   emptyText: ReactNode
   emptyAction?: ReactNode
@@ -26,6 +28,7 @@ const ListState = ({
   isError,
   isEmpty,
   loadingText,
+  loadingFallback,
   errorText,
   emptyText,
   emptyAction,
@@ -34,7 +37,7 @@ const ListState = ({
   isRetrying,
   appPublicContent = false,
 }: ListStateProps) => {
-  if (isPending) return <AsyncState status="loading" message={loadingText} />
+  if (isPending) return loadingFallback ?? <AsyncState status="loading" message={loadingText} />
   if (isError && isEmpty)
     return (
       <AsyncState
