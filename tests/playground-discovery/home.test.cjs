@@ -117,6 +117,12 @@ test('놀이터 아래 돌봄 지도 카드도 초록 CARE MAP 티켓에 버튼 
     html,
     /^<section aria-label="우리 동네 돌봄 지도" data-accent="green" class="ticket"><span class="strip">CARE MAP<\/span>/,
   )
-  assert.match(html, /<a href="\/care-map" class="button-primary">동물병원 찾기/)
+  assert.match(html, /<div><a href="\/care-map" class="button-primary">동물병원 찾기/)
   assert.match(html, /<a href="\/care-map\?kind=shelter" class="button-secondary">보호시설 찾기/)
+  // 버튼 폭은 계약을 우회하지 않고 감싸는 칸으로 정한다.
+  for (const file of [
+    'src/widgets/care-map-entry/ui/CareMapEntry.tsx',
+    'src/widgets/feature-highlights/ui/FeatureHighlights.tsx',
+  ])
+    assert.doesNotMatch(source(file), /cn\(buttonVariants/, file)
 })

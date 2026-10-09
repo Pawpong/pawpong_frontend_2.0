@@ -35,7 +35,6 @@ const { FeatureHighlights } = load('src/widgets/feature-highlights/ui/FeatureHig
   },
   '@/shared/ui': { Container: ({ children }) => React.createElement('section', {}, children) },
   '@/shared/assets': { PixelArrowRightIcon: () => null },
-  '@/shared/lib/cn': { cn: (...values) => values.filter(Boolean).join(' ') },
   '@/shared/ui/Button': { buttonVariants: ({ intent }) => `button-${intent}` },
   '@/shared/ui/Ticket': {
     ticketStyles: { ticket: 'ticket' },
@@ -118,7 +117,7 @@ test('valid optional cards still render under the same globally throwing QueryCl
     assert.match(markup, /href="\/ai-filter"/)
     // 놀이터 티켓과 같은 틀: 반짝임 카드는 버터 띠에 NEW 라벨, 버튼은 하나면 줄을 채운다.
     assert.match(markup, /data-accent="butter" class="ticket"><span class="strip">NEW<\/span>/)
-    assert.match(markup, /href="\/ai-filter" class="button-primary col-span-full"/)
+    assert.match(markup, /<div class="col-span-full"><a href="\/ai-filter" class="button-primary">/)
   } finally {
     client.clear()
   }

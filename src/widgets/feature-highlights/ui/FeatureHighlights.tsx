@@ -11,7 +11,6 @@ import {
 } from '@/entities/feature-highlight'
 import { Container } from '@/shared/ui'
 import { PixelArrowRightIcon } from '@/shared/assets'
-import { cn } from '@/shared/lib/cn'
 import { buttonVariants } from '@/shared/ui/Button'
 import { TicketStrip, ticketStyles } from '@/shared/ui/Ticket'
 import styles from './FeatureHighlights.module.css'
@@ -98,20 +97,21 @@ export function FeatureHighlights({
                 </div>
                 <div className={styles.actions}>
                   {card.actions.map((action, index) => (
-                    <Link
+                    <div
                       key={`${action.href}-${index}`}
-                      href={action.href}
-                      className={cn(
-                        buttonVariants({
+                      className={card.actions.length === 1 ? 'col-span-full' : undefined}
+                    >
+                      <Link
+                        href={action.href}
+                        className={buttonVariants({
                           intent: index === 0 ? 'primary' : 'secondary',
                           width: 'full',
-                        }),
-                        card.actions.length === 1 && 'col-span-full',
-                      )}
-                    >
-                      {action.label}
-                      <PixelArrowRightIcon aria-hidden className="ml-1.5 size-3.5 shrink-0" />
-                    </Link>
+                        })}
+                      >
+                        {action.label}
+                        <PixelArrowRightIcon aria-hidden className="ml-1.5 size-3.5 shrink-0" />
+                      </Link>
+                    </div>
                   ))}
                 </div>
               </div>

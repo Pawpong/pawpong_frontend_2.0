@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { LocationPinIcon, PixelArrowRightIcon } from '@/shared/assets'
-import { cn } from '@/shared/lib/cn'
 import { Container } from '@/shared/ui'
 import { buttonVariants } from '@/shared/ui/Button'
 import { TicketStrip, ticketStyles } from '@/shared/ui/Ticket'
@@ -61,18 +60,23 @@ export function CareMapEntry({
         </div>
         {actions.length > 0 && (
           <div className={styles.actions}>
+            {/* 버튼 폭은 감싸는 칸이 정한다. 버튼이 하나면 칸이 줄을 채운다. */}
             {actions.map((action, index) => (
-              <Link
+              <div
                 key={`${action.href}-${index}`}
-                href={action.href}
-                className={cn(
-                  buttonVariants({ intent: index === 0 ? 'primary' : 'secondary', width: 'full' }),
-                  actions.length === 1 && 'col-span-full',
-                )}
+                className={actions.length === 1 ? 'col-span-full' : undefined}
               >
-                {action.label}
-                <PixelArrowRightIcon aria-hidden className="ml-1.5 size-3.5 shrink-0" />
-              </Link>
+                <Link
+                  href={action.href}
+                  className={buttonVariants({
+                    intent: index === 0 ? 'primary' : 'secondary',
+                    width: 'full',
+                  })}
+                >
+                  {action.label}
+                  <PixelArrowRightIcon aria-hidden className="ml-1.5 size-3.5 shrink-0" />
+                </Link>
+              </div>
             ))}
           </div>
         )}
