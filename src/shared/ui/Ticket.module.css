@@ -2,6 +2,8 @@
 .ticket {
   --accent: #fff3b8;
   --accent-edge: #ad651d;
+  /* 띠 위 작은 글자는 띠 색 위에서 4.5:1 이상이 되도록 테두리보다 한 단계 진하게 쓴다. */
+  --accent-ink: var(--color-primary-600, #94591f);
   position: relative;
   overflow: hidden;
   border: 3px solid var(--accent-edge);
@@ -12,14 +14,17 @@
 .ticket[data-accent='green'] {
   --accent: #cfe6c3;
   --accent-edge: #55784d;
+  --accent-ink: #4a6943;
 }
 .ticket[data-accent='peach'] {
   --accent: #ffd9c2;
   --accent-edge: #b86a3c;
+  --accent-ink: #8f522e;
 }
 .ticket[data-accent='blue'] {
   --accent: #d6e4fb;
   --accent-edge: #4f6f9f;
+  --accent-ink: #476590;
 }
 .strip {
   display: flex;
@@ -28,7 +33,7 @@
   gap: 0.5rem;
   padding: 0.6rem 1rem;
   background: var(--accent);
-  color: var(--accent-edge);
+  color: var(--accent-ink);
   font:
     0.75rem/1.4 var(--font-cafe24proup),
     sans-serif;

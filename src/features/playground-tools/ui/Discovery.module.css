@@ -101,7 +101,7 @@
   height: 1.5rem;
   border: 2px solid var(--accent-edge);
   background: var(--accent);
-  color: var(--accent-edge);
+  color: var(--accent-ink, var(--accent-edge));
   font:
     0.7rem/1 var(--font-cafe24proup),
     sans-serif;

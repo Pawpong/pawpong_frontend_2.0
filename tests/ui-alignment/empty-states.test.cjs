@@ -124,3 +124,23 @@ test('카드는 누르는 동안 살짝 줄고 움직임을 줄인 환경에서�
     /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*&:active \{\s*scale: none;/,
   )
 })
+
+test('티켓 띠 글자와 외출 준비함 개수, 푸터 저작권 줄은 작은 글자 대비 4.5:1 이상 색을 씀', () => {
+  const ticket = source('src/shared/ui/Ticket.module.css')
+  assert.match(ticket, /\.strip \{[\s\S]*?color: var\(--accent-ink\);/)
+  for (const ink of [
+    '--accent-ink: var(--color-primary-600, #94591f)',
+    '--accent-ink: #4a6943',
+    '--accent-ink: #8f522e',
+    '--accent-ink: #476590',
+  ])
+    assert.ok(ticket.includes(ink), ink)
+  assert.match(
+    source('src/features/playground-tools/ui/Tools.module.css'),
+    /\.listHeading strong span \{[\s\S]*?color: var\(--color-neutral-700, #6b6b6b\);/,
+  )
+  assert.match(
+    source('src/widgets/site-footer/ui/SiteFooter.tsx'),
+    /text-xs font-medium text-neutral-700">\s*Copyright/,
+  )
+})

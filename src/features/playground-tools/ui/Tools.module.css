@@ -103,7 +103,8 @@
 .listHeading strong span {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #827b72;
+  /* 흰 바탕 작은 글자 대비 4.5:1 이상 */
+  color: var(--color-neutral-700, #6b6b6b);
 }
 .progress {
   display: block;
