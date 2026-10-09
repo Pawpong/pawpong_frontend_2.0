@@ -140,7 +140,7 @@ function studio(remaining = 1, isLoggedIn = true) {
     '@/shared/lib/fonts': { cafe24Proup: { className: '' } },
     '@/shared/lib/cn': { cn: (...args) => args.join(' ') },
     '@/shared/lib/authReadSession': { isAuthReadSessionCurrent: () => true },
-    '@/shared/lib/useInView': { useInView: () => [() => {}, true] },
+    '@/shared/lib/useViewportPosition': { useViewportPosition: () => [() => {}, 'inside'] },
     '@/shared/ui/Skeleton': { SkeletonBlock: () => null },
     '@/shared/ui': { Button, ComposerSectionHeading: () => null, buttonVariants: () => '' },
     '@/shared/ui/PhotoUploadField': { PhotoUploadField: () => null },

@@ -11,7 +11,7 @@ import { PLAYGROUND_BILLING_ENABLED } from '@/shared/config/playground'
 import { cafe24Proup } from '@/shared/lib/fonts'
 import { cn } from '@/shared/lib/cn'
 import { isAuthReadSessionCurrent } from '@/shared/lib/authReadSession'
-import { useInView } from '@/shared/lib/useInView'
+import { useViewportPosition } from '@/shared/lib/useViewportPosition'
 import { AsyncState, Button, ComposerSectionHeading, buttonVariants } from '@/shared/ui'
 import { PhotoUploadField } from '@/shared/ui/PhotoUploadField'
 import { SkeletonBlock } from '@/shared/ui/Skeleton'
@@ -121,10 +121,16 @@ export function AiFilterStudio({
             ? '캐릭터 만들기 · 1회 사용'
             : `${selectedFilter.name} 씌우기`
           : '필터를 골라 주세요'
-  const [ctaRef, ctaInView] = useInView<HTMLDivElement>()
-  // 사진과 필터를 고른 뒤 만들기 버튼이 화면 아래로 밀려나 있으면 모바일 하단에 같은 버튼을 띄운다.
+  const [ctaRef, ctaPosition] = useViewportPosition<HTMLDivElement>()
+  // 사진과 필터를 고른 뒤 만들기 버튼이 아직 화면 아래에 있으면 모바일 하단에 같은 버튼을 띄운다.
+  // 버튼을 지나 보관함까지 내려간 경우(위로 지나감)에는 띄우지 않아 아래 내용을 가리지 않는다.
   const showFloatingCta =
-    isLoggedIn && canConvert && !ctaInView && !ai.isWorking && !awaitingResult && !result
+    isLoggedIn &&
+    canConvert &&
+    ctaPosition === 'below' &&
+    !ai.isWorking &&
+    !awaitingResult &&
+    !result
   const returnUrl = gameCharacter
     ? `/ai-filter?purpose=pet-sprite-v1${sourceJobId ? `&sourceJobId=${encodeURIComponent(sourceJobId)}` : ''}`
     : '/ai-filter'
