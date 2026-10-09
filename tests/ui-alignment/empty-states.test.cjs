@@ -67,3 +67,11 @@ test('활동 화면의 이어가기 링크도 글자 화살표 대신 읽지 않
     assert.match(code, /<PixelArrowRightIcon aria-hidden/, file)
   }
 })
+
+test('오류 화면 문구도 해요체로 맞추고 사과 문장과 안내가 섞이지 않게 함', () => {
+  const boundary = source('src/shared/ui/ErrorBoundaryUI.tsx')
+  const messages = source('src/widgets/route-error/model/messages.ts')
+  for (const code of [boundary, messages]) assert.doesNotMatch(code, /습니다|합니다/)
+  assert.match(boundary, /잠시 후 다시 시도해 주세요\./)
+  assert.match(messages, /title: '문제가 생겼어요'/)
+})
