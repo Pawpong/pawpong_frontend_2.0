@@ -10,6 +10,7 @@ import {
   LocationPinIcon,
   PlusIcon,
   CloseIcon,
+  PawPrintIcon,
 } from '@/shared/assets'
 import {
   OUTING_TEMPLATES,
@@ -24,7 +25,29 @@ import {
 import { createChecklistStore } from '../model/checklistStore'
 import { currentToolOwner, useToolOwner } from '../model/useToolOwner'
 import { ToolPage } from './ToolPage'
+import discovery from './Discovery.module.css'
 import styles from './Tools.module.css'
+
+const SIDE_TICKETS = [
+  {
+    href: '/care-map',
+    accent: 'green',
+    label: 'CARE MAP',
+    title: '방문할 곳 확인하기',
+    body: '주변 동물병원과 보호시설을 지도에서 살펴보세요. 방문 전 운영 여부도 확인해 주세요.',
+    cta: '돌봄 지도 열기',
+    Icon: LocationPinIcon,
+  },
+  {
+    href: '/playground/memory-card',
+    accent: 'butter',
+    label: 'PLAY CARD',
+    title: '오늘의 추억 카드 만들기',
+    body: '좋아하는 사진을 골라 따뜻한 카드로 남겨보세요.',
+    cta: '추억 카드 꾸미기',
+    Icon: PawPrintIcon,
+  },
+] as const
 
 function Checklist({ owner }: { owner: string }) {
   const [store] = useState(() => {
@@ -246,21 +269,28 @@ function Checklist({ owner }: { owner: string }) {
             <PixelArrowRightIcon aria-hidden className="size-4" />
           </Link>
         </section>
-        <section className={styles.smallCard}>
-          <LocationPinIcon aria-hidden className="size-8 text-brand" />
-          <h2>방문할 곳 확인하기</h2>
-          <p>주변 동물병원과 보호시설을 지도에서 살펴보세요. 방문 전 운영 여부도 확인해 주세요.</p>
-          <Link href="/care-map" className={styles.inlineLink}>
-            돌봄 지도 열기 <PixelArrowRightIcon aria-hidden className="size-3" />
+        {/* 놀이터 첫 화면의 돌봄 도구·놀이 카드와 같은 티켓으로 다음 행동을 잇는다. */}
+        {SIDE_TICKETS.map(({ href, accent, label, title, body, cta, Icon }) => (
+          <Link
+            key={href}
+            href={href}
+            data-accent={accent}
+            className={`${discovery.ticket} flex flex-col focus-ring`}
+          >
+            <span className={discovery.ticketTop}>
+              <span>{label}</span>
+              <Icon aria-hidden className="size-4" />
+            </span>
+            <span className="flex flex-col p-4 tab:p-5">
+              <span className="text-base font-semibold break-keep text-neutral-850">{title}</span>
+              <span className="mt-1.5 text-xs leading-5 break-keep text-neutral-700">{body}</span>
+              <span className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-primary-600">
+                {cta}
+                <PixelArrowRightIcon aria-hidden className="size-3" />
+              </span>
+            </span>
           </Link>
-        </section>
-        <Link href="/playground/memory-card" className={styles.smallCard}>
-          <span className={styles.eyebrow}>사진 한 장의 기념품</span>
-          <h2>
-            오늘의 추억 카드 만들기 <span aria-hidden>↗</span>
-          </h2>
-          <p>좋아하는 사진을 골라 따뜻한 카드로 남겨보세요.</p>
-        </Link>
+        ))}
       </aside>
     </div>
   )

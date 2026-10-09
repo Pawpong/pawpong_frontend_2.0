@@ -15,7 +15,6 @@
 }
 /* 공통 focus-ring 유틸리티와 같은 두께·색·간격을 쓴다. */
 .back:focus-visible,
-.inlineLink:focus-visible,
 .textButton:focus-visible,
 .purpose:focus-visible,
 .theme:focus-visible {
@@ -293,8 +292,7 @@
     sans-serif;
   color: #6d471f;
 }
-.noteCard p,
-.smallCard p {
+.noteCard p {
   margin: 0.6rem 0 1.3rem;
   font-size: 0.85rem;
   line-height: 1.85;
@@ -304,31 +302,6 @@
 .noteCard a {
   width: 100%;
   font-size: 0.85rem;
-}
-.smallCard {
-  display: block;
-  padding: 1.4rem;
-  border: 1px solid #e8e0d5;
-  border-radius: 1rem;
-  background: #fff;
-}
-.smallCard h2 {
-  font-size: 1rem;
-  font-weight: 700;
-  margin-top: 0.6rem;
-  line-height: 1.65;
-}
-.smallCard p {
-  margin-bottom: 0.6rem;
-}
-.inlineLink {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  gap: 0.5rem;
-  font-size: 0.85rem;
-  color: #94591f;
-  font-weight: 600;
 }
 .previewPanel {
   min-width: 0;
