@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useQueryClient } from '@tanstack/react-query'
 import { aiImageQueries } from '@/entities/ai-image'
-import { PawPrintIcon } from '@/shared/assets'
+import { PawPrintIcon, PixelArrowRightIcon } from '@/shared/assets'
 import { PLAYGROUND_BILLING_ENABLED } from '@/shared/config/playground'
 import { cafe24Proup } from '@/shared/lib/fonts'
 import { cn } from '@/shared/lib/cn'
@@ -582,7 +582,8 @@ export function AiFilterStudio({
               href="/home?tab=ai-photos"
               className="inline-flex min-h-11 items-center text-sm font-semibold text-primary-700 focus-ring"
             >
-              보관함 <span aria-hidden>→</span>
+              보관함
+              <PixelArrowRightIcon aria-hidden className="ml-1.5 size-3" />
             </Link>
           </div>
           <AiPhotoArchive

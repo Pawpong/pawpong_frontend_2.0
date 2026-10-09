@@ -39,7 +39,9 @@ test('AI 사진 화면의 글자 링크는 포커스 표시와 44px 높이를 �
   const archive = source('src/features/ai-image/ui/AiPhotoArchive.tsx')
   assert.equal((archive.match(/inline-flex min-h-11 items-center[^"]*focus-ring/g) ?? []).length, 2)
   const studio = source('src/features/ai-image/ui/AiFilterStudio.tsx')
-  assert.match(studio, /보관함 <span aria-hidden>→<\/span>/)
+  // 글자 화살표 대신 읽지 않는 픽셀 화살표를 쓴다.
+  assert.match(studio, /보관함\s*<PixelArrowRightIcon aria-hidden/)
+  assert.doesNotMatch(studio, /보관함\s*(<span aria-hidden>)?→/)
   assert.match(
     studio,
     /min-h-11 items-center text-sm font-semibold text-primary-700 underline focus-ring/,
