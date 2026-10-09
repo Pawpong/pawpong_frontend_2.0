@@ -335,17 +335,22 @@ export function AiFilterStudio({
                       )}
                     >
                       <span className="relative block aspect-square w-full bg-point-100">
-                        {filter.thumbnailUrl && (
+                        {filter.thumbnailUrl ? (
                           <Image
                             src={filter.thumbnailUrl}
                             alt=""
                             fill
-                            unoptimized
+                            // 관리자가 올린 원본(수 MB)을 그대로 받지 않도록 최적화를 거친다.
                             // 필터 목록은 첫 화면의 핵심 선택지라 지연 로딩으로 빈 칸이 보이지 않게 한다.
                             loading="eager"
                             sizes="(min-width: 1024px) 200px, 45vw"
                             className="object-cover"
                           />
+                        ) : (
+                          // 예시 이미지가 아직 없는 필터도 빈 칸 대신 놀이터 예시 자리와 같은 발바닥으로 채운다.
+                          <span className="flex size-full items-center justify-center" aria-hidden>
+                            <PawPrintIcon className="size-12 rotate-12 text-secondary-300" />
+                          </span>
                         )}
                         {selected && (
                           <span className="absolute top-2 right-2 flex size-8 items-center justify-center rounded-full bg-point-500 shadow">
