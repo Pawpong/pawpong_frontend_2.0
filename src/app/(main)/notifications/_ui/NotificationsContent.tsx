@@ -34,6 +34,7 @@ import {
   ListState,
   NavigationBar,
 } from '@/shared/ui'
+import { SkeletonBlock } from '@/shared/ui/Skeleton'
 
 type ReadFilter = 'all' | 'unread' | 'read'
 
@@ -249,6 +250,27 @@ const NotificationsContent = () => {
             isError={isError}
             isEmpty={notifications.length === 0}
             loadingText="알림을 불러오는 중이에요."
+            loadingFallback={
+              // 알림 행과 같은 틀(테두리 상자·행 여백·읽음 점·세 줄)로 자리를 잡아 둔다.
+              <div role="status" aria-busy="true">
+                <span className="sr-only">알림을 불러오는 중이에요.</span>
+                <div
+                  aria-hidden
+                  className="flex flex-col divide-y divide-neutral-150 overflow-hidden rounded-xl border border-neutral-150 bg-white"
+                >
+                  {Array.from({ length: 4 }, (_, index) => (
+                    <div key={index} className="flex gap-3 px-4 py-4 tab:px-5 tab:py-5">
+                      <SkeletonBlock className="mt-1.5 size-2.5 shrink-0 rounded-full" />
+                      <div className="flex-1 space-y-2">
+                        <SkeletonBlock className="h-4 w-1/2 rounded" />
+                        <SkeletonBlock className="h-3.5 w-full rounded" />
+                        <SkeletonBlock className="h-3 w-1/4 rounded" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            }
             errorText="알림을 불러오지 못했어요."
             emptyText={isFiltered ? '조건에 맞는 알림이 없어요.' : '아직 도착한 알림이 없어요.'}
             onRetry={() => void refetch()}

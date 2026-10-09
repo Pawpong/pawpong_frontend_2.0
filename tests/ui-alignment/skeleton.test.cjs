@@ -104,3 +104,12 @@ test('관심 입양글·즐겨찾는 브리더·브리더 홈 분양 목록도 �
     /<ListingCardGridSkeleton[\s\S]*?layout="publicBreeder"[\s\S]*?className=\{gridClassName\}/,
   )
 })
+
+test('알림센터는 불러오는 동안 알림 행과 같은 틀의 스켈레톤을 보여줌', () => {
+  const page = source('src/app/(main)/notifications/_ui/NotificationsContent.tsx')
+  assert.match(
+    page,
+    /loadingFallback=\{[\s\S]*?<span className="sr-only">알림을 불러오는 중이에요\.<\/span>/,
+  )
+  assert.match(page, /px-4 py-4 tab:px-5 tab:py-5/)
+})

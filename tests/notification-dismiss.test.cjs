@@ -327,6 +327,7 @@ test('center deletion reports failure in the confirmation dialog and succeeds on
         useDeleteAllNotifications: () => ({}),
       },
       '@/shared/assets': { PawPrintIcon: 'PawPrintIcon' },
+      '@/shared/ui/Skeleton': { SkeletonBlock: 'SkeletonBlock' },
       '@/shared/api': { normalizeApiError: (error) => error },
       '@/shared/lib/dedupeBy': { dedupeBy: (items) => items },
       '@/shared/lib/infiniteList': {
