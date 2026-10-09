@@ -104,7 +104,7 @@ export function CommunityExperiencePanel({
         <CommunityRecordCard key={summary.kind} summary={summary} />
       ))}
       {experience?.clinic && (
-        <p className="text-xs leading-relaxed text-neutral-600">
+        <p className="text-xs leading-relaxed text-neutral-700">
           작성자가 겪은 방문 경험이에요. 병원 평가나 의학적 판단이 아니에요.
         </p>
       )}
@@ -140,7 +140,7 @@ export function CommunityExperiencePanel({
               </li>
             ))}
           </ol>
-          <p className="text-xs leading-relaxed text-neutral-600">
+          <p className="text-xs leading-relaxed text-neutral-700">
             작성자가 공개하기로 고른 장소를 방문 순서대로 이은 참고선이에요. 실제 걸은 길이나 거리,
             길 안내가 아니며 일부 장소는 동네 정도로만 표시될 수 있어요.
           </p>
