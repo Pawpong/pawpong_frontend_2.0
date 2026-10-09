@@ -16,6 +16,8 @@ interface AdoptionCtaBarProps {
    * (서버가 어차피 거절하는 요청을 폼까지 다 채운 뒤에 알게 되는 걸 막는다)
    */
   applyBlockedReason?: string
+  /** 신청 버튼만 막는 사유. applyBlockedReason 과 달리 문의하기는 그대로 둔다 (브리더 계정) */
+  applyDisabledReason?: string
   /**
    * 로그인 사용자가 이 개체에 이미 넣어둔 신청. 있으면 신청 버튼 대신
    * 채팅·신청서 보기로 바꾼다 — 다시 신청해도 서버가 409 로 막기 때문이다.
@@ -41,6 +43,7 @@ const AdoptionCtaBar = ({
   isFavorite,
   onToggleFavorite,
   applyBlockedReason,
+  applyDisabledReason,
   myApplication,
   variant = 'fixed',
 }: AdoptionCtaBarProps) => {
@@ -124,12 +127,18 @@ const AdoptionCtaBar = ({
               />
             </div>
             <div className={ACTION_LAYOUT}>
-              <Link
-                href={`/adoption/${listingId}/apply`}
-                className={buttonVariants({ width: 'full' })}
-              >
-                입양 신청하기
-              </Link>
+              {applyDisabledReason ? (
+                <Button disabled aria-live="polite" width="full">
+                  <span className="truncate">{applyDisabledReason}</span>
+                </Button>
+              ) : (
+                <Link
+                  href={`/adoption/${listingId}/apply`}
+                  className={buttonVariants({ width: 'full' })}
+                >
+                  입양 신청하기
+                </Link>
+              )}
             </div>
           </div>
         )}
