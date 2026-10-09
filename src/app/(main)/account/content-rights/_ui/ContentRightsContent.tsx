@@ -105,7 +105,7 @@ export function ContentRightsContent({ onConsented }: { onConsented?: () => void
             </span>
           </label>
           <Button onClick={submit} disabled={!checked || saving || !status} size="lg" width="full">
-            {saving ? '저장하는 중...' : '동의하고 앱에 표시하기'}
+            {saving ? '저장하는 중…' : '동의하고 앱에 표시하기'}
           </Button>
         </>
       )}

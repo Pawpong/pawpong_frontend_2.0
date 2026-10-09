@@ -71,7 +71,7 @@ export function PetPurchaseDialog({
               disabled={disabled || pending}
               onClick={onConfirm}
             >
-              {pending ? '구매 확인 중...' : '별사탕으로 구매'}
+              {pending ? '구매 확인 중…' : '별사탕으로 구매'}
             </button>
             <button
               ref={closeButton}

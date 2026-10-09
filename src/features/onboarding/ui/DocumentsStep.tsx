@@ -37,7 +37,7 @@ const DocumentsStep = () => {
       title="브리더 정보를 입력해주세요"
       onNext={() => handleSubmit(submit)()}
       onBack={goBack}
-      nextLabel={isPending ? '가입 중...' : '다음'}
+      nextLabel={isPending ? '가입 중…' : '다음'}
       nextDisabled={isPending}
       navError={firstErrorMessage ?? error ?? undefined}
     >

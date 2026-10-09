@@ -223,7 +223,7 @@ export function PetAdoption({
                 disabled={disabled || candidates.isFetching}
                 onClick={() => void retryImages()}
               >
-                {candidates.isFetching ? '그림 확인하는 중...' : '그림 다시 불러오기'}
+                {candidates.isFetching ? '그림 확인하는 중…' : '그림 다시 불러오기'}
               </Button>
               <p className="text-xs leading-5 text-neutral-700">
                 그림이 보이지 않으면 다시 불러오세요. AI 이용 횟수는 사용하지 않아요.
