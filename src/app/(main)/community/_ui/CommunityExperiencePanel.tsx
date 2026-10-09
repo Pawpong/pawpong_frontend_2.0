@@ -167,10 +167,10 @@ export function CommunityExperiencePanel({
         <p className="text-xs text-neutral-700">
           저장한 글이에요.{' '}
           <Link
-            href="/bookmarks?tab=saved-feeds"
+            href="/home?tab=posts&filter=saved"
             className="rounded font-bold text-primary-700 underline focus-ring"
           >
-            관심 목록에서 다시 보기
+            마이홈에서 다시 보기
           </Link>
         </p>
       )}

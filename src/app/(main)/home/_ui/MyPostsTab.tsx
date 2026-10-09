@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState, type ReactNode } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { communityQueries } from '@/entities/community'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
@@ -15,6 +16,8 @@ const POST_FILTERS = [
   { value: 'written', label: '작성한 글' },
   { value: 'commented', label: '댓글 단 글' },
   { value: 'liked', label: '좋아요한 글' },
+  // 저장목록의 '저장 피드' 탭을 옮겨 왔다 — 같은 커뮤니티 글 목록이라 칩 하나로 충분하다
+  { value: 'saved', label: '저장한 글' },
 ] as const
 
 type PostFilter = (typeof POST_FILTERS)[number]['value']
@@ -38,6 +41,11 @@ const STATE_TEXT: Record<
     errorText: '좋아요한 글을 불러오지 못했어요.',
     emptyText: '아직 좋아요한 글이 없어요.',
   },
+  saved: {
+    loadingText: '저장한 글을 불러오는 중이에요.',
+    errorText: '저장한 글을 불러오지 못했어요.',
+    emptyText: '아직 저장한 글이 없어요.',
+  },
 }
 
 // 빈 목록에서 바로 다음 행동으로 잇는다. 쓴 글이 없으면 쓰기로, 반응한 글이 없으면 둘러보기로.
@@ -45,6 +53,7 @@ const EMPTY_ACTION: Record<PostFilter, ReactNode> = {
   written: <EmptyStateLink href="/community/write">첫 이야기 쓰기</EmptyStateLink>,
   commented: <EmptyStateLink href="/community">커뮤니티 둘러보기</EmptyStateLink>,
   liked: <EmptyStateLink href="/community">커뮤니티 둘러보기</EmptyStateLink>,
+  saved: <EmptyStateLink href="/community">커뮤니티 둘러보기</EmptyStateLink>,
 }
 
 interface PostsViewProps {
@@ -79,7 +88,7 @@ const WrittenPosts = ({
   )
 }
 
-/** 댓글 단 글 · 좋아요한 글 — 서버 페이지네이션 무한 스크롤 */
+/** 댓글 단 글 · 좋아요한 글 · 저장한 글 — 서버 페이지네이션 무한 스크롤 */
 const ActivityPosts = ({
   filter,
   enabled,
@@ -94,7 +103,9 @@ const ActivityPosts = ({
   const query = useInfiniteQuery({
     ...(filter === 'liked'
       ? communityQueries.myLiked(24, enabled, session)
-      : communityQueries.myCommented(24, enabled, session)),
+      : filter === 'saved'
+        ? { ...communityQueries.myBookmarks(24), enabled }
+        : communityQueries.myCommented(24, enabled, session)),
     throwOnError: false,
   })
   const posts = useMemo(
@@ -122,10 +133,14 @@ const ActivityPosts = ({
   )
 }
 
-/** 마이홈 '내가 쓴 글' 탭 — 작성한 글 / 댓글 단 글 / 좋아요한 글을 칩으로 전환한다 */
+/** 마이홈 '내가 쓴 글' 탭 — 작성한 글 / 댓글 단 글 / 좋아요한 글 / 저장한 글을 칩으로 전환한다 */
 const MyPostsTab = ({ enabled, gridClassName }: { enabled: boolean; gridClassName?: string }) => {
   const session = useAuthReadSession()
-  const [filter, setFilter] = useState<PostFilter>('written')
+  // 커뮤니티 상세의 '저장한 글 다시 보기'처럼 특정 칩으로 바로 들어오는 링크(?filter=saved)를 받는다
+  const requestedFilter = useSearchParams().get('filter')
+  const [filter, setFilter] = useState<PostFilter>(
+    POST_FILTERS.find((option) => option.value === requestedFilter)?.value ?? 'written',
+  )
 
   const header = (
     <div role="group" aria-label="내 글 보기" className="flex flex-wrap items-center gap-2">
