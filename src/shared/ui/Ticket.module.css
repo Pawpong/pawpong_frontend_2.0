@@ -1,9 +1,13 @@
 /* 놀이터 PLAY CARD 에서 시작한 도트 티켓 틀. 링크 카드와 놀이 결과 카드가 함께 쓴다. */
-.ticket {
+/* 띠 색 변수. 티켓 틀 없이 색만 필요한 작은 요소(이어서 놀기 링크 등)는 .accent 를 쓴다. */
+.ticket,
+.accent {
   --accent: #fff3b8;
   --accent-edge: #ad651d;
   /* 띠 위 작은 글자는 띠 색 위에서 4.5:1 이상이 되도록 테두리보다 한 단계 진하게 쓴다. */
   --accent-ink: var(--color-primary-600, #94591f);
+}
+.ticket {
   position: relative;
   overflow: hidden;
   border: 3px solid var(--accent-edge);
@@ -11,17 +15,20 @@
   background: var(--color-base-white, #fff);
   box-shadow: 6px 6px 0 var(--accent);
 }
-.ticket[data-accent='green'] {
+.ticket[data-accent='green'],
+.accent[data-accent='green'] {
   --accent: #cfe6c3;
   --accent-edge: #55784d;
   --accent-ink: #4a6943;
 }
-.ticket[data-accent='peach'] {
+.ticket[data-accent='peach'],
+.accent[data-accent='peach'] {
   --accent: #ffd9c2;
   --accent-edge: #b86a3c;
   --accent-ink: #8f522e;
 }
-.ticket[data-accent='blue'] {
+.ticket[data-accent='blue'],
+.accent[data-accent='blue'] {
   --accent: #d6e4fb;
   --accent-edge: #4f6f9f;
   --accent-ink: #476590;
