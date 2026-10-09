@@ -8,7 +8,6 @@ import { aiImageQueries } from '@/entities/ai-image'
 import { useAuthReadSession } from '@/shared/lib/useAuthReadSession'
 import type { AuthReadSession } from '@/shared/lib/authReadSession'
 import { cn } from '@/shared/lib/cn'
-import { PixelArrowRightIcon } from '@/shared/assets'
 import {
   RetryButton,
   Button,
@@ -18,6 +17,7 @@ import {
   DialogTitle,
   EmptyState,
   DeleteConfirmModal,
+  ListHeader,
 } from '@/shared/ui'
 import { EmptyStateLink } from '@/shared/ui/EmptyStateLink'
 import { GridSkeleton } from '@/shared/ui/Skeleton'
@@ -32,7 +32,7 @@ interface AiPhotoArchiveProps {
   limit?: number
   /** limit 로 잘렸을 때 전체 보기 링크 */
   moreHref?: string
-  /** 사진이 있을 때 목록 위에 '새 사진 만들기' 링크를 둔다(마이홈 탭처럼 만들기 화면 밖에서 볼 때). */
+  /** 목록 위에 'AI 사진 n장' 제목과 새 사진 만들기 + 버튼을 둔다(마이홈 탭처럼 만들기 화면 밖에서 볼 때). */
   createHref?: string
   gridClassName?: string
   /** 크게 본 사진 아래 붙일 이어가기 버튼(예: 반려동물 캐릭터 만들기). 다른 기능은 화면 조립 계층에서 넣는다. */
@@ -104,37 +104,57 @@ function AiArchiveContent({
     setConfirmHide(false)
     setShareComparison(false)
   }
+  // 마이홈 탭처럼 만들기 화면 밖에서 볼 때만 분양 목록과 같은 '제목 n장 +' 줄을 둔다
+  const header = createHref && (
+    <div className="mb-4">
+      <ListHeader
+        title="AI 사진"
+        count={generationsQuery.data ? items.length : undefined}
+        unit="장"
+        create={{ href: createHref, label: '새 사진 만들기' }}
+      />
+    </div>
+  )
   if (generationsQuery.isPending) {
     return (
-      <GridSkeleton
-        label="보관함을 불러오는 중이에요."
-        count={limit ?? 8}
-        className={cn('grid grid-cols-3 gap-1.5 tab:grid-cols-4 tab:gap-3', gridClassName)}
-      />
+      <>
+        {header}
+        <GridSkeleton
+          label="보관함을 불러오는 중이에요."
+          count={limit ?? 8}
+          className={cn('grid grid-cols-3 gap-1.5 tab:grid-cols-4 tab:gap-3', gridClassName)}
+        />
+      </>
     )
   }
   if (generationsQuery.isError && !generationsQuery.data) {
     return (
-      <EmptyState
-        role="alert"
-        illustration={false}
-        size="compact"
-        message="보관함을 불러오지 못했어요."
-        action={
-          <RetryButton
-            onRetry={() => void generationsQuery.refetch()}
-            isRetrying={generationsQuery.isFetching}
-          />
-        }
-      />
+      <>
+        {header}
+        <EmptyState
+          role="alert"
+          illustration={false}
+          size="compact"
+          message="보관함을 불러오지 못했어요."
+          action={
+            <RetryButton
+              onRetry={() => void generationsQuery.refetch()}
+              isRetrying={generationsQuery.isFetching}
+            />
+          }
+        />
+      </>
     )
   }
   if (items.length === 0) {
     return (
-      <EmptyState
-        message="아직 만든 AI 사진이 없어요. 첫 작품을 만들어 볼까요?"
-        action={<EmptyStateLink href="/ai-filter">AI 필터 써 보기</EmptyStateLink>}
-      />
+      <>
+        {header}
+        <EmptyState
+          message="아직 만든 AI 사진이 없어요. 첫 작품을 만들어 볼까요?"
+          action={<EmptyStateLink href="/ai-filter">AI 필터 써 보기</EmptyStateLink>}
+        />
+      </>
     )
   }
 
@@ -152,21 +172,7 @@ function AiArchiveContent({
           />
         </div>
       )}
-      {createHref && (
-        <div className="mb-3 flex items-center justify-between gap-3">
-          <p className="text-sm text-neutral-700">
-            만든 사진 <strong className="font-semibold text-neutral-850">{items.length}</strong>장
-          </p>
-          {/* 놀이터 카드의 이어가기 링크와 같은 모양 */}
-          <Link
-            href={createHref}
-            className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-primary-600 focus-ring"
-          >
-            새 사진 만들기
-            <PixelArrowRightIcon aria-hidden className="size-3" />
-          </Link>
-        </div>
-      )}
+      {header}
       <ul
         className={cn('grid grid-cols-3 gap-1.5 tab:grid-cols-4 tab:gap-3', gridClassName)}
         aria-label="내 AI 사진"
