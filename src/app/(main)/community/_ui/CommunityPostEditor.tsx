@@ -25,7 +25,6 @@ import {
 } from '@/entities/community'
 import { CommunityExperienceEditor } from './CommunityExperienceEditor'
 import { profileQueries } from '@/entities/profile'
-import Link from 'next/link'
 import {
   takePendingCommunityPost,
   PostAiComparisonEditor,
@@ -47,6 +46,8 @@ import {
   useCommunityEditorNavigation,
 } from '@/features/community'
 import { RetryButton, Container, NavigationBar } from '@/shared/ui'
+import { TicketLink } from '@/shared/ui/Ticket'
+import { PawPrintIcon } from '@/shared/assets'
 import {
   usePostForm,
   PostFormLayout,
@@ -330,22 +331,16 @@ const PostForm = ({ postId, post, initialRecord, photoSource, returnTo }: PostFo
                 </p>
               </div>
             ) : (
-              <Link
+              // 놀이터의 AI 사진 카드와 같은 티켓으로 잇는다.
+              <TicketLink
                 href="/ai-filter"
-                className="flex items-center justify-between gap-3 rounded-xl border border-primary-200 bg-point-50 p-4 focus-ring transition-colors hover:bg-point-100"
-              >
-                <span>
-                  <span className="block text-sm font-bold text-primary-700">
-                    {handoff ? 'AI 필터로 만든 사진을 담았어요' : 'AI 필터로 사진 꾸미기'}
-                  </span>
-                  <span className="mt-0.5 block text-xs text-neutral-700">
-                    도트 그림·스티커·수채화로 꾸며보세요. 작성 중인 글은 임시저장할 수 있어요.
-                  </span>
-                </span>
-                <span aria-hidden className="text-lg text-primary-700">
-                  →
-                </span>
-              </Link>
+                label="PLAY CARD"
+                icon={<PawPrintIcon aria-hidden className="size-4" />}
+                title={handoff ? 'AI 필터로 만든 사진을 담았어요' : 'AI 필터로 사진 꾸미기'}
+                body="도트 그림·스티커·수채화로 꾸며보세요. 작성 중인 글은 임시저장할 수 있어요."
+                cta={handoff ? '다른 필터로 다시 만들기' : 'AI 필터 열기'}
+                size="sm"
+              />
             )}
             {!isMemoryCardHandoff && (
               <PostAiComparisonEditor
