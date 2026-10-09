@@ -34,13 +34,16 @@ const BannerSlide = ({ banner, first = false }: { banner: BannerDto; first?: boo
     banner.mobileImageUrl && failedMobileImageUrl !== banner.mobileImageUrl
       ? banner.mobileImageUrl
       : banner.desktopImageUrl
+  // 글자를 이미지에 그려 넣은 예전 배너만 글자가 뭉개지지 않게 최고 품질로 받는다.
+  // 글자를 폰트로 얹는 배너(textOverlay)는 글자 없는 도트 원화라 기본 품질로도 충분하고 용량이 약 1/3 이 된다.
+  const quality = banner.textOverlay ? 75 : 100
   // Swiper의 실제 폭(태블릿 78.75vw, PC 최대 1134px)에 맞는 해상도를 요청한다.
   const { props: desktopImage } = getImageProps({
     src: banner.desktopImageUrl,
     alt: banner.textOverlay ? '' : (banner.title ?? ''),
     fill: true,
     sizes: '(min-width: 90rem) 70.875rem, 78.75vw',
-    quality: 100,
+    quality,
   })
 
   return (
@@ -64,7 +67,7 @@ const BannerSlide = ({ banner, first = false }: { banner: BannerDto; first?: boo
               alt={banner.textOverlay ? '' : (banner.title ?? '')}
               fill
               sizes="100vw"
-              quality={100}
+              quality={quality}
               className="object-cover"
               onError={() => {
                 if (

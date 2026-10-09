@@ -47,7 +47,7 @@ const nextConfig: NextConfig = {
       { pathname: '/_next/static/media/**' },
       { pathname: '/*.svg' },
     ],
-    // 글자가 포함된 홈 배너는 압축 품질을 별도로 높인다.
+    // 글자를 이미지에 그려 넣은 예전 홈 배너만 100, 나머지는 기본 75 를 쓴다.
     qualities: [75, 100],
     remotePatterns: [
       {

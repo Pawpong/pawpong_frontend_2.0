@@ -80,3 +80,12 @@ test('서버가 그린 배너는 스와이퍼가 붙기 전에도 첫 장을 가
     /\.banner-swiper:not\(\.swiper-initialized\) \.swiper-slide \+ \.swiper-slide \{\s*transform: scale\(0\.85\);/,
   )
 })
+
+test('글자를 폰트로 얹는 배너는 기본 품질, 글자를 그려 넣은 예전 배너만 최고 품질로 받음', () => {
+  const slide = source('src/widgets/banner/ui/BannerSlide.tsx')
+  assert.match(slide, /const quality = banner\.textOverlay \? 75 : 100/)
+  assert.match(slide, /getImageProps\(\{[\s\S]*?quality,/)
+  assert.match(slide, /quality=\{quality\}/)
+  assert.doesNotMatch(slide, /quality(: |=\{)100/)
+  assert.match(source('next.config.ts'), /qualities: \[75, 100\]/)
+})
