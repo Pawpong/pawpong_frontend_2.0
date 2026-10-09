@@ -6,7 +6,7 @@ import { aiImageQueries } from '@/entities/ai-image'
 import { PlaygroundBilling } from '@/features/in-app-purchase'
 import { PetEntryCard } from '@/features/playground-pet/ui/PetEntryCard'
 import { PlaygroundCareShelf, PlaygroundPlayShelf } from '@/features/playground-tools'
-import { PixelArrowRightIcon } from '@/shared/assets'
+import { CameraIcon, PixelArrowRightIcon } from '@/shared/assets'
 import { PLAYGROUND_BILLING_ENABLED } from '@/shared/config/playground'
 import { buttonVariants } from '@/shared/ui/Button'
 import { FeatureIntro } from '@/shared/ui/FeatureIntro'
@@ -31,11 +31,11 @@ export function PlaygroundContent() {
         <br className="tab:hidden" /> 우리 아이와 함께할 작은 즐거움을 찾아보세요.
       </FeatureIntro>
 
-      <PlaygroundPlayShelf />
-
       <FeatureShowcase
         headingId="playground-ai"
-        badge="사진으로 노는 시간"
+        label="AI PHOTO"
+        icon={<CameraIcon aria-hidden className="size-5" />}
+        eyebrow="사진으로 노는 시간"
         title="AI 사진 만들기"
         description={
           <>
@@ -83,6 +83,7 @@ export function PlaygroundContent() {
       />
 
       <PetEntryCard />
+      <PlaygroundPlayShelf />
       <PlaygroundCareShelf />
       {PLAYGROUND_BILLING_ENABLED && <PlaygroundBilling />}
     </div>

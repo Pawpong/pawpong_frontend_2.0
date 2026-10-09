@@ -45,6 +45,7 @@ test('놀이터 AI 예시는 불러오는 동안 같은 3칸 틀의 스켈레톤
     '@/shared/assets': { PawPrintIcon: () => null },
     '@/shared/lib/cn': { cn },
     './Skeleton': skeleton,
+    './Ticket': { TicketStrip: () => null, ticketStyles: {} },
   })
   const html = renderToStaticMarkup(
     createElement(FeatureShowcaseTilesSkeleton, { label: 'AI 필터 예시를 불러오고 있어요.' }),

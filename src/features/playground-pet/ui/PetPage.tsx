@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import { ApiError } from '@/shared/api/unwrap'
 import { Button, buttonVariants } from '@/shared/ui/Button'
-import { ArrowBackIcon, PixelArrowRightIcon } from '@/shared/assets'
+import { ArrowBackIcon, PawPrintIcon, PixelArrowRightIcon } from '@/shared/assets'
 import { FeatureIntro } from '@/shared/ui/FeatureIntro'
 import { FeatureShowcase, FeatureShowcaseTiles } from '@/shared/ui/FeatureShowcase'
 import { PET_ROOM_PREVIEWS, PET_STEPS } from '../constants/pet-intro'
@@ -167,7 +167,10 @@ export function PetPage() {
       ) : !session ? (
         <FeatureShowcase
           headingId="pet-guest"
-          badge="로그인하고 시작해요"
+          label="MY PET"
+          icon={<PawPrintIcon aria-hidden className="size-5" />}
+          accent="peach"
+          eyebrow="로그인하고 시작해요"
           title="우리 아이와 새로운 일상을 시작해요"
           description={
             <>

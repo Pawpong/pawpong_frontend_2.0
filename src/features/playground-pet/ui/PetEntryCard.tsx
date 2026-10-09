@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
-import { PixelArrowRightIcon } from '@/shared/assets'
+import { PawPrintIcon, PixelArrowRightIcon } from '@/shared/assets'
 import { buttonVariants } from '@/shared/ui/Button'
 import { FeatureShowcase, FeatureShowcaseTiles } from '@/shared/ui/FeatureShowcase'
 import { PET_ROOM_PREVIEWS, PET_STEPS } from '../constants/pet-intro'
@@ -14,7 +14,10 @@ export function PetEntryCard() {
   return (
     <FeatureShowcase
       headingId="playground-pet"
-      badge="사진에서 시작되는 작은 일상"
+      label="MY PET"
+      icon={<PawPrintIcon aria-hidden className="size-5" />}
+      accent="peach"
+      eyebrow="사진에서 시작되는 작은 일상"
       title="내 반려동물 키우기"
       description={
         <>
