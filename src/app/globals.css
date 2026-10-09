@@ -311,12 +311,19 @@ html[data-native-viewport] img {
 
 /* Shared discovery-card feedback; preserve geometry and avoid sticky touch hover. */
 @utility card-interactive {
-  transition: box-shadow 160ms ease-out;
+  transition:
+    box-shadow 160ms ease-out,
+    scale 120ms ease-out;
 
   @media (hover: hover) and (pointer: fine) {
     &:hover {
       box-shadow: 0 0 0 1px var(--color-secondary-400);
     }
+  }
+
+  /* 누르는 동안 살짝 줄어 눌렸다는 걸 바로 알려준다. */
+  &:active {
+    scale: 0.98;
   }
 
   &:focus-within {
@@ -326,5 +333,9 @@ html[data-native-viewport] img {
 
   @media (prefers-reduced-motion: reduce) {
     transition: none;
+
+    &:active {
+      scale: none;
+    }
   }
 }
