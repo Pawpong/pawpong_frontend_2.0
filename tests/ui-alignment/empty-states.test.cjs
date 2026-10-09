@@ -9,7 +9,8 @@ test('개인 목록이 비면 같은 모양의 버튼으로 다음 행동을 안
     ['src/app/(main)/home/_ui/MyPostsTab.tsx', '/community/write'],
     ['src/app/(main)/bookmarks/_ui/FavoriteBreedersContent.tsx', '/explore'],
     ['src/app/(main)/bookmarks/_ui/FavoritesTab.tsx', '/explore?type=adoption'],
-    ['src/app/(main)/bookmarks/_ui/SavedFeedsTab.tsx', '/community'],
+    // 저장 피드 탭은 마이홈 게시글 탭의 '저장한 글' 칩으로 옮겼다
+    ['src/app/(main)/home/_ui/MyPostsTab.tsx', '/community'],
     ['src/features/ai-image/ui/AiPhotoArchive.tsx', '/ai-filter'],
   ]
   for (const [file, href] of cases) {
