@@ -9,7 +9,10 @@ const playFiles = [
   `${ui}/PetBtiDiscovery.tsx`,
   `${ui}/PlayResultActions.tsx`,
   `${ui}/PlayResultCard.tsx`,
+  `${ui}/PlayQuiz.tsx`,
+  `${ui}/PlayShuffle.tsx`,
   'src/features/playground-tools/model/discovery.ts',
+  'src/features/playground-tools/model/playQuiz.ts',
   'src/features/playground-tools/lib/sharePlayCard.ts',
 ]
 
@@ -62,12 +65,14 @@ test('결과 화면은 추억 카드, AI 사진, 방, 산책 공유로 이어지
 test('카드 연출은 움직임 줄이기 설정에서 멈추고 결과 제목으로 포커스를 옮김', () => {
   const css = source(`${ui}/Discovery.module.css`)
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)\s*{[^}]*\.reveal/)
-  for (const file of [`${ui}/OutingDiscovery.tsx`, `${ui}/PetTasteDiscovery.tsx`]) {
+  for (const file of [`${ui}/OutingDiscovery.tsx`, `${ui}/PlayQuiz.tsx`]) {
     const code = source(file)
     assert.match(code, /tabIndex=\{-1\}/, file)
     assert.match(code, /focus\(\{ preventScroll: true \}\)/, file)
-    assert.match(code, /RadioCardGroup/, file)
   }
+  // 산책 뽑기는 두 가지를 고르는 선택 카드, 질문 놀이는 고르면 넘어가는 버튼을 쓴다.
+  assert.match(source(`${ui}/OutingDiscovery.tsx`), /RadioCardGroup/)
+  assert.match(source(`${ui}/PetTasteDiscovery.tsx`), /<PlayQuiz\b/)
 })
 
 test('공통 선택 카드는 기본으로 필수 표시를 유지하고 놀이에서만 끌 수 있음', () => {

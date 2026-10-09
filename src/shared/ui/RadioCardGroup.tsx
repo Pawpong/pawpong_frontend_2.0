@@ -53,7 +53,7 @@ export const RadioCardGroup = ({
               onBlur={onBlur}
               className="mt-0.5 size-4 shrink-0 accent-primary-500"
             />
-            <span>
+            <span className="min-w-0 break-keep">
               <span className="block text-sm font-semibold text-neutral-850">{option.label}</span>
               {option.description && (
                 <span className="mt-1 block text-xs leading-relaxed text-neutral-700">

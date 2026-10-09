@@ -6,7 +6,7 @@ const { source } = require('./fixtures/alignment.fixture.cjs')
 
 const repo = path.resolve(__dirname, '../..')
 
-// 담당자 영역(채팅·명예의 전당·돌봄 지도·반려동물 키우기)과 놀이터 작업 경로는 각 작업에서 따로 맞춘다.
+// 담당자 영역(채팅·명예의 전당·돌봄 지도·반려동물 키우기)은 각 담당 작업에서 따로 맞춘다.
 const EXCLUDED = [
   /^src\/app\/\(main\)\/chat\//,
   /^src\/features\/chat-[^/]+\//,
@@ -17,13 +17,6 @@ const EXCLUDED = [
   /^src\/app\/\(main\)\/care-map\//,
   /^src\/features\/playground-pet\//,
   /^src\/entities\/playground-pet\//,
-  /^src\/features\/playground-tools\//,
-  /^src\/app\/\(main\)\/playground\//,
-  /^src\/widgets\/care-map-entry\//,
-  /^src\/widgets\/feature-highlights\//,
-  /^src\/shared\/ui\/(RadioCardGroup|PixelProgressBar|Ticket|FeatureShowcase|FeatureIntro)\.tsx$/,
-  /^src\/app\/\(main\)\/community\/_ui\/(CommunityPostEditor|CommunityExperiencePanel)\.tsx$/,
-  /^src\/app\/\(main\)\/_ui\/ManagedFeatureHighlights\.tsx$/,
 ]
 
 // 실제로 비활성 상태에만 붙는 회색은 대비 기준 예외라 남긴다.
