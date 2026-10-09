@@ -1,0 +1,36 @@
+import 'server-only'
+import type { ApiResponseFull, BannerDto } from '@/shared/types'
+
+/** 서버에서 미리 받은 배너와 받은 시각. 클라이언트 캐시의 신선도 계산에 함께 쓴다. */
+export interface InitialBanners {
+  banners: BannerDto[]
+  fetchedAt: number
+}
+
+// 배너는 관리자만 바꾸므로 1분 동안 같은 HTML 을 재사용한다. 서명 이미지 주소는 하루 동안 유효하다.
+const BANNER_REVALIDATE_SECONDS = 60
+// 배너 API 가 늦으면 첫 화면 전체를 붙잡지 않고 기존처럼 브라우저 조회에 맡긴다.
+const BANNER_TIMEOUT_MS = 1500
+
+/**
+ * 홈 첫 배너를 HTML 에 바로 싣기 위한 익명 조회.
+ * 브라우저가 화면 코드를 받고 배너 API 를 다시 부른 뒤에야 이미지를 요청하던 순서를 없앤다.
+ * 실패하면 null 을 돌려 기존 클라이언트 조회로 그대로 동작한다.
+ */
+export async function getInitialBanners(): Promise<InitialBanners | null> {
+  const origin = process.env.NEXT_PUBLIC_API_BASE_URL
+  if (!origin) return null
+  try {
+    const response = await fetch(`${origin.replace(/\/+$/, '')}/api/v2/home/banners`, {
+      credentials: 'omit',
+      next: { revalidate: BANNER_REVALIDATE_SECONDS },
+      signal: AbortSignal.timeout(BANNER_TIMEOUT_MS),
+    })
+    if (!response.ok) return null
+    const body: ApiResponseFull<BannerDto[]> = await response.json()
+    if (!body.success || !Array.isArray(body.data)) return null
+    return { banners: body.data, fetchedAt: Date.now() }
+  } catch {
+    return null
+  }
+}
