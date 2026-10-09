@@ -1,4 +1,12 @@
-import type { OutingPace, OutingSetting, PlayCard, TasteType } from '../model/discovery.types'
+import type {
+  BtiLetter,
+  BtiProfile,
+  BtiType,
+  OutingPace,
+  OutingSetting,
+  PlayCard,
+  TasteType,
+} from '../model/discovery.types'
 
 export const OUTING_SETTINGS: { id: OutingSetting; label: string; detail: string }[] = [
   { id: 'outside', label: '익숙한 동네에서', detail: '평소 함께 걷던 곳을 새롭게' },
@@ -277,6 +285,219 @@ export const TASTE_CARDS: Record<TasteType, PlayCard> = {
     ],
     accent: 'butter',
     memoryMessage: '오늘은 여기서 쉬어가요',
+  },
+}
+
+// 'MBTI'는 등록 상표라 놀이 이름으로 쓰지 않는다.
+export const BTI_NAME = '멍냥BTI'
+
+// 축(E/I·S/N·T/F·J/P)마다 3문항씩 둘 중 하나를 골라 동점이 없다. 강아지·고양이 공통 문항이다.
+// 축이 번갈아 나오고 앞뒤 선택지의 글자도 문항마다 섞어 두어, 한쪽만 골라도 한 유형으로 몰리지 않는다.
+export const BTI_QUESTIONS: readonly {
+  title: string
+  options: readonly [{ label: string; letter: BtiLetter }, { label: string; letter: BtiLetter }]
+}[] = [
+  {
+    title: '초인종이 울리면?',
+    options: [
+      { label: '누가 왔나 현관까지 나가 봐요', letter: 'E' },
+      { label: '누운 채로 눈만 떠요', letter: 'I' },
+    ],
+  },
+  {
+    title: '장난감 바구니에서 우리 아이가 고르는 건?',
+    options: [
+      { label: '다 해진 최애 장난감 하나면 충분해요', letter: 'S' },
+      { label: '장난감보다 휴지심이나 병뚜껑을 갖고 놀아요', letter: 'N' },
+    ],
+  },
+  {
+    title: '이름을 부르면?',
+    options: [
+      { label: '하던 걸 멈추고 바로 와요', letter: 'F' },
+      { label: '한 번 쳐다보고, 간식 소리가 나야 와요', letter: 'T' },
+    ],
+  },
+  {
+    title: '아침에 우리 아이는?',
+    options: [
+      { label: '알람보다 먼저 일어나 나를 깨워요', letter: 'J' },
+      { label: '내가 일어나도 계속 자요', letter: 'P' },
+    ],
+  },
+  {
+    title: '사진첩에 더 많은 건?',
+    options: [
+      { label: '누군가에게 안겨 있는 사진', letter: 'E' },
+      { label: '창밖을 보는 뒷모습 사진', letter: 'I' },
+    ],
+  },
+  {
+    title: 'TV나 휴대폰 화면에 동물이 나오면?',
+    options: [
+      { label: '힐끗 보고 말아요', letter: 'S' },
+      { label: '화면 뒤로 가서 어디 있나 찾아봐요', letter: 'N' },
+    ],
+  },
+  {
+    title: '내가 아파서 종일 누워 있던 날, 우리 아이는?',
+    options: [
+      { label: '평소처럼 지내다 가끔 와서 확인만 해요', letter: 'T' },
+      { label: '침대 옆을 떠나지 않아요', letter: 'F' },
+    ],
+  },
+  {
+    title: '밥그릇 앞에서 우리 아이는?',
+    options: [
+      { label: '조금 먹고 돌아다니다 생각날 때 또 먹어요', letter: 'P' },
+      { label: '주자마자 그 자리에서 다 먹어요', letter: 'J' },
+    ],
+  },
+  {
+    title: '우리 아이가 사람이라면 주말에는?',
+    options: [
+      { label: '집에서 퍼즐 맞추며 하루를 보낼 것 같아요', letter: 'I' },
+      { label: '동네 카페 단골로 사장님이랑 수다 떨 것 같아요', letter: 'E' },
+    ],
+  },
+  {
+    title: '간식을 숨기고 "찾아봐!" 하면?',
+    options: [
+      { label: '엉뚱한 데부터 뒤지며 집 안을 탐험해요', letter: 'N' },
+      { label: '내 손이랑 주머니부터 확인해요', letter: 'S' },
+    ],
+  },
+  {
+    title: '우리 아이가 사람이라면, 친구가 고민을 털어놓을 때?',
+    options: [
+      { label: '맛있는 거 먹으러 가자고 할 것 같아요', letter: 'T' },
+      { label: '말없이 옆에 앉아 있어 줄 것 같아요', letter: 'F' },
+    ],
+  },
+  {
+    title: '우리 아이가 사람이라면 여행 스타일은?',
+    options: [
+      { label: '일단 출발하고 보는 타입', letter: 'P' },
+      { label: '맛집 리스트를 시간표로 짜 오는 타입', letter: 'J' },
+    ],
+  },
+]
+
+// 16유형 문구. 어느 쪽 글자든 아쉽게 들리지 않게 쓴다 (T·I 도 '쿨한 독립파'처럼).
+export const BTI_PROFILES: Record<BtiType, BtiProfile> = {
+  ENFP: {
+    title: '동네 인싸 탐험가',
+    description:
+      '어디서든 친구를 만들고, 처음 보는 것도 일단 반가워해요. 우리 집 분위기 메이커예요.',
+    trait: '초인종 소리에 누구보다 먼저 현관으로 가는 모습',
+    play: '오늘의 산책 뽑기',
+    memoryMessage: '오늘도 세상 모든 게 반가운 우리 집 인싸',
+  },
+  ENFJ: {
+    title: '다정한 반장님',
+    description: '가족 모두를 살뜰히 챙기고, 누가 속상하면 가장 먼저 다가와요.',
+    trait: '내가 누워 있는 날 곁을 지켜 주는 모습',
+    play: '추억 카드 꾸미기',
+    memoryMessage: '모두를 챙기느라 바쁜 우리 집 반장님',
+  },
+  ENTP: {
+    title: '엉뚱한 발명가',
+    description: '평범한 장난감은 시시해요. 휴지심 하나로도 새로운 놀이를 만들어 내요.',
+    trait: '숨겨 둔 간식을 엉뚱한 곳에서 찾아내는 모습',
+    play: '반려동물 방 꾸미기',
+    memoryMessage: '오늘은 또 무슨 놀이를 발명했을까?',
+  },
+  ENTJ: {
+    title: '타고난 대장님',
+    description: '원하는 게 분명하고, 그걸 얻는 방법도 잘 알아요. 간식 시간은 대장님이 정해요.',
+    trait: '밥 시간을 정확히 알려 주는 모습',
+    play: '오늘의 산책 뽑기',
+    memoryMessage: '오늘의 일정은 대장님 마음대로',
+  },
+  INFP: {
+    title: '창가의 몽상가',
+    description:
+      '조용히 창밖을 바라보며 자기만의 세상을 여행해요. 마음을 연 사람에겐 한없이 다정해요.',
+    trait: '창밖을 오래 바라보는 뒷모습',
+    play: '추억 카드 꾸미기',
+    memoryMessage: '창밖 너머 무슨 꿈을 꾸고 있을까?',
+  },
+  INFJ: {
+    title: '속 깊은 수호천사',
+    description: '말없이 곁을 지키며 내 기분을 먼저 알아채요. 조용하지만 누구보다 깊은 마음이에요.',
+    trait: '속상한 날 말없이 옆에 앉아 있는 모습',
+    play: 'AI 사진 만들기',
+    memoryMessage: '말하지 않아도 알아주는 내 작은 천사',
+  },
+  INTP: {
+    title: '조용한 탐구가',
+    description: '궁금한 게 생기면 혼자서 끝까지 파고들어요. 관심 없는 일엔 꿈쩍도 안 해요.',
+    trait: '화면 속 동물을 찾아 TV 뒤를 살피는 모습',
+    play: '반려동물 방 꾸미기',
+    memoryMessage: '오늘의 연구 주제는 무엇일까?',
+  },
+  INTJ: {
+    title: '계획하는 전략가',
+    description: '하루 일과가 머릿속에 다 있어요. 원하는 게 생기면 조용히 기회를 노려요.',
+    trait: '알람보다 먼저 일어나 나를 깨우는 모습',
+    play: '오늘의 산책 뽑기',
+    memoryMessage: '모든 건 계획대로, 우리 집 전략가',
+  },
+  ESFP: {
+    title: '무대 위 아이돌',
+    description: '카메라만 보면 신이 나고, 관심받는 순간을 사랑해요. 오늘도 무대는 거실이에요.',
+    trait: '누군가에게 안겨 찍힌 사진이 가득한 사진첩',
+    play: 'AI 사진 만들기',
+    memoryMessage: '오늘도 우리 집 무대의 주인공',
+  },
+  ESFJ: {
+    title: '우리 집 분위기 담당',
+    description: '가족이 모이는 곳엔 꼭 있어요. 모두가 함께일 때 가장 행복해해요.',
+    trait: '이름만 불러도 하던 걸 멈추고 달려오는 모습',
+    play: '추억 카드 꾸미기',
+    memoryMessage: '다 같이 있을 때 제일 행복한 너',
+  },
+  ESTP: {
+    title: '일단 뛰고 보는 행동대장',
+    description: '생각보다 몸이 먼저 움직여요. 재미있는 일이 생기면 이미 그 자리에 가 있어요.',
+    trait: '무슨 소리만 나면 제일 먼저 달려가는 모습',
+    play: '오늘의 산책 뽑기',
+    memoryMessage: '생각보다 발이 먼저인 우리 집 행동대장',
+  },
+  ESTJ: {
+    title: '똑 부러지는 관리인',
+    description: '우리 집 규칙은 내가 지켜요. 밥 시간, 놀이 시간, 잠잘 시간까지 척척이에요.',
+    trait: '밥을 주자마자 깔끔하게 비우는 모습',
+    play: '반려동물 방 꾸미기',
+    memoryMessage: '오늘도 규칙대로, 우리 집 관리인',
+  },
+  ISFP: {
+    title: '느긋한 예술가',
+    description: '좋아하는 자리에서 햇살을 즐기며 자기 속도로 지내요. 작은 것에도 행복해해요.',
+    trait: '그날그날 마음에 드는 곳에서 낮잠 자는 모습',
+    play: 'AI 사진 만들기',
+    memoryMessage: '햇살 한 줌이면 충분한 느긋한 하루',
+  },
+  ISFJ: {
+    title: '든든한 집지킴이',
+    description: '익숙한 집과 가족을 가장 사랑해요. 늘 같은 자리에서 우리를 기다려 줘요.',
+    trait: '다 해진 최애 장난감을 아끼는 모습',
+    play: '추억 카드 꾸미기',
+    memoryMessage: '늘 그 자리에서 기다려 주는 너',
+  },
+  ISTP: {
+    title: '쿨한 독립파',
+    description: '혼자서도 잘 놀고, 필요할 때만 슬쩍 다가와요. 그래서 다가와 줄 때 더 특별해요.',
+    trait: '이름을 불러도 간식 소리에만 오는 모습',
+    play: '반려동물 방 꾸미기',
+    memoryMessage: '쿨한 척해도 결국 옆에 와 있는 너',
+  },
+  ISTJ: {
+    title: '시간 지키는 모범생',
+    description: '매일 같은 시간에 같은 일을 하는 게 제일 편해요. 한번 익힌 건 꼭 기억해요.',
+    trait: '늘 같은 자리에서 잠드는 모습',
+    play: '오늘의 산책 뽑기',
+    memoryMessage: '오늘도 어제처럼, 성실한 우리 집 모범생',
   },
 }
 

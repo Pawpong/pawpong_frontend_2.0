@@ -15,7 +15,7 @@ function allCards() {
   const outing = Object.values(constants.OUTING_DECKS).flatMap((paces) =>
     Object.values(paces).flat(),
   )
-  return [...outing, ...Object.values(constants.TASTE_CARDS)]
+  return [...outing, ...Object.values(constants.TASTE_CARDS), ...model.BTI_CARDS]
 }
 
 // 공유 API 흉내. 호출 기록을 남기고 지정한 결과를 돌려준다.
