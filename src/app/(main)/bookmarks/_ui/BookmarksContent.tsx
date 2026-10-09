@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { TabBar, TabsContent } from '@/shared/ui'
+import { useAuthStatus } from '@/features/auth'
 import { BOOKMARK_TABS } from './constants'
 import { FavoritesTab } from './FavoritesTab'
 import { AdoptionListTab } from './AdoptionListTab'
@@ -15,11 +16,20 @@ const BookmarksContent = ({ initialTab }: { initialTab?: string }) => {
     BOOKMARK_TABS.some((tab) => tab.id === initialTab) && initialTab ? initialTab : 'favorites',
   )
 
+  // 입양 신청이 입양자 전용이라 브리더에게는 입양목록이 생기지 않는다(서버도 403) — 탭을 빼고,
+  // ?tab=adoption-list 로 들어와도 첫 탭을 연다 (비활성 탭은 언마운트돼 조회도 하지 않는다)
+  const { userRole } = useAuthStatus()
+  const tabs =
+    userRole === 'breeder'
+      ? BOOKMARK_TABS.filter((tab) => tab.id !== 'adoption-list')
+      : BOOKMARK_TABS
+  const currentTab = tabs.some((tab) => tab.id === activeTab) ? activeTab : 'favorites'
+
   return (
     <div className="flex w-full flex-1 flex-col">
       <TabBar
-        items={BOOKMARK_TABS.map((tab) => ({ value: tab.id, label: tab.label }))}
-        value={activeTab}
+        items={tabs.map((tab) => ({ value: tab.id, label: tab.label }))}
+        value={currentTab}
         onValueChange={setActiveTab}
         ariaLabel="저장목록"
       >
