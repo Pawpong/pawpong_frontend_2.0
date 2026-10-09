@@ -9,8 +9,9 @@ export interface InitialBanners {
 
 // 배너는 관리자만 바꾸므로 1분 동안 같은 HTML 을 재사용한다. 서명 이미지 주소는 하루 동안 유효하다.
 const BANNER_REVALIDATE_SECONDS = 60
-// 배너 API 가 늦으면 첫 화면 전체를 붙잡지 않고 기존처럼 브라우저 조회에 맡긴다.
-const BANNER_TIMEOUT_MS = 1500
+// 1분 재검증은 사용자 요청을 기다리게 하지 않는 백그라운드 재생성이라 공유 메타 조회와 같은 3초를 준다.
+// 1.5초로는 배포 빌드 때 받지 못해 첫 재검증 전까지 배너 없는 HTML 이 나갔다.
+const BANNER_TIMEOUT_MS = 3000
 
 /**
  * 홈 첫 배너를 HTML 에 바로 싣기 위한 익명 조회.
