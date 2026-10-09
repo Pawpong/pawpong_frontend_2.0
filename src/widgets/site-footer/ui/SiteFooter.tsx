@@ -81,7 +81,7 @@ const SiteFooter = () => {
           </address>
 
           <div className="mt-6 flex flex-col gap-3 pt-5 tab:flex-row tab:items-center tab:justify-between">
-            <p className="text-xs font-medium text-neutral-600">
+            <p className="text-xs font-medium text-neutral-700">
               Copyright © 2025 Pawpong Inc. All rights reserved.
             </p>
             <nav aria-label="법적 고지" className="flex flex-wrap gap-4">
