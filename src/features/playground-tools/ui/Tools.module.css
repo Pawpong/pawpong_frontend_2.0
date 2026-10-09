@@ -22,7 +22,7 @@
   outline-offset: 2px;
 }
 .header {
-  margin: 1rem 0 2rem;
+  margin: 0.75rem 0 2rem;
 }
 .eyebrow {
   display: inline-flex;
@@ -31,17 +31,6 @@
   font-size: 0.75rem;
   font-weight: 700;
   color: var(--color-primary-600, #94591f);
-}
-.header h1 {
-  margin: 0.5rem 0 0.75rem;
-  font:
-    1.8rem/1.4 var(--font-cafe24proup),
-    sans-serif;
-}
-.header p {
-  color: var(--color-neutral-700, #727272);
-  line-height: 1.7;
-  word-break: keep-all;
 }
 .toolGrid,
 .cardMaker {
