@@ -75,3 +75,14 @@ test('오류 화면 문구도 해요체로 맞추고 사과 문장과 안내가 
   assert.match(boundary, /잠시 후 다시 시도해 주세요\./)
   assert.match(messages, /title: '문제가 생겼어요'/)
 })
+
+test('사진이 여러 장인 캐러셀 트랙은 키보드로 들어와 화살표 키로 넘길 수 있음', () => {
+  const carousel = source('src/shared/ui/ImageCarousel.tsx')
+  assert.match(carousel, /tabIndex=\{hasMultiple \? 0 : undefined\}/)
+  assert.match(carousel, /role=\{hasMultiple \? 'group' : undefined\}/)
+  assert.match(
+    carousel,
+    /aria-label=\{hasMultiple \? `\$\{alt\} 사진 \$\{images\.length\}장` : undefined\}/,
+  )
+  assert.match(carousel, /overflow-x-auto overflow-y-hidden focus-ring-inset/)
+})
