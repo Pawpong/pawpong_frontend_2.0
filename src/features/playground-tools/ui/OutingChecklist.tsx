@@ -4,10 +4,12 @@ import { useEffect, useState, useSyncExternalStore, type FormEvent } from 'react
 import Link from 'next/link'
 import { Button, buttonVariants } from '@/shared/ui/Button'
 import { IconButton } from '@/shared/ui/IconButton'
-import { TicketLink } from '@/shared/ui/Ticket'
+import { PixelProgressBar } from '@/shared/ui/PixelProgressBar'
+import { TicketLink, TicketStrip, ticketStyles } from '@/shared/ui/Ticket'
 import {
   PixelCheckIcon,
   PixelArrowRightIcon,
+  PixelPencilIcon,
   LocationPinIcon,
   PlusIcon,
   CloseIcon,
@@ -22,6 +24,7 @@ import {
   normalizeItemLabel,
   createChecklistItemId,
   type ChecklistAction,
+  type OutingType,
 } from '../model/checklist'
 import { createChecklistStore } from '../model/checklistStore'
 import { currentToolOwner, useToolOwner } from '../model/useToolOwner'
@@ -49,6 +52,14 @@ const SIDE_TICKETS = [
   },
 ] as const
 
+// 돌아온 뒤 남길 기록 티켓 라벨. 놀이터 돌봄 도구(WALK NOTE·CLINIC NOTE)와 같은 이름을 쓴다.
+const NOTE_LABEL: Record<OutingType, string> = {
+  walk: 'WALK NOTE',
+  cafe: 'DAILY NOTE',
+  travel: 'TRIP NOTE',
+  clinic: 'CLINIC NOTE',
+}
+
 function Checklist({ owner }: { owner: string }) {
   const [store] = useState(() => {
     let storage: Storage | null = null
@@ -71,6 +82,7 @@ function Checklist({ owner }: { owner: string }) {
   const items = checklistItems(data, data.selected)
   const checked = data.lists[data.selected].checked
   const allDone = checked.length === items.length
+  const percent = items.length === 0 ? 0 : Math.round((checked.length / items.length) * 100)
   const dispatch = (action: ChecklistAction) => {
     if (currentToolOwner() === owner) store.dispatch(action)
   }
@@ -112,162 +124,182 @@ function Checklist({ owner }: { owner: string }) {
   }
   return (
     <div className={styles.toolGrid}>
-      <section className={styles.panel} aria-labelledby="outing-pick">
-        <h2 id="outing-pick" className={styles.sectionTitle}>
-          오늘은 어디로 갈까요?
-        </h2>
-        <div className={styles.purposeGrid} role="group" aria-label="외출 목적">
-          {OUTING_TEMPLATES.map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              aria-pressed={data.selected === t.id}
-              className={styles.purpose}
-              onClick={() => {
-                dispatch({ type: 'select', outing: t.id })
-                setConfirm(null)
-                setMessage('')
-                setItemLabel('')
-              }}
-            >
-              <LocationPinIcon aria-hidden className="size-5" />
-              {t.title}
-            </button>
-          ))}
-        </div>
-        <div className={styles.listHeading}>
-          <div>
-            <span className={styles.eyebrow}>우리 아이 외출 준비함</span>
-            <h2>{template.title}</h2>
-            <p>{template.caption}</p>
-          </div>
-          <strong aria-label={`${items.length}개 중 ${checked.length}개 준비`}>
-            {checked.length}
-            <span> / {items.length}</span>
-          </strong>
-        </div>
-        <progress
-          max={items.length}
-          value={checked.length}
-          aria-label="외출 준비 진행률"
-          className={styles.progress}
-        />
-        <ul className={styles.checklist}>
-          {items.map((item) => (
-            <li key={item.id} className={checked.includes(item.id) ? styles.checkedRow : ''}>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={checked.includes(item.id)}
-                  onChange={() => dispatch({ type: 'toggle', outing: data.selected, id: item.id })}
-                />
-                <span>{item.label}</span>
-                {item.custom && <small>직접 추가</small>}
-              </label>
-              {item.custom && (
-                <IconButton
-                  size="touch"
-                  tone="danger"
-                  aria-label={`${item.label} 준비물 삭제`}
-                  onClick={() => dispatch({ type: 'remove', outing: data.selected, id: item.id })}
-                >
-                  <CloseIcon aria-hidden className="size-4" />
-                </IconButton>
-              )}
-            </li>
-          ))}
-        </ul>
-        <form onSubmit={addItem} className={styles.addForm}>
-          <label htmlFor="outing-new" className="sr-only">
-            나만의 준비물
-          </label>
-          <input
-            id="outing-new"
-            value={itemLabel}
-            onChange={(e) => setItemLabel(e.target.value)}
-            maxLength={MAX_ITEM_LENGTH}
-            placeholder="우리 아이에게 필요한 준비물"
-            autoComplete="off"
-          />
-          <Button type="submit" intent="secondary">
-            <PlusIcon aria-hidden className="size-4" />
-            추가
-          </Button>
-        </form>
-        {allDone && (
-          <p className={styles.success}>
-            <PixelCheckIcon aria-hidden className="size-5" />
-            준비 끝! 우리 아이와 좋은 하루 보내세요.
-          </p>
-        )}
-        <div className={styles.actions}>
-          <Button intent="secondary" onClick={copyList}>
-            목록 복사
-          </Button>
-          <button type="button" className={styles.textButton} onClick={() => setConfirm('uncheck')}>
-            체크만 비우기
-          </button>
-        </div>
-        {confirm && (
-          <div className={styles.confirm} role="group" aria-label="준비함 초기화 확인">
-            <p>
-              {confirm === 'clear'
-                ? '이 계정의 모든 외출 준비함과 직접 추가한 항목을 지울까요?'
-                : '이 준비함의 체크를 모두 해제할까요? 직접 추가한 항목은 보관돼요.'}
-            </p>
-            <div className={styles.actions}>
-              <Button intent="secondary" size="md" onClick={() => setConfirm(null)}>
-                취소
-              </Button>
-              <Button
-                size="md"
+      <section aria-labelledby="outing-pick" data-accent="green" className={ticketStyles.ticket}>
+        <TicketStrip label="CHECK LIST" icon={<PixelCheckIcon aria-hidden className="size-4" />} />
+        <div className={styles.panelBody}>
+          <h2 id="outing-pick" className={styles.sectionTitle}>
+            오늘은 어디로 갈까요?
+          </h2>
+          <div className={styles.purposeGrid} role="group" aria-label="외출 목적">
+            {OUTING_TEMPLATES.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                aria-pressed={data.selected === t.id}
+                className={styles.purpose}
                 onClick={() => {
-                  dispatch(
-                    confirm === 'clear'
-                      ? { type: 'clear' }
-                      : { type: 'uncheck', outing: data.selected },
-                  )
+                  dispatch({ type: 'select', outing: t.id })
                   setConfirm(null)
-                  setMessage('준비함을 비웠어요.')
+                  setMessage('')
+                  setItemLabel('')
                 }}
               >
-                비우기
-              </Button>
-            </div>
+                <LocationPinIcon aria-hidden className="size-5" />
+                {t.title}
+              </button>
+            ))}
           </div>
-        )}
-        <p className={styles.status} role="status">
-          {message}
-        </p>
-        <details className={styles.plainList}>
-          <summary>텍스트 목록 보기</summary>
-          <pre>{checklistText(data)}</pre>
-        </details>
-        <p className={styles.storageNote}>
-          {saved
-            ? '이 브라우저에 자동 저장돼요. 다른 기기에는 이어지지 않아요.'
-            : '브라우저 저장이 차단되어 지금 화면에서만 사용할 수 있어요.'}
-          {owner === 'guest' && ' 로그인 전 준비함은 이 브라우저를 쓰는 사람과 공유돼요.'}
-        </p>
-        <button type="button" className={styles.textButton} onClick={() => setConfirm('clear')}>
-          모든 준비함 지우기
-        </button>
+          <div className={styles.listHeading}>
+            <div>
+              <span className={styles.eyebrow}>우리 아이 외출 준비함</span>
+              <h2>{template.title}</h2>
+              <p>{template.caption}</p>
+            </div>
+            <strong aria-label={`${items.length}개 중 ${checked.length}개 준비`}>
+              {checked.length}
+              <span> / {items.length}</span>
+            </strong>
+          </div>
+          <div className={styles.progress}>
+            <PixelProgressBar percent={percent} label={`외출 준비 진행률 ${percent}%`} />
+          </div>
+          <ul className={styles.checklist}>
+            {items.map((item) => (
+              <li key={item.id} className={checked.includes(item.id) ? styles.checkedRow : ''}>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={checked.includes(item.id)}
+                    onChange={() =>
+                      dispatch({ type: 'toggle', outing: data.selected, id: item.id })
+                    }
+                  />
+                  <span>{item.label}</span>
+                  {item.custom && <small>직접 추가</small>}
+                </label>
+                {item.custom && (
+                  <IconButton
+                    size="touch"
+                    tone="danger"
+                    aria-label={`${item.label} 준비물 삭제`}
+                    onClick={() => dispatch({ type: 'remove', outing: data.selected, id: item.id })}
+                  >
+                    <CloseIcon aria-hidden className="size-4" />
+                  </IconButton>
+                )}
+              </li>
+            ))}
+          </ul>
+          <form onSubmit={addItem} className={styles.addForm}>
+            <label htmlFor="outing-new" className="sr-only">
+              나만의 준비물
+            </label>
+            <input
+              id="outing-new"
+              value={itemLabel}
+              onChange={(e) => setItemLabel(e.target.value)}
+              maxLength={MAX_ITEM_LENGTH}
+              placeholder="우리 아이에게 필요한 준비물"
+              autoComplete="off"
+            />
+            <Button type="submit" intent="secondary">
+              <PlusIcon aria-hidden className="size-4" />
+              추가
+            </Button>
+          </form>
+          {/* 알림 영역은 늘 두고, 다 챙긴 순간 축하 문구가 통 튀어 들어온다. */}
+          <div role="status">
+            {allDone && (
+              <p className={styles.success}>
+                <span aria-hidden className={styles.confetti} />
+                <PixelCheckIcon aria-hidden className="size-5" />
+                준비 끝! 우리 아이와 좋은 하루 보내세요.
+              </p>
+            )}
+          </div>
+          <div className={styles.actions}>
+            <Button intent="secondary" onClick={copyList}>
+              목록 복사
+            </Button>
+            <button
+              type="button"
+              className={styles.textButton}
+              onClick={() => setConfirm('uncheck')}
+            >
+              체크만 비우기
+            </button>
+          </div>
+          {confirm && (
+            <div className={styles.confirm} role="group" aria-label="준비함 초기화 확인">
+              <p>
+                {confirm === 'clear'
+                  ? '이 계정의 모든 외출 준비함과 직접 추가한 항목을 지울까요?'
+                  : '이 준비함의 체크를 모두 해제할까요? 직접 추가한 항목은 보관돼요.'}
+              </p>
+              <div className={styles.actions}>
+                <Button intent="secondary" size="md" onClick={() => setConfirm(null)}>
+                  취소
+                </Button>
+                <Button
+                  size="md"
+                  onClick={() => {
+                    dispatch(
+                      confirm === 'clear'
+                        ? { type: 'clear' }
+                        : { type: 'uncheck', outing: data.selected },
+                    )
+                    setConfirm(null)
+                    setMessage('준비함을 비웠어요.')
+                  }}
+                >
+                  비우기
+                </Button>
+              </div>
+            </div>
+          )}
+          <p className={styles.status} role="status">
+            {message}
+          </p>
+          <details className={styles.plainList}>
+            <summary>텍스트 목록 보기</summary>
+            <pre>{checklistText(data)}</pre>
+          </details>
+          <p className={styles.storageNote}>
+            {saved
+              ? '이 브라우저에 자동 저장돼요. 다른 기기에는 이어지지 않아요.'
+              : '브라우저 저장이 차단되어 지금 화면에서만 사용할 수 있어요.'}
+            {owner === 'guest' && ' 로그인 전 준비함은 이 브라우저를 쓰는 사람과 공유돼요.'}
+          </p>
+          <button type="button" className={styles.textButton} onClick={() => setConfirm('clear')}>
+            모든 준비함 지우기
+          </button>
+        </div>
       </section>
       <aside className={styles.sideStack}>
-        <section className={styles.noteCard}>
-          <span className={styles.eyebrow}>돌아온 뒤에도 함께</span>
-          <h2>
-            오늘의 순간을
-            <br />
-            이야기로 남겨요
-          </h2>
-          <p>
-            어디를 다녀왔는지, 우리 아이가 무엇을 좋아했는지. 작은 기록이 다음 나들이의 힌트가 돼요.
-          </p>
-          <Link href={template.nextUrl} className={buttonVariants()}>
-            {template.nextLabel}
-            <PixelArrowRightIcon aria-hidden className="size-4" />
-          </Link>
+        <section aria-labelledby="outing-note" data-accent="green" className={ticketStyles.ticket}>
+          <TicketStrip
+            label={NOTE_LABEL[data.selected]}
+            icon={<PixelPencilIcon aria-hidden className="size-4" />}
+          />
+          <div className={styles.noteBody}>
+            <span className={styles.eyebrow}>돌아온 뒤에도 함께</span>
+            <h2 id="outing-note">
+              오늘의 순간을
+              <br />
+              이야기로 남겨요
+            </h2>
+            <p>
+              어디를 다녀왔는지, 우리 아이가 무엇을 좋아했는지. 작은 기록이 다음 나들이의 힌트가
+              돼요.
+            </p>
+            {/* 버튼 폭은 감싸는 칸이 정한다. */}
+            <div>
+              <Link href={template.nextUrl} className={buttonVariants({ width: 'full' })}>
+                {template.nextLabel}
+                <PixelArrowRightIcon aria-hidden className="ml-1.5 size-4" />
+              </Link>
+            </div>
+          </div>
         </section>
         {/* 놀이터 첫 화면의 돌봄 도구·놀이 카드와 같은 티켓으로 다음 행동을 잇는다. */}
         {SIDE_TICKETS.map(({ href, accent, label, title, body, cta, Icon }) => (

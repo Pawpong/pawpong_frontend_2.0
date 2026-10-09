@@ -1,6 +1,6 @@
 'use client'
 
-import { useId, type ReactNode } from 'react'
+import { useId, type ComponentProps, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { PHOTO_ACCEPT } from '@/shared/lib/preparePhoto'
 import {
@@ -19,6 +19,7 @@ interface PostFormLayoutProps {
   mobileTitle?: string
   introTitle: string
   introDescription: string
+  introTicket?: ComponentProps<typeof ComposerLayout>['introTicket']
   form: PostFormState
   placeholder?: string
   maxLength?: number
@@ -35,6 +36,7 @@ const PostFormLayout = ({
   mobileTitle,
   introTitle,
   introDescription,
+  introTicket,
   form,
   placeholder,
   maxLength,
@@ -51,6 +53,7 @@ const PostFormLayout = ({
       mobileTitle={mobileTitle}
       introTitle={introTitle}
       description={introDescription}
+      introTicket={introTicket}
       onBack={onBack ?? (() => router.back())}
     >
       <ComposerColumns>

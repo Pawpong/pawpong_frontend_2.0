@@ -24,6 +24,7 @@ import {
   type CommunityExperience,
 } from '@/entities/community'
 import { CommunityExperienceEditor } from './CommunityExperienceEditor'
+import { communityRecordIntro } from './communityRecordIntro'
 import { profileQueries } from '@/entities/profile'
 import {
   takePendingCommunityPost,
@@ -248,14 +249,24 @@ const PostForm = ({ postId, post, initialRecord, photoSource, returnTo }: PostFo
   const handleSubmit = () => save('published')
   const handleSaveDraft = () => save('draft')
 
+  // 놀이터 기록 도구에서 들어온 새 글은 같은 티켓 머리로 무엇을 기록하는지 먼저 보여 준다.
+  const recordIntro = post ? null : communityRecordIntro(initialRecord)
+
   return (
     <>
       <PostFormLayout
         title={formText.title}
         mobileTitle={formText.mobileTitle}
         form={visibleForm}
-        introTitle={isEdit ? '우리 아이의 이야기를 다듬어주세요' : '우리 아이의 일상을 나눠주세요'}
-        introDescription="함께 웃고, 궁금한 것을 묻고, 반려동물과의 소중한 순간을 기록해요."
+        introTitle={
+          recordIntro?.title ??
+          (isEdit ? '우리 아이의 이야기를 다듬어주세요' : '우리 아이의 일상을 나눠주세요')
+        }
+        introDescription={
+          recordIntro?.description ??
+          '함께 웃고, 궁금한 것을 묻고, 반려동물과의 소중한 순간을 기록해요.'
+        }
+        introTicket={recordIntro ?? undefined}
         placeholder={
           (experienceEnabled && communityWritingPrompt(experience)) ||
           '오늘 우리 아이는 어떤 하루를 보냈나요?'
