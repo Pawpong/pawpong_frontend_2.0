@@ -131,3 +131,25 @@ test('게시글 상세는 불러오는 동안 두 배치 모두 실제 글 모�
   assert.match(panel, /삭제되었거나 볼 수 없는 게시글이에요\./)
   assert.doesNotMatch(panel, /게시글입니다/)
 })
+
+test('마이홈은 프로필을 불러오는 동안 실제 2단 틀의 스켈레톤을 그림', () => {
+  const skeleton = loadTypescript('src/shared/ui/Skeleton.tsx', { '@/shared/lib/cn': { cn } })
+  const columns = loadTypescript('src/app/(main)/home/_ui/HomeColumns.tsx', {
+    '@/shared/ui': {
+      Container: ({ children, className }) => createElement('div', { className }, children),
+    },
+  })
+  const { MyHomeSkeleton } = loadTypescript('src/app/(main)/home/_ui/MyHomeSkeleton.tsx', {
+    '@/shared/ui/Skeleton': skeleton,
+    './HomeColumns': columns,
+  })
+  const html = renderToStaticMarkup(createElement(MyHomeSkeleton))
+  assert.match(html, /role="status" aria-busy="true"/)
+  assert.match(html, /<span class="sr-only">프로필을 불러오는 중이에요\.<\/span>/)
+  assert.match(html, /size-20 rounded-full/)
+  assert.equal(html.match(/aspect-square/g).length, 6)
+  assert.match(
+    source('src/app/(main)/home/_ui/MyHomeContent.tsx'),
+    /profileQuery\.isPending \? \(\s*<MyHomeSkeleton \/>/,
+  )
+})
