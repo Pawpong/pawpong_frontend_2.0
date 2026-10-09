@@ -36,6 +36,8 @@ export default defineConfig([
       './src/app/(main)/activity/applications/[applicationId]/page.tsx',
       './src/app/(main)/activity/applications/[applicationId]/edit/page.tsx',
       './src/app/(main)/activity/reviews/[reviewId]/page.tsx',
+      // 비로그인 마이홈 진입을 서버에서 바로 로그인으로 보낸다(#488)
+      './src/app/(main)/home/page.tsx',
     ],
     rules: {
       'fsd/no-public-api-sidestep': 'off',
@@ -47,6 +49,8 @@ export default defineConfig([
     files: [
       './src/app/api/support/conversations/**/route.ts',
       './src/app/api/community/photos/**/route.ts',
+      // 홈은 entities/home 의 서버 전용 진입점으로 첫 배너를 받아 HTML 에 싣는다.
+      './src/app/(main)/page.tsx',
     ],
     rules: {
       'fsd/no-public-api-sidestep': 'off',
