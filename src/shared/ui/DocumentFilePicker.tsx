@@ -76,7 +76,7 @@ const DocumentFilePicker = ({
 
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span className="text-sm font-semibold text-neutral-850 tab:text-base">{label}</span>
-          <span className="truncate text-xs font-medium text-neutral-500 tab:text-sm">
+          <span className="truncate text-xs font-medium text-neutral-700 tab:text-sm">
             {selectedFileName || description || 'PDF 또는 이미지 파일을 선택해주세요.'}
           </span>
         </span>

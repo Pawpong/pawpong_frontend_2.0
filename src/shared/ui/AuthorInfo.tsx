@@ -46,7 +46,7 @@ const AuthorInfo = ({
           <div className="flex items-center gap-2">
             <span className={cn('font-semibold text-text-primary', nameSize)}>{nickname}</span>
             {badgeSlot}
-            <span className="text-xs font-medium text-text-secondary" suppressHydrationWarning>
+            <span className="text-xs font-medium text-neutral-700" suppressHydrationWarning>
               {displayTime}
             </span>
           </div>
@@ -63,7 +63,7 @@ const AuthorInfo = ({
         <span className={cn('font-semibold text-text-primary', nameSize)}>{nickname}</span>
         {badgeSlot}
       </Link>
-      <span className="text-xs font-medium text-text-secondary" suppressHydrationWarning>
+      <span className="text-xs font-medium text-neutral-700" suppressHydrationWarning>
         {displayTime}
       </span>
     </div>

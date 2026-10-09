@@ -120,7 +120,7 @@ export function CommunityPlaceSearch({
                 className="block min-h-11 w-full px-3 py-2 text-left focus-ring-inset hover:bg-secondary-50 disabled:text-neutral-400"
               >
                 <span className="block text-sm font-semibold">{place.name}</span>
-                <span className="block text-xs text-neutral-600">
+                <span className="block text-xs text-neutral-700">
                   {place.roadAddress || place.address}
                 </span>
               </button>

@@ -78,11 +78,11 @@ const SettingsLinkRow = ({ href, label, description }: SettingsLink) => (
   >
     <span className="flex min-w-0 flex-col gap-0.5">
       <span className="text-sm font-semibold text-neutral-850 tab:text-base">{label}</span>
-      <span className="text-xs leading-[1.5] font-medium text-neutral-500 tab:text-sm">
+      <span className="text-xs leading-[1.5] font-medium text-neutral-700 tab:text-sm">
         {description}
       </span>
     </span>
-    <ArrowRightIcon className="size-5 shrink-0 text-neutral-500 transition-transform group-hover:translate-x-0.5 group-hover:text-primary-500" />
+    <ArrowRightIcon className="size-5 shrink-0 text-neutral-700 transition-transform group-hover:translate-x-0.5 group-hover:text-primary-500" />
   </Link>
 )
 
@@ -161,7 +161,7 @@ const SettingsContent = ({ userRole }: SettingsContentProps) => {
               <span className="text-sm font-semibold text-error-600 tab:text-base">
                 {isPending ? '로그아웃하는 중' : '로그아웃'}
               </span>
-              <span className="text-xs leading-[1.5] font-medium text-neutral-500 tab:text-sm">
+              <span className="text-xs leading-[1.5] font-medium text-neutral-700 tab:text-sm">
                 이 기기의 포퐁 계정에서 로그아웃해요.
               </span>
             </button>
@@ -173,7 +173,7 @@ const SettingsContent = ({ userRole }: SettingsContentProps) => {
                 className="flex min-h-18 w-full flex-col items-start justify-center gap-0.5 px-4 py-3 text-left focus-ring-inset transition-colors hover:bg-error-50/40 disabled:cursor-not-allowed disabled:opacity-50 tab:px-5"
               >
                 <span className="text-sm font-semibold text-error-600 tab:text-base">탈퇴</span>
-                <span className="text-xs leading-[1.5] font-medium text-neutral-500 tab:text-sm">
+                <span className="text-xs leading-[1.5] font-medium text-neutral-700 tab:text-sm">
                   계정 이용을 중지해요. 소셜 로그인으로 복구할 수 있어요.
                 </span>
               </button>

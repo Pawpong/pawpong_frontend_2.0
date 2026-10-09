@@ -66,7 +66,7 @@ function Field({
         {required ? (
           <span className="ml-1 font-medium text-primary-600">필수</span>
         ) : (
-          <span className="ml-1 font-medium text-neutral-500">선택</span>
+          <span className="ml-1 font-medium text-neutral-700">선택</span>
         )}
       </label>
       {children(id)}
@@ -130,7 +130,7 @@ function IntegerInput({
         }}
         className={cn(INPUT, 'pr-12')}
       />
-      <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm font-medium text-neutral-600">
+      <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm font-medium text-neutral-700">
         {unit}
       </span>
     </div>
@@ -166,7 +166,7 @@ function DistanceInput({
         }}
         className={cn(INPUT, 'pr-12')}
       />
-      <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm font-medium text-neutral-600">
+      <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm font-medium text-neutral-700">
         km
       </span>
     </div>
@@ -193,7 +193,7 @@ function ChoiceGroup<T extends string>({
       <legend className="mb-1.5 text-xs font-bold text-neutral-850">
         {label}
         <span
-          className={cn('ml-1 font-medium', optional ? 'text-neutral-500' : 'text-primary-600')}
+          className={cn('ml-1 font-medium', optional ? 'text-neutral-700' : 'text-primary-600')}
         >
           {optional ? '선택' : '필수'}
         </span>

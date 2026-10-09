@@ -219,7 +219,7 @@ const VerificationContent = () => {
                   'text-body-sm tab:text-body-md',
                   index === statusContent.step
                     ? 'font-semibold text-primary-700'
-                    : 'font-medium text-neutral-500',
+                    : 'font-medium text-neutral-700',
                 )}
               >
                 <span className="mr-2">{index + 1}</span>
@@ -278,7 +278,7 @@ const VerificationContent = () => {
       {canEdit && (
         <div className="fixed inset-x-0 bottom-0 z-sticky border-t border-neutral-100 bg-white pb-[env(safe-area-inset-bottom)]">
           <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 px-5 py-4 tab:px-8">
-            <p className="hidden text-body-md text-neutral-500 tab:block">
+            <p className="hidden text-body-md text-neutral-700 tab:block">
               {isSubmitting ? '서류를 제출하고 있어요.' : '등록한 서류를 확인하고 제출해주세요.'}
             </p>
             <Button

@@ -36,7 +36,7 @@ const DeleteConfirmModal = ({
       <>
         {`삭제한 ${target}은 복구할 수 없어요.`}
         {(isPending || isChecking) && (
-          <span role="status" className="mt-2 block text-sm text-neutral-600">
+          <span role="status" className="mt-2 block text-sm text-neutral-700">
             {isChecking ? '목록을 확인하고 있어요.' : '삭제 중이에요. 잠시 기다려 주세요.'}
           </span>
         )}

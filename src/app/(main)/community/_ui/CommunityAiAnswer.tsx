@@ -49,10 +49,10 @@ function AnswerContent({
         <h3 className="text-sm font-bold">포퐁 AI 참고 답변</h3>
         <span className="rounded bg-point-100 px-2 py-1 text-xs">AI 생성</span>
       </div>
-      <p className="mb-4 text-xs leading-relaxed text-neutral-600">{notice}</p>
+      <p className="mb-4 text-xs leading-relaxed text-neutral-700">{notice}</p>
       <div aria-live="polite" aria-atomic="true">
         {result.isPending && !busy && (
-          <p role="status" className="text-sm text-neutral-600">
+          <p role="status" className="text-sm text-neutral-700">
             저장된 답변을 확인하고 있어요.
           </p>
         )}
@@ -85,7 +85,7 @@ function AnswerContent({
           </p>
         )}
         {!answer && !busy && !result.isPending && !result.isError && (
-          <p className="text-sm leading-relaxed text-neutral-600">
+          <p className="text-sm leading-relaxed text-neutral-700">
             아직 AI 답변이 없어요. 사람들의 댓글 답변과 함께 참고할 수 있어요.
           </p>
         )}
@@ -135,7 +135,7 @@ function AnswerContent({
             >
               AI 참고 답변 받기
             </Button>
-            <p className="text-xs leading-relaxed text-neutral-600">
+            <p className="text-xs leading-relaxed text-neutral-700">
               개발 체험 중이며 하루 최대 3회예요. 접수된 요청은 실패해도 횟수에 포함될 수 있어요.
               AI는 잘못된 답변을 할 수 있어요.
             </p>

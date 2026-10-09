@@ -68,7 +68,7 @@ export function CommunityRelatedPosts({
                 <span className="line-clamp-2 text-sm leading-snug font-medium text-neutral-850">
                   {post.title || post.bodyExcerpt}
                 </span>
-                <span className="mt-0.5 block truncate text-xs text-neutral-600">
+                <span className="mt-0.5 block truncate text-xs text-neutral-700">
                   {post.authorNickname}
                   {post.experience?.tags?.length
                     ? ` · ${post.experience.tags

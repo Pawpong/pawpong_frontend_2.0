@@ -66,7 +66,7 @@ export const ApplicationProgress = ({
             <li
               key={label}
               aria-current={index === step ? 'step' : undefined}
-              className={`border-t-2 pt-3 text-sm ${index <= step ? 'border-primary-500 font-semibold text-primary-500' : 'border-neutral-150 text-neutral-500'}`}
+              className={`border-t-2 pt-3 text-sm ${index <= step ? 'border-primary-500 font-semibold text-primary-500' : 'border-neutral-150 text-neutral-700'}`}
             >
               {label}
               {index === step && <span className="sr-only"> · 현재 단계</span>}

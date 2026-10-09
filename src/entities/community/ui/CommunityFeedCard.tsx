@@ -129,7 +129,7 @@ const CommunityFeedCard = ({
             </span>
             {badgeSlot}
             <span
-              className="text-xs leading-[1.5] font-medium text-neutral-500"
+              className="text-xs leading-[1.5] font-medium text-neutral-700"
               suppressHydrationWarning
             >
               {formatRelativeTime(createdAt)}

@@ -26,7 +26,7 @@ const NoticeRow = ({ notice }: { notice: Notice }) => (
         <span className="min-w-0 text-base leading-[1.5] font-semibold text-neutral-850">
           {notice.title}
         </span>
-        <span className="text-xs font-medium text-neutral-500">
+        <span className="text-xs font-medium text-neutral-700">
           {formatDate(notice.publishedAt ?? notice.createdAt)}
         </span>
       </span>

@@ -44,7 +44,7 @@ const NoticeDetailContent = ({ noticeId }: { noticeId: string }) => {
                     {data.title}
                   </h1>
                 </div>
-                <p className="text-xs font-medium text-neutral-500">
+                <p className="text-xs font-medium text-neutral-700">
                   {formatDate(data.publishedAt ?? data.createdAt)} · {data.authorName}
                 </p>
               </div>

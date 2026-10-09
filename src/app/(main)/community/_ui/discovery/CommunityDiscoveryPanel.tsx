@@ -76,11 +76,11 @@ export function CommunityDiscoveryPanel({
           <div className="mb-3 flex items-center justify-between gap-2">
             <h2 className="text-sm font-semibold text-neutral-850">
               관심 주제{' '}
-              <span className="ml-1 font-normal text-neutral-500">
+              <span className="ml-1 font-normal text-neutral-700">
                 {topics.length}/{COMMUNITY_MAX_FILTER_TOPICS}
               </span>
             </h2>
-            <span className="text-xs text-neutral-500">여러 개 선택할 수 있어요</span>
+            <span className="text-xs text-neutral-700">여러 개 선택할 수 있어요</span>
           </div>
           <div
             role="group"
@@ -97,7 +97,7 @@ export function CommunityDiscoveryPanel({
                   'min-h-10 rounded-lg px-3 text-xs font-semibold focus-ring transition-colors',
                   group === item
                     ? 'bg-white text-primary-700 shadow-sm'
-                    : 'text-neutral-600 hover:text-neutral-850',
+                    : 'text-neutral-700 hover:text-neutral-850',
                 )}
               >
                 {item.title}
@@ -186,7 +186,7 @@ export function CommunityDiscoveryPanel({
               추가
             </Button>
           </div>
-          <p id={`${id}-tag-hint`} className="mt-2 text-xs text-neutral-500">
+          <p id={`${id}-tag-hint`} className="mt-2 text-xs text-neutral-700">
             입력한 태그가 모두 달린 글을 찾아요.
           </p>
           {error && (
@@ -221,7 +221,7 @@ export function CommunityDiscoveryPanel({
             <AppliedFilters config={config} value={draft} onChange={setDraft} />
           </div>
         )}
-        <p className="text-xs leading-relaxed text-neutral-500">
+        <p className="text-xs leading-relaxed text-neutral-700">
           서로 다른 조건은 함께 적용돼요. 진료 경험은 병원 평가나 의료 인증이 아니에요.
         </p>
       </div>

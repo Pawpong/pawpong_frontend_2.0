@@ -59,13 +59,13 @@ export function PostAiComparisonEditor({
           {editor.beforeSrc && editor.afterSrc && (
             <div className="mx-auto w-full max-w-md">
               <BeforeAfterSlider beforeSrc={editor.beforeSrc} afterSrc={editor.afterSrc} />
-              <p className="mt-2 text-center text-xs text-neutral-600">
+              <p className="mt-2 text-center text-xs text-neutral-700">
                 좌우로 움직여 다른 사용자에게 보일 모습을 확인해요.
               </p>
             </div>
           )}
           {editor.busy && (
-            <p role="status" className="text-sm text-neutral-600">
+            <p role="status" className="text-sm text-neutral-700">
               비교할 원본을 준비하고 있어요…
             </p>
           )}
@@ -75,7 +75,7 @@ export function PostAiComparisonEditor({
             </p>
           )}
           {editor.submission.error && (
-            <p role="status" className="text-sm text-neutral-600">
+            <p role="status" className="text-sm text-neutral-700">
               {editor.submission.error}
             </p>
           )}
@@ -157,7 +157,7 @@ export function PostAiComparisonEditor({
               )}
             </div>
           )}
-          <p className="text-xs text-neutral-600">
+          <p className="text-xs text-neutral-700">
             비교를 끄면 연결한 원본은 게시글에서 빠지고 AI 결과만 남아요.
           </p>
         </>
