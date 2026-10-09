@@ -2,6 +2,7 @@
 
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { ListState, ShowcaseSection } from '@/shared/ui'
+import { SkeletonBlock } from '@/shared/ui/Skeleton'
 import {
   CommunityMediaCard,
   communityQueries,
@@ -11,6 +12,10 @@ import {
 import { flattenPages } from '@/shared/lib/infiniteList'
 
 const CARD_COUNT = 5
+
+// 불러온 타일과 같은 줄 배치를 스켈레톤과 함께 쓴다.
+const ROW_CLASS =
+  'flex w-max gap-3 tab:grid tab:w-full tab:grid-cols-5 tab:gap-[clamp(0.75rem,2vw,1.667rem)] pc:grid-cols-4'
 
 const CommunityShowcase = () => {
   // 홈은 부분 실패 허용 — 오류를 전역 바운더리로 던지지 않고 섹션 안에서 안내한다.
@@ -36,6 +41,19 @@ const CommunityShowcase = () => {
         isError={isError}
         isEmpty={fetched.length === 0}
         loadingText="커뮤니티 게시글을 불러오는 중이에요."
+        loadingFallback={
+          <div role="status" aria-busy="true" className="w-full overflow-hidden">
+            <span className="sr-only">커뮤니티 게시글을 불러오는 중이에요.</span>
+            <div className={ROW_CLASS} aria-hidden>
+              {Array.from({ length: 5 }, (_, index) => (
+                <SkeletonBlock
+                  key={index}
+                  className={`size-[7.625rem] tab:aspect-square tab:size-auto tab:w-full ${index >= 4 ? 'pc:hidden' : ''}`}
+                />
+              ))}
+            </div>
+          </div>
+        }
         errorText="커뮤니티 게시글을 불러오지 못했어요."
         emptyText="아직 등록된 커뮤니티 게시글이 없어요."
       >
@@ -44,7 +62,7 @@ const CommunityShowcase = () => {
             (분양중인 동물 카드와 같은 보간) — tab 5열, pc 4열(≈300px).
             스크롤 뷰포트에 자체 max-w를 두면 섹션 타이틀과 좌우 여백이 어긋난다 — Container 폭 그대로 둔다. */}
         <div className="w-full overflow-x-auto">
-          <div className="flex w-max gap-3 tab:grid tab:w-full tab:grid-cols-5 tab:gap-[clamp(0.75rem,2vw,1.667rem)] pc:grid-cols-4">
+          <div className={ROW_CLASS}>
             {fetched.map((post, index) => (
               <CommunityMediaCard
                 key={post.detailHref ?? index}

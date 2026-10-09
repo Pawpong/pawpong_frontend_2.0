@@ -79,3 +79,13 @@ test('탐색 목록은 불러오는 동안 같은 격자에 카드 모양 스켈
   ])
     assert.match(source(file), /loadingFallback=\{<ListingCardGridSkeleton label=/, file)
 })
+
+test('홈 분양·자랑하기 영역은 불러온 카드와 같은 배치의 스켈레톤으로 자리를 잡아 둠', () => {
+  const adoption = source('src/widgets/adoption-showcase/ui/AdoptionShowcase.tsx')
+  assert.match(adoption, /<div className=\{GRID_CLASS\}>/)
+  assert.match(adoption, /loadingFallback=\{[\s\S]*?<div className=\{GRID_CLASS\} aria-hidden>/)
+  const community = source('src/widgets/community-showcase/ui/CommunityShowcase.tsx')
+  assert.match(community, /<div className=\{ROW_CLASS\}>/)
+  assert.match(community, /loadingFallback=\{[\s\S]*?<div className=\{ROW_CLASS\} aria-hidden>/)
+  for (const code of [adoption, community]) assert.match(code, /role="status" aria-busy="true"/)
+})
