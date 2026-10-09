@@ -69,3 +69,11 @@ test('AI 필터는 모바일에서 사진 칸을 낮추고 만들기 버튼이 �
   assert.match(field, /selectLabel = '참여 사진 선택'/)
   assert.match(field, /frameClassName = 'aspect-square'/)
 })
+
+test('비로그인 AI 필터 안내 칸도 로그인 상태 사진 칸과 같은 모바일 4:3 높이를 씀', () => {
+  const studio = source('src/features/ai-image/ui/AiFilterStudio.tsx')
+  assert.match(
+    studio,
+    /flex aspect-\[4\/3\] w-full flex-col items-center justify-center gap-4 rounded-xl border border-primary-200 bg-point-50 p-6 text-center tab:aspect-square/,
+  )
+})

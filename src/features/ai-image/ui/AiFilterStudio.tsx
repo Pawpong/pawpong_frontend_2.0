@@ -300,7 +300,7 @@ export function AiFilterStudio({
               )}
             </>
           ) : (
-            <div className="flex aspect-square w-full flex-col items-center justify-center gap-4 rounded-xl border border-primary-200 bg-point-50 p-6 text-center">
+            <div className="flex aspect-[4/3] w-full flex-col items-center justify-center gap-4 rounded-xl border border-primary-200 bg-point-50 p-6 text-center tab:aspect-square">
               <p className="text-sm font-semibold text-neutral-850">
                 로그인하면 우리 아이 사진으로 바로 만들어 볼 수 있어요
               </p>
