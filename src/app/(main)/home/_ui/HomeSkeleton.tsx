@@ -2,10 +2,10 @@ import { SkeletonBlock } from '@/shared/ui/Skeleton'
 import { HomeColumns } from './HomeColumns'
 
 /**
- * 마이홈 프로필을 불러오는 동안 실제와 같은 2단 틀(왼쪽 프로필·메뉴, 오른쪽 글 격자)로 자리를 잡는다.
+ * 마이홈·다른 회원 홈의 프로필을 불러오는 동안 실제와 같은 2단 틀(왼쪽 프로필·메뉴, 오른쪽 글 격자)로 자리를 잡는다.
  * 빈 칸은 각자 aria-hidden 이라 낭독기에는 안내 문구만 읽힌다.
  */
-export function MyHomeSkeleton() {
+export function HomeSkeleton() {
   return (
     <div role="status" aria-busy="true">
       <span className="sr-only">프로필을 불러오는 중이에요.</span>
