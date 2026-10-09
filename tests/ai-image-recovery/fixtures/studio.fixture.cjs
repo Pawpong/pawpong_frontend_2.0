@@ -16,6 +16,7 @@ function studioMarkup(phase, canResume = true, props = {}) {
     '@/entities/ai-image': { aiImageQueries: { myGenerations: () => ({ queryKey: [] }) } },
     '@/features/playground-pet/ui/PetResultLink': { PetResultLink: () => null },
     '@/shared/assets': { PawPrintIcon: () => null, PixelArrowRightIcon: () => null },
+    '@/shared/ui/Skeleton': { SkeletonBlock: () => null },
     '@/shared/lib/fonts': { cafe24Proup: { className: 'fixture-font' } },
     '@/shared/config/playground': load('src/shared/config/playground.ts'),
     '@/shared/lib/cn': { cn: (...args) => args.filter(Boolean).join(' ') },
