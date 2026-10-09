@@ -6,6 +6,7 @@ const ui = 'src/features/playground-tools/ui'
 const playFiles = [
   `${ui}/OutingDiscovery.tsx`,
   `${ui}/PetTasteDiscovery.tsx`,
+  `${ui}/PetBtiDiscovery.tsx`,
   `${ui}/PlayResultActions.tsx`,
   `${ui}/PlayResultCard.tsx`,
   'src/features/playground-tools/model/discovery.ts',
@@ -36,6 +37,7 @@ test('기존 외출 준비함 주소와 저장 데이터는 그대로 두고 새
   assert.match(source('src/app/(main)/playground/outing/page.tsx'), /<OutingChecklist \/>/)
   assert.match(source('src/app/(main)/playground/walk-card/page.tsx'), /<OutingDiscovery \/>/)
   assert.match(source('src/app/(main)/playground/taste/page.tsx'), /<PetTasteDiscovery \/>/)
+  assert.match(source('src/app/(main)/playground/bti/page.tsx'), /<PetBtiDiscovery \/>/)
   assert.match(
     source('src/features/playground-tools/model/checklistStore.ts'),
     /`pawpong:outing:v1:\$\{encodeURIComponent\(owner\)\}`/,

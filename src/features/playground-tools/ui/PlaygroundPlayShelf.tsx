@@ -1,5 +1,6 @@
-import { PawPrintIcon, PixelArrowRightIcon, ProfileStarIcon } from '@/shared/assets'
+import { FavoriteIcon, PawPrintIcon, PixelArrowRightIcon, ProfileStarIcon } from '@/shared/assets'
 import { TicketLink } from '@/shared/ui/Ticket'
+import { BTI_NAME } from '../constants/discovery'
 
 const PLAYS = [
   {
@@ -19,6 +20,15 @@ const PLAYS = [
     cta: '취향 카드 만들기',
     accent: 'blue',
     Icon: ProfileStarIcon,
+  },
+  {
+    href: '/playground/bti',
+    eyebrow: '질문 열두 개, 둘 중 하나만',
+    title: `우리 아이 ${BTI_NAME}`,
+    body: '평소 우리 아이 모습으로 16가지 성향 중 하나를 찾아요.',
+    cta: '성향 카드 만들기',
+    accent: 'peach',
+    Icon: FavoriteIcon,
   },
 ] as const
 

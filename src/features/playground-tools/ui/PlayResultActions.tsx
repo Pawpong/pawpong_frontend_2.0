@@ -13,7 +13,7 @@ import { currentToolOwner } from '../model/useToolOwner'
 type NextPlay = { href: string; title: string; detail: string }
 
 // 결과 다음에 이어갈 놀이. 첫 화면과 같은 순서(사진 → 방 → 기록)를 유지한다.
-function nextPlays(from: 'outing' | 'taste'): NextPlay[] {
+function nextPlays(from: 'outing' | 'taste' | 'bti'): NextPlay[] {
   return [
     {
       href: '/ai-filter',
@@ -46,7 +46,7 @@ export function PlayResultActions({
 }: {
   card: PlayCard
   owner: string
-  from: 'outing' | 'taste'
+  from: 'outing' | 'taste' | 'bti'
 }) {
   const [status, setStatus] = useState('')
   const [fallback, setFallback] = useState(false)
