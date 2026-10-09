@@ -22,7 +22,9 @@ test('외출 준비함은 공통 아이콘 버튼과 그룹 이름을 쓰고 장
   const checklist = source('src/features/playground-tools/ui/OutingChecklist.tsx')
   assert.match(checklist, /<IconButton\s+size="touch"\s+tone="danger"/)
   assert.match(checklist, /role="group" aria-label="외출 목적"/)
-  assert.match(checklist, /<span aria-hidden>\u2197<\/span>/)
+  // 장식 화살표는 남아 있다면 반드시 읽지 않게 감싼다.
+  assert.doesNotMatch(checklist, /(?<!<span aria-hidden>)\u2197/)
+  assert.match(checklist, /discovery\.ticket\b/)
 })
 
 test('버튼 폭은 계약을 우회하지 않고 감싸는 칸으로 정하며 이야기 쓰기 버튼은 줄을 채움', () => {
