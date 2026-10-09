@@ -44,3 +44,9 @@ test('목록 화면의 로딩·오류·빈 상태 문구는 해요체로 맞춤'
       assert.doesNotMatch(code, /불러오는 중입니다|불러오지 못했습니다|(?<!\/\/.*)없습니다\./, file)
     }
 })
+
+test('링크 티켓은 누르면 그림자 쪽으로 내려앉고 움직임을 줄인 환경에서는 움직이지 않음', () => {
+  const css = source('src/shared/ui/Ticket.module.css')
+  assert.match(css, /a\.ticket:active \{\s*translate: 3px 3px;\s*box-shadow: 3px 3px 0 var\(--accent\);/)
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*a\.ticket:active \{\s*translate: none;/)
+})
