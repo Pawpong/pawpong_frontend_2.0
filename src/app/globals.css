@@ -272,7 +272,16 @@
     align-items: center;
   }
 
+  /* 서버가 그린 배너는 스와이퍼가 붙기 전에도 첫 장을 가운데, 다음 장을 작게 둬 붙는 순간 자리가 튀지 않게 한다. */
+  .banner-swiper:not(.swiper-initialized) .swiper-wrapper {
+    transform: translate3d(calc((100% - min(70.875rem, 78.75vw)) / 2), 0, 0);
+  }
+  .banner-swiper:not(.swiper-initialized) .swiper-slide + .swiper-slide {
+    transform: scale(0.85);
+  }
+
   /* 양옆 미리보기 배너는 Figma의 반투명 흰색 오버레이로 비활성 상태를 표현한다. */
+  .banner-swiper:not(.swiper-initialized) .swiper-slide:nth-child(2) [data-banner-slide]::after,
   .banner-swiper .swiper-slide-prev [data-banner-slide]::after,
   .banner-swiper .swiper-slide-next [data-banner-slide]::after {
     position: absolute;

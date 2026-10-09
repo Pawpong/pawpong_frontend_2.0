@@ -7,6 +7,7 @@ import { Autoplay, EffectCoverflow, Navigation } from 'swiper/modules'
 import { useQuery } from '@tanstack/react-query'
 import { homeQueries } from '@/entities/home'
 import { cn } from '@/shared/lib/cn'
+import type { BannerDto } from '@/shared/types'
 import { BannerSlide } from './BannerSlide'
 import 'swiper/css'
 
@@ -52,8 +53,17 @@ const ChevronRight = ({ className }: { className?: string }) => (
   </svg>
 )
 
-const Banner = () => {
-  const { data: banners } = useQuery(homeQueries.banners())
+interface BannerProps {
+  /** 서버에서 미리 받은 배너. 없으면 기존처럼 브라우저에서 조회한다. */
+  initial?: { banners: BannerDto[]; fetchedAt: number } | null
+}
+
+const Banner = ({ initial }: BannerProps) => {
+  const { data: banners } = useQuery({
+    ...homeQueries.banners(),
+    // 서버가 받은 시각을 넘겨, 캐시된 HTML 이 오래됐으면 화면에 뜬 뒤 다시 조회하게 한다.
+    ...(initial && { initialData: initial.banners, initialDataUpdatedAt: initial.fetchedAt }),
+  })
   const swiperRef = useRef<SwiperInstance | null>(null)
   const [activeIndex, setActiveIndex] = useState(0)
 
