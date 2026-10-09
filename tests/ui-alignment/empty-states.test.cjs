@@ -111,3 +111,16 @@ test('토스트·안내·확인 문구는 해요체로 맞추고 동의·약관 
     /본인은 만 14세 이상입니다\./,
   )
 })
+
+test('카드는 누르는 동안 살짝 줄고 움직임을 줄인 환경에서는 그대로 있음', () => {
+  const css = source('src/app/globals.css')
+  const utility = css.slice(
+    css.indexOf('@utility card-interactive'),
+    css.indexOf('@utility card-interactive') + 700,
+  )
+  assert.match(utility, /&:active \{\s*scale: 0\.98;/)
+  assert.match(
+    utility,
+    /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*&:active \{\s*scale: none;/,
+  )
+})
