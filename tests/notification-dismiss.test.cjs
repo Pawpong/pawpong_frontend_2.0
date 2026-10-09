@@ -101,6 +101,7 @@ function bellHarness(api, records) {
       EmptyState: 'EmptyState',
       ActionSheetItem: 'ActionSheetItem',
     },
+    '@/shared/ui/Skeleton': { ListRowsSkeleton: 'ListRowsSkeleton' },
   })
   const render = () => {
     cursor = 0

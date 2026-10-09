@@ -195,3 +195,13 @@ test('공지·자주 묻는 질문·임시저장·저장 피드는 줄 모양 �
   ])
     assert.match(source(file), pattern, file)
 })
+
+test('상단 알림 드롭다운도 불러오는 동안 줄 스켈레톤을 쓰고 안내 줄 글자 대비를 지킴', () => {
+  const bell = source('src/widgets/gnb/ui/NotificationBell.tsx')
+  assert.match(
+    bell,
+    /<ListRowsSkeleton label="알림을 불러오는 중이에요\." rows=\{3\} className="px-4" \/>/,
+  )
+  assert.doesNotMatch(bell, /불러오는 중\.\.\./)
+  assert.match(bell, /text-xs text-neutral-700">\s*지운 알림도/)
+})
