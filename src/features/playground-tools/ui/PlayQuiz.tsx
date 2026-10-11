@@ -2,7 +2,7 @@
 
 import { useEffect, useReducer, useRef } from 'react'
 import { ArrowBackIcon, PixelArrowRightIcon } from '@/shared/assets'
-import { cn } from '@/shared/lib/cn'
+import { PixelChoiceButton } from '@/shared/ui/PixelChoiceButton'
 import { PixelProgressBar } from '@/shared/ui/PixelProgressBar'
 import { TicketStrip, ticketStyles, type TicketAccent } from '@/shared/ui/Ticket'
 import { prefersReducedMotion } from '../lib/motion'
@@ -146,18 +146,13 @@ export function PlayQuiz({
                 <ul className="mt-5 grid gap-3" aria-labelledby={headingId}>
                   {question.options.map((option, index) => (
                     <li key={option}>
-                      <button
-                        type="button"
+                      <PixelChoiceButton
                         aria-pressed={answers[step] === index}
-                        data-picked={picked === index ? '' : undefined}
-                        className={cn(styles.choice, 'focus-ring')}
+                        mark={KEYS[index]}
                         onClick={() => pick(index)}
                       >
-                        <span aria-hidden className={styles.choiceKey}>
-                          {KEYS[index]}
-                        </span>
                         <span className="min-w-0">{option}</span>
-                      </button>
+                      </PixelChoiceButton>
                     </li>
                   ))}
                 </ul>

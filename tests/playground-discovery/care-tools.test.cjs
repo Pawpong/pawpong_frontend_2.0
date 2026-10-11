@@ -32,13 +32,9 @@ test('외출 준비함의 체크·목적 고르기 연출은 움직임 줄이기
   )
   assert.match(css, /\.checklist small \{[\s\S]*?color: var\(--color-neutral-700, #6b6b6b\);/)
   const reduced = css.slice(css.lastIndexOf('@media (prefers-reduced-motion: reduce)'))
-  for (const selector of [
-    ".purpose[aria-pressed='true']",
-    '.checklist input:checked',
-    '.checkedRow',
-    '.success',
-    '.confetti',
-  ])
+  // 목적 고르기는 공통 PixelChoiceButton 이 움직임 줄이기를 맡는다(quiz.test 에서 확인).
+  assert.match(source(`${ui}/OutingChecklist.tsx`), /<PixelChoiceButton\b/)
+  for (const selector of ['.checklist input:checked', '.checkedRow', '.success', '.confetti'])
     assert.ok(reduced.includes(selector), selector)
 })
 

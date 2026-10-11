@@ -176,66 +176,6 @@
   animation: stamp-in 900ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* 질문 고르기: 티켓처럼 누르면 그림자 쪽으로 내려앉고, 고른 순간 통 튀어 오른다. */
-.choice {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  width: 100%;
-  min-height: 3.5rem;
-  padding: 0.75rem 1rem;
-  border: 2px solid var(--color-secondary-200, #eddbc6);
-  border-radius: 0.5rem;
-  background: var(--color-base-white, #fff);
-  box-shadow: 3px 3px 0 var(--color-secondary-100, #f7efe4);
-  color: var(--color-neutral-850, #3e3e3e);
-  font-size: 0.9375rem;
-  font-weight: 600;
-  line-height: 1.45;
-  text-align: left;
-  word-break: keep-all;
-  cursor: pointer;
-  transition:
-    translate 120ms ease-out,
-    box-shadow 120ms ease-out,
-    border-color 120ms ease-out,
-    background-color 120ms ease-out;
-}
-.choice:active {
-  translate: 2px 2px;
-  box-shadow: 1px 1px 0 var(--color-secondary-100, #f7efe4);
-}
-.choice[aria-pressed='true'] {
-  border-color: var(--accent-edge);
-  background: color-mix(in srgb, var(--accent) 45%, var(--color-base-white, #fff));
-  box-shadow: 3px 3px 0 var(--accent);
-}
-.choice[data-picked] {
-  animation: pick 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-@media (hover: hover) {
-  .choice:hover {
-    border-color: var(--accent-edge);
-  }
-}
-.choiceKey {
-  display: grid;
-  flex-shrink: 0;
-  place-items: center;
-  width: 1.75rem;
-  height: 1.75rem;
-  border-radius: 0.25rem;
-  background: var(--accent);
-  color: var(--accent-ink);
-  font:
-    0.8125rem/1 var(--font-cafe24proup),
-    sans-serif;
-}
-/* 고른 답은 진한 띠 글자색 바탕에 흰 글자(4.5:1 이상) */
-.choice[aria-pressed='true'] .choiceKey {
-  background: var(--accent-ink);
-  color: var(--color-base-white, #fff);
-}
 /* 다음 질문이 오른쪽에서 들어온다. */
 .question {
   animation: slide-in 360ms cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -365,14 +305,6 @@
     scale: 1;
   }
 }
-@keyframes pick {
-  30% {
-    scale: 0.95;
-  }
-  65% {
-    scale: 1.03;
-  }
-}
 @keyframes slide-in {
   from {
     opacity: 0;
@@ -429,16 +361,13 @@
   .scene[data-busy] .deckRight,
   .sparkles,
   .stamp,
-  .choice[data-picked],
   .question,
   .shuffleDeck span {
     animation: none;
   }
-  .choice,
   .nextPlay {
     transition: none;
   }
-  .choice:active,
   .nextPlay:active {
     translate: none;
   }

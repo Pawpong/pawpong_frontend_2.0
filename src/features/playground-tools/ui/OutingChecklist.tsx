@@ -4,6 +4,7 @@ import { useEffect, useState, useSyncExternalStore, type FormEvent } from 'react
 import Link from 'next/link'
 import { Button, buttonVariants } from '@/shared/ui/Button'
 import { IconButton } from '@/shared/ui/IconButton'
+import { PixelChoiceButton } from '@/shared/ui/PixelChoiceButton'
 import { PixelProgressBar } from '@/shared/ui/PixelProgressBar'
 import { TicketLink, TicketStrip, ticketStyles } from '@/shared/ui/Ticket'
 import {
@@ -130,13 +131,16 @@ function Checklist({ owner }: { owner: string }) {
           <h2 id="outing-pick" className={styles.sectionTitle}>
             오늘은 어디로 갈까요?
           </h2>
-          <div className={styles.purposeGrid} role="group" aria-label="외출 목적">
+          <div
+            className="grid grid-cols-2 gap-2.5 lap:grid-cols-4"
+            role="group"
+            aria-label="외출 목적"
+          >
             {OUTING_TEMPLATES.map((t) => (
-              <button
+              <PixelChoiceButton
                 key={t.id}
-                type="button"
                 aria-pressed={data.selected === t.id}
-                className={styles.purpose}
+                tile
                 onClick={() => {
                   dispatch({ type: 'select', outing: t.id })
                   setConfirm(null)
@@ -144,9 +148,9 @@ function Checklist({ owner }: { owner: string }) {
                   setItemLabel('')
                 }}
               >
-                <LocationPinIcon aria-hidden className="size-5" />
+                <LocationPinIcon aria-hidden className="size-5 shrink-0" />
                 {t.title}
-              </button>
+              </PixelChoiceButton>
             ))}
           </div>
           <div className={styles.listHeading}>

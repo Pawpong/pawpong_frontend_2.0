@@ -16,7 +16,6 @@
 /* 공통 focus-ring 유틸리티와 같은 두께·색·간격을 쓴다. */
 .back:focus-visible,
 .textButton:focus-visible,
-.purpose:focus-visible,
 .theme:focus-visible {
   outline: 2px solid var(--color-primary-500, #ad651d);
   outline-offset: 2px;
@@ -55,40 +54,6 @@
     1.125rem/1.5 var(--font-cafe24proup),
     sans-serif;
   margin: 0.3rem 0 1.2rem;
-}
-.purposeGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.6rem;
-}
-.purpose {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 0.5rem;
-  border: 2px solid var(--color-secondary-200, #eddbc6);
-  border-radius: 0.5rem;
-  background: var(--color-base-white, #fff);
-  box-shadow: 3px 3px 0 var(--color-secondary-100, #f7efe4);
-  min-height: 52px;
-  padding: 0.8rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    translate 120ms ease-out,
-    box-shadow 120ms ease-out;
-}
-.purpose:active {
-  translate: 2px 2px;
-  box-shadow: 1px 1px 0 var(--color-secondary-100, #f7efe4);
-}
-.purpose[aria-pressed='true'] {
-  background: var(--accent, #cfe6c3);
-  border-color: var(--accent-edge, #55784d);
-  color: var(--accent-ink, #4a6943);
-  box-shadow: 3px 3px 0 color-mix(in srgb, var(--accent-edge, #55784d) 35%, transparent);
-  animation: pop 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .listHeading {
   display: flex;
@@ -520,16 +485,6 @@
     top: 6rem;
   }
 }
-@media (min-width: 1024px) {
-  .purposeGrid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-  .purpose {
-    justify-content: center;
-    flex-direction: column;
-    padding: 0.8rem 0.25rem;
-  }
-}
 
 @keyframes pop {
   30% {
@@ -568,16 +523,11 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .purpose,
-  .purpose[aria-pressed='true'],
   .checklist input:checked,
   .checkedRow,
   .success,
   .confetti {
     transition: none;
     animation: none;
-  }
-  .purpose:active {
-    translate: none;
   }
 }
