@@ -7,6 +7,9 @@ import type {
 
 export const DEFAULT_CARE_CENTER = { latitude: 37.5665, longitude: 126.978 }
 
+/** 주변 검색 반경 선택지(m) — 종류별 시작 반경(5km·20km)을 포함한다 */
+export const CARE_RADIUS_OPTIONS = [3000, 5000, 10000, 20000] as const
+
 /** 공공 등록자료(전국 목록)가 있는 종류인지 — 동반 카페·여행지·숙소는 주변 검색만 있다 */
 export const hasCareDirectory = (kind: CarePlaceKind): kind is CareDirectoryKind =>
   kind === 'hospital' || kind === 'shelter'

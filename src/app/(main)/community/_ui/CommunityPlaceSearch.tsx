@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useId, useRef, useState } from 'react'
-import { searchCarePlaces, type CarePlace, type CarePlaceKind } from '@/entities/care-place'
+import { useId, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { carePlaceQueries, type CarePlace, type CarePlaceKind } from '@/entities/care-place'
 
 /** 돌봄 지도와 같은 공개 장소 목록에서 방문한 곳을 고른다. */
 export function CommunityPlaceSearch({
@@ -20,47 +21,36 @@ export function CommunityPlaceSearch({
   const id = useId()
   const noun = kind === 'hospital' ? '병원' : '장소'
   const [query, setQuery] = useState('')
-  const [places, setPlaces] = useState<CarePlace[] | null>(null)
-  const [searching, setSearching] = useState(false)
-  const [error, setError] = useState('')
-  const active = useRef<AbortController | null>(null)
-  useEffect(() => () => active.current?.abort(), [])
+  // 찾기를 누른 검색어만 조회한다. 새 검색어로 바뀌거나 화면을 떠나면 이전 요청은 취소된다.
+  const [submitted, setSubmitted] = useState('')
+  const result = useQuery({
+    ...carePlaceQueries.places(
+      {
+        latitude: 37.5665,
+        longitude: 126.978,
+        kind,
+        query: submitted,
+        radius: 20000,
+        scope: 'keyword',
+        region: '',
+        referralOnly: false,
+      },
+      1,
+    ),
+    enabled: submitted !== '',
+    retry: false,
+    // 새 검색어를 찾는 동안에도 이전 목록을 그대로 둔다
+    placeholderData: (previous) => previous,
+  })
+  const searching = result.isFetching
+  const places = submitted && !result.isError ? (result.data?.places ?? null) : null
+  const error = result.isError ? '장소 검색을 완료하지 못했어요. 잠시 뒤 다시 시도해 주세요.' : ''
 
-  const search = async () => {
+  const search = () => {
     const keyword = query.trim()
     if (!keyword || searching) return
-    active.current?.abort()
-    const controller = new AbortController()
-    active.current = controller
-    setSearching(true)
-    setError('')
-    try {
-      const response = await searchCarePlaces(
-        {
-          latitude: 37.5665,
-          longitude: 126.978,
-          kind,
-          query: keyword,
-          radius: 20000,
-          scope: 'keyword',
-          region: '',
-          referralOnly: false,
-        },
-        1,
-        controller.signal,
-      )
-      if (!controller.signal.aborted) setPlaces(response.places)
-    } catch {
-      if (!controller.signal.aborted) {
-        setPlaces(null)
-        setError('장소 검색을 완료하지 못했어요. 잠시 뒤 다시 시도해 주세요.')
-      }
-    } finally {
-      if (active.current === controller) {
-        active.current = null
-        setSearching(false)
-      }
-    }
+    if (keyword === submitted) void result.refetch()
+    else setSubmitted(keyword)
   }
 
   return (
@@ -81,7 +71,7 @@ export function CommunityPlaceSearch({
           onKeyDown={(event) => {
             if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
               event.preventDefault()
-              void search()
+              search()
             }
           }}
           className="min-h-11 min-w-0 flex-1 rounded-lg border border-neutral-200 bg-white px-3 text-base focus-ring tab:text-sm"
@@ -89,7 +79,7 @@ export function CommunityPlaceSearch({
         <button
           type="button"
           disabled={disabled || searching || !query.trim()}
-          onClick={() => void search()}
+          onClick={search}
           className="min-h-11 shrink-0 rounded-lg border border-primary-500 bg-white px-4 text-sm font-bold text-primary-700 focus-ring hover:bg-primary-50 disabled:border-neutral-200 disabled:text-neutral-400"
         >
           {searching ? '찾는 중' : '찾기'}
@@ -114,7 +104,7 @@ export function CommunityPlaceSearch({
                 disabled={disabled || !canPick(place)}
                 onClick={() => {
                   onPick(place)
-                  setPlaces(null)
+                  setSubmitted('')
                   setQuery('')
                 }}
                 className="block min-h-11 w-full px-3 py-2 text-left focus-ring-inset hover:bg-secondary-50 disabled:text-neutral-400"

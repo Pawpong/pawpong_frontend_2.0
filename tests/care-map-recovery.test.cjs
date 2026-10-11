@@ -14,6 +14,14 @@ new Function(
   }).outputText,
 )(searchState)
 
+const careConstants = {}
+new Function(
+  'exports',
+  ts.transpileModule(fs.readFileSync('src/entities/care-place/model/constants.ts', 'utf8'), {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 },
+  }).outputText,
+)(careConstants)
+
 const compiled = ts.transpileModule(
   fs.readFileSync('src/features/care-map/ui/CareMapContent.tsx', 'utf8'),
   {
@@ -33,9 +41,16 @@ function renderer(getResult) {
   const dependencies = {
     'next/dynamic': () => () => null,
     '@tanstack/react-query': {
-      useQuery: ({ queryKey }) => (queryKey[0] === 'care-places' ? getResult() : {}),
+      useQuery: ({ queryKey }) => (queryKey[1] === 'places' ? getResult() : {}),
     },
-    '@/entities/care-place': {},
+    '@/entities/care-place': {
+      ...careConstants,
+      carePlaceQueries: {
+        config: () => ({ queryKey: ['care-place', 'config'] }),
+        directorySummary: () => ({ queryKey: ['care-place', 'directory-summary'] }),
+        places: (search, page) => ({ queryKey: ['care-place', 'places', search, page] }),
+      },
+    },
     '@/shared/lib/fonts': { cafe24Proup: { className: 'test-font' } },
     '../lib/care-location': {},
     '@/shared/lib/nativeBridge': { inNativeAppWebView: () => false },
