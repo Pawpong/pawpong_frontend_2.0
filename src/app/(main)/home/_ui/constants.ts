@@ -27,14 +27,14 @@ const BREEDER_MY_HOME_TABS: HomeTabConfig[] = [HOME_TAB.listings, HOME_TAB.posts
 
 // 마이홈 사이드바 하단 이동 링크 — 전체메뉴에만 있던 내 계정 화면들을 마이홈에 모은다
 const MY_HOME_SIDE_LINKS = [
-  { label: '저장목록', href: '/bookmarks' },
+  { label: '관심 목록', href: '/bookmarks' },
   { label: '신청·후기', href: '/activity' },
   { label: '설정', href: '/settings' },
 ]
 
 // 브리더 마이홈 전용 — 신청서 질문 관리·인증 서류는 브리더만 쓴다
 const BREEDER_MY_HOME_SIDE_LINKS = [
-  { label: '저장목록', href: '/bookmarks' },
+  { label: '관심 목록', href: '/bookmarks' },
   { label: '신청·후기', href: '/activity' },
   { label: '신청서 질문 관리', href: '/adoption/application-form' },
   { label: '인증 서류 관리', href: '/profile/verification' },

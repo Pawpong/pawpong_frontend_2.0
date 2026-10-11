@@ -31,7 +31,7 @@ const BookmarksContent = ({ initialTab }: { initialTab?: string }) => {
         items={tabs.map((tab) => ({ value: tab.id, label: tab.label }))}
         value={currentTab}
         onValueChange={setActiveTab}
-        ariaLabel="저장목록"
+        ariaLabel="관심 목록"
       >
         <TabsContent value="favorites" className="mt-0">
           <FavoritesTab />
