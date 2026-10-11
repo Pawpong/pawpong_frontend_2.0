@@ -2,17 +2,36 @@ import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { PixelArrowRightIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
-import styles from './Ticket.module.css'
 
 export type TicketAccent = 'butter' | 'blue' | 'green' | 'peach'
 
-/** 티켓 틀 클래스. 링크가 아닌 카드(놀이 결과 등)는 이 틀과 TicketStrip 을 직접 조합한다. */
-export const ticketStyles = styles
+// 띠 색 변수(--accent·--accent-edge·--accent-ink). 기본은 버터, data-accent 로 바꾼다.
+// 띠 위 작은 글자(--accent-ink)는 띠 색 위에서 4.5:1 이상이 되도록 테두리보다 한 단계 진하게 쓴다.
+const ACCENT =
+  '[--accent:#fff3b8] [--accent-edge:#ad651d] [--accent-ink:var(--color-primary-600,#94591f)] ' +
+  'data-[accent=green]:[--accent:#cfe6c3] data-[accent=green]:[--accent-edge:#55784d] data-[accent=green]:[--accent-ink:#4a6943] ' +
+  'data-[accent=peach]:[--accent:#ffd9c2] data-[accent=peach]:[--accent-edge:#b86a3c] data-[accent=peach]:[--accent-ink:#8f522e] ' +
+  'data-[accent=blue]:[--accent:#d6e4fb] data-[accent=blue]:[--accent-edge:#4f6f9f] data-[accent=blue]:[--accent-ink:#476590]'
+
+/**
+ * 놀이터 PLAY CARD 에서 시작한 도트 티켓 틀. 링크가 아닌 카드(놀이 결과 등)는 이 틀과 TicketStrip 을 직접 조합한다.
+ * 티켓 틀 없이 색만 필요한 작은 요소(이어서 놀기 링크 등)는 accent 를 쓴다.
+ */
+export const ticketStyles = {
+  accent: ACCENT,
+  ticket: `${ACCENT} relative overflow-hidden rounded-lg border-3 border-(--accent-edge) bg-white shadow-[0.375rem_0.375rem_0_var(--accent)]`,
+  strip:
+    'flex items-center justify-between gap-2 bg-(--accent) px-4 py-[0.6rem] font-cafe24 text-xs leading-[1.4] tracking-[0.04em] text-(--accent-ink)',
+  // 절취선 아래 아랫단. 순서 안내처럼 본문을 거드는 내용을 띠 색을 옅게 깔아 둔다.
+  stub: 'border-t-2 border-dashed border-(--accent-edge)/40 bg-(--accent)/35',
+  stubNumber:
+    'flex size-6 shrink-0 items-center justify-center rounded-sm bg-(--accent) font-cafe24 text-xs leading-none text-(--accent-ink)',
+} as const
 
 /** 티켓 윗단: 영문 라벨과 작은 도트 아이콘. */
 export function TicketStrip({ label, icon }: { label: ReactNode; icon?: ReactNode }) {
   return (
-    <span className={styles.strip}>
+    <span className={ticketStyles.strip}>
       <span>{label}</span>
       {icon}
     </span>
@@ -60,9 +79,10 @@ export function TicketLink({
       href={href}
       data-accent={accent}
       className={cn(
-        styles.ticket,
+        ticketStyles.ticket,
         'flex h-full flex-col focus-ring',
-        // 움직임 전환은 Ticket.module.css 가 맡는다(누름 반응과 함께).
+        // 누르는 순간 그림자 쪽으로 내려앉아 눌렸다는 걸 바로 알려준다.
+        'transition-[translate,box-shadow] duration-120 ease-out active:translate-x-0.75 active:translate-y-0.75 active:shadow-[0.1875rem_0.1875rem_0_var(--accent)] motion-reduce:transition-none motion-reduce:active:translate-none',
         lift && 'hover:-translate-y-0.5 motion-reduce:hover:translate-y-0',
         className,
       )}

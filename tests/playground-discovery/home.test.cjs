@@ -64,10 +64,8 @@ test('기능 소개도 PLAY CARD 와 같은 티켓 틀에 띠 라벨과 절취�
     'next/link': ({ href, ...props }) => createElement('a', { href, ...props }),
     '@/shared/assets': { PixelArrowRightIcon: () => null },
     '@/shared/lib/cn': { cn },
-    './Ticket.module.css': {
-      default: { ticket: 'ticket', strip: 'strip', stub: 'stub', stubNumber: 'num' },
-    },
   })
+  const { ticketStyles } = ticket
   const { FeatureShowcase } = loadTypescript('src/shared/ui/FeatureShowcase.tsx', {
     'next/image': () => null,
     '@/shared/assets': { PawPrintIcon: () => null },
@@ -88,10 +86,15 @@ test('기능 소개도 PLAY CARD 와 같은 티켓 틀에 띠 라벨과 절취�
       steps: ['고르기', '만들기'],
     }),
   )
-  assert.match(html, /^<section aria-labelledby="demo" data-accent="peach" class="ticket">/)
-  assert.match(html, /<span class="strip"><span>AI PHOTO<\/span><\/span>/)
+  assert.ok(
+    html.startsWith(
+      `<section aria-labelledby="demo" data-accent="peach" class="${ticketStyles.ticket}">`,
+    ),
+  )
+  assert.ok(html.includes(`<span class="${ticketStyles.strip}"><span>AI PHOTO</span></span>`))
   assert.match(html, /<p class="[^"]*text-primary-600">사진으로 노는 시간<\/p><h2 id="demo"/)
-  assert.match(html, /<ol class="stub [^"]*"><li[^>]*><span class="num">1<\/span>고르기<\/li>/)
+  assert.ok(html.includes(`<ol class="${ticketStyles.stub} `))
+  assert.ok(html.includes(`<span class="${ticketStyles.stubNumber}">1</span>고르기</li>`))
   // 놀이 카드 셋은 노트북부터 한 줄에 놓이고 태블릿에서는 마지막 카드가 혼자 남지 않는다.
   const shelf = source('src/features/playground-tools/ui/PlaygroundPlayShelf.tsx')
   assert.match(shelf, /tab:grid-cols-2 lap:grid-cols-3/)
@@ -99,18 +102,20 @@ test('기능 소개도 PLAY CARD 와 같은 티켓 틀에 띠 라벨과 절취�
 })
 
 test('놀이터 아래 돌봄 지도 카드도 초록 CARE MAP 티켓에 버튼 두 개를 둠', () => {
-  const cn = (...values) => values.filter(Boolean).join(' ')
-  const { CareMapEntry } = loadTypescript('src/widgets/care-map-entry/ui/CareMapEntry.tsx', {
+  // 돌봄 지도 입구와 새 기능 소개는 같은 공통 카드(TicketActionCard)를 쓴다.
+  const ticketActionCard = loadTypescript('src/shared/ui/TicketActionCard.tsx', {
     'next/link': { __esModule: true, default: (props) => createElement('a', props) },
-    '@/shared/assets': { LocationPinIcon: () => null, PixelArrowRightIcon: () => null },
-    '@/shared/lib/cn': { cn },
-    '@/shared/ui': { Container: ({ children }) => createElement('div', {}, children) },
-    '@/shared/ui/Button': { buttonVariants: ({ intent }) => `button-${intent}` },
-    '@/shared/ui/Ticket': {
+    '@/shared/assets': { PixelArrowRightIcon: () => null },
+    './Button': { buttonVariants: ({ intent }) => `button-${intent}` },
+    './Ticket': {
       ticketStyles: { ticket: 'ticket' },
       TicketStrip: ({ label }) => createElement('span', { className: 'strip' }, label),
     },
-    './CareMapEntry.module.css': { default: {} },
+  })
+  const { CareMapEntry } = loadTypescript('src/widgets/care-map-entry/ui/CareMapEntry.tsx', {
+    '@/shared/assets': { LocationPinIcon: () => null },
+    '@/shared/ui': { Container: ({ children }) => createElement('div', {}, children) },
+    '@/shared/ui/TicketActionCard': ticketActionCard,
   })
   const html = renderToStaticMarkup(createElement(CareMapEntry, { embedded: true }))
   assert.match(
@@ -121,6 +126,7 @@ test('놀이터 아래 돌봄 지도 카드도 초록 CARE MAP 티켓에 버튼 
   assert.match(html, /<a href="\/care-map\?kind=shelter" class="button-secondary">보호시설 찾기/)
   // 버튼 폭은 계약을 우회하지 않고 감싸는 칸으로 정한다.
   for (const file of [
+    'src/shared/ui/TicketActionCard.tsx',
     'src/widgets/care-map-entry/ui/CareMapEntry.tsx',
     'src/widgets/feature-highlights/ui/FeatureHighlights.tsx',
   ])

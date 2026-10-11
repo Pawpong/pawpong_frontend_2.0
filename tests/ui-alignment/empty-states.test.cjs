@@ -47,15 +47,16 @@ test('목록 화면의 로딩·오류·빈 상태 문구는 해요체로 맞춤'
 })
 
 test('링크 티켓은 누르면 그림자 쪽으로 내려앉고 움직임을 줄인 환경에서는 움직이지 않음', () => {
-  const css = source('src/shared/ui/Ticket.module.css')
-  assert.match(
-    css,
-    /a\.ticket:active \{\s*translate: 3px 3px;\s*box-shadow: 3px 3px 0 var\(--accent\);/,
-  )
-  assert.match(
-    css,
-    /@media \(prefers-reduced-motion: reduce\) \{[\s\S]*a\.ticket:active \{\s*translate: none;/,
-  )
+  // TicketLink 클래스: 3px(0.1875rem) 내려앉고 그림자도 같은 만큼 줄어든다.
+  const ticket = source('src/shared/ui/Ticket.tsx')
+  for (const utility of [
+    'active:translate-x-0.75',
+    'active:translate-y-0.75',
+    'active:shadow-[0.1875rem_0.1875rem_0_var(--accent)]',
+    'motion-reduce:transition-none',
+    'motion-reduce:active:translate-none',
+  ])
+    assert.ok(ticket.includes(utility), utility)
 })
 
 test('활동 화면의 이어가기 링크도 글자 화살표 대신 읽지 않는 픽셀 화살표를 씀', () => {
@@ -127,13 +128,13 @@ test('카드는 누르는 동안 살짝 줄고 움직임을 줄인 환경에서�
 })
 
 test('티켓 띠 글자와 외출 준비함 개수, 푸터 저작권 줄은 작은 글자 대비 4.5:1 이상 색을 씀', () => {
-  const ticket = source('src/shared/ui/Ticket.module.css')
-  assert.match(ticket, /\.strip \{[\s\S]*?color: var\(--accent-ink\);/)
+  const ticket = source('src/shared/ui/Ticket.tsx')
+  assert.match(ticket, /strip:\s*'[^']*text-\(--accent-ink\)/)
   for (const ink of [
-    '--accent-ink: var(--color-primary-600, #94591f)',
-    '--accent-ink: #4a6943',
-    '--accent-ink: #8f522e',
-    '--accent-ink: #476590',
+    '[--accent-ink:var(--color-primary-600,#94591f)]',
+    'data-[accent=green]:[--accent-ink:#4a6943]',
+    'data-[accent=peach]:[--accent-ink:#8f522e]',
+    'data-[accent=blue]:[--accent-ink:#476590]',
   ])
     assert.ok(ticket.includes(ink), ink)
   assert.match(

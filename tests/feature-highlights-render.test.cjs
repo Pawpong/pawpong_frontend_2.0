@@ -22,11 +22,19 @@ function load(file, dependencies) {
   return module.exports
 }
 const policy = load('src/entities/feature-highlight/model/policy.ts', {})
-const { FeatureHighlights } = load('src/widgets/feature-highlights/ui/FeatureHighlights.tsx', {
+const ticketActionCard = load('src/shared/ui/TicketActionCard.tsx', {
   'next/link': {
     __esModule: true,
     default: ({ children, ...props }) => React.createElement('a', props, children),
   },
+  '@/shared/assets': { PixelArrowRightIcon: () => null },
+  './Button': { buttonVariants: ({ intent }) => `button-${intent}` },
+  './Ticket': {
+    ticketStyles: { ticket: 'ticket' },
+    TicketStrip: ({ label }) => React.createElement('span', { className: 'strip' }, label),
+  },
+})
+const { FeatureHighlights } = load('src/widgets/feature-highlights/ui/FeatureHighlights.tsx', {
   '@/entities/feature-highlight': {
     ...policy,
     getFeatureHighlights: async () => {
@@ -34,13 +42,7 @@ const { FeatureHighlights } = load('src/widgets/feature-highlights/ui/FeatureHig
     },
   },
   '@/shared/ui': { Container: ({ children }) => React.createElement('section', {}, children) },
-  '@/shared/assets': { PixelArrowRightIcon: () => null },
-  '@/shared/ui/Button': { buttonVariants: ({ intent }) => `button-${intent}` },
-  '@/shared/ui/Ticket': {
-    ticketStyles: { ticket: 'ticket' },
-    TicketStrip: ({ label }) => React.createElement('span', { className: 'strip' }, label),
-  },
-  './FeatureHighlights.module.css': { __esModule: true, default: {} },
+  '@/shared/ui/TicketActionCard': ticketActionCard,
 })
 function render(client, placement) {
   return renderToStaticMarkup(
