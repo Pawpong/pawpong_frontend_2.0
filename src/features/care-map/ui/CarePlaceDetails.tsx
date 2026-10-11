@@ -1,8 +1,22 @@
 import { CARE_PLACE_KIND_LABEL, type CarePlace } from '@/entities/care-place'
+import { BookmarkIcon } from '@/shared/assets'
+import { ToggleIconButton } from '@/shared/ui/ToggleIconButton'
 import { CareMapIcon } from './CareMapIcon'
 import { CareDirectionsDialog } from './CareDirectionsDialog'
 
-export function CarePlaceDetails({ place, onClose }: { place: CarePlace; onClose(): void }) {
+export function CarePlaceDetails({
+  place,
+  onClose,
+  favorited,
+  onToggleFavorite,
+  favoriteError,
+}: {
+  place: CarePlace
+  onClose(): void
+  favorited: boolean
+  onToggleFavorite(): void
+  favoriteError?: string
+}) {
   return (
     <section
       aria-label={`${place.name} 상세 정보`}
@@ -25,15 +39,30 @@ export function CarePlaceDetails({ place, onClose }: { place: CarePlace; onClose
             {place.name}
           </h2>
         </div>
-        <button
-          type="button"
-          onClick={onClose}
-          className="care-map-icon-button shrink-0"
-          aria-label="시설 상세 닫기"
-        >
-          <CareMapIcon name="close" />
-        </button>
+        <div className="flex shrink-0 items-center gap-1">
+          <ToggleIconButton
+            icon={BookmarkIcon}
+            hasFillState
+            pressedTone="bookmark"
+            aria-label="즐겨찾기"
+            pressed={favorited}
+            onClick={onToggleFavorite}
+          />
+          <button
+            type="button"
+            onClick={onClose}
+            className="care-map-icon-button"
+            aria-label="시설 상세 닫기"
+          >
+            <CareMapIcon name="close" />
+          </button>
+        </div>
       </div>
+      {favoriteError && (
+        <p role="alert" className="mb-2 text-xs text-error-500">
+          {favoriteError}
+        </p>
+      )}
       <p className="text-sm leading-6 text-neutral-850">
         {place.roadAddress || place.address || '공식 등록 주소 미제공'}
       </p>

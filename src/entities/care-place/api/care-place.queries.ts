@@ -1,7 +1,12 @@
 import { queryOptions } from '@tanstack/react-query'
 import { STALE_TIME } from '@/shared/api'
 import type { CarePlaceSearch } from '../model/types'
-import { getCareDirectorySummary, getCareMapConfig, searchCarePlaces } from './care-place.api'
+import {
+  getCareDirectorySummary,
+  getCareMapConfig,
+  getCarePlaceFavorites,
+  searchCarePlaces,
+} from './care-place.api'
 
 export const carePlaceQueries = {
   all: () => ['care-place'] as const,
@@ -17,6 +22,15 @@ export const carePlaceQueries = {
     queryOptions({
       queryKey: [...carePlaceQueries.all(), 'directory-summary'],
       queryFn: ({ signal }) => getCareDirectorySummary(signal),
+      staleTime: STALE_TIME.DEFAULT,
+    }),
+
+  /** 로그인한 사용자만 조회한다 */
+  favorites: (enabled = true) =>
+    queryOptions({
+      queryKey: [...carePlaceQueries.all(), 'favorites'],
+      queryFn: ({ signal }) => getCarePlaceFavorites(signal),
+      enabled,
       staleTime: STALE_TIME.DEFAULT,
     }),
 
