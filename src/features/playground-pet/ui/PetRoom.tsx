@@ -422,7 +422,10 @@ export function PetRoom({
             </p>
           )}
         </div>
-        {active && operationNotice}
+        {/* 게임 중 저장 안내는 게임 판 바로 위 흐름에 놓인다. 카드를 뒤집을 때마다 생겼다 사라지면
+            판이 위아래로 흔들리므로, 안내 한 줄(위 여백 6px + 최소 높이 26px) 자리를 늘 잡아 둔다.
+            flow-root 는 안내의 위 여백이 칸 밖으로 빠져나가(margin collapse) 6px 가 다시 흔들리는 걸 막는다 */}
+        {active && <div className="flow-root min-h-8">{operationNotice}</div>}
         {!online && (
           <p className={styles.offline} role="alert">
             인터넷 연결이 끊겼어요. 연결되면 최신 상태를 다시 불러올게요.
