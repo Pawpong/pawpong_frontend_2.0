@@ -26,6 +26,7 @@ import {
   BREEDER_MY_HOME_SIDE_LINKS,
   MY_PHOTO_GRID,
   MY_HOME_TAB_PANEL,
+  MY_HOME_LISTINGS_PANEL,
 } from './constants'
 
 const HOME_LISTING_PAGE_SIZE = 16
@@ -123,7 +124,7 @@ const MyHomeContent = () => {
             <BreederIntroduction {...introProps} placement="tab" />
 
             {/* 작성 진입점은 + 메뉴(모바일 상단 바·2단 프로필 카드)가 맡는다 */}
-            <Container className={MY_HOME_TAB_PANEL}>
+            <Container className={MY_HOME_LISTINGS_PANEL}>
               <MyPetPostingList
                 pageSize={HOME_LISTING_PAGE_SIZE}
                 showTotalCount

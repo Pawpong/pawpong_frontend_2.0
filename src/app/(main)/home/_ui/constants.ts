@@ -46,6 +46,10 @@ const BREEDER_MY_HOME_SIDE_LINKS = [
 // 2단(tab+)은 오른쪽 컬럼이 이미 위 여백을 가져 위를 0으로 둬야 왼쪽 프로필 카드와 윗선이 맞는다
 const MY_HOME_TAB_PANEL = 'py-5 tab:pt-0 tab:pb-10'
 
+// 브리더 분양 목록 탭만 예외 — 2단에서는 소개 명패(BreederIntroduction placement="tab")가 제목 줄 위에 온다.
+// 위를 0으로 두면 제목 줄이 명패 그림자에 붙으므로, 같은 명패를 쓰는 공개 홈(PublicBreederListings)처럼 40px 를 둔다
+const MY_HOME_LISTINGS_PANEL = 'py-5 tab:py-10'
+
 // 카드 그리드(분양·브리더). 폭에 맞춰 열 수가 늘도록 모든 구간에서 auto-fill 로 채운다.
 // 원본 변형이 모바일을 max-w-[21.4375rem] 2열로 묶어둬서, 그 상한·정렬·gap 을 함께 푼다.
 // 최소 152px: 320→1열, 375→2열, 710→4열. PC 2단(우측 980px)에서만 4열로 고정해 카드가 더 잘게
@@ -72,6 +76,7 @@ export {
   MY_HOME_SIDE_LINKS,
   BREEDER_MY_HOME_SIDE_LINKS,
   MY_HOME_TAB_PANEL,
+  MY_HOME_LISTINGS_PANEL,
   CARD_GRID,
   PHOTO_GRID,
   MY_PHOTO_GRID,
