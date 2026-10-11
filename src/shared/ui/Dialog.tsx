@@ -13,6 +13,12 @@ export const DialogPortal = DialogPrimitive.Portal
 
 export const DialogClose = DialogPrimitive.Close
 
+// 기본 틀·닫기 버튼 없이 화면이 직접 꾸미는 대화상자용 원본 (돌봄 지도 길찾기 선택)
+export const DialogBareOverlay = DialogPrimitive.Overlay
+export const DialogBareContent = DialogPrimitive.Content
+export const DialogBareTitle = DialogPrimitive.Title
+export const DialogBareDescription = DialogPrimitive.Description
+
 export const DialogOverlay = React.forwardRef<
   React.ComponentRef<typeof DialogPrimitive.Overlay>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>

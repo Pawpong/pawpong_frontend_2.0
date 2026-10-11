@@ -1,4 +1,4 @@
-import type { CarePlace } from '@/entities/care-place'
+import { CARE_PLACE_KIND_LABEL, type CarePlace } from '@/entities/care-place'
 import { CareMapIcon } from './CareMapIcon'
 import { CareDirectionsDialog } from './CareDirectionsDialog'
 
@@ -11,15 +11,14 @@ export function CarePlaceDetails({ place, onClose }: { place: CarePlace; onClose
       <div className="mb-3 flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="mb-1 text-xs font-semibold text-primary-500">
-            {place.kind === 'hospital'
-              ? '동물병원'
-              : place.kind === 'cafe'
-                ? '애견동반카페'
-                : place.kind === 'shelter'
-                  ? place.registration
-                    ? '등록 동물보호센터'
-                    : '보호·입양시설'
-                  : place.category}
+            {/* 보호센터는 등록 여부를, 여행지·숙소는 관광공사 분류를 그대로 보여준다 */}
+            {place.kind === 'shelter'
+              ? place.registration
+                ? '등록 동물보호센터'
+                : '보호·입양시설'
+              : place.kind === 'travel' || place.kind === 'stay'
+                ? place.category
+                : CARE_PLACE_KIND_LABEL[place.kind]}
           </p>
           <h2 className="text-lg font-bold break-keep text-neutral-850">{place.name}</h2>
         </div>
@@ -130,7 +129,7 @@ export function CarePlaceDetails({ place, onClose }: { place: CarePlace; onClose
         </a>
       )}
       {place.registration && (
-        <p className="mt-3 text-[11px] text-neutral-700">
+        <p className="mt-3 text-[0.6875rem] text-neutral-700">
           <a
             href={place.registration.url}
             target="_blank"

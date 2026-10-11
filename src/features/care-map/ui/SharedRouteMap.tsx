@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { getCareMapConfig } from '@/entities/care-place'
+import { carePlaceQueries } from '@/entities/care-place'
 import type { CommunityRoutePoint } from '@/shared/types'
 import {
   loadKakaoMaps,
@@ -19,12 +19,7 @@ export function SharedRouteMap({
   onAdd?: (point: CommunityRoutePoint) => void
   focusPoint?: CommunityRoutePoint
 }) {
-  const config = useQuery({
-    queryKey: ['care-map', 'config'],
-    queryFn: ({ signal }) => getCareMapConfig(signal),
-    retry: false,
-    staleTime: 300000,
-  })
+  const config = useQuery({ ...carePlaceQueries.config(), retry: false })
   const container = useRef<HTMLDivElement>(null)
   const addRef = useRef(onAdd)
   const initial = useRef(points[0] ?? { latitude: 37.5665, longitude: 126.978, name: '' })

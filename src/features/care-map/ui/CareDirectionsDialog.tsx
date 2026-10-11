@@ -1,10 +1,19 @@
 'use client'
 
 import { useState } from 'react'
-import * as Dialog from '@radix-ui/react-dialog'
 import type { CarePlace } from '@/entities/care-place'
 import { cafe24Proup } from '@/shared/lib/fonts'
 import { getNativePlatform } from '@/shared/lib/nativeBridge'
+import {
+  Dialog,
+  DialogBareContent,
+  DialogBareDescription,
+  DialogBareOverlay,
+  DialogBareTitle,
+  DialogClose,
+  DialogPortal,
+  DialogTrigger,
+} from '@/shared/ui/Dialog'
 import { careDirectionsHref, getCareDirections } from '../lib/care-directions'
 import { CareMapIcon } from './CareMapIcon'
 
@@ -13,33 +22,35 @@ export function CareDirectionsDialog({ place }: { place: CarePlace }) {
   const links = getCareDirections(place)
   if (!links.length) return null
   return (
-    <Dialog.Root
+    <Dialog
       onOpenChange={(open) => {
         if (open) setNativeApp(getNativePlatform() !== null)
       }}
     >
-      <Dialog.Trigger asChild>
+      <DialogTrigger asChild>
         <button type="button" className="care-map-button care-map-button-primary flex-1">
           <CareMapIcon name="arrow" className="size-4" />
           길찾기
         </button>
-      </Dialog.Trigger>
-      <Dialog.Portal>
-        <Dialog.Overlay className="care-map-directions-overlay z-modal" />
-        <Dialog.Content className="care-map-directions z-modal">
+      </DialogTrigger>
+      <DialogPortal>
+        <DialogBareOverlay className="care-map-directions-overlay z-modal" />
+        <DialogBareContent className="care-map-directions z-modal">
           <div className="care-map-directions-heading">
-            <Dialog.Title className={cafe24Proup.className}>어떤 지도로 찾아갈까요?</Dialog.Title>
-            <Dialog.Close asChild>
+            <DialogBareTitle className={cafe24Proup.className}>
+              어떤 지도로 찾아갈까요?
+            </DialogBareTitle>
+            <DialogClose asChild>
               <button type="button" className="care-map-icon-button" aria-label="길찾기 선택 닫기">
                 <CareMapIcon name="close" />
               </button>
-            </Dialog.Close>
+            </DialogClose>
           </div>
-          <Dialog.Description className="care-map-directions-destination">
+          <DialogBareDescription className="care-map-directions-destination">
             {place.name}
             <br />
             <span>{place.roadAddress || place.address}</span>
-          </Dialog.Description>
+          </DialogBareDescription>
           <div className="care-map-directions-options">
             {links.map((link) => (
               <a
@@ -65,8 +76,8 @@ export function CareDirectionsDialog({ place }: { place: CarePlace }) {
           <p className="care-map-directions-note">
             연결된 지도에서 출발지와 이동 방법을 확인해 주세요.
           </p>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+        </DialogBareContent>
+      </DialogPortal>
+    </Dialog>
   )
 }
