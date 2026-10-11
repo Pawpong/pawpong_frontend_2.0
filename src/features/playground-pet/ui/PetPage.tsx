@@ -3,7 +3,10 @@
 import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import { ApiError } from '@/shared/api/unwrap'
+import { AsyncState } from '@/shared/ui/AsyncState'
 import { Button, buttonVariants } from '@/shared/ui/Button'
+import { EmptyState } from '@/shared/ui/EmptyState'
+import { RetryButton } from '@/shared/ui/RetryButton'
 import { ArrowBackIcon, PawPrintIcon, PixelArrowRightIcon } from '@/shared/assets'
 import { FeatureIntro } from '@/shared/ui/FeatureIntro'
 import { FeatureShowcase, FeatureShowcaseTiles } from '@/shared/ui/FeatureShowcase'
@@ -26,30 +29,30 @@ function PetSessionContent({
   const { query, busy, uncertain, notice } = controller
   if (!query.data) {
     if (query.isPending)
-      return (
-        <p role="status" className="rounded-2xl bg-point-50 p-10 text-center text-neutral-700">
-          우리 아이의 방을 준비하고 있어요…
-        </p>
-      )
+      return <AsyncState status="loading" message="우리 아이의 방을 준비하고 있어요…" />
     const unavailable = query.error instanceof ApiError && query.error.status === 404
     return (
-      <div role="alert" className="space-y-4 rounded-2xl border border-secondary-200 p-6">
-        <p>
-          {unavailable
+      <EmptyState
+        role="alert"
+        message={
+          unavailable
             ? '반려동물 키우기를 잠시 이용할 수 없어요. 놀이터에서 다시 만나요.'
-            : '우리 아이의 방을 불러오지 못했어요. 저장된 돌봄 기록은 그대로 있어요.'}
-        </p>
-        {!unavailable && (
-          <Button intent="secondary" onClick={() => void query.refetch()}>
-            다시 불러오기
-          </Button>
-        )}
-        <div>
-          <Link href="/playground" className={buttonVariants({ intent: 'secondary' })}>
-            놀이터로 돌아가기
-          </Link>
-        </div>
-      </div>
+            : '우리 아이의 방을 불러오지 못했어요. 저장된 돌봄 기록은 그대로 있어요.'
+        }
+        action={
+          <div className="flex flex-wrap justify-center gap-2">
+            {!unavailable && (
+              <RetryButton onRetry={() => void query.refetch()} isRetrying={query.isFetching} />
+            )}
+            <Link
+              href="/playground"
+              className={buttonVariants({ intent: 'secondary', size: 'sm' })}
+            >
+              놀이터로 돌아가기
+            </Link>
+          </div>
+        }
+      />
     )
   }
   const view = query.data
@@ -150,20 +153,16 @@ export function PetPage() {
         우리 아이와 함께하는 작은 도트 세상
       </FeatureIntro>
       {config.isPending ? (
-        <p role="status" className="py-10 text-center text-neutral-700">
-          우리 아이를 만나러 가는 중…
-        </p>
+        <AsyncState status="loading" message="우리 아이를 만나러 가는 중…" />
       ) : config.isError ? (
-        <div role="alert" className="space-y-4 rounded-xl bg-point-50 p-6">
-          <p>반려동물 키우기를 불러오지 못했어요.</p>
-          <Button intent="secondary" onClick={() => void config.refetch()}>
-            다시 확인하기
-          </Button>
-        </div>
+        <AsyncState
+          status="error"
+          message="반려동물 키우기를 불러오지 못했어요."
+          onRetry={() => void config.refetch()}
+          isRetrying={config.isFetching}
+        />
       ) : !config.data?.enabled ? (
-        <p role="status" className="rounded-xl bg-point-50 p-6 text-neutral-700">
-          반려동물 키우기를 잠시 이용할 수 없어요. 놀이터에서 다시 만나요.
-        </p>
+        <EmptyState message="반려동물 키우기를 잠시 이용할 수 없어요. 놀이터에서 다시 만나요." />
       ) : !session ? (
         <FeatureShowcase
           headingId="pet-guest"

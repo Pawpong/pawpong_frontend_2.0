@@ -15,6 +15,7 @@ test('만료된 게임은 새로고침과 취소를 안내하고 복원된 간�
   })
   const { PetMiniGames } = load('src/features/playground-pet/ui/PetMiniGames.tsx', {
     react: React,
+    '@/shared/ui/PixelProgressBar': { PixelProgressBar: () => null },
     'react-dom': {
       createPortal() {
         throw new Error('No game surface in this render')

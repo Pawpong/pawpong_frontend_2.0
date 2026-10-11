@@ -2,16 +2,30 @@ const FILL_START = 10.4868
 const FILL_END = 544.113
 const FILL_WIDTH = FILL_END - FILL_START
 
+// 채움 색 [본색, 윗면 하이라이트]. green 이 기본(회원가입 EXP 바), 나머지는 놀이터 키우기의 상태별 색
+const TONE_FILL = {
+  green: ['#39D264', '#74F08E'],
+  olive: ['#9CAA69', '#C3CF8F'],
+  pink: ['#DA9B8C', '#F0C2B6'],
+  brown: ['#BA984E', '#DCC07E'],
+  purple: ['#B595BD', '#D6BFDC'],
+} as const
+
+type PixelProgressTone = keyof typeof TONE_FILL
+
 interface PixelProgressBarProps {
   percent: number
   /** 화면 낭독기용 이름 (기본: '진행률 n%') */
   label?: string
+  /** 채움 색 (기본 green) */
+  tone?: PixelProgressTone
 }
 
 /** 회원가입 EXP 바와 같은 도트 진행 바. 감싸는 요소의 크기를 그대로 채운다. */
-const PixelProgressBar = ({ percent, label }: PixelProgressBarProps) => {
+const PixelProgressBar = ({ percent, label, tone = 'green' }: PixelProgressBarProps) => {
   const clampedPercent = Math.min(100, Math.max(0, percent))
   const fillEndX = FILL_START + (clampedPercent / 100) * FILL_WIDTH
+  const [fill, highlight] = TONE_FILL[tone]
 
   return (
     <svg
@@ -40,7 +54,7 @@ const PixelProgressBar = ({ percent, label }: PixelProgressBarProps) => {
       <path d="M550.517 19.7384H10.4869V22.3889H550.517V19.7384Z" fill="#D9BD44" />
       {/* 내부 흰색 영역 */}
       <path d="M544.113 9.25621H14.5593V19.7384H544.113V9.25621Z" fill="white" />
-      {/* 녹색 채움 (진행률) */}
+      {/* 채움 (진행률) */}
       {clampedPercent > 0 && (
         <>
           <rect
@@ -48,14 +62,14 @@ const PixelProgressBar = ({ percent, label }: PixelProgressBarProps) => {
             y={9.25618}
             width={fillEndX - FILL_START}
             height={10.48222}
-            fill="#39D264"
+            fill={fill}
           />
           <rect
             x={FILL_START}
             y={9.25618}
             width={fillEndX - FILL_START}
             height={4.02742}
-            fill="#74F08E"
+            fill={highlight}
           />
         </>
       )}

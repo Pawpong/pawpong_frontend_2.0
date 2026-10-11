@@ -54,6 +54,7 @@ test('후보 링크는 부적격 또는 다른 계정의 그림을 전송하지 
       ...load('src/entities/playground-pet/model/presentation.ts'),
       getEligiblePetImages: async () => ({ images: [] }),
     },
+    '@/shared/ui/AsyncState': { AsyncState: noop },
     '@/shared/ui/Button': { Button: noop, buttonVariants: () => '' },
     '@/shared/ui/Input': { Input: noop },
     '@/shared/assets': { PawPrintIcon: noop, PixelCheckIcon: noop },

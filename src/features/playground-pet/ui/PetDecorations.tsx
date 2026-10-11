@@ -30,6 +30,7 @@ import { PetGlyph } from './PetGlyph'
 import { PetCatalogFilters } from './PetCatalogFilters'
 import { PetPurchaseDialog } from './PetPurchaseDialog'
 import { PetAssetThumbnail } from './PetAssetThumbnail'
+import { PixelProgressBar } from '@/shared/ui/PixelProgressBar'
 import styles from './PetRoom.module.css'
 
 export function PetDecorations({
@@ -359,11 +360,13 @@ export function PetDecorations({
               <span>
                 {collection.owned} / {collection.total} 수집
               </span>
-              <progress
-                max={collection.total}
-                value={collection.owned}
-                aria-label={`${collection.label} 수집`}
-              />
+              <div className="h-3 w-full">
+                <PixelProgressBar
+                  percent={(collection.owned / Math.max(1, collection.total)) * 100}
+                  tone="olive"
+                  label={`${collection.label} 수집`}
+                />
+              </div>
             </button>
           ))}
         </div>

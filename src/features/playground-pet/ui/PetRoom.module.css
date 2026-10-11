@@ -198,49 +198,11 @@
   margin-left: auto;
   font-size: 11px;
 }
-.stat progress,
-.growth progress,
-.achievements progress,
-.gameProgress {
-  display: block;
-  width: 100%;
-  height: 8px;
-  border: 1px solid var(--edge);
-  background: var(--cream);
-  color: #8d985a;
-}
-.stat progress::-webkit-progress-bar,
-.growth progress::-webkit-progress-bar,
-.achievements progress::-webkit-progress-bar,
-.gameProgress::-webkit-progress-bar {
-  background: var(--cream);
-}
-.stat progress::-webkit-progress-value {
-  background: #9caa69;
-}
-.stat:nth-child(2) progress::-webkit-progress-value {
-  background: #da9b8c;
-}
-.stat:nth-child(3) progress::-webkit-progress-value {
-  background: #ba984e;
-}
-.stat progress::-moz-progress-bar {
-  background: #9caa69;
-}
 .growth > div {
   display: flex;
   justify-content: space-between;
   font-size: 10px;
   font-weight: 600;
-}
-.growth progress {
-  height: 6px;
-}
-.growth progress::-webkit-progress-value {
-  background: #b595bd;
-}
-.growth progress::-moz-progress-bar {
-  background: #b595bd;
 }
 .careButtons {
   display: grid;
@@ -453,11 +415,6 @@
 .collectionButton span {
   font-size: 10px;
   color: var(--muted);
-}
-.collectionButton progress {
-  width: 100%;
-  height: 5px;
-  accent-color: #788c55;
 }
 .catalogFilters {
   display: grid;
@@ -761,15 +718,6 @@
 .snackReadout span {
   font-size: 12px;
 }
-.gameProgress {
-  height: 10px;
-}
-.gameProgress::-webkit-progress-value {
-  background: #a3ad6d;
-}
-.gameProgress::-moz-progress-bar {
-  background: #a3ad6d;
-}
 .snackControls {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -836,16 +784,6 @@
 .achievements li > span {
   font-size: 10px;
   white-space: nowrap;
-}
-.achievements progress {
-  height: 5px;
-  margin-top: 6px;
-}
-.achievements progress::-webkit-progress-value {
-  background: #a7b377;
-}
-.achievements progress::-moz-progress-bar {
-  background: #a7b377;
 }
 .achievementDone {
   background: #fbefd0 !important;
@@ -1143,21 +1081,6 @@
   margin-top: 16px;
   font-size: 12px;
   font-weight: 700;
-}
-.questProgress progress {
-  width: 100%;
-  height: 8px;
-  border: 1px solid var(--edge);
-  background: var(--cream);
-}
-.questProgress progress::-webkit-progress-bar {
-  background: var(--cream);
-}
-.questProgress progress::-webkit-progress-value {
-  background: #b595bd;
-}
-.questProgress progress::-moz-progress-bar {
-  background: #b595bd;
 }
 .slots {
   margin-bottom: 14px;

@@ -85,6 +85,7 @@ function decorations(runtime = React) {
     ...load('src/features/playground-pet/ui/PetDecorations.tsx', {
       ...common,
       'next/image': { default: (props) => React.createElement('img', props) },
+      '@/shared/ui/PixelProgressBar': { PixelProgressBar: () => null },
       '@/entities/playground-pet/model/room': room,
       '@/entities/playground-pet/model/shop': shop,
       '../constants/pet-shop': constants,

@@ -34,6 +34,7 @@ function roomUiHarness() {
   const { PetRoom } = load('src/features/playground-pet/ui/PetRoom.tsx', {
     react: hooks,
     'react/jsx-runtime': require('react/jsx-runtime'),
+    '@/shared/ui/PixelProgressBar': { PixelProgressBar: () => null },
     '@/entities/playground-pet': presentation,
     '@/entities/playground-pet/model/room': room,
     '@/entities/playground-pet/model/shop': load('src/entities/playground-pet/model/shop.ts', {

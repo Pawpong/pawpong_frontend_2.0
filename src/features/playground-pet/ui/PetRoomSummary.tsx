@@ -8,6 +8,7 @@ import {
 } from '@/entities/playground-pet'
 import { PET_SLOT_LABELS, PET_SLOTS } from '@/entities/playground-pet/model/room'
 import { PetGlyph } from './PetGlyph'
+import { PixelProgressBar } from '@/shared/ui/PixelProgressBar'
 import styles from './PetRoom.module.css'
 
 interface PetRoomSummaryProps {
@@ -21,6 +22,8 @@ interface PetRoomSummaryProps {
 /** 방 탭: 함께한 날, 오늘의 돌봄 진행, 방 소품 요약과 다른 탭으로 가는 버튼. */
 export function PetRoomSummary({ pet, view, daysTogether, now, onOpenTab }: PetRoomSummaryProps) {
   const { game } = view
+  const completedQuests = view.daily.quests.filter((quest) => quest.completed).length
+  const totalQuests = view.daily.quests.length
   return (
     <section className={styles.panel}>
       <div className={styles.panelHeading}>
@@ -37,14 +40,15 @@ export function PetRoomSummary({ pet, view, daysTogether, now, onOpenTab }: PetR
       </p>
       <div className={styles.questProgress}>
         <span>
-          오늘의 돌봄 {view.daily.quests.filter((quest) => quest.completed).length} /{' '}
-          {view.daily.quests.length}
+          오늘의 돌봄 {completedQuests} / {totalQuests}
         </span>
-        <progress
-          value={view.daily.quests.filter((quest) => quest.completed).length}
-          max={Math.max(1, view.daily.quests.length)}
-          aria-label={`오늘의 돌봄 ${view.daily.quests.filter((quest) => quest.completed).length} / ${view.daily.quests.length}`}
-        />
+        <div className="h-3">
+          <PixelProgressBar
+            percent={(completedQuests / Math.max(1, totalQuests)) * 100}
+            tone="purple"
+            label={`오늘의 돌봄 ${completedQuests} / ${totalQuests}`}
+          />
+        </div>
       </div>
       <div className={styles.questList}>
         {view.daily.quests.map((quest) => (

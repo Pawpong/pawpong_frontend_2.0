@@ -46,12 +46,14 @@ import { PetAdoption } from './PetAdoption'
 import { PetRecords } from './PetRecords'
 import { PetRoomSummary } from './PetRoomSummary'
 import { usePetNavigation } from '../lib/usePetNavigation'
+import { PixelProgressBar } from '@/shared/ui/PixelProgressBar'
 import styles from './PetRoom.module.css'
 
+// tone — 상태마다 진행 바 색을 달리해 한눈에 구분한다
 const STATS = [
-  { id: 'fullness', label: '배부름', icon: 'bone' },
-  { id: 'mood', label: '기분', icon: 'heart' },
-  { id: 'energy', label: '에너지', icon: 'rest' },
+  { id: 'fullness', label: '배부름', icon: 'bone', tone: 'olive' },
+  { id: 'mood', label: '기분', icon: 'heart', tone: 'pink' },
+  { id: 'energy', label: '에너지', icon: 'rest', tone: 'brown' },
 ] as const
 
 export function PetRoom({
@@ -442,14 +444,20 @@ export function PetRoom({
         )}
         <div ref={setGameSurface} className={styles.deviceGameSurface} hidden={!active} />
         <div className={styles.stats} aria-label="우리 아이 상태">
-          {STATS.map(({ id, label, icon }) => (
+          {STATS.map(({ id, label, icon, tone }) => (
             <div key={id} className={styles.stat}>
               <div>
                 <PetGlyph kind={icon} />
                 <span>{label}</span>
                 <strong>{pet.stats[id]}</strong>
               </div>
-              <progress value={pet.stats[id]} max={100} aria-label={`${label} ${pet.stats[id]}`} />
+              <div className="h-3">
+                <PixelProgressBar
+                  percent={pet.stats[id]}
+                  tone={tone}
+                  label={`${label} ${pet.stats[id]}`}
+                />
+              </div>
             </div>
           ))}
         </div>
@@ -460,7 +468,13 @@ export function PetRoom({
               {pet.totalXp} / {pet.xpForNextLevel ?? 'MAX'}
             </span>
           </div>
-          <progress value={petLevelProgress(pet)} max={100} aria-label="다음 레벨까지 성장" />
+          <div className="h-3">
+            <PixelProgressBar
+              percent={petLevelProgress(pet)}
+              tone="purple"
+              label="다음 레벨까지 성장"
+            />
+          </div>
         </div>
         <div className={styles.careButtons}>
           {(Object.keys(PET_ACTION_LABELS) as PetAction[]).map((action) => {

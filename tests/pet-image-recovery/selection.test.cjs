@@ -53,6 +53,9 @@ test('목록이 없는 최초 오류에는 빈 캐릭터 안내 대신 읽기 �
   app.query.isError = true
   const tree = app.render()
   assert.equal(radios(tree).length, 0)
-  assert.ok(tree.some((node) => node.props.children === '다시 불러오기'))
+  // 공통 AsyncState(error) + RetryButton 으로 재시도를 제공한다
+  assert.ok(
+    tree.some((node) => node.props.status === 'error' && typeof node.props.onRetry === 'function'),
+  )
   assert.deepEqual(app.calls.commands, [])
 })
