@@ -65,11 +65,13 @@ test('지금 할 수 없는 돌봄은 권하지 않고 가능한 시점을 알�
 
 test('오늘의 돌봄 막대는 완료한 돌봄 수를 보여주고 열리는 콘텐츠가 없는 기록은 숨김', () => {
   const code = room()
+  // 막대는 완료한 돌봄 수 / 전체로 채우고(PixelProgressBar), 같은 값을 낭독 이름에도 쓴다
   assert.match(
     code,
-    /value=\{view\.daily\.quests\.filter\(\(quest\) => quest\.completed\)\.length\}/,
+    /completedQuests = view\.daily\.quests\.filter\(\(quest\) => quest\.completed\)\.length/,
   )
-  assert.match(code, /aria-label=\{`오늘의 돌봄 \$\{/)
+  assert.match(code, /percent=\{\(completedQuests \/ Math\.max\(1, totalQuests\)\) \* 100\}/)
+  assert.match(code, /label=\{`오늘의 돌봄 \$\{completedQuests\}/)
   assert.match(code, /\.filter\(\(record\) => record\.type !== 'unlock'\)/)
 })
 

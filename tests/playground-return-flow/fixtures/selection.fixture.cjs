@@ -33,6 +33,7 @@ function selectionFixture(initialSourceJobId = 'requested') {
       ...load('src/entities/playground-pet/model/presentation.ts'),
       getEligiblePetImages: async () => ({ images: [] }),
     },
+    '@/shared/ui/AsyncState': { AsyncState: noop },
     '@/shared/ui/Button': { Button: noop, buttonVariants: () => '' },
     '@/shared/ui/Input': { Input: noop },
     '@/shared/assets': { PawPrintIcon: noop, PixelCheckIcon: noop },

@@ -17,6 +17,7 @@ test('기억 게임은 공개된 그림만 표시하고 키보드 버튼과 오�
     react: React,
     'react-dom': { createPortal() {} },
     'react/jsx-runtime': jsx,
+    '@/shared/ui/PixelProgressBar': { PixelProgressBar: () => null },
     '@/entities/playground-pet/model/snack': snack,
     '../lib/useServerClock': { petRequestKey() {} },
     '../lib/usePetStartIntent':

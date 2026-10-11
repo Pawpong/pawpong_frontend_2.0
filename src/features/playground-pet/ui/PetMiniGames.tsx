@@ -22,6 +22,7 @@ import { petRequestKey } from '../lib/useServerClock'
 import { usePetStartIntent } from '../lib/usePetStartIntent'
 import type { PetStageSnapshot } from '../lib/petGameEngine'
 import { PetGlyph } from './PetGlyph'
+import { PixelProgressBar } from '@/shared/ui/PixelProgressBar'
 import styles from './PetRoom.module.css'
 
 type SnackRun = {
@@ -422,12 +423,13 @@ export function PetMiniGames({
               간식 {preview?.catches ?? 0} · 빨간 공 {preview?.hazards ?? 0}
             </span>
           </div>
-          <progress
-            className={styles.gameProgress}
-            value={elapsed}
-            max={30_000}
-            aria-label="간식 게임 진행 시간"
-          />
+          <div className="h-3">
+            <PixelProgressBar
+              percent={(elapsed / 30_000) * 100}
+              tone="olive"
+              label="간식 게임 진행 시간"
+            />
+          </div>
           <p className={styles.hint}>
             화면 좌우 터치 · ← → 방향키 · 아래 버튼 ·{' '}
             {['왼쪽', '가운데', '오른쪽'][snackRun?.lane ?? 1]} 칸

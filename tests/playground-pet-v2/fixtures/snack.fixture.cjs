@@ -41,6 +41,7 @@ function snackUiHarness() {
     react: runtime.react,
     'react-dom': { createPortal: (node) => node },
     'react/jsx-runtime': require('react/jsx-runtime'),
+    '@/shared/ui/PixelProgressBar': { PixelProgressBar: () => null },
     '@/entities/playground-pet/model/snack': snack,
     '../lib/useServerClock': { petRequestKey: () => `explicit-key-${++key}` },
     '../lib/usePetStartIntent':

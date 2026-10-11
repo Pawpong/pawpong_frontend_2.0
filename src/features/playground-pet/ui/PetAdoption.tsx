@@ -9,6 +9,7 @@ import {
   normalizePetName,
   type PetCommand,
 } from '@/entities/playground-pet'
+import { AsyncState } from '@/shared/ui/AsyncState'
 import { Button, buttonVariants } from '@/shared/ui/Button'
 import { Input } from '@/shared/ui/Input'
 import { PawPrintIcon, PixelCheckIcon } from '@/shared/assets'
@@ -119,16 +120,14 @@ export function PetAdoption({
         </p>
       )}
       {candidates.isPending ? (
-        <p role="status" className="py-12 text-center text-neutral-700">
-          완성된 도트 그림을 불러오고 있어요…
-        </p>
+        <AsyncState status="loading" message="완성된 도트 그림을 불러오고 있어요…" />
       ) : candidates.isError && images.length === 0 ? (
-        <div role="alert" className="space-y-4 py-8">
-          <p>선택할 수 있는 그림을 불러오지 못했어요.</p>
-          <Button intent="secondary" onClick={() => void candidates.refetch()}>
-            다시 불러오기
-          </Button>
-        </div>
+        <AsyncState
+          status="error"
+          message="선택할 수 있는 그림을 불러오지 못했어요."
+          onRetry={() => void candidates.refetch()}
+          isRetrying={candidates.isFetching}
+        />
       ) : images.length === 0 && !candidates.hasNextPage ? (
         <div className="mt-6 rounded-xl bg-point-50 px-5 py-9 text-center">
           <PawPrintIcon aria-hidden className="mx-auto size-12 text-secondary-500" />

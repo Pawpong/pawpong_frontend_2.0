@@ -1,6 +1,7 @@
 import type { PetView } from '@/entities/playground-pet'
 import { PetGlyph } from './PetGlyph'
 import { PetImage } from './PetImage'
+import { PixelProgressBar } from '@/shared/ui/PixelProgressBar'
 import styles from './PetRoom.module.css'
 
 const RECORD_LABELS = {
@@ -44,11 +45,13 @@ export function PetRecords({ pet, game, records }: PetRecordsProps) {
               <PetGlyph kind={achievement.completed ? 'star' : 'paw'} />
               <div>
                 <strong>{achievement.label}</strong>
-                <progress
-                  max={achievement.target}
-                  value={achievement.progress}
-                  aria-label={`${achievement.label} 진행`}
-                />
+                <div className="mt-1.5 h-3">
+                  <PixelProgressBar
+                    percent={(achievement.progress / Math.max(1, achievement.target)) * 100}
+                    tone="olive"
+                    label={`${achievement.label} 진행`}
+                  />
+                </div>
               </div>
               <span>
                 {achievement.completed ? '완료' : `${achievement.progress}/${achievement.target}`}
