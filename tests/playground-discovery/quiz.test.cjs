@@ -87,11 +87,19 @@ test('통통 튀는 연출(고르기·뒤집기·도장·섞기)은 움직임 �
     '.reveal',
     '.sparkles',
     '.stamp',
-    '.choice[data-picked]',
     '.question',
     '.shuffleDeck span',
     '.scene[data-busy] .deckLeft',
   ])
     assert.ok(reduced.includes(selector), selector)
-  assert.match(reduced, /\.choice:active,\s*\.nextPlay:active \{\s*translate: none;/)
+  assert.match(reduced, /\.nextPlay:active \{\s*translate: none;/)
+  // 답 고르기 버튼(공통 PixelChoiceButton)도 튀기·내려앉기를 멈춘다.
+  const choice = source('src/shared/ui/PixelChoiceButton.tsx')
+  for (const utility of [
+    'motion-reduce:animate-none',
+    'motion-reduce:transition-none',
+    'motion-reduce:active:translate-none',
+  ])
+    assert.ok(choice.includes(utility), utility)
+  assert.match(source(`${ui}/PlayQuiz.tsx`), /<PixelChoiceButton\b/)
 })

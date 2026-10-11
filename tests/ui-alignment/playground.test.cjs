@@ -8,7 +8,8 @@ test('놀이터 도구 스타일은 공통 브레이크포인트와 focus-ring �
   const styles = css()
   assert.doesNotMatch(styles, /min-width: (760|1080)px/)
   assert.match(styles, /@media \(min-width: 768px\)/)
-  assert.match(styles, /@media \(min-width: 1024px\)/)
+  // 노트북(1024px) 배치는 Tailwind lap: 토큰으로 옮겼다(외출 목적 네 칸).
+  assert.match(source('src/features/playground-tools/ui/OutingChecklist.tsx'), /lap:grid-cols-4/)
   assert.match(
     styles,
     /outline: 2px solid var\(--color-primary-500, #ad651d\);\s*outline-offset: 2px;/,
@@ -21,7 +22,7 @@ test('놀이터 도구 스타일은 공통 브레이크포인트와 focus-ring �
 test('외출 준비함은 공통 아이콘 버튼과 그룹 이름을 쓰고 장식 기호를 읽지 않게 함', () => {
   const checklist = source('src/features/playground-tools/ui/OutingChecklist.tsx')
   assert.match(checklist, /<IconButton\s+size="touch"\s+tone="danger"/)
-  assert.match(checklist, /role="group" aria-label="외출 목적"/)
+  assert.match(checklist, /role="group"\s+aria-label="외출 목적"/)
   // 장식 화살표는 남아 있다면 반드시 읽지 않게 감싼다.
   assert.doesNotMatch(checklist, /(?<!<span aria-hidden>)\u2197/)
   assert.match(checklist, /<TicketLink\b/)
