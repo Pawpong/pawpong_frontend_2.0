@@ -49,8 +49,25 @@ function renderer(getResult) {
         config: () => ({ queryKey: ['care-place', 'config'] }),
         directorySummary: () => ({ queryKey: ['care-place', 'directory-summary'] }),
         places: (search, page) => ({ queryKey: ['care-place', 'places', search, page] }),
+        favorites: (enabled) => ({ queryKey: ['care-place', 'favorites'], enabled }),
       },
     },
+    // 비로그인 상태 — 즐겨찾기는 이 복구 회귀의 범위 밖이다.
+    '@/features/auth': {
+      useLoginGuard: () => ({
+        isLoggedIn: false,
+        guard: (action) => action,
+        openPrompt() {},
+        isPromptOpen: false,
+        setPromptOpen() {},
+      }),
+    },
+    '@/shared/api': { normalizeApiError: (error) => error },
+    '@/shared/assets': { BookmarkIcon: () => null },
+    '../api/care-place-favorite.mutations': {
+      useToggleCarePlaceFavorite: () => ({ mutate() {}, isError: false }),
+    },
+    '../lib/care-place-favorite': { favoriteToCarePlace: (favorite) => favorite },
     '@/shared/lib/fonts': { cafe24Proup: { className: 'test-font' } },
     '../lib/care-location': {},
     '@/shared/lib/nativeBridge': { inNativeAppWebView: () => false },
@@ -59,6 +76,7 @@ function renderer(getResult) {
       FeatureIntro: ({ children }) => React.createElement('header', null, children),
     },
     '@/shared/ui': {
+      LoginPromptModal: () => null,
       RetryButton: ({ onRetry, isRetrying }) =>
         React.createElement(
           'button',

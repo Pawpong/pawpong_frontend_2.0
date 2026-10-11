@@ -9,4 +9,6 @@ export type {
   CareCoordinates,
   MappedCarePlace,
   CareDirectorySummary,
+  CarePlaceFavorite,
+  CarePlaceFavoriteSnapshot,
 } from './model/types'

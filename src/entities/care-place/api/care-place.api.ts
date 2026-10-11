@@ -1,6 +1,11 @@
 import { apiClient, API_VERSION, unwrap, type ApiRequestConfig } from '@/shared/api'
 import type { ApiResponse } from '@/shared/types'
-import type { CareDirectorySummary, CarePlacePage, CarePlaceSearch } from '../model/types'
+import type {
+  CareDirectorySummary,
+  CarePlaceFavorite,
+  CarePlacePage,
+  CarePlaceSearch,
+} from '../model/types'
 
 const publicRequest: ApiRequestConfig = { skipAuth: true, skipAuthRefresh: true }
 
@@ -37,6 +42,16 @@ export async function searchCarePlaces(
         signal,
       },
     ),
+  )
+}
+
+/** 내 즐겨찾기 (로그인 필요, 최근 저장순) */
+export async function getCarePlaceFavorites(signal?: AbortSignal) {
+  return unwrap(
+    await apiClient.get<ApiResponse<CarePlaceFavorite[]>>(`${API_VERSION}/care-map/favorites`, {
+      signal,
+    }),
+    '즐겨찾기를 불러오지 못했어요.',
   )
 }
 

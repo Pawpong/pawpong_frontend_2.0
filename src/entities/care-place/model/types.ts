@@ -33,6 +33,25 @@ export interface CarePlace {
 
 export type MappedCarePlace = CarePlace & CareCoordinates & { markerNumber: number }
 
+/** 즐겨찾기할 때 서버에 함께 저장하는 시설 정보 — 시설을 id 로 다시 조회하는 API 가 없다 */
+export type CarePlaceFavoriteSnapshot = Pick<
+  CarePlace,
+  | 'id'
+  | 'kind'
+  | 'name'
+  | 'category'
+  | 'address'
+  | 'roadAddress'
+  | 'phone'
+  | 'latitude'
+  | 'longitude'
+  | 'placeUrl'
+>
+
+export interface CarePlaceFavorite extends CarePlaceFavoriteSnapshot {
+  favoritedAt: string
+}
+
 export interface CarePlaceSearch extends CareCoordinates {
   kind: CarePlaceKind
   query: string
