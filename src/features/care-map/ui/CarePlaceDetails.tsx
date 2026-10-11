@@ -20,7 +20,10 @@ export function CarePlaceDetails({ place, onClose }: { place: CarePlace; onClose
                 ? place.category
                 : CARE_PLACE_KIND_LABEL[place.kind]}
           </p>
-          <h2 className="text-lg font-bold break-keep text-neutral-850">{place.name}</h2>
+          {/* 띄어쓰기 없는 긴 시설명은 iOS Safari 가 괄호 앞에서도 줄을 바꾸지 않아 닫기 버튼 밑으로 넘친다 */}
+          <h2 className="text-lg font-bold break-words break-keep text-neutral-850">
+            {place.name}
+          </h2>
         </div>
         <button
           type="button"
