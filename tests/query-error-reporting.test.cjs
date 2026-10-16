@@ -27,6 +27,9 @@ test('failed queries and mutations reach Sentry with safe request context and no
     '@tanstack/react-query-devtools': { ReactQueryDevtools: () => null },
     '@/shared/api': { ApiError, isApiError, STALE_TIME: { DEFAULT: 30000 } },
     '@sentry/nextjs': { captureException: (...args) => captures.push(args) },
+    '../api/queryRecovery': load('src/shared/api/queryRecovery.ts', {
+      './unwrap': { isApiError },
+    }),
   })
   const client = QueryProvider({ children: null }).props.client
   try {

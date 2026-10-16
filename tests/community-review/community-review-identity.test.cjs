@@ -52,6 +52,7 @@ test('사용자가 취소한 요청은 장애로 수집하지 않고 자동 재�
     '@sentry/nextjs': { captureException: (value) => captures.push(value) },
     './authStateEvents': {},
     './authQueryBoundary': {},
+    '../api/queryRecovery': load('src/shared/api/queryRecovery.ts', { './unwrap': api }),
   }).QueryProvider
   const client = Provider({ children: null }).props.client
   try {
