@@ -3,6 +3,7 @@
 import type { UseFormRegisterReturn } from 'react-hook-form'
 import { Input, InputField, HelpMessage, Button } from '@/shared/ui'
 import type { useDuplicateCheck } from '../model/useDuplicateCheck'
+import { FieldError } from './FieldError'
 
 // [refactored] InfoStep 별명 · KennelInfoStep 브리더명의 판박이 필드
 // (InputField + Input + 중복확인 버튼 + HelpMessage + useDuplicateCheck) 통합.
@@ -19,6 +20,8 @@ interface DuplicateCheckFieldProps {
   value: string
   registration: UseFormRegisterReturn
   check: ReturnType<typeof useDuplicateCheck>
+  /** 스텝 검증 에러 — 있으면 중복 확인 안내 대신 띄운다 */
+  error?: string
 }
 
 const DuplicateCheckField = ({
@@ -30,6 +33,7 @@ const DuplicateCheckField = ({
   value,
   registration,
   check,
+  error,
 }: DuplicateCheckFieldProps) => {
   const { onChange, ...inputRegistration } = registration
 
@@ -38,13 +42,14 @@ const DuplicateCheckField = ({
       <div className="flex w-full items-end gap-2">
         <Input
           type="text"
+          aria-label={label}
           placeholder={placeholder}
           {...inputRegistration}
           onChange={(event) => {
             onChange(event)
             check.reset()
           }}
-          className="flex-1"
+          className="min-w-0 flex-1"
         />
         <div className="flex w-[6.25rem] shrink-0">
           <Button
@@ -58,7 +63,8 @@ const DuplicateCheckField = ({
           </Button>
         </div>
       </div>
-      {check.message && (
+      <FieldError message={error} />
+      {!error && check.message && (
         <HelpMessage status={check.message.status} className="mt-1">
           {check.message.text}
         </HelpMessage>

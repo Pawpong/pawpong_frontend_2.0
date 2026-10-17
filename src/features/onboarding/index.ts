@@ -16,3 +16,5 @@ export {
 } from './model/types'
 export type { UserType, StepConfig, StepId } from './model/types'
 export { SKIP_ONBOARDING_VALIDATION } from './model/devFlags'
+
+export { OnboardingChoice } from './ui/OnboardingChoice'

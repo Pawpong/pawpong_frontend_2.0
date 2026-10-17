@@ -1,5 +1,9 @@
 import type { SocialSignupSession } from '@/shared/lib/socialSignupSession'
-import type { RegisterBreederRequest, UploadBreederDocumentsResponse } from '@/shared/types'
+import type {
+  RegisterBreederRequest,
+  TermsAgreementItem,
+  UploadBreederDocumentsResponse,
+} from '@/shared/types'
 import type { AnimalSelectFormData, KennelInfoFormData, ProfileFormData } from './schema'
 
 const PET_TYPE_MAP = {
@@ -16,6 +20,7 @@ interface BuildBreederRegistrationRequestParams {
   profile: ProfileFormData
   kennel: KennelInfoFormData
   uploaded: UploadBreederDocumentsResponse | null
+  termsAgreements: TermsAgreementItem[]
 }
 
 /** 검증된 온보딩 상태와 업로드 결과를 브리더 가입 DTO로 옮기는 순수 매퍼. */
@@ -25,6 +30,7 @@ export const buildBreederRegistrationRequest = ({
   profile,
   kennel,
   uploaded,
+  termsAgreements,
 }: BuildBreederRegistrationRequestParams): RegisterBreederRequest => ({
   tempId: social.tempId,
   provider: social.provider,
@@ -46,6 +52,7 @@ export const buildBreederRegistrationRequest = ({
     privacyPolicy: profile.privacyAgreed,
     marketingConsent: profile.marketingAgreed,
   },
+  termsAgreements,
   profileImage: kennel.profileImage?.filename,
   documentUrls: uploaded?.uploadedDocuments.map(({ filename }) => filename),
   documentTypes: uploaded?.uploadedDocuments.map(({ type }) => type),

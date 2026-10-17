@@ -9,6 +9,7 @@ import { STEP_LAYOUT } from '../model/stepLayout'
 import { StepContainer } from './StepContainer'
 import { TextareaField, TextLabel, Button } from '@/shared/ui'
 import { CheckboxField } from './CheckboxField'
+import { FieldError } from './FieldError'
 import { ADOPTION_SURVEY_QUESTIONS } from '@/shared/config'
 
 // [refactored] 라벨(선택) + TextareaField 블록 판박이(자기소개·집비우는·공간소개) 통합
@@ -42,9 +43,17 @@ interface SurveyTextareaProps {
   placeholder: string
   register: UseFormRegister<SurveyFormData>
   length: number
+  error?: string
 }
 
-const SurveyTextarea = ({ name, label, placeholder, register, length }: SurveyTextareaProps) => (
+const SurveyTextarea = ({
+  name,
+  label,
+  placeholder,
+  register,
+  length,
+  error,
+}: SurveyTextareaProps) => (
   <div className="flex w-full flex-col gap-0.5">
     <TextLabel size="14" requirement="선택">
       {label}
@@ -55,6 +64,7 @@ const SurveyTextarea = ({ name, label, placeholder, register, length }: SurveyTe
       currentLength={length}
       {...register(name)}
     />
+    <FieldError message={error} />
   </div>
 )
 
@@ -62,13 +72,16 @@ const SurveyStep = () => {
   // 입양자 플로우의 마지막 데이터 단계 — 실제 가입 호출은 useAdopterSignup 이 담당한다
   const { submit, isPending, error } = useAdopterSignup()
 
-  const { register, control, watch, setValue, handleSubmit, firstErrorMessage, goBack } =
-    useStepForm('survey', surveySchema, {
+  const { register, control, watch, setValue, handleSubmit, formState, goBack } = useStepForm(
+    'survey',
+    surveySchema,
+    {
       privacyAgreed: false,
       selfIntro: '',
       awayTime: '',
       livingSpace: '',
-    })
+    },
+  )
 
   const handleSkip = () => {
     // 선택 답변의 교차 검증보다 스킵 의도가 우선이므로 폼 값도 먼저 비운다.
@@ -80,17 +93,18 @@ const SurveyStep = () => {
 
   return (
     <StepContainer
-      title="간단한 조사 양식"
+      title="어떤 가족이 되어주실 건가요?"
+      subtitle="입양 상담에 사용할 소개예요. 선택 질문은 다음에 작성해도 괜찮아요."
       onNext={() => handleSubmit((data) => submit(data, { skipped: false }))()}
       onBack={goBack}
-      nextLabel={isPending ? '가입 중…' : '다음'}
+      nextLabel={isPending ? '가입 중…' : '가입 완료하기'}
       nextDisabled={isPending}
-      navError={firstErrorMessage ?? error ?? undefined}
+      navError={error ?? undefined}
     >
       {/* 콘텐츠 영역 — 섹션 간 gap: 모바일 32px / tab+ 58px (Figma root gap, mt 대신 gap) */}
       <div className={cn('flex w-full flex-col', STEP_LAYOUT.blockGap)}>
         {/* 섹션 1: 개인정보 수집 동의 — 항목 간 gap 8px (Figma spacing/8) */}
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-3 rounded-xl bg-neutral-50 p-4">
           <TextLabel size="16" requirement="필수">
             반려동물 입양 상담을 위한 개인정보 수집과 이용에 동의하시나요?
           </TextLabel>
@@ -109,13 +123,16 @@ const SurveyStep = () => {
           <Controller
             name="privacyAgreed"
             control={control}
-            render={({ field }) => (
-              <CheckboxField
-                label="동의합니다"
-                checked={field.value}
-                onCheckedChange={field.onChange}
-                className="px-2"
-              />
+            render={({ field, fieldState }) => (
+              <div>
+                <CheckboxField
+                  label="동의합니다"
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                  className="px-2"
+                />
+                <FieldError message={fieldState.error?.message} />
+              </div>
             )}
           />
         </div>
@@ -138,6 +155,7 @@ const SurveyStep = () => {
             {...SURVEY_FIELDS[0]}
             register={register}
             length={watch(SURVEY_FIELDS[0].name)?.length ?? 0}
+            error={formState.errors[SURVEY_FIELDS[0].name]?.message}
           />
 
           {/* 공간/생활패턴 섹션 라벨 — 모바일 14 / tab+ 16 (Figma) */}
@@ -151,6 +169,7 @@ const SurveyStep = () => {
               {...field}
               register={register}
               length={watch(field.name)?.length ?? 0}
+              error={formState.errors[field.name]?.message}
             />
           ))}
         </div>

@@ -31,9 +31,11 @@ export const buildAdopterRegistrationRequest = ({
     emailVerificationToken: emailMethod ? profile.emailVerificationToken : undefined,
     nickname,
     bio: info.introduction?.trim() || undefined,
-    realName: social.name || nickname,
+    realName: info.realName?.trim() || social.name || nickname,
     phone: emailMethod ? undefined : profile?.phone,
     profileImage: info.profileImage?.filename,
+    // 관심있는 키워드(자유 입력)를 서버의 관심 품종 목록으로 보낸다 — 비었으면 생략
+    interestedBreedIds: info.selectedKeywords?.length ? info.selectedKeywords : undefined,
     counselDefaultProfile:
       !skipped && selfIntroduction
         ? {

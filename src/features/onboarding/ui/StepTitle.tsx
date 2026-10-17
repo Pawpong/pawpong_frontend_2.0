@@ -14,14 +14,9 @@ interface StepTitleProps {
  * 굵기 말고는 위계 신호가 없었다. 제목은 display, 부제목은 보조 설명(prose)으로 나눈다.
  */
 const StepTitle = ({ children, subtitle, className }: StepTitleProps) => (
-  <div
-    className={cn(
-      'flex w-full flex-col items-center gap-2 px-4 py-8 text-center tab:px-12 tab:py-10 pc:px-20',
-      className,
-    )}
-  >
-    <h1 className={TEXT.display}>{children}</h1>
-    {subtitle && <p className={TEXT.prose}>{subtitle}</p>}
+  <div className={cn('flex w-full flex-col items-start gap-3 py-8 text-left tab:py-10', className)}>
+    <h1 className={cn(TEXT.display, 'break-keep')}>{children}</h1>
+    {subtitle && <p className={cn(TEXT.prose, 'break-keep')}>{subtitle}</p>}
   </div>
 )
 

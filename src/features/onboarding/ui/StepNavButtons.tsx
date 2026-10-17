@@ -17,7 +17,7 @@ const StepNavButtons = ({
   onNext,
   onBack,
   nextLabel = '다음',
-  backLabel = '뒤로',
+  backLabel = '이전 단계',
   nextDisabled = false,
   error,
   className,
@@ -25,8 +25,7 @@ const StepNavButtons = ({
 }: StepNavButtonsProps) => (
   <div
     className={cn(
-      // tab+ 레이아웃: Figma BtnLayout(966-11668) — gap 8 / py 12 / px 48·80
-      'fixed right-0 bottom-0 left-0 z-10 flex flex-col items-center gap-3 bg-white px-4 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))] tab:static tab:right-auto tab:bottom-auto tab:left-auto tab:z-auto tab:gap-2 tab:px-12 tab:py-3 pc:px-20',
+      'sticky bottom-0 z-sticky mt-auto flex w-full shrink-0 flex-col items-center gap-4 bg-base-white pt-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))]',
       className,
     )}
   >
@@ -36,13 +35,8 @@ const StepNavButtons = ({
       </HelpMessage>
     )}
     {onNext && (
-      <div className="flex w-full max-w-[16.125rem] tab:w-[16.125rem]">
-        <Button
-          onClick={onNext}
-          disabled={nextDisabled}
-          // Figma BaseButton(966-11656): tab+ 258x40 / 16px. mo 는 기존 48 높이 유지
-          width="full"
-        >
+      <div className="flex w-full tab:max-w-sm">
+        <Button onClick={onNext} disabled={nextDisabled} size="lg" width="full">
           {nextLabel}
         </Button>
       </div>

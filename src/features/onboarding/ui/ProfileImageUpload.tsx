@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { PawPrintIcon } from '@/shared/assets'
-import { Button, HelpMessage } from '@/shared/ui'
+import { PixelImageIcon } from '@/shared/assets'
+import { HelpMessage, ProfileAvatar } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { loadSocialSignupSession } from '@/shared/lib/socialSignupSession'
 import { useUploadProfileImage } from '../api/onboarding.mutations'
@@ -57,44 +57,25 @@ const ProfileImageUpload = ({ value, onChange, className }: ProfileImageUploadPr
     )
   }
 
-  const shownImage = previewUrl ?? value?.url ?? null
+  const shownImage = previewUrl ?? value?.url
 
   return (
-    // 아바타 100 + 버튼 블록(112) 사이 spacing/32 (Figma 3414-752442)
-    <div className={cn('flex w-28 flex-col items-center gap-8', className)}>
-      <div className="flex size-[5rem] items-center justify-center overflow-hidden rounded-full bg-neutral-100 text-neutral-700 tab:size-[6.25rem]">
-        {shownImage ? (
-          // 사용자가 고른 파일(blob)·CDN URL 모두 표시 — next/image는 blob 미지원이라 img 사용
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={shownImage} alt="프로필 미리보기" className="size-full object-cover" />
-        ) : (
-          <PawPrintIcon className="h-auto w-[67.306%]" />
-        )}
-      </div>
-
-      {/* 사진 선택 / 기본 프로필 — 버튼 사이 spacing/12 */}
-      <div className="flex w-full flex-col items-center gap-3">
-        <Button
-          size="md"
-          intent="dark"
-          onClick={() => inputRef.current?.click()}
-          disabled={isPending}
-          width="full"
-        >
-          사진 선택
-        </Button>
-        <Button
-          intent="ghost"
-          onClick={() => {
-            setPreviewUrl(null)
-            setError(null)
-            onChange?.(undefined)
-          }}
-          size="inline"
-        >
-          기본 프로필
-        </Button>
-      </div>
+    // 가운데 아바타 100 — 아바타 자체가 사진 고르기 버튼이고, 오른쪽 아래 배지가 그걸 알려준다
+    <div className={cn('flex w-full flex-col items-center gap-2', className)}>
+      <button
+        type="button"
+        onClick={() => inputRef.current?.click()}
+        disabled={isPending}
+        aria-label="프로필 사진 선택 (선택)"
+        className="group relative rounded-full focus-ring disabled:cursor-wait"
+      >
+        {/* 사용자가 고른 파일(blob)·CDN URL 모두 표시, 없으면 공통 빈 프로필(갈색 발바닥) */}
+        <ProfileAvatar src={shownImage} alt="프로필 미리보기" size="xlarge" />
+        {/* 배지 32 를 아바타 원 둘레(45° 지점)에 걸치게 박스 오른쪽 아래 모서리에 붙인다 */}
+        <span className="absolute right-0 bottom-0 flex size-8 items-center justify-center rounded-full border border-neutral-150 bg-base-white text-neutral-700 transition-colors group-hover:bg-action-subtle group-active:bg-action-subtle-press">
+          <PixelImageIcon className="size-4" />
+        </span>
+      </button>
 
       <input
         ref={inputRef}
