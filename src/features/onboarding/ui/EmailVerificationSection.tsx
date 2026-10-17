@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import {
+  useFormState,
   useWatch,
   type Control,
   type UseFormGetValues,
@@ -20,6 +21,7 @@ import {
 import { hasEmailVerification, normalizeSignupEmail } from '../model/contactVerification'
 import type { ProfileFormData } from '../model/schema'
 import { useOnboardingForm } from '../model/useOnboardingForm'
+import { FieldError } from './FieldError'
 
 interface Props {
   control: Control<ProfileFormData>
@@ -37,6 +39,7 @@ export const EmailVerificationSection = ({
   supported,
 }: Props) => {
   const profile = useWatch({ control }) as ProfileFormData
+  const { errors } = useFormState({ control, name: 'emailVerificationToken' })
   const [challenge, setChallenge] = useState<(EmailChallenge & { offsetMs: number }) | null>(null)
   const [message, setMessage] = useState<{ text: string; error: boolean } | null>(null)
   const [clock, setClock] = useState(() => Date.now())
@@ -276,6 +279,7 @@ export const EmailVerificationSection = ({
               : '인증번호 유효 시간이 지났어요. 인증 메일을 다시 받아 주세요.'}
           </p>
         )}
+        <FieldError message={errors.emailVerificationToken?.message} />
       </InputField>
       <div id="signup-email-status" aria-live="polite">
         {proofExpired ? (

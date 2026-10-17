@@ -2,6 +2,7 @@
 
 import { useEffect, useSyncExternalStore } from 'react'
 import {
+  useFormState,
   useWatch,
   type Control,
   type UseFormGetValues,
@@ -22,6 +23,7 @@ import {
   shouldOfferEmailVerification,
 } from '../model/contactVerification'
 import { EmailVerificationSection } from './EmailVerificationSection'
+import { FieldError } from './FieldError'
 import { useOnboardingForm } from '../model/useOnboardingForm'
 
 const subscribeToStaticSession = () => () => undefined
@@ -53,6 +55,7 @@ const PhoneVerificationSection = ({
     name: ['phone', 'verificationCode', 'phoneVerified'],
   })
   const profile = useWatch({ control }) as ProfileFormData
+  const { errors } = useFormState({ control })
   const emailMethod = profile.verificationMethod === 'email'
   const failures = profile.phoneFailureCount ?? 0
   const emailConfig = useQuery({
@@ -102,6 +105,7 @@ const PhoneVerificationSection = ({
           {...register('email')}
           {...lockedInputProps(emailMethod ? hasEmailVerification(profile) : !!socialEmail)}
         />
+        <FieldError message={errors.email?.message} />
       </InputField>
 
       {emailMethod ? (
@@ -118,7 +122,8 @@ const PhoneVerificationSection = ({
             <div className="flex items-end gap-2">
               <Input
                 type="tel"
-                placeholder="휴대폰 번호를 입력해주세요"
+                autoComplete="tel"
+                placeholder="01012345678"
                 {...register('phone')}
                 className="h-12 min-w-0 flex-1"
                 aria-label="휴대폰 번호"
@@ -149,15 +154,18 @@ const PhoneVerificationSection = ({
                 {verification.phoneMessage.text}
               </HelpMessage>
             )}
+            <FieldError message={errors.phone?.message} />
           </InputField>
 
           <InputField label="인증번호" required>
             <div className="flex items-end gap-2">
-              <div className="relative flex-1">
+              <div className="relative min-w-0 flex-1">
                 <Input
                   type="text"
                   inputMode="numeric"
-                  placeholder="인증번호를 입력해주세요"
+                  autoComplete="one-time-code"
+                  maxLength={6}
+                  placeholder="숫자 6자리"
                   {...register('verificationCode')}
                   className="h-12 min-w-0 pr-[3.5rem]"
                   aria-label="휴대폰 인증번호"
@@ -191,6 +199,9 @@ const PhoneVerificationSection = ({
                 {verification.codeMessage.text}
               </HelpMessage>
             )}
+            <FieldError
+              message={errors.verificationCode?.message ?? errors.phoneVerified?.message}
+            />
           </InputField>
           {!phoneVerified &&
             shouldOfferEmailVerification(failures, emailConfig.data?.enabled === true) && (

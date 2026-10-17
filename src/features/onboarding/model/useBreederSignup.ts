@@ -1,6 +1,8 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { termsQueries } from '@/entities/term'
 import { useRegisterBreeder, useUploadBreederDocuments } from '../api/onboarding.mutations'
 import { updateMyProfile } from '@/entities/profile'
 import { useOnboarding } from './OnboardingContext'
@@ -10,6 +12,7 @@ import type { DocumentsFormData } from './schema'
 import { buildBreederRegistrationRequest } from './buildBreederRegistrationRequest'
 import { getBreederDocumentsSignature, getSelectedBreederDocuments } from './breederDocuments'
 import { hasContactVerification } from './contactVerification'
+import { buildTermsAgreements, REQUIRED_BREEDER_TERM_CODES } from './termsAgreements'
 
 /**
  * 브리더 가입 완료 (서류 업로드 → POST /auth/register/breeder → bio PATCH)
@@ -19,6 +22,8 @@ import { hasContactVerification } from './contactVerification'
  */
 export const useBreederSignup = () => {
   const { formData, setFormData } = useOnboarding()
+  // 동의 이력에 실을 code/version 출처 — 입양자 가입과 같은 쿼리
+  const { data: activeTerms } = useQuery(termsQueries.list())
   const { mutateAsync: registerBreeder, isPending: isCompleting } = useRegisterBreeder()
   const { mutateAsync: uploadDocuments, isPending: isUploading } = useUploadBreederDocuments()
   // 가입 요청이 실패해 다시 시도할 때 같은 서류를 또 올리지 않도록 업로드 결과를 들고 있는다
@@ -76,6 +81,25 @@ export const useBreederSignup = () => {
       return
     }
 
+    // 만 14세 확인까지 약관 코드·버전으로 남긴다 (입양자 가입과 같은 방식, 상담 동의만 없음)
+    const agreedByCode = {
+      service: profile.serviceAgreed,
+      privacy: profile.privacyAgreed,
+      marketing: profile.marketingAgreed,
+      age_14plus: profile.isOver14,
+    }
+    const { agreements: termsAgreements, missingCodes } = buildTermsAgreements(
+      activeTerms,
+      agreedByCode,
+    )
+    if (
+      REQUIRED_BREEDER_TERM_CODES.some((code) => !agreedByCode[code]) ||
+      missingCodes.length > 0
+    ) {
+      setError('약관 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.')
+      return
+    }
+
     // 업로드할 서류 (선택된 것만 — 0개면 업로드 호출을 건너뛴다)
     const documents = getSelectedBreederDocuments(documentsData)
 
@@ -94,7 +118,14 @@ export const useBreederSignup = () => {
         uploadedRef.current = { signature, result: uploaded }
       }
 
-      const dto = buildBreederRegistrationRequest({ social, animal, profile, kennel, uploaded })
+      const dto = buildBreederRegistrationRequest({
+        social,
+        animal,
+        profile,
+        kennel,
+        uploaded,
+        termsAgreements,
+      })
 
       const tokens = await registerBreeder(dto)
 

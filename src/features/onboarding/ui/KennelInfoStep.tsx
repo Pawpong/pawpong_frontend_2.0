@@ -12,9 +12,10 @@ import { StepContainer } from './StepContainer'
 import { Dropdown, InputField, KeywordTextField, TextareaField } from '@/shared/ui'
 import { ProfileImageUpload } from './ProfileImageUpload'
 import { DuplicateCheckField } from './DuplicateCheckField'
+import { FieldError } from './FieldError'
 
 const KennelInfoStep = () => {
-  const { register, control, setValue, handleSubmit, watch, onSubmit, firstErrorMessage, goBack } =
+  const { register, control, setValue, handleSubmit, watch, onSubmit, formState, goBack } =
     useStepForm('kennel-info', kennelInfoSchema, {
       breederName: '',
       city: '',
@@ -45,10 +46,10 @@ const KennelInfoStep = () => {
 
   return (
     <StepContainer
-      title="브리더 정보를 입력해주세요"
+      title="브리더를 소개해주세요"
+      subtitle="입양 가족에게 보여질 프로필이에요. 필수 정보부터 채워주세요."
       onNext={handleNext}
       onBack={goBack}
-      navError={firstErrorMessage}
     >
       <div className={cn('flex w-full flex-col items-center px-1 tab:px-0', STEP_LAYOUT.blockGap)}>
         {/* 업로드 후 받은 URL을 폼(profileImage)에 보관 → DocumentsStep의 가입 요청에서 전송 */}
@@ -64,18 +65,19 @@ const KennelInfoStep = () => {
         <div className={cn('flex w-full flex-col', STEP_LAYOUT.fieldGap)}>
           {/* 브리더명 + 중복검사 — 공통 DuplicateCheckField */}
           <DuplicateCheckField
-            label="별명"
+            label="브리더명"
             required
-            placeholder="별명을 입력해주세요"
+            placeholder="활동하는 브리더명 또는 켄넬명"
             checkLabel="중복 확인"
             pendingLabel="확인 중"
             value={breederName}
             registration={register('breederName')}
             check={breederNameCheck}
+            error={formState.errors.breederName?.message}
           />
 
           {/* 지역 — 시/도를 바꾸면 이전 시/군구는 그 시/도에 없는 값이라 비운다 */}
-          <InputField label="주소" required>
+          <InputField label="활동 지역" required>
             <div className="flex flex-col gap-2">
               <Controller
                 name="city"
@@ -99,19 +101,20 @@ const KennelInfoStep = () => {
                   <Dropdown
                     value={field.value}
                     onValueChange={field.onChange}
-                    placeholder="시/군구를 선택해주세요"
+                    placeholder="시/군구 선택 (선택사항)"
                     options={districtOptions}
                     disabled={!city}
                   />
                 )}
               />
             </div>
+            <FieldError message={formState.errors.city?.message} />
           </InputField>
 
           {/* 소개 — 일반 가입(InfoStep)과 동일 규격. 브리더 가입 DTO 엔 소개가 없어 가입 후 bio 로 저장 */}
           <TextareaField
-            label="소개"
-            placeholder="입력해보세요"
+            label="소개 (선택)"
+            placeholder="브리딩 철학과 아이들을 돌보는 환경을 소개해주세요"
             maxLength={INTRODUCTION_MAX_LENGTH}
             currentLength={introduction?.length ?? 0}
             {...register('introduction')}
@@ -132,6 +135,7 @@ const KennelInfoStep = () => {
                 />
               )}
             />
+            <FieldError message={formState.errors.selectedBreeds?.message} />
           </InputField>
         </div>
       </div>

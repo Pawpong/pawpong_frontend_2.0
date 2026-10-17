@@ -82,6 +82,11 @@ export type ProfileFormData = z.infer<typeof profileSchema>
 export const INTRODUCTION_MAX_LENGTH = 200
 
 export const infoSchema = z.object({
+  realName: z
+    .string()
+    .trim()
+    .min(1, { error: '이름을 입력해주세요' })
+    .max(50, { error: '이름은 50자 이하로 입력해주세요' }),
   nickname: z
     .string()
     .min(2, { error: '닉네임을 2자 이상 입력해주세요' })

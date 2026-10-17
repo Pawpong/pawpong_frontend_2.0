@@ -187,13 +187,11 @@ test('같은 탭 새로고침은 proof를 유지하고 만료/다른 소셜 세�
   try {
     const first = load(root + 'useOnboardingForm.ts').useOnboardingForm
     first.getState().startSession('owner-one')
-    first
-      .getState()
-      .completeStep('profile', {
-        ...verifiedProfile(),
-        verificationCode: '111111',
-        emailVerificationCode: '222222',
-      })
+    first.getState().completeStep('profile', {
+      ...verifiedProfile(),
+      verificationCode: '111111',
+      emailVerificationCode: '222222',
+    })
     first.getState().completeStep('info', { nickname: '친구회원', selectedKeywords: [] })
     const stored = JSON.parse(values.get('pawpong:onboarding-form'))
     assert.equal(stored.state.drafts.profile.emailVerificationCode, '')
@@ -202,12 +200,10 @@ test('같은 탭 새로고침은 proof를 유지하고 만료/다른 소셜 세�
     await reloaded.persist.rehydrate()
     assert.equal(hasContactVerification(reloaded.getState().drafts.profile), true)
     assert.equal(reloaded.getState().completedSteps.includes('profile'), true)
-    reloaded
-      .getState()
-      .saveDraft('profile', {
-        ...reloaded.getState().drafts.profile,
-        emailVerificationExpiresAt: new Date(0).toISOString(),
-      })
+    reloaded.getState().saveDraft('profile', {
+      ...reloaded.getState().drafts.profile,
+      emailVerificationExpiresAt: new Date(0).toISOString(),
+    })
     reloaded.getState().invalidateExpiredEmailVerification()
     assert.equal(reloaded.getState().completedSteps.includes('profile'), false)
     assert.equal(reloaded.getState().completedSteps.includes('info'), false)
@@ -217,4 +213,65 @@ test('같은 탭 새로고침은 proof를 유지하고 만료/다른 소셜 세�
     if (original === undefined) delete global.sessionStorage
     else global.sessionStorage = original
   }
+})
+
+test('가입 프로필의 이름을 검증하고 소셜 이름 대신 가입 요청에 전달한다', () => {
+  const { infoSchema } = load(root + 'schema.ts')
+  const info = { realName: '  김포퐁  ', nickname: '포퐁친구', selectedKeywords: [] }
+  assert.equal(infoSchema.safeParse({ ...info, realName: '  ' }).success, false)
+  assert.equal(infoSchema.safeParse({ ...info, realName: '가'.repeat(51) }).success, false)
+  const parsed = infoSchema.parse(info)
+  const { buildAdopterRegistrationRequest } = load(root + 'buildAdopterRegistrationRequest.ts')
+  const request = buildAdopterRegistrationRequest({
+    social: { tempId: 'test', email: 'friend@example.test', name: '소셜 이름' },
+    profile: verifiedProfile(),
+    info: parsed,
+    survey: { privacyAgreed: true },
+    termsAgreements: [],
+    skipped: true,
+  })
+  assert.equal(request.realName, '김포퐁')
+  assert.equal(request.nickname, '포퐁친구')
+})
+
+test('브리더 가입은 만 14세 확인까지 약관 코드·버전을 싣고, 입양자 가입은 관심 키워드를 보낸다', () => {
+  const { REQUIRED_BREEDER_TERM_CODES, buildTermsAgreements } = load(root + 'termsAgreements.ts')
+  // 브리더는 입양 상담을 받지 않아 counsel_privacy 를 요구하지 않는다
+  assert.deepEqual([...REQUIRED_BREEDER_TERM_CODES], ['service', 'privacy', 'age_14plus'])
+  const activeTerms = ['service', 'privacy', 'age_14plus', 'marketing', 'counsel_privacy'].map(
+    (code) => ({ code, version: 'v1' }),
+  )
+  const { agreements } = buildTermsAgreements(activeTerms, {
+    service: true,
+    privacy: true,
+    marketing: false,
+    age_14plus: true,
+  })
+  const { buildBreederRegistrationRequest } = load(root + 'buildBreederRegistrationRequest.ts')
+  const breeder = buildBreederRegistrationRequest({
+    social: { tempId: 'signed-fixture-session', provider: 'kakao', email: 'relay@example.test' },
+    profile: verifiedProfile(),
+    animal: { selected: 'dog' },
+    kennel: { breederName: '푸들하우스', city: '서울', district: '', selectedBreeds: ['푸들'] },
+    uploaded: null,
+    termsAgreements: agreements,
+  })
+  assert.deepEqual(breeder.termsAgreements, [
+    { code: 'service', version: 'v1' },
+    { code: 'privacy', version: 'v1' },
+    { code: 'age_14plus', version: 'v1' },
+  ])
+
+  const { buildAdopterRegistrationRequest } = load(root + 'buildAdopterRegistrationRequest.ts')
+  const adopter = (selectedKeywords) =>
+    buildAdopterRegistrationRequest({
+      social: { tempId: 'test', email: 'friend@example.test', name: '친구' },
+      profile: verifiedProfile(),
+      info: { nickname: '친구회원', selectedKeywords },
+      survey: {},
+      termsAgreements: [],
+      skipped: true,
+    })
+  assert.deepEqual(adopter(['산책', '푸들']).interestedBreedIds, ['산책', '푸들'])
+  assert.equal(adopter([]).interestedBreedIds, undefined)
 })

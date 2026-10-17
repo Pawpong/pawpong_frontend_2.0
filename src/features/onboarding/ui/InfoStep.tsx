@@ -1,7 +1,7 @@
 'use client'
 
 import { Controller } from 'react-hook-form'
-import { InputField, KeywordTextField, TextareaField } from '@/shared/ui'
+import { Input, InputField, KeywordTextField, TextareaField } from '@/shared/ui'
 import { useStepForm } from '../model/useStepForm'
 import { useDuplicateCheck } from '../model/useDuplicateCheck'
 import { useCheckNicknameDuplicate } from '../api/onboarding.mutations'
@@ -11,15 +11,20 @@ import { STEP_LAYOUT } from '../model/stepLayout'
 import { StepContainer } from './StepContainer'
 import { ProfileImageUpload } from './ProfileImageUpload'
 import { DuplicateCheckField } from './DuplicateCheckField'
+import { FieldError } from './FieldError'
 
 const InfoStep = () => {
-  const { register, control, handleSubmit, watch, onSubmit, firstErrorMessage, goBack } =
-    useStepForm('info', infoSchema, {
+  const { register, control, handleSubmit, watch, onSubmit, formState, goBack } = useStepForm(
+    'info',
+    infoSchema,
+    {
+      realName: '',
       nickname: '',
       selectedKeywords: [],
       profileImage: undefined,
       introduction: '',
-    })
+    },
+  )
 
   const nickname = watch('nickname')
   const introduction = watch('introduction')
@@ -39,10 +44,10 @@ const InfoStep = () => {
 
   return (
     <StepContainer
-      title="회원 정보를 입력해주세요"
+      title="나를 소개해주세요"
+      subtitle="포퐁에서 사용할 활동명과 프로필을 만들어주세요."
       onNext={handleNext}
       onBack={goBack}
-      navError={firstErrorMessage}
     >
       <>
         <Controller
@@ -55,6 +60,18 @@ const InfoStep = () => {
 
         {/* 포퐁 활동명 · 소개 (Figma 3414-752441) — 필드 사이 spacing/20 */}
         <div className={cn('flex w-full flex-col', STEP_LAYOUT.fieldGap)}>
+          <InputField label="이름" required>
+            <Input
+              autoComplete="name"
+              aria-label="이름"
+              placeholder="입양 상담에 사용할 이름"
+              {...register('realName')}
+            />
+            <FieldError message={formState.errors.realName?.message} />
+            <p className="mt-2 text-body-sm text-neutral-700">
+              공개 프로필에는 아래 활동명이 표시돼요.
+            </p>
+          </InputField>
           {/* 시안의 input-btn(gap 8, items-end) 구조 그대로 — 공통 DuplicateCheckField */}
           <DuplicateCheckField
             label="포퐁 활동명"
@@ -65,19 +82,20 @@ const InfoStep = () => {
             value={nickname}
             registration={register('nickname')}
             check={nicknameCheck}
+            error={formState.errors.nickname?.message}
           />
 
           <TextareaField
-            label="소개"
-            placeholder="입력해보세요"
+            label="소개 (선택)"
+            placeholder="반려동물과 함께하고 싶은 일상을 소개해주세요"
             maxLength={INTRODUCTION_MAX_LENGTH}
             currentLength={introduction?.length ?? 0}
             {...register('introduction')}
           />
 
-          {/* 관심있는 키워드 — 활동명·소개와 같은 필드 묶음. 서버로 전송되진 않지만
-              같은 방식(콤마 구분 자유 입력)으로 통일한다 */}
-          <InputField label="관심있는 키워드">
+          {/* 관심있는 키워드 — 활동명·소개와 같은 필드 묶음. 콤마 구분 자유 입력으로 받아
+              가입 요청의 관심 품종 목록(interestedBreedIds)으로 보낸다 */}
+          <InputField label="관심있는 키워드" requirement="선택">
             <Controller
               name="selectedKeywords"
               control={control}

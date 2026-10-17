@@ -56,6 +56,8 @@ export interface RegisterBreederRequest {
   breeds: string[]
   plan: 'basic' | 'pro'
   agreements: RegisterBreederAgreements
+  /** 입양자 가입과 같은 코드·버전 동의 이력 (만 14세 확인 포함) */
+  termsAgreements: TermsAgreementItem[]
   tempId?: string
   provider?: string
   profileImage?: string

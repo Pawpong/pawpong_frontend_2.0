@@ -8,7 +8,7 @@ export const STEP_LAYOUT = {
   /** 본문 최대 폭 — 모든 스텝 공통 */
   content: 'w-full max-w-[40.625rem]',
   /** 블록(설명 ↔ 입력 묶음 ↔ 부가영역) 사이 */
-  blockGap: 'gap-8 tab:gap-12',
+  blockGap: 'gap-8',
   /** 한 묶음 안 필드끼리 */
-  fieldGap: 'gap-5',
+  fieldGap: 'gap-6',
 } as const
