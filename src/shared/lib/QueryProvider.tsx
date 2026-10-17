@@ -5,8 +5,10 @@ import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from '@ta
 import { ApiError, STALE_TIME, isApiError } from '@/shared/api'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { useEffect, useState } from 'react'
+import { getTransientErrorRefetchInterval } from '../api/queryRecovery'
 
 const shouldRetryRequest = (error: unknown, failureCount: number) => {
+  if (isApiError(error) && error.request?.transportCode === 'ERR_CANCELED') return false
   if (isApiError(error) && error.status && [400, 401, 403, 404].includes(error.status)) {
     return false
   }
@@ -62,7 +64,10 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
             staleTime: STALE_TIME.DEFAULT,
             retry: (failureCount, error) => shouldRetryRequest(error, failureCount),
             throwOnError: (error) => shouldThrowToBoundary(error),
-            refetchOnWindowFocus: false,
+            // 일시 단절로 실패한 활성 조회는 재접속·화면 복귀·30초 주기로 복구한다.
+            // 정상 캐시·4xx·취소 요청 및 변경 요청은 자동 재실행하지 않는다.
+            refetchInterval: getTransientErrorRefetchInterval,
+            refetchOnWindowFocus: (query) => getTransientErrorRefetchInterval(query) !== false,
           },
           mutations: {
             retry: false,
@@ -106,6 +111,16 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
       recoverActiveQueries(2)
     }
 
+    const handleAppActive = () => {
+      void queryClient.refetchQueries(
+        {
+          type: 'active',
+          predicate: (query) => getTransientErrorRefetchInterval(query) !== false,
+        },
+        { cancelRefetch: false },
+      )
+    }
+
     const navigation = performance.getEntriesByType('navigation')[0] as
       | PerformanceNavigationTiming
       | undefined
@@ -116,9 +131,11 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
 
     window.addEventListener('pageshow', handlePageShow)
     window.addEventListener('popstate', handlePopState)
+    window.addEventListener('pawpong:app-active', handleAppActive)
     return () => {
       window.removeEventListener('pageshow', handlePageShow)
       window.removeEventListener('popstate', handlePopState)
+      window.removeEventListener('pawpong:app-active', handleAppActive)
       if (scheduledFrame !== null) window.cancelAnimationFrame(scheduledFrame)
     }
   }, [queryClient])

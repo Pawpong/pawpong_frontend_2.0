@@ -15,6 +15,7 @@ interface QueryWithErrorState {
  */
 export const getTransientErrorRefetchInterval = (query: QueryWithErrorState) => {
   if (query.state.status !== 'error' || !isApiError(query.state.error)) return false
+  if (query.state.error.request?.transportCode === 'ERR_CANCELED') return false
 
   const { status } = query.state.error
   return status === undefined || status >= 500 ? TRANSIENT_ERROR_REFETCH_INTERVAL : false
