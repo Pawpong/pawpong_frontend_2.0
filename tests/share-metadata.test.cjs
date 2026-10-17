@@ -18,7 +18,15 @@ const load = (file, dependencies = {}, globals = {}) => {
   return output
 }
 const site = load('src/shared/config/site.ts')
-const meta = load('src/shared/lib/metadata.ts', { '@/shared/config/site': site })
+const mobileConfig = load('src/shared/config/mobileApp.ts')
+const mobile = load('src/shared/lib/mobileApp.ts', {
+  '@/shared/config/site': site,
+  '@/shared/config/mobileApp': mobileConfig,
+})
+const meta = load('src/shared/lib/metadata.ts', {
+  '@/shared/config/site': site,
+  './mobileApp': mobile,
+})
 const content = (fetch) =>
   load(
     'src/app/_lib/contentMetadata.ts',
@@ -42,9 +50,46 @@ test('default cards contain an absolute canonical, OG and Twitter image', () => 
 })
 
 test('private screens are noindex and have no user-specific canonical', () => {
-  const result = meta.createPageMetadata({ title: '채팅', noIndex: true })
+  const result = meta.createPageMetadata({ title: '채팅', path: '/chat/secret', noIndex: true })
   assert.deepEqual(result.robots, { index: false, follow: false })
   assert.equal(result.alternates, undefined)
+  assert.equal(result.itunes, undefined)
+  assert.equal(result.appLinks, undefined)
+})
+
+test('public app metadata follows the content permalink for both platforms without root inheritance', () => {
+  const url = 'https://pawpong.kr/community/post/abc'
+  const result = meta.createPageMetadata({ title: '공개 글', path: '/community/post/abc' })
+  assert.deepEqual(result.itunes, { appId: '6814126823', appArgument: url })
+  assert.equal(result.appLinks.ios.url, url)
+  assert.equal(result.appLinks.ios.app_store_id, '6814126823')
+  assert.equal(result.appLinks.android.url, url)
+  assert.equal(result.appLinks.android.package, 'kr.pawpong.app')
+  assert.equal(result.appLinks.web.should_fallback, true)
+  for (const path of [undefined, 'https://evil.example/post']) {
+    const result = meta.createPageMetadata({ title: '포퐁', path })
+    assert.equal(result.appLinks, undefined)
+    assert.equal(result.itunes, undefined)
+  }
+})
+
+test('both released apps have free download structured data without fabricated review or version', () => {
+  const data = mobile.createMobileAppStructuredData()
+  assert.equal(data['@context'], 'https://schema.org')
+  assert.equal(data['@graph'].length, 2)
+  const [ios, android] = data['@graph']
+  assert.equal(ios.operatingSystem, 'iOS')
+  assert.equal(ios.installUrl, 'https://apps.apple.com/kr/app/id6814126823')
+  assert.equal(android.operatingSystem, 'Android')
+  assert.equal(android.installUrl, 'https://play.google.com/store/apps/details?id=kr.pawpong.app')
+  for (const app of data['@graph']) {
+    assert.equal(app['@type'], 'MobileApplication')
+    assert.equal(app.url, 'https://pawpong.kr/app')
+    assert.equal(app.offers.price, '0')
+    assert.equal(app.aggregateRating, undefined)
+    assert.equal(app.review, undefined)
+    assert.equal(app.softwareVersion, undefined)
+  }
 })
 
 test('public post metadata fetches anonymously without caching and uses its own permalink', async () => {
