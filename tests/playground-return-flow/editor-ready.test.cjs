@@ -13,6 +13,7 @@ function editor(isReady) {
       './CommunityEditorExitDialog',
       './CommunityPhotoRecovery',
       './CommunityExperienceEditor',
+      './CommunityCategoryField',
       '@/shared/ui/Ticket',
       '@/shared/assets',
       '@/features/ai-image',

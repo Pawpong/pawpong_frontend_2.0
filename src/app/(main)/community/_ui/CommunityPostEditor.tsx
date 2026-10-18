@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
+import { TicketLink } from '@/shared/ui/Ticket'
+import { PawPrintIcon } from '@/shared/assets'
 import { useAuthStatus } from '@/features/auth'
 import {
   communityQueries,
@@ -17,14 +19,15 @@ import { CommunityEditorExitDialog } from './CommunityEditorExitDialog'
 import { CommunityPhotoRecovery } from './CommunityPhotoRecovery'
 import {
   communityWritingPrompt,
+  EMPTY_COMMUNITY_EXPERIENCE,
   initialCommunityExperience,
   isCommunityExperienceEmpty,
   prepareCommunityExperience,
   validateCommunityExperience,
   type CommunityExperience,
 } from '@/entities/community'
-import { CommunityExperienceEditor } from './CommunityExperienceEditor'
-import { communityRecordIntro } from './communityRecordIntro'
+import { CommunityCategoryField } from './CommunityCategoryField'
+import { CommunityExperienceEditor, CommunityEditorTags } from './CommunityExperienceEditor'
 import { profileQueries } from '@/entities/profile'
 import {
   takePendingCommunityPost,
@@ -47,8 +50,6 @@ import {
   useCommunityEditorNavigation,
 } from '@/features/community'
 import { RetryButton, Container, NavigationBar } from '@/shared/ui'
-import { TicketLink } from '@/shared/ui/Ticket'
-import { PawPrintIcon } from '@/shared/assets'
 import {
   usePostForm,
   PostFormLayout,
@@ -249,24 +250,12 @@ const PostForm = ({ postId, post, initialRecord, photoSource, returnTo }: PostFo
   const handleSubmit = () => save('published')
   const handleSaveDraft = () => save('draft')
 
-  // 놀이터 기록 도구에서 들어온 새 글은 같은 티켓 머리로 무엇을 기록하는지 먼저 보여 준다.
-  const recordIntro = post ? null : communityRecordIntro(initialRecord)
-
   return (
     <>
       <PostFormLayout
         title={formText.title}
         mobileTitle={formText.mobileTitle}
         form={visibleForm}
-        introTitle={
-          recordIntro?.title ??
-          (isEdit ? '우리 아이의 이야기를 다듬어주세요' : '우리 아이의 일상을 나눠주세요')
-        }
-        introDescription={
-          recordIntro?.description ??
-          '함께 웃고, 궁금한 것을 묻고, 반려동물과의 소중한 순간을 기록해요.'
-        }
-        introTicket={recordIntro ?? undefined}
         placeholder={
           (experienceEnabled && communityWritingPrompt(experience)) ||
           '오늘 우리 아이는 어떤 하루를 보냈나요?'
@@ -286,6 +275,43 @@ const PostForm = ({ postId, post, initialRecord, photoSource, returnTo }: PostFo
           isSaveDraftValid: canSaveDraft,
           isSubmitting,
         }}
+        beforeContent={
+          <div>
+            <PetCategorySuggestion
+              automaticAllowed={
+                !reviewConfig.isPending &&
+                !reviewConfig.isError &&
+                (!reviewEnabled || aiReviewConsent)
+              }
+              text={form.text}
+              photo={form.files[0]}
+              value={petType}
+              onChange={setPetType}
+              disabled={isSubmitting || form.isProcessingPhotos}
+            />
+            {experienceEnabled && experienceConfig.data && (
+              <CommunityCategoryField
+                error={experienceNotice}
+                value={experience}
+                onChange={setExperience}
+                config={experienceConfig.data}
+                disabled={isSubmitting || form.isProcessingPhotos}
+              />
+            )}
+          </div>
+        }
+        photoFooter={
+          experienceEnabled && (
+            <CommunityEditorTags
+              value={experience?.tags ?? []}
+              onChange={(tags) =>
+                setExperience({ ...(experience ?? EMPTY_COMMUNITY_EXPERIENCE), tags })
+              }
+              disabled={isSubmitting || form.isProcessingPhotos}
+              autoTagging={reviewEnabled ? (aiReviewConsent ? 'on' : 'consent') : 'off'}
+            />
+          )
+        }
         belowContent={
           <div className="flex flex-col gap-4">
             {!config.ready && (
@@ -303,21 +329,12 @@ const PostForm = ({ postId, post, initialRecord, photoSource, returnTo }: PostFo
                 )}
               </div>
             )}
-            {reviewEnabled && reviewConfig.data && (
-              <CommunityReviewConsent
-                config={reviewConfig.data}
-                consent={aiReviewConsent}
-                onChange={setAiReviewConsent}
-                disabled={isSubmitting || form.isProcessingPhotos}
-              />
-            )}
             {experienceEnabled && experienceConfig.data && (
               <CommunityExperienceEditor
                 value={experience}
                 onChange={setExperience}
                 config={experienceConfig.data}
                 disabled={isSubmitting || form.isProcessingPhotos}
-                autoTagging={reviewEnabled ? (aiReviewConsent ? 'on' : 'consent') : 'off'}
                 error={experienceNotice}
                 photos={currentPhotos.map((photo, photoIndex) =>
                   typeof photo === 'string'
@@ -334,59 +351,52 @@ const PostForm = ({ postId, post, initialRecord, photoSource, returnTo }: PostFo
             {photoSource && !post && !handoff && form.images.length === 0 && (
               <CommunityPhotoRecovery source={photoSource} />
             )}
-            {isMemoryCardHandoff ? (
-              <div className="rounded-xl border border-primary-200 bg-point-50 p-4">
-                <p className="text-sm font-bold text-primary-700">완성한 추억 카드를 담았어요</p>
-                <p className="mt-1 text-xs text-neutral-700">
-                  카드와 함께 기억하고 싶은 오늘의 이야기를 남겨 주세요.
-                </p>
+            <details
+              className="group border-t border-neutral-150 py-4"
+              open={isMemoryCardHandoff || !!handoff || !!initialComparison || undefined}
+            >
+              <summary className="flex min-h-11 cursor-pointer items-center justify-between text-body-md font-medium focus-ring">
+                사진 꾸미기 · AI 사진 비교 <span aria-hidden>＋</span>
+              </summary>
+              <div className="mt-3 space-y-4">
+                {isMemoryCardHandoff ? (
+                  <p className="text-body-md text-neutral-700">완성한 추억 카드를 담았어요.</p>
+                ) : (
+                  <>
+                    <TicketLink
+                      href="/ai-filter"
+                      label="PLAY CARD"
+                      icon={<PawPrintIcon aria-hidden className="size-4" />}
+                      title={handoff ? 'AI 필터로 만든 사진을 담았어요' : 'AI 필터로 사진 꾸미기'}
+                      body="도트 그림·스티커·수채화로 꾸며보세요. 이동하기 전에 작성 중인 글을 임시저장해 주세요."
+                      cta={handoff ? '다른 필터로 다시 만들기' : 'AI 필터 열기'}
+                      size="sm"
+                    />
+                    <PostAiComparisonEditor
+                      editor={comparison}
+                      photos={currentPhotos}
+                      disabled={isSubmitting || form.isProcessingPhotos}
+                    />
+                  </>
+                )}
               </div>
-            ) : (
-              // 놀이터의 AI 사진 카드와 같은 티켓으로 잇는다.
-              <TicketLink
-                href="/ai-filter"
-                label="PLAY CARD"
-                icon={<PawPrintIcon aria-hidden className="size-4" />}
-                title={handoff ? 'AI 필터로 만든 사진을 담았어요' : 'AI 필터로 사진 꾸미기'}
-                body="도트 그림·스티커·수채화로 꾸며보세요. 작성 중인 글은 임시저장할 수 있어요."
-                cta={handoff ? '다른 필터로 다시 만들기' : 'AI 필터 열기'}
-                size="sm"
-              />
-            )}
-            {!isMemoryCardHandoff && (
-              <PostAiComparisonEditor
-                editor={comparison}
-                photos={currentPhotos}
-                disabled={isSubmitting || form.isProcessingPhotos}
-              />
-            )}
-            <PetCategorySuggestion
-              automaticAllowed={
-                !reviewConfig.isPending &&
-                !reviewConfig.isError &&
-                (!reviewEnabled || aiReviewConsent)
-              }
-              text={form.text}
-              photo={form.files[0]}
-              value={petType}
-              onChange={setPetType}
-              disabled={isSubmitting || form.isProcessingPhotos}
-            />
-            <div className="rounded-xl bg-neutral-50 p-5">
-              <h3 className="mb-2 text-sm font-semibold">누구와 나눌까요?</h3>
-              <p className="mb-3 text-xs leading-relaxed text-neutral-700">
-                {visibility === 'followers'
-                  ? '나를 팔로우하는 사람들에게만 보여요.'
-                  : visibility === 'private'
-                    ? '이 글은 나에게만 보여요.'
-                    : '포퐁을 방문하는 누구나 볼 수 있어요.'}
-              </p>
+            </details>
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-neutral-150 py-4">
+              <h3 className="mb-2 text-sm font-semibold">공개 범위</h3>
               <VisibilitySelect
                 value={visibility}
                 onChange={setVisibility}
                 disabled={isSubmitting}
               />
             </div>
+            {reviewEnabled && reviewConfig.data && (
+              <CommunityReviewConsent
+                config={reviewConfig.data}
+                consent={aiReviewConsent}
+                onChange={setAiReviewConsent}
+                disabled={isSubmitting || form.isProcessingPhotos}
+              />
+            )}
           </div>
         }
       />

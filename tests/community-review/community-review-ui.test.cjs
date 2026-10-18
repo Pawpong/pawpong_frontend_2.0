@@ -9,7 +9,7 @@ const consent = load('src/app/(main)/community/_ui/CommunityReviewConsent.tsx')
 test('심사 동의 전 자동 카테고리 분류는 호출하지 않고 직접 선택은 유지함', () => {
   const flags = []
   const Component = load('src/features/community/ui/PetCategorySuggestion.tsx', {
-    '@/shared/assets': { PawPrintIcon: () => null },
+    '@/entities/community': { CommunityPixelIcon: () => null },
     '@/shared/ui': {
       Chip: ({ children }) => createElement('button', null, children),
       Button: () => null,

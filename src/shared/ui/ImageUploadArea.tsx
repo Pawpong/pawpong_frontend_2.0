@@ -45,6 +45,15 @@ const imageUploadVariants = tv({
         preview:
           'size-[3.793rem] rounded-[0.438rem] border border-[#cdcdcd] bg-fill-placeholder tab:h-[12.623rem] tab:w-[12.363rem] tab:rounded-[0.596rem] tab:border-0',
       },
+      compact: {
+        root: 'gap-3',
+        tiles: 'flex-wrap gap-2',
+        addButton:
+          'size-20 justify-center gap-1 rounded-lg border border-neutral-200 bg-neutral-50 text-neutral-700 transition-colors hover:bg-secondary-50 disabled:opacity-50',
+        addIcon: 'size-6',
+        addCounter: 'text-body-sm',
+        preview: 'size-20 rounded-lg border border-neutral-150 bg-neutral-50',
+      },
       composer: {
         root: 'gap-3',
         tiles: 'flex-wrap gap-3',
@@ -96,7 +105,7 @@ const ImageUploadArea = ({
   accept = 'image/*',
 }: ImageUploadAreaProps) => {
   const styles = imageUploadVariants({ size })
-  const isComposer = size === 'composer'
+  const isComposer = size === 'composer' || size === 'compact'
   const AddIcon = size === 'post' || isComposer ? CameraIcon : ImageIcon
   const inputRef = useRef<HTMLInputElement>(null)
   const [modalOpen, setModalOpen] = useState(false)
