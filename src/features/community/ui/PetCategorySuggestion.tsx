@@ -1,14 +1,14 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { PawPrintIcon } from '@/shared/assets'
-import { Button, Chip } from '@/shared/ui'
+import { CommunityPixelIcon } from '@/entities/community'
+import { Button } from '@/shared/ui'
 import type { CommunityPetType } from '@/shared/types'
 import { usePetCategorySuggestion } from '../lib/usePetCategorySuggestion'
 
 const OPTIONS: { value: CommunityPetType; label: string }[] = [
-  { value: 'dog', label: '강아지' },
   { value: 'cat', label: '고양이' },
+  { value: 'dog', label: '강아지' },
   { value: 'reptile', label: '파충류' },
 ]
 
@@ -54,26 +54,33 @@ export function PetCategorySuggestion({
   }
 
   return (
-    <fieldset className="rounded-xl bg-neutral-50 p-5" disabled={disabled}>
+    <fieldset className="min-w-0 border-b border-neutral-150 pb-5" disabled={disabled}>
       <legend className="sr-only">이야기 카테고리</legend>
-      <h3 className="text-sm font-semibold">어떤 아이 이야기인가요?</h3>
-      <div className="mt-3 flex flex-wrap gap-2">
-        {OPTIONS.map((option) => (
-          <Chip
+      <h3 className="text-sm font-semibold">게시판</h3>
+      <div className="mt-3 grid grid-cols-4 gap-1 rounded-xl bg-secondary-50 p-1.5">
+        {[{ value: '' as const, label: '전체' }, ...OPTIONS].map((option) => (
+          <button
+            type="button"
             key={option.value}
-            selected={value === option.value}
+            aria-pressed={value === option.value}
             disabled={disabled}
-            onClick={() => choose(value === option.value ? '' : option.value)}
+            onClick={() => choose(option.value)}
+            className={`flex min-h-12 items-center justify-center gap-1 rounded-lg px-1 text-body-sm focus-ring transition-colors tab:gap-2 tab:text-body-md ${value === option.value ? 'bg-white font-semibold text-primary-700 shadow-sm' : 'text-neutral-700 hover:bg-white/60'} disabled:opacity-50`}
           >
+            <CommunityPixelIcon
+              name={option.value || 'all'}
+              className="size-6 shrink-0 tab:size-7"
+            />
             {option.label}
-          </Chip>
+          </button>
         ))}
       </div>
-      <div className="mt-3 rounded-xl border border-secondary-200 bg-secondary-50 p-4">
-        <div className="flex items-center gap-2 text-sm font-semibold text-neutral-850">
-          <PawPrintIcon aria-hidden className="size-4 text-primary-500" />
-          포퐁 AI 자동 분류
-        </div>
+      <details className="mt-3 text-body-sm text-neutral-700">
+        <summary className="w-fit cursor-pointer rounded focus-ring">
+          {suggestion && !manual
+            ? `${suggestion.label} 게시판으로 자동 분류했어요`
+            : 'AI 자동 분류 안내'}
+        </summary>
         <div aria-live="polite" className="mt-2 text-sm leading-relaxed text-neutral-700">
           {!automaticAllowed ? (
             <p>AI 자동 분류를 시작하지 않았어요. 카테고리는 직접 고를 수 있어요.</p>
@@ -115,7 +122,7 @@ export function PetCategorySuggestion({
             멈춰요. 연락처 등 개인정보는 빼 주세요.
           </p>
         )}
-      </div>
+      </details>
     </fieldset>
   )
 }

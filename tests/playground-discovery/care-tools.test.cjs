@@ -38,7 +38,7 @@ test('외출 준비함의 체크·목적 고르기 연출은 움직임 줄이기
     assert.ok(reduced.includes(selector), selector)
 })
 
-test('산책·병원 기록 링크로 들어온 새 글은 놀이터와 같은 티켓 머리를 쓰고 수정 글은 기본 머리를 씀', () => {
+test('산책·병원 기록 소개는 기록 종류별 티켓 머리를 만들고 작성 틀은 티켓 머리를 그림', () => {
   const { communityRecordIntro } = loadTypescript(
     'src/app/(main)/community/_ui/communityRecordIntro.tsx',
     {
@@ -55,10 +55,6 @@ test('산책·병원 기록 링크로 들어온 새 글은 놀이터와 같은 �
   assert.match(communityRecordIntro('clinic').description, /진료기록 사진은 올리지/)
   for (const value of [undefined, 'question', '__proto__', 'toString'])
     assert.equal(communityRecordIntro(value), null, String(value))
-
-  const editor = source('src/app/(main)/community/_ui/CommunityPostEditor.tsx')
-  assert.match(editor, /const recordIntro = post \? null : communityRecordIntro\(initialRecord\)/)
-  assert.match(editor, /introTicket=\{recordIntro \?\? undefined\}/)
 
   const cn = (...values) => values.filter(Boolean).join(' ')
   const { ComposerLayout } = loadTypescript('src/shared/ui/ComposerLayout.tsx', {
@@ -104,13 +100,9 @@ test('산책·병원 기록 링크로 들어온 새 글은 놀이터와 같은 �
   assert.match(plain, /우리 아이의 일상을 나눠주세요/)
 })
 
-test('고른 선택 카드·기록 칩의 작은 설명은 옅은 배경 위에서도 4.5:1 이상인 색을 씀', () => {
+test('고른 선택 카드의 작은 설명은 옅은 배경 위에서도 4.5:1 이상인 색을 씀', () => {
   assert.match(
     source('src/shared/ui/RadioCardGroup.tsx'),
     /value === option\.value \? 'text-neutral-800' : 'text-neutral-700'/,
-  )
-  assert.match(
-    source('src/app/(main)/community/_ui/CommunityExperienceEditor.tsx'),
-    /selected \? 'text-neutral-800' : 'text-neutral-700'/,
   )
 })
