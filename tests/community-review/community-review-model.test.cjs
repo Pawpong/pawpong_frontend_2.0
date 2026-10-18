@@ -43,66 +43,52 @@ test('작성자 상태는 안전한 필드만 남기고 손상된 승인은 보�
   )
   assert.equal(model.isCommunityPostHeld({ aiReview: model.parseCommunityPostReview(null) }), true)
 })
-test('운영과 알 수 없는 호스트는 설정 API를 호출하지 않고 닫음', async () => {
-  let calls = 0
-  const host = load('src/shared/lib/server/developmentCommunityHost.ts')
+test('API 주소가 없으면 심사 설정을 닫고 다른 환경으로 연결하지 않음', async () => {
   const route = load(
     'src/app/api/community/review/route.ts',
+    { '@/entities/community': model },
     {
-      '@/shared/lib/server': host,
-      '@/entities/community': model,
-    },
-    {
-      fetch: async () => {
-        calls++
-        return Response.json({
-          success: true,
-          data: { enabled: true, dailyLimit: 10, notice: '안내' },
-        })
-      },
+      process: { env: {} },
+      fetch: async () => assert.fail('설정되지 않은 API를 호출하면 안 됨'),
     },
   )
-  for (const domain of ['pawpong.kr', 'admin.pawpong.kr', 'feature.vercel.app']) {
-    const response = await route.GET(
-      new NextRequest(`https://${domain}/api/community/review/config`, {
-        headers: { host: domain },
-      }),
-    )
-    assert.equal((await response.json()).enabled, false)
-    assert.equal(response.headers.get('cache-control'), 'no-store')
-  }
-  assert.equal(calls, 0)
+  const response = await route.GET()
+  assert.equal((await response.json()).enabled, false)
+  assert.equal(response.headers.get('cache-control'), 'no-store')
 })
-test('개발 설정 조회는 인증을 전달하지 않고 캐시 없이 검증하며 오류는 닫음', async () => {
-  const host = load('src/shared/lib/server/developmentCommunityHost.ts')
-  let payload = { enabled: true, dailyLimit: 10, notice: '안내', sourceHash: 'synthetic' }
-  const calls = []
-  const route = load(
-    'src/app/api/community/review/route.ts',
-    {
-      '@/shared/lib/server': host,
-      '@/entities/community': model,
-    },
-    {
-      fetch: async (...args) => {
-        calls.push(args)
-        return Response.json({ success: true, data: payload })
+
+test('운영·개발 심사 설정은 환경별 API만 사용하고 인증을 전달하지 않으며 오류는 닫음', async () => {
+  for (const base of ['https://api.pawpong.kr', 'https://dev-api.pawpong.kr']) {
+    let payload = { enabled: true, dailyLimit: 10, notice: '안내', sourceHash: 'synthetic' }
+    const calls = []
+    const route = load(
+      'src/app/api/community/review/route.ts',
+      { '@/entities/community': model },
+      {
+        process: { env: { NEXT_PUBLIC_API_BASE_URL: `${base}/` } },
+        fetch: async (...args) => {
+          calls.push(args)
+          return Response.json({ success: true, data: payload })
+        },
       },
-    },
-  )
-  const request = new NextRequest('https://dev.pawpong.kr/api/community/review/config', {
-    headers: { host: 'dev.pawpong.kr', authorization: 'synthetic' },
-  })
-  assert.deepEqual(await (await route.GET(request)).json(), {
-    enabled: true,
-    dailyLimit: 10,
-    notice: '안내',
-  })
-  assert.equal(calls[0][1].headers, undefined)
-  assert.equal(calls[0][1].cache, 'no-store')
-  assert.equal(calls[0][1].redirect, 'error')
-  payload = { enabled: 'true' }
-  const failed = await route.GET(request)
-  assert.equal(failed.status, 503)
-  assert.equal((await failed.json()).enabled, false)
+    )
+    const request = new NextRequest('https://pawpong.kr/api/community/review', {
+      headers: { host: 'untrusted.example', authorization: 'synthetic' },
+    })
+    assert.deepEqual(await (await route.GET(request)).json(), {
+      enabled: true,
+      dailyLimit: 10,
+      notice: '안내',
+    })
+    assert.equal(calls[0][0], `${base}/api/v2/community/review/config`)
+    assert.equal(calls[0][1].headers, undefined)
+    assert.equal(calls[0][1].cache, 'no-store')
+    assert.equal(calls[0][1].redirect, 'error')
+    payload = { enabled: 'true' }
+    const failed = await route.GET(request)
+    assert.equal(failed.status, 503)
+    assert.equal((await failed.json()).enabled, false)
+    payload = { enabled: false }
+    assert.equal((await (await route.GET(request)).json()).enabled, false)
+  }
 })

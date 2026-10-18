@@ -53,32 +53,56 @@ test('복합 필터는 쿼리 키와 서버 파라미터에 함께 포함한다'
   })
 })
 
-test('커뮤니티 체험과 AI 설정은 운영에서 닫고 잘못된 개발 응답도 거부한다', async () => {
-  let called = false
+test('커뮤니티 체험 설정은 배포 환경의 API를 사용하고 잘못된 응답은 닫음', async () => {
+  const config = {
+    enabled: true,
+    aiEnabled: true,
+    topics: [{ key: 'walk', label: '산책' }],
+    aiNotice: '안내',
+  }
+  for (const base of ['https://api.pawpong.kr', 'https://dev-api.pawpong.kr']) {
+    const calls = []
+    let data = config
+    const route = load(
+      'src/app/api/community/experience/config/route.ts',
+      {},
+      {
+        process: { env: { NEXT_PUBLIC_API_BASE_URL: `${base}/` } },
+        fetch: async (...args) => {
+          calls.push(args)
+          return Response.json({ success: true, data })
+        },
+      },
+    )
+    const request = new NextRequest('https://pawpong.kr/api/community/experience/config', {
+      headers: { host: 'untrusted.example', authorization: 'synthetic' },
+    })
+    const response = await route.GET(request)
+    assert.deepEqual(await response.json(), config)
+    assert.equal(response.headers.get('cache-control'), 'no-store')
+    assert.equal(calls[0][0], `${base}/api/v2/community/experience/config`)
+    assert.equal(calls[0][1].headers, undefined)
+    assert.equal(calls[0][1].cache, 'no-store')
+    assert.equal(calls[0][1].redirect, 'error')
+    data = { enabled: true }
+    const malformed = await route.GET(request)
+    assert.equal(malformed.status, 503)
+    assert.equal((await malformed.json()).enabled, false)
+    data = { enabled: false }
+    assert.equal((await (await route.GET(request)).json()).enabled, false)
+  }
+})
+
+test('API 주소가 없으면 커뮤니티 체험 설정을 닫고 다른 환경으로 연결하지 않음', async () => {
   const route = load(
     'src/app/api/community/experience/config/route.ts',
     {},
     {
-      fetch: async () => {
-        called = true
-        return Response.json({ success: true, data: { enabled: true } })
-      },
+      process: { env: {} },
+      fetch: async () => assert.fail('설정되지 않은 API를 호출하면 안 됨'),
     },
   )
-  const production = await route.GET(
-    new NextRequest('https://pawpong.kr/api/community/experience/config', {
-      headers: { host: 'pawpong.kr' },
-    }),
-  )
-  assert.equal(called, false)
-  assert.equal((await production.json()).aiEnabled, false)
-  const malformed = await route.GET(
-    new NextRequest('https://dev.pawpong.kr/api/community/experience/config', {
-      headers: { host: 'dev.pawpong.kr' },
-    }),
-  )
-  assert.equal(malformed.status, 503)
-  assert.equal((await malformed.json()).enabled, false)
+  assert.equal((await (await route.GET()).json()).enabled, false)
 })
 
 test('기존 피드 쿼리 키를 유지하고 새 주제만 선택적으로 추가한다', async () => {
