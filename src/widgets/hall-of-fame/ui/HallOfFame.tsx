@@ -64,7 +64,7 @@ const HallOfFame = () => {
               errorText="명예의 동물을 불러오지 못했습니다."
               emptyText="아직 선정된 명예의 동물이 없습니다."
             >
-              <HallOfFamePodium winners={winners} />
+              <HallOfFamePodium winners={winners} state={hallOfFame?.state ?? 'open'} />
             </ListState>
           </div>
         </div>
