@@ -2,7 +2,6 @@
 
 import { Button, LoginPromptModal } from '@/shared/ui'
 import { COMMUNITY_LOGIN_PROMPT } from '@/entities/community'
-import { useLoginGuard } from '@/features/auth'
 import { CommentComposer } from './CommentComposer'
 import { CommentComposerShell } from './CommentComposerShell'
 import type { CommentThreadController } from './useCommentThread'
@@ -18,20 +17,25 @@ interface CommentComposerBarProps {
  */
 const CommentComposerBar = ({ thread, className }: CommentComposerBarProps) => {
   const { isLoggedIn, me, createComment, replyTarget, cancelReply, handleSubmitComment } = thread
-  const { openPrompt, isPromptOpen, setPromptOpen } = useLoginGuard()
+  const { openPrompt, isPromptOpen, setPromptOpen } = thread.login
 
   return (
     <div className={className}>
       {isLoggedIn ? (
         <CommentComposer
+          key={thread.composerKey}
+          draft={thread.commentBody}
+          onDraftChange={thread.setCommentBody}
           onSubmit={handleSubmitComment}
-          isSubmitting={createComment.isPending}
+          isSubmitting={thread.isSubmitting}
           hasSubmitError={createComment.isError}
           submitError={createComment.error}
           onClearSubmitError={createComment.reset}
           profileImageUrl={me?.profileImageUrl}
           replyingToNickname={replyTarget?.nickname}
           onCancelReply={cancelReply}
+          onCheckComments={() => void thread.refetch()}
+          isCheckingComments={thread.isFetching}
         />
       ) : (
         // [refactored] 마크업 복제 대신 CommentComposer와 같은 Shell을 공유한다

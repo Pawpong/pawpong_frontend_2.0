@@ -42,7 +42,7 @@ const VisibilitySelect = ({ value, onChange, disabled }: VisibilitySelectProps) 
           <span className="flex-1 text-left text-sm leading-[1.5] font-medium whitespace-nowrap text-neutral-850">
             {activeLabel}
           </span>
-          <ChevronDownIcon className="size-6 text-neutral-500" />
+          <ChevronDownIcon className="size-6 text-neutral-700" />
         </button>
       </DropdownMenuTrigger>
 
@@ -55,7 +55,7 @@ const VisibilitySelect = ({ value, onChange, disabled }: VisibilitySelectProps) 
             key={option.id}
             onClick={() => onChange(option.id)}
             className={`px-4 py-2.5 text-sm font-medium ${
-              value === option.id ? 'bg-surface-primary text-text-primary' : 'text-text-secondary'
+              value === option.id ? 'bg-surface-primary text-text-primary' : 'text-neutral-700'
             }`}
           >
             {option.label}

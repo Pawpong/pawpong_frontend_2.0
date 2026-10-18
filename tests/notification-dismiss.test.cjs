@@ -101,6 +101,7 @@ function bellHarness(api, records) {
       EmptyState: 'EmptyState',
       ActionSheetItem: 'ActionSheetItem',
     },
+    '@/shared/ui/Skeleton': { ListRowsSkeleton: 'ListRowsSkeleton' },
   })
   const render = () => {
     cursor = 0
@@ -222,7 +223,7 @@ test('clear all includes unloaded pages, disables duplicate actions and preserve
   assert.ok(f.records.every((item) => item.isRead))
   assert.equal(
     h.render().find((node) => node.type === 'EmptyState').props.message,
-    '새 알림이 없습니다.',
+    '새 알림이 없어요.',
   )
 })
 
@@ -327,6 +328,7 @@ test('center deletion reports failure in the confirmation dialog and succeeds on
         useDeleteAllNotifications: () => ({}),
       },
       '@/shared/assets': { PawPrintIcon: 'PawPrintIcon' },
+      '@/shared/ui/Skeleton': { SkeletonBlock: 'SkeletonBlock' },
       '@/shared/api': { normalizeApiError: (error) => error },
       '@/shared/lib/dedupeBy': { dedupeBy: (items) => items },
       '@/shared/lib/infiniteList': {

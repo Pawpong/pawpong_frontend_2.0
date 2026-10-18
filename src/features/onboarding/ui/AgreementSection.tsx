@@ -8,14 +8,22 @@ import type { ProfileFormData } from '../model/schema'
 import { AGREEMENTS } from '../model/agreements'
 import type { Policy } from '../model/policyContent'
 import { CheckboxField } from './CheckboxField'
+import { FieldError } from './FieldError'
 
 interface AgreementSectionProps {
   control: Control<ProfileFormData>
   setValue: UseFormSetValue<ProfileFormData>
   activeTerms?: Terms[]
+  /** 필수 약관을 불러오지 못해 동의를 받을 수 없는 상태 */
+  termsUnavailable?: boolean
 }
 
-const AgreementSection = ({ control, setValue, activeTerms }: AgreementSectionProps) => {
+const AgreementSection = ({
+  control,
+  setValue,
+  activeTerms,
+  termsUnavailable,
+}: AgreementSectionProps) => {
   const [openPolicy, setOpenPolicy] = useState<Policy | null>(null)
   const [serviceAgreed, privacyAgreed, marketingAgreed, isOver14] = useWatch({
     control,
@@ -38,8 +46,18 @@ const AgreementSection = ({ control, setValue, activeTerms }: AgreementSectionPr
 
   return (
     <>
-      <div className="flex w-full flex-col gap-6 tab:gap-10">
-        <div className="flex flex-col gap-3 tab:gap-4">
+      <div className="flex w-full flex-col gap-5 border-t border-neutral-150 pt-6">
+        <div>
+          <h2 className="font-cafe24 text-body-xl text-neutral-850">서비스 이용 동의</h2>
+          <FieldError
+            message={
+              termsUnavailable
+                ? '약관 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.'
+                : undefined
+            }
+          />
+        </div>
+        <div className="flex flex-col gap-4">
           <CheckboxField
             label="전체 약관동의"
             checked={allAgreementsChecked}
@@ -53,14 +71,17 @@ const AgreementSection = ({ control, setValue, activeTerms }: AgreementSectionPr
                 key={agreement.id}
                 name={agreement.id}
                 control={control}
-                render={({ field }) => (
-                  <CheckboxField
-                    label={agreement.label}
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    hasDetailLink={!!policy}
-                    onDetailClick={() => setOpenPolicy(policy)}
-                  />
+                render={({ field, fieldState }) => (
+                  <div>
+                    <CheckboxField
+                      label={agreement.label}
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      hasDetailLink={!!policy}
+                      onDetailClick={() => setOpenPolicy(policy)}
+                    />
+                    <FieldError message={fieldState.error?.message} />
+                  </div>
                 )}
               />
             )
@@ -70,12 +91,15 @@ const AgreementSection = ({ control, setValue, activeTerms }: AgreementSectionPr
         <Controller
           name="isOver14"
           control={control}
-          render={({ field }) => (
-            <CheckboxField
-              label="본인은 만 14세 이상입니다."
-              checked={field.value}
-              onCheckedChange={field.onChange}
-            />
+          render={({ field, fieldState }) => (
+            <div>
+              <CheckboxField
+                label="본인은 만 14세 이상입니다."
+                checked={field.value}
+                onCheckedChange={field.onChange}
+              />
+              <FieldError message={fieldState.error?.message} />
+            </div>
           )}
         />
       </div>

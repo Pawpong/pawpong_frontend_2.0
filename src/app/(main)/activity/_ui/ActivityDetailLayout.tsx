@@ -32,12 +32,12 @@ export const ActivityDetailLayout = ({
     />
     <Container className={`${PAGE_WIDTH_CLASS} px-4 py-8 tab:max-w-[90rem] tab:py-10 pc:py-12`}>
       {isPending && !hasData && (
-        <AsyncState status="loading" message="상세 내용을 불러오는 중입니다." />
+        <AsyncState status="loading" message="상세 내용을 불러오는 중이에요." />
       )}
       {isError && !hasData && (
         <AsyncState
           status="error"
-          message="상세 내용을 불러오지 못했습니다."
+          message="상세 내용을 불러오지 못했어요."
           onRetry={onRetry}
           isRetrying={isRetrying}
         />

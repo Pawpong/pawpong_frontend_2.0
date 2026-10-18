@@ -1,8 +1,15 @@
 'use client'
 
+import { usePublicActivityBadges } from '@/features/gamification'
 import { useMemo, useState } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { Container, InfiniteScrollTrigger, ListState, ListingCardGrid } from '@/shared/ui'
+import {
+  Container,
+  InfiniteScrollTrigger,
+  ListState,
+  ListingCardGrid,
+  ListingCardGridSkeleton,
+} from '@/shared/ui'
 import { breederQueries } from '@/entities/breeder'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
 import { flattenPages, getTotalItems } from '@/shared/lib/infiniteList'
@@ -59,6 +66,9 @@ const BreederExploreContent = ({ category, keyword }: BreederExploreContentProps
     () => dedupeBy(flattenPages(data).map(toBreederCardModel), (breeder) => breeder.id),
     [data],
   )
+  const levels = usePublicActivityBadges(
+    breeders.map((breeder) => ({ ownerId: breeder.id, role: 'breeder' })),
+  )
   const totalCount = getTotalItems(data)
 
   return (
@@ -79,15 +89,20 @@ const BreederExploreContent = ({ category, keyword }: BreederExploreContentProps
           isPending={isPending}
           isError={isError}
           isEmpty={breeders.length === 0}
-          loadingText="브리더를 불러오는 중입니다."
-          errorText="브리더를 불러오지 못했습니다."
-          emptyText="등록된 브리더가 없습니다."
+          loadingText="브리더를 불러오는 중이에요."
+          loadingFallback={<ListingCardGridSkeleton label="브리더를 불러오는 중이에요." />}
+          errorText="브리더를 불러오지 못했어요."
+          emptyText="등록된 브리더가 없어요."
         >
           <ListingCardGrid
             items={breeders}
             getKey={(breeder) => breeder.id}
             renderItem={(breeder, index) => (
-              <BreederCard breeder={breeder} preload={index < 4 && Boolean(breeder.imageUrl)} />
+              <BreederCard
+                level={levels.find((owner) => owner.ownerId === breeder.id)?.level}
+                breeder={breeder}
+                preload={index < 4 && Boolean(breeder.imageUrl)}
+              />
             )}
           />
         </ListState>

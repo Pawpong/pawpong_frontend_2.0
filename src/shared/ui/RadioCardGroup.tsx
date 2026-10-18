@@ -21,6 +21,8 @@ interface RadioCardGroupProps {
   onChange: (value: string) => void
   onBlur?: () => void
   error?: string
+  // 기본은 신청서 계약대로 '필수'를 표시한다. 놀이처럼 강제하지 않는 선택에서만 끈다.
+  required?: boolean
 }
 
 export const RadioCardGroup = ({
@@ -31,12 +33,13 @@ export const RadioCardGroup = ({
   onChange,
   onBlur,
   error,
+  required = true,
 }: RadioCardGroupProps) => {
   const id = useId()
   return (
     <fieldset aria-describedby={error ? `${id}-error` : undefined}>
       <legend className="mb-3 text-sm font-semibold text-neutral-850">
-        {label} <span className="font-normal text-primary-600">필수</span>
+        {label} {required && <span className="font-normal text-primary-600">필수</span>}
       </legend>
       <div className="grid gap-3 tab:grid-cols-2">
         {options.map((option) => (
@@ -50,10 +53,13 @@ export const RadioCardGroup = ({
               onBlur={onBlur}
               className="mt-0.5 size-4 shrink-0 accent-primary-500"
             />
-            <span>
+            <span className="min-w-0 break-keep">
               <span className="block text-sm font-semibold text-neutral-850">{option.label}</span>
               {option.description && (
-                <span className="mt-1 block text-xs leading-relaxed text-neutral-700">
+                // 고른 칸의 옅은 배경 위에서도 4.5:1 이상이 되도록 한 단계 진하게 쓴다.
+                <span
+                  className={`mt-1 block text-xs leading-relaxed ${value === option.value ? 'text-neutral-800' : 'text-neutral-700'}`}
+                >
                   {option.description}
                 </span>
               )}

@@ -28,7 +28,7 @@ const ReviewRow = ({ review }: { review: PublicReviewDto }) => (
       {review.content}
     </p>
 
-    <span className="text-xs font-medium text-neutral-500">{formatDate(review.writtenAt)}</span>
+    <span className="text-xs font-medium text-neutral-700">{formatDate(review.writtenAt)}</span>
 
     {/* 답글 작성·수정은 브리더 본인의 '받은 후기'(ReceivedReviewList)에서만 한다. 여기선 읽기 전용 */}
     {review.replyContent && (
@@ -38,7 +38,7 @@ const ReviewRow = ({ review }: { review: PublicReviewDto }) => (
           {review.replyContent}
         </p>
         {review.replyWrittenAt && (
-          <span className="text-xs font-medium text-neutral-500">
+          <span className="text-xs font-medium text-neutral-700">
             {formatDate(review.replyWrittenAt)}
           </span>
         )}
@@ -72,9 +72,9 @@ const PublicBreederReviews = ({ breederId }: PublicBreederReviewsProps) => {
           isPending={query.isPending}
           isError={query.isError}
           isEmpty={reviews.length === 0}
-          loadingText="후기를 불러오는 중입니다."
-          errorText="후기를 불러오지 못했습니다."
-          emptyText="아직 등록된 후기가 없습니다."
+          loadingText="후기를 불러오는 중이에요."
+          errorText="후기를 불러오지 못했어요."
+          emptyText="아직 등록된 후기가 없어요."
           onRetry={() => void query.refetch()}
           isRetrying={query.isFetching}
         >

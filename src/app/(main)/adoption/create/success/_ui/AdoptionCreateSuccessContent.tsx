@@ -12,11 +12,11 @@ const AdoptionCreateSuccessContent = ({ petId }: AdoptionCreateSuccessContentPro
       <div className="flex flex-1 flex-col items-center justify-center rounded-2xl bg-[#f5f5f5] px-6">
         <p className="text-center text-[1.875rem] leading-[1.5] font-bold text-text-primary">
           <span className="tab:hidden">
-            분양글이 성공적으로
+            분양글을
             <br />
-            업로드 되었습니다.
+            올렸어요
           </span>
-          <span className="hidden tab:inline">분양글이 성공적으로 업로드 되었습니다.</span>
+          <span className="hidden tab:inline">분양글을 올렸어요</span>
         </p>
         <div className="mt-16 flex flex-col items-center gap-[1.4375rem] tab:flex-row">
           <Link

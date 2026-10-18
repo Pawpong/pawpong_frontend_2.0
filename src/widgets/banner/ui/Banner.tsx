@@ -7,6 +7,7 @@ import { Autoplay, EffectCoverflow, Navigation } from 'swiper/modules'
 import { useQuery } from '@tanstack/react-query'
 import { homeQueries } from '@/entities/home'
 import { cn } from '@/shared/lib/cn'
+import type { BannerDto } from '@/shared/types'
 import { BannerSlide } from './BannerSlide'
 import 'swiper/css'
 
@@ -52,8 +53,17 @@ const ChevronRight = ({ className }: { className?: string }) => (
   </svg>
 )
 
-const Banner = () => {
-  const { data: banners } = useQuery(homeQueries.banners())
+interface BannerProps {
+  /** 서버에서 미리 받은 배너. 없으면 기존처럼 브라우저에서 조회한다. */
+  initial?: { banners: BannerDto[]; fetchedAt: number } | null
+}
+
+const Banner = ({ initial }: BannerProps) => {
+  const { data: banners } = useQuery({
+    ...homeQueries.banners(),
+    // 서버가 받은 시각을 넘겨, 캐시된 HTML 이 오래됐으면 화면에 뜬 뒤 다시 조회하게 한다.
+    ...(initial && { initialData: initial.banners, initialDataUpdatedAt: initial.fetchedAt }),
+  })
   const swiperRef = useRef<SwiperInstance | null>(null)
   const [activeIndex, setActiveIndex] = useState(0)
 
@@ -105,19 +115,19 @@ const Banner = () => {
         onRealIndexChange={(swiper) => setActiveIndex(normalizeIndex(swiper.realIndex))}
         className="banner-swiper mx-auto h-auto w-full max-w-full py-0 tab:py-[clamp(0.75rem,1.09375vw,1.09375rem)]"
       >
-        {carouselBanners.map(({ banner }) => (
+        {carouselBanners.map(({ banner }, index) => (
           <SwiperSlide
             key={banner.bannerId}
             className="!h-auto !w-full tab:!w-[min(70.875rem,78.75vw)]"
           >
-            <BannerSlide banner={banner} />
+            <BannerSlide banner={banner} first={index === 0} />
           </SwiperSlide>
         ))}
       </Swiper>
 
-      {/* 모바일은 배너 아래에 배경 없이 배치하고, 탭·PC에서는 배너 내부에 배치한다. */}
-      <div className="relative z-10 flex justify-center py-2.5 tab:absolute tab:inset-x-0 tab:bottom-0 pc:bottom-10">
-        <div className="flex h-4 w-25 items-center justify-center gap-1 rounded-full px-4 py-1">
+      {/* 페이지 표시가 배너의 글자·캐릭터·스토어 버튼을 가리지 않도록 아래에 둔다. */}
+      <div className="relative z-10 flex justify-center py-2.5">
+        <div className="flex h-4 items-center justify-center gap-1 rounded-full px-4 py-1">
           {orderedBanners.map((banner, index) => (
             <button
               key={banner.bannerId}
@@ -144,7 +154,7 @@ const Banner = () => {
             type="button"
             aria-label={label}
             className={cn(
-              'absolute top-1/2 z-10 hidden -translate-y-1/2 items-center justify-center text-primary-500 focus-ring transition-[color,transform] hover:text-primary-700 focus-visible:rounded-sm tab:flex tab:size-[min(3rem,3.333vw)] [&.swiper-button-disabled]:cursor-default [&.swiper-button-disabled]:text-neutral-400 [&.swiper-button-disabled]:hover:text-neutral-400',
+              'absolute top-[calc(50%-1.125rem)] z-10 hidden -translate-y-1/2 items-center justify-center text-primary-500 focus-ring transition-[color,transform] hover:text-primary-700 focus-visible:rounded-sm tab:flex tab:size-[min(3rem,3.333vw)] [&.swiper-button-disabled]:cursor-default [&.swiper-button-disabled]:text-neutral-400 [&.swiper-button-disabled]:hover:text-neutral-400',
               position,
               className,
             )}

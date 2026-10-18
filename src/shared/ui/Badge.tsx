@@ -17,7 +17,7 @@ const badgeVariants = tv({
   variants: {
     variant: {
       // [refactored] 같은 값의 토큰으로 교체, 사용처 없던 filled·status 제거
-      outline: 'border border-[#a8a8a8] text-[#a8a8a8] px-2.5 py-1 text-sm leading-5.5',
+      outline: 'border border-[#a8a8a8] text-neutral-700 px-2.5 py-1 text-sm leading-5.5',
       // Figma 디자인 시스템 뱃지 (743-68292) — large 기준, size="md"로 medium 전환
       default:
         'border border-neutral-300 bg-white px-2 py-1 text-base leading-[1.5] font-medium text-neutral-700',
@@ -29,7 +29,7 @@ const badgeVariants = tv({
       // 필터 칩 선택 상태 (975-19584 active) — point 채움 + primary 테두리/텍스트
       pointFilled: 'border border-primary-500 bg-point-500 text-primary-500',
       // primaryFilled와 동일 사이즈의 회색 채움 (분양완료 등 비활성 상태)
-      neutralFilled: 'bg-neutral-150 text-neutral-400',
+      neutralFilled: 'bg-neutral-150 text-neutral-700',
       // 목록 개수 카운트 (임시저장 등) — point 채움 + neutral-850 텍스트
       pointCount: 'bg-point-500 px-2 py-0.5 text-xs font-semibold text-neutral-850',
       // 진행 중 상태 표시 (작성 중 등) — VerificationContent 상태 뱃지와 동일 톤

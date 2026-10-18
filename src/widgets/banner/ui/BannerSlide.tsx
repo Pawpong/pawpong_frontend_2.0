@@ -1,9 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
+import Image, { getImageProps } from 'next/image'
 import Link from 'next/link'
 import type { BannerDto } from '@/shared/types'
+import { BannerCopy } from './BannerCopy'
+import styles from './BannerCopy.module.css'
 
 /** 링크 래퍼 — 표시(BannerSlide)와 링크 분기 로직 분리 (SRP) */
 const BannerLink = ({ banner, children }: { banner: BannerDto; children: React.ReactNode }) => {
@@ -24,9 +26,25 @@ const BannerLink = ({ banner, children }: { banner: BannerDto; children: React.R
 
 //QA: 배너 컴포넌트 분리 — API 이미지/링크 렌더링은 BannerSlide가 담당하고,
 //QA: 슬라이드 이동과 양옆 미리보기 배치는 부모 Banner가 담당한다.
-const BannerSlide = ({ banner }: { banner: BannerDto }) => {
-  const [mobileImageFailed, setMobileImageFailed] = useState(!banner.mobileImageUrl)
-  const mobileImageUrl = mobileImageFailed ? banner.desktopImageUrl : banner.mobileImageUrl
+// 첫 화면 슬라이드만 이미지 요청 우선순위를 높인다. <picture>라 preload 대신 fetchPriority만 써서
+// 데스크톱에서 쓰지 않는 모바일 원본을 미리 받지 않게 한다.
+const BannerSlide = ({ banner, first = false }: { banner: BannerDto; first?: boolean }) => {
+  const [failedMobileImageUrl, setFailedMobileImageUrl] = useState<string | null>(null)
+  const mobileImageUrl =
+    banner.mobileImageUrl && failedMobileImageUrl !== banner.mobileImageUrl
+      ? banner.mobileImageUrl
+      : banner.desktopImageUrl
+  // 글자를 이미지에 그려 넣은 예전 배너만 글자가 뭉개지지 않게 최고 품질로 받는다.
+  // 글자를 폰트로 얹는 배너(textOverlay)는 글자 없는 도트 원화라 기본 품질로도 충분하고 용량이 약 1/3 이 된다.
+  const quality = banner.textOverlay ? 75 : 100
+  // Swiper의 실제 폭(태블릿 78.75vw, PC 최대 1134px)에 맞는 해상도를 요청한다.
+  const { props: desktopImage } = getImageProps({
+    src: banner.desktopImageUrl,
+    alt: banner.textOverlay ? '' : (banner.title ?? ''),
+    fill: true,
+    sizes: '(min-width: 90rem) 70.875rem, 78.75vw',
+    quality,
+  })
 
   return (
     <BannerLink banner={banner}>
@@ -35,28 +53,35 @@ const BannerSlide = ({ banner }: { banner: BannerDto }) => {
         className="relative w-full overflow-hidden rounded-[0.4455rem] bg-[#d9d9d9] tab:rounded pc:rounded-xl"
       >
         {/* //QA: 이미지 비율 수정 — breakpoint별 Figma 원본 비율을 유지해 이미지 왜곡을 방지한다. */}
-        <div className="relative aspect-[375/191.6667] tab:aspect-[604.8/241.0667] pc:aspect-[1134/452]">
-          <Image
-            src={banner.desktopImageUrl}
-            alt={banner.title ?? ''}
-            fill
-            sizes="(min-width: 90rem) 70.875rem, 37.8rem"
-            className="hidden object-cover tab:block"
-            loading="eager"
-          />
-          <Image
-            src={mobileImageUrl}
-            alt={banner.title ?? ''}
-            fill
-            sizes="100vw"
-            className="object-cover tab:hidden"
-            onError={() => {
-              if (!mobileImageFailed && mobileImageUrl !== banner.desktopImageUrl) {
-                setMobileImageFailed(true)
-              }
-            }}
-            loading="eager"
-          />
+        <div
+          className={`${styles.frame} relative aspect-[375/191.6667] tab:aspect-[604.8/241.0667] pc:aspect-[1134/452]`}
+        >
+          <picture>
+            <source
+              media="(min-width: 768px)"
+              srcSet={desktopImage.srcSet ?? desktopImage.src}
+              sizes={desktopImage.sizes}
+            />
+            <Image
+              src={mobileImageUrl}
+              alt={banner.textOverlay ? '' : (banner.title ?? '')}
+              fill
+              sizes="100vw"
+              quality={quality}
+              className="object-cover"
+              onError={() => {
+                if (
+                  !window.matchMedia('(min-width: 768px)').matches &&
+                  mobileImageUrl !== banner.desktopImageUrl
+                ) {
+                  setFailedMobileImageUrl(banner.mobileImageUrl)
+                }
+              }}
+              loading="eager"
+              fetchPriority={first ? 'high' : 'low'}
+            />
+          </picture>
+          {banner.textOverlay && <BannerCopy copy={banner.textOverlay} />}
         </div>
       </section>
     </BannerLink>

@@ -22,11 +22,19 @@ function load(file, dependencies) {
   return module.exports
 }
 const policy = load('src/entities/feature-highlight/model/policy.ts', {})
-const { FeatureHighlights } = load('src/widgets/feature-highlights/ui/FeatureHighlights.tsx', {
+const ticketActionCard = load('src/shared/ui/TicketActionCard.tsx', {
   'next/link': {
     __esModule: true,
     default: ({ children, ...props }) => React.createElement('a', props, children),
   },
+  '@/shared/assets': { PixelArrowRightIcon: () => null },
+  './Button': { buttonVariants: ({ intent }) => `button-${intent}` },
+  './Ticket': {
+    ticketStyles: { ticket: 'ticket' },
+    TicketStrip: ({ label }) => React.createElement('span', { className: 'strip' }, label),
+  },
+})
+const { FeatureHighlights } = load('src/widgets/feature-highlights/ui/FeatureHighlights.tsx', {
   '@/entities/feature-highlight': {
     ...policy,
     getFeatureHighlights: async () => {
@@ -34,9 +42,7 @@ const { FeatureHighlights } = load('src/widgets/feature-highlights/ui/FeatureHig
     },
   },
   '@/shared/ui': { Container: ({ children }) => React.createElement('section', {}, children) },
-  '@/shared/assets': { PixelArrowRightIcon: () => null },
-  '@/shared/lib/fonts': { cafe24Proup: { className: 'pixel-font' } },
-  './FeatureHighlights.module.css': { __esModule: true, default: {} },
+  '@/shared/ui/TicketActionCard': ticketActionCard,
 })
 function render(client, placement) {
   return renderToStaticMarkup(
@@ -111,6 +117,9 @@ test('valid optional cards still render under the same globally throwing QueryCl
     assert.match(markup, /기존 페이지 본문/)
     assert.match(markup, /AI 사진 만들기/)
     assert.match(markup, /href="\/ai-filter"/)
+    // 놀이터 티켓과 같은 틀: 반짝임 카드는 버터 띠에 NEW 라벨, 버튼은 하나면 줄을 채운다.
+    assert.match(markup, /data-accent="butter" class="ticket"><span class="strip">NEW<\/span>/)
+    assert.match(markup, /<div class="col-span-full"><a href="\/ai-filter" class="button-primary">/)
   } finally {
     client.clear()
   }

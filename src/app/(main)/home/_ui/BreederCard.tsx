@@ -1,11 +1,13 @@
 'use client'
 
+import { BreederLevelBadge, type BreederLevel } from '@/entities/gamification'
 import { Badge, LocationText, MediaCard } from '@/shared/ui'
 import { formatJoinedBreederLocation } from '@/shared/lib/formatBreederLocation'
 import { FavoriteBreederIconButton } from './FavoriteBreederIconButton'
 import type { FavoriteBreeder } from '@/shared/types'
 
 interface BreederCardProps {
+  level?: BreederLevel | null
   breeder: FavoriteBreeder
   showPopularBadge?: boolean
   preload?: boolean
@@ -18,7 +20,7 @@ interface BreederCardProps {
  * 규격만 이 시안을 따른다: medium(모바일 164) / large(PC 282).
  * 즐겨찾기는 프로필과 같은 픽셀 별 버튼을 사용하며, 사진과 무관하게 상태가 읽히도록 바탕을 둔다.
  */
-const BreederCard = ({ breeder, showPopularBadge, preload = false }: BreederCardProps) => {
+const BreederCard = ({ breeder, level, showPopularBadge, preload = false }: BreederCardProps) => {
   return (
     <MediaCard
       href={`/home/${breeder.id}`}
@@ -52,6 +54,7 @@ const BreederCard = ({ breeder, showPopularBadge, preload = false }: BreederCard
       <p className="truncate text-xs leading-[1.5] font-semibold text-neutral-850 tab:text-base">
         {breeder.nickname}
       </p>
+      <BreederLevelBadge level={level} />
       <LocationText location={formatJoinedBreederLocation(breeder.location)} size="compact" />
     </MediaCard>
   )

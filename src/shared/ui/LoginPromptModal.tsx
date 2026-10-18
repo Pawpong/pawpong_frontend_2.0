@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation'
 import { CtaModal } from './CtaModal'
+import { normalizeReturnUrl } from '../lib/normalizeReturnUrl'
 
 interface LoginPromptModalProps {
   open: boolean
@@ -28,7 +29,14 @@ const LoginPromptModal = ({ open, onOpenChange, description }: LoginPromptModalP
         {
           label: '로그인하러 가기',
           intent: 'primary',
-          onClick: () => router.push(`/login?returnUrl=${encodeURIComponent(pathname)}`),
+          onClick: () => {
+            const location = window.location
+            const returnUrl = normalizeReturnUrl(
+              `${location.pathname}${location.search}${location.hash}`,
+              pathname,
+            )
+            router.push(`/login?returnUrl=${encodeURIComponent(returnUrl)}`)
+          },
         },
         { label: '닫기', intent: 'ghost', onClick: () => onOpenChange(false) },
       ]}

@@ -19,6 +19,7 @@ import {
 import type { BreederMyReviewItem } from '@/shared/types'
 import { ActivityIdentity } from './ActivityIdentity'
 import { ReviewReplyForm } from './ReviewReplyForm'
+import { PixelArrowRightIcon } from '@/shared/assets'
 
 export const ReceivedReviewRow = ({
   review,
@@ -61,7 +62,8 @@ export const ReceivedReviewRow = ({
             href={`/activity/received-reviews/${review.reviewId}`}
             className={buttonVariants({ intent: 'link', size: 'md' })}
           >
-            후기 자세히 보기 →
+            후기 자세히 보기
+            <PixelArrowRightIcon aria-hidden className="ml-1 size-3" />
           </Link>
         </div>
       )}
@@ -102,7 +104,7 @@ export const ReceivedReviewRow = ({
       {deleteReply.isError && (
         <AlertMessage
           status="error"
-          message={normalizeApiError(deleteReply.error, '답글을 삭제하지 못했습니다.').message}
+          message={normalizeApiError(deleteReply.error, '답글을 삭제하지 못했어요.').message}
         />
       )}
       <DeleteConfirmModal

@@ -118,7 +118,7 @@ const BreederIntroduction = ({
               ) : null}
             </>
           ) : (
-            <p className="mt-3 text-sm leading-[1.6] text-neutral-500">
+            <p className="mt-3 text-sm leading-[1.6] text-neutral-700">
               아직 소개가 없어요. 입양자에게 브리더님을 소개해 주세요.
             </p>
           )}

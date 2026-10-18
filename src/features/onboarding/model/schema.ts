@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { hasEmailVerification } from './contactVerification'
 
 const PHONE_REGEX = /^01[016789]\d{7,8}$/
 const ANIMAL_TYPES = ['cat', 'dog', 'lizard'] as const
@@ -15,24 +16,43 @@ export type UploadedProfileImageFormValue = z.infer<typeof uploadedProfileImageS
 
 export const profileSchema = z
   .object({
-    // 소셜 로그인으로만 가입하므로 이메일은 소셜 세션에서 받아 채운다 (사용자 편집 없음)
+    // 휴대폰 경로는 소셜 이메일, 이메일 경로는 실제 인증받을 수신 주소를 사용한다.
     email: z.email({ error: '올바른 이메일을 입력해주세요' }),
-    phone: z
-      .string()
-      .min(1, { error: '휴대폰번호를 입력해주세요' })
-      // API가 하이픈을 제거하므로 검증도 하이픈 제거 후 판정 (010-1234-5678 허용)
-      .refine((v) => PHONE_REGEX.test(v.replace(/-/g, '')), {
-        error: '올바른 휴대폰번호를 입력해주세요',
-      }),
+    phone: z.string(),
     // 인증 완료 후에는 persist 시 코드를 지워도 이전 단계로 돌아올 수 있다.
     verificationCode: z.string(),
     phoneVerified: z.boolean(),
+    verificationMethod: z.enum(['phone', 'email']).optional(),
+    phoneFailureCount: z.number().int().min(0).optional(),
+    emailVerificationCode: z.string().optional(),
+    emailVerified: z.boolean().optional(),
+    emailVerifiedFor: z.string().optional(),
+    emailVerificationToken: z.string().optional(),
+    emailVerificationExpiresAt: z.string().optional(),
+    emailServerTimeOffsetMs: z.number().finite().optional(),
     serviceAgreed: z.boolean().refine((v) => v, { error: '서비스 이용약관에 동의해주세요' }),
     privacyAgreed: z.boolean().refine((v) => v, { error: '개인정보 수집에 동의해주세요' }),
     marketingAgreed: z.boolean(),
     isOver14: z.boolean().refine((v) => v, { error: '만 14세 이상이어야 합니다' }),
   })
   .superRefine((data, context) => {
+    if (data.verificationMethod === 'email') {
+      if (!hasEmailVerification(data)) {
+        context.addIssue({
+          code: 'custom',
+          path: ['emailVerificationToken'],
+          message: '이메일 인증을 완료해주세요. 만료됐다면 인증 메일을 다시 받아주세요.',
+        })
+      }
+      return
+    }
+    if (!PHONE_REGEX.test(data.phone.replace(/-/g, ''))) {
+      context.addIssue({
+        code: 'custom',
+        path: ['phone'],
+        message: data.phone ? '올바른 휴대폰번호를 입력해주세요' : '휴대폰번호를 입력해주세요',
+      })
+    }
     if (data.phoneVerified) return
     if (!data.verificationCode) {
       context.addIssue({
@@ -62,6 +82,11 @@ export type ProfileFormData = z.infer<typeof profileSchema>
 export const INTRODUCTION_MAX_LENGTH = 200
 
 export const infoSchema = z.object({
+  realName: z
+    .string()
+    .trim()
+    .min(1, { error: '이름을 입력해주세요' })
+    .max(50, { error: '이름은 50자 이하로 입력해주세요' }),
   nickname: z
     .string()
     .min(2, { error: '닉네임을 2자 이상 입력해주세요' })

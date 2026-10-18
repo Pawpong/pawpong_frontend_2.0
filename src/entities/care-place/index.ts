@@ -1,4 +1,5 @@
-export { getCareMapConfig, searchCarePlaces, getCareDirectorySummary } from './api/care-place.api'
+export * from './api/care-place.queries'
+export { CARE_PLACE_KINDS, CARE_PLACE_KIND_LABEL, isCarePlaceKind } from './model/constants'
 export type {
   CarePlace,
   CarePlacePage,
@@ -8,4 +9,6 @@ export type {
   CareCoordinates,
   MappedCarePlace,
   CareDirectorySummary,
+  CarePlaceFavorite,
+  CarePlaceFavoriteSnapshot,
 } from './model/types'

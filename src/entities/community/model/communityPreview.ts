@@ -7,6 +7,7 @@ interface CommunityPreviewAuthor {
 }
 
 interface CommunityPreviewProps {
+  aiReview?: CommunityPostCard['aiReview']
   postId: string
   author: CommunityPreviewAuthor
   createdAt: string
@@ -23,8 +24,10 @@ interface CommunityPreviewProps {
 }
 
 const toCommunityPreviewProps = (post: CommunityPostCard): CommunityPreviewProps => ({
+  aiReview: post.aiReview,
   postId: post.postId,
-  shareable: post.visibility === 'public' && post.status === 'published',
+  shareable:
+    post.visibility === 'public' && post.status === 'published' && post.aiReview?.state !== 'held',
   author: {
     id: post.authorId,
     nickname: post.authorNickname,

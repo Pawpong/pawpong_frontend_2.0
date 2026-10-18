@@ -14,6 +14,14 @@ new Function(
   }).outputText,
 )(searchState)
 
+const careConstants = {}
+new Function(
+  'exports',
+  ts.transpileModule(fs.readFileSync('src/entities/care-place/model/constants.ts', 'utf8'), {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 },
+  }).outputText,
+)(careConstants)
+
 const compiled = ts.transpileModule(
   fs.readFileSync('src/features/care-map/ui/CareMapContent.tsx', 'utf8'),
   {
@@ -33,16 +41,42 @@ function renderer(getResult) {
   const dependencies = {
     'next/dynamic': () => () => null,
     '@tanstack/react-query': {
-      useQuery: ({ queryKey }) => (queryKey[0] === 'care-places' ? getResult() : {}),
+      useQuery: ({ queryKey }) => (queryKey[1] === 'places' ? getResult() : {}),
     },
-    '@/entities/care-place': {},
+    '@/entities/care-place': {
+      ...careConstants,
+      carePlaceQueries: {
+        config: () => ({ queryKey: ['care-place', 'config'] }),
+        directorySummary: () => ({ queryKey: ['care-place', 'directory-summary'] }),
+        places: (search, page) => ({ queryKey: ['care-place', 'places', search, page] }),
+        favorites: (enabled) => ({ queryKey: ['care-place', 'favorites'], enabled }),
+      },
+    },
+    // 비로그인 상태 — 즐겨찾기는 이 복구 회귀의 범위 밖이다.
+    '@/features/auth': {
+      useLoginGuard: () => ({
+        isLoggedIn: false,
+        guard: (action) => action,
+        openPrompt() {},
+        isPromptOpen: false,
+        setPromptOpen() {},
+      }),
+    },
+    '@/shared/api': { normalizeApiError: (error) => error },
+    '@/shared/assets': { BookmarkIcon: () => null },
+    '../api/care-place-favorite.mutations': {
+      useToggleCarePlaceFavorite: () => ({ mutate() {}, isError: false }),
+    },
+    '../lib/care-place-favorite': { favoriteToCarePlace: (favorite) => favorite },
     '@/shared/lib/fonts': { cafe24Proup: { className: 'test-font' } },
     '../lib/care-location': {},
+    '@/shared/lib/nativeBridge': { inNativeAppWebView: () => false },
     '../lib/care-search-state': searchState,
     '@/shared/ui/FeatureIntro': {
       FeatureIntro: ({ children }) => React.createElement('header', null, children),
     },
     '@/shared/ui': {
+      LoginPromptModal: () => null,
       RetryButton: ({ onRetry, isRetrying }) =>
         React.createElement(
           'button',
@@ -86,7 +120,7 @@ const page = {
   locationUnavailable: true,
 }
 
-test('a failed location retry retains loaded facilities and offers retry, then recovers', async () => {
+test('위치 재시도가 실패해도 불러온 시설을 유지하고 다시 시도로 복구함', async () => {
   let fail = false
   const client = new QueryClient()
   const observer = new QueryObserver(client, {
@@ -124,7 +158,7 @@ test('a failed location retry retains loaded facilities and offers retry, then r
   }
 })
 
-test('an initial failure with no loaded records shows a recoverable error', async () => {
+test('처음 불러오기에 실패해 시설이 없으면 다시 시도할 수 있는 오류를 보여줌', async () => {
   const client = new QueryClient()
   const observer = new QueryObserver(client, {
     queryKey: ['care-places', 'initial-failure'],

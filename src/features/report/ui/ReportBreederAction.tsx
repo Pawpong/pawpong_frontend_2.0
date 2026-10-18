@@ -23,7 +23,7 @@ export const ReportBreederAction = ({ breederId }: { breederId: string }) => {
       requireOtherDescription
       onSubmit={async (data) => {
         await reportBreeder.mutateAsync({ breederId, ...data })
-        return '신고가 접수되었습니다. 운영팀이 내용을 검토할 예정입니다.'
+        return '신고를 접수했어요. 운영팀이 내용을 검토할 예정이에요.'
       }}
     />
   )

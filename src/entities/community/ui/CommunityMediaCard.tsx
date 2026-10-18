@@ -1,12 +1,17 @@
 'use client'
 
 import { useState, type MouseEventHandler } from 'react'
-import Image from 'next/image'
+import { SessionImage as Image } from '@/shared/ui/SessionImage'
 import Link from 'next/link'
 import { FavoriteIcon, PawPrintIcon, PixelMessageIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
+import { useAuthReadSession } from '@/shared/lib/useAuthReadSession'
+import { isSessionImageSource, sessionImageSource } from '@/shared/lib/sessionImageSource'
+import type { CommunityPostReview } from '@/shared/types'
+import { CommunityReviewLabel } from './CommunityReviewLabel'
 
 interface CommunityMediaCardProps {
+  aiReview?: CommunityPostReview
   href: string
   imageUrl?: string
   imageCount: number
@@ -28,6 +33,7 @@ interface CommunityMediaCardProps {
  */
 const CommunityMediaCard = ({
   href,
+  aiReview,
   imageUrl,
   imageCount,
   alt,
@@ -39,7 +45,11 @@ const CommunityMediaCard = ({
   className,
 }: CommunityMediaCardProps) => {
   const [failedImageUrl, setFailedImageUrl] = useState<string>()
-  const showImage = Boolean(imageUrl) && failedImageUrl !== imageUrl
+  const session = useAuthReadSession()
+  const imageIdentity = isSessionImageSource(imageUrl)
+    ? sessionImageSource(imageUrl, session?.scope ?? 'anonymous')
+    : imageUrl
+  const showImage = Boolean(imageUrl) && failedImageUrl !== imageIdentity
   const isProfileGrid = variant === 'profileGrid'
 
   return (
@@ -64,7 +74,7 @@ const CommunityMediaCard = ({
           sizes="(min-width: 768px) 20vw, 122px"
           loading={preload ? 'eager' : 'lazy'}
           fetchPriority={preload ? 'high' : 'auto'}
-          onError={() => setFailedImageUrl(imageUrl)}
+          onError={() => setFailedImageUrl(imageIdentity)}
           className="object-cover"
         />
       ) : !isProfileGrid ? (
@@ -76,6 +86,11 @@ const CommunityMediaCard = ({
         </span>
       ) : null}
 
+      {aiReview?.state === 'held' && (
+        <span className="absolute right-1 bottom-1 left-1">
+          <CommunityReviewLabel review={aiReview} />
+        </span>
+      )}
       {imageCount > 1 && (
         <span className="absolute top-1 right-1 flex h-[1.375rem] min-w-10 items-center justify-center rounded-full bg-neutral-850/90 px-2 text-[0.625rem] leading-[1.5] font-semibold text-white pc:top-2.5 pc:right-3">
           {imageCount}장

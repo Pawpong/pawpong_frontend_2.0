@@ -1,8 +1,22 @@
-import type { CarePlace } from '@/entities/care-place'
+import { CARE_PLACE_KIND_LABEL, type CarePlace } from '@/entities/care-place'
+import { BookmarkIcon } from '@/shared/assets'
+import { ToggleIconButton } from '@/shared/ui/ToggleIconButton'
 import { CareMapIcon } from './CareMapIcon'
 import { CareDirectionsDialog } from './CareDirectionsDialog'
 
-export function CarePlaceDetails({ place, onClose }: { place: CarePlace; onClose(): void }) {
+export function CarePlaceDetails({
+  place,
+  onClose,
+  favorited,
+  onToggleFavorite,
+  favoriteError,
+}: {
+  place: CarePlace
+  onClose(): void
+  favorited: boolean
+  onToggleFavorite(): void
+  favoriteError?: string
+}) {
   return (
     <section
       aria-label={`${place.name} 상세 정보`}
@@ -11,27 +25,44 @@ export function CarePlaceDetails({ place, onClose }: { place: CarePlace; onClose
       <div className="mb-3 flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="mb-1 text-xs font-semibold text-primary-500">
-            {place.kind === 'hospital'
-              ? '동물병원'
-              : place.kind === 'cafe'
-                ? '애견동반카페'
-                : place.kind === 'shelter'
-                  ? place.registration
-                    ? '등록 동물보호센터'
-                    : '보호·입양시설'
-                  : place.category}
+            {/* 보호센터는 등록 여부를, 여행지·숙소는 관광공사 분류를 그대로 보여준다 */}
+            {place.kind === 'shelter'
+              ? place.registration
+                ? '등록 동물보호센터'
+                : '보호·입양시설'
+              : place.kind === 'travel' || place.kind === 'stay'
+                ? place.category
+                : CARE_PLACE_KIND_LABEL[place.kind]}
           </p>
-          <h2 className="text-lg font-bold break-keep text-neutral-850">{place.name}</h2>
+          {/* 띄어쓰기 없는 긴 시설명은 iOS Safari 가 괄호 앞에서도 줄을 바꾸지 않아 닫기 버튼 밑으로 넘친다 */}
+          <h2 className="text-lg font-bold break-words break-keep text-neutral-850">
+            {place.name}
+          </h2>
         </div>
-        <button
-          type="button"
-          onClick={onClose}
-          className="care-map-icon-button shrink-0"
-          aria-label="시설 상세 닫기"
-        >
-          <CareMapIcon name="close" />
-        </button>
+        <div className="flex shrink-0 items-center gap-1">
+          <ToggleIconButton
+            icon={BookmarkIcon}
+            hasFillState
+            pressedTone="bookmark"
+            aria-label="즐겨찾기"
+            pressed={favorited}
+            onClick={onToggleFavorite}
+          />
+          <button
+            type="button"
+            onClick={onClose}
+            className="care-map-icon-button"
+            aria-label="시설 상세 닫기"
+          >
+            <CareMapIcon name="close" />
+          </button>
+        </div>
       </div>
+      {favoriteError && (
+        <p role="alert" className="mb-2 text-xs text-error-500">
+          {favoriteError}
+        </p>
+      )}
       <p className="text-sm leading-6 text-neutral-850">
         {place.roadAddress || place.address || '공식 등록 주소 미제공'}
       </p>
@@ -130,7 +161,7 @@ export function CarePlaceDetails({ place, onClose }: { place: CarePlace; onClose
         </a>
       )}
       {place.registration && (
-        <p className="mt-3 text-[11px] text-neutral-700">
+        <p className="mt-3 text-[0.6875rem] text-neutral-700">
           <a
             href={place.registration.url}
             target="_blank"

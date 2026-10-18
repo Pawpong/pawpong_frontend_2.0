@@ -1,5 +1,6 @@
 import { createPageMetadata } from '@/shared/lib/metadata'
 
+import { isCarePlaceKind } from '@/entities/care-place'
 import { CareMapContent } from '@/features/care-map'
 
 export const metadata = createPageMetadata({
@@ -15,9 +16,6 @@ export default async function CareMapPage({
   searchParams: Promise<{ kind?: string }>
 }) {
   const { kind } = await searchParams
-  const initialKind =
-    kind === 'shelter' || kind === 'cafe' || kind === 'travel' || kind === 'stay'
-      ? kind
-      : 'hospital'
+  const initialKind = isCarePlaceKind(kind) ? kind : 'hospital'
   return <CareMapContent key={initialKind} initialKind={initialKind} />
 }

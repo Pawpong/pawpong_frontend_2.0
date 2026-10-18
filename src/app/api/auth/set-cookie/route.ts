@@ -1,4 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
+import { isSameOriginRequest, readBoundedJson } from '@/shared/lib/server'
+import { AUTH_BFF_NO_STORE, AUTH_COOKIE_BODY_MAX_BYTES } from '../_constants/auth-bff'
+import { authCookieTokensSchema } from '../_lib/auth-token.schema'
 
 const DEFAULT_ACCESS_TOKEN_MAX_AGE_SECONDS = 60 * 60 * 24
 const DEFAULT_REFRESH_TOKEN_MAX_AGE_SECONDS = 60 * 60 * 24 * 7
@@ -36,7 +39,13 @@ type JwtPayload = {
 function decodeJwtPayload(token: string): JwtPayload {
   try {
     const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
-    return JSON.parse(Buffer.from(base64, 'base64').toString('utf8')) as JwtPayload
+    const payload: unknown = JSON.parse(Buffer.from(base64, 'base64').toString('utf8'))
+    if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return {}
+    const { role, exp } = payload as Record<string, unknown>
+    return {
+      role: role === 'adopter' || role === 'breeder' ? role : undefined,
+      exp: typeof exp === 'number' && Number.isFinite(exp) ? exp : undefined,
+    }
   } catch {
     return {}
   }
@@ -135,14 +144,25 @@ function setHostOnlyCookies(res: NextResponse, cookies: AuthCookie[], isSecure: 
 }
 
 export async function POST(req: NextRequest) {
-  const { accessToken, refreshToken } = (await req.json()) as {
-    accessToken?: string
-    refreshToken?: string
-  }
-
-  if (!accessToken || !refreshToken) {
-    return NextResponse.json({ ok: false, message: '토큰이 없습니다.' }, { status: 400 })
-  }
+  if (!isSameOriginRequest(req))
+    return NextResponse.json(
+      { ok: false, message: '허용되지 않은 요청입니다.' },
+      { status: 403, headers: AUTH_BFF_NO_STORE },
+    )
+  if (req.headers.get('content-type')?.split(';')[0].trim() !== 'application/json')
+    return NextResponse.json(
+      { ok: false, message: '올바른 JSON 요청이 필요합니다.' },
+      { status: 400, headers: AUTH_BFF_NO_STORE },
+    )
+  const parsed = authCookieTokensSchema.safeParse(
+    await readBoundedJson(req, AUTH_COOKIE_BODY_MAX_BYTES).catch(() => null),
+  )
+  if (!parsed.success)
+    return NextResponse.json(
+      { ok: false, message: '올바른 토큰이 필요합니다.' },
+      { status: 400, headers: AUTH_BFF_NO_STORE },
+    )
+  const { accessToken, refreshToken } = parsed.data
 
   const userRole = decodeJwtRole(accessToken)
   const accessTokenMaxAge = resolveJwtMaxAgeSeconds(
@@ -165,7 +185,7 @@ export async function POST(req: NextRequest) {
     { name: 'userRole', value: userRole, httpOnly: false, maxAgeSeconds: accessTokenMaxAge },
   ]
 
-  const res = NextResponse.json({ ok: true })
+  const res = NextResponse.json({ ok: true }, { headers: AUTH_BFF_NO_STORE })
 
   // localhost(HTTP)에서는 Secure 쿠키 사용 불가
   const isSecure = process.env.NODE_ENV === 'production'

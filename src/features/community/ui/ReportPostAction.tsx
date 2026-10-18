@@ -28,7 +28,7 @@ export const ReportPostAction = ({
       options={REPORT_REASON_OPTIONS}
       onSubmit={async (data) => {
         const { reported } = await reportPost.mutateAsync(data)
-        return reported ? '신고가 접수되었습니다.' : '이미 접수된 신고입니다. 검토를 기다려주세요.'
+        return reported ? '신고를 접수했어요.' : '이미 접수된 신고예요. 검토를 기다려 주세요.'
       }}
     />
   )

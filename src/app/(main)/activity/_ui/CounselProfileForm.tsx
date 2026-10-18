@@ -69,7 +69,7 @@ const CounselProfileFields = ({ initialValues }: { initialValues: CounselValues 
 
       {updateProfile.isError && (
         <p role="alert" className="text-xs text-error-700">
-          저장하지 못했습니다. 잠시 후 다시 시도해주세요.
+          저장하지 못했어요. 잠시 후 다시 시도해주세요.
         </p>
       )}
 
@@ -106,8 +106,8 @@ const CounselProfileForm = () => {
         isPending={isPending}
         isError={isError}
         isEmpty={false}
-        loadingText="신청서를 불러오는 중입니다."
-        errorText="신청서를 불러오지 못했습니다."
+        loadingText="신청서를 불러오는 중이에요."
+        errorText="신청서를 불러오지 못했어요."
         emptyText=""
         onRetry={() => void refetch()}
         isRetrying={isRetrying}

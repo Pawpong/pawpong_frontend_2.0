@@ -55,3 +55,56 @@ test('100MB boundary matches server input limit', () => {
     /100MB/,
   )
 })
+
+test('image loading settles on load/error and times out without retaining handlers', async () => {
+  let image,
+    timeout,
+    cleared = 0
+  class PendingDecodeImage {
+    naturalWidth = 640
+    naturalHeight = 480
+    constructor() {
+      image = this
+    }
+    decode() {
+      return new Promise(() => {})
+    }
+  }
+  const module = { exports: {} }
+  new Function('require', 'module', 'exports', 'Image', 'setTimeout', 'clearTimeout', outputText)(
+    require,
+    module,
+    module.exports,
+    PendingDecodeImage,
+    (callback, delay) => {
+      assert.equal(delay, 30_000)
+      timeout = callback
+      return 1
+    },
+    () => {
+      cleared++
+    },
+  )
+  const load = module.exports.loadPhotoImage
+  const ready = load('blob:ready')
+  image.onload()
+  assert.equal(await ready, image)
+  assert.equal(image.onload, null)
+  assert.equal(image.onerror, null)
+  assert.equal(image.src, 'blob:ready')
+
+  const failed = load('blob:broken')
+  const rejected = assert.rejects(failed, /불러오지 못했습니다/)
+  image.onerror()
+  await rejected
+  assert.equal(image.src, '')
+
+  const stalled = load('blob:stalled')
+  const bounded = assert.rejects(stalled, /오래 걸리고/)
+  timeout()
+  await bounded
+  assert.equal(image.src, '')
+  assert.equal(image.onload, null)
+  assert.equal(image.onerror, null)
+  assert.equal(cleared, 3)
+})

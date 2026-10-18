@@ -1,4 +1,6 @@
 @import 'tailwindcss';
+/* 공통 컴포넌트가 tv() 문자열로만 쓰는 사용자 정의 유틸리티는 빌드 캐시의 클래스 스캔 결과와 무관하게 항상 만든다. */
+@source inline('touch-target');
 
 /* 다크모드 미사용: dark: variant를 클래스 기반으로 고정해 OS 다크모드(prefers-color-scheme) 자동 적용 차단 */
 @custom-variant dark (&:where(.dark, .dark *));
@@ -198,6 +200,17 @@
   --color-pressed-favorite: #ff8181;
   --color-pressed-bookmark: #a9835a;
   --color-focus: var(--color-primary-500);
+
+  /* 도트 선택 버튼(PixelChoiceButton)을 고른 순간 통 튀어 오른다 */
+  --animate-pixel-pick: pixel-pick 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  @keyframes pixel-pick {
+    30% {
+      scale: 0.95;
+    }
+    65% {
+      scale: 1.03;
+    }
+  }
 }
 
 /* 키보드 포커스 링 — 버튼류와 클릭 가능한 카드/행이 공통으로 쓴다 */
@@ -205,6 +218,24 @@
   &:focus-visible {
     outline: 2px solid var(--color-focus);
     outline-offset: 2px;
+  }
+}
+
+/*
+ * 손가락으로 누르는 기기에서만 보이는 크기는 그대로 두고 누를 수 있는 영역을 최소 44px로 넓힌다.
+ * 투명한 ::after가 요소 가운데에 겹치므로 요소 자신이 relative·absolute 같은 기준 위치여야 한다.
+ */
+@utility touch-target {
+  @media (pointer: coarse) {
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: max(100%, 2.75rem);
+      height: max(100%, 2.75rem);
+      transform: translate(-50%, -50%);
+    }
   }
 }
 
@@ -252,7 +283,16 @@
     align-items: center;
   }
 
+  /* 서버가 그린 배너는 스와이퍼가 붙기 전에도 첫 장을 가운데, 다음 장을 작게 둬 붙는 순간 자리가 튀지 않게 한다. */
+  .banner-swiper:not(.swiper-initialized) .swiper-wrapper {
+    transform: translate3d(calc((100% - min(70.875rem, 78.75vw)) / 2), 0, 0);
+  }
+  .banner-swiper:not(.swiper-initialized) .swiper-slide + .swiper-slide {
+    transform: scale(0.85);
+  }
+
   /* 양옆 미리보기 배너는 Figma의 반투명 흰색 오버레이로 비활성 상태를 표현한다. */
+  .banner-swiper:not(.swiper-initialized) .swiper-slide:nth-child(2) [data-banner-slide]::after,
   .banner-swiper .swiper-slide-prev [data-banner-slide]::after,
   .banner-swiper .swiper-slide-next [data-banner-slide]::after {
     position: absolute;
@@ -274,14 +314,27 @@
   }
 }
 
+/* iOS 앱에는 사진 보관함 저장 권한 문구(NSPhotoLibraryAddUsageDescription)가 없어
+   이미지를 길게 눌러 저장하면 앱이 종료될 수 있다. 새 앱 빌드에 문구를 넣기 전까지 앱 안 이미지의 길게 누르기 메뉴를 끈다. */
+html[data-native-viewport] img {
+  -webkit-touch-callout: none;
+}
+
 /* Shared discovery-card feedback; preserve geometry and avoid sticky touch hover. */
 @utility card-interactive {
-  transition: box-shadow 160ms ease-out;
+  transition:
+    box-shadow 160ms ease-out,
+    scale 120ms ease-out;
 
   @media (hover: hover) and (pointer: fine) {
     &:hover {
       box-shadow: 0 0 0 1px var(--color-secondary-400);
     }
+  }
+
+  /* 누르는 동안 살짝 줄어 눌렸다는 걸 바로 알려준다. */
+  &:active {
+    scale: 0.98;
   }
 
   &:focus-within {
@@ -291,5 +344,9 @@
 
   @media (prefers-reduced-motion: reduce) {
     transition: none;
+
+    &:active {
+      scale: none;
+    }
   }
 }

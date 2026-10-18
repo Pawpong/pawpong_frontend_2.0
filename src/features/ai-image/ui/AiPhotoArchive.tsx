@@ -1,14 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { aiImageQueries, hideAiImageGeneration } from '@/entities/ai-image'
-import { PetResultLink } from '@/features/playground-pet/ui/PetResultLink'
+import { useQuery } from '@tanstack/react-query'
+import { aiImageQueries } from '@/entities/ai-image'
+import { useAuthReadSession } from '@/shared/lib/useAuthReadSession'
+import type { AuthReadSession } from '@/shared/lib/authReadSession'
 import { cn } from '@/shared/lib/cn'
-import type { AiImageGeneration } from '@/shared/types'
 import {
   RetryButton,
   Button,
@@ -17,9 +16,12 @@ import {
   DialogDescription,
   DialogTitle,
   EmptyState,
+  DeleteConfirmModal,
+  ListHeader,
 } from '@/shared/ui'
-import { fetchAiImageFile, fetchAiSourceFile, saveAiImageFile } from '../lib/aiImageFile'
-import { setPendingCommunityPhoto } from '../lib/pendingCommunityPhoto'
+import { EmptyStateLink } from '@/shared/ui/EmptyStateLink'
+import { GridSkeleton } from '@/shared/ui/Skeleton'
+import { useAiArchiveAction } from '../lib/useAiArchiveAction'
 import { ArchivePhotoCompare } from './ArchivePhotoCompare'
 import { AiPostShareChoice } from './AiPostShareChoice'
 
@@ -30,7 +32,11 @@ interface AiPhotoArchiveProps {
   limit?: number
   /** limit 로 잘렸을 때 전체 보기 링크 */
   moreHref?: string
+  /** 목록 위에 'AI 사진 n장' 제목과 새 사진 만들기 + 버튼을 둔다(마이홈 탭처럼 만들기 화면 밖에서 볼 때). */
+  createHref?: string
   gridClassName?: string
+  /** 크게 본 사진 아래 붙일 이어가기 버튼(예: 반려동물 캐릭터 만들기). 다른 기능은 화면 조립 계층에서 넣는다. */
+  renderResultAction?: (jobId: string, className?: string) => ReactNode
 }
 
 const formatDate = (iso: string) =>
@@ -47,23 +53,42 @@ const formatDate = (iso: string) =>
  * 사진을 누르면 크게 보고 저장·커뮤니티에 올리기·보관함에서 지우기를 할 수 있다.
  * 실패한 변환은 보여주지 않고, 진행 중인 것은 '만드는 중' 칸으로 둔다.
  */
-export function AiPhotoArchive({ enabled, limit, moreHref, gridClassName }: AiPhotoArchiveProps) {
-  const router = useRouter()
-  const queryClient = useQueryClient()
-  const generationsQuery = useQuery(aiImageQueries.myGenerations(enabled))
+export function AiPhotoArchive({
+  enabled,
+  limit,
+  moreHref,
+  createHref,
+  gridClassName,
+  renderResultAction,
+}: AiPhotoArchiveProps) {
+  const session = useAuthReadSession()
+  if (!enabled || !session) return null
+  return (
+    <AiArchiveContent
+      key={session.scope}
+      session={session}
+      limit={limit}
+      moreHref={moreHref}
+      createHref={createHref}
+      gridClassName={gridClassName}
+      renderResultAction={renderResultAction}
+    />
+  )
+}
+
+function AiArchiveContent({
+  session,
+  limit,
+  moreHref,
+  createHref,
+  gridClassName,
+  renderResultAction,
+}: Omit<AiPhotoArchiveProps, 'enabled'> & { session: AuthReadSession }) {
+  const generationsQuery = useQuery(aiImageQueries.myGenerations(true, session))
   const filtersQuery = useQuery(aiImageQueries.filters())
   const [openJobId, setOpenJobId] = useState<string | null>(null)
   const [shareComparison, setShareComparison] = useState(false)
-  const [busyAction, setBusyAction] = useState<'save' | 'post' | null>(null)
-  const [actionError, setActionError] = useState<string | null>(null)
-
-  const hideMutation = useMutation({
-    mutationFn: hideAiImageGeneration,
-    onSuccess: () => {
-      setOpenJobId(null)
-      void queryClient.invalidateQueries({ queryKey: aiImageQueries.myGenerations().queryKey })
-    },
-  })
+  const [confirmHide, setConfirmHide] = useState(false)
 
   const filterName = (filterId: string) =>
     filtersQuery.data?.find((filter) => filter.filterId === filterId)?.name ?? 'AI 필터'
@@ -71,67 +96,83 @@ export function AiPhotoArchive({ enabled, limit, moreHref, gridClassName }: AiPh
   const items = (generationsQuery.data ?? []).filter((job) => job.status !== 'failed')
   const visible = limit ? items.slice(0, limit) : items
   const opened = items.find((job) => job.jobId === openJobId) ?? null
+  const action = useAiArchiveAction(session, opened?.jobId ?? null)
 
-  const runAction = async (action: 'save' | 'post', job: AiImageGeneration) => {
-    setBusyAction(action)
-    setActionError(null)
-    try {
-      const file = await fetchAiImageFile(job.jobId)
-      if (action === 'save') {
-        await saveAiImageFile(file)
-      } else {
-        setPendingCommunityPhoto(
-          file,
-          shareComparison ? await fetchAiSourceFile(job.jobId) : undefined,
-          job.jobId,
-        )
-        router.push('/community/write')
-      }
-    } catch {
-      setActionError('사진을 가져오지 못했어요. 잠시 후 다시 시도해 주세요.')
-    } finally {
-      setBusyAction(null)
-    }
+  const close = () => {
+    action.cancel()
+    setOpenJobId(null)
+    setConfirmHide(false)
+    setShareComparison(false)
   }
-
-  if (!enabled) return null
-  if (generationsQuery.isPending) {
-    return <EmptyState message="보관함을 불러오는 중이에요." illustration={false} size="compact" />
-  }
-  if (generationsQuery.isError) {
-    return (
-      <EmptyState
-        role="alert"
-        illustration={false}
-        size="compact"
-        message="보관함을 불러오지 못했어요."
-        action={
-          <RetryButton
-            onRetry={() => void generationsQuery.refetch()}
-            isRetrying={generationsQuery.isFetching}
-          />
-        }
+  // 마이홈 탭처럼 만들기 화면 밖에서 볼 때만 분양 목록과 같은 '제목 n장 +' 줄을 둔다
+  const header = createHref && (
+    <div className="mb-4">
+      <ListHeader
+        title="AI 사진"
+        count={generationsQuery.data ? items.length : undefined}
+        unit="장"
+        create={{ href: createHref, label: '새 사진 만들기' }}
       />
+    </div>
+  )
+  if (generationsQuery.isPending) {
+    return (
+      <>
+        {header}
+        <GridSkeleton
+          label="보관함을 불러오는 중이에요."
+          count={limit ?? 8}
+          className={cn('grid grid-cols-3 gap-1.5 tab:grid-cols-4 tab:gap-3', gridClassName)}
+        />
+      </>
+    )
+  }
+  if (generationsQuery.isError && !generationsQuery.data) {
+    return (
+      <>
+        {header}
+        <EmptyState
+          role="alert"
+          illustration={false}
+          size="compact"
+          message="보관함을 불러오지 못했어요."
+          action={
+            <RetryButton
+              onRetry={() => void generationsQuery.refetch()}
+              isRetrying={generationsQuery.isFetching}
+            />
+          }
+        />
+      </>
     )
   }
   if (items.length === 0) {
     return (
-      <EmptyState
-        message="아직 만든 AI 사진이 없어요. 첫 작품을 만들어 볼까요?"
-        action={
-          <Link
-            href="/ai-filter"
-            className="text-sm font-semibold text-primary-700 underline underline-offset-4"
-          >
-            AI 필터 써 보기
-          </Link>
-        }
-      />
+      <>
+        {header}
+        <EmptyState
+          message="아직 만든 AI 사진이 없어요. 첫 작품을 만들어 볼까요?"
+          action={<EmptyStateLink href="/ai-filter">AI 필터 써 보기</EmptyStateLink>}
+        />
+      </>
     )
   }
 
   return (
     <>
+      {generationsQuery.isError && (
+        <div
+          role="status"
+          className="mb-4 flex flex-wrap items-center gap-3 text-sm text-neutral-700"
+        >
+          <p>최신 보관함을 확인하지 못했어요. 마지막으로 불러온 사진을 표시해요.</p>
+          <RetryButton
+            onRetry={() => void generationsQuery.refetch()}
+            isRetrying={generationsQuery.isFetching}
+          />
+        </div>
+      )}
+      {header}
       <ul
         className={cn('grid grid-cols-3 gap-1.5 tab:grid-cols-4 tab:gap-3', gridClassName)}
         aria-label="내 AI 사진"
@@ -144,6 +185,8 @@ export function AiPhotoArchive({ enabled, limit, moreHref, gridClassName }: AiPh
                 type="button"
                 disabled={!done}
                 onClick={() => {
+                  action.cancel()
+                  setConfirmHide(false)
                   setShareComparison(false)
                   setOpenJobId(job.jobId)
                 }}
@@ -175,7 +218,7 @@ export function AiPhotoArchive({ enabled, limit, moreHref, gridClassName }: AiPh
       {limit && items.length > limit && moreHref && (
         <Link
           href={moreHref}
-          className="mt-3 inline-block text-sm font-semibold text-primary-700 underline underline-offset-4"
+          className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-primary-700 underline underline-offset-4 focus-ring"
         >
           보관함 전체 보기 ({items.length})
         </Link>
@@ -184,10 +227,7 @@ export function AiPhotoArchive({ enabled, limit, moreHref, gridClassName }: AiPh
       <Dialog
         open={!!opened}
         onOpenChange={(open) => {
-          if (!open) {
-            setOpenJobId(null)
-            setActionError(null)
-          }
+          if (!open) close()
         }}
       >
         {opened?.resultImageUrl && (
@@ -203,44 +243,62 @@ export function AiPhotoArchive({ enabled, limit, moreHref, gridClassName }: AiPh
             <AiPostShareChoice
               checked={shareComparison}
               onChange={setShareComparison}
-              disabled={!!busyAction}
+              disabled={!!action.busy}
             />
-            <PetResultLink sourceJobId={opened.jobId} />
-            {actionError && (
+            {renderResultAction?.(opened.jobId)}
+            {action.error && (
               <p role="alert" className="text-sm text-error-500">
-                {actionError}
+                {action.error}
               </p>
             )}
             <div className="grid grid-cols-2 gap-2">
               <Button
                 intent="secondary"
                 size="lg"
-                disabled={!!busyAction}
-                onClick={() => void runAction('save', opened)}
+                disabled={!!action.busy}
+                onClick={() => void action.run('save')}
               >
-                {busyAction === 'save' ? '준비 중…' : '저장하기'}
+                {action.busy === 'save' ? '준비 중…' : '저장하기'}
               </Button>
               <Button
                 size="lg"
-                disabled={!!busyAction}
-                onClick={() => void runAction('post', opened)}
+                disabled={!!action.busy}
+                onClick={() => void action.run('post', shareComparison)}
               >
-                {busyAction === 'post' ? '준비 중…' : '커뮤니티에 올리기'}
+                {action.busy === 'post' ? '준비 중…' : '커뮤니티에 올리기'}
               </Button>
             </div>
+            {(action.busy === 'post' || action.busy === 'save') && (
+              <Button intent="ghost" onClick={action.cancel}>
+                사진 가져오기 취소
+              </Button>
+            )}
             <div className="flex justify-self-center">
               <Button
                 size="md"
                 intent="ghost"
-                disabled={hideMutation.isPending}
-                onClick={() => hideMutation.mutate(opened.jobId)}
+                disabled={!!action.busy}
+                onClick={() => {
+                  action.cancel()
+                  setConfirmHide(true)
+                }}
               >
-                {hideMutation.isPending ? '지우는 중…' : '보관함에서 지우기'}
+                {action.busy === 'hide' ? '지우는 중…' : '보관함에서 지우기'}
               </Button>
             </div>
           </DialogContent>
         )}
       </Dialog>
+      <DeleteConfirmModal
+        open={confirmHide && !!opened}
+        onOpenChange={(open) => !action.busy && setConfirmHide(open)}
+        target="보관함 사진"
+        isPending={action.busy === 'hide'}
+        errorMessage={action.error}
+        onConfirm={async () => {
+          if (await action.run('hide')) close()
+        }}
+      />
     </>
   )
 }

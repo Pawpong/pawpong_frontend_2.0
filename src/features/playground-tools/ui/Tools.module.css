@@ -1,0 +1,533 @@
+.page {
+  width: 100%;
+  max-width: 68rem;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 5rem;
+  color: var(--color-neutral-850, #3e3e3e);
+}
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  color: var(--color-primary-600, #94591f);
+  font-size: 0.875rem;
+}
+/* 공통 focus-ring 유틸리티와 같은 두께·색·간격을 쓴다. */
+.back:focus-visible,
+.textButton:focus-visible,
+.theme:focus-visible {
+  outline: 2px solid var(--color-primary-500, #ad651d);
+  outline-offset: 2px;
+}
+.header {
+  margin: 0.75rem 0 2rem;
+}
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-primary-600, #94591f);
+}
+.toolGrid,
+.cardMaker {
+  display: grid;
+  gap: 1.5rem;
+  align-items: start;
+}
+.panel {
+  min-width: 0;
+  border: 1px solid var(--color-secondary-200, #eddbc6);
+  border-radius: 1.25rem;
+  background: white;
+  padding: 1.25rem;
+}
+/* 외출 준비함 티켓 본문. 틀·띠는 shared/ui/Ticket.module.css 가 맡는다. */
+.panelBody {
+  min-width: 0;
+  padding: 1.25rem;
+}
+.sectionTitle {
+  font:
+    1.125rem/1.5 var(--font-cafe24proup),
+    sans-serif;
+  margin: 0.3rem 0 1.2rem;
+}
+.listHeading {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  margin: 2rem 0 1rem;
+}
+.listHeading h2 {
+  margin: 0.4rem 0;
+  font:
+    1.4rem/1.4 var(--font-cafe24proup),
+    sans-serif;
+}
+.listHeading p {
+  color: #707070;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  word-break: keep-all;
+}
+.listHeading strong {
+  color: #ad651d;
+  font-size: 1.7rem;
+  white-space: nowrap;
+}
+.listHeading strong span {
+  font-size: 0.875rem;
+  font-weight: 500;
+  /* 흰 바탕 작은 글자 대비 4.5:1 이상 */
+  color: var(--color-neutral-700, #6b6b6b);
+}
+/* 멍냥BTI 질문과 같은 도트 진행 바를 감싸는 칸 */
+.progress {
+  width: 100%;
+  height: 1rem;
+}
+.checklist {
+  list-style: none;
+  margin: 1rem 0 1.25rem;
+  padding: 0;
+}
+.checklist li {
+  display: flex;
+  align-items: center;
+  min-height: 58px;
+  border-bottom: 1px solid #f3ede4;
+  gap: 0.25rem;
+}
+.checklist label {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex: 1;
+  min-height: 58px;
+  padding: 0.5rem 0;
+  cursor: pointer;
+}
+.checklist label span {
+  flex: 1;
+  overflow-wrap: anywhere;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+.checklist input {
+  display: grid;
+  place-content: center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  margin: 0;
+  border: 2px solid var(--accent-edge, #55784d);
+  border-radius: 3px;
+  background: var(--color-base-white, #fff);
+  appearance: none;
+  cursor: pointer;
+}
+.checklist input::before {
+  width: 12px;
+  height: 12px;
+  /* 도트 체크 모양 */
+  clip-path: polygon(
+    0 50%,
+    25% 50%,
+    25% 75%,
+    42% 75%,
+    42% 25%,
+    58% 25%,
+    58% 0,
+    100% 0,
+    100% 25%,
+    75% 25%,
+    75% 50%,
+    58% 50%,
+    58% 100%,
+    25% 100%,
+    25% 75%,
+    0 75%
+  );
+  background: var(--color-base-white, #fff);
+  content: '';
+  scale: 0;
+}
+.checklist input:checked {
+  background: var(--accent-ink, #4a6943);
+  border-color: var(--accent-ink, #4a6943);
+  animation: pop 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.checklist input:checked::before {
+  scale: 1;
+}
+.checklist input:focus-visible {
+  outline: 2px solid var(--color-primary-500, #ad651d);
+  outline-offset: 2px;
+}
+.checklist small {
+  font-size: 0.625rem;
+  color: var(--color-neutral-700, #6b6b6b);
+  white-space: nowrap;
+}
+.checkedRow {
+  animation: row-glow 700ms ease-out;
+}
+.checkedRow label span {
+  text-decoration: line-through;
+  /* 지운 줄도 읽을 수 있게 4.5:1 이상 */
+  color: var(--color-neutral-700, #6b6b6b);
+}
+.addForm {
+  display: flex;
+  gap: 0.6rem;
+}
+.addForm input,
+.fields input:not([type='range']) {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #ded8cf;
+  border-radius: 0.6rem;
+  font-size: 16px;
+  background: white;
+  color: #3e3e3e;
+}
+.addForm input:focus,
+.fields input:focus {
+  outline: 2px solid #ad651d;
+  outline-offset: 2px;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  align-items: center;
+  margin-top: 1rem;
+}
+.textButton {
+  min-height: 44px;
+  padding: 0.4rem 0.15rem;
+  font-size: 0.8rem;
+  color: #77634d;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+.success {
+  position: relative;
+  margin-top: 1rem;
+  padding: 0.85rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  background: #f0f6de;
+  border: 2px solid var(--accent-edge, #55784d);
+  border-radius: 0.5rem;
+  color: #42622c;
+  font-size: 0.85rem;
+  font-weight: 600;
+  animation: pop-in 520ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.confetti {
+  position: absolute;
+  top: 50%;
+  left: 1.6rem;
+  width: 6px;
+  height: 6px;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow:
+    0 -26px 0 var(--color-point-500, #ffff70),
+    22px -18px 0 var(--accent-edge, #55784d),
+    30px 4px 0 var(--color-point-500, #ffff70),
+    -22px -18px 0 var(--accent-edge, #55784d),
+    -28px 6px 0 var(--color-point-500, #ffff70),
+    12px 24px 0 var(--accent-edge, #55784d),
+    -12px 24px 0 var(--color-point-500, #ffff70);
+  animation: burst 760ms ease-out 120ms;
+}
+.success svg {
+  flex-shrink: 0;
+}
+.confirm {
+  margin-top: 1rem;
+  border: 1px solid #e7cdac;
+  background: #fffbea;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.85rem;
+  line-height: 1.7;
+}
+.status {
+  min-height: 1.5rem;
+  margin-top: 0.8rem;
+  color: #805125;
+  font-size: 0.8rem;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.plainList {
+  margin: 0.25rem 0 1rem;
+  font-size: 0.8rem;
+}
+.plainList summary {
+  cursor: pointer;
+  padding: 0.5rem 0;
+  color: #77634d;
+  min-height: 44px;
+}
+.plainList pre {
+  white-space: pre-wrap;
+  font-family: inherit;
+  line-height: 1.9;
+  padding: 0.85rem;
+  background: #faf8f3;
+  border-radius: 0.5rem;
+  overflow-wrap: anywhere;
+}
+.storageNote {
+  font-size: 0.75rem;
+  color: #77716a;
+  line-height: 1.8;
+  word-break: keep-all;
+}
+.sideStack {
+  display: grid;
+  gap: 1.2rem;
+}
+.noteBody {
+  padding: 1.25rem;
+}
+.noteBody h2 {
+  margin: 0.6rem 0;
+  font:
+    1.35rem/1.5 var(--font-cafe24proup),
+    sans-serif;
+  color: var(--color-neutral-850, #3e3e3e);
+}
+.noteBody p {
+  margin: 0.5rem 0 1.2rem;
+  font-size: 0.85rem;
+  line-height: 1.8;
+  color: var(--color-neutral-700, #6b6b6b);
+  word-break: keep-all;
+}
+.previewPanel {
+  min-width: 0;
+  padding: 1.15rem;
+  border-radius: 1.25rem;
+  background: #f7f3e9;
+  border: 1px solid #ede3d1;
+}
+.previewLabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.9rem;
+  color: #716557;
+  font-size: 0.7rem;
+}
+.previewLabel span:first-child {
+  font-family: var(--font-cafe24proup), sans-serif;
+  font-size: 0.9rem;
+  color: #6d471f;
+}
+.memoryCanvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1080/1350;
+  background: #fff3b8;
+  box-shadow: 0 6px 16px #59422416;
+}
+.photoActions {
+  margin: 0 0 0.75rem;
+}
+.previewPanel > p {
+  text-align: center;
+  margin-top: 1rem;
+}
+.hint {
+  font-size: 0.7rem;
+  color: #77716a;
+  margin: 0.6rem 0;
+  line-height: 1.75;
+}
+.fields {
+  border: 0;
+  padding: 0;
+  margin: 1.5rem 0;
+  display: grid;
+  gap: 1.1rem;
+  min-width: 0;
+}
+.fields > label,
+.cropControls label {
+  display: grid;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  min-width: 0;
+}
+.fields small {
+  font-size: 0.65rem;
+  color: #81766a;
+  text-align: right;
+  font-weight: 400;
+}
+.fieldTitle {
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.6rem;
+}
+.themeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+.theme {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 0.25rem;
+  min-height: 80px;
+  border: 1px solid #e6ded3;
+  border-radius: 0.65rem;
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+.theme > span {
+  height: 24px;
+  width: 40px;
+  background: var(--theme-color);
+  border: 1px solid #9d8d7640;
+}
+.theme[aria-pressed='true'] {
+  border: 2px solid #ad651d;
+  background: #fffdf3;
+  font-weight: 700;
+}
+.cropControls {
+  padding: 1rem;
+  background: #fcfaf5;
+  border-radius: 0.7rem;
+}
+.cropControls summary {
+  display: flex;
+  align-items: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 44px;
+}
+.cropControls label {
+  margin-top: 0.7rem;
+  font-size: 0.75rem;
+  color: #716557;
+}
+.cropControls input {
+  width: 100%;
+  min-height: 44px;
+  accent-color: #ad651d;
+}
+.exportActions {
+  display: flex;
+  gap: 0.6rem;
+}
+.exportActions button {
+  font-size: 0.875rem;
+}
+.nextStep {
+  border-top: 1px dashed #e8d8c2;
+  margin-top: 1.2rem;
+  padding-top: 1.2rem;
+}
+.nextStep p {
+  font-size: 0.75rem;
+  color: #817365;
+  margin-bottom: 0.75rem;
+}
+.nextStep a {
+  font-size: 0.8rem;
+}
+@media (min-width: 768px) {
+  .page {
+    padding: 2rem 2rem 5rem;
+  }
+  .header h1 {
+    font-size: 2.2rem;
+  }
+  .toolGrid {
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  }
+  .cardMaker {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  }
+  .panel {
+    padding: 1.6rem;
+  }
+  .panelBody,
+  .noteBody {
+    padding: 1.5rem;
+  }
+  .previewPanel {
+    position: sticky;
+    top: 6rem;
+  }
+}
+
+@keyframes pop {
+  30% {
+    scale: 0.92;
+  }
+  65% {
+    scale: 1.06;
+  }
+}
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    scale: 0.85;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+@keyframes burst {
+  from {
+    opacity: 1;
+    scale: 0.3;
+  }
+  70% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    scale: 1.4;
+  }
+}
+@keyframes row-glow {
+  from {
+    background: color-mix(in srgb, var(--accent, #cfe6c3) 70%, transparent);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .checklist input:checked,
+  .checkedRow,
+  .success,
+  .confetti {
+    transition: none;
+    animation: none;
+  }
+}

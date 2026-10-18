@@ -16,6 +16,7 @@ import { AlertMessage, buttonVariants } from '@/shared/ui'
 import { ApplicationChatButton } from '@/features/chat-entry'
 import { getReviewTypeForStatus } from '../../../_ui/ActivityBadges'
 import { ReviewComposer } from '../../../_ui/ReviewComposer'
+import { PixelArrowRightIcon } from '@/shared/assets'
 
 const ApplicationDetailContent = ({
   applicationId,
@@ -75,7 +76,8 @@ const ApplicationDetailContent = ({
                         size: 'md',
                       })}
                     >
-                      브리더 홈 보기 →
+                      브리더 홈 보기
+                      <PixelArrowRightIcon aria-hidden className="ml-1 size-3" />
                     </Link>
                   </>
                 }

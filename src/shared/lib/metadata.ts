@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { SHARE_IMAGE, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from '@/shared/config/site'
+import { createMobileAppMetadata } from './mobileApp'
 
 export const summarizeShareText = (value: string, limit = 160): string =>
   value
@@ -24,13 +25,15 @@ export const createPageMetadata = ({
   const fullTitle =
     title === SITE_NAME ? `${SITE_NAME} | 새로운 가족과의 만남` : `${title} | ${SITE_NAME}`
   const summary = summarizeShareText(description) || SITE_DESCRIPTION
-  const url = path ? new URL(path, SITE_URL).href : undefined
+  const candidate = path && !noIndex ? new URL(path, SITE_URL) : undefined
+  const url = candidate?.origin === SITE_URL ? candidate.href : undefined
   const imageUrl = image || SHARE_IMAGE
   return {
     title: fullTitle,
     description: summary,
     alternates: url ? { canonical: url } : undefined,
     robots: noIndex ? { index: false, follow: false } : undefined,
+    ...(url && createMobileAppMetadata(url)),
     openGraph: {
       type: 'website',
       locale: 'ko_KR',

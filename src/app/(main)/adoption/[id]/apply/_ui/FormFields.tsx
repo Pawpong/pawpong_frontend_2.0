@@ -132,7 +132,7 @@ const FooterCtaBar = ({
   submitLabel = '상담 신청하기',
   submitLabelTab = '입양 상담',
   submitLabelPc = '입양 상담하기',
-  pendingLabel = '제출 중...',
+  pendingLabel = '제출 중…',
 }: {
   onCancel: () => void
   isValid: boolean

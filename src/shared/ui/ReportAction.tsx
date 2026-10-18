@@ -79,7 +79,7 @@ export const ReportAction = <Reason extends string>({
       resetForm()
       setResult(message)
     } catch (cause) {
-      setError(normalizeApiError(cause, '신고 접수에 실패했습니다. 다시 시도해주세요.').message)
+      setError(normalizeApiError(cause, '신고를 접수하지 못했어요. 다시 시도해 주세요.').message)
     } finally {
       setPending(false)
     }
@@ -126,7 +126,7 @@ export const ReportAction = <Reason extends string>({
             <DialogDescription>
               신고 사유를 선택해주세요.
               <br />
-              접수된 내용은 운영 정책에 따라 검토됩니다.
+              접수된 내용은 운영 정책에 따라 검토해요.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={submit} aria-busy={pending} className="flex flex-col gap-4">

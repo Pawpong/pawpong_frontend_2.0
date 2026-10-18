@@ -8,6 +8,8 @@ const COMMUNITY_POST_LIST_KEYS: QueryKey[] = [
   communityQueries.userPostsAll(),
   communityQueries.draftsAll(),
   communityQueries.myBookmarksAll(),
+  communityQueries.myLikedAll(),
+  communityQueries.myCommentedAll(),
 ]
 
 export const invalidateCommunityPostLists = (queryClient: QueryClient) =>

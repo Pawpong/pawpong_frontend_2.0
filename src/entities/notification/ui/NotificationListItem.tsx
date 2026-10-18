@@ -53,7 +53,7 @@ const NotificationListItem = ({
           <span className="line-clamp-2 text-sm leading-[1.5] font-medium text-neutral-700">
             {item.body}
           </span>
-          <span className="flex items-center gap-1.5 text-xs font-medium text-neutral-500">
+          <span className="flex items-center gap-1.5 text-xs font-medium text-neutral-700">
             {category && !compact && (
               <span className="rounded bg-neutral-100 px-1.5 py-0.5 text-neutral-700">
                 {notificationCategoryLabel(category)}

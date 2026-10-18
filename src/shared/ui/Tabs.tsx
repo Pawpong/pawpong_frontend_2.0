@@ -44,7 +44,7 @@ const tabsTriggerVariants = tv({
       // cafe24 폰트 — 변수 단독으론 미적용이라 className 병행
       underline: cn(
         cafe24Proup.className,
-        'relative flex-1 items-start font-cafe24 text-neutral-500 data-[state=active]:text-primary-500',
+        'relative flex-1 items-start font-cafe24 text-neutral-700 data-[state=active]:text-primary-500',
         'after:absolute after:bottom-0 after:left-0 after:w-full after:bg-primary-500',
         'after:opacity-0 data-[state=active]:after:opacity-100',
       ),

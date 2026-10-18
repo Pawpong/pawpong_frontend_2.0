@@ -1,6 +1,8 @@
 'use client'
 
 import { BeforeAfterSlider } from '@/shared/ui'
+import { ActivityBadgeRow, BreederLevelBadge } from '@/entities/gamification'
+import { usePublicActivityBadges } from '@/features/gamification'
 
 import type { ReactNode } from 'react'
 import {
@@ -18,10 +20,14 @@ import {
 } from '@/entities/community'
 import { useLoginGuard } from '@/features/auth'
 import { cn } from '@/shared/lib/cn'
+import { SkeletonBlock } from '@/shared/ui/Skeleton'
 import { usePostDetail } from '../post/[postId]/_ui/usePostDetail'
 import { useCommentThread } from '../post/[postId]/_ui/useCommentThread'
 import { CommentList } from '../post/[postId]/_ui/CommentList'
 import { CommentComposerBar } from '../post/[postId]/_ui/CommentComposerBar'
+import { CommunityExperiencePanel } from './CommunityExperiencePanel'
+import { isCommunityPostHeld } from '@/entities/community'
+import { CommunityPostReviewPanel } from './CommunityPostReviewPanel'
 
 /**
  * 게시글 상세 본문 (Figma feed-detail, node 3753:246802)
@@ -62,21 +68,71 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
   // 좋아요·북마크는 비로그인 요청이 401로 떨어지므로 먼저 로그인으로 유도한다
   const { guard, isPromptOpen, setPromptOpen } = useLoginGuard()
   // 목록과 입력창이 서로 떨어진 자리에 배치되므로 스레드 상태는 여기서 한 번만 만든다
-  const thread = useCommentThread(postId)
+  const held = !!post && isCommunityPostHeld(post)
+  const interactive = !!post && post.status === 'published' && !held
+  const thread = useCommentThread(postId, interactive)
+  const badges = usePublicActivityBadges(
+    post
+      ? [{ ownerId: post.authorId, role: post.authorModel === 'Breeder' ? 'breeder' : 'adopter' }]
+      : [],
+  )
 
   // 캐시가 없는 직접 진입에서는 상세 응답 전까지 채울 값이 없다 — 빈 패널 대신 상태를 알린다
+  if (!post && isPending && !isError) {
+    // 실제 글과 같은 배치(좌우 모달은 사진 60%·글 40%, 세로는 정사각 사진 아래 글)로 자리를 잡는다.
+    const sideBySide = layout === 'side-by-side'
+    const lines = (
+      <div className="space-y-3 p-4">
+        <div className="flex items-center gap-2">
+          <SkeletonBlock className="size-8 rounded-full" />
+          <SkeletonBlock className="h-4 w-24 rounded" />
+        </div>
+        <SkeletonBlock className="h-4 w-3/4 rounded" />
+        <SkeletonBlock className="h-4 w-1/2 rounded" />
+      </div>
+    )
+    return (
+      <div
+        role="status"
+        aria-busy="true"
+        className={cn(
+          'flex h-full min-h-0 w-full',
+          sideBySide ? 'flex-row' : 'flex-col',
+          className,
+        )}
+      >
+        <span className="sr-only">게시글을 불러오는 중이에요.</span>
+        {sideBySide ? (
+          <>
+            <SkeletonBlock className="h-full w-[60%] shrink-0 rounded-none" />
+            <div className="flex w-[40%] flex-col">
+              {trailingAction && (
+                <div className="flex shrink-0 items-center justify-end px-4 py-2">
+                  {trailingAction}
+                </div>
+              )}
+              {lines}
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="flex shrink-0 items-center justify-end px-4 py-2">{trailingAction}</div>
+            <SkeletonBlock className="aspect-square w-full shrink-0 rounded-none" />
+            {lines}
+          </>
+        )}
+      </div>
+    )
+  }
+
   if (!post) {
     return (
       <div className={cn('flex h-full min-h-0 w-full flex-col', className)}>
         <div className="flex shrink-0 items-center justify-end px-4 py-2">{trailingAction}</div>
         <AsyncState
-          status={isError ? 'error' : isPending ? 'loading' : 'empty'}
+          status={isError ? 'error' : 'empty'}
           message={
-            isError
-              ? '게시글을 불러오지 못했습니다.'
-              : isPending
-                ? '게시글을 불러오는 중입니다.'
-                : '삭제되었거나 볼 수 없는 게시글입니다.'
+            isError ? '게시글을 불러오지 못했어요.' : '삭제되었거나 볼 수 없는 게시글이에요.'
           }
           onRetry={isError ? () => void refetch() : undefined}
           isRetrying={isRetrying}
@@ -103,8 +159,19 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
           alt={post.authorNickname}
           className="shrink-0"
         />
-        <span className="truncate text-body-lg font-semibold text-neutral-850">
-          {post.authorNickname}
+        <span className="min-w-0">
+          <span className="block truncate text-body-lg font-semibold text-neutral-850">
+            {post.authorNickname} <BreederLevelBadge level={badges[0]?.level} />
+          </span>
+          <ActivityBadgeRow
+            badges={
+              badges.find(
+                (owner) =>
+                  owner.ownerId === post.authorId &&
+                  owner.role === (post.authorModel === 'Breeder' ? 'breeder' : 'adopter'),
+              )?.badges ?? []
+            }
+          />
         </span>
       </a>
       {trailingAction}
@@ -126,7 +193,7 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
   )
 
   // 인스타그램처럼 액션바는 본문 흐름 안에 두고, 하단에는 입력창만 고정한다
-  const actionBar = (
+  const actionBar = interactive && (
     <div className="border-b border-neutral-100 px-4 py-3">
       <CommunityPostActions
         likeCount={post.likeCount}
@@ -220,12 +287,16 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
           {header}
           <div className="min-h-0 flex-1 overflow-y-auto">
             {caption}
+            <CommunityPostReviewPanel post={post} isOwner={isOwner} />
+            <CommunityExperiencePanel post={post} isOwner={isOwner} />
             {actionBar}
-            <div className="p-4">
-              <CommentList thread={thread} />
-            </div>
+            {interactive && (
+              <div className="p-4">
+                <CommentList thread={thread} />
+              </div>
+            )}
           </div>
-          <CommentComposerBar thread={thread} className={COMPOSER_CLASS} />
+          {interactive && <CommentComposerBar thread={thread} className={COMPOSER_CLASS} />}
         </div>
         {modals}
       </div>
@@ -239,12 +310,16 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
       <div className="min-h-0 flex-1 overflow-y-auto">
         {imageCarousel}
         {caption}
+        <CommunityPostReviewPanel post={post} isOwner={isOwner} />
+        <CommunityExperiencePanel post={post} isOwner={isOwner} />
         {actionBar}
-        <div className="p-4">
-          <CommentList thread={thread} />
-        </div>
+        {interactive && (
+          <div className="p-4">
+            <CommentList thread={thread} />
+          </div>
+        )}
       </div>
-      <CommentComposerBar thread={thread} className={COMPOSER_CLASS} />
+      {interactive && <CommentComposerBar thread={thread} className={COMPOSER_CLASS} />}
       {modals}
     </div>
   )

@@ -17,8 +17,8 @@ interface ErrorBoundaryUIProps {
 export function ErrorBoundaryUI({
   error,
   reset,
-  title = '문제가 발생했습니다',
-  description = '페이지를 불러오는 중 오류가 발생했습니다.',
+  title = '문제가 생겼어요',
+  description = '페이지를 불러오지 못했어요.',
 }: ErrorBoundaryUIProps) {
   const reloadRequired = needsDocumentReload(error)
 
@@ -32,9 +32,9 @@ export function ErrorBoundaryUI({
       title={title}
       description={
         <p>
-          죄송합니다. {description}
+          {description}
           <br />
-          잠시 후 다시 시도해주세요.
+          잠시 후 다시 시도해 주세요.
         </p>
       }
       actions={

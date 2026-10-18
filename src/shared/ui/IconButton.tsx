@@ -4,7 +4,7 @@ import { tv, type VariantProps } from '@/shared/lib/tv'
 // 아이콘 전용 버튼 — 정사각 터치 영역 + tone 별 hover. 아이콘 크기는 넘겨주는 아이콘이 정한다.
 // aria-label 필수. edge는 아이콘을 가장자리에 맞추며 버튼의 터치 영역 크기는 유지한다.
 const iconButtonStyles = tv({
-  base: 'focus-ring inline-flex shrink-0 rounded-lg items-center justify-center transition-colors disabled:cursor-not-allowed disabled:text-action-disabled-fg',
+  base: 'focus-ring touch-target relative inline-flex shrink-0 rounded-lg items-center justify-center transition-colors disabled:cursor-not-allowed disabled:text-action-disabled-fg',
   variants: {
     edge: {
       none: '',

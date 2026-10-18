@@ -1,4 +1,6 @@
-import { apiClient, API_VERSION, unwrap } from '@/shared/api'
+import { apiClient, API_VERSION, unwrap, withAuthReadSession } from '@/shared/api'
+import { ApiError } from '@/shared/api/unwrap'
+import { getAuthReadSession, type AuthReadSession } from '@/shared/lib/authReadSession'
 import type {
   ApiResponseFull,
   NotificationListFilter,
@@ -23,8 +25,22 @@ export const getNotifications = async (
 }
 
 /** 읽지 않은 알림 수 조회 */
-export const getUnreadCount = async (): Promise<number> => {
-  return apiClient
-    .get<ApiResponseFull<{ unreadCount: number }>>(`${API_VERSION}/notification/unread-count`)
-    .then((res) => unwrap(res, '읽지 않은 알림 수를 불러오는데 실패했습니다.').unreadCount)
+export const getUnreadCount = async (
+  session: AuthReadSession | null = getAuthReadSession(),
+  signal?: AbortSignal,
+): Promise<number> => {
+  return withAuthReadSession(
+    async (config) => {
+      const res = await apiClient.get<ApiResponseFull<{ unreadCount: number }>>(
+        `${API_VERSION}/notification/unread-count`,
+        config,
+      )
+      const count = unwrap(res, '읽지 않은 알림 수를 불러오는데 실패했습니다.').unreadCount
+      if (!Number.isSafeInteger(count) || count < 0)
+        throw new ApiError('알림 개수를 확인하지 못했습니다.', 502)
+      return count
+    },
+    session,
+    signal,
+  )
 }

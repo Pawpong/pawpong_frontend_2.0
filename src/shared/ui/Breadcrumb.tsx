@@ -9,7 +9,7 @@ const Breadcrumb = ({ items, className }: BreadcrumbProps) => {
       {items.map((item, index) => (
         <span
           key={item}
-          className={index < items.length - 1 ? 'text-text-muted' : 'text-text-primary'}
+          className={index < items.length - 1 ? 'text-neutral-700' : 'text-text-primary'}
         >
           {item}
           {index < items.length - 1 && ' > '}

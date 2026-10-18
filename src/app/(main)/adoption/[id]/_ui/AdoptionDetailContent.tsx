@@ -56,14 +56,17 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
   const isMyListing = !!me && me.userId === detail.breeder.id
 
   // 서버가 어차피 거절하는 경우를 버튼 단계에서 알린다 — 신청 생성은 status: 'available' 인
-  // 펫만 받는다(findApplicablePet). 브리더 계정도 다른 브리더에게 입양 신청을 넣을 수 있어
-  // role 로는 막지 않는다. 비로그인은 그대로 노출해 신청 페이지에서 로그인 유도 흐름을 타게 둔다.
+  // 펫만 받는다(findApplicablePet). 비로그인은 그대로 노출해 신청 페이지에서 로그인 유도 흐름을 타게 둔다.
   const applyBlockedReason =
     detail.status === 'adopted'
       ? '분양이 완료된 개체예요'
       : detail.status === 'reserved'
         ? '예약 중인 개체예요'
         : undefined
+  // 입양 신청은 입양자 전용이다(POST /v2/adoption-application, StrictRolesGuard) — 브리더는 신청서를
+  // 다 쓴 뒤에야 403 으로 막히므로 신청 버튼만 내린다. 브리더끼리 채팅은 허용돼 문의하기는 둔다.
+  // 문의하기와 반씩 나눈 자리라 375 폭에서도 한 줄에 들어가는 길이로 둔다.
+  const applyDisabledReason = me?.role === 'breeder' ? '입양자 전용' : undefined
 
   // 내 글일 때만 수정·삭제 진입점을 준다. 삭제는 소프트 삭제라 목록에서 사라지므로
   // 성공 후 상세에 머무르면 없는 글을 보게 된다 — 마이홈으로 돌려보낸다.
@@ -87,6 +90,7 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
     isFavorite,
     onToggleFavorite: toggleFavorite,
     applyBlockedReason,
+    applyDisabledReason,
     myApplication: detail.myApplicationId
       ? { applicationId: detail.myApplicationId, breederUserId: detail.breeder.id }
       : undefined,

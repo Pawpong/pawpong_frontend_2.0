@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { expireAuthCookies } from '@/shared/lib/server/authCookies'
+import { isSameOriginRequest } from '@/shared/lib/server'
+import { AUTH_BFF_NO_STORE } from '../_constants/auth-bff'
 
 /**
  * [BFF] 로그아웃 — 인증 쿠키 전체 삭제
@@ -17,16 +19,23 @@ import { expireAuthCookies } from '@/shared/lib/server/authCookies'
  * (같은 이름을 res.cookies.set 으로 두 번 설정하면 덮어써지므로 헤더를 직접 append)
  */
 export async function POST(request: NextRequest) {
+  if (!isSameOriginRequest(request))
+    return NextResponse.json(
+      { ok: false, message: '허용되지 않은 요청입니다.' },
+      { status: 403, headers: AUTH_BFF_NO_STORE },
+    )
   try {
-    const res = NextResponse.json({ ok: true, message: '쿠키가 삭제되었습니다.' })
+    const res = NextResponse.json(
+      { ok: true, message: '쿠키가 삭제되었습니다.' },
+      { headers: AUTH_BFF_NO_STORE },
+    )
     expireAuthCookies(res, request)
     return res
-  } catch (error) {
-    console.error('쿠키 삭제 실패:', error)
+  } catch {
     // 에러가 나도 쿠키 삭제는 보장
     const res = NextResponse.json(
       { ok: false, message: '쿠키 삭제 중 오류가 발생했습니다.' },
-      { status: 500 },
+      { status: 500, headers: AUTH_BFF_NO_STORE },
     )
     expireAuthCookies(res, request)
     return res

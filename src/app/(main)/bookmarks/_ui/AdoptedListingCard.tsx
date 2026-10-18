@@ -155,7 +155,7 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
       <CtaModal
         open={modalOpen}
         onOpenChange={setModalOpen}
-        title="분양 완료 된 건입니다."
+        title="분양이 완료된 건이에요."
         icon={null}
         actions={[
           {

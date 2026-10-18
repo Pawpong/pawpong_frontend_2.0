@@ -12,8 +12,6 @@ type UseStepFormReturn<T extends FieldValues> = UseFormReturn<T> & {
   onSubmit: (data: T) => void
   /** 입력값을 보관하고 이전 단계로 (StepContainer 의 onBack 에 그대로 넘긴다) */
   goBack: () => void
-  /** 검증 실패 시 첫 번째 에러 메시지 (nav 버튼 위 표시용) */
-  firstErrorMessage?: string
 }
 
 // [refactored] zodResolver 연결 — 스텝 스키마로 실제 유효성 검증
@@ -61,11 +59,8 @@ const useStepForm = <K extends FormStepId>(
     goNext()
   }
 
-  // 검증 실패 시 조용히 막히지 않도록 첫 에러 메시지 노출 (formState.errors 구독)
-  const firstError = Object.values(form.formState.errors)[0]
-  const firstErrorMessage = typeof firstError?.message === 'string' ? firstError.message : undefined
-
-  return { ...form, onSubmit, goBack: goBackWithDraft, firstErrorMessage }
+  // 검증 에러는 각 스텝이 formState.errors 로 해당 필드 밑에 띄운다 (FieldError)
+  return { ...form, onSubmit, goBack: goBackWithDraft }
 }
 
 export { useStepForm }

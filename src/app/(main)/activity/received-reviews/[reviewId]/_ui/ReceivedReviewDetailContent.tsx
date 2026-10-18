@@ -30,7 +30,7 @@ export const ReceivedReviewDetailContent = ({ reviewId }: { reviewId: string }) 
       {review ? (
         <ReceivedReviewRow review={review} detail />
       ) : (
-        !isPending && !hasNextPage && !isError && <EmptyState message="후기를 찾을 수 없습니다." />
+        !isPending && !hasNextPage && !isError && <EmptyState message="후기를 찾을 수 없어요." />
       )}
     </ActivityDetailLayout>
   )

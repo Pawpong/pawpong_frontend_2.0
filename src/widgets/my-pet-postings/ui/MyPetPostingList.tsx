@@ -2,7 +2,14 @@
 
 import { useState, type ReactNode } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
-import { RetryButton, Button, SortOptions, InfiniteScrollTrigger, ListState } from '@/shared/ui'
+import {
+  RetryButton,
+  Button,
+  SortOptions,
+  InfiniteScrollTrigger,
+  ListHeader,
+  ListState,
+} from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { TEXT } from '@/shared/config'
 import { flattenPages, getTotalItems } from '@/shared/lib/infiniteList'
@@ -60,39 +67,29 @@ const MyPetPostingList = ({
 
   return (
     <section aria-label="내 분양 목록" className="flex flex-col">
-      {/* [refactored] 액션 자리가 빠지며 자식 하나만 남은 래퍼들을 걷어냄 */}
-      <div className="flex flex-col gap-3">
-        <div className="flex min-w-0 items-center gap-2">
-          <h2 className={TEXT.section}>분양 목록</h2>
-          {showTotalCount && data && (
-            <span className="text-sm font-normal text-neutral-500">
-              {getTotalItems(data).toLocaleString('ko-KR')}건
-            </span>
-          )}
-        </div>
-        <div className="flex flex-col gap-2 border-b border-neutral-200 pb-2">
-          <PetStatusFilter value={status} onChange={setStatus} />
-          <SortOptions
-            compact
-            ariaLabel="내 분양 목록 정렬"
-            options={SORT_OPTIONS}
-            value={sort}
-            onValueChange={setSort}
-          />
-        </div>
-      </div>
+      <ListHeader
+        title="분양 목록"
+        count={showTotalCount && data ? getTotalItems(data) : undefined}
+      >
+        <PetStatusFilter value={status} onChange={setStatus} />
+        <SortOptions
+          compact
+          ariaLabel="내 분양 목록 정렬"
+          options={SORT_OPTIONS}
+          value={sort}
+          onValueChange={setSort}
+        />
+      </ListHeader>
 
       <ListState
         isPending={isPending}
         isError={isError}
         isEmpty={postings.length === 0}
-        loadingText="분양 목록을 불러오는 중입니다."
-        errorText="분양 목록을 불러오지 못했습니다."
+        loadingText="분양 목록을 불러오는 중이에요."
+        errorText="분양 목록을 불러오지 못했어요."
         emptyText={
           <div className="flex flex-col items-center gap-3">
-            <span>
-              {status ? '해당 상태의 분양글이 없습니다.' : '아직 등록한 분양글이 없어요.'}
-            </span>
+            <span>{status ? '해당 상태의 분양글이 없어요.' : '아직 등록한 분양글이 없어요.'}</span>
             <span className={TEXT.sub}>
               {status
                 ? '다른 상태의 아이들도 확인해 보세요.'
@@ -122,7 +119,7 @@ const MyPetPostingList = ({
           role="alert"
           className="flex flex-wrap items-center justify-center gap-3 text-body-md text-neutral-700"
         >
-          다음 분양글을 불러오지 못했습니다.
+          다음 분양글을 불러오지 못했어요.
           <RetryButton onRetry={() => void fetchNextPage()} isRetrying={isFetchingNextPage} />
         </div>
       )}

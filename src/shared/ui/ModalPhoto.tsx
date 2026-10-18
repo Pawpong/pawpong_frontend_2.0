@@ -1,6 +1,6 @@
 'use client'
 
-import Image from 'next/image'
+import { SessionImage as Image } from './SessionImage'
 import { PixelArrowRightIcon } from '@/shared/assets'
 import { IconButton } from './IconButton'
 
@@ -33,8 +33,8 @@ export const ModalPhoto = ({
           className="h-auto max-h-[min(34rem,60dvh)] w-full rounded-lg object-contain"
         />
       ) : (
-        <div className="flex h-32 items-center justify-center text-body-md text-neutral-500">
-          표시할 사진이 없습니다.
+        <div className="flex h-32 items-center justify-center text-body-md text-neutral-700">
+          표시할 사진이 없어요.
         </div>
       )}
       {representativeIndex === currentIndex && images.length > 0 && (
@@ -49,7 +49,7 @@ export const ModalPhoto = ({
           <PixelArrowRightIcon className="size-5 rotate-180" />
         </IconButton>
       )}
-      <p aria-live="polite" className="text-body-md font-medium text-neutral-500 tabular-nums">
+      <p aria-live="polite" className="text-body-md font-medium text-neutral-700 tabular-nums">
         <span className="font-semibold text-neutral-850">
           {images.length ? currentIndex + 1 : 0}
         </span>{' '}

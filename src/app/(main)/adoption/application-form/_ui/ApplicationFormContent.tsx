@@ -65,11 +65,11 @@ const ApplicationFormContent = () => {
 
     const tooShort = valid.some((q) => q.length < MIN_LENGTH)
     if (tooShort) {
-      toast.error(`질문은 최소 ${MIN_LENGTH}자 이상이어야 합니다.`)
+      toast.error(`질문은 ${MIN_LENGTH}자 이상 적어 주세요.`)
       return
     }
     if (new Set(valid).size !== valid.length) {
-      toast.error('중복된 질문이 있습니다. 각 질문은 고유해야 합니다.')
+      toast.error('같은 질문이 있어요. 질문을 서로 다르게 적어 주세요.')
       return
     }
 
@@ -80,9 +80,9 @@ const ApplicationFormContent = () => {
       const saved = toRows(result.customQuestions)
       setRows(saved)
       setSavedRows(saved)
-      toast.success(`커스텀 질문 ${saved.length}개가 저장되었습니다.`)
+      toast.success(`커스텀 질문 ${saved.length}개를 저장했어요.`)
     } catch (error) {
-      toast.error(normalizeApiError(error, '저장에 실패했습니다.').message)
+      toast.error(normalizeApiError(error, '저장하지 못했어요.').message)
     }
   }
 
@@ -92,7 +92,7 @@ const ApplicationFormContent = () => {
         <AsyncState
           status={formQuery.isError ? 'error' : 'loading'}
           message={
-            formQuery.isError ? '신청서를 불러오지 못했습니다.' : '신청서를 불러오는 중입니다.'
+            formQuery.isError ? '신청서를 불러오지 못했어요.' : '신청서를 불러오는 중이에요.'
           }
           onRetry={formQuery.isError ? () => void formQuery.refetch() : undefined}
           isRetrying={formQuery.isFetching}
@@ -174,7 +174,7 @@ const ApplicationFormContent = () => {
                 />
                 <p
                   id={`question-count-${row.key}`}
-                  className="mt-2 text-right text-body-sm font-medium text-neutral-500"
+                  className="mt-2 text-right text-body-sm font-medium text-neutral-700"
                 >
                   {row.question.length}/{MAX_LENGTH}
                 </p>
@@ -193,7 +193,7 @@ const ApplicationFormContent = () => {
               <PlusIcon className="size-5" />
               질문 추가하기
             </Button>
-            <p className="text-center text-body-sm font-medium text-neutral-500">
+            <p className="text-center text-body-sm font-medium text-neutral-700">
               {isMaxReached
                 ? '질문 5개를 모두 추가했어요.'
                 : `최대 ${MAX_QUESTIONS}개 · 질문당 ${MIN_LENGTH}~${MAX_LENGTH}자`}
@@ -207,7 +207,7 @@ const ApplicationFormContent = () => {
 
       <div className="fixed inset-x-0 bottom-0 z-sticky border-t border-neutral-100 bg-white pb-[env(safe-area-inset-bottom)]">
         <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 px-5 py-4 tab:px-8">
-          <p role="status" className="hidden text-body-md text-neutral-500 tab:block">
+          <p role="status" className="hidden text-body-md text-neutral-700 tab:block">
             {updateForm.isPending
               ? '질문을 저장하고 있어요.'
               : isDirty

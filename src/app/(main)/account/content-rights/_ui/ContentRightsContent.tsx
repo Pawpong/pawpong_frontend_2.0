@@ -86,7 +86,7 @@ export function ContentRightsContent({ onConsented }: { onConsented?: () => void
       </div>
 
       {loading ? (
-        <p className="text-sm text-neutral-500">동의 상태를 확인하고 있어요.</p>
+        <p className="text-sm text-neutral-700">동의 상태를 확인하고 있어요.</p>
       ) : status?.accepted ? (
         <div className="rounded-xl border border-secondary-400 bg-secondary-50 p-5" role="status">
           <p className="font-semibold text-neutral-850">앱 표시 동의가 저장됐어요.</p>
@@ -105,7 +105,7 @@ export function ContentRightsContent({ onConsented }: { onConsented?: () => void
             </span>
           </label>
           <Button onClick={submit} disabled={!checked || saving || !status} size="lg" width="full">
-            {saving ? '저장하는 중...' : '동의하고 앱에 표시하기'}
+            {saving ? '저장하는 중…' : '동의하고 앱에 표시하기'}
           </Button>
         </>
       )}

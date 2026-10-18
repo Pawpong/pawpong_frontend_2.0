@@ -22,15 +22,20 @@ export const buildAdopterRegistrationRequest = ({
 }: BuildAdopterRegistrationRequestParams): RegisterAdopterRequest => {
   const nickname = info.nickname.trim()
   const selfIntroduction = survey.selfIntro?.trim()
+  const emailMethod = profile?.verificationMethod === 'email'
 
   return {
     tempId: social.tempId,
-    email: social.email || profile?.email || '',
+    email: emailMethod ? profile.email.trim().toLowerCase() : social.email || profile?.email || '',
+    verificationMethod: emailMethod ? 'email' : 'phone',
+    emailVerificationToken: emailMethod ? profile.emailVerificationToken : undefined,
     nickname,
     bio: info.introduction?.trim() || undefined,
-    realName: social.name || nickname,
-    phone: profile?.phone,
+    realName: info.realName?.trim() || social.name || nickname,
+    phone: emailMethod ? undefined : profile?.phone,
     profileImage: info.profileImage?.filename,
+    // 관심있는 키워드(자유 입력)를 서버의 관심 품종 목록으로 보낸다 — 비었으면 생략
+    interestedBreedIds: info.selectedKeywords?.length ? info.selectedKeywords : undefined,
     counselDefaultProfile:
       !skipped && selfIntroduction
         ? {

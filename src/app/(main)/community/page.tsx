@@ -1,6 +1,7 @@
 import { createPageMetadata } from '@/shared/lib/metadata'
 
 import { CommunityContent } from './_ui/CommunityContent'
+import { Suspense } from 'react'
 
 export const metadata = createPageMetadata({
   title: '커뮤니티',
@@ -9,7 +10,17 @@ export const metadata = createPageMetadata({
 })
 
 const CommunityPage = () => {
-  return <CommunityContent />
+  return (
+    <Suspense
+      fallback={
+        <p role="status" className="p-5">
+          커뮤니티 탐색을 준비하고 있어요.
+        </p>
+      }
+    >
+      <CommunityContent />
+    </Suspense>
+  )
 }
 
 export default CommunityPage

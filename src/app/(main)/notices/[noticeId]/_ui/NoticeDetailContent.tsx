@@ -21,11 +21,11 @@ const NoticeDetailContent = ({ noticeId }: { noticeId: string }) => {
 
       <Container className="px-4 py-5 tab:py-8 pc:py-10">
         <div className="mx-auto flex w-full max-w-168 flex-col gap-5 pc:max-w-[59.25rem]">
-          {isPending && <AsyncState status="loading" message="공지사항을 불러오는 중입니다." />}
+          {isPending && <AsyncState status="loading" message="공지사항을 불러오는 중이에요." />}
           {isError && !data && (
             <AsyncState
               status="error"
-              message="공지사항을 불러오지 못했습니다."
+              message="공지사항을 불러오지 못했어요."
               onRetry={() => void refetch()}
               isRetrying={isRetrying}
             />
@@ -44,7 +44,7 @@ const NoticeDetailContent = ({ noticeId }: { noticeId: string }) => {
                     {data.title}
                   </h1>
                 </div>
-                <p className="text-xs font-medium text-neutral-500">
+                <p className="text-xs font-medium text-neutral-700">
                   {formatDate(data.publishedAt ?? data.createdAt)} · {data.authorName}
                 </p>
               </div>

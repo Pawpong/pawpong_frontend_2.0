@@ -35,9 +35,9 @@ const AdoptionListTab = () => {
           isPending={isPending}
           isError={isError}
           isEmpty={groupedEntries.length === 0}
-          loadingText="입양목록을 불러오는 중입니다."
-          errorText="입양목록을 불러오지 못했습니다."
-          emptyText="입양한 내역이 없습니다."
+          loadingText="입양목록을 불러오는 중이에요."
+          errorText="입양목록을 불러오지 못했어요."
+          emptyText="입양한 내역이 없어요."
         >
           {groupedEntries.map(([date, items]) => (
             <div key={date} className="flex flex-col gap-[0.375rem] tab:gap-[0.625rem]">

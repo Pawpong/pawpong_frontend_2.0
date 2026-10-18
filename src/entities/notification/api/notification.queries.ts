@@ -1,6 +1,7 @@
 import { createQuery, createInfiniteQuery, STALE_TIME } from '@/shared/api'
 import type { NotificationListFilter, NotificationResponseDto } from '@/shared/types'
 import { getNotifications, getUnreadCount } from './notification.api'
+import { getAuthReadSession } from '@/shared/lib/authReadSession'
 
 export const notificationQueries = {
   all: () => ['notification'] as const,
@@ -12,10 +13,17 @@ export const notificationQueries = {
       staleTime: STALE_TIME.REALTIME,
     }),
 
-  unreadCount: () =>
-    createQuery({
-      queryKey: [...notificationQueries.all(), 'unread-count'],
-      queryFn: getUnreadCount,
+  unreadCount: () => {
+    const session = getAuthReadSession()
+    const options = createQuery({
+      queryKey: [...notificationQueries.all(), 'unread-count', session?.scope ?? 'guest'],
+      queryFn: () => getUnreadCount(session),
+      enabled: Boolean(session),
       staleTime: STALE_TIME.REALTIME,
-    }),
+    })
+    return {
+      ...options,
+      queryFn: ({ signal }: { signal: AbortSignal }) => getUnreadCount(session, signal),
+    }
+  },
 }

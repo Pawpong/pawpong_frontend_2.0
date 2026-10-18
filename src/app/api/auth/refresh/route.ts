@@ -1,5 +1,8 @@
 import { cookies } from 'next/headers'
-import { NextResponse } from 'next/server'
+import { NextResponse, type NextRequest } from 'next/server'
+import { isSameOriginRequest } from '@/shared/lib/server'
+import { AUTH_BFF_NO_STORE } from '../_constants/auth-bff'
+import { authRefreshResponseSchema } from '../_lib/auth-token.schema'
 
 /**
  * [BFF] 액세스 토큰 재발급
@@ -12,9 +15,12 @@ import { NextResponse } from 'next/server'
  *
  * 주의: 백엔드 refresh 엔드포인트는 v2 경로다 → POST {API_BASE}/api/v2/auth/refresh
  */
-export async function POST() {
-  const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), 8_000)
+export async function POST(request: NextRequest) {
+  if (!isSameOriginRequest(request))
+    return NextResponse.json(
+      { success: false, message: '허용되지 않은 요청입니다.' },
+      { status: 403, headers: AUTH_BFF_NO_STORE },
+    )
   try {
     const cookieStore = await cookies()
     const refreshToken = cookieStore.get('refreshToken')?.value
@@ -22,7 +28,7 @@ export async function POST() {
     if (!refreshToken) {
       return NextResponse.json(
         { success: false, message: 'refreshToken이 없습니다.' },
-        { status: 401 },
+        { status: 401, headers: AUTH_BFF_NO_STORE },
       )
     }
 
@@ -35,27 +41,29 @@ export async function POST() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refreshToken }),
-      signal: controller.signal,
+      signal: AbortSignal.any([request.signal, AbortSignal.timeout(8_000)]),
       cache: 'no-store',
+      redirect: 'error',
+      credentials: 'omit',
     })
 
-    const data = await response.json()
-
-    if (!response.ok || !data.success) {
+    if (!response.ok) {
       return NextResponse.json(
-        { success: false, message: data.message || '토큰 갱신에 실패했습니다.' },
-        { status: response.status },
+        { success: false, message: '토큰 갱신에 실패했습니다.' },
+        { status: response.status >= 400 ? response.status : 502, headers: AUTH_BFF_NO_STORE },
       )
     }
-
-    return NextResponse.json(data)
-  } catch (error) {
-    console.error('토큰 리프레시 오류:', error)
+    const parsed = authRefreshResponseSchema.safeParse(await response.json().catch(() => null))
+    if (!parsed.success)
+      return NextResponse.json(
+        { success: false, message: '토큰 응답을 확인하지 못했습니다.' },
+        { status: 502, headers: AUTH_BFF_NO_STORE },
+      )
+    return NextResponse.json(parsed.data, { headers: AUTH_BFF_NO_STORE })
+  } catch {
     return NextResponse.json(
       { success: false, message: '토큰 갱신 중 오류가 발생했습니다.' },
-      { status: 500 },
+      { status: 503, headers: AUTH_BFF_NO_STORE },
     )
-  } finally {
-    clearTimeout(timeout)
   }
 }

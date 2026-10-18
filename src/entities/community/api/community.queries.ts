@@ -1,11 +1,20 @@
-import { createInfiniteQuery, createQuery, STALE_TIME } from '@/shared/api'
-import type { CommunitySortType, CommunityPetType } from '@/shared/types'
+import {
+  createInfiniteQuery,
+  createQuery,
+  STALE_TIME,
+  getAuthReadSession,
+  type AuthReadSession,
+} from '@/shared/api'
+import type { CommunitySortType, CommunityPetType, CommunityDiscoveryFilters } from '@/shared/types'
 import {
   getCommunityPosts,
   getCommunityPostDetail,
+  getRelatedCommunityPosts,
   getCommunityComments,
   getMyBookmarkedPosts,
+  getMyCommentedPosts,
   getMyDraftPosts,
+  getMyLikedPosts,
   getCurrentCommunityHallOfFame,
   getCommunityHallOfFameHistory,
 } from './community.api'
@@ -21,10 +30,31 @@ export const communityQueries = {
     category?: string,
     search?: string,
     pageSize = 15,
+    topic?: string,
+    discovery?: CommunityDiscoveryFilters,
   ) =>
     createInfiniteQuery({
-      queryKey: [...communityQueries.postsAll(), sort, petType, category, search, pageSize],
-      queryFn: (page) => getCommunityPosts({ sort, petType, category, search, page, pageSize }),
+      queryKey: [
+        ...communityQueries.postsAll(),
+        sort,
+        petType,
+        category,
+        search,
+        pageSize,
+        ...(topic ? [topic] : []),
+        ...(discovery ? [discovery] : []),
+      ],
+      queryFn: (page) =>
+        getCommunityPosts({
+          sort,
+          petType,
+          category,
+          search,
+          page,
+          pageSize,
+          ...(topic ? { topic } : {}),
+          ...(discovery ?? {}),
+        }),
       staleTime: STALE_TIME.DEFAULT,
     }),
 
@@ -39,6 +69,18 @@ export const communityQueries = {
       enabled: !!postId,
       staleTime: STALE_TIME.DEFAULT,
     }),
+
+  // 상세 캐시를 통째로 고치는 낙관적 갱신에 섞이지 않게 별도 키를 쓴다.
+  related: (postId: string, enabled = true, pageSize = 6) => ({
+    queryKey: [...communityQueries.all(), 'related', postId, pageSize] as const,
+    queryFn: ({ signal }: { signal: AbortSignal }) =>
+      getRelatedCommunityPosts(postId, pageSize, signal),
+    enabled: enabled && !!postId,
+    retry: false,
+    // 곁들이는 영역이라 실패해도 글 화면을 오류 경계로 넘기지 않는다.
+    throwOnError: false,
+    staleTime: 60_000,
+  }),
 
   myPostsAll: () => [...communityQueries.all(), 'myPosts'] as const,
 
@@ -77,10 +119,14 @@ export const communityQueries = {
 
   commentsForPost: (postId: string) => [...communityQueries.commentsAll(), postId] as const,
 
-  comments: (postId: string, pageSize = 20) =>
+  comments: (
+    postId: string,
+    pageSize = 20,
+    session: AuthReadSession | null = getAuthReadSession(),
+  ) =>
     createInfiniteQuery({
-      queryKey: [...communityQueries.commentsForPost(postId), pageSize],
-      queryFn: (page) => getCommunityComments(postId, { page, pageSize }),
+      queryKey: [...communityQueries.commentsForPost(postId), pageSize, session?.scope ?? 'guest'],
+      queryFn: (page, signal) => getCommunityComments(postId, { page, pageSize }, signal, session),
       enabled: !!postId,
       staleTime: STALE_TIME.DEFAULT,
     }),
@@ -91,6 +137,35 @@ export const communityQueries = {
     createInfiniteQuery({
       queryKey: [...communityQueries.myBookmarksAll(), pageSize],
       queryFn: (page) => getMyBookmarkedPosts({ page, pageSize }),
+      staleTime: STALE_TIME.DEFAULT,
+    }),
+
+  // 마이홈 '내가 쓴 글' 탭의 '좋아요한 글' · '댓글 단 글' 칩. 사진 그리드 3·4열에 맞춰 24개씩
+  myLikedAll: () => [...communityQueries.all(), 'myLiked'] as const,
+
+  myLiked: (
+    pageSize = 24,
+    enabled = true,
+    session: AuthReadSession | null = getAuthReadSession(),
+  ) =>
+    createInfiniteQuery({
+      queryKey: [...communityQueries.myLikedAll(), session?.scope ?? 'guest', pageSize],
+      queryFn: (page, signal) => getMyLikedPosts({ page, pageSize }, session, signal),
+      enabled: enabled && Boolean(session),
+      staleTime: STALE_TIME.DEFAULT,
+    }),
+
+  myCommentedAll: () => [...communityQueries.all(), 'myCommented'] as const,
+
+  myCommented: (
+    pageSize = 24,
+    enabled = true,
+    session: AuthReadSession | null = getAuthReadSession(),
+  ) =>
+    createInfiniteQuery({
+      queryKey: [...communityQueries.myCommentedAll(), session?.scope ?? 'guest', pageSize],
+      queryFn: (page, signal) => getMyCommentedPosts({ page, pageSize }, session, signal),
+      enabled: enabled && Boolean(session),
       staleTime: STALE_TIME.DEFAULT,
     }),
 

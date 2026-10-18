@@ -26,13 +26,13 @@ const SortOptions = <Value extends string>({
         aria-pressed={value === option.value}
         onClick={() => onValueChange(option.value)}
         className={cn(
-          'min-h-10 rounded px-1 whitespace-nowrap focus-ring',
+          'touch-target relative min-h-10 rounded px-1 whitespace-nowrap focus-ring',
           compact ? 'text-xs' : 'text-sm',
           value === option.value
             ? compact
               ? 'font-medium text-neutral-700'
               : 'font-semibold text-neutral-850'
-            : 'text-neutral-500 hover:text-neutral-850',
+            : 'text-neutral-700 hover:text-neutral-850',
         )}
       >
         {option.label}

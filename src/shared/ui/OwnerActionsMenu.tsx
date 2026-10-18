@@ -15,6 +15,8 @@ interface OwnerActionsMenuProps {
   onDelete: () => void
   /** 트리거의 구체적인 접근성 이름 */
   ariaLabel?: string
+  triggerId?: string
+  disabled?: boolean
 }
 
 /**
@@ -22,10 +24,16 @@ interface OwnerActionsMenuProps {
  * onEdit을 생략하면 삭제 항목만 노출한다.
  * 소유자 판정은 호출부에서 하고, 이 컴포넌트는 렌더된 시점에 항상 표시한다.
  */
-const OwnerActionsMenu = ({ onEdit, onDelete, ariaLabel = '더보기' }: OwnerActionsMenuProps) => (
+const OwnerActionsMenu = ({
+  onEdit,
+  onDelete,
+  ariaLabel = '더보기',
+  triggerId,
+  disabled,
+}: OwnerActionsMenuProps) => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
-      <IconButton edge="both" aria-label={ariaLabel}>
+      <IconButton edge="both" aria-label={ariaLabel} id={triggerId} disabled={disabled}>
         <MoreVertIcon className="size-6" />
       </IconButton>
     </DropdownMenuTrigger>

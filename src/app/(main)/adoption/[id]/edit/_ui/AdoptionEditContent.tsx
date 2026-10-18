@@ -34,7 +34,7 @@ const AdoptionEditContent = ({ petId }: AdoptionEditContentProps) => {
     isFetching: isRetrying,
   } = useAdoptionEditForm(petId)
 
-  // 남의 글이면 서버가 막으므로 여기서도 '불러오지 못했습니다' 로 수렴한다
+  // 남의 글이면 서버가 막으므로 여기서도 '불러오지 못했어요' 로 수렴한다
   if (isLoading || isLoadError) {
     return (
       <div className="flex min-h-screen w-full flex-col bg-point-50">
@@ -50,7 +50,7 @@ const AdoptionEditContent = ({ petId }: AdoptionEditContentProps) => {
               role={isLoadError ? 'alert' : 'status'}
               className="text-sm font-medium text-neutral-700"
             >
-              {isLoadError ? '분양글을 불러오지 못했습니다.' : '분양글을 불러오는 중입니다.'}
+              {isLoadError ? '분양글을 불러오지 못했어요.' : '분양글을 불러오는 중이에요.'}
             </p>
             {isLoadError && (
               <div className="flex items-center gap-2">

@@ -5,6 +5,8 @@ import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from '@ta
 import { ApiError, STALE_TIME, isApiError } from '@/shared/api'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { useEffect, useState } from 'react'
+import { AUTH_STATE_CHANGED } from './authStateEvents'
+import { createAuthQueryBoundary } from './authQueryBoundary'
 import { getTransientErrorRefetchInterval } from '../api/queryRecovery'
 
 const shouldRetryRequest = (error: unknown, failureCount: number) => {
@@ -26,6 +28,7 @@ const shouldThrowToBoundary = (error: unknown) => {
 const shouldCaptureError = (error: unknown): error is Error => {
   if (!(error instanceof Error)) return false
   if (!(error instanceof ApiError)) return true
+  if (error.request?.transportCode === 'ERR_CANCELED') return false
   return error.status === undefined || error.status >= 500
 }
 
@@ -77,7 +80,29 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
   )
 
   useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | undefined
+    const unsubscribe = queryClient.getMutationCache().subscribe((event) => {
+      if (
+        event.type !== 'updated' ||
+        event.action.type !== 'success' ||
+        event.mutation.options.mutationKey?.[0] === 'gamification'
+      )
+        return
+      clearTimeout(timer)
+      timer = setTimeout(() => {
+        void queryClient.invalidateQueries({ queryKey: ['gamification', 'private'] })
+        void queryClient.invalidateQueries({ queryKey: ['gamification', 'public'] })
+      }, 1500)
+    })
+    return () => {
+      unsubscribe()
+      clearTimeout(timer)
+    }
+  }, [queryClient])
+
+  useEffect(() => {
     let scheduledFrame: number | null = null
+    const handleIdentityChange = createAuthQueryBoundary(queryClient)
 
     const recoverActiveQueries = (framesUntilRecovery = 1) => {
       if (scheduledFrame !== null) window.cancelAnimationFrame(scheduledFrame)
@@ -112,6 +137,7 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
     }
 
     const handleAppActive = () => {
+      handleIdentityChange()
       void queryClient.refetchQueries(
         {
           type: 'active',
@@ -132,10 +158,16 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
     window.addEventListener('pageshow', handlePageShow)
     window.addEventListener('popstate', handlePopState)
     window.addEventListener('pawpong:app-active', handleAppActive)
+    window.addEventListener(AUTH_STATE_CHANGED, handleIdentityChange)
+    window.addEventListener('focus', handleIdentityChange)
+    document.addEventListener('visibilitychange', handleIdentityChange)
     return () => {
       window.removeEventListener('pageshow', handlePageShow)
       window.removeEventListener('popstate', handlePopState)
       window.removeEventListener('pawpong:app-active', handleAppActive)
+      window.removeEventListener(AUTH_STATE_CHANGED, handleIdentityChange)
+      window.removeEventListener('focus', handleIdentityChange)
+      document.removeEventListener('visibilitychange', handleIdentityChange)
       if (scheduledFrame !== null) window.cancelAnimationFrame(scheduledFrame)
     }
   }, [queryClient])

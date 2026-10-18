@@ -2,60 +2,59 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import {
+  PET_ACTION_ICONS,
   PET_ACTION_LABELS,
   petActionHint,
+  petDaysTogether,
   petLevelProgress,
+  petWaitShort,
   remainingSeconds,
-  formatPetWait,
+  formatPetCountdown,
+  petMood,
+  petLevelUp,
+  PET_ROOM_TABS,
+  type PetTab,
   type PetAction,
   type PetCatalogItem,
   type PetCommand,
   type PetView,
   type PetGameOutcome,
   type PetGameKind,
+  type PetRoomSlot,
 } from '@/entities/playground-pet'
 import type { PetCommandResult } from '@/entities/playground-pet/model/commandQueue'
-import { PET_SLOT_LABELS, PET_SLOTS, previewPetRoom } from '@/entities/playground-pet/model/room'
+import {
+  PET_SLOT_AREAS,
+  PET_SLOT_LABELS,
+  PET_SLOTS,
+  previewPetRoom,
+} from '@/entities/playground-pet/model/room'
 import { useServerClock } from '../lib/useServerClock'
 import { usePetCharacter } from '../lib/usePetCharacter'
 import { usePetAssets } from '../lib/usePetAssets'
 import { usePetSound } from '../lib/usePetSound'
 import type { PetSession } from '../lib/usePetSession'
 import type { PetGameHandle, PetStageSnapshot } from '../lib/petGameEngine'
+import { newlyAvailablePetItems } from '@/entities/playground-pet/model/shop'
 import { PetImage } from './PetImage'
 import { PetStage } from './PetStage'
 import { PetDecorations } from './PetDecorations'
+import { usePetDeviceViewport } from '../lib/usePetDeviceViewport'
 import { PetMiniGames } from './PetMiniGames'
 import { PetGlyph } from './PetGlyph'
 import { PetAdoption } from './PetAdoption'
+import { PetRecords } from './PetRecords'
+import { PetRoomSummary } from './PetRoomSummary'
+import { usePetNavigation } from '../lib/usePetNavigation'
+import { PixelProgressBar } from '@/shared/ui/PixelProgressBar'
 import styles from './PetRoom.module.css'
 
+// tone — 상태마다 진행 바 색을 달리해 한눈에 구분한다
 const STATS = [
-  { id: 'fullness', label: '배부름', icon: 'bone' },
-  { id: 'mood', label: '기분', icon: 'heart' },
-  { id: 'energy', label: '에너지', icon: 'rest' },
+  { id: 'fullness', label: '배부름', icon: 'bone', tone: 'olive' },
+  { id: 'mood', label: '기분', icon: 'heart', tone: 'pink' },
+  { id: 'energy', label: '에너지', icon: 'rest', tone: 'brown' },
 ] as const
-const ACTION_ICONS = { greet: 'paw', feed: 'bone', play: 'play', rest: 'rest' } as const
-const TABS = [
-  { id: 'room', label: '내 방' },
-  { id: 'decorate', label: '꾸미기' },
-  { id: 'games', label: '미니게임' },
-  { id: 'records', label: '기록' },
-] as const
-type PetTab = (typeof TABS)[number]['id']
-const RECORD_LABELS = {
-  adopted: '처음 만난 날',
-  first_meal: '첫 식사를 함께했어요',
-  level_up: '우리 아이가 자랐어요',
-  unlock: '새로운 추억이 열렸어요',
-  seven_days: '일곱 날을 함께했어요',
-}
-const formatDate = (iso: string) =>
-  new Intl.DateTimeFormat('ko-KR', {
-    timeZone: 'Asia/Seoul',
-    month: 'long',
-    day: 'numeric',
-  }).format(new Date(iso))
 
 export function PetRoom({
   view,
@@ -83,6 +82,7 @@ export function PetRoom({
   initialCharacterSourceId?: string
 }) {
   const pet = view.pet!
+  const viewport = usePetDeviceViewport()
   const game = view.game
   const fullBody = pet.character?.format === 'pet-sprite-v1'
   const requestedSourceId = initialCharacterSourceId?.toLowerCase()
@@ -90,15 +90,21 @@ export function PetRoom({
     fullBody && requestedSourceId && requestedSourceId !== pet.character?.sourceJobId
   const showCharacterSelection = !fullBody || Boolean(replaceCharacter)
   const active = game?.games.active
-  const availableTabs = game ? TABS : TABS.filter(({ id }) => id === 'room' || id === 'records')
-  const [menu, setMenu] = useState<{ tab: PetTab; sessionId: string | null }>(() => ({
-    tab: active ? 'games' : 'room',
-    sessionId: active?.sessionId ?? null,
-  }))
-  if (active && menu.sessionId !== active.sessionId)
-    setMenu({ tab: 'games', sessionId: active.sessionId })
+  const availableTabs = game
+    ? PET_ROOM_TABS
+    : PET_ROOM_TABS.filter(({ id }) => id === 'room' || id === 'records')
+  const navigation = usePetNavigation(active?.sessionId)
+  const [slotRequest, setSlotRequest] = useState<{ slot: PetRoomSlot; serial: number } | null>(null)
+  // 탭을 옮기면 방 위에서 고른 자리 요청을 지워 다시 열 때 예전 자리로 좁혀지지 않게 한다.
   function setTab(tab: PetTab) {
-    setMenu((current) => ({ ...current, tab }))
+    navigation.selectTab(tab)
+    setItem(null)
+    setSlotRequest(null)
+  }
+  /** 패널 안 바로가기는 눌린 버튼이 사라지므로 새로 고른 탭으로 포커스를 옮긴다. */
+  function openTab(tab: PetTab) {
+    setTab(tab)
+    window.requestAnimationFrame(() => document.getElementById(`pet-tab-${tab}`)?.focus())
   }
   const [canvasReady, setCanvasReady] = useState(false)
   const gameHandle = useRef<PetGameHandle | null>(null)
@@ -109,7 +115,32 @@ export function PetRoom({
     (kind: PetGameKind) => gameHandle.current?.prepareGame(kind) ?? Promise.resolve(false),
     [],
   )
+  const cancelGamePreparation = useCallback(() => {
+    gameHandle.current?.cancelPreparation()
+  }, [])
   const [gameSurface, setGameSurface] = useState<HTMLDivElement | null>(null)
+  const [stageOverlay, setStageOverlay] = useState<HTMLDivElement | null>(null)
+  const [pokeNotice, setPokeNotice] = useState('')
+  const [popDone, setPopDone] = useState(reaction)
+  const [online, setOnline] = useState(
+    () => typeof navigator === 'undefined' || navigator.onLine !== false,
+  )
+  const [growth, setGrowth] = useState<{
+    id: string
+    level: number
+    banner: number | null
+    from: number
+  }>({
+    id: pet.id,
+    level: pet.level,
+    banner: null,
+    from: pet.level,
+  })
+  if (growth.id !== pet.id || growth.level !== pet.level)
+    setGrowth({ id: pet.id, level: pet.level, banner: petLevelUp(growth, pet), from: growth.level })
+  // 레벨이 오르며 실제로 새로 고를 수 있게 된 소품만 알린다. 서버 카탈로그의 minLevel 기준이다.
+  const unlockedItems =
+    growth.banner !== null && game ? newlyAvailablePetItems(game, growth.from, growth.banner) : []
   const [selectedItem, setItem] = useState<PetCatalogItem | null>(null)
   const [snack, setSnack] = useState<PetStageSnapshot['snack']>(null)
   const [reducedMotion, setReducedMotion] = useState(false)
@@ -128,10 +159,41 @@ export function PetRoom({
       sound.play(feedback.stars > 0)
     }
   }, [reaction, sound, feedback.stars])
+  // 캐릭터를 연결하면 포커스를 갖고 있던 연결 안내가 사라지므로 방 화면으로 포커스를 옮긴다.
+  useEffect(() => {
+    if (gameOutcome?.kind !== 'character') return
+    document.getElementById('pet-game-screen')?.focus({ preventScroll: false })
+  }, [gameOutcome])
   const now = useServerClock(view.serverTime)
+  const resting = Boolean(pet.restEndsAt && now < Date.parse(pet.restEndsAt))
+  const mood = petMood(pet.stats, resting)
+  // 지금 할 수 없는 돌봄을 계속 권하지 않도록 서버가 알려준 가능 여부를 함께 본다.
+  const moodAvailability = mood?.action ? view.actions?.[mood.action] : undefined
+  const moodWait = moodAvailability ? petWaitShort(moodAvailability, now) : null
+  const moodPossible = !mood?.action || Boolean(moodAvailability?.allowed)
+  const daysTogether = petDaysTogether(pet.createdAt, view.serverTime)
+  const rewardPop = reaction !== popDone && (feedback.xp > 0 || feedback.stars > 0)
+  useEffect(() => {
+    if (reaction === popDone) return
+    const timer = window.setTimeout(() => setPopDone(reaction), 1800)
+    return () => window.clearTimeout(timer)
+  }, [reaction, popDone])
+  useEffect(() => {
+    if (growth.banner === null) return
+    const timer = window.setTimeout(
+      () => setGrowth((current) => ({ ...current, banner: null })),
+      5000,
+    )
+    return () => window.clearTimeout(timer)
+  }, [growth.banner])
+  useEffect(() => {
+    if (!pokeNotice) return
+    const timer = window.setTimeout(() => setPokeNotice(''), 2500)
+    return () => window.clearTimeout(timer)
+  }, [pokeNotice])
   const lastRefresh = useRef('')
   const refresh = useCallback(() => onRefresh(), [onRefresh])
-  const tab = active ? 'games' : availableTabs.some(({ id }) => id === menu.tab) ? menu.tab : 'room'
+  const tab = availableTabs.some(({ id }) => id === navigation.tab) ? navigation.tab : 'room'
   const deadlines = Object.values(view.actions ?? {}).flatMap((action) =>
     action.nextAvailableAt ? [Date.parse(action.nextAvailableAt)] : [],
   )
@@ -144,19 +206,35 @@ export function PetRoom({
     }
   }, [deadline, disabled, now, refresh, view.serverTime])
   useEffect(() => {
+    // 연결이 돌아오면 저장된 화면을 믿지 않고 서버 상태를 다시 읽는다.
+    const update = () => {
+      setOnline(navigator.onLine)
+      if (navigator.onLine) refresh()
+    }
+    window.addEventListener('online', update)
+    window.addEventListener('offline', update)
+    return () => {
+      window.removeEventListener('online', update)
+      window.removeEventListener('offline', update)
+    }
+  }, [refresh])
+  useEffect(() => {
     const media = window.matchMedia('(prefers-reduced-motion: reduce)')
     const update = () => setReducedMotion(media.matches)
     update()
     media.addEventListener('change', update)
     return () => media.removeEventListener('change', update)
   }, [])
-  const room = game ? previewPetRoom(game.room, tab === 'decorate' ? selectedItem : null) : null
+  const previewing = tab === 'decorate' || tab === 'shop'
+  const room = game ? previewPetRoom(game.room, previewing ? selectedItem : null) : null
   const snapshot = useMemo<PetStageSnapshot>(
     () => ({
       room,
       manifest: assets.manifest,
       characterUrl: fullBody ? character.url : null,
-      resting: Boolean(pet.restEndsAt && now < Date.parse(pet.restEndsAt)),
+      resting,
+      mood: moodPossible ? (mood?.kind ?? null) : null,
+      highlight: previewing && selectedItem ? selectedItem.slot : null,
       reaction,
       feedback,
       reducedMotion,
@@ -167,8 +245,11 @@ export function PetRoom({
       assets.manifest,
       character.url,
       fullBody,
-      pet.restEndsAt,
-      now,
+      resting,
+      mood?.kind,
+      moodPossible,
+      previewing,
+      selectedItem,
       reaction,
       feedback,
       reducedMotion,
@@ -209,9 +290,16 @@ export function PetRoom({
     </div>
   )
   return (
-    <div className={styles.gameLayout} data-active-game={Boolean(active)}>
+    <div
+      ref={viewport}
+      className={styles.gameLayout}
+      data-active-game={Boolean(active)}
+      data-compact={previewing && !active}
+    >
       <section
         data-pet-device
+        id="pet-game-screen"
+        tabIndex={-1}
         className={styles.device}
         aria-label={`${pet.name}의 휴대형 반려동물 게임`}
       >
@@ -243,7 +331,56 @@ export function PetRoom({
               name={pet.name}
               onReady={setCanvasReady}
               onGame={setGameHandle}
-            />
+              onPoke={(result) =>
+                setPokeNotice(
+                  result === 'pet'
+                    ? `쓰다듬어 줬어요. ${pet.name} 기분이 좋아 보여요!`
+                    : `${pet.name}, 이리 와!`,
+                )
+              }
+            >
+              <div ref={setStageOverlay} className={styles.stageOverlay} />
+              {previewing &&
+                !active &&
+                PET_SLOTS.map((slot) => {
+                  const area = PET_SLOT_AREAS[slot]
+                  return (
+                    <button
+                      key={slot}
+                      className={styles.hotspot}
+                      style={{
+                        left: `${((area.x + area.width / 2) / 320) * 100}%`,
+                        top: `${((area.y + area.height / 2) / 224) * 100}%`,
+                      }}
+                      aria-pressed={slotRequest?.slot === slot}
+                      aria-label={`${PET_SLOT_LABELS[slot]} 소품 고르기`}
+                      onClick={() => {
+                        setItem(null)
+                        setSlotRequest((current) => ({ slot, serial: (current?.serial ?? 0) + 1 }))
+                      }}
+                    >
+                      {PET_SLOT_LABELS[slot]}
+                    </button>
+                  )
+                })}
+              {rewardPop && !active && (
+                <p className={styles.rewardPop} aria-hidden="true">
+                  {feedback.xp > 0 && <span>+{feedback.xp} EXP</span>}
+                  {feedback.stars > 0 && (
+                    <span>
+                      <PetGlyph kind="star" /> +{feedback.stars}
+                    </span>
+                  )}
+                </p>
+              )}
+              {growth.banner !== null && !active && (
+                <p className={styles.levelUp} role="status">
+                  <PetGlyph kind="star" /> Lv.{growth.banner} 달성! {pet.name} 한 뼘 자랐어요
+                  {unlockedItems.length > 0 &&
+                    ` · 새 소품 ${unlockedItems.length}개를 상점에서 고를 수 있어요`}
+                </p>
+              )}
+            </PetStage>
           ) : (
             <div className={styles.carePortrait}>
               <PetImage src={pet.imageUrl} alt={`${pet.name}의 도트 초상화`} />
@@ -251,9 +388,9 @@ export function PetRoom({
           )}
           {game && !fullBody && !active && (
             <div className={styles.stageStatus}>
-              <p>우리 아이의 전신 캐릭터를 연결하면 이 방에서 함께 놀 수 있어요.</p>
+              <p>우리 아이의 캐릭터를 연결하면 이 방에서 함께 놀 수 있어요.</p>
               <a className={styles.smallButton} href="#pet-character-connection">
-                전신 캐릭터 연결하기
+                캐릭터 연결하기
               </a>
             </div>
           )}
@@ -276,26 +413,54 @@ export function PetRoom({
               </div>
             </div>
           )}
-          {tab === 'decorate' && selectedItem && (
+          {previewing && selectedItem && (
             <p className={styles.previewLabel}>미리보기 · {selectedItem.name}</p>
           )}
-          {pet.restEndsAt && now < Date.parse(pet.restEndsAt) && !active && (
+          {resting && !active && (
             <p className={styles.restLabel}>
-              쉬는 중 · {Math.ceil(remainingSeconds(pet.restEndsAt, now) / 60)}분
+              쉬는 중 · {formatPetCountdown(remainingSeconds(pet.restEndsAt, now))}
             </p>
           )}
         </div>
-        {active && operationNotice}
+        {/* 게임 중 저장 안내는 게임 판 바로 위 흐름에 놓인다. 카드를 뒤집을 때마다 생겼다 사라지면
+            판이 위아래로 흔들리므로, 안내 한 줄(위 여백 6px + 최소 높이 26px) 자리를 늘 잡아 둔다.
+            flow-root 는 안내의 위 여백이 칸 밖으로 빠져나가(margin collapse) 6px 가 다시 흔들리는 걸 막는다 */}
+        {active && <div className="flow-root min-h-8">{operationNotice}</div>}
+        {!online && (
+          <p className={styles.offline} role="alert">
+            인터넷 연결이 끊겼어요. 연결되면 최신 상태를 다시 불러올게요.
+          </p>
+        )}
+        {!active && fullBody && (
+          <p className={styles.moodLine} role="status" aria-live="polite">
+            {pokeNotice ||
+              (mood
+                ? `${pet.name} · ${mood.label}${
+                    !mood.action
+                      ? ''
+                      : moodPossible
+                        ? ` → ${PET_ACTION_LABELS[mood.action]}`
+                        : ` · ${PET_ACTION_LABELS[mood.action]}는 ${moodWait ?? '조금 뒤'} 할 수 있어요`
+                  }`
+                : `방을 눌러 ${pet.name} 불러 보세요. 쓰다듬어 줄 수도 있어요.`)}
+          </p>
+        )}
         <div ref={setGameSurface} className={styles.deviceGameSurface} hidden={!active} />
         <div className={styles.stats} aria-label="우리 아이 상태">
-          {STATS.map(({ id, label, icon }) => (
+          {STATS.map(({ id, label, icon, tone }) => (
             <div key={id} className={styles.stat}>
               <div>
                 <PetGlyph kind={icon} />
                 <span>{label}</span>
                 <strong>{pet.stats[id]}</strong>
               </div>
-              <progress value={pet.stats[id]} max={100} aria-label={`${label} ${pet.stats[id]}`} />
+              <div className="h-3">
+                <PixelProgressBar
+                  percent={pet.stats[id]}
+                  tone={tone}
+                  label={`${label} ${pet.stats[id]}`}
+                />
+              </div>
             </div>
           ))}
         </div>
@@ -306,31 +471,37 @@ export function PetRoom({
               {pet.totalXp} / {pet.xpForNextLevel ?? 'MAX'}
             </span>
           </div>
-          <progress value={petLevelProgress(pet)} max={100} aria-label="다음 레벨까지 성장" />
+          <div className="h-3">
+            <PixelProgressBar
+              percent={petLevelProgress(pet)}
+              tone="purple"
+              label="다음 레벨까지 성장"
+            />
+          </div>
         </div>
         <div className={styles.careButtons}>
           {(Object.keys(PET_ACTION_LABELS) as PetAction[]).map((action) => {
             const availability = view.actions?.[action]
             const hint = availability ? petActionHint(availability, now) : '상태를 불러오는 중'
+            // 기다리는 돌봄도 키보드로 닿아 남은 시간을 들을 수 있게 disabled 대신 aria-disabled로 막는다.
+            const blocked = disabled || Boolean(active) || !availability?.allowed
             return (
               <button
                 key={action}
+                type="button"
                 className={styles.careButton}
-                disabled={disabled || Boolean(active) || !availability?.allowed}
+                data-suggested={mood?.action === action && Boolean(availability?.allowed)}
+                aria-disabled={blocked}
                 title={hint}
                 aria-label={`${PET_ACTION_LABELS[action]}, ${hint}`}
-                onClick={() => onAction(action)}
+                onClick={() => {
+                  if (!blocked) onAction(action)
+                }}
               >
-                <PetGlyph kind={ACTION_ICONS[action]} />
+                <PetGlyph kind={PET_ACTION_ICONS[action]} />
                 <span>{PET_ACTION_LABELS[action]}</span>
-                {!availability?.allowed && availability?.nextAvailableAt && (
-                  <small>
-                    {Math.max(
-                      1,
-                      Math.ceil(remainingSeconds(availability.nextAvailableAt, now) / 60),
-                    )}
-                    분
-                  </small>
+                {availability && petWaitShort(availability, now) && (
+                  <small>{petWaitShort(availability, now)}</small>
                 )}
               </button>
             )
@@ -346,10 +517,7 @@ export function PetRoom({
               aria-controls={`pet-panel-${id}`}
               tabIndex={tab === id ? 0 : -1}
               disabled={Boolean(active) && id !== 'games'}
-              onClick={() => {
-                setTab(id)
-                setItem(null)
-              }}
+              onClick={() => setTab(id)}
             >
               {label}
             </button>
@@ -368,12 +536,12 @@ export function PetRoom({
           <section
             id="pet-character-connection"
             className={styles.panel}
-            aria-label="전신 캐릭터 연결 안내"
+            aria-label="캐릭터 연결 안내"
           >
-            <h2>우리 아이에게 작은 전신 캐릭터를 연결해요</h2>
+            <h2>우리 아이의 게임 캐릭터를 연결해요</h2>
             <p className={styles.hint}>
               {fullBody
-                ? '새 전신 그림을 확인하고 직접 연결해 주세요.'
+                ? '새 캐릭터를 확인하고 직접 연결해 주세요.'
                 : '기존 그림은 사진용 초상화예요.'}{' '}
               돌봄·이름·성장 기록·별사탕은 그대로 유지돼요. 자동으로 새 그림을 만들거나 이용 횟수를
               쓰지 않아요.
@@ -386,6 +554,15 @@ export function PetRoom({
               disabled={disabled || Boolean(active)}
               onAdopt={(command) => void onCommand(command)}
             />
+            {replaceCharacter && (
+              <button
+                className={styles.smallButton}
+                disabled={disabled || Boolean(active)}
+                onClick={navigation.clearSource}
+              >
+                지금 캐릭터 유지하기
+              </button>
+            )}
           </section>
         )}
         <div
@@ -394,64 +571,13 @@ export function PetRoom({
           aria-labelledby="pet-tab-room"
           hidden={tab !== 'room'}
         >
-          <section className={styles.panel}>
-            <div className={styles.panelHeading}>
-              <div>
-                <p className={styles.eyebrow}>오늘도 함께하는 작은 일상</p>
-                <h2>우리 아이의 방</h2>
-              </div>
-              <PetGlyph kind="paw" />
-            </div>
-            <p className={styles.hint}>
-              {pet.name}와 {view.week.daysTogether}일째 함께하고 있어요. 돌봄으로 자라고, 별사탕으로
-              방을 꾸며요.
-            </p>
-            <div className={styles.questList}>
-              {view.daily.quests.map((quest) => (
-                <div key={quest.id}>
-                  <span>
-                    <PetGlyph kind={ACTION_ICONS[quest.id]} /> {PET_ACTION_LABELS[quest.id]}
-                  </span>
-                  <strong>{quest.completed ? '완료 ✓' : `+${quest.rewardXp} EXP`}</strong>
-                </div>
-              ))}
-            </div>
-            <p className={styles.finePrint}>
-              오늘 성장 EXP {view.daily.xp} / {view.daily.maxXp} · 친밀도 {pet.stats.affinity}
-            </p>
-            {game ? (
-              <>
-                <div className={styles.roomInventory}>
-                  {PET_SLOTS.map((slot) => (
-                    <div key={slot}>
-                      <span>{PET_SLOT_LABELS[slot]}</span>
-                      <strong>
-                        {game.catalog.find((item) => item.id === game.room[slot])?.name ??
-                          '비어 있음'}
-                      </strong>
-                    </div>
-                  ))}
-                </div>
-                <div className={styles.buttonRow}>
-                  <button className={styles.primaryButton} onClick={() => setTab('decorate')}>
-                    우리 아이 방 꾸미기
-                  </button>
-                  <button className={styles.smallButton} onClick={() => setTab('games')}>
-                    미니게임 하기
-                  </button>
-                </div>
-              </>
-            ) : (
-              <p role="status" className={styles.hint}>
-                새 게임 기능을 준비하고 있어요. 돌봄은 계속할 수 있어요.
-              </p>
-            )}
-            {pet.restEndsAt && (
-              <p className={styles.hint}>
-                휴식 {formatPetWait(remainingSeconds(pet.restEndsAt, now))}
-              </p>
-            )}
-          </section>
+          <PetRoomSummary
+            pet={pet}
+            view={view}
+            daysTogether={daysTogether}
+            now={now}
+            onOpenTab={openTab}
+          />
         </div>
         <div
           id="pet-panel-decorate"
@@ -459,8 +585,9 @@ export function PetRoom({
           aria-labelledby="pet-tab-decorate"
           hidden={tab !== 'decorate'}
         >
-          {game && (
+          {game && tab === 'decorate' && (
             <PetDecorations
+              mode="inventory"
               game={game}
               level={pet.level}
               revision={pet.revision}
@@ -468,7 +595,39 @@ export function PetRoom({
               manifest={assets.manifest}
               selected={selectedItem}
               onSelect={setItem}
+              slotRequest={slotRequest}
               onCommand={onCommand}
+              onOpenShop={(slot) => {
+                openTab('shop')
+                // 보던 자리는 상점에서도 그대로 좁혀 보여준다.
+                if (slot)
+                  setSlotRequest((current) => ({ slot, serial: (current?.serial ?? 0) + 1 }))
+              }}
+              onReloadImages={assets.retry}
+              loadingImages={!assets.manifest && !assets.error}
+            />
+          )}
+        </div>
+        <div
+          id="pet-panel-shop"
+          role="tabpanel"
+          aria-labelledby="pet-tab-shop"
+          hidden={tab !== 'shop'}
+        >
+          {game && tab === 'shop' && (
+            <PetDecorations
+              mode="shop"
+              game={game}
+              level={pet.level}
+              revision={pet.revision}
+              disabled={disabled}
+              manifest={assets.manifest}
+              selected={selectedItem}
+              onSelect={setItem}
+              slotRequest={slotRequest}
+              onCommand={onCommand}
+              onReloadImages={assets.retry}
+              loadingImages={!assets.manifest && !assets.error}
             />
           )}
         </div>
@@ -480,15 +639,19 @@ export function PetRoom({
         >
           {game && (
             <PetMiniGames
+              key={pet.id}
               game={game}
               gameOutcome={gameOutcome}
               revision={pet.revision}
               serverTime={view.serverTime}
               now={now}
               disabled={disabled}
+              selected={tab === 'games'}
               characterReady={stageReady}
               onPrepareGame={prepareGame}
+              onCancelPreparation={cancelGamePreparation}
               gameSurface={gameSurface}
+              stageOverlay={stageOverlay}
               onCommand={onCommand}
               onRefresh={refresh}
               onSnack={setSnack}
@@ -501,57 +664,7 @@ export function PetRoom({
           aria-labelledby="pet-tab-records"
           hidden={tab !== 'records'}
         >
-          <section className={styles.panel}>
-            <div className={styles.panelHeading}>
-              <div>
-                <p className={styles.eyebrow}>같이 쌓은 작은 추억</p>
-                <h2>성장 기록</h2>
-              </div>
-              <PetGlyph kind="star" />
-            </div>
-            {game && (
-              <ul className={styles.achievements}>
-                {game.achievements.map((achievement) => (
-                  <li
-                    key={achievement.id}
-                    className={achievement.completed ? styles.achievementDone : undefined}
-                  >
-                    <PetGlyph kind={achievement.completed ? 'star' : 'paw'} />
-                    <div>
-                      <strong>{achievement.label}</strong>
-                      <progress
-                        max={achievement.target}
-                        value={achievement.progress}
-                        aria-label={`${achievement.label} 진행`}
-                      />
-                    </div>
-                    <span>
-                      {achievement.completed
-                        ? '완료'
-                        : `${achievement.progress}/${achievement.target}`}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-            <ul className={styles.records}>
-              {view.records.map((record) => (
-                <li key={record.id}>
-                  <time dateTime={record.at}>{formatDate(record.at)}</time>
-                  <span>
-                    {RECORD_LABELS[record.type]}
-                    {record.level ? ` · Lv.${record.level}` : ''}
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <details className={styles.hint}>
-              <summary>처음 함께한 그림 보기</summary>
-              <div className={styles.portrait}>
-                <PetImage src={pet.imageUrl} alt={`${pet.name}의 처음 함께한 그림`} />
-              </div>
-            </details>
-          </section>
+          <PetRecords pet={pet} game={game} records={view.records} />
         </div>
       </div>
     </div>

@@ -61,8 +61,8 @@ const SearchButton = ({
 
   return (
     <button type="button" onClick={onClick} className={cn(pill({ active: false }), className)}>
-      <span className="text-sm leading-[1.5] font-semibold text-neutral-500">검색</span>
-      <SearchIcon className="size-5 shrink-0 text-neutral-500" />
+      <span className="text-sm leading-[1.5] font-semibold text-neutral-700">검색</span>
+      <SearchIcon className="size-5 shrink-0 text-neutral-700" />
     </button>
   )
 }

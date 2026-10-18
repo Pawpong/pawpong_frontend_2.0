@@ -13,6 +13,7 @@ interface UsePhoneVerificationParams {
   onCodeSent?: () => void
   isVerified: boolean
   onVerifiedChange: (verified: boolean) => void
+  onFailure?: () => void
 }
 
 /**
@@ -24,6 +25,7 @@ export const usePhoneVerification = ({
   onCodeSent,
   isVerified,
   onVerifiedChange,
+  onFailure,
 }: UsePhoneVerificationParams) => {
   const { mutate: sendCodeMutate, isPending: isSending } = useSendVerificationCode()
   const { mutate: verifyCodeMutate, isPending: isVerifying } = useVerifyCode()
@@ -62,6 +64,7 @@ export const usePhoneVerification = ({
         })
       },
       onError: (error) => {
+        onFailure?.()
         setPhoneMessage({
           text: error instanceof Error ? error.message : '인증번호 발송에 실패했습니다.',
           status: 'error',
@@ -91,6 +94,7 @@ export const usePhoneVerification = ({
           setCodeMessage({ text: '인증되었습니다.', status: 'success' })
         },
         onError: (error) => {
+          onFailure?.()
           setCodeMessage({
             text: error instanceof Error ? error.message : '인증번호를 다시 입력해주세요',
             status: 'error',

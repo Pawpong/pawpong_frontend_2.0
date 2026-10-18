@@ -5,6 +5,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     '/',
     '/about',
+    '/app',
     '/explore',
     '/community',
     '/hall-of-fame',

@@ -61,12 +61,16 @@ export async function inPetSession<T>(session: PetSession, request: () => Promis
   try {
     data = await request()
   } catch (error) {
+    if (!petSessionIsCurrent(session)) {
+      notifyAuthStateChanged()
+      throw error
+    }
     if (error instanceof ApiError && error.status === 401 && petSessionIsCurrent(session)) {
-      // Recover credentials only. A new scope reloads its own data; the rejected command is never replayed.
+      // 인증만 복구하고 새 세션에서 다시 조회한다. 거절된 쓰기는 자동 재전송하지 않는다.
       try {
         await refreshAuthSession()
       } catch {
-        // Shared recovery clears rejected credentials and preserves them on a transport failure.
+        // 인증 거절 시 쿠키를 지우되 통신 장애에서는 공통 복구가 기존 인증을 유지한다.
       }
       notifyAuthStateChanged()
     }

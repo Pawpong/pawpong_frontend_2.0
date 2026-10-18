@@ -34,7 +34,7 @@ const ReviewComposer = ({ applicationId, breederName, reviewType }: ReviewCompos
   }
 
   const errorMessage = createReview.isError
-    ? normalizeApiError(createReview.error, '후기를 등록하지 못했습니다.').message
+    ? normalizeApiError(createReview.error, '후기를 등록하지 못했어요.').message
     : null
 
   return (

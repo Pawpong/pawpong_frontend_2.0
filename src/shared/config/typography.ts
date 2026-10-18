@@ -22,5 +22,5 @@ export const TEXT = {
   prose:
     'text-[0.9375rem] leading-[1.5] font-medium whitespace-pre-wrap text-neutral-700 tab:text-base',
   /** 브레드크럼·날짜·보조 설명. 13 → 14 */
-  meta: 'text-[0.8125rem] leading-[1.5] font-medium text-neutral-500 tab:text-sm',
+  meta: 'text-[0.8125rem] leading-[1.5] font-medium text-neutral-700 tab:text-sm',
 } as const

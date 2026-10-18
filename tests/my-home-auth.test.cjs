@@ -1,21 +1,6 @@
 const { test } = require('node:test')
 const assert = require('node:assert/strict')
-const fs = require('node:fs')
-const ts = require('typescript')
-
-function load(file, dependencies = {}) {
-  const code = ts.transpileModule(fs.readFileSync(file, 'utf8'), {
-    fileName: file,
-    compilerOptions: {
-      module: ts.ModuleKind.CommonJS,
-      target: ts.ScriptTarget.ES2022,
-      jsx: ts.JsxEmit.ReactJSX,
-    },
-  }).outputText
-  const output = {}
-  new Function('exports', 'require', code)(output, (name) => dependencies[name] ?? require(name))
-  return output
-}
+const { loadTypescript: load } = require('./helpers/load-typescript.cjs')
 
 test('마이홈은 화면을 그리기 전에 서버에서 로그인을 확인하고 돌아올 탭을 함께 넘긴다', async () => {
   const returnUrls = []

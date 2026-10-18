@@ -12,6 +12,7 @@ interface ActivityInfiniteListProps<T> {
   title: string
   description: string
   emptyText: string
+  emptyAction?: ReactNode
   keyOf: (item: T) => string
   renderItem: (item: T) => ReactNode
 }
@@ -22,6 +23,7 @@ export const ActivityInfiniteList = <T,>({
   title,
   description,
   emptyText,
+  emptyAction,
   keyOf,
   renderItem,
 }: ActivityInfiniteListProps<T>) => {
@@ -46,6 +48,7 @@ export const ActivityInfiniteList = <T,>({
       isError={isError}
       isEmpty={items.length === 0}
       emptyText={emptyText}
+      emptyAction={emptyAction}
       hasNextPage={!!hasNextPage}
       isFetchingNextPage={isFetchingNextPage}
       onRetry={() => void refetch()}

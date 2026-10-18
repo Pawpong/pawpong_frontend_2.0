@@ -5,15 +5,17 @@ import Image from 'next/image'
 import { PawPrintIcon } from '@/shared/assets'
 import { Button } from '@/shared/ui/Button'
 
-export function PetImage({
-  src,
-  alt,
-  compact = false,
-}: {
+type PetImageProps = {
   src: string
   alt: string
   compact?: boolean
-}) {
+}
+
+export function PetImage(props: PetImageProps) {
+  return <PetImageContent key={props.src} {...props} />
+}
+
+function PetImageContent({ src, alt, compact = false }: PetImageProps) {
   const [failed, setFailed] = useState(false)
   if (failed)
     return (
@@ -23,7 +25,7 @@ export function PetImage({
           {compact ? '그림을 불러오지 못했어요' : '그림을 불러오지 못했지만 우리 아이는 잘 있어요.'}
         </p>
         {!compact && (
-          <Button intent="secondary" size="lg" onClick={() => setFailed(false)}>
+          <Button type="button" intent="secondary" size="lg" onClick={() => setFailed(false)}>
             그림 다시 보기
           </Button>
         )}

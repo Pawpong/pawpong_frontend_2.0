@@ -1,4 +1,14 @@
-import { apiClient, API_VERSION, unwrap } from '@/shared/api'
+import {
+  apiClient,
+  API_VERSION,
+  unwrap,
+  withAuthReadSession,
+  getAuthReadSession,
+  ApiError,
+  type AuthReadSession,
+} from '@/shared/api'
+import { parseCommunityPostReview } from '../model/communityReview'
+import { toCommunityPhotoProxyUrl } from '../model/communityPhoto'
 import type {
   ApiResponseFull,
   PaginationResponse,
@@ -26,6 +36,8 @@ interface RawAuthor {
 }
 
 interface RawCommunityPostCard {
+  aiReview?: unknown
+  experience?: import('@/shared/types').CommunityExperience | null
   postId: string
   author: RawAuthor
   authorModel: CommunityAuthorModel
@@ -59,7 +71,9 @@ interface RawCommunityComment {
   createdAt: string
 }
 
-interface RawCommunityPostDetail {
+export interface RawCommunityPostDetail {
+  aiReview?: unknown
+  experience?: import('@/shared/types').CommunityExperience | null
   postId: string
   author: RawAuthor
   authorModel: CommunityAuthorModel
@@ -88,13 +102,17 @@ const flattenAuthor = (author: RawAuthor) => ({
 })
 
 const mapCard = (raw: RawCommunityPostCard): CommunityPostCard => ({
+  ...(raw.aiReview !== undefined ? { aiReview: parseCommunityPostReview(raw.aiReview) } : {}),
+  ...(raw.experience ? { experience: raw.experience } : {}),
   postId: raw.postId,
   ...flattenAuthor(raw.author),
   authorModel: raw.authorModel,
   title: raw.title,
   bodyExcerpt: raw.bodyExcerpt,
-  primaryPhotoUrl: raw.primaryPhotoUrl,
-  photoUrls: raw.photoUrls,
+  primaryPhotoUrl: raw.primaryPhotoUrl
+    ? toCommunityPhotoProxyUrl(raw.primaryPhotoUrl)
+    : raw.primaryPhotoUrl,
+  photoUrls: raw.photoUrls.map(toCommunityPhotoProxyUrl),
   aiComparison: raw.aiComparison,
   petType: raw.petType,
   category: raw.category,
@@ -121,13 +139,15 @@ const mapComment = (raw: RawCommunityComment): CommunityComment => ({
   createdAt: raw.createdAt,
 })
 
-const mapDetail = (raw: RawCommunityPostDetail): CommunityPostDetail => ({
+export const mapCommunityPostDetail = (raw: RawCommunityPostDetail): CommunityPostDetail => ({
+  ...(raw.aiReview !== undefined ? { aiReview: parseCommunityPostReview(raw.aiReview) } : {}),
+  ...(raw.experience ? { experience: raw.experience } : {}),
   postId: raw.postId,
   ...flattenAuthor(raw.author),
   authorModel: raw.authorModel,
   title: raw.title,
   body: raw.body,
-  photoUrls: raw.photoUrls,
+  photoUrls: raw.photoUrls.map(toCommunityPhotoProxyUrl),
   aiComparison: raw.aiComparison,
   petType: raw.petType,
   category: raw.category,
@@ -149,6 +169,14 @@ export const getCommunityPosts = async (
 ): Promise<PaginationResponse<CommunityPostCard>> => {
   const query = new URLSearchParams()
   if (params.petType) query.set('petType', params.petType)
+  if (params.topic) query.set('topic', params.topic)
+  if (params.topics?.length) query.set('topics', params.topics.join(','))
+  if (params.topicMatch) query.set('topicMatch', params.topicMatch)
+  if (params.tags?.length) query.set('tags', params.tags.join(','))
+  if (params.kind) query.set('kind', params.kind)
+  if (params.media) query.set('media', params.media)
+  if (params.period) query.set('period', params.period)
+  if (params.record) query.set('record', params.record)
   if (params.category) query.set('category', params.category)
   if (params.authorId) query.set('authorId', params.authorId)
   if (params.search) query.set('search', params.search)
@@ -164,12 +192,29 @@ export const getCommunityPosts = async (
   return { ...page, items: page.items.map(mapCard) }
 }
 
+/**
+ * 함께 읽을 글 — 서버가 공통 태그·주제·동물 종류로 고른다.
+ * 열람자가 볼 수 없는 글은 서버에서 빠지므로 여기서 다시 거르지 않는다.
+ */
+export const getRelatedCommunityPosts = async (
+  postId: string,
+  pageSize = 6,
+  signal?: AbortSignal,
+): Promise<PaginationResponse<CommunityPostCard>> => {
+  const response = await apiClient.get<ApiResponseFull<PaginationResponse<RawCommunityPostCard>>>(
+    `${API_VERSION}/community/posts/${postId}/related?page=1&pageSize=${pageSize}`,
+    { signal },
+  )
+  const page = unwrap(response, '함께 읽을 글을 불러오지 못했습니다.')
+  return { ...page, items: page.items.map(mapCard) }
+}
+
 /** 커뮤니티 게시글 상세 조회 */
 export const getCommunityPostDetail = async (postId: string): Promise<CommunityPostDetail> => {
   const response = await apiClient.get<ApiResponseFull<RawCommunityPostDetail>>(
     `${API_VERSION}/community/posts/${postId}`,
   )
-  return mapDetail(unwrap(response, '커뮤니티 게시글 조회에 실패했습니다.'))
+  return mapCommunityPostDetail(unwrap(response, '커뮤니티 게시글 조회에 실패했습니다.'))
 }
 
 /** 내가 저장한 게시글 목록 조회 */
@@ -187,6 +232,52 @@ export const getMyBookmarkedPosts = async (
   // 저장 목록 응답의 isSaved가 false로 내려와도 이 엔드포인트 결과는 전부 내가 저장한 글이다.
   return { ...page, items: page.items.map((raw) => ({ ...mapCard(raw), isSaved: true })) }
 }
+
+const getMyActivityPosts = async (
+  path: 'liked' | 'commented',
+  params: CommunityBookmarkListParams,
+  errorMessage: string,
+  session: AuthReadSession | null,
+  signal?: AbortSignal,
+): Promise<PaginationResponse<CommunityPostCard>> => {
+  const query = new URLSearchParams()
+  if (params.page) query.set('page', String(params.page))
+  if (params.pageSize) query.set('pageSize', String(params.pageSize))
+
+  const response = await withAuthReadSession(
+    (config) =>
+      apiClient.get<ApiResponseFull<PaginationResponse<RawCommunityPostCard>>>(
+        `${API_VERSION}/community/posts/me/${path}?${query.toString()}`,
+        config,
+      ),
+    session,
+    signal,
+  )
+  const page = unwrap(response, errorMessage)
+  return { ...page, items: page.items.map(mapCard) }
+}
+
+/** 내가 좋아요한 게시글 목록 — 좋아요한 시각 최신순 */
+export const getMyLikedPosts = (
+  params: CommunityBookmarkListParams = {},
+  session: AuthReadSession | null = getAuthReadSession(),
+  signal?: AbortSignal,
+) =>
+  getMyActivityPosts('liked', params, '좋아요한 게시글 목록 조회에 실패했습니다.', session, signal)
+
+/** 내가 댓글 단 게시글 목록 — 글당 한 번, 최근 댓글 순 */
+export const getMyCommentedPosts = (
+  params: CommunityBookmarkListParams = {},
+  session: AuthReadSession | null = getAuthReadSession(),
+  signal?: AbortSignal,
+) =>
+  getMyActivityPosts(
+    'commented',
+    params,
+    '댓글 단 게시글 목록 조회에 실패했습니다.',
+    session,
+    signal,
+  )
 
 /** 내가 임시저장(draft) 한 게시글 목록 — 본인에게만 노출, 최신순 */
 export const getMyDraftPosts = async (
@@ -207,25 +298,41 @@ export const getMyDraftPosts = async (
 export const getCommunityComments = async (
   postId: string,
   params: { page?: number; pageSize?: number } = {},
+  signal?: AbortSignal,
+  session: AuthReadSession | null = getAuthReadSession(),
 ): Promise<PaginationResponse<CommunityComment>> => {
+  const assertCurrent = () => {
+    if (getAuthReadSession() !== session) throw new ApiError('조회하는 계정이 변경되었습니다.', 401)
+  }
+  assertCurrent()
   const query = new URLSearchParams()
   if (params.page) query.set('page', String(params.page))
   if (params.pageSize) query.set('pageSize', String(params.pageSize))
 
   const response = await apiClient.get<ApiResponseFull<PaginationResponse<RawCommunityComment>>>(
     `${API_VERSION}/community/posts/${postId}/comments?${query.toString()}`,
+    { signal },
   )
 
+  assertCurrent()
   const page = unwrap(response, '댓글 목록 조회에 실패했습니다.')
   return { ...page, items: page.items.map(mapComment) }
 }
+
+const mapHallOfFame = (round: CommunityHallOfFame): CommunityHallOfFame => ({
+  ...round,
+  winners: round.winners.map((winner) => ({
+    ...winner,
+    photoUrl: winner.photoUrl ? toCommunityPhotoProxyUrl(winner.photoUrl) : winner.photoUrl,
+  })),
+})
 
 /** 명예의 전당 현재 회차 */
 export const getCurrentCommunityHallOfFame = async (): Promise<CommunityHallOfFame> => {
   const response = await apiClient.get<ApiResponseFull<CommunityHallOfFame>>(
     `${API_VERSION}/community/hall-of-fame/current`,
   )
-  return unwrap(response, '명예의 전당 조회에 실패했습니다.')
+  return mapHallOfFame(unwrap(response, '명예의 전당 조회에 실패했습니다.'))
 }
 
 /** 명예의 전당 지난 회차 목록 (확정분만, 최신순) */
@@ -239,5 +346,6 @@ export const getCommunityHallOfFameHistory = async (
   const response = await apiClient.get<ApiResponseFull<PaginationResponse<CommunityHallOfFame>>>(
     `${API_VERSION}/community/hall-of-fame?${query.toString()}`,
   )
-  return unwrap(response, '지난 명예의 전당 조회에 실패했습니다.')
+  const page = unwrap(response, '지난 명예의 전당 조회에 실패했습니다.')
+  return { ...page, items: page.items.map(mapHallOfFame) }
 }

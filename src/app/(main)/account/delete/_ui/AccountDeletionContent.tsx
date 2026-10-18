@@ -269,7 +269,7 @@ export function AccountDeletionContent() {
           </div>
         </div>
       )}
-      <p className="text-xs leading-relaxed text-neutral-500">
+      <p className="text-xs leading-relaxed text-neutral-700">
         접수 여부를 확인할 수 없거나 처리가 오래 지연되면 coldingcontact@gmail.com으로 문의해
         주세요. 비밀번호나 로그인 토큰을 보내지 마세요.
       </p>

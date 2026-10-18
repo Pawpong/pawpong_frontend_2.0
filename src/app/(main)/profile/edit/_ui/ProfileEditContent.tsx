@@ -179,7 +179,7 @@ const ProfileEditContent = () => {
       setPhotoPreview(res.cdnUrl)
       setPhotoFileName(res.fileName)
     } catch (error) {
-      showError(error, '사진 업로드에 실패했습니다.')
+      showError(error, '사진을 올리지 못했어요.')
     }
   }
 
@@ -275,9 +275,9 @@ const ProfileEditContent = () => {
       setPendingPhotos(null)
       // 저장된 값을 새 기준으로 다시 시드한다
       setBreederSeeded(false)
-      toast.success('프로필이 변경되었습니다')
+      toast.success('프로필을 바꿨어요.')
     } catch (error) {
-      showError(error, '프로필 적용에 실패했습니다.')
+      showError(error, '프로필을 적용하지 못했어요.')
     } finally {
       setIsApplying(false)
     }
@@ -300,10 +300,10 @@ const ProfileEditContent = () => {
           status={profileError ? 'error' : 'loading'}
           message={
             profileError
-              ? '프로필을 불러오지 못했습니다.'
+              ? '프로필을 불러오지 못했어요.'
               : profilePending
-                ? '프로필을 불러오는 중입니다.'
-                : '프로필을 확인할 수 없습니다.'
+                ? '프로필을 불러오는 중이에요.'
+                : '프로필을 확인할 수 없어요.'
           }
           onRetry={
             profileError
@@ -413,7 +413,7 @@ const ProfileEditContent = () => {
                 photos={pendingPhotos ?? representativePhotos}
                 disabled={isSaving}
                 onChange={setPendingPhotos}
-                onError={(error) => showError(error, '사진을 선택하지 못했습니다.')}
+                onError={(error) => showError(error, '사진을 선택하지 못했어요.')}
               />
             </ProfileSection>
 
@@ -497,7 +497,7 @@ const ProfileEditContent = () => {
           </div>
         )}
         <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 px-5 py-4 tab:px-8">
-          <p className="hidden text-body-md text-neutral-500 tab:block">
+          <p className="hidden text-body-md text-neutral-700 tab:block">
             {isSaving
               ? '프로필을 적용하고 있어요.'
               : isDirty

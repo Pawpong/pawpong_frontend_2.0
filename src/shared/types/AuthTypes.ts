@@ -22,6 +22,8 @@ export interface CounselDefaultProfile {
 }
 
 export interface RegisterAdopterRequest {
+  verificationMethod?: 'phone' | 'email'
+  emailVerificationToken?: string
   tempId: string
   email: string
   nickname: string
@@ -43,8 +45,10 @@ export interface RegisterBreederAgreements {
 }
 
 export interface RegisterBreederRequest {
+  verificationMethod?: 'phone' | 'email'
+  emailVerificationToken?: string
   email: string
-  phoneNumber: string
+  phoneNumber?: string
   breederName: string
   breederLocation: { city: string; district?: string }
   animal: 'cat' | 'dog' | 'reptile'
@@ -52,6 +56,8 @@ export interface RegisterBreederRequest {
   breeds: string[]
   plan: 'basic' | 'pro'
   agreements: RegisterBreederAgreements
+  /** 입양자 가입과 같은 코드·버전 동의 이력 (만 14세 확인 포함) */
+  termsAgreements: TermsAgreementItem[]
   tempId?: string
   provider?: string
   profileImage?: string

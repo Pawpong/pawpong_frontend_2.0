@@ -1,4 +1,17 @@
-import { apiClient, API_VERSION, unwrap, unwrapVoid } from '@/shared/api'
+import {
+  apiClient,
+  API_VERSION,
+  unwrap,
+  unwrapVoid,
+  withAuthWriteSession,
+  getAuthReadSession,
+  type AuthReadSession,
+} from '@/shared/api'
+import { mapCommunityPostDetail, type RawCommunityPostDetail } from '@/entities/community'
+import {
+  captureCommunityWriteSession,
+  communityWriteRequestOptions,
+} from '../lib/communityWriteSession'
 import type {
   ApiResponseFull,
   CommunityPostDetail,
@@ -28,24 +41,32 @@ export const unlikeCommunityPost = async (postId: string): Promise<void> => {
 /** 게시글 작성 */
 export const createCommunityPost = async (
   data: CreateCommunityPostRequest,
+  signal?: AbortSignal,
 ): Promise<CommunityPostDetail> => {
-  const response = await apiClient.post<ApiResponseFull<CommunityPostDetail>>(
+  const assertCurrent = captureCommunityWriteSession(signal)
+  const response = await apiClient.post<ApiResponseFull<RawCommunityPostDetail>>(
     `${API_VERSION}/community/posts`,
     data,
+    communityWriteRequestOptions(signal, data.aiReviewConsent !== undefined),
   )
-  return unwrap(response, '게시글 작성에 실패했습니다.')
+  assertCurrent()
+  return mapCommunityPostDetail(unwrap(response, '게시글 작성에 실패했습니다.'))
 }
 
 /** 게시글 수정 */
 export const updateCommunityPost = async (
   postId: string,
   data: UpdateCommunityPostRequest,
+  signal?: AbortSignal,
 ): Promise<CommunityPostDetail> => {
-  const response = await apiClient.patch<ApiResponseFull<CommunityPostDetail>>(
+  const assertCurrent = captureCommunityWriteSession(signal)
+  const response = await apiClient.patch<ApiResponseFull<RawCommunityPostDetail>>(
     `${API_VERSION}/community/posts/${postId}`,
     data,
+    communityWriteRequestOptions(signal, data.aiReviewConsent !== undefined),
   )
-  return unwrap(response, '게시글 수정에 실패했습니다.')
+  assertCurrent()
+  return mapCommunityPostDetail(unwrap(response, '게시글 수정에 실패했습니다.'))
 }
 
 /** 게시글 삭제 (소프트) */
@@ -60,28 +81,45 @@ export const deleteCommunityPost = async (postId: string): Promise<CommunityPost
 export const createCommunityComment = async (
   postId: string,
   data: CreateCommunityCommentRequest,
+  session: AuthReadSession | null = getAuthReadSession(),
 ): Promise<{ commentId: string }> => {
-  const response = await apiClient.post<ApiResponseFull<{ commentId: string }>>(
-    `${API_VERSION}/community/posts/${postId}/comments`,
-    data,
-    { timeout: 15_000 },
-  )
-  return unwrap(response, '댓글 작성에 실패했습니다.')
+  return withAuthWriteSession(async (config) => {
+    const response = await apiClient.post<ApiResponseFull<{ commentId: string }>>(
+      `${API_VERSION}/community/posts/${postId}/comments`,
+      data,
+      { ...config, timeout: 15_000 },
+    )
+    return unwrap(response, '댓글 작성에 실패했습니다.')
+  }, session)
 }
 
 /** 댓글 수정 */
 export const updateCommunityComment = async (
   commentId: string,
   data: UpdateCommunityCommentRequest,
+  session: AuthReadSession | null = getAuthReadSession(),
 ): Promise<void> => {
-  const response = await apiClient.patch(`${API_VERSION}/community/comments/${commentId}`, data)
-  unwrapVoid(response, '댓글 수정에 실패했습니다.')
+  return withAuthWriteSession(async (config) => {
+    const response = await apiClient.patch(`${API_VERSION}/community/comments/${commentId}`, data, {
+      ...config,
+      timeout: 15_000,
+    })
+    unwrapVoid(response, '댓글 수정에 실패했습니다.')
+  }, session)
 }
 
 /** 댓글 삭제 */
-export const deleteCommunityComment = async (commentId: string): Promise<void> => {
-  const response = await apiClient.delete(`${API_VERSION}/community/comments/${commentId}`)
-  unwrapVoid(response, '댓글 삭제에 실패했습니다.')
+export const deleteCommunityComment = async (
+  commentId: string,
+  session: AuthReadSession | null = getAuthReadSession(),
+): Promise<void> => {
+  return withAuthWriteSession(async (config) => {
+    const response = await apiClient.delete(`${API_VERSION}/community/comments/${commentId}`, {
+      ...config,
+      timeout: 15_000,
+    })
+    unwrapVoid(response, '댓글 삭제에 실패했습니다.')
+  }, session)
 }
 
 /** 게시글 북마크 */

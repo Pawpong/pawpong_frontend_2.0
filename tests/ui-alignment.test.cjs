@@ -1,0 +1,8 @@
+require('./ui-alignment/ai-image.test.cjs')
+require('./ui-alignment/playground.test.cjs')
+require('./ui-alignment/community.test.cjs')
+require('./ui-alignment/gamification.test.cjs')
+require('./ui-alignment/home.test.cjs')
+require('./ui-alignment/faq.test.cjs')
+require('./ui-alignment/explore.test.cjs')
+require('./ui-alignment/banner.test.cjs')

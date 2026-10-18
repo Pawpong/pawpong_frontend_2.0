@@ -145,13 +145,13 @@ const VerificationContent = () => {
       setFiles({})
       toast.success('서류를 제출했어요. 심사 결과를 알려드릴게요.')
     } catch (error) {
-      toast.error(normalizeApiError(error, '서류 제출에 실패했습니다.').message)
+      toast.error(normalizeApiError(error, '서류를 제출하지 못했어요.').message)
     }
   }
 
   if (profileQuery.isPending) {
     return (
-      <AsyncState status="loading" message="인증 정보를 불러오는 중입니다." className="min-h-dvh" />
+      <AsyncState status="loading" message="인증 정보를 불러오는 중이에요." className="min-h-dvh" />
     )
   }
 
@@ -159,7 +159,7 @@ const VerificationContent = () => {
     return (
       <AsyncState
         status="error"
-        message="인증 정보를 불러오지 못했습니다."
+        message="인증 정보를 불러오지 못했어요."
         onRetry={() => void profileQuery.refetch()}
         isRetrying={profileQuery.isFetching}
         className="min-h-dvh"
@@ -219,7 +219,7 @@ const VerificationContent = () => {
                   'text-body-sm tab:text-body-md',
                   index === statusContent.step
                     ? 'font-semibold text-primary-700'
-                    : 'font-medium text-neutral-500',
+                    : 'font-medium text-neutral-700',
                 )}
               >
                 <span className="mr-2">{index + 1}</span>
@@ -278,7 +278,7 @@ const VerificationContent = () => {
       {canEdit && (
         <div className="fixed inset-x-0 bottom-0 z-sticky border-t border-neutral-100 bg-white pb-[env(safe-area-inset-bottom)]">
           <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 px-5 py-4 tab:px-8">
-            <p className="hidden text-body-md text-neutral-500 tab:block">
+            <p className="hidden text-body-md text-neutral-700 tab:block">
               {isSubmitting ? '서류를 제출하고 있어요.' : '등록한 서류를 확인하고 제출해주세요.'}
             </p>
             <Button

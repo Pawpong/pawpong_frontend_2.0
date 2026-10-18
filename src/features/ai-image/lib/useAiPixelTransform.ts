@@ -9,6 +9,11 @@ import {
 } from '@/entities/ai-image'
 import type { AiImageGeneration } from '@/shared/types'
 import {
+  getAuthReadSession,
+  isAuthReadSessionCurrent,
+  type AuthReadSession,
+} from '@/shared/lib/authReadSession'
+import {
   AI_IMAGE_RETRY_INTERVAL_MS,
   AiImagePendingError,
   aiImageErrorMessage,
@@ -32,6 +37,7 @@ export type AiPixelTransformPhase =
   | 'failed'
 
 export interface AiPixelTransformResult {
+  session: AuthReadSession
   jobId: string
   imageUrl: string
   /** 결과 파일키 (ai-image/result/...) */
@@ -66,6 +72,7 @@ export const useAiPixelTransform = () => {
   const controller = useRef<AbortController | null>(null)
   const inFlight = useRef<Promise<AiPixelTransformResult | null> | null>(null)
   const pendingJob = useRef<AiImageGeneration | null>(null)
+  const owner = useRef<AuthReadSession | null>(null)
 
   useEffect(
     () => () => {
@@ -81,6 +88,7 @@ export const useAiPixelTransform = () => {
     controller.current = null
     inFlight.current = null
     pendingJob.current = null
+    owner.current = null
     setCanResume(false)
     setPhase('idle')
     setResult(null)
@@ -93,10 +101,14 @@ export const useAiPixelTransform = () => {
       filterId: string
       generationPurpose?: 'pet-sprite-v1'
     }): Promise<AiPixelTransformResult | null> => {
+      if (owner.current && !isAuthReadSessionCurrent(owner.current)) reset()
       if (inFlight.current) return inFlight.current
       if (!input && !pendingJob.current) return Promise.resolve(null)
+      const session = input ? getAuthReadSession() : owner.current
+      if (!session) return Promise.resolve(null)
+      owner.current = session
       const current = ++operation.current
-      const isCurrent = () => current === operation.current
+      const isCurrent = () => current === operation.current && isAuthReadSessionCurrent(session)
       const requestController = new AbortController()
       controller.current = requestController
       const { signal } = requestController
@@ -112,18 +124,18 @@ export const useAiPixelTransform = () => {
         let generationRequested = !input
         try {
           if (input) {
-            const { inputObjectKey } = await uploadAiImageSource(input.file, { signal })
+            const { inputObjectKey } = await uploadAiImageSource(input.file, { signal, session })
             if (!isCurrent()) return null
             setPhase('checking')
             generationRequested = true
-            // Never replay this POST: a lost response does not mean the job was rejected.
+            // 응답 유실은 작업 거절을 뜻하지 않으므로 생성 쓰기를 자동으로 반복하지 않는다.
             const accepted = await requestAiImageGeneration(
               {
                 filterId: input.filterId,
                 inputObjectKey,
                 ...(input.generationPurpose ? { generationPurpose: input.generationPurpose } : {}),
               },
-              { signal },
+              { signal, session },
             )
             if (!isCurrent()) return null
             pendingJob.current = accepted
@@ -143,12 +155,15 @@ export const useAiPixelTransform = () => {
               Math.max(0, Math.min(AI_IMAGE_RETRY_INTERVAL_MS, deadline - Date.now())),
               signal,
             )
+            if (!isCurrent()) return null
             job = await readAiImageWithRetry(
-              (remainingMs) =>
-                getAiImageGeneration(job.jobId, {
+              (remainingMs) => {
+                if (!isCurrent()) throw new DOMException('조회가 취소되었습니다.', 'AbortError')
+                return getAiImageGeneration(job.jobId, {
                   signal,
                   timeout: Math.min(10000, remainingMs),
-                }),
+                })
+              },
               { signal, deadline, onRetry },
             )
             if (!isCurrent()) return null
@@ -166,15 +181,18 @@ export const useAiPixelTransform = () => {
           }
 
           const blob = await readAiImageWithRetry(
-            (remainingMs) =>
-              getAiImageGenerationImage(job.jobId, {
+            (remainingMs) => {
+              if (!isCurrent()) throw new DOMException('조회가 취소되었습니다.', 'AbortError')
+              return getAiImageGenerationImage(job.jobId, {
                 signal,
                 timeout: Math.min(60000, remainingMs),
-              }),
+              })
+            },
             { signal, deadline: Date.now() + DOWNLOAD_TIMEOUT_MS, onRetry },
           )
           if (!isCurrent()) return null
           const next: AiPixelTransformResult = {
+            session,
             jobId: job.jobId,
             imageUrl: job.resultImageUrl,
             objectKey: job.resultObjectKey,
@@ -207,9 +225,10 @@ export const useAiPixelTransform = () => {
           }
           return null
         } finally {
-          if (isCurrent()) {
+          if (current === operation.current) {
             inFlight.current = null
             controller.current = null
+            if (!isAuthReadSessionCurrent(session)) reset()
           }
         }
       }
@@ -217,7 +236,7 @@ export const useAiPixelTransform = () => {
       inFlight.current = promise
       return promise
     },
-    [],
+    [reset],
   )
   const resume = useCallback(() => perform(), [perform])
 

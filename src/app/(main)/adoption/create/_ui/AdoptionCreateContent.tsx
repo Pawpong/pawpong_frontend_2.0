@@ -44,8 +44,8 @@ const AdoptionCreateContent = () => {
               className="text-sm font-medium text-neutral-700"
             >
               {isDraftLoadError
-                ? '임시저장 글을 불러오지 못했습니다.'
-                : '임시저장 글을 불러오는 중입니다.'}
+                ? '임시저장 글을 불러오지 못했어요.'
+                : '임시저장 글을 불러오는 중이에요.'}
             </p>
             {isDraftLoadError && (
               <div className="flex items-center gap-2">

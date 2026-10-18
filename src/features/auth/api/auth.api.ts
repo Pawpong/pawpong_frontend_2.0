@@ -1,28 +1,38 @@
 import { beginLogout, waitForAuthCookieWrites } from '@/shared/lib/authSessionLifecycle'
 import { unregisterNativePushSession } from '@/shared/lib/nativePushSession'
 import { clearAuthCookies } from '@/shared/lib/authSessionRecovery'
+import { withAuthCookieLock } from '@/shared/lib/authCookieLock'
+import { captureAuthCookieScope, assertAuthCookieScopeCurrent } from '@/shared/lib/authCookieScope'
 import { apiClient, API_VERSION, unwrap } from '@/shared/api'
 import type { ApiRequestConfig } from '@/shared/api'
 import type { ApiResponse, ReactivateAccountResponse } from '@/shared/types'
 
 export const logout = async (): Promise<{ message: string; loggedOutAt: string }> => {
-  beginLogout()
-  await unregisterNativePushSession()
-  try {
-    // 토큰이 만료돼도 refresh로 세션을 되살리지 않도록 로그아웃 요청은 자동 갱신을 건너뛴다.
-    const response = await apiClient.post<ApiResponse<{ message: string; loggedOutAt: string }>>(
-      `${API_VERSION}/auth/logout`,
-      undefined,
-      { skipAuthRefresh: true } as ApiRequestConfig,
-    )
-    await waitForAuthCookieWrites()
-    await clearAuthCookies()
-    return unwrap(response, '로그아웃에 실패했습니다.')
-  } catch (error) {
-    await waitForAuthCookieWrites()
-    await clearAuthCookies()
-    throw error
-  }
+  const originalScope = captureAuthCookieScope()
+  return withAuthCookieLock(async (lease) => {
+    assertAuthCookieScopeCurrent(originalScope)
+    beginLogout()
+    const scope = captureAuthCookieScope()
+    await unregisterNativePushSession()
+    assertAuthCookieScopeCurrent(scope)
+    try {
+      // 토큰이 만료돼도 refresh로 세션을 되살리지 않도록 로그아웃 요청은 자동 갱신을 건너뛴다.
+      const response = await apiClient.post<ApiResponse<{ message: string; loggedOutAt: string }>>(
+        `${API_VERSION}/auth/logout`,
+        undefined,
+        { skipAuthRefresh: true } as ApiRequestConfig,
+      )
+      await waitForAuthCookieWrites()
+      await clearAuthCookies(scope, lease)
+      assertAuthCookieScopeCurrent(scope, true)
+      return unwrap(response, '로그아웃에 실패했습니다.')
+    } catch (error) {
+      await waitForAuthCookieWrites()
+      await clearAuthCookies(scope, lease)
+      assertAuthCookieScopeCurrent(scope, true)
+      throw error
+    }
+  })
 }
 
 /**

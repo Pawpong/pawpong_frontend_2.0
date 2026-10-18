@@ -4,6 +4,13 @@
  *
  */
 
+export interface BannerTextOverlay {
+  layout: 'welcome' | 'launch' | 'category'
+  headline: string
+  subtitle?: string
+  ctaLabel?: string
+}
+
 /** 배너 DTO */
 export interface BannerDto {
   bannerId: string
@@ -15,6 +22,7 @@ export interface BannerDto {
   linkUrl: string
   title?: string
   description?: string
+  textOverlay?: BannerTextOverlay | null
   order: number
   isActive: boolean
   targetAudience?: ('guest' | 'adopter' | 'breeder')[]

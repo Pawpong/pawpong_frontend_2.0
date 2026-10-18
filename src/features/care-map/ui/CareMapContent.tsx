@@ -1,6 +1,6 @@
 'use client'
 
-import { RetryButton } from '@/shared/ui'
+import { LoginPromptModal, RetryButton } from '@/shared/ui'
 import dynamic from 'next/dynamic'
 import {
   useCallback,
@@ -12,12 +12,15 @@ import {
   type FormEvent,
 } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { useLoginGuard } from '@/features/auth'
+import { normalizeApiError } from '@/shared/api'
+import { BookmarkIcon } from '@/shared/assets'
 import { cafe24Proup } from '@/shared/lib/fonts'
 import { FeatureIntro } from '@/shared/ui/FeatureIntro'
 import {
-  getCareDirectorySummary,
-  getCareMapConfig,
-  searchCarePlaces,
+  CARE_PLACE_KINDS,
+  CARE_PLACE_KIND_LABEL,
+  carePlaceQueries,
   type CareCoordinates,
   type CarePlaceKind,
   type MappedCarePlace,
@@ -25,8 +28,12 @@ import {
 import { CareMapIcon } from './CareMapIcon'
 import { CarePlaceDetails } from './CarePlaceDetails'
 import { CareMapGuide } from './CareMapGuide'
+import { useToggleCarePlaceFavorite } from '../api/care-place-favorite.mutations'
+import { favoriteToCarePlace } from '../lib/care-place-favorite'
 import { careLocationFailureMessage, startCareLocation } from '../lib/care-location'
+import { inNativeAppWebView } from '@/shared/lib/nativeBridge'
 import {
+  CARE_RADIUS_OPTIONS,
   careSearchReducer,
   createCareSearchState,
   DEFAULT_CARE_CENTER,
@@ -43,13 +50,6 @@ const KakaoMapCanvas = dynamic(() => import('./KakaoMapCanvas'), {
     </div>
   ),
 })
-const KIND_LABEL: Record<CarePlaceKind, string> = {
-  hospital: '동물병원',
-  shelter: '보호센터',
-  cafe: '애견동반카페',
-  travel: '여행지',
-  stay: '숙소',
-}
 export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: CarePlaceKind }) {
   const [{ search, page, selectedId, nearbyOrigin }, dispatch] = useReducer(
     careSearchReducer,
@@ -78,7 +78,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
       },
       onFailure: (reason) => {
         setLocating(false)
-        setLocationMessage(careLocationFailureMessage(reason))
+        setLocationMessage(careLocationFailureMessage(reason, inNativeAppWebView()))
       },
     })
     cancelLocation.current = cancel
@@ -86,28 +86,31 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
   }, [])
   const detailRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<HTMLOListElement>(null)
-  const config = useQuery({
-    queryKey: ['care-map', 'config'],
-    queryFn: ({ signal }) => getCareMapConfig(signal),
-    staleTime: 300000,
-    retry: 1,
-  })
-  const summary = useQuery({
-    queryKey: ['care-map', 'directory-summary'],
-    queryFn: ({ signal }) => getCareDirectorySummary(signal),
-    staleTime: 300000,
-    retry: 1,
-  })
+  // 즐겨찾기 칩을 누르면 검색 대신 고른 종류의 즐겨찾기만 목록·지도에 보여준다
+  const [favoritesOnly, setFavoritesOnly] = useState(false)
+  const login = useLoginGuard()
+  const config = useQuery({ ...carePlaceQueries.config(), retry: 1 })
+  const summary = useQuery({ ...carePlaceQueries.directorySummary(), retry: 1 })
   const result = useQuery({
-    queryKey: ['care-places', search, page],
-    queryFn: ({ signal }) => searchCarePlaces(search, page, signal),
-    // Live place coordinates only belong to the currently displayed result.
-    staleTime: 0,
-    gcTime: 0,
-    refetchOnWindowFocus: false,
+    ...carePlaceQueries.places(search, page),
     retry: 1,
+    enabled: !favoritesOnly,
   })
-  const places = result.data?.places
+  const favorites = useQuery(carePlaceQueries.favorites(login.isLoggedIn))
+  const toggleFavorite = useToggleCarePlaceFavorite()
+  const favoriteIds = useMemo(
+    () => new Set(favorites.data?.map((favorite) => favorite.id)),
+    [favorites.data],
+  )
+  const favoritePlaces = useMemo(
+    () =>
+      (favorites.data ?? [])
+        .filter((favorite) => favorite.kind === search.kind)
+        .map(favoriteToCarePlace),
+    [favorites.data, search.kind],
+  )
+  const places = favoritesOnly ? favoritePlaces : result.data?.places
+  const list = favoritesOnly ? favorites : result
   const mapped = useMemo(
     () =>
       (places ?? []).flatMap((place, index): MappedCarePlace[] =>
@@ -134,13 +137,25 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
     summary.data?.regions.find((region) => region.id === search.region)?.label ?? '전국'
   const nearbyLabel = nearbyOrigin === 'location' ? '내 위치 주변' : '지도 중심 주변'
   const hasFilters =
-    !isDirectory || search.region !== 'all' || !!search.query || search.referralOnly
+    !favoritesOnly &&
+    (!isDirectory || search.region !== 'all' || !!search.query || search.referralOnly)
+  const directoryActive = isDirectory && !favoritesOnly
+  const locationActive = !favoritesOnly && !isDirectory && nearbyOrigin === 'location'
 
   const updateSearch = (action: CareSearchAction) => {
     cancelPendingLocation()
     setCenterRequest(null)
     setLocationMessage(null)
+    // 종류만 바꿀 때는 즐겨찾기 보기를 유지하고, 다른 검색 조건을 고르면 검색으로 돌아간다
+    if (action.type !== 'kind') setFavoritesOnly(false)
     dispatch(action)
+  }
+  const showFavorites = () => {
+    if (!login.isLoggedIn) return login.openPrompt()
+    cancelPendingLocation()
+    setLocationMessage(null)
+    setFavoritesOnly(true)
+    dispatch({ type: 'select', id: null })
   }
   const changeKind = (kind: CarePlaceKind) => {
     updateSearch({ type: 'kind', kind })
@@ -188,7 +203,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
       },
       onFailure: (reason) => {
         setLocating(false)
-        setLocationMessage(careLocationFailureMessage(reason))
+        setLocationMessage(careLocationFailureMessage(reason, inNativeAppWebView()))
       },
     })
   }
@@ -200,7 +215,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
         <br className="tab:hidden" /> 함께 떠날 카페·여행지·숙소까지 포퐁에서 가까이 만나보세요.
       </FeatureIntro>
       <div className="care-map-counts" role="group" aria-label="시설 종류 · 전국 등록 시설 수">
-        {(['hospital', 'shelter', 'cafe', 'travel', 'stay'] as const).map((kind) => {
+        {CARE_PLACE_KINDS.map((kind) => {
           const active = search.kind === kind
           const count =
             kind === 'hospital'
@@ -218,7 +233,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
             >
               <span className="care-map-category-heading">
                 <CareMapIcon name={kind} className="size-5 shrink-0" />
-                <span className={cafe24Proup.className}>{KIND_LABEL[kind]}</span>
+                <span className={cafe24Proup.className}>{CARE_PLACE_KIND_LABEL[kind]}</span>
                 <span className="care-map-selection" aria-hidden="true">
                   {active ? '✓' : ''}
                 </span>
@@ -285,7 +300,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
                 setInput(event.target.value)
               }}
               maxLength={80}
-              placeholder={`${isHospital ? '병원' : KIND_LABEL[search.kind]} 이름 또는 지역 검색`}
+              placeholder={`${isHospital ? '병원' : CARE_PLACE_KIND_LABEL[search.kind]} 이름 또는 지역 검색`}
               enterKeyHint="search"
             />
             {(input || search.query) && (
@@ -311,8 +326,8 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
           {hasDirectory && (
             <button
               type="button"
-              className={`care-map-chip ${isDirectory ? 'care-map-chip-active' : ''}`}
-              aria-pressed={isDirectory}
+              className={`care-map-chip ${directoryActive ? 'care-map-chip-active' : ''}`}
+              aria-pressed={directoryActive}
               onClick={() => updateSearch({ type: 'directory' })}
             >
               {regionLabel} 등록
@@ -322,16 +337,25 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
             type="button"
             onClick={locate}
             disabled={locating}
-            aria-pressed={!isDirectory && nearbyOrigin === 'location'}
-            className={`care-map-chip ${!isDirectory && nearbyOrigin === 'location' ? 'care-map-chip-active' : ''}`}
+            aria-pressed={locationActive}
+            className={`care-map-chip ${locationActive ? 'care-map-chip-active' : ''}`}
           >
             <CareMapIcon name="locate" className="size-4" />
             {locating ? '위치 확인 중…' : '내 주변 찾기'}
           </button>
-          {!isDirectory && nearbyOrigin === 'map' && (
+          <button
+            type="button"
+            onClick={showFavorites}
+            aria-pressed={favoritesOnly}
+            className={`care-map-chip ${favoritesOnly ? 'care-map-chip-active' : ''}`}
+          >
+            <BookmarkIcon status={favoritesOnly ? 'fill' : 'default'} className="size-4" />
+            즐겨찾기
+          </button>
+          {!favoritesOnly && !isDirectory && nearbyOrigin === 'map' && (
             <span className="care-map-scope-status">지도 중심 주변</span>
           )}
-          {search.scope === 'nearby' && (
+          {!favoritesOnly && search.scope === 'nearby' && (
             <select
               aria-label="주변 검색 반경"
               value={search.radius}
@@ -340,14 +364,15 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
                 updateSearch({ type: 'radius', radius: Number(event.target.value) })
               }
             >
-              <option value={3000}>3km</option>
-              <option value={5000}>5km</option>
-              <option value={10000}>10km</option>
-              <option value={20000}>20km</option>
+              {CARE_RADIUS_OPTIONS.map((radius) => (
+                <option key={radius} value={radius}>
+                  {radius / 1000}km
+                </option>
+              ))}
             </select>
           )}
         </div>
-        {isHospital && (
+        {isHospital && !favoritesOnly && (
           <div className="care-map-filters" role="group" aria-label="진료 조건">
             <span className="care-map-filter-label">진료 조건</span>
             <button
@@ -388,7 +413,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
           </div>
         )}
       </div>
-      {isHospital && (
+      {isHospital && !favoritesOnly && (
         <p className="mb-3 text-xs leading-5 text-primary-700">
           {search.referralOnly
             ? `공식 의뢰 안내를 확인한 ${summary.data ? `전국 ${summary.data.referralCount}곳 중 ` : '병원 중 '}선택한 조건에 맞는 곳이에요. 전체 2차 병원 목록은 아니에요.`
@@ -396,33 +421,44 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
         </p>
       )}
 
-      <div className="grid gap-4 lap:grid-cols-[350px_minmax(0,1fr)] lap:items-start">
+      <div className="grid gap-4 lap:grid-cols-[21.875rem_minmax(0,1fr)] lap:items-start">
         <section
           className="care-map-results order-2 lap:order-1"
           aria-label="시설 검색 결과"
-          aria-busy={result.isFetching}
+          aria-busy={list.isFetching}
         >
           <div className="border-b border-neutral-150 px-4 py-4">
             <div className="flex items-center justify-between gap-2">
               <h2 className="text-sm font-semibold text-neutral-850">
-                {isDirectory ? regionLabel : nearbyLabel} {KIND_LABEL[search.kind]}{' '}
+                {favoritesOnly ? '즐겨찾기한' : isDirectory ? regionLabel : nearbyLabel}{' '}
+                {CARE_PLACE_KIND_LABEL[search.kind]}{' '}
                 <span className="text-primary-500">
-                  {(result.data?.totalCount ?? places?.length ?? 0).toLocaleString()}
+                  {(
+                    (favoritesOnly ? undefined : result.data?.totalCount) ??
+                    places?.length ??
+                    0
+                  ).toLocaleString()}
                 </span>
               </h2>
               <span className="text-xs text-neutral-600">
-                {search.scope === 'nearby' ? `반경 ${search.radius / 1000}km` : '등록 이름순'}
+                {favoritesOnly
+                  ? '최근 저장순'
+                  : search.scope === 'nearby'
+                    ? `반경 ${search.radius / 1000}km`
+                    : '등록 이름순'}
               </span>
             </div>
             <p className="mt-1 text-xs leading-5 text-neutral-600">
-              {isShelter && isDirectory
-                ? '관할 지자체 기준 · 공동 보호센터는 한 곳으로 표시'
-                : search.scope === 'nearby'
-                  ? `${nearbyOrigin === 'location' ? '확인한 내 위치' : '검색한 지도 중심'}에서 직선 거리순`
-                  : '반려동물 진료 가능 여부는 병원에 확인해 주세요'}
+              {favoritesOnly
+                ? '저장한 때의 정보예요. 방문 전 전화로 확인해 주세요.'
+                : isShelter && isDirectory
+                  ? '관할 지자체 기준 · 공동 보호센터는 한 곳으로 표시'
+                  : search.scope === 'nearby'
+                    ? `${nearbyOrigin === 'location' ? '확인한 내 위치' : '검색한 지도 중심'}에서 직선 거리순`
+                    : '반려동물 진료 가능 여부는 병원에 확인해 주세요'}
             </p>
           </div>
-          {result.isError && result.data && (
+          {!favoritesOnly && result.isError && result.data && (
             <div className="border-b border-neutral-150 bg-point-50 px-4 py-3" role="alert">
               <p className="text-xs leading-5 text-neutral-700">
                 새 시설 정보를 불러오지 못했어요. 이전 조회 결과를 표시하고 있어요.
@@ -436,15 +472,31 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
               </button>
             </div>
           )}
-          <div className="max-h-[540px] overflow-y-auto overscroll-contain">
-            {result.isPending ? (
+          <div className="max-h-[33.75rem] overflow-y-auto overscroll-contain">
+            {list.isPending ? (
               <p className="px-4 py-16 text-center text-sm text-neutral-600" role="status">
-                시설 정보와 지도 위치를 찾고 있어요…
+                {favoritesOnly
+                  ? '즐겨찾기를 불러오고 있어요…'
+                  : '시설 정보와 지도 위치를 찾고 있어요…'}
               </p>
-            ) : result.isError && !result.data ? (
+            ) : list.isError && !list.data ? (
               <div className="px-5 py-12 text-center" role="alert">
-                <p className="mb-3 text-sm">시설 정보를 불러오지 못했어요.</p>
-                <RetryButton onRetry={() => void result.refetch()} isRetrying={result.isFetching} />
+                <p className="mb-3 text-sm">
+                  {favoritesOnly
+                    ? '즐겨찾기를 불러오지 못했어요.'
+                    : '시설 정보를 불러오지 못했어요.'}
+                </p>
+                <RetryButton onRetry={() => void list.refetch()} isRetrying={list.isFetching} />
+              </div>
+            ) : favoritesOnly && !places?.length ? (
+              <div className="px-5 py-12 text-center">
+                <BookmarkIcon className="mx-auto mb-3 size-8 text-primary-300" />
+                <p className="text-sm font-semibold">
+                  즐겨찾기한 {CARE_PLACE_KIND_LABEL[search.kind]} 목록이 비어 있어요.
+                </p>
+                <p className="mt-2 text-xs leading-5 text-neutral-600">
+                  시설 상세에서 즐겨찾기를 누르면 여기에 모아 둘게요.
+                </p>
               </div>
             ) : !places?.length ? (
               <div className="px-5 py-12 text-center">
@@ -492,7 +544,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
                           </span>
                         )}
                         {place.latitude === null && (
-                          <span className="mt-1 block text-[11px] text-neutral-600">
+                          <span className="mt-1 block text-[0.6875rem] text-neutral-600">
                             지도 위치 확인 필요 · 연락처 보기
                           </span>
                         )}
@@ -504,7 +556,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
               </ol>
             )}
           </div>
-          {(page > 1 || result.data?.hasMore) && (
+          {!favoritesOnly && (page > 1 || result.data?.hasMore) && (
             <nav
               className="flex items-center justify-between gap-3 border-t border-neutral-150 p-3"
               aria-label="시설 목록 페이지"
@@ -537,7 +589,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
               </button>
             </nav>
           )}
-          {result.data?.limited && (
+          {!favoritesOnly && result.data?.limited && (
             <p className="border-t border-neutral-150 p-3 text-xs leading-5 text-neutral-600">
               주변 검색은 일부 결과만 제공돼요.{' '}
               {hasDirectory ? '전국 등록 목록이나' : '반경을 줄이거나'} 더 구체적인 지역명으로
@@ -548,7 +600,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
 
         <div className="order-1 min-w-0 lap:sticky lap:top-20 lap:order-2">
           <div
-            className="care-map-canvas relative h-[340px] overflow-hidden tab:h-[440px] lap:h-[530px]"
+            className="care-map-canvas relative h-[21.25rem] overflow-hidden tab:h-[27.5rem] lap:h-[33.125rem]"
             onPointerDownCapture={cancelPendingLocation}
             onWheelCapture={cancelPendingLocation}
             onKeyDownCapture={cancelPendingLocation}
@@ -601,25 +653,27 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
             </div>
             <div className="pointer-events-none absolute right-3 bottom-9 left-3 z-20 flex justify-center">
               <span className="care-map-caption">
-                {result.isPending
+                {list.isPending
                   ? '시설 위치를 확인하고 있어요…'
                   : selected
                     ? selected.latitude === null
                       ? '위치를 확인하지 못했어요. 아래 연락처로 문의해 주세요.'
                       : selected.name
-                    : `이 페이지 ${mapped.length}곳 지도 표시 · 핀을 눌러보세요`}
+                    : `${favoritesOnly ? '즐겨찾기' : '이 페이지'} ${mapped.length}곳 지도 표시 · 핀을 눌러보세요`}
               </span>
             </div>
           </div>
           <p className="mt-2 text-xs leading-5 text-neutral-600" role="status">
             {locationMessage ??
-              (isDirectory
-                ? isShelter
-                  ? '선택한 지자체의 등록 보호센터예요. 실제 시설은 다른 지역에 있을 수 있어요.'
-                  : '선택한 지역의 등록 병원이에요. 방문 전 전화로 확인해 주세요.'
-                : `${nearbyLabel} 반경 ${search.radius / 1000}km에서 찾아요. 거리는 직선 거리예요.`)}
+              (favoritesOnly
+                ? '즐겨찾기한 곳만 보여요. 다른 검색 범위를 고르면 다시 검색해요.'
+                : isDirectory
+                  ? isShelter
+                    ? '선택한 지자체의 등록 보호센터예요. 실제 시설은 다른 지역에 있을 수 있어요.'
+                    : '선택한 지역의 등록 병원이에요. 방문 전 전화로 확인해 주세요.'
+                  : `${nearbyLabel} 반경 ${search.radius / 1000}km에서 찾아요. 거리는 직선 거리예요.`)}
           </p>
-          {result.data?.locationUnavailable && (
+          {!favoritesOnly && result.data?.locationUnavailable && (
             <div
               className="mt-2 flex items-center justify-between gap-2 text-xs text-primary-700"
               role="alert"
@@ -641,6 +695,18 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
               <CarePlaceDetails
                 place={selected}
                 onClose={() => dispatch({ type: 'select', id: null })}
+                favorited={favoriteIds.has(selected.id)}
+                onToggleFavorite={login.guard(() =>
+                  toggleFavorite.mutate({
+                    place: selected,
+                    favorited: favoriteIds.has(selected.id),
+                  }),
+                )}
+                favoriteError={
+                  toggleFavorite.isError && toggleFavorite.variables?.place.id === selected.id
+                    ? normalizeApiError(toggleFavorite.error, '즐겨찾기를 바꾸지 못했어요.').message
+                    : undefined
+                }
               />
             )}
           </div>
@@ -649,7 +715,12 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
           </div>
         </div>
       </div>
-      <footer className="mt-6 border-t border-neutral-150 pt-4 text-[11px] leading-5 text-neutral-600">
+      <LoginPromptModal
+        open={login.isPromptOpen}
+        onOpenChange={login.setPromptOpen}
+        description="로그인하고 시설을 즐겨찾기해 보세요."
+      />
+      <footer className="mt-6 border-t border-neutral-150 pt-4 text-[0.6875rem] leading-5 text-neutral-600">
         {summary.data && hasCareDirectory(search.kind) && (
           <p>
             <a

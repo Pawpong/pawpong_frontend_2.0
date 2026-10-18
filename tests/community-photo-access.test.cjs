@@ -1,0 +1,5 @@
+require('./community-photo-access/photo-url.test.cjs')
+require('./community-photo-access/photo-bff.test.cjs')
+require('./community-photo-access/photo-body.test.cjs')
+require('./community-photo-access/session-image.test.cjs')
+require('./community-photo-access/photo-optimizer.test.cjs')

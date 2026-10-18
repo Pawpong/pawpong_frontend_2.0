@@ -1,6 +1,6 @@
 'use client'
 
-import Image from 'next/image'
+import { SessionImage as Image } from './SessionImage'
 import { cn } from '@/shared/lib/cn'
 import { useImageCarousel } from '@/shared/lib/useImageCarousel'
 import { MediaDialog } from './MediaDialog'

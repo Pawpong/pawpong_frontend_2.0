@@ -15,7 +15,24 @@ function load(file, globals = {}, dependencies = {}) {
   )
   return output
 }
-const helpers = load('src/app/l/[slug]/_lib/landing.ts')
+const mobileConfig = load('src/shared/config/mobileApp.ts')
+const site = load('src/shared/config/site.ts')
+const mobile = load(
+  'src/shared/lib/mobileApp.ts',
+  {},
+  {
+    '@/shared/config/mobileApp': mobileConfig,
+    '@/shared/config/site': site,
+  },
+)
+const helpers = load(
+  'src/app/l/[slug]/_lib/landing.ts',
+  {},
+  {
+    '@/shared/config/mobileApp': mobileConfig,
+    '@/shared/lib/mobileApp': mobile,
+  },
+)
 const validLink = {
   slug: 'welcome-2026',
   title: '새 가족 찾기',
@@ -24,7 +41,14 @@ const validLink = {
   imageUrl: '',
 }
 function getRoute(fetch) {
-  return load('src/app/l/[slug]/route.ts', { fetch }, { './_lib/landing': helpers }).GET
+  return load(
+    'src/app/l/[slug]/route.ts',
+    { fetch },
+    {
+      './_lib/landing': helpers,
+      '@/shared/lib/mobileApp': mobile,
+    },
+  ).GET
 }
 const request = (ua = 'Safari') =>
   new Request('https://pawpong.kr/l/welcome-2026', { headers: { 'user-agent': ua } })
@@ -73,7 +97,7 @@ test('HTML contains escaped metadata and usable link actions before JavaScript r
       })
     return json({
       storeUrl: url.includes('platform=ios')
-        ? 'https://apps.apple.com/kr/app/id123456789'
+        ? 'https://apps.apple.com/kr/app/id6814126823'
         : 'https://play.google.com/store/apps/details?id=kr.pawpong.app',
     })
   })
@@ -94,7 +118,12 @@ test('HTML contains escaped metadata and usable link actions before JavaScript r
   const scriptTag = '<script src="/scripts/deep-link-open.js" defer></script>'
   assert.ok(html.includes(scriptTag))
   assert.doesNotMatch(html.replace(scriptTag, ''), /<script|<img src=x|javascript:/)
-  assert.match(html, /data-ios-store="https:\/\/apps.apple.com\/kr\/app\/id123456789"/)
+  assert.match(html, /data-ios-store="https:\/\/apps.apple.com\/kr\/app\/id6814126823"/)
+  assert.match(
+    html,
+    /name="apple-itunes-app" content="app-id=6814126823, app-argument=https:\/\/pawpong.kr\/l\/welcome-2026"/,
+  )
+  assert.match(html, /property="al:android:package" content="kr.pawpong.app"/)
   assert.match(
     html,
     /data-android-store="https:\/\/play.google.com\/store\/apps\/details\?id=kr.pawpong.app"/,
@@ -107,7 +136,7 @@ test('HTML contains escaped metadata and usable link actions before JavaScript r
   )
 })
 
-test('Android intent fallback uses the configured official store and safe web fallback', async () => {
+test('Android intent uses configured Pawpong store or the verified released store fallback', async () => {
   let store = 'https://play.google.com/store/apps/details?id=kr.pawpong.app'
   const get = getRoute(async (url) =>
     json(url.includes('/deep-links/') ? validLink : { storeUrl: store }),
@@ -117,8 +146,26 @@ test('Android intent fallback uses the configured official store and safe web fa
   assert.match(html, /S.browser_fallback_url=https%3A%2F%2Fplay.google.com/)
   store = 'https://play.google.com.evil.example/store/apps/details?id=kr.pawpong.app'
   html = await (await get(request('Android Chrome'), params)).text()
-  assert.match(html, /S.browser_fallback_url=https%3A%2F%2Fpawpong.kr%2Fexplore/)
-  assert.doesNotMatch(html, /evil.example|Google Play에서 받기|App Store에서 받기/)
+  assert.match(html, /S.browser_fallback_url=https%3A%2F%2Fplay.google.com/)
+  assert.doesNotMatch(html, /evil.example/)
+  assert.match(html, /Google Play에서 받기/)
+  assert.match(html, /App Store에서 받기/)
+})
+
+test('released Android store remains available when admin version settings are empty or unavailable', async () => {
+  for (const storeData of [{ storeUrl: '' }, undefined]) {
+    const get = getRoute(async (url) => {
+      if (url.includes('/deep-links/')) return json(validLink)
+      if (!storeData) throw new Error('version config unavailable')
+      return json(storeData)
+    })
+    const response = await get(request(), params)
+    const html = await response.text()
+    assert.equal(response.status, 200)
+    assert.match(html, /href="https:\/\/play.google.com\/store\/apps\/details\?id=kr.pawpong.app"/)
+    assert.match(html, /href="https:\/\/apps.apple.com\/kr\/app\/id6814126823"/)
+    assert.doesNotMatch(html, /다운로드를 준비 중/)
+  }
 })
 
 test('missing and disabled links return 404; invalid slugs never call backend', async () => {
@@ -161,11 +208,28 @@ test('store links reject credentials, non HTTPS URLs and unrelated Android packa
     'http://apps.apple.com/kr/app/id123',
     'https://user@apps.apple.com/kr/app/id123',
     'https://evil.example/id123',
+    'https://apps.apple.com/kr/app/id123456789',
+    'https://apps.apple.com:8443/kr/app/id6814126823',
+    'https://apps.apple.com/kr/app/id68141268230',
   ])
     assert.equal(helpers.parseStoreUrl(value, 'ios'), undefined)
   assert.equal(
     helpers.parseStoreUrl('https://play.google.com/store/apps/details?id=another.app', 'android'),
     undefined,
+  )
+  assert.equal(
+    helpers.parseStoreUrl(
+      'https://play.google.com/store/apps/details?id=kr.pawpong.app&id=another.app',
+      'android',
+    ),
+    undefined,
+  )
+  assert.equal(
+    helpers.parseStoreUrl(
+      'https://apps.apple.com/kr/app/%ED%8F%AC%ED%90%81/id6814126823?uo=4',
+      'ios',
+    ),
+    'https://apps.apple.com/kr/app/%ED%8F%AC%ED%90%81/id6814126823?uo=4',
   )
 })
 
@@ -186,6 +250,7 @@ test('dev and local links keep their own canonical and fallback origins; unknown
   const html = helpers.renderLanding(validLink, 'Android', {}, 'https://dev.pawpong.kr')
   assert.match(html, /rel="canonical" href="https:\/\/dev.pawpong.kr\/l\/welcome-2026"/)
   assert.match(html, /S.browser_fallback_url=https%3A%2F%2Fdev.pawpong.kr%2Fexplore/)
+  assert.doesNotMatch(html, /apple-itunes-app|al:ios|al:android/)
 })
 
 test('Next wildcard listen address uses only a validated Host for local canonical links', () => {

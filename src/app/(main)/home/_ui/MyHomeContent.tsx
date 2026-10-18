@@ -8,8 +8,9 @@ import { RetryButton, buttonVariants, Container, NavigationBar } from '@/shared/
 import { cn } from '@/shared/lib/cn'
 import { transientQueryRecoveryOptions } from '@/shared/api'
 import { profileQueries } from '@/entities/profile'
+import { activityConfigOptions } from '@/entities/gamification'
 import { AiPhotoArchive } from '@/features/ai-image'
-import { communityQueries } from '@/entities/community'
+import { PetResultLink } from '@/features/playground-pet'
 // [refactored] 분양 페이지와 동일한 목록 블록 — 위젯으로 공유
 import { MyPetPostingList } from '@/widgets/my-pet-postings'
 import { toMyProfileCardProps } from '../_lib/toMyProfileCardProps'
@@ -17,15 +18,17 @@ import { ProfileCard } from './ProfileCard'
 import { MyHomeActionMenu } from './MyHomeActionMenu'
 import { BreederIntroduction } from './BreederIntroduction'
 import { HomeTabs, TabsContent } from './HomeTabs'
-import { FavoriteBreedersContent } from './FavoriteBreedersContent'
-import { HomePostGrid } from './HomePostGrid'
+import { MyPostsTab } from './MyPostsTab'
+import { HomeSkeleton } from './HomeSkeleton'
 import {
   MY_HOME_TABS,
   BREEDER_MY_HOME_TABS,
+  MY_ACTIVITY_HREF,
   MY_HOME_SIDE_LINKS,
   BREEDER_MY_HOME_SIDE_LINKS,
-  CARD_GRID,
-  PHOTO_GRID,
+  MY_PHOTO_GRID,
+  MY_HOME_TAB_PANEL,
+  MY_HOME_LISTINGS_PANEL,
 } from './constants'
 
 const HOME_LISTING_PAGE_SIZE = 16
@@ -40,14 +43,12 @@ const MyHomeContent = () => {
   })
   const myProfile = profileQuery.data
   const isBreeder = myProfile?.role === 'breeder'
-
-  // 마이홈 '게시글' 탭 — 내가 작성한 커뮤니티 글을 백엔드에서 조회 (profile 로드 후 활성화)
-  const postsQuery = useQuery({
-    ...communityQueries.myPosts(!!myProfile),
-    refetchOnMount: 'always',
-    throwOnError: false,
-  })
-  const myPostsData = postsQuery.data
+  // 활동 단계 기능이 꺼져 있으면 나의 활동 화면이 비므로 링크도 뺀다
+  const activityConfig = useQuery(activityConfigOptions)
+  const activityEnabled = !!activityConfig.data?.enabled && !activityConfig.isError
+  const sideLinks = (isBreeder ? BREEDER_MY_HOME_SIDE_LINKS : MY_HOME_SIDE_LINKS).filter(
+    (link) => activityEnabled || link.href !== MY_ACTIVITY_HREF,
+  )
 
   // [refactored] navbar 는 2단(tab+)에서 숨고 sticky 도 아니라 높이를 잴 이유가 없어졌다.
   // sticky 기준은 GNB 하나뿐이고, 그건 HomeTabs 가 스스로 읽는다.
@@ -59,28 +60,25 @@ const MyHomeContent = () => {
   const requestedTab = useSearchParams().get('tab')
   const [selectedTab, setSelectedTab] = useState<string | null>(requestedTab)
   const activeTab = tabs.find((tab) => tab.id === selectedTab)?.id ?? defaultTab
-  const posts = myPostsData?.items ?? []
   const profileCardProps = myProfile ? toMyProfileCardProps(myProfile) : null
 
   if (!profileCardProps) {
     return (
       <div className="flex w-full flex-col">
         <NavigationBar title="마이홈" />
-        <Container className="flex min-h-60 items-center justify-center px-4 py-10">
-          {profileQuery.isPending ? (
-            <p role="status" className="text-sm font-medium text-neutral-700">
-              프로필을 불러오는 중입니다.
-            </p>
-          ) : (
+        {profileQuery.isPending ? (
+          <HomeSkeleton />
+        ) : (
+          <Container className="flex min-h-60 items-center justify-center px-4 py-10">
             <div role="alert" className="flex flex-col items-center gap-3 text-center">
-              <p className="text-sm font-medium text-neutral-700">프로필을 불러오지 못했습니다.</p>
+              <p className="text-sm font-medium text-neutral-700">프로필을 불러오지 못했어요.</p>
               <RetryButton
                 onRetry={() => void profileQuery.refetch()}
                 isRetrying={profileQuery.isFetching}
               />
             </div>
-          )}
-        </Container>
+          </Container>
+        )}
       </div>
     )
   }
@@ -124,7 +122,7 @@ const MyHomeContent = () => {
             {isBreeder && <BreederIntroduction {...introProps} placement="profile" />}
           </>
         }
-        sideLinks={isBreeder ? BREEDER_MY_HOME_SIDE_LINKS : MY_HOME_SIDE_LINKS}
+        sideLinks={sideLinks}
       >
         {/* 분양 목록 탭 (브리더만) — 시안 3170-790275: 라벨+필터 -> 카드 그리드.
             standalone /adoption/my-listings 페이지는 이 탭과 완전히 중복이라 제거했다 —
@@ -134,7 +132,7 @@ const MyHomeContent = () => {
             <BreederIntroduction {...introProps} placement="tab" />
 
             {/* 작성 진입점은 + 메뉴(모바일 상단 바·2단 프로필 카드)가 맡는다 */}
-            <Container className="py-8 tab:py-10">
+            <Container className={MY_HOME_LISTINGS_PANEL}>
               <MyPetPostingList
                 pageSize={HOME_LISTING_PAGE_SIZE}
                 showTotalCount
@@ -153,27 +151,22 @@ const MyHomeContent = () => {
 
         {/* Figma 4145:721426 — 모바일·태블릿 3열, PC 4열의 정사각 미디어 그리드 */}
         <TabsContent value="posts" className="mt-0">
-          <HomePostGrid
-            posts={posts}
-            isPending={postsQuery.isPending}
-            isError={postsQuery.isError}
-            onRetry={() => void postsQuery.refetch()}
-            isRetrying={postsQuery.isFetching}
-            loadingText="내가 쓴 글을 불러오는 중입니다."
-            errorText="내가 쓴 글을 불러오지 못했습니다."
-            emptyText="내가 쓴 글이 없습니다."
-            gridClassName={PHOTO_GRID}
-          />
+          {/* 작성한 글 / 댓글 단 글 / 좋아요한 글 / 저장한 글 칩 전환 — 내 글 조회는 profile 로드 후 활성화.
+              분양 목록·AI 사진 탭과 같은 여백이라 제목 줄이 탭을 바꿔도 같은 자리에 온다 */}
+          <Container className={MY_HOME_TAB_PANEL}>
+            <MyPostsTab enabled={!!myProfile} gridClassName={MY_PHOTO_GRID} />
+          </Container>
         </TabsContent>
 
         <TabsContent value="ai-photos" className="mt-0">
-          <div className="px-4 pt-4 tab:px-0">
-            <AiPhotoArchive enabled={!!myProfile} />
-          </div>
-        </TabsContent>
-
-        <TabsContent value="breeders" className="mt-0">
-          <FavoriteBreedersContent gridClassName={CARD_GRID} />
+          {/* 분양 목록 탭과 같은 여백 — 제목 줄이 탭을 바꿔도 같은 자리에 온다 */}
+          <Container className={MY_HOME_TAB_PANEL}>
+            <AiPhotoArchive
+              enabled={!!myProfile}
+              createHref="/ai-filter"
+              renderResultAction={(jobId) => <PetResultLink sourceJobId={jobId} />}
+            />
+          </Container>
         </TabsContent>
       </HomeTabs>
     </div>

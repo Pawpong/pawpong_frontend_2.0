@@ -1,4 +1,4 @@
-import { ApiError } from '@/shared/api/unwrap'
+import { ApiError, AuthWriteRetryRequiredError } from '@/shared/api'
 
 export const AI_IMAGE_RETRY_INTERVAL_MS = 3000
 
@@ -39,7 +39,7 @@ interface AiImageReadOptions {
   onRetry: () => void
 }
 
-/** Only retry reads: an unanswered generation POST may already have consumed a quota slot. */
+/** 조회만 반복한다. 응답 없는 생성 요청도 이미 이용 횟수를 썼을 수 있다. */
 export async function readAiImageWithRetry<T>(
   read: (remainingMs: number) => Promise<T>,
   { signal, deadline, onRetry }: AiImageReadOptions,
@@ -65,6 +65,7 @@ export async function readAiImageWithRetry<T>(
 }
 
 export function aiImageErrorMessage(error: unknown): string {
+  if (error instanceof AuthWriteRetryRequiredError) return error.message
   if (error instanceof ApiError && error.status === 401)
     return '로그인이 만료됐어요. 다시 로그인한 뒤 보관함에서 결과를 확인해 주세요.'
   if (error instanceof ApiError && error.status === 403)

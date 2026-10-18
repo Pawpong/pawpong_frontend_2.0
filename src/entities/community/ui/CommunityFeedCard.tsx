@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, type ReactNode } from 'react'
-import Image from 'next/image'
+import { SessionImage as Image } from '@/shared/ui/SessionImage'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { BeforeAfterSlider, ImageCarousel, OwnerActionsMenu, ProfileAvatar } from '@/shared/ui'
@@ -10,6 +10,7 @@ import { formatRelativeTime } from '@/shared/lib/formatRelativeTime'
 import type { CommunityPreviewProps } from '../model/communityPreview'
 import { CommunityPostActions } from './CommunityPostActions'
 import { COMMUNITY_CAROUSEL_STYLE } from '../model/communityUi'
+import { CommunityReviewLabel } from './CommunityReviewLabel'
 
 interface CommunityFeedCardProps extends CommunityPreviewProps {
   /** 내 글일 때만 전달 — 더보기가 삭제(및 필요한 화면에서는 수정)로 동작 */
@@ -20,6 +21,9 @@ interface CommunityFeedCardProps extends CommunityPreviewProps {
   onToggleSave?: () => void
   /** 남의 글 헤더 오른쪽에 둘 기능 레이어 액션(팔로우) */
   followAction?: ReactNode
+  badgeSlot?: ReactNode
+  /** 본문 아래에 둘 기록·주제·태그 줄 */
+  metaSlot?: ReactNode
   /** 남의 글 액션 줄 오른쪽 끝에 둘 기능 레이어 액션(신고 깃발) */
   reportAction?: ReactNode
   /** 이미지 표현 — 커뮤니티 피드는 1:1 캐러셀, 마이홈처럼 카드가 넓은 곳은 가로 스크롤 썸네일 */
@@ -43,6 +47,7 @@ const CommunityFeedCard = ({
   text,
   images = [],
   aiComparison,
+  aiReview,
   likeCount,
   commentCount,
   isLiked,
@@ -54,6 +59,8 @@ const CommunityFeedCard = ({
   onToggleLike,
   onToggleSave,
   followAction,
+  badgeSlot,
+  metaSlot,
   reportAction,
   mediaLayout = 'carousel',
   preload = false,
@@ -120,8 +127,9 @@ const CommunityFeedCard = ({
             <span className="truncate text-sm leading-[1.5] font-semibold text-neutral-850">
               {author.nickname}
             </span>
+            {badgeSlot}
             <span
-              className="text-xs leading-[1.5] font-medium text-neutral-500"
+              className="text-xs leading-[1.5] font-medium text-neutral-700"
               suppressHydrationWarning
             >
               {formatRelativeTime(createdAt)}
@@ -131,13 +139,17 @@ const CommunityFeedCard = ({
         {onDelete ? <OwnerActionsMenu onEdit={onEdit} onDelete={onDelete} /> : followAction}
       </div>
 
+      <div className="px-3">
+        <CommunityReviewLabel review={aiReview} />
+      </div>
       {wide && text && (
         <Link href={href} prefetch={false} className="mb-4 block rounded focus-ring">
-          <p className="line-clamp-4 text-[0.9375rem] leading-7 font-normal whitespace-pre-line text-neutral-850">
+          <p className="line-clamp-4 text-body-md font-normal whitespace-pre-line text-neutral-850 tab:text-body-lg">
             {text}
           </p>
         </Link>
       )}
+      {metaSlot && <div className={cn('px-3 pb-3', wide && 'mb-4 p-0')}>{metaSlot}</div>}
 
       {/* 미디어 — 기본은 카드 폭을 채우는 1:1 캐러셀 (여러 장이면 우상단에 장수 배지),
           row 는 사진을 원래 비율 그대로 가로로 늘어놓고 넘치면 스크롤한다 */}

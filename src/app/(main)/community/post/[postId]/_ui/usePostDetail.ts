@@ -19,7 +19,7 @@ import type { CommunityPostCard, PaginationResponse } from '@/shared/types'
 const usePostDetail = (postId: string) => {
   const router = useRouter()
   // [refactored] useAuthStatus + profileQueries.me 조합을 useMe로
-  const { me } = useMe()
+  const { me, isLoggedIn } = useMe()
   const queryClient = useQueryClient()
   // 피드에서 넘어온 경우 목록 캐시에 이미 카드가 있다 — 상세 응답을 기다리는 동안
   // 그 값으로 화면을 먼저 채워 빈 모달이 보이지 않게 한다 (정렬·검색어별 캐시를 모두 훑는다)
@@ -31,7 +31,8 @@ const usePostDetail = (postId: string) => {
     for (const [, data] of caches) {
       for (const page of data?.pages ?? []) {
         const card = page.items.find((item) => item.postId === postId)
-        if (card) return toPlaceholderPostDetail(card)
+        if (card && card.visibility === 'public' && !card.aiReview)
+          return toPlaceholderPostDetail(card)
       }
     }
     return undefined
@@ -57,7 +58,7 @@ const usePostDetail = (postId: string) => {
 
   const [confirmDeletePost, setConfirmDeletePost] = useState(false)
 
-  const isOwner = !!me?.userId && !!post && me.userId === post.authorId
+  const isOwner = isLoggedIn && !!me?.userId && !!post && me.userId === post.authorId
 
   // 삭제 성공 시에만 목록으로 이동 (실패하면 모달을 유지해 재시도 가능)
   const handleDeletePost = () => {

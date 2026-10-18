@@ -1,0 +1,1 @@
+export const PET_ASSET_TIMEOUT_MS = 15_000

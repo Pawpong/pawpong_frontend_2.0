@@ -54,7 +54,7 @@ export function createQuery<TData>(config: {
  */
 export function createInfiniteQuery<TData>(config: {
   queryKey: readonly unknown[]
-  queryFn: (page: number) => Promise<PaginationResponse<TData>>
+  queryFn: (page: number, signal: AbortSignal) => Promise<PaginationResponse<TData>>
   enabled?: boolean
   staleTime?: number
   refetchOnMount?: RefetchOnMount
@@ -63,7 +63,7 @@ export function createInfiniteQuery<TData>(config: {
 
   return infiniteQueryOptions({
     queryKey: config.queryKey,
-    queryFn: ({ pageParam }) => config.queryFn(pageParam as number),
+    queryFn: ({ pageParam, signal }) => config.queryFn(pageParam as number, signal),
     initialPageParam: 1,
     getNextPageParam: (last) =>
       last.pagination.hasNextPage ? last.pagination.currentPage + 1 : undefined,

@@ -35,8 +35,15 @@ export const useAiPixelFilter = (gameCharacter = false) => {
     [runTransform, selectedFilterId, gameCharacter],
   )
 
+  // 목록을 아직 못 받았거나 받지 못한 상태를 '필터 없음'과 구분해 화면이 다시 시도할 수 있게 한다.
+  const filtersState: 'loading' | 'error' | 'ready' =
+    filtersQuery.data !== undefined ? 'ready' : filtersQuery.isError ? 'error' : 'loading'
+
   return {
     filters,
+    filtersState,
+    retryFilters: () => void filtersQuery.refetch(),
+    isRetryingFilters: filtersQuery.isFetching,
     isAvailable: filters.length > 0,
     selectedFilterId,
     selectFilter: setPickedFilterId,

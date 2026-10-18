@@ -2,7 +2,6 @@
 
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { Button } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { STEP_LAYOUT } from '../model/stepLayout'
 import { StepLayout } from './StepLayout'
@@ -16,17 +15,13 @@ const CompleteStep = () => {
   // 미완료로 판단해 홈 이동과 경쟁하며 /signup으로 돌려보낸다.
 
   return (
-    <StepLayout className="w-full flex-1">
-      <StepTitle subtitle="포퐁에 오신걸 환영해요!">가입완료</StepTitle>
+    <StepLayout className="mx-auto w-full max-w-3xl flex-1 px-5 pt-8 tab:px-10">
+      <StepTitle subtitle="포퐁에 오신 걸 환영해요. 이제 새로운 만남을 시작해보세요.">
+        가입이 완료되었어요
+      </StepTitle>
 
-      {/* 이전 스텝과 동일: 콘텐츠 flex-1로 채워 nav 하단 고정, 모바일은 fixed nav 가림 방지용 pb */}
-      <div
-        className={cn(
-          'flex flex-1 flex-col items-center justify-center px-4 pb-[calc(7.5rem+env(safe-area-inset-bottom))] tab:min-h-0 tab:px-0 tab:pb-12',
-          STEP_LAYOUT.content,
-        )}
-      >
-        <div className="h-[17.3125rem] w-[14.875rem] overflow-hidden rounded-2xl bg-[#8ed4ff] tab:w-[38.8125rem]">
+      <div className={cn('flex flex-col items-center py-6', STEP_LAYOUT.content)}>
+        <div className="h-[17.3125rem] w-full overflow-hidden rounded-2xl bg-secondary-100">
           <Image
             src="/images/onboarding/onboarding-banner-small.svg"
             alt="가입완료 배너"
@@ -51,11 +46,6 @@ const CompleteStep = () => {
           router.replace('/')
         }}
         nextLabel="홈으로"
-        extraButtons={
-          <Button intent="ghost" size="inline">
-            문의하기
-          </Button>
-        }
       />
     </StepLayout>
   )

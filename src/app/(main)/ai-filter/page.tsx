@@ -9,9 +9,25 @@ export const metadata = createPageMetadata({
   path: '/ai-filter',
 })
 
-const AiFilterPage = async ({ searchParams }: { searchParams: Promise<{ purpose?: string }> }) => {
+const AiFilterPage = async ({
+  searchParams,
+}: {
+  searchParams: Promise<{ purpose?: string; sourceJobId?: string }>
+}) => {
   const params = await searchParams
-  return <AiFilterContent gameCharacter={params.purpose === 'pet-sprite-v1'} />
+  const gameCharacter = params.purpose === 'pet-sprite-v1'
+  return (
+    <AiFilterContent
+      gameCharacter={gameCharacter}
+      sourceJobId={
+        gameCharacter &&
+        typeof params.sourceJobId === 'string' &&
+        /^[a-f\d]{24}$/i.test(params.sourceJobId)
+          ? params.sourceJobId
+          : undefined
+      }
+    />
+  )
 }
 
 export default AiFilterPage

@@ -2,10 +2,11 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Container, PixelSelectCard } from '@/shared/ui'
 import { loadSocialSignupSession } from '@/shared/lib/socialSignupSession'
 import {
   SKIP_ONBOARDING_VALIDATION,
+  OnboardingChoice,
+  OnboardingProgressBar,
   StepLayout,
   StepNavButtons,
   StepTitle,
@@ -33,26 +34,39 @@ const SignupTypeSelect = () => {
   }
 
   return (
-    /* 상단 정렬 — 제목·카드·버튼을 한 덩어리로 위에서부터 쌓는다.
-       가운데 정렬은 화면이 길수록 위아래 공백이 같이 커져 다른 스텝과 시작 위치가 어긋났다. */
-    <StepLayout className="flex-1 gap-10 pt-14 pb-10 tab:gap-16 tab:pt-20">
-      <StepTitle className="py-0 tab:py-0">회원유형을 선택해 주세요</StepTitle>
-
-      <Container className="flex flex-col items-center px-4">
-        <div className="flex w-full max-w-[40.625rem] flex-col items-center justify-center gap-7 tab:flex-row pc:gap-12">
-          {USER_TYPE_OPTIONS.map((option) => (
-            <PixelSelectCard
-              key={option.value}
-              label={option.label}
-              selected={selected === option.value}
-              onClick={() => setSelected(option.value)}
-            />
-          ))}
-        </div>
-      </Container>
+    <StepLayout className="mx-auto w-full max-w-3xl flex-1 px-5 pt-8 tab:px-10 tab:pt-12">
+      <OnboardingProgressBar percent={0} />
+      <StepTitle subtitle="어떤 만남을 위해 오셨나요? 나에게 맞는 회원 유형을 선택해주세요.">
+        회원 유형을 선택해주세요
+      </StepTitle>
+      <div className="grid w-full gap-4 tab:grid-cols-2">
+        {USER_TYPE_OPTIONS.map((option) => (
+          <OnboardingChoice
+            key={option.value}
+            label={option.label}
+            description={
+              option.value === 'breeder'
+                ? '정성껏 돌본 아이들에게\n좋은 가족을 찾아주고 싶어요.'
+                : '나와 함께할 반려동물을 만나고,\n일상을 나누고 싶어요.'
+            }
+            image={`/images/onboarding/member-${option.value}-v3.png`}
+            selected={selected === option.value}
+            onClick={() => setSelected(option.value)}
+          />
+        ))}
+      </div>
+      <p className="mt-5 mb-8 w-full text-body-md text-neutral-700">
+        브리더 회원은 활동 정보와 인증 서류를 함께 등록할 수 있어요.
+      </p>
 
       <StepNavButtons
-        className="static w-full pt-0 pb-0"
+        nextLabel={
+          selected === 'breeder'
+            ? '브리더로 시작하기'
+            : selected === 'general'
+              ? '일반 회원으로 시작하기'
+              : '회원 유형을 선택해주세요'
+        }
         onNext={handleNext}
         // router.back() 은 방금 떠나온 다음 단계로 되감긴다 — 가입을 그만두는 것이므로 홈으로 보낸다
         onBack={() => router.push('/')}

@@ -4,6 +4,8 @@ const fs = require('node:fs')
 const http = require('node:http')
 const ts = require('typescript')
 const axios = require('axios')
+const { requestAuthFixture } = require('./fixtures/request-auth.fixture.cjs')
+const { token } = require('./api-session-boundary/fixtures/api.fixture.cjs')
 
 function load(file, dependencies) {
   const code = ts.transpileModule(fs.readFileSync(file, 'utf8'), {
@@ -19,7 +21,7 @@ function load(file, dependencies) {
 }
 
 test(
-  'installed Axios preserves API client refresh retry and multipart file bytes',
+  '설치된 Axios는 인증 갱신 재시도와 멀티파트 파일 바이트를 유지함',
   { timeout: 10000 },
   async () => {
     const calls = []
@@ -33,7 +35,7 @@ test(
         res.end(JSON.stringify({ contentType: req.headers['content-type'], body }))
         return
       }
-      if (req.url === '/deny' || req.headers.authorization !== 'Bearer refreshed-fixture') {
+      if (req.url === '/deny' || req.headers.authorization !== `Bearer ${token('owner-a', 2)}`) {
         res.writeHead(401)
         res.end(JSON.stringify({ message: '인증이 필요합니다.' }))
         return
@@ -43,11 +45,14 @@ test(
     await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve))
     try {
       let refreshes = 0
+      let currentToken = token('owner-a')
+      const tokens = { getAccessToken: () => currentToken }
       const { ApiError } = load('src/shared/api/unwrap.ts', {})
       const { apiClient } = load('src/shared/api/client.ts', {
         axios,
         './unwrap': { ApiError },
-        './token': { getAccessToken: () => 'expired-fixture' },
+        './token': tokens,
+        './requestAuthScope': requestAuthFixture(tokens, { getAuthSessionGeneration: () => 1 }),
         '@/shared/lib/authSessionLifecycle': {
           getAuthSessionGeneration: () => 1,
           isAuthSessionCurrent: () => true,
@@ -55,7 +60,8 @@ test(
         '@/shared/lib/authSessionRecovery': {
           refreshAuthSession: async () => {
             refreshes += 1
-            return 'refreshed-fixture'
+            currentToken = token('owner-a', 2)
+            return currentToken
           },
         },
         '@/shared/config/apiBaseUrl': {
@@ -68,7 +74,7 @@ test(
       assert.equal(refreshes, 1)
       assert.deepEqual(
         calls.map((call) => call.authorization),
-        ['Bearer expired-fixture', 'Bearer refreshed-fixture'],
+        [`Bearer ${token('owner-a')}`, `Bearer ${token('owner-a', 2)}`],
       )
 
       await assert.rejects(apiClient.get('/deny', { skipAuthRefresh: true }), { status: 401 })
@@ -89,7 +95,7 @@ test(
 )
 
 test(
-  'a stalled POST reports a safe API endpoint and a retry message without resending',
+  '응답 없는 쓰기는 개인정보 없는 경로와 재시도 안내를 제공하고 자동 전송하지 않음',
   { timeout: 10000 },
   async () => {
     let requests = 0
@@ -103,6 +109,10 @@ test(
         axios,
         './unwrap': { ApiError },
         './token': { getAccessToken: () => 'private-token-fixture' },
+        './requestAuthScope': requestAuthFixture(
+          { getAccessToken: () => 'private-token-fixture' },
+          { getAuthSessionGeneration: () => 1 },
+        ),
         '@/shared/lib/authSessionLifecycle': {},
         '@/shared/lib/authSessionRecovery': {},
         '@/shared/config/apiBaseUrl': {
@@ -128,7 +138,7 @@ test(
           return true
         },
       )
-      assert.equal(requests, 1, 'mutations must not be replayed after an ambiguous timeout')
+      assert.equal(requests, 1, '시간 초과로 결과를 알 수 없는 쓰기를 자동 재실행하지 않는다')
       await assert.rejects(
         apiClient.get('/api/v2/adoption/69b145b8bb7113dab153250f?secret=private-query-fixture', {
           adapter: (config) =>

@@ -43,9 +43,9 @@ const CommunityDraftSection = () => {
         isError={isError}
         onRetry={() => void refetch()}
         isRetrying={isRetrying}
-        loadingText="임시저장한 글을 불러오는 중입니다."
-        errorText="임시저장한 글을 불러오지 못했습니다."
-        emptyText="임시저장한 글이 없습니다."
+        loadingText="임시저장한 글을 불러오는 중이에요."
+        errorText="임시저장한 글을 불러오지 못했어요."
+        emptyText="임시저장한 글이 없어요."
       >
         <div className="flex min-w-0 flex-col gap-5 tab:gap-8 tab:rounded-lg tab:border tab:border-neutral-300 tab:p-3">
           {drafts.map((draft, index) => (

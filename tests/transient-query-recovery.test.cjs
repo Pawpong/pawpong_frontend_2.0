@@ -10,6 +10,7 @@ function fixture() {
   const effects = []
   const window = new EventTarget()
   const document = new EventTarget()
+  let identityChecks = 0
   const { QueryProvider } = load(
     'src/shared/lib/QueryProvider.tsx',
     {
@@ -18,6 +19,8 @@ function fixture() {
       '@tanstack/react-query-devtools': { ReactQueryDevtools: () => null },
       '@/shared/api': { ...api, STALE_TIME: { DEFAULT: 300_000 } },
       '@sentry/nextjs': { captureException: () => {} },
+      './authStateEvents': { AUTH_STATE_CHANGED: 'auth-changed' },
+      './authQueryBoundary': { createAuthQueryBoundary: () => () => identityChecks++ },
       '../api/queryRecovery': recovery,
     },
     { window, document, performance: { getEntriesByType: () => [] } },
@@ -28,6 +31,7 @@ function fixture() {
   return {
     client,
     window,
+    identityChecks: () => identityChecks,
     close: () => {
       cleanups.forEach((cleanup) => cleanup?.())
       client.unmount()
@@ -132,6 +136,7 @@ test('native app resume retries only active transient reads and never a failed m
     f.window.dispatchEvent(new Event('pawpong:app-active'))
     await tick()
     await tick()
+    assert.equal(f.identityChecks(), 1)
     assert.deepEqual(Object.fromEntries(calls), {
       network: 2,
       server: 2,

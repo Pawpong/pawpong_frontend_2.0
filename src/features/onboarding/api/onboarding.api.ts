@@ -1,4 +1,17 @@
 import { apiClient, API_VERSION, unwrap, unwrapVoid } from '@/shared/api'
+import {
+  parseEmailConfig,
+  parseEmailChallenge,
+  parseEmailProof,
+  type EmailVerificationConfig,
+  type EmailChallenge,
+  type EmailVerificationProof,
+} from '../model/emailVerificationContract'
+export type {
+  EmailVerificationConfig,
+  EmailChallenge,
+  EmailVerificationProof,
+} from '../model/emailVerificationContract'
 import type {
   ApiResponse,
   BreederUploadDocumentType,
@@ -41,6 +54,31 @@ export const verifyCode = async (phone: string, code: string): Promise<void> => 
   )
   unwrapVoid(response, '인증 코드 확인에 실패했습니다.')
 }
+
+export const getEmailVerificationConfig = async (): Promise<EmailVerificationConfig> =>
+  apiClient
+    .get<ApiResponse<EmailVerificationConfig>>(`${API_VERSION}/auth/email/config`)
+    .then((res) => parseEmailConfig(unwrap(res, '이메일 인증 지원 여부를 확인하지 못했습니다.')))
+
+export const sendEmailVerificationCode = async (
+  email: string,
+  tempId: string,
+): Promise<EmailChallenge> =>
+  apiClient
+    .post<ApiResponse<EmailChallenge>>(`${API_VERSION}/auth/email/send-code`, { email, tempId })
+    .then((res) => parseEmailChallenge(unwrap(res, '인증 메일 발송에 실패했습니다.')))
+
+export const verifyEmailVerificationCode = async (
+  email: string,
+  tempId: string,
+  challengeId: string,
+  code: string,
+): Promise<EmailVerificationProof> =>
+  apiClient
+    .post<
+      ApiResponse<EmailVerificationProof>
+    >(`${API_VERSION}/auth/email/verify-code`, { email, tempId, challengeId, code })
+    .then((res) => parseEmailProof(unwrap(res, '이메일 인증번호 확인에 실패했습니다.')))
 
 export const uploadBreederDocuments = async (
   tempId: string,

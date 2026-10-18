@@ -90,9 +90,7 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
         <AsyncState
           status={isProfileError ? 'error' : 'loading'}
           message={
-            isProfileError
-              ? '신청자 정보를 불러오지 못했습니다.'
-              : '신청자 정보를 불러오는 중입니다.'
+            isProfileError ? '신청자 정보를 불러오지 못했어요.' : '신청자 정보를 불러오는 중이에요.'
           }
           onRetry={isProfileError ? () => void retryProfile() : undefined}
           isRetrying={isRetrying}

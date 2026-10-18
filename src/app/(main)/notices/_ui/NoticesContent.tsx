@@ -8,6 +8,7 @@ import { dedupeBy } from '@/shared/lib/dedupeBy'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import { formatDate } from '@/shared/lib/formatDate'
 import { Badge, Container, InfiniteScrollTrigger, ListState, NavigationBar } from '@/shared/ui'
+import { ListRowsSkeleton } from '@/shared/ui/Skeleton'
 import type { Notice } from '@/shared/types'
 
 // 공지 행 — FAQ 목록(FaqItem)과 완전히 같은 규격.
@@ -25,7 +26,7 @@ const NoticeRow = ({ notice }: { notice: Notice }) => (
         <span className="min-w-0 text-base leading-[1.5] font-semibold text-neutral-850">
           {notice.title}
         </span>
-        <span className="text-xs font-medium text-neutral-500">
+        <span className="text-xs font-medium text-neutral-700">
           {formatDate(notice.publishedAt ?? notice.createdAt)}
         </span>
       </span>
@@ -62,9 +63,10 @@ const NoticesContent = () => {
             isPending={isPending}
             isError={isError}
             isEmpty={notices.length === 0}
-            loadingText="공지사항을 불러오는 중입니다."
-            errorText="공지사항을 불러오지 못했습니다."
-            emptyText="등록된 공지사항이 없습니다."
+            loadingText="공지사항을 불러오는 중이에요."
+            loadingFallback={<ListRowsSkeleton label="공지사항을 불러오는 중이에요." />}
+            errorText="공지사항을 불러오지 못했어요."
+            emptyText="등록된 공지사항이 없어요."
             onRetry={() => void refetch()}
             isRetrying={isRetrying}
           >

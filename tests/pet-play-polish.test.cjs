@@ -1,0 +1,6 @@
+require('./pet-play-polish/mood.test.cjs')
+require('./pet-play-polish/interaction.test.cjs')
+require('./pet-play-polish/motion.test.cjs')
+require('./pet-play-polish/room-feedback.test.cjs')
+require('./pet-play-polish/snack-render.test.cjs')
+require('./pet-play-polish/rest.test.cjs')

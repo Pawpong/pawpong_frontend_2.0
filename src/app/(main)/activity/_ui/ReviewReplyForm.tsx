@@ -26,7 +26,7 @@ export const ReviewReplyForm = ({
   }
 
   const errorMessage = mutation.isError
-    ? normalizeApiError(mutation.error, '답글을 저장하지 못했습니다.').message
+    ? normalizeApiError(mutation.error, '답글을 저장하지 못했어요.').message
     : null
 
   return (

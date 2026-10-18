@@ -8,6 +8,13 @@ export const REQUIRED_ADOPTER_TERM_CODES = [
   'counsel_privacy',
 ] as const satisfies readonly TermsCode[]
 
+/** 브리더 가입에 반드시 기록돼야 하는 동의 코드 — 입양 상담을 받지 않아 counsel_privacy 는 없다 */
+export const REQUIRED_BREEDER_TERM_CODES = [
+  'service',
+  'privacy',
+  'age_14plus',
+] as const satisfies readonly TermsCode[]
+
 interface BuildTermsAgreementsResult {
   agreements: TermsAgreementItem[]
   missingCodes: TermsCode[]
@@ -38,7 +45,10 @@ export const buildTermsAgreements = (
   }
 }
 
-export const hasAllRequiredAdopterTerms = (activeTerms: Terms[] | undefined): boolean => {
+export const hasAllRequiredTerms = (
+  activeTerms: Terms[] | undefined,
+  requiredCodes: readonly TermsCode[],
+): boolean => {
   const activeCodes = new Set((activeTerms ?? []).map(({ code }) => code))
-  return REQUIRED_ADOPTER_TERM_CODES.every((code) => activeCodes.has(code))
+  return requiredCodes.every((code) => activeCodes.has(code))
 }

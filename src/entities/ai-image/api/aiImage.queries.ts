@@ -1,5 +1,5 @@
 import { queryOptions } from '@tanstack/react-query'
-import { createQuery, STALE_TIME } from '@/shared/api'
+import { createQuery, STALE_TIME, getAuthReadSession, type AuthReadSession } from '@/shared/api'
 import { getAiImageFilters, getMyAiImageGenerations } from './aiImage.api'
 
 export const aiImageQueries = {
@@ -15,15 +15,17 @@ export const aiImageQueries = {
     }),
 
   /** 내 AI 사진 보관함 — 로그인 상태에서만 켠다 */
-  myGenerations: (enabled = true) =>
+  myGenerations: (enabled = true, session: AuthReadSession | null = getAuthReadSession()) =>
     queryOptions({
       ...createQuery({
-        queryKey: [...aiImageQueries.all(), 'my-generations'],
-        queryFn: () => getMyAiImageGenerations(),
+        queryKey: [...aiImageQueries.all(), 'my-generations', session?.scope ?? 'signed-out'],
+        queryFn: () => getMyAiImageGenerations(session),
         staleTime: STALE_TIME.REALTIME,
-        enabled,
+        enabled: enabled && !!session,
         throwOnError: false,
       }),
+      queryFn: ({ signal }) => getMyAiImageGenerations(session, signal),
+      gcTime: 0,
       refetchInterval: (query) =>
         query.state.data?.some((job) => ['pending', 'queued', 'processing'].includes(job.status))
           ? 5000

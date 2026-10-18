@@ -1,0 +1,5 @@
+require('./community-editor/navigation.test.cjs')
+require('./community-editor/config.test.cjs')
+require('./community-editor/exit-guard.test.cjs')
+require('./community-editor/submission.test.cjs')
+require('./community-editor/dialog.test.cjs')

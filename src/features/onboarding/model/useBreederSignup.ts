@@ -1,6 +1,8 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { termsQueries } from '@/entities/term'
 import { useRegisterBreeder, useUploadBreederDocuments } from '../api/onboarding.mutations'
 import { updateMyProfile } from '@/entities/profile'
 import { useOnboarding } from './OnboardingContext'
@@ -9,6 +11,8 @@ import { SIGNUP_ERROR } from './signupErrors' // [refactored]
 import type { DocumentsFormData } from './schema'
 import { buildBreederRegistrationRequest } from './buildBreederRegistrationRequest'
 import { getBreederDocumentsSignature, getSelectedBreederDocuments } from './breederDocuments'
+import { hasContactVerification } from './contactVerification'
+import { buildTermsAgreements, REQUIRED_BREEDER_TERM_CODES } from './termsAgreements'
 
 /**
  * 브리더 가입 완료 (서류 업로드 → POST /auth/register/breeder → bio PATCH)
@@ -18,6 +22,8 @@ import { getBreederDocumentsSignature, getSelectedBreederDocuments } from './bre
  */
 export const useBreederSignup = () => {
   const { formData, setFormData } = useOnboarding()
+  // 동의 이력에 실을 code/version 출처 — 입양자 가입과 같은 쿼리
+  const { data: activeTerms } = useQuery(termsQueries.list())
   const { mutateAsync: registerBreeder, isPending: isCompleting } = useRegisterBreeder()
   const { mutateAsync: uploadDocuments, isPending: isUploading } = useUploadBreederDocuments()
   // 가입 요청이 실패해 다시 시도할 때 같은 서류를 또 올리지 않도록 업로드 결과를 들고 있는다
@@ -44,7 +50,8 @@ export const useBreederSignup = () => {
     const profile = formData.profile
 
     // 폼의 이메일은 소셜 세션 값을 그대로 채운 것 — 세션이 우선, 없으면 폼 값
-    const email = social.email || profile?.email || ''
+    const email =
+      profile?.verificationMethod === 'email' ? profile.email : social.email || profile?.email || ''
     const breeds = kennel?.selectedBreeds ?? []
 
     // 백엔드 필수값 사전 검증 (FE 스키마상 optional 이지만 register/breeder 에서 필수)
@@ -65,12 +72,31 @@ export const useBreederSignup = () => {
       setError('품종을 1개 이상 선택해주세요. (브리더 정보 단계)')
       return
     }
-    if (!profile?.phone || !profile.phoneVerified) {
-      setError(SIGNUP_ERROR.phoneUnverified)
+    if (!profile || !hasContactVerification(profile)) {
+      setError(SIGNUP_ERROR.contactUnverified)
       return
     }
     if (!email) {
       setError(SIGNUP_ERROR.noEmail)
+      return
+    }
+
+    // 만 14세 확인까지 약관 코드·버전으로 남긴다 (입양자 가입과 같은 방식, 상담 동의만 없음)
+    const agreedByCode = {
+      service: profile.serviceAgreed,
+      privacy: profile.privacyAgreed,
+      marketing: profile.marketingAgreed,
+      age_14plus: profile.isOver14,
+    }
+    const { agreements: termsAgreements, missingCodes } = buildTermsAgreements(
+      activeTerms,
+      agreedByCode,
+    )
+    if (
+      REQUIRED_BREEDER_TERM_CODES.some((code) => !agreedByCode[code]) ||
+      missingCodes.length > 0
+    ) {
+      setError('약관 정보를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.')
       return
     }
 
@@ -92,7 +118,14 @@ export const useBreederSignup = () => {
         uploadedRef.current = { signature, result: uploaded }
       }
 
-      const dto = buildBreederRegistrationRequest({ social, animal, profile, kennel, uploaded })
+      const dto = buildBreederRegistrationRequest({
+        social,
+        animal,
+        profile,
+        kennel,
+        uploaded,
+        termsAgreements,
+      })
 
       const tokens = await registerBreeder(dto)
 

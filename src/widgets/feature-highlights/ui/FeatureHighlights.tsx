@@ -1,7 +1,6 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import {
   getFeatureHighlights,
@@ -10,9 +9,7 @@ import {
   type HighlightPlacement,
 } from '@/entities/feature-highlight'
 import { Container } from '@/shared/ui'
-import { PixelArrowRightIcon } from '@/shared/assets'
-import { cafe24Proup } from '@/shared/lib/fonts'
-import styles from './FeatureHighlights.module.css'
+import { TicketActionCard } from '@/shared/ui/TicketActionCard'
 
 export function FeatureHighlights({
   placement,
@@ -41,16 +38,20 @@ export function FeatureHighlights({
 
   return (
     <Container className={`py-4 tab:py-6 ${className ?? ''}`}>
-      <div className={styles.list} aria-label="포퐁의 새로운 기능">
+      <div className="grid gap-5" aria-label="포퐁의 새로운 기능">
         {cards.map((card) =>
           card.icon === 'map' ? (
             <div key={card.id}>{renderMap(card)}</div>
           ) : (
-            <section key={card.id} aria-label={card.title} className={styles.card}>
-              <div className={styles.intro}>
+            // 놀이터 티켓과 같은 틀. 하트는 복숭아, 반짝임은 버터 색 띠를 쓴다.
+            <TicketActionCard
+              key={card.id}
+              label="NEW"
+              accent={card.icon === 'heart' ? 'peach' : 'butter'}
+              icon={
                 <svg
                   viewBox="0 0 32 32"
-                  className={styles.icon}
+                  className="size-11 flex-none text-primary-500 tab:size-14"
                   aria-hidden="true"
                   focusable="false"
                   shapeRendering="crispEdges"
@@ -72,30 +73,12 @@ export function FeatureHighlights({
                     }
                   />
                 </svg>
-                <div className={styles.copy}>
-                  {card.eyebrow && <p className={styles.eyebrow}>{card.eyebrow}</p>}
-                  <h2 className={`${cafe24Proup.className} ${styles.title}`}>{card.title}</h2>
-                  {card.description && <p className={styles.description}>{card.description}</p>}
-                </div>
-              </div>
-              <div className={styles.actions}>
-                {card.actions.map((action, index) => (
-                  <Link
-                    key={`${action.href}-${index}`}
-                    href={action.href}
-                    className={`${cafe24Proup.className} ${styles.action}`}
-                    data-primary={index === 0}
-                  >
-                    <span>{action.label}</span>
-                    <PixelArrowRightIcon
-                      className={styles.arrow}
-                      aria-hidden="true"
-                      focusable="false"
-                    />
-                  </Link>
-                ))}
-              </div>
-            </section>
+              }
+              eyebrow={card.eyebrow}
+              title={card.title}
+              description={card.description}
+              actions={card.actions}
+            />
           ),
         )}
       </div>

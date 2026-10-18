@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { isSameOriginRequest } from '@/shared/lib/server/sameOrigin'
+import { isSameOriginRequest, readBoundedJson } from '@/shared/lib/server'
 import {
   reviewLoginErrorMessage,
   reviewLoginRequestSchema,
@@ -16,34 +16,6 @@ function failure(status: number) {
   )
 }
 
-async function readCredentials(request: NextRequest): Promise<unknown> {
-  const reader = request.body?.getReader()
-  if (!reader) return null
-  const chunks: Uint8Array[] = []
-  let size = 0
-  try {
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-      size += value.byteLength
-      if (size > MAX_BODY_BYTES) {
-        await reader.cancel()
-        return null
-      }
-      chunks.push(value)
-    }
-    const body = new Uint8Array(size)
-    let offset = 0
-    for (const chunk of chunks) {
-      body.set(chunk, offset)
-      offset += chunk.byteLength
-    }
-    return JSON.parse(new TextDecoder().decode(body))
-  } finally {
-    reader.releaseLock()
-  }
-}
-
 /** 심사 계정 인증만 중계한다. 쿠키 발급은 기존 saveAuthTokens 흐름을 사용한다. */
 export async function POST(request: NextRequest) {
   if (!isSameOriginRequest(request)) {
@@ -55,7 +27,7 @@ export async function POST(request: NextRequest) {
 
   let credentials
   try {
-    credentials = reviewLoginRequestSchema.safeParse(await readCredentials(request))
+    credentials = reviewLoginRequestSchema.safeParse(await readBoundedJson(request, MAX_BODY_BYTES))
   } catch {
     return failure(400)
   }

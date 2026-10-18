@@ -39,16 +39,16 @@ export interface StepConfig {
 
 export const ONBOARDING_STEPS = {
   general: [
-    { id: 'profile', label: '계정 정보 입력' },
-    { id: 'info', label: '회원 정보 입력' },
-    { id: 'survey', label: '간단한 조사 양식' },
+    { id: 'profile', label: '계정 인증' },
+    { id: 'info', label: '프로필' },
+    { id: 'survey', label: '입양 준비' },
     { id: 'complete', label: '가입완료' },
   ],
   breeder: [
-    { id: 'animal-select', label: '브리더 동물 선택' },
-    { id: 'profile', label: '개인 정보 입력' },
-    { id: 'kennel-info', label: '브리더 정보 입력' },
-    { id: 'documents', label: '입점 서류 등록' },
+    { id: 'animal-select', label: '동물 선택' },
+    { id: 'profile', label: '계정 인증' },
+    { id: 'kennel-info', label: '브리더 정보' },
+    { id: 'documents', label: '서류 등록' },
     { id: 'complete', label: '가입완료' },
   ],
 } satisfies Record<UserType, StepConfig[]>

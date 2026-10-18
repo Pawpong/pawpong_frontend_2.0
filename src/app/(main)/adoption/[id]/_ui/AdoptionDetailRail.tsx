@@ -1,6 +1,7 @@
 'use client'
 
 import type { ReactNode } from 'react'
+import { PublicActivityLevel } from '@/features/gamification'
 import Link from 'next/link'
 import { useAuthStatus } from '@/features/auth'
 import { ReportBreederAction } from '@/features/report'
@@ -173,6 +174,7 @@ const AdoptionDetailRail = ({
 
       <hr className="border-neutral-200" />
       <BreederRow breeder={detail.breeder} />
+      <PublicActivityLevel owner={{ ownerId: detail.breeder.id, role: 'breeder' }} />
     </div>
   </aside>
 )
