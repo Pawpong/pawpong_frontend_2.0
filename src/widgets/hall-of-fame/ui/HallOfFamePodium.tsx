@@ -15,6 +15,7 @@ import 'swiper/css'
 interface HallOfFamePodiumProps {
   winners: CommunityHallOfFameWinner[]
   state: CommunityHallOfFame['state']
+  unavailableRanks?: number[]
   className?: string
 }
 
@@ -183,26 +184,32 @@ const PodiumCard = ({
   winner,
   rank,
   state = 'final',
+  unavailable = false,
 }: {
   winner?: CommunityHallOfFameWinner
   rank: 1 | 2 | 3
   state?: CommunityHallOfFame['state']
+  unavailable?: boolean
 }) => {
   if (!winner)
     return (
       <article
-        aria-label={`${rank}위 · ${state === 'open' ? '집계 중' : '선정된 글 없음'}`}
+        aria-label={`${rank}위 · ${unavailable ? '현재 열람 불가' : state === 'open' ? '집계 중' : '선정된 글 없음'}`}
         className="relative z-10 flex w-[9.25rem] shrink-0 flex-col items-center gap-2 rounded-xl border border-dashed border-secondary-500 bg-white/60 p-2 pc:w-[16.3125rem] pc:px-4 pc:py-2"
       >
         <div className="flex h-[7.0625rem] w-[8.25rem] flex-col items-center justify-center gap-2 pc:h-[12.1875rem] pc:w-[14.3125rem]">
           <span className="text-xs font-semibold text-primary-700 pc:text-sm">{rank}위</span>
           <PawPrintIcon className="size-8 text-secondary-600 pc:size-12" aria-hidden="true" />
           <span className="text-sm font-semibold text-neutral-700">
-            {state === 'open' ? '집계 중' : '선정된 글 없음'}
+            {unavailable ? '현재 열람 불가' : state === 'open' ? '집계 중' : '선정된 글 없음'}
           </span>
         </div>
         <p className="py-1 text-center text-xs leading-[1.5] text-neutral-600 pc:py-2 pc:text-sm">
-          {state === 'open' ? '아직 후보가 없어요' : '이 순위는 비어 있어요'}
+          {unavailable
+            ? '수상 기록은 유지되지만 게시글은 볼 수 없어요'
+            : state === 'open'
+              ? '아직 후보가 없어요'
+              : '이 순위는 비어 있어요'}
         </p>
       </article>
     )
@@ -262,7 +269,12 @@ const toRankSlots = (winners: CommunityHallOfFameWinner[]) =>
     winner: winners.find((winner) => winner.rank === rank),
   }))
 
-const HallOfFamePodium = ({ winners, state, className }: HallOfFamePodiumProps) => {
+const HallOfFamePodium = ({
+  winners,
+  state,
+  unavailableRanks = [],
+  className,
+}: HallOfFamePodiumProps) => {
   const ranked = toRankSlots(winners)
 
   return (
@@ -285,7 +297,12 @@ const HallOfFamePodium = ({ winners, state, className }: HallOfFamePodiumProps) 
       >
         {ranked.map(({ rank, winner }) => (
           <SwiperSlide key={rank} className="!flex !h-full !w-[9.25rem] !items-center">
-            <PodiumCard winner={winner} rank={rank} state={state} />
+            <PodiumCard
+              winner={winner}
+              rank={rank}
+              state={state}
+              unavailable={unavailableRanks.includes(rank)}
+            />
           </SwiperSlide>
         ))}
       </Swiper>
@@ -300,7 +317,12 @@ const HallOfFamePodium = ({ winners, state, className }: HallOfFamePodiumProps) 
               rank !== 1 && 'flex h-full items-end',
             )}
           >
-            <PodiumCard winner={winner} rank={rank} state={state} />
+            <PodiumCard
+              winner={winner}
+              rank={rank}
+              state={state}
+              unavailable={unavailableRanks.includes(rank)}
+            />
           </div>
         ))}
       </div>
