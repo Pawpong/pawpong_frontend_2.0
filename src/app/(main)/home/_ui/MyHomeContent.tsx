@@ -8,6 +8,7 @@ import { RetryButton, buttonVariants, Container, NavigationBar } from '@/shared/
 import { cn } from '@/shared/lib/cn'
 import { transientQueryRecoveryOptions } from '@/shared/api'
 import { profileQueries } from '@/entities/profile'
+import { activityConfigOptions } from '@/entities/gamification'
 import { AiPhotoArchive } from '@/features/ai-image'
 import { PetResultLink } from '@/features/playground-pet'
 // [refactored] 분양 페이지와 동일한 목록 블록 — 위젯으로 공유
@@ -22,6 +23,7 @@ import { HomeSkeleton } from './HomeSkeleton'
 import {
   MY_HOME_TABS,
   BREEDER_MY_HOME_TABS,
+  MY_ACTIVITY_HREF,
   MY_HOME_SIDE_LINKS,
   BREEDER_MY_HOME_SIDE_LINKS,
   MY_PHOTO_GRID,
@@ -41,6 +43,12 @@ const MyHomeContent = () => {
   })
   const myProfile = profileQuery.data
   const isBreeder = myProfile?.role === 'breeder'
+  // 활동 단계 기능이 꺼져 있으면 나의 활동 화면이 비므로 링크도 뺀다
+  const activityConfig = useQuery(activityConfigOptions)
+  const activityEnabled = !!activityConfig.data?.enabled && !activityConfig.isError
+  const sideLinks = (isBreeder ? BREEDER_MY_HOME_SIDE_LINKS : MY_HOME_SIDE_LINKS).filter(
+    (link) => activityEnabled || link.href !== MY_ACTIVITY_HREF,
+  )
 
   // [refactored] navbar 는 2단(tab+)에서 숨고 sticky 도 아니라 높이를 잴 이유가 없어졌다.
   // sticky 기준은 GNB 하나뿐이고, 그건 HomeTabs 가 스스로 읽는다.
@@ -114,7 +122,7 @@ const MyHomeContent = () => {
             {isBreeder && <BreederIntroduction {...introProps} placement="profile" />}
           </>
         }
-        sideLinks={isBreeder ? BREEDER_MY_HOME_SIDE_LINKS : MY_HOME_SIDE_LINKS}
+        sideLinks={sideLinks}
       >
         {/* 분양 목록 탭 (브리더만) — 시안 3170-790275: 라벨+필터 -> 카드 그리드.
             standalone /adoption/my-listings 페이지는 이 탭과 완전히 중복이라 제거했다 —

@@ -3,7 +3,9 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
+import { useQuery } from '@tanstack/react-query'
 import { RESPONSIVE_SHELL_CLASS } from '@/shared/config'
+import { activityConfigOptions } from '@/entities/gamification'
 import { useAuthStatus } from '@/features/auth'
 import { MobileSupportInquiry } from '@/features/inquiry'
 import { cn } from '@/shared/lib/cn'
@@ -24,6 +26,10 @@ const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
   // 인증이 필요한 화면도 목록에서 감추지 않고, 비로그인이면 돌아올 주소를 실어 로그인으로 보낸다
   const hrefFor = ({ href, requiresAuth }: NavItem) =>
     requiresAuth && !isLoggedIn ? `/login?returnUrl=${encodeURIComponent(href)}` : href
+  // 메뉴는 GNB 에 늘 붙어 있어 열렸을 때만 조회한다 — 닫혀 있는 동안 모든 화면에서 설정을 주기 조회하지 않게
+  const activityConfig = useQuery({ ...activityConfigOptions, enabled: open })
+  const activityEnabled = !!activityConfig.data?.enabled && !activityConfig.isError
+  const items = MOBILE_MENU_ITEMS.filter((item) => activityEnabled || !item.requiresActivity)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -73,7 +79,7 @@ const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
             )}
           >
             <nav className="flex flex-col gap-8 pc:gap-4" aria-label="설정">
-              {MOBILE_MENU_ITEMS.map((item) => (
+              {items.map((item) => (
                 <Link
                   key={item.href}
                   href={hrefFor(item)}

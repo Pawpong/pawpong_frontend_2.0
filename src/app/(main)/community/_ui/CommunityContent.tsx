@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import { ActivityBadgeRow, BreederLevelBadge } from '@/entities/gamification'
-import { ActivityEntry, usePublicActivityBadges } from '@/features/gamification'
+import { usePublicActivityBadges } from '@/features/gamification'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import {
@@ -181,7 +181,6 @@ const CommunityContent = () => {
               </>
             )}
             <div className="mt-6 border-t border-neutral-100 pt-6">
-              <ActivityEntry />
               <Button onClick={writePost} width="full" size="lg">
                 {writeEntry.label}
               </Button>
@@ -194,9 +193,6 @@ const CommunityContent = () => {
           </aside>
 
           <section className="min-w-0" aria-label="커뮤니티 게시글">
-            <div className="pc:hidden">
-              <ActivityEntry />
-            </div>
             <SearchBar
               key={appliedSearch}
               className={experienceEnabled ? 'mb-4' : 'mb-6'}

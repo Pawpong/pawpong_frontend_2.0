@@ -7,7 +7,7 @@ import { useActivitySession } from '../lib/useActivitySession'
 /**
  * 마이홈 이름 옆 내 레벨. 본인 화면이라 공개 레벨 플래그와 무관하게 보인다.
  * 나의 활동 화면과 같은 key 를 써서 그 화면의 대조 결과가 바로 반영되고 요청도 한 번만 나간다.
- * 마이홈에서 나의 활동 탭을 뺐으므로 이 배지가 나의 활동으로 가는 입구다.
+ * 마이홈에서 나의 활동 탭을 뺐으므로 이 배지(모바일)와 사이드바 링크(tab+)가 나의 활동으로 가는 입구다.
  */
 export function MyLevelBadge({ userId }: { userId?: string }) {
   const config = useQuery(activityConfigOptions)

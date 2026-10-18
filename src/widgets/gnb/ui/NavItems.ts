@@ -3,6 +3,8 @@ export interface NavItem {
   href: string
   /** 로그인해야 열리는 화면 — 비로그인은 숨기지 않고 로그인으로 보낸다 */
   requiresAuth?: boolean
+  /** 활동 단계 기능이 꺼져 있으면 화면이 비므로 메뉴에서도 뺀다 */
+  requiresActivity?: boolean
 }
 
 // 데스크탑 상단 nav는 shared/config/mainNav(HEADER_NAV)로 통일 (BottomNav와 공유)
@@ -13,9 +15,11 @@ export interface NavItem {
 // '서비스 소개'·'자주 묻는 질문'은 2026-09-14 부터 푸터(SiteFooter)로 이동.
 //
 // 항목은 로그인 여부·역할과 무관하게 전부 노출하고, 비로그인은 returnUrl 을 실어 로그인으로 보낸다.
+// 나의 활동만 활동 단계 기능이 켜져 있을 때 보인다.
 export const MOBILE_MENU_ITEMS: NavItem[] = [
   { name: '관심 목록', href: '/bookmarks', requiresAuth: true },
   { name: '신청·후기', href: '/activity', requiresAuth: true },
+  { name: '나의 활동', href: '/my-activity', requiresAuth: true, requiresActivity: true },
   { name: '우리 동네 돌봄 지도', href: '/care-map' },
   { name: '명예의 전당', href: '/hall-of-fame' },
   { name: '공지사항', href: '/notices' },
