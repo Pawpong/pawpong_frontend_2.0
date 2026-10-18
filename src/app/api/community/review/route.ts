@@ -1,14 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { isDevelopmentCommunityHost } from '@/shared/lib/server'
+import { NextResponse } from 'next/server'
 import { CLOSED_COMMUNITY_REVIEW_CONFIG, parseCommunityReviewConfig } from '@/entities/community'
 
 export const dynamic = 'force-dynamic'
-export async function GET(request: NextRequest) {
+export async function GET() {
   const headers = { 'Cache-Control': 'no-store' }
-  if (!isDevelopmentCommunityHost(request.headers.get('host')))
-    return NextResponse.json(CLOSED_COMMUNITY_REVIEW_CONFIG, { headers })
+  const base = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/+$/, '')
+  if (!base) return NextResponse.json(CLOSED_COMMUNITY_REVIEW_CONFIG, { headers })
   try {
-    const response = await fetch('https://dev-api.pawpong.kr/api/v2/community/review/config', {
+    const response = await fetch(`${base}/api/v2/community/review/config`, {
       cache: 'no-store',
       redirect: 'error',
       signal: AbortSignal.timeout(5000),
