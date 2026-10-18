@@ -57,7 +57,16 @@ function renderDiscoveryQuery(config, query = 'media=map') {
     '@/shared/lib/infiniteList': { flattenPages: () => [] },
     '@/shared/lib/cn': { cn: () => '' },
     './constants': { COMMUNITY_SORT_OPTIONS: [] },
-    './CommunityDiscovery': { CommunityDiscovery: nothing },
+    './CommunityDiscovery': {
+      AppliedFilters: nothing,
+      CommunityCategoryBand: nothing,
+      CommunityCategoryNav: nothing,
+      CommunityDetailFilter: nothing,
+      CommunityPetTiles: nothing,
+      CommunitySideNav: nothing,
+      CommunitySubTopics: nothing,
+      discoveryTitle: () => [],
+    },
     './CommunityFeedMeta': { CommunityFeedMeta: nothing },
     './FeedFollowButton': { FeedFollowButton: nothing },
   })

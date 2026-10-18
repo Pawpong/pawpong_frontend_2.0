@@ -17,7 +17,6 @@ import {
 import {
   Button,
   DeleteConfirmModal,
-  Chip,
   IconButton,
   InfiniteScrollTrigger,
   ListState,
@@ -38,17 +37,26 @@ import { ConnectedFeedCard, useDeletePostConfirm } from '@/features/community'
 import { useLoginGuard, useMe } from '@/features/auth'
 import { FeedFollowButton } from './FeedFollowButton'
 import { flattenPages } from '@/shared/lib/infiniteList'
-import { cn } from '@/shared/lib/cn'
 import type { CommunityDiscoveryFilters } from '@/shared/types'
 import { COMMUNITY_SORT_OPTIONS } from './constants'
-import { CommunityDiscovery } from './CommunityDiscovery'
+import {
+  AppliedFilters,
+  CommunityCategoryNav,
+  CommunityCategoryBand,
+  CommunityDetailFilter,
+  CommunityPetTiles,
+  CommunitySideNav,
+  CommunitySubTopics,
+  discoveryTitle,
+} from './CommunityDiscovery'
 import { CommunityFeedMeta } from './CommunityFeedMeta'
 
+// '전체'는 카테고리의 '전체'와 같은 격자 아이콘을 써서 뜻을 맞춘다
 const PET_OPTIONS = [
-  { value: '', label: '전체 이야기', shortLabel: '전체' },
-  { value: 'cat', label: '고양이 이야기', shortLabel: '고양이' },
-  { value: 'dog', label: '강아지 이야기', shortLabel: '강아지' },
-  { value: 'reptile', label: '파충류 이야기', shortLabel: '파충류' },
+  { value: '', label: '전체 이야기', shortLabel: '전체', icon: 'all' },
+  { value: 'cat', label: '고양이 이야기', shortLabel: '고양이', icon: 'cat' },
+  { value: 'dog', label: '강아지 이야기', shortLabel: '강아지', icon: 'dog' },
+  { value: 'reptile', label: '파충류 이야기', shortLabel: '파충류', icon: 'reptile' },
 ] as const
 
 const CommunityContent = () => {
@@ -70,7 +78,7 @@ const CommunityContent = () => {
   const experienceEnabled = experience.data?.enabled === true && !experience.isError
   const hasDiscovery = countCommunityDiscovery(discovery) > 0
   const filterUnavailable = hasDiscovery && experience.isError
-  const filtered = experienceEnabled && countCommunityDiscovery(discovery) > 0
+  const filtered = experienceEnabled && hasDiscovery // [refactored] 같은 개수 계산을 두 번 하지 않는다
   const topicLabel = (key: string) =>
     experience.data?.topics.find((topic) => topic.key === key)?.label ?? key
   const { guard, isPromptOpen, setPromptOpen } = useLoginGuard()
@@ -121,6 +129,12 @@ const CommunityContent = () => {
   // 하단 탭으로 오가는 최상위 화면이라 링크로 바로 열면 돌아갈 기록이 없다 — 그때는 홈으로 보낸다
   const goBack = () => (window.history.length > 1 ? router.back() : router.push('/'))
   const selectedLabel = PET_OPTIONS.find((option) => option.value === petType)?.label
+  // 동물 · 카테고리 · 말머리를 목록 제목에 이어 지금 보는 범위를 한 줄로 알려 준다
+  const listPath = appliedSearch
+    ? ['검색 결과']
+    : [selectedLabel, ...(experienceEnabled ? discoveryTitle(discovery, topicLabel) : [])].filter(
+        (label): label is string => Boolean(label),
+      )
 
   return (
     <>
@@ -141,31 +155,31 @@ const CommunityContent = () => {
           </>
         }
       />
-
       <div className="mx-auto w-full max-w-[68rem] px-5 pt-5 pb-28 tab:px-8 tab:pt-8 pc:px-10">
         <div className="grid min-w-0 grid-cols-1 pc:grid-cols-[13rem_minmax(0,1fr)] pc:items-start pc:gap-12">
           <aside className="sticky top-24 hidden pc:block" aria-label="커뮤니티 탐색">
-            <nav aria-label="동물별 이야기" className="flex flex-col gap-1">
-              {PET_OPTIONS.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  aria-pressed={petType === option.value}
-                  onClick={() => changeNavigation({ petType: option.value })}
-                  className={cn(
-                    'flex min-h-12 items-center justify-between rounded-xl px-4 text-left text-[0.9375rem] focus-ring transition-colors',
-                    petType === option.value
-                      ? 'bg-neutral-100 font-semibold text-neutral-850'
-                      : 'font-medium text-neutral-700 hover:bg-neutral-50 hover:text-neutral-850',
-                  )}
-                >
-                  {option.label}
-                  {petType === option.value && (
-                    <span aria-hidden className="size-1.5 rounded-full bg-primary-500" />
-                  )}
-                </button>
-              ))}
-            </nav>
+            <p aria-hidden className="mb-2 px-4 text-xs font-semibold text-neutral-700">
+              동물
+            </p>
+            <CommunitySideNav
+              label="동물별 이야기"
+              iconClassName="size-8" // [refactored] 동물 그림은 도트 아이콘보다 크게
+              items={PET_OPTIONS.map((option) => ({
+                key: option.value || 'all',
+                label: option.label,
+                icon: option.icon,
+                selected: petType === option.value,
+                onSelect: () => changeNavigation({ petType: option.value }),
+              }))}
+            />
+            {experienceEnabled && (
+              <>
+                <p aria-hidden className="mt-6 mb-2 px-4 text-xs font-semibold text-neutral-700">
+                  카테고리
+                </p>
+                <CommunityCategoryNav value={discovery} onChange={setDiscovery} />
+              </>
+            )}
             <div className="mt-6 border-t border-neutral-100 pt-6">
               <ActivityEntry />
               <Button onClick={writePost} width="full" size="lg">
@@ -194,12 +208,26 @@ const CommunityContent = () => {
               maxLength={COMMUNITY_SEARCH_MAX_LENGTH}
               onSubmit={(search) => changeNavigation({ search })}
             />
+            {/* 동물 → 카테고리 → 말머리(배경이 연결된 세 줄). PC 는 동물·카테고리를 사이드바가 맡고 말머리 띠만 둔다 */}
+            <CommunityPetTiles
+              connected={experienceEnabled}
+              options={PET_OPTIONS}
+              value={petType}
+              onChange={(next) => changeNavigation({ petType: next })}
+            />
             {experienceEnabled && experience.data && (
-              <CommunityDiscovery
-                config={experience.data}
-                value={discovery}
-                onChange={setDiscovery}
-              />
+              <>
+                <CommunityCategoryBand
+                  value={discovery}
+                  onChange={setDiscovery}
+                  topicLabel={topicLabel}
+                />
+                <CommunitySubTopics
+                  value={discovery}
+                  onChange={setDiscovery}
+                  topicLabel={topicLabel}
+                />
+              </>
             )}
             {hasDiscovery && !experience.isPending && !experience.isError && !experienceEnabled && (
               <p
@@ -217,32 +245,55 @@ const CommunityContent = () => {
               </p>
             )}
 
-            <nav
-              aria-label="동물별 이야기"
-              // 칩 터치 영역(44px)이 가로 스크롤에 잘리지 않게 위아래 여유를 두고 바깥 간격은 유지한다.
-              className="-mt-2 mb-5 flex gap-2 overflow-x-auto pt-2 pb-2 pc:hidden"
-            >
-              {PET_OPTIONS.map((option) => (
-                <Chip
-                  key={option.value}
-                  selected={petType === option.value}
-                  onClick={() => changeNavigation({ petType: option.value })}
+            {/* 결과 도구 줄 — 지금 보는 범위(제목) 옆에 세부 조건과 정렬을 모은다 */}
+            <div className="border-b border-neutral-150 pb-4">
+              <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+                <h2
+                  aria-label={listPath.join(' > ')}
+                  className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1 text-body-sm font-medium text-neutral-700 tab:text-body-md"
                 >
-                  {option.shortLabel}
-                </Chip>
-              ))}
-            </nav>
-
-            <div className="flex items-center justify-between gap-3 border-b border-neutral-150 pb-4">
-              <h2 className="text-base font-semibold text-neutral-850">
-                {appliedSearch ? '검색 결과' : filtered ? '찾은 이야기' : selectedLabel}
-              </h2>
-              <SortOptions
-                ariaLabel="게시글 정렬"
-                options={COMMUNITY_SORT_OPTIONS}
-                value={sort}
-                onValueChange={(sort) => changeNavigation({ sort })}
-              />
+                  {listPath.map((label, index) => (
+                    <span key={`${index}-${label}`} className="inline-flex items-center gap-1.5">
+                      {index > 0 && (
+                        <span aria-hidden="true" className="font-normal text-neutral-700">
+                          {'>'}
+                        </span>
+                      )}
+                      <span
+                        className={
+                          index === listPath.length - 1
+                            ? 'font-semibold text-neutral-850'
+                            : undefined
+                        }
+                      >
+                        {label}
+                      </span>
+                    </span>
+                  ))}
+                </h2>
+                <div className="flex shrink-0 items-center gap-3">
+                  {experienceEnabled && experience.data && (
+                    <CommunityDetailFilter
+                      config={experience.data}
+                      value={discovery}
+                      onChange={setDiscovery}
+                    />
+                  )}
+                  <SortOptions
+                    ariaLabel="게시글 정렬"
+                    options={COMMUNITY_SORT_OPTIONS}
+                    value={sort}
+                    onValueChange={(sort) => changeNavigation({ sort })}
+                  />
+                </div>
+              </div>
+              {experienceEnabled && experience.data && (
+                <AppliedFilters
+                  config={experience.data}
+                  value={discovery}
+                  onChange={setDiscovery}
+                />
+              )}
             </div>
             {appliedSearch && (
               <div className="flex items-center justify-between gap-3 border-b border-neutral-100 py-3 text-sm">

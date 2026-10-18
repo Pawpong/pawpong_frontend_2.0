@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense } from 'react'
+import { Suspense, useSyncExternalStore } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname, useSearchParams } from 'next/navigation'
@@ -49,6 +49,10 @@ const BOTTOM_ICONS: Record<string, string> = {
   '/chat': '/images/nav/bottom-chat.svg',
 }
 
+const subscribeNothing = () => () => undefined
+const isClient = () => true
+const isServer = () => false
+
 const BottomNavView = ({ pathname }: { pathname: string }) => {
   const { me } = useMe()
   const { isLoggedIn } = useAuthStatus()
@@ -58,6 +62,9 @@ const BottomNavView = ({ pathname }: { pathname: string }) => {
     enabled: isLoggedIn,
     throwOnError: false,
   })
+  // Suspense 안이라 늦게 하이드레이션된다. 그사이 NavBar 가 받아 둔 숫자로 첫 렌더를 그리면
+  // 배지 없는 서버 HTML 과 어긋나므로, 하이드레이션이 끝난 뒤에만 배지를 보여 준다
+  const hydrated = useSyncExternalStore(subscribeNothing, isClient, isServer)
 
   return (
     <>
@@ -96,7 +103,7 @@ const BottomNavView = ({ pathname }: { pathname: string }) => {
                     active={isActive(pathname)}
                   />
                 )}
-                {href === '/chat' && <UnreadCountBadge count={unreadChatCount} />}
+                {href === '/chat' && <UnreadCountBadge count={hydrated ? unreadChatCount : 0} />}
               </span>
               <span
                 className={cn(
