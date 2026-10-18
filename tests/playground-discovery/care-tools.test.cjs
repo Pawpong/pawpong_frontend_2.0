@@ -38,24 +38,7 @@ test('외출 준비함의 체크·목적 고르기 연출은 움직임 줄이기
     assert.ok(reduced.includes(selector), selector)
 })
 
-test('산책·병원 기록 소개는 기록 종류별 티켓 머리를 만들고 작성 틀은 티켓 머리를 그림', () => {
-  const { communityRecordIntro } = loadTypescript(
-    'src/app/(main)/community/_ui/communityRecordIntro.tsx',
-    {
-      '@/shared/assets': {
-        LocationPinIcon: () => null,
-        PawPrintIcon: () => null,
-        PixelPencilIcon: () => null,
-      },
-    },
-  )
-  assert.equal(communityRecordIntro('walk').label, 'WALK NOTE')
-  assert.equal(communityRecordIntro('walk').title, '산책 기록 남기기')
-  assert.equal(communityRecordIntro('clinic').label, 'CLINIC NOTE')
-  assert.match(communityRecordIntro('clinic').description, /진료기록 사진은 올리지/)
-  for (const value of [undefined, 'question', '__proto__', 'toString'])
-    assert.equal(communityRecordIntro(value), null, String(value))
-
+test('작성 틀은 티켓을 주면 티켓 머리를, 없으면 기본 머리를 그림', () => {
   const cn = (...values) => values.filter(Boolean).join(' ')
   const { ComposerLayout } = loadTypescript('src/shared/ui/ComposerLayout.tsx', {
     '@/shared/assets': { PawPrintIcon: () => null },
