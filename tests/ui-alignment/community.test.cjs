@@ -26,10 +26,14 @@ test('댓글 수정 입력과 처리 안내는 공통 입력칸과 focus-ring을
   assert.doesNotMatch(feedback, /focus-visible:ring-2/)
 })
 
-test('이야기 찾기의 상세 필터는 공통 버튼이고 빠른 탐색과 선택 조건은 이름 있는 묶음임', () => {
+test('이야기 찾기의 세부 조건은 공통 버튼이고 카테고리·말머리·선택 조건은 이름 있는 묶음임', () => {
   const discovery = source(`${ui}/CommunityDiscovery.tsx`)
-  assert.match(discovery, /<DialogTrigger asChild>\s*<Button intent="secondary" size="md">/)
-  assert.match(discovery, /role="group"\s+aria-label="빠른 탐색"/)
+  assert.match(discovery, /<DialogTrigger asChild>[\s\S]*?<Button\s+intent="ghost"\s+size="sm"/)
+  assert.match(discovery, /role="group"\s+aria-label="카테고리"/)
+  // PC 사이드바의 동물·카테고리 목록은 같은 공통 목록(도트 아이콘 + 이름)을 쓴다
+  assert.match(discovery, /<CommunitySideNav\s+label="카테고리"/)
+  assert.match(source(`${ui}/CommunityContent.tsx`), /<CommunitySideNav\s+label="동물별 이야기"/)
+  assert.match(discovery, /aria-label=\{`\$\{category\.label\} 말머리`\}/)
   assert.match(
     source(`${ui}/discovery/AppliedFilters.tsx`),
     /role="group"\s+aria-label="선택한 조건"/,

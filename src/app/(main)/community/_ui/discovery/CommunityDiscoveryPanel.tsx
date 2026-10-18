@@ -2,22 +2,22 @@
 
 import { useId, useState } from 'react'
 import {
-  COMMUNITY_MAX_FILTER_TOPICS,
   COMMUNITY_MAX_TAGS,
-  COMMUNITY_RECORD_LABELS,
-  COMMUNITY_TOPIC_GROUPS,
-  countCommunityDiscovery,
   toCommunityTag,
   type CommunityExperienceConfig,
 } from '@/entities/community'
 import type { CommunityDiscoveryFilters } from '@/shared/types'
 import { DialogDescription, DialogTitle } from '@/shared/ui/Dialog'
 import { Button } from '@/shared/ui/Button'
-import { cn } from '@/shared/lib/cn'
 import { AppliedFilters } from './AppliedFilters'
-import { FilterOptions, filterPill } from './FilterControls'
-import { KIND_LABELS, MEDIA_LABELS, PERIOD_LABELS } from './constants'
+import { FilterOptions } from './FilterControls'
+import { MEDIA_LABELS, PERIOD_LABELS } from './constants'
+import { countDetailFilters, keepCategory } from './categories'
 
+/**
+ * 세부 조건 — 카테고리·말머리(무슨 이야기)는 목록 위에서 고르고,
+ * 여기서는 그 안을 태그·담긴 자료·올린 시기(어떤 글)로 좁힌다.
+ */
 export function CommunityDiscoveryPanel({
   config,
   initialValue,
@@ -29,14 +29,8 @@ export function CommunityDiscoveryPanel({
 }) {
   const id = useId()
   const [draft, setDraft] = useState(initialValue)
-  const [groupIndex, setGroupIndex] = useState(0)
   const [tag, setTag] = useState('')
   const [error, setError] = useState('')
-  const topics = draft.topics ?? []
-  const groups = COMMUNITY_TOPIC_GROUPS.filter((group) =>
-    group.keys.some((key) => config.topics.some((topic) => topic.key === key)),
-  )
-  const group = groups[groupIndex] ?? groups[0]
   const patch = (next: Partial<CommunityDiscoveryFilters>) => setDraft({ ...draft, ...next })
   const withPendingTag = (): CommunityDiscoveryFilters | null => {
     if (!tag.trim()) return draft
@@ -63,99 +57,16 @@ export function CommunityDiscoveryPanel({
     setTag('')
     setError('')
   }
+  const count = countDetailFilters(draft)
   return (
     <>
       <header className="shrink-0 border-b border-neutral-100 px-5 py-5 pr-14 tab:px-6 tab:pr-14">
-        <DialogTitle className="font-cafe24 text-xl">어떤 이야기를 찾으세요?</DialogTitle>
+        <DialogTitle className="font-cafe24 text-xl">세부 조건</DialogTitle>
         <DialogDescription className="mt-1 text-xs">
-          조건을 고른 뒤 적용해 주세요. 닫으면 현재 목록을 유지해요.
+          고른 카테고리 안에서 태그·자료·시기로 더 좁혀요. 닫으면 현재 목록을 유지해요.
         </DialogDescription>
       </header>
       <div className="min-h-0 flex-1 space-y-6 overflow-y-auto overscroll-contain px-5 py-5 tab:px-6">
-        <div>
-          <div className="mb-3 flex items-center justify-between gap-2">
-            <h2 className="text-sm font-semibold text-neutral-850">
-              관심 주제{' '}
-              <span className="ml-1 font-normal text-neutral-700">
-                {topics.length}/{COMMUNITY_MAX_FILTER_TOPICS}
-              </span>
-            </h2>
-            <span className="text-xs text-neutral-700">여러 개 선택할 수 있어요</span>
-          </div>
-          <div
-            role="group"
-            aria-label="주제 분야"
-            className="mb-4 flex flex-wrap gap-1 rounded-xl bg-neutral-50 p-1"
-          >
-            {groups.map((item, index) => (
-              <button
-                key={item.title}
-                type="button"
-                aria-pressed={group === item}
-                onClick={() => setGroupIndex(index)}
-                className={cn(
-                  'min-h-10 rounded-lg px-3 text-xs font-semibold focus-ring transition-colors',
-                  group === item
-                    ? 'bg-white text-primary-700 shadow-sm'
-                    : 'text-neutral-700 hover:text-neutral-850',
-                )}
-              >
-                {item.title}
-                {item.keys.some((key) => topics.includes(key)) && (
-                  <span className="ml-1 text-primary-500">
-                    {item.keys.filter((key) => topics.includes(key)).length}
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
-          <div
-            role="group"
-            aria-label={group?.title ?? '관심 주제'}
-            className="flex min-h-12 flex-wrap content-start gap-2"
-          >
-            {group?.keys
-              .filter((key) => config.topics.some((topic) => topic.key === key))
-              .map((key) => {
-                const selected = topics.includes(key)
-                return (
-                  <button
-                    key={key}
-                    type="button"
-                    aria-pressed={selected}
-                    disabled={!selected && topics.length >= COMMUNITY_MAX_FILTER_TOPICS}
-                    onClick={() => {
-                      const next = selected
-                        ? topics.filter((topic) => topic !== key)
-                        : [...topics, key]
-                      patch({ topics: next, ...(next.length < 2 ? { topicMatch: undefined } : {}) })
-                    }}
-                    className={cn(filterPill(selected), 'disabled:opacity-40')}
-                  >
-                    {config.topics.find((topic) => topic.key === key)?.label}
-                  </button>
-                )
-              })}
-          </div>
-          {topics.length > 1 && (
-            <div className="mt-4">
-              <FilterOptions
-                label="주제 일치 방식"
-                options={{ any: '하나라도 포함', all: '모두 포함' }}
-                value={draft.topicMatch ?? 'any'}
-                onChange={(mode) => patch({ topicMatch: mode === 'all' ? 'all' : undefined })}
-              />
-            </div>
-          )}
-        </div>
-        <div className="border-t border-neutral-100 pt-5">
-          <FilterOptions
-            label="기록 종류"
-            options={COMMUNITY_RECORD_LABELS}
-            value={draft.record}
-            onChange={(record) => patch({ record })}
-          />
-        </div>
         <form
           noValidate
           onSubmit={(event) => {
@@ -195,13 +106,7 @@ export function CommunityDiscoveryPanel({
             </p>
           )}
         </form>
-        <div className="grid gap-5 tab:grid-cols-2">
-          <FilterOptions
-            label="글 성격"
-            options={KIND_LABELS}
-            value={draft.kind}
-            onChange={(kind) => patch({ kind })}
-          />
+        <div className="grid gap-5 border-t border-neutral-100 pt-5 tab:grid-cols-2">
           <FilterOptions
             label="담긴 자료"
             options={MEDIA_LABELS}
@@ -215,7 +120,7 @@ export function CommunityDiscoveryPanel({
             onChange={(period) => patch({ period })}
           />
         </div>
-        {countCommunityDiscovery(draft) > 0 && (
+        {count > 0 && (
           <div className="rounded-xl bg-neutral-50 p-3">
             <p className="text-xs font-semibold text-neutral-700">선택한 조건</p>
             <AppliedFilters config={config} value={draft} onChange={setDraft} />
@@ -229,7 +134,7 @@ export function CommunityDiscoveryPanel({
         <Button
           intent="ghost"
           onClick={() => {
-            setDraft({})
+            setDraft(keepCategory(draft))
             setTag('')
             setError('')
           }}
@@ -245,7 +150,7 @@ export function CommunityDiscoveryPanel({
           }}
         >
           이 조건으로 보기
-          {countCommunityDiscovery(draft) > 0 ? ` · ${countCommunityDiscovery(draft)}` : ''}
+          {count > 0 ? ` · ${count}` : ''}
         </Button>
       </footer>
     </>

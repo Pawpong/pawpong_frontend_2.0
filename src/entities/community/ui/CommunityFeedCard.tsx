@@ -144,7 +144,7 @@ const CommunityFeedCard = ({
       </div>
       {wide && text && (
         <Link href={href} prefetch={false} className="mb-4 block rounded focus-ring">
-          <p className="line-clamp-4 text-[0.9375rem] leading-7 font-normal whitespace-pre-line text-neutral-850">
+          <p className="line-clamp-4 text-body-md font-normal whitespace-pre-line text-neutral-850 tab:text-body-lg">
             {text}
           </p>
         </Link>
