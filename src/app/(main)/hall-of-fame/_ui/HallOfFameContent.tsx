@@ -15,7 +15,7 @@ const HISTORY_PAGE_SIZE = 10
 const PastPeriod = ({ hallOfFame }: { hallOfFame: CommunityHallOfFame }) => {
   const { year, title, range } = formatHallOfFamePeriod(hallOfFame)
 
-  const isEmpty = hallOfFame.winners.length === 0
+  const isEmpty = hallOfFame.winners.length === 0 && !hallOfFame.unavailableRanks?.length
 
   return (
     <article
@@ -49,7 +49,12 @@ const PastPeriod = ({ hallOfFame }: { hallOfFame: CommunityHallOfFame }) => {
           >
             {toRankSlots(hallOfFame.winners).map(({ rank, winner }) => (
               <li key={rank} className="shrink-0 snap-center">
-                <PodiumCard rank={rank} winner={winner} state={hallOfFame.state} />
+                <PodiumCard
+                  rank={rank}
+                  winner={winner}
+                  state={hallOfFame.state}
+                  unavailable={hallOfFame.unavailableRanks?.includes(rank)}
+                />
               </li>
             ))}
           </ol>
@@ -107,7 +112,7 @@ const HallOfFameContent = () => {
               <ListState
                 isPending={current.isPending}
                 isError={current.isError}
-                isEmpty={winners.length === 0}
+                isEmpty={winners.length === 0 && !current.data?.unavailableRanks?.length}
                 loadingText="명예의 동물을 불러오는 중입니다."
                 errorText="명예의 동물을 불러오지 못했습니다."
                 emptyText="이번 회차는 아직 집계 중이에요. 커뮤니티에 자랑글을 올려보세요!"
@@ -115,6 +120,7 @@ const HallOfFameContent = () => {
                 <HallOfFamePodium
                   winners={winners}
                   state={current.data?.state ?? 'open'}
+                  unavailableRanks={current.data?.unavailableRanks}
                   className="pc:h-[26rem]"
                 />
               </ListState>
