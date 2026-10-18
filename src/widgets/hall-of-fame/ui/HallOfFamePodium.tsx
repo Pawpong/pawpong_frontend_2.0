@@ -6,7 +6,7 @@ import { useAuthReadSession } from '@/shared/lib/useAuthReadSession'
 import { isSessionImageSource, sessionImageSource } from '@/shared/lib/sessionImageSource'
 import Link from 'next/link'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import type { CommunityHallOfFameWinner } from '@/shared/types'
+import type { CommunityHallOfFame, CommunityHallOfFameWinner } from '@/shared/types'
 import { FavoriteIcon, PawPrintIcon } from '@/shared/assets'
 import { ProfileAvatar } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
@@ -14,6 +14,7 @@ import 'swiper/css'
 
 interface HallOfFamePodiumProps {
   winners: CommunityHallOfFameWinner[]
+  state: CommunityHallOfFame['state']
   className?: string
 }
 
@@ -178,7 +179,33 @@ const PixelFrame = ({ winner, rank }: { winner?: CommunityHallOfFameWinner; rank
   )
 }
 
-const PodiumCard = ({ winner, rank }: { winner?: CommunityHallOfFameWinner; rank: 1 | 2 | 3 }) => {
+const PodiumCard = ({
+  winner,
+  rank,
+  state = 'final',
+}: {
+  winner?: CommunityHallOfFameWinner
+  rank: 1 | 2 | 3
+  state?: CommunityHallOfFame['state']
+}) => {
+  if (!winner)
+    return (
+      <article
+        aria-label={`${rank}위 · ${state === 'open' ? '집계 중' : '선정된 글 없음'}`}
+        className="relative z-10 flex w-[9.25rem] shrink-0 flex-col items-center gap-2 rounded-xl border border-dashed border-secondary-500 bg-white/60 p-2 pc:w-[16.3125rem] pc:px-4 pc:py-2"
+      >
+        <div className="flex h-[7.0625rem] w-[8.25rem] flex-col items-center justify-center gap-2 pc:h-[12.1875rem] pc:w-[14.3125rem]">
+          <span className="text-xs font-semibold text-primary-700 pc:text-sm">{rank}위</span>
+          <PawPrintIcon className="size-8 text-secondary-600 pc:size-12" aria-hidden="true" />
+          <span className="text-sm font-semibold text-neutral-700">
+            {state === 'open' ? '집계 중' : '선정된 글 없음'}
+          </span>
+        </div>
+        <p className="py-1 text-center text-xs leading-[1.5] text-neutral-600 pc:py-2 pc:text-sm">
+          {state === 'open' ? '아직 후보가 없어요' : '이 순위는 비어 있어요'}
+        </p>
+      </article>
+    )
   const author = (
     <>
       <ProfileAvatar
@@ -188,13 +215,16 @@ const PodiumCard = ({ winner, rank }: { winner?: CommunityHallOfFameWinner; rank
         className="shrink-0"
       />
       <span className="min-w-0 truncate text-xs leading-[1.5] font-semibold text-neutral-850 pc:text-base">
-        {winner?.author.nickname ?? '수상자 없음'}
+        {winner.author.nickname}
       </span>
     </>
   )
 
   return (
     <article className="relative z-10 flex w-[9.25rem] shrink-0 flex-col items-center gap-2 rounded-xl bg-white p-2 shadow-[0_7px_7px_rgba(55,55,55,0.1)] pc:w-[16.3125rem] pc:px-4 pc:py-2">
+      <span className="absolute top-2 left-2 z-30 rounded-md bg-primary-700 px-2 py-0.5 text-xs font-semibold text-white pc:top-3 pc:left-4 pc:text-sm">
+        {rank}위
+      </span>
       <PixelFrame winner={winner} rank={rank} />
 
       <div className="flex w-full items-center p-0.5 pc:p-1">
@@ -225,14 +255,14 @@ const PodiumCard = ({ winner, rank }: { winner?: CommunityHallOfFameWinner; rank
   )
 }
 
-/** 1~3위 슬롯 — 빈 순위는 winner 없이 '수상자 없음' 카드로 채운다. */
+/** 서버 순위를 그대로 유지하며, 비어 있는 순위는 회차 상태에 맞춰 안내한다. */
 const toRankSlots = (winners: CommunityHallOfFameWinner[]) =>
   ([1, 2, 3] as const).map((rank) => ({
     rank,
     winner: winners.find((winner) => winner.rank === rank),
   }))
 
-const HallOfFamePodium = ({ winners, className }: HallOfFamePodiumProps) => {
+const HallOfFamePodium = ({ winners, state, className }: HallOfFamePodiumProps) => {
   const ranked = toRankSlots(winners)
 
   return (
@@ -255,7 +285,7 @@ const HallOfFamePodium = ({ winners, className }: HallOfFamePodiumProps) => {
       >
         {ranked.map(({ rank, winner }) => (
           <SwiperSlide key={rank} className="!flex !h-full !w-[9.25rem] !items-center">
-            <PodiumCard winner={winner} rank={rank} />
+            <PodiumCard winner={winner} rank={rank} state={state} />
           </SwiperSlide>
         ))}
       </Swiper>
@@ -270,7 +300,7 @@ const HallOfFamePodium = ({ winners, className }: HallOfFamePodiumProps) => {
               rank !== 1 && 'flex h-full items-end',
             )}
           >
-            <PodiumCard winner={winner} rank={rank} />
+            <PodiumCard winner={winner} rank={rank} state={state} />
           </div>
         ))}
       </div>
