@@ -25,10 +25,14 @@ const BREEDER_HOME_TABS: HomeTabConfig[] = [
 // 브리더 마이홈은 시안(3170-825849)이 '게시글' 표기 — 입양자 마이홈의 '내가 쓴 글'과 다르다
 const BREEDER_MY_HOME_TABS: HomeTabConfig[] = [HOME_TAB.listings, HOME_TAB.posts, HOME_TAB.aiPhotos]
 
-// 마이홈 사이드바 하단 이동 링크 — 전체메뉴에만 있던 내 계정 화면들을 마이홈에 모은다
+// 마이홈 사이드바 하단 이동 링크 — 전체메뉴에만 있던 내 계정 화면들을 마이홈에 모은다.
+// 나의 활동은 활동 단계 기능이 켜져 있을 때만 MyHomeContent 가 남긴다
+const MY_ACTIVITY_HREF = '/my-activity'
+
 const MY_HOME_SIDE_LINKS = [
   { label: '관심 목록', href: '/bookmarks' },
   { label: '신청·후기', href: '/activity' },
+  { label: '나의 활동', href: MY_ACTIVITY_HREF },
   { label: '설정', href: '/settings' },
 ]
 
@@ -36,6 +40,7 @@ const MY_HOME_SIDE_LINKS = [
 const BREEDER_MY_HOME_SIDE_LINKS = [
   { label: '관심 목록', href: '/bookmarks' },
   { label: '신청·후기', href: '/activity' },
+  { label: '나의 활동', href: MY_ACTIVITY_HREF },
   { label: '신청서 질문 관리', href: '/adoption/application-form' },
   { label: '인증 서류 관리', href: '/profile/verification' },
   { label: '설정', href: '/settings' },
@@ -73,6 +78,7 @@ export {
   MY_HOME_TABS,
   BREEDER_HOME_TABS,
   BREEDER_MY_HOME_TABS,
+  MY_ACTIVITY_HREF,
   MY_HOME_SIDE_LINKS,
   BREEDER_MY_HOME_SIDE_LINKS,
   MY_HOME_TAB_PANEL,

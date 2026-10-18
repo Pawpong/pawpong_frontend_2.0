@@ -33,7 +33,7 @@ function renderDiscoveryQuery(config, query = 'media=map') {
       getFirstPhotoPostId: nothing,
     },
     '@/entities/gamification': { ActivityBadgeRow: nothing },
-    '@/features/gamification': { ActivityEntry: nothing, usePublicActivityBadges: () => [] },
+    '@/features/gamification': { usePublicActivityBadges: () => [] },
     '@/features/community': {
       useDeletePostConfirm: () => ({ modalProps: {} }),
       ConnectedFeedCard: nothing,

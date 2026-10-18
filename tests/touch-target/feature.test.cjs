@@ -5,14 +5,13 @@ const fs = require('node:fs')
 const read = (file) => fs.readFileSync(file, 'utf8')
 const ui = 'src/app/(main)/community/_ui'
 
-test('커뮤니티 알약 버튼과 활동 단계 진입 링크는 공통 터치 영역을 씀', () => {
+test('커뮤니티 알약 버튼은 공통 터치 영역을 씀', () => {
   for (const file of [
     `${ui}/discovery/FilterControls.tsx`,
     `${ui}/CommunityFeedMeta.tsx`,
     `${ui}/CommunityExperiencePanel.tsx`,
     `${ui}/CommunityRecordFields.tsx`,
     `${ui}/CommunityExperienceEditor.tsx`,
-    'src/features/gamification/ui/ActivityEntry.tsx',
   ]) {
     const code = read(file)
     assert.match(code, /touch-target/, file)
