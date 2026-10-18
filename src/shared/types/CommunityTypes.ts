@@ -226,6 +226,8 @@ export interface CommunityHallOfFame {
   state: 'open' | 'final'
   refreshedAt: string
   /** 0~3건. 회차에 글이 없으면 빈 배열 (서버가 폴백하지 않는다) */
+  /** 수상 기록은 있지만 현재 열람할 수 없는 게시글의 순위 */
+  unavailableRanks?: number[]
   winners: CommunityHallOfFameWinner[]
 }
 export interface CommunityRoutePoint {

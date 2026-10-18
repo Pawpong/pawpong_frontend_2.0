@@ -9,7 +9,8 @@ import { HallOfFamePodium } from './HallOfFamePodium'
 
 const HallOfFame = () => {
   const current = useQuery({ ...communityQueries.hallOfFameCurrent(), throwOnError: false })
-  const isCurrentEmpty = current.data?.winners.length === 0
+  const isCurrentEmpty =
+    current.data?.winners.length === 0 && !current.data?.unavailableRanks?.length
   // 서버는 회차 초반 빈 회차를 폴백하지 않으므로, 홈에서는 직전 확정 회차를 대신 보여준다.
   const history = useInfiniteQuery({
     ...communityQueries.hallOfFameHistory(1),
@@ -19,7 +20,7 @@ const HallOfFame = () => {
 
   const hallOfFame = isCurrentEmpty ? flattenPages(history.data)[0] : current.data
   const winners = hallOfFame?.winners ?? []
-  const hasWinners = winners.length > 0
+  const hasWinners = winners.length > 0 || Boolean(hallOfFame?.unavailableRanks?.length)
   const period = hallOfFame && formatHallOfFamePeriod(hallOfFame)
 
   return (
@@ -64,7 +65,11 @@ const HallOfFame = () => {
               errorText="명예의 동물을 불러오지 못했습니다."
               emptyText="아직 선정된 명예의 동물이 없습니다."
             >
-              <HallOfFamePodium winners={winners} state={hallOfFame?.state ?? 'open'} />
+              <HallOfFamePodium
+                winners={winners}
+                state={hallOfFame?.state ?? 'open'}
+                unavailableRanks={hallOfFame?.unavailableRanks}
+              />
             </ListState>
           </div>
         </div>
