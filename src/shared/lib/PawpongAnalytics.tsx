@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import {
+  analyticsCampaign,
   analyticsEnabled,
   analyticsPage,
   analyticsReferrer,
@@ -49,6 +50,8 @@ export function PawpongAnalytics() {
       // Update engagement context even on excluded authentication/callback routes.
       browser.gtag?.('set', parameters)
       if (!page) return
+      // GA reads campaign source from the landing page_location; later views stay template-only.
+      const campaign = previousPage.current === null ? analyticsCampaign(location.search) : ''
       previousPage.current = safeUrl
 
       // Lock the transport for this document so a late capability event never double counts.
@@ -84,7 +87,11 @@ export function PawpongAnalytics() {
         script.src = `https://www.googletagmanager.com/gtm.js?id=${GTM_CONTAINER_ID}`
         document.head.appendChild(script)
       }
-      browser.dataLayer.push({ event: 'pawpong_page_view', ...parameters })
+      browser.dataLayer.push({
+        event: 'pawpong_page_view',
+        ...parameters,
+        ...(campaign ? { page_location: `${safeUrl}?${campaign}` } : {}),
+      })
     }
 
     // Only the first view waits for RN's onLoad capability injection. Later committed

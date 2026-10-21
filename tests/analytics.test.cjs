@@ -60,11 +60,30 @@ test('referrers retain origin or safe route only', () => {
   assert.equal(policy.analyticsReferrer('javascript:alert(1)'), '')
 })
 
+test('landing campaign keeps fixed ad keys only and drops contact data, URLs and search terms', () => {
+  assert.equal(
+    policy.analyticsCampaign(
+      '?utm_source=instagram&utm_medium=paid_social&utm_campaign=가을_입양&utm_content=card+a&utm_id=120212345678901234&gclid=Cj0KCQ-abc_1',
+    ),
+    'utm_source=instagram&utm_medium=paid_social&utm_campaign=%EA%B0%80%EC%9D%84_%EC%9E%85%EC%96%91&utm_content=card+a&utm_id=120212345678901234&gclid=Cj0KCQ-abc_1',
+  )
+  assert.equal(
+    policy.analyticsCampaign(
+      '?utm_source=me@example.com&utm_medium=010-1234-5678&utm_campaign=https://evil.test&utm_term=private+search&fbclid=x&token=secret&q=private',
+    ),
+    '',
+  )
+  assert.equal(policy.analyticsCampaign(`?utm_source=${'a'.repeat(101)}&utm_campaign=<script>`), '')
+  assert.equal(policy.analyticsCampaign('?gclid=abc.def'), '')
+  assert.equal(policy.analyticsCampaign(''), '')
+})
+
 function componentSession({
   native = false,
   debug = false,
   host = 'pawpong.kr',
   webview = false,
+  search = '',
 } = {}) {
   const queue = [],
     scripts = [],
@@ -132,7 +151,7 @@ function componentSession({
           : policy,
     browser,
     document,
-    { hostname: host },
+    { hostname: host, search },
     { userAgent: native || webview ? 'Android PawpongApp/1.0' : 'Browser' },
     { env: { NEXT_PUBLIC_APP_ENV: 'production', NEXT_PUBLIC_ANALYTICS_DEBUG: String(debug) } },
   )
@@ -164,6 +183,29 @@ test('SPA navigation sends one page_view per visit, including return navigation;
   assert.equal(session.scripts.length, 1)
   assert.equal(JSON.stringify(events).includes('/one'), false)
   assert.equal(JSON.stringify(events).includes('/two'), false)
+})
+
+test('only the landing page_view carries campaign keys; later views and the shared model stay template-only', () => {
+  const session = componentSession({
+    search: '?utm_source=instagram&utm_campaign=fall&email=me@example.com&postId=secret',
+  })
+  session.render('/community')
+  session.render('/explore')
+  const views = session.queue.filter((item) => item.event === 'pawpong_page_view')
+  assert.deepEqual(
+    views.map((view) => view.page_location),
+    [
+      'https://pawpong.kr/community?utm_source=instagram&utm_campaign=fall',
+      'https://pawpong.kr/explore',
+    ],
+  )
+  const others = session.queue.filter((item) => item.event !== 'pawpong_page_view')
+  assert.equal(JSON.stringify(others).includes('utm_'), false)
+  assert.equal(JSON.stringify(session.queue).includes('secret'), false)
+  assert.equal(JSON.stringify(session.queue).includes('example.com'), false)
+  const native = componentSession({ native: true, search: '?utm_source=instagram' })
+  native.render('/community')
+  assert.equal(JSON.stringify(native.messages).includes('utm_'), false)
 })
 
 test('new Android uses native screen views without any web GTM; development remains silent', () => {
