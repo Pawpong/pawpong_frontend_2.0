@@ -14,6 +14,16 @@ const pages: Record<string, string> = {
   '/bookmarks': 'bookmarks',
   '/care-map': 'care_map',
   '/playground': 'playground',
+  '/playground/cards': 'play_cards',
+  '/playground/walk-card': 'walk_card',
+  '/playground/taste': 'pet_taste',
+  '/playground/bti': 'pet_bti',
+  '/playground/outing': 'outing_checklist',
+  '/playground/memory-card': 'memory_card',
+  '/playground/pet': 'playground_pet',
+  '/level': 'level',
+  '/my-activity': 'my_activity',
+  '/app': 'app_download',
   '/activity': 'activity',
   '/drafts': 'drafts',
   '/profile/edit': 'profile_edit',
@@ -36,6 +46,7 @@ const pages: Record<string, string> = {
 }
 
 const dynamicPages: [RegExp, string, string][] = [
+  [/^\/playground\/cards\/[^/]+$/, '/playground/cards/:card', 'play_card'],
   [/^\/home\/[^/]+$/, '/home/:user', 'user_home'],
   [/^\/community\/post\/[^/]+$/, '/community/post/:post', 'community_post'],
   [/^\/community\/post\/[^/]+\/edit$/, '/community/post/:post/edit', 'community_edit'],
@@ -50,7 +61,7 @@ const dynamicPages: [RegExp, string, string][] = [
     'application_edit',
   ],
   [/^\/activity\/(?:received-reviews|reviews)\/[^/]+$/, '/activity/reviews/:review', 'review'],
-  [/^\/signup\/(?:adopter|breeder)(?:\/[^/]+)?$/, '/signup/:type/:step', 'signup_step'],
+  [/^\/signup\/(?:adopter|general|breeder)(?:\/[^/]+)?$/, '/signup/:type/:step', 'signup_step'],
 ]
 
 /** Only route templates leave the device. Queries, hashes and user-provided titles never do. */

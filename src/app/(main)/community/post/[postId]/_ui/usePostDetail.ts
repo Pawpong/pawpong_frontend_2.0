@@ -10,13 +10,13 @@ import {
   useDeleteCommunityPost,
 } from '@/features/community'
 import { useMe } from '@/features/auth'
-import type { CommunityPostCard, PaginationResponse } from '@/shared/types'
+import type { CommunityPostCard, CommunityPostDetail, PaginationResponse } from '@/shared/types'
 
 /**
  * 게시글 상세에 필요한 데이터·액션 — PostDetailPanel이 쓰고, 그 패널을 풀페이지(PostDetailContent)와
  * 모달(PostDetailDialog)이 공유해 항상 같은 로직·같은 레이아웃으로 그린다.
  */
-const usePostDetail = (postId: string) => {
+const usePostDetail = (postId: string, publicPost?: CommunityPostDetail) => {
   const router = useRouter()
   // [refactored] useAuthStatus + profileQueries.me 조합을 useMe로
   const { me, isLoggedIn } = useMe()
@@ -40,7 +40,7 @@ const usePostDetail = (postId: string) => {
 
   const postQuery = useQuery({
     ...communityQueries.detail(postId),
-    placeholderData: placeholder,
+    placeholderData: placeholder ?? publicPost,
     refetchOnMount: 'always',
     throwOnError: false,
   })
@@ -75,9 +75,9 @@ const usePostDetail = (postId: string) => {
     isFetching: postQuery.isFetching,
     isOwner,
     toggleLike,
-    isLikePending,
+    isLikePending: isLikePending || postQuery.isPlaceholderData,
     toggleBookmark,
-    isBookmarkPending,
+    isBookmarkPending: isBookmarkPending || postQuery.isPlaceholderData,
     confirmDeletePost,
     setConfirmDeletePost,
     handleDeletePost,

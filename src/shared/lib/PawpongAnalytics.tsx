@@ -10,6 +10,7 @@ import {
 } from './analyticsPolicy'
 
 type AnalyticsWindow = Window & {
+  __pawpongAnalyticsTransport?: 'native' | 'web'
   dataLayer?: unknown[]
   gtag?: (...args: unknown[]) => void
   ReactNativeWebView?: { postMessage: (message: string) => void }
@@ -51,12 +52,14 @@ export function PawpongAnalytics() {
       previousPage.current = safeUrl
 
       // Lock the transport for this document so a late capability event never double counts.
+      transport.current ??= browser.__pawpongAnalyticsTransport ?? null
       transport.current ??=
         browser.__PAWPONG_APP__?.platform === 'android' &&
         browser.__PAWPONG_APP__?.capabilities?.analytics &&
         browser.ReactNativeWebView
           ? 'native'
           : 'web'
+      browser.__pawpongAnalyticsTransport = transport.current
       if (transport.current === 'native') {
         browser.ReactNativeWebView?.postMessage(
           JSON.stringify({

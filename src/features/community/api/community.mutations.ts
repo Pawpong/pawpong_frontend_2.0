@@ -1,5 +1,8 @@
 'use client'
 
+import { isCommunityPostHeld } from '@/entities/community'
+import { trackAction } from '@/shared/lib/analyticsEvents'
+
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type {
   CommunityPostReportRequest,
@@ -22,7 +25,11 @@ export const useCreateCommunityPost = () => {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (data: CreateCommunityPostRequest) => createCommunityPost(data),
-    onSuccess: () => invalidateCommunityPostLists(qc),
+    onSuccess: (post) => {
+      if (post.status === 'published' && post.visibility === 'public' && !isCommunityPostHeld(post))
+        trackAction('pawpong_post_publish', 'community')
+      return invalidateCommunityPostLists(qc)
+    },
   })
 }
 

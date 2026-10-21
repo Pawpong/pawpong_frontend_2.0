@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { trackAction } from '@/shared/lib/analyticsEvents'
 import { PawPrintIcon } from '@/shared/assets'
 import { Button } from '@/shared/ui/Button'
 import { RadioCardGroup } from '@/shared/ui/RadioCardGroup'
@@ -31,12 +32,21 @@ function Discovery({ owner }: { owner: string }) {
   const timer = useRef<number | undefined>(undefined)
   const resultHeading = useRef<HTMLHeadingElement>(null)
   const choices = useRef<HTMLDivElement>(null)
+  const completed = useRef(false)
   const size = outingDeckSize(setting, pace)
   const card = turn === null || drawing ? null : outingCard(setting, pace, turn)
 
   useEffect(() => () => window.clearTimeout(timer.current), [])
   useEffect(() => {
-    if (turn === null) return
+    if (turn === null) {
+      completed.current = false
+      return
+    }
+    // Browsing another card is still the same play. Choosing again starts a new one.
+    if (!completed.current) {
+      completed.current = true
+      trackAction('pawpong_play_complete', 'outing')
+    }
     resultHeading.current?.focus({ preventScroll: true })
     resultHeading.current?.scrollIntoView({ block: 'nearest' })
   }, [turn])

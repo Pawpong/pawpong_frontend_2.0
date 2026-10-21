@@ -1,5 +1,7 @@
 'use client'
 
+import { trackAction } from '@/shared/lib/analyticsEvents'
+
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { applicationQueries } from '@/entities/application'
 import type { ApplicationCreateRequest, ApplicationUpdateRequest } from '@/shared/types'
@@ -10,6 +12,7 @@ export const useCreateApplication = () => {
   return useMutation({
     mutationFn: (data: ApplicationCreateRequest) => createApplication(data),
     onSuccess: () => {
+      trackAction('generate_lead', 'adoption_application')
       void qc.invalidateQueries({ queryKey: applicationQueries.all() })
     },
   })
