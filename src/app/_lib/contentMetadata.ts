@@ -1,9 +1,9 @@
 import 'server-only'
 import { cache } from 'react'
+import { getPublicCommunityPost } from './publicCommunityPost'
 import type {
   ApiResponseFull,
   AdoptionPetDetail,
-  CommunityPostDetail,
   AdopterPublicProfile,
   BreederPublicProfile,
   Notice,
@@ -50,9 +50,7 @@ export const getAdoptionMetadata = async (id: string) => {
 
 export const getPostMetadata = async (id: string) => {
   const path = `/community/post/${encodeURIComponent(id)}`
-  const post = await getPublicData<
-    Pick<CommunityPostDetail, 'title' | 'body' | 'photoUrls' | 'visibility' | 'status'>
-  >(`/community/posts/${encodeURIComponent(id)}`)
+  const post = await getPublicCommunityPost(id)
   if (!post || post.visibility !== 'public' || post.status !== 'published') return unavailable(path)
   return createPageMetadata({
     title: post.title || summarizeShareText(post.body, 50) || '커뮤니티 게시글',

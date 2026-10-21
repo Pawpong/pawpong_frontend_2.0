@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { FavoriteIcon, PawPrintIcon, PixelArrowRightIcon, ProfileStarIcon } from '@/shared/assets'
 import { TicketLink } from '@/shared/ui/Ticket'
 import { BTI_NAME } from '../constants/discovery'
@@ -76,6 +77,13 @@ export function PlaygroundPlayShelf() {
           </li>
         ))}
       </ul>
+      <Link
+        href="/playground/cards"
+        className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-primary-600 underline underline-offset-4 focus-ring"
+      >
+        놀이 카드 모아보기
+        <PixelArrowRightIcon aria-hidden className="size-3" />
+      </Link>
     </section>
   )
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useReducer, useRef } from 'react'
+import { trackAction } from '@/shared/lib/analyticsEvents'
 import { ArrowBackIcon, PixelArrowRightIcon } from '@/shared/assets'
 import { PixelChoiceButton } from '@/shared/ui/PixelChoiceButton'
 import { PixelProgressBar } from '@/shared/ui/PixelProgressBar'
@@ -91,6 +92,17 @@ export function PlayQuiz({
   const question = questions[step]
   const answered = answers[step] !== undefined
   const result = phase === 'done' ? getResult(answers) : null
+  const trackedResult = useRef(false)
+  useEffect(() => {
+    if (!result) {
+      trackedResult.current = false
+      return
+    }
+    if (!trackedResult.current) {
+      trackedResult.current = true
+      trackAction('pawpong_play_complete', id)
+    }
+  }, [result, id])
   const percent = phase === 'asking' ? Math.round((step / total) * 100) : 100
   const headingId = `${id}-question`
 

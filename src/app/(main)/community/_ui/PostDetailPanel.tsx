@@ -5,6 +5,7 @@ import { ActivityBadgeRow, BreederLevelBadge } from '@/entities/gamification'
 import { usePublicActivityBadges } from '@/features/gamification'
 
 import type { ReactNode } from 'react'
+import type { CommunityPostDetail } from '@/shared/types'
 import {
   AsyncState,
   DeleteConfirmModal,
@@ -36,6 +37,7 @@ import { CommunityPostReviewPanel } from './CommunityPostReviewPanel'
  */
 interface PostDetailPanelProps {
   postId: string
+  publicPost?: CommunityPostDetail
   /** side-by-side: pc 모달 · stacked: tab 모달·mo 페이지 공용 */
   layout: 'side-by-side' | 'stacked'
   /** 헤더 오른쪽 끝 아이콘 — 모달은 닫기(X), mo 페이지는 목록으로 */
@@ -47,7 +49,13 @@ interface PostDetailPanelProps {
 const COMPOSER_CLASS =
   'shrink-0 border-t border-neutral-150 bg-base-white px-4 pb-[env(safe-area-inset-bottom)]'
 
-const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDetailPanelProps) => {
+const PostDetailPanel = ({
+  postId,
+  publicPost,
+  layout,
+  trailingAction,
+  className,
+}: PostDetailPanelProps) => {
   const {
     router,
     post,
@@ -64,7 +72,7 @@ const PostDetailPanel = ({ postId, layout, trailingAction, className }: PostDeta
     handleDeletePost,
     isDeletePending,
     isFetching: isRetrying,
-  } = usePostDetail(postId)
+  } = usePostDetail(postId, publicPost)
   // 좋아요·북마크는 비로그인 요청이 401로 떨어지므로 먼저 로그인으로 유도한다
   const { guard, isPromptOpen, setPromptOpen } = useLoginGuard()
   // 목록과 입력창이 서로 떨어진 자리에 배치되므로 스레드 상태는 여기서 한 번만 만든다
