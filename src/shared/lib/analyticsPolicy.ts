@@ -72,6 +72,31 @@ export function analyticsPage(pathname: string): { path: string; screen: string 
   return dynamic ? { path: dynamic[1], screen: dynamic[2] } : null
 }
 
+// utm_term is left out: it can carry a search keyword. fbclid is unused by GA.
+const CAMPAIGN_KEYS = [
+  'utm_source',
+  'utm_medium',
+  'utm_campaign',
+  'utm_content',
+  'utm_id',
+  'gclid',
+] as const
+
+/** Ad attribution for the landing view only: fixed keys, short plain values, never contact data or URLs. */
+export function analyticsCampaign(search: string): string {
+  const params = new URLSearchParams(search)
+  const kept = new URLSearchParams()
+  for (const key of CAMPAIGN_KEYS) {
+    const value = params.get(key)?.trim()
+    if (!value || value.length > 100) continue
+    if (key === 'gclid' ? !/^[\w-]+$/.test(value) : !/^[\p{L}\p{N} _.+:-]+$/u.test(value)) continue
+    // Numeric ad IDs stay; Korean mobile numbers do not.
+    if (key !== 'gclid' && /(^|\D)01[016789][-.\s]?\d{3,4}[-.\s]?\d{4}(\D|$)/.test(value)) continue
+    kept.set(key, value)
+  }
+  return kept.toString()
+}
+
 export function analyticsEnabled(
   hostname: string,
   environment: string | undefined,
