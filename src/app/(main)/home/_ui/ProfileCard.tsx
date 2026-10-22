@@ -22,8 +22,7 @@ import { cn } from '@/shared/lib/cn'
 import { normalizeApiError } from '@/shared/api'
 import { formatBreederLocation } from '@/shared/lib/formatBreederLocation'
 import { profileQueries } from '@/entities/profile'
-import { useAuthStatus, useLoginGuard } from '@/features/auth'
-import { ReportBreederAction } from '@/features/report'
+import { useLoginGuard } from '@/features/auth'
 import { useFollowUser, useUnfollowUser, useRemoveFollower } from '@/features/profile'
 import { useCreateOrGetChatRoom } from '@/features/send-message'
 import type {
@@ -33,6 +32,7 @@ import type {
   PaginationResponse,
 } from '@/shared/types'
 import { FavoriteBreederIconButton } from './FavoriteBreederIconButton'
+import { PublicProfileActions } from './PublicProfileActions'
 
 // 백엔드 FollowUserCard → 모달이 쓰는 FollowUser (맞팔 여부는 두 플래그 조합)
 const toFollowUser = (card: FollowUserCard): FollowUser => ({
@@ -224,11 +224,8 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip', menu }: Profile
   )
   const { mutate: unfollow } = useUnfollowUser()
   const { mutate: removeFollower } = useRemoveFollower()
-  // 남의 브리더 홈에서만 카드 우상단 즐겨찾기·신고를 띄운다
-  const showFavoriteAction = mode === 'breeder' && breederProfile !== null
-  // 브리더 신고는 입양자(비로그인 포함)에게만 보인다
-  const { isReady, isLoggedIn, userRole } = useAuthStatus()
-  const canReportBreeder = isReady && (!isLoggedIn || userRole === 'adopter')
+  // 남의 브리더 홈에서만 팔로우·메시지 옆에 즐겨찾기 버튼을 둔다
+  const favoriteBreeder = mode === 'breeder' ? breederProfile : null
   // 특별시·광역시는 city/district 가 사실상 같은 지역이라(서울특별시/서울시) 그대로
   // 이어 붙이면 중복 표시된다 — 브리더 탐색 카드에서 고친 것과 같은 기준을 여기서도 적용
   const locationText = breederProfile
@@ -242,29 +239,18 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip', menu }: Profile
   const following = toFollowUsers(followingsQuery)
   const mutualFollowers = isVisitor ? toMutualFollowers(followersQuery) : []
 
-  // 즐겨찾기·더보기 — 2단(tab+)에서는 아바타 줄로, 모바일에서는 이름 줄로 자리를 옮긴다
-  const favoriteActions = showFavoriteAction ? (
-    <div className="flex shrink-0 items-center gap-1">
-      <FavoriteBreederIconButton
-        breederId={breederProfile.breederId}
-        isFavorited={breederProfile.isFavorited}
-        size="nav"
-      />
-      {canReportBreeder && <ReportBreederAction breederId={breederProfile.breederId} />}
-    </div>
-  ) : null
-  // [refactored] 2단 아바타 줄 우상단 — 남의 홈은 즐겨찾기·신고, 내 홈은 작성·수정 메뉴
-  const profileActions = (
-    <div className="flex shrink-0 items-center gap-1">
-      <ShareButton
-        url={`/home/${profileUserId}`}
-        title={`${profile.nickname}님의 홈`}
-        description={profile.bio}
-        imageUrl={profile.profileImageUrl}
-        ariaLabel="프로필 공유하기"
-      />
-      {favoriteActions}
-    </div>
+  // 공유(+남의 브리더 홈은 ⋯ 신고) — 2단(tab+)은 아바타 줄 오른쪽.
+  // 모바일에서 남의 홈은 상단 바가 같은 묶음을 갖고, 내 홈만 이름 줄에 공유를 둔다
+  const profileActions = isVisitor ? (
+    <PublicProfileActions profile={profile} />
+  ) : (
+    <ShareButton
+      url={`/home/${profileUserId}`}
+      title={`${profile.nickname}님의 홈`}
+      description={profile.bio}
+      imageUrl={profile.profileImageUrl}
+      ariaLabel="프로필 공유하기"
+    />
   )
   const cornerActions = (
     <div className="flex items-center gap-1">
@@ -278,8 +264,9 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip', menu }: Profile
       {/* [refactored] 아바타 + (이름·카운트·소개) + 액션을 한 행으로.
           모바일에서는 액션만 다음 줄로 감싸(w-full) 두 버튼이 눌리기 좋은 폭을 갖는다.
           sidebar 레이아웃은 PC 에서만 세로로 쌓는다.
-          즐겨찾기는 팔로우·메시지와 급이 다른 보조 토글이라(Figma 3349-2026986) 액션 행에
-          섞지 않고 이름 줄 오른쪽에 둔다 — 안 그러면 팔로우/메시지 폭이 좁아지고 위계가 깨진다. */}
+          즐겨찾기는 팔로우·메시지 옆 정사각 아이콘 버튼으로 둔다 — 두 버튼은 폭을 나눠 갖고
+          별만 고정 폭이라 위계가 유지된다. 이름 줄에 공유·별·신고를 늘어놓으면 모바일에서
+          긴 이름이 잘리고 어수선해서 옮겼다 (공유·신고는 상단 바·아바타 줄의 PublicProfileActions). */}
       <div
         className={cn(
           'mx-auto flex w-full max-w-168 flex-wrap items-start gap-x-4 gap-y-3',
@@ -311,9 +298,8 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip', menu }: Profile
             />
           )}
           <div className="flex w-full min-w-0 flex-1 flex-col gap-0.5">
-            {/* 즐겨찾기·신고는 카드가 유일한 진입점이다 (상단 nav 는 2단에서 사라진다).
-                절대배치 대신 이름 줄에 나란히 둬서 자리를 예약할 필요가 없다.
-                2단(tab+)에서는 아바타 줄로 옮겨가 여기선 숨긴다 */}
+            {/* 내 홈만 모바일 이름 줄에 공유를 둔다 (2단에서는 아바타 줄로 옮겨가 숨긴다).
+                남의 홈은 이름만 — 공유·더보기는 상단 바(모바일)와 아바타 줄(tab+)이 맡는다 */}
             <div className="flex items-start gap-1">
               {/* 내 홈은 이름 앞에 내 레벨 배지를 붙인다. 긴 이름은 이름만 줄인다 */}
               <div className="flex min-w-0 flex-1 items-center gap-1.5">
@@ -323,7 +309,7 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip', menu }: Profile
                   {profile.nickname}
                 </p>
               </div>
-              <div className={cn(isSidebar && 'tab:hidden')}>{profileActions}</div>
+              {!isVisitor && <div className={cn(isSidebar && 'tab:hidden')}>{profileActions}</div>}
             </div>
             {isVisitor && (
               <PublicActivityLevel
@@ -351,7 +337,8 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip', menu }: Profile
           </div>
         </div>
 
-        {/* 팔로우 + 메시지 — 동급 액션 두 개가 폭을 반씩 나눠 갖는다(ACTION_SIZE의 flex-1) */}
+        {/* 팔로우 + 메시지 — 동급 액션 두 개가 폭을 반씩 나눠 갖는다(ACTION_SIZE의 flex-1).
+            남의 브리더 홈은 끝에 즐겨찾기 정사각 버튼이 붙는다 */}
         {isVisitor && (
           <div
             className={cn(
@@ -361,6 +348,13 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip', menu }: Profile
             )}
           >
             <VisitorActions targetId={profileUserId} isFollowing={isFollowing} />
+            {favoriteBreeder && (
+              <FavoriteBreederIconButton
+                breederId={favoriteBreeder.breederId}
+                isFavorited={favoriteBreeder.isFavorited}
+                size="action"
+              />
+            )}
           </div>
         )}
       </div>
