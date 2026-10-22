@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { cn } from '@/shared/lib/cn'
 import { Badge, EmptyState } from '@/shared/ui'
 import { CheckIcon } from '@/shared/assets'
-import type { AdoptionDetailDto } from '@/shared/types'
+import type { AdoptionDetailDto, HealthCheckStatus } from '@/shared/types'
 import { TEXT } from '@/shared/config'
 import { DetailSection } from './DetailSection'
 
@@ -29,48 +29,63 @@ const TableRow = ({ className, children }: { className?: string; children: React
  */
 const HealthBlock = ({
   title,
-  completed,
+  status,
   completedLabel,
   isEmpty,
   incompleteReason,
   emptyText,
+  unsetText,
   children,
 }: {
   title: string
-  completed: boolean
+  /** 없으면 브리더가 아직 입력하지 않은 것 — '미완료'(안 했다고 밝힘)와 구분해 보여준다 */
+  status?: HealthCheckStatus
   completedLabel: string
   isEmpty: boolean
   /** 미완료 시 브리더가 직접 남긴 사유 — 있으면 기본 문구 대신 그대로 보여준다 */
   incompleteReason?: string
+  /** 상태는 골랐지만 세부 기록만 없을 때 */
   emptyText: string
+  /** 상태 자체를 입력하지 않았을 때 — 다음에 무엇을 하면 되는지 알려준다 */
+  unsetText: string
   children: ReactNode
-}) => (
-  <div className="flex flex-col gap-2">
-    <div className="flex items-center justify-between gap-2">
-      <p className={TEXT.sub}>{title}</p>
-      <Badge variant={completed ? 'primaryOutline' : 'neutralFilled'} size="lg">
-        {completed && <CheckIcon className="size-4" />}
-        <span>{completed ? completedLabel : '미완료'}</span>
-      </Badge>
-    </div>
+}) => {
+  const completed = status === 'completed'
+  // 입력하지 않은 것을 '미완료' 로 찍으면 접종을 하고 적지 않은 아이가 미접종으로 읽힌다.
+  const badgeLabel = completed ? completedLabel : status === 'incomplete' ? '미완료' : '미등록'
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center justify-between gap-2">
+        <p className={TEXT.sub}>{title}</p>
+        <Badge variant={completed ? 'primaryOutline' : 'neutralFilled'} size="lg">
+          {completed && <CheckIcon className="size-4" />}
+          <span>{badgeLabel}</span>
+        </Badge>
+      </div>
 
-    {!isEmpty ? (
-      <>
-        <Table>{children}</Table>
-        {!completed && incompleteReason && (
-          <p className="rounded-lg bg-neutral-50 p-3 text-sm leading-relaxed text-neutral-700">
-            {incompleteReason}
-          </p>
-        )}
-      </>
-    ) : (
-      // 사유만 문단으로 띄우면 일러스트가 사라져 "빈 상태"라는 신호가 없어진다.
-      // 일러스트는 그대로 두고 문구 자리에 사유를 넣는다 — 사유는 작성 폼에서 필수로 받는 값이라
-      // 레거시 글처럼 비어 있을 때만 기본 문구로 대체한다.
-      <EmptyState message={incompleteReason || emptyText} size="compact" />
-    )}
-  </div>
-)
+      {!isEmpty ? (
+        <>
+          <Table>{children}</Table>
+          {status === 'incomplete' && incompleteReason && (
+            <p className="rounded-lg bg-neutral-50 p-3 text-sm leading-relaxed text-neutral-700">
+              {incompleteReason}
+            </p>
+          )}
+        </>
+      ) : (
+        // 사유만 문단으로 띄우면 일러스트가 사라져 "빈 상태"라는 신호가 없어진다.
+        // 일러스트는 그대로 두고 문구 자리에 사유를 넣는다 — 사유는 작성 폼에서 필수로 받는 값이라
+        // 레거시 글처럼 비어 있을 때만 기본 문구로 대체한다.
+        <EmptyState
+          message={
+            (status === 'incomplete' && incompleteReason) || (status ? emptyText : unsetText)
+          }
+          size="compact"
+        />
+      )}
+    </div>
+  )
+}
 
 const HealthInfoCard = ({ detail }: { detail: AdoptionDetailDto }) => (
   <DetailSection title="건강 정보" emphasis>
@@ -79,10 +94,11 @@ const HealthInfoCard = ({ detail }: { detail: AdoptionDetailDto }) => (
       <HealthBlock
         title="예방 접종 현황"
         completedLabel="접종 완료"
-        completed={detail.health.vaccinationCompleted}
+        status={detail.health.vaccinationStatus}
         isEmpty={detail.health.vaccinations.length === 0}
         incompleteReason={detail.health.vaccinationIncompleteReason}
         emptyText="등록된 접종 정보가 없어요."
+        unsetText="브리더가 접종 정보를 등록하지 않았어요. 상담에서 확인해 주세요."
       >
         <TableRow className={cn('py-[0.25rem]', TEXT.sub)}>
           <span className="min-w-px flex-1">접종명</span>
@@ -102,10 +118,11 @@ const HealthInfoCard = ({ detail }: { detail: AdoptionDetailDto }) => (
       <HealthBlock
         title="유전병 검사"
         completedLabel="검사 완료"
-        completed={detail.health.geneticTestCompleted}
+        status={detail.health.geneticTestStatus}
         isEmpty={detail.health.geneticTest.results.length === 0}
         incompleteReason={detail.health.geneticTestIncompleteReason}
         emptyText="등록된 유전병 검사 정보가 없어요."
+        unsetText="브리더가 유전병 검사 정보를 등록하지 않았어요. 상담에서 확인해 주세요."
       >
         <TableRow>
           <span className={cn('min-w-px flex-1', TEXT.sub)}>검진일</span>
