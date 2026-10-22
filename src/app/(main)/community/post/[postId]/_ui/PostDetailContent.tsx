@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import type { CommunityPostDetail } from '@/shared/types'
 import { CloseIcon } from '@/shared/assets'
 import { useBreakpoint } from '@/shared/lib/useBreakpoint'
 import { PostDetailPanel } from '../../../_ui/PostDetailPanel'
@@ -8,6 +9,7 @@ import { iconButtonVariants } from '@/shared/ui'
 
 interface PostDetailContentProps {
   postId: string
+  publicPost?: CommunityPostDetail
 }
 
 const closeButton = (
@@ -25,7 +27,7 @@ const closeButton = (
  * PostDetailPanel을 그대로 쓴다. 예전에는 이 화면만 따로 구현돼 모달과 디자인이 어긋나 있었다.
  * mo는 페이지 전체를 채우고, tab+는 모달과 같은 카드 표면 안에 둔다.
  */
-const PostDetailContent = ({ postId }: PostDetailContentProps) => {
+const PostDetailContent = ({ postId, publicPost }: PostDetailContentProps) => {
   const isTabUp = useBreakpoint('tab')
   const isLapUp = useBreakpoint('lap')
 
@@ -35,6 +37,7 @@ const PostDetailContent = ({ postId }: PostDetailContentProps) => {
     return (
       <PostDetailPanel
         postId={postId}
+        publicPost={publicPost}
         layout="stacked"
         trailingAction={closeButton}
         className="h-[calc(100dvh-3rem)]"
@@ -52,6 +55,7 @@ const PostDetailContent = ({ postId }: PostDetailContentProps) => {
         </header>
         <PostDetailPanel
           postId={postId}
+          publicPost={publicPost}
           layout={isLapUp ? 'side-by-side' : 'stacked'}
           className="min-h-0 flex-1"
         />

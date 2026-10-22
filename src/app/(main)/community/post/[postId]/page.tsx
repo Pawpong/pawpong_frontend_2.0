@@ -1,3 +1,4 @@
+import { getPublicCommunityPost } from '@/app/_lib/publicCommunityPost'
 import { getPostMetadata } from '@/app/_lib/contentMetadata'
 import { PostDetailContent } from './_ui/PostDetailContent'
 
@@ -10,7 +11,8 @@ export const generateMetadata = async ({ params }: CommunityPostDetailPageProps)
 
 const CommunityPostDetailPage = async ({ params }: CommunityPostDetailPageProps) => {
   const { postId } = await params
-  return <PostDetailContent postId={postId} />
+  const publicPost = await getPublicCommunityPost(postId)
+  return <PostDetailContent postId={postId} publicPost={publicPost ?? undefined} />
 }
 
 export default CommunityPostDetailPage

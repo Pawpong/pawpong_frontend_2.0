@@ -34,6 +34,16 @@ const content = (fetch) =>
       'server-only': {},
       react: { cache: (fn) => fn },
       '@/shared/lib/metadata': meta,
+      './publicCommunityPost': load(
+        'src/app/_lib/publicCommunityPost.ts',
+        {
+          'server-only': {},
+          react: { cache: (fn) => fn },
+          'next/headers': { headers: async () => new Headers() },
+          '@/entities/community/api/community.api': { mapCommunityPostDetail: (value) => value },
+        },
+        { fetch, process: { env: { NEXT_PUBLIC_API_BASE_URL: 'https://api.example.test/' } } },
+      ),
     },
     { fetch, process: { env: { NEXT_PUBLIC_API_BASE_URL: 'https://api.example.test/' } } },
   )
@@ -58,8 +68,11 @@ test('private screens are noindex and have no user-specific canonical', () => {
 })
 
 test('public app metadata follows the content permalink for both platforms without root inheritance', () => {
-  const url = 'https://pawpong.kr/community/post/abc'
-  const result = meta.createPageMetadata({ title: '공개 글', path: '/community/post/abc' })
+  const url = 'https://pawpong.kr/community/post/0123456789abcdef01234567'
+  const result = meta.createPageMetadata({
+    title: '공개 글',
+    path: '/community/post/0123456789abcdef01234567',
+  })
   assert.deepEqual(result.itunes, { appId: '6814126823', appArgument: url })
   assert.equal(result.appLinks.ios.url, url)
   assert.equal(result.appLinks.ios.app_store_id, '6814126823')
@@ -104,12 +117,15 @@ test('public post metadata fetches anonymously without caching and uses its own 
       status: 'published',
     })
   })
-  const result = await api.getPostMetadata('abc')
+  const result = await api.getPostMetadata('0123456789abcdef01234567')
   assert.equal(result.title, '우리 고양이 | 포퐁')
   assert.equal(result.description, '반가워요 오늘도')
-  assert.equal(result.openGraph.url, 'https://pawpong.kr/community/post/abc')
+  assert.equal(result.openGraph.url, 'https://pawpong.kr/community/post/0123456789abcdef01234567')
   assert.equal(result.openGraph.images[0].url, 'https://images.example.test/cat.jpg')
-  assert.equal(seen[0].url, 'https://api.example.test/api/v2/community/posts/abc')
+  assert.equal(
+    seen[0].url,
+    'https://api.example.test/api/v2/community/posts/0123456789abcdef01234567',
+  )
   assert.equal(seen[0].options.credentials, 'omit')
   assert.equal(seen[0].options.cache, 'no-store')
   assert.equal(seen[0].options.headers, undefined)
@@ -129,7 +145,7 @@ test('private, followers-only and draft post metadata never contains private tex
         visibility,
         status,
       }),
-    ).getPostMetadata('secret')
+    ).getPostMetadata('0123456789abcdef01234567')
     assert.equal(result.robots.index, false)
     assert.doesNotMatch(JSON.stringify(result), /SECRET|secret\.test/)
     assert.equal(result.openGraph.images[0].url, site.SHARE_IMAGE)
@@ -146,7 +162,7 @@ test('missing, unauthorized, malformed and unavailable backend responses produce
       throw new Error('timeout')
     },
   ]) {
-    const result = await content(fetch).getPostMetadata('missing')
+    const result = await content(fetch).getPostMetadata('0123456789abcdef01234567')
     assert.equal(result.robots.index, false)
     assert.equal(result.openGraph.images[0].url, site.SHARE_IMAGE)
   }

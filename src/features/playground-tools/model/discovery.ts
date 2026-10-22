@@ -103,7 +103,7 @@ export function playCardText(card: PlayCard) {
   ].join('\n')
 }
 
-const ALL_PLAY_CARDS: readonly PlayCard[] = [
+export const ALL_PLAY_CARDS: readonly PlayCard[] = [
   ...Object.values(OUTING_DECKS).flatMap((paces) => Object.values(paces).flat()),
   ...Object.values(TASTE_CARDS),
   ...BTI_CARDS,

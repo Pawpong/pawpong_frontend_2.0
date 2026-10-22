@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import {
+  analyticsCampaign,
   analyticsEnabled,
   analyticsPage,
   analyticsReferrer,
@@ -10,6 +11,7 @@ import {
 } from './analyticsPolicy'
 
 type AnalyticsWindow = Window & {
+  __pawpongAnalyticsTransport?: 'native' | 'web'
   dataLayer?: unknown[]
   gtag?: (...args: unknown[]) => void
   ReactNativeWebView?: { postMessage: (message: string) => void }
@@ -48,15 +50,19 @@ export function PawpongAnalytics() {
       // Update engagement context even on excluded authentication/callback routes.
       browser.gtag?.('set', parameters)
       if (!page) return
+      // GA reads campaign source from the landing page_location; later views stay template-only.
+      const campaign = previousPage.current === null ? analyticsCampaign(location.search) : ''
       previousPage.current = safeUrl
 
       // Lock the transport for this document so a late capability event never double counts.
+      transport.current ??= browser.__pawpongAnalyticsTransport ?? null
       transport.current ??=
         browser.__PAWPONG_APP__?.platform === 'android' &&
         browser.__PAWPONG_APP__?.capabilities?.analytics &&
         browser.ReactNativeWebView
           ? 'native'
           : 'web'
+      browser.__pawpongAnalyticsTransport = transport.current
       if (transport.current === 'native') {
         browser.ReactNativeWebView?.postMessage(
           JSON.stringify({
@@ -81,7 +87,11 @@ export function PawpongAnalytics() {
         script.src = `https://www.googletagmanager.com/gtm.js?id=${GTM_CONTAINER_ID}`
         document.head.appendChild(script)
       }
-      browser.dataLayer.push({ event: 'pawpong_page_view', ...parameters })
+      browser.dataLayer.push({
+        event: 'pawpong_page_view',
+        ...parameters,
+        ...(campaign ? { page_location: `${safeUrl}?${campaign}` } : {}),
+      })
     }
 
     // Only the first view waits for RN's onLoad capability injection. Later committed

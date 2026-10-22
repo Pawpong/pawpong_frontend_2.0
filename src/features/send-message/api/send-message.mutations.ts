@@ -1,5 +1,7 @@
 'use client'
 
+import { trackAction } from '@/shared/lib/analyticsEvents'
+
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { chatQueries } from '@/entities/chat'
 import type { ChatRoomResponseDto, CreateRoomRequestDto } from '@/shared/types'
@@ -17,6 +19,7 @@ export const useCreateOrGetChatRoom = () => {
   return useMutation({
     mutationFn: (data: CreateRoomRequestDto) => createOrGetChatRoom(data),
     onSuccess: () => {
+      trackAction('pawpong_chat_open', 'chat')
       void qc.invalidateQueries({ queryKey: chatQueries.rooms().queryKey })
     },
   })

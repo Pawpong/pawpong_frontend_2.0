@@ -2,12 +2,16 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { useQuery } from '@tanstack/react-query'
+import { petConfigOptions } from '@/entities/playground-pet'
 import { CameraIcon, PixelArrowRightIcon, ShareIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { Button, buttonVariants } from '@/shared/ui/Button'
 import { Textarea } from '@/shared/ui/Textarea'
 import { ticketStyles, type TicketAccent } from '@/shared/ui/Ticket'
 import { PLAY_SHARE_MESSAGES, sharePlayCard } from '../lib/sharePlayCard'
+import { trackAction } from '@/shared/lib/analyticsEvents'
+import { playCardUrl } from '../model/playCardLinks'
 import { memoryCardHref, playCardText } from '../model/discovery'
 import type { PlayCard } from '../model/discovery.types'
 import { currentToolOwner } from '../model/useToolOwner'
@@ -59,6 +63,7 @@ export function PlayResultActions({
   owner: string
   from: 'outing' | 'taste' | 'bti'
 }) {
+  const petConfig = useQuery(petConfigOptions)
   const [status, setStatus] = useState('')
   const [fallback, setFallback] = useState(false)
   const [pending, setPending] = useState(false)
@@ -71,6 +76,8 @@ export function PlayResultActions({
     }
   }, [])
   const text = playCardText(card)
+  const url = playCardUrl(card, typeof window === 'undefined' ? undefined : window.location.origin)
+  const shareText = [text, url].join('\n\n')
   const current = () => alive.current && currentToolOwner() === owner
 
   async function share() {
@@ -79,8 +86,10 @@ export function PlayResultActions({
     setPending(true)
     setStatus('')
     try {
-      const outcome = await sharePlayCard(navigator, { title: card.title, text })
+      const outcome = await sharePlayCard(navigator, { title: card.title, text, url })
       if (!current()) return
+      if (outcome === 'shared' || outcome === 'copied')
+        trackAction('share', from, outcome === 'shared' ? 'native' : 'clipboard')
       if (outcome === 'fallback') setFallback(true)
       setStatus(PLAY_SHARE_MESSAGES[outcome])
     } finally {
@@ -110,12 +119,18 @@ export function PlayResultActions({
           {status}
         </p>
       </div>
+      <Link
+        href="/playground/cards"
+        className="inline-flex min-h-11 items-center text-sm font-semibold text-primary-600 underline underline-offset-4 focus-ring"
+      >
+        놀이 카드 모아보기
+      </Link>
       {fallback && (
         <label className="block text-sm font-semibold text-neutral-850">
           공유할 카드 내용
           <Textarea
             readOnly
-            value={text}
+            value={shareText}
             rows={8}
             className="mt-2 h-48"
             onFocus={(event) => event.currentTarget.select()}
@@ -126,28 +141,33 @@ export function PlayResultActions({
         <h3 className="text-sm font-semibold text-neutral-850">이어서 놀아볼까요?</h3>
         {/* 놀이터 첫 화면 티켓과 같은 색·라벨의 작은 티켓 링크 */}
         <ul className="mt-3 grid gap-3 tab:grid-cols-3">
-          {nextPlays(from).map((next) => (
-            <li key={next.href}>
-              <Link
-                href={next.href}
-                data-accent={next.accent}
-                className={cn(ticketStyles.accent, styles.nextPlay, 'h-full focus-ring')}
-              >
-                <span aria-hidden className={styles.nextTag}>
-                  {next.label}
-                </span>
-                <span className="min-w-0">
-                  <span className="block text-sm font-semibold break-keep text-neutral-850">
-                    {next.title}
+          {nextPlays(from)
+            .filter(
+              (next) =>
+                next.href !== '/playground/pet' || (petConfig.data?.enabled && !petConfig.isError),
+            )
+            .map((next) => (
+              <li key={next.href}>
+                <Link
+                  href={next.href}
+                  data-accent={next.accent}
+                  className={cn(ticketStyles.accent, styles.nextPlay, 'h-full focus-ring')}
+                >
+                  <span aria-hidden className={styles.nextTag}>
+                    {next.label}
                   </span>
-                  <span className="mt-0.5 block text-xs leading-5 break-keep text-neutral-700">
-                    {next.detail}
+                  <span className="min-w-0">
+                    <span className="block text-sm font-semibold break-keep text-neutral-850">
+                      {next.title}
+                    </span>
+                    <span className="mt-0.5 block text-xs leading-5 break-keep text-neutral-700">
+                      {next.detail}
+                    </span>
                   </span>
-                </span>
-                <PixelArrowRightIcon aria-hidden className="size-3 shrink-0 text-primary-600" />
-              </Link>
-            </li>
-          ))}
+                  <PixelArrowRightIcon aria-hidden className="size-3 shrink-0 text-primary-600" />
+                </Link>
+              </li>
+            ))}
         </ul>
       </nav>
     </div>

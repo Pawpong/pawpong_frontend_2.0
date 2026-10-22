@@ -14,6 +14,16 @@ const pages: Record<string, string> = {
   '/bookmarks': 'bookmarks',
   '/care-map': 'care_map',
   '/playground': 'playground',
+  '/playground/cards': 'play_cards',
+  '/playground/walk-card': 'walk_card',
+  '/playground/taste': 'pet_taste',
+  '/playground/bti': 'pet_bti',
+  '/playground/outing': 'outing_checklist',
+  '/playground/memory-card': 'memory_card',
+  '/playground/pet': 'playground_pet',
+  '/level': 'level',
+  '/my-activity': 'my_activity',
+  '/app': 'app_download',
   '/activity': 'activity',
   '/drafts': 'drafts',
   '/profile/edit': 'profile_edit',
@@ -36,6 +46,7 @@ const pages: Record<string, string> = {
 }
 
 const dynamicPages: [RegExp, string, string][] = [
+  [/^\/playground\/cards\/[^/]+$/, '/playground/cards/:card', 'play_card'],
   [/^\/home\/[^/]+$/, '/home/:user', 'user_home'],
   [/^\/community\/post\/[^/]+$/, '/community/post/:post', 'community_post'],
   [/^\/community\/post\/[^/]+\/edit$/, '/community/post/:post/edit', 'community_edit'],
@@ -50,7 +61,7 @@ const dynamicPages: [RegExp, string, string][] = [
     'application_edit',
   ],
   [/^\/activity\/(?:received-reviews|reviews)\/[^/]+$/, '/activity/reviews/:review', 'review'],
-  [/^\/signup\/(?:adopter|breeder)(?:\/[^/]+)?$/, '/signup/:type/:step', 'signup_step'],
+  [/^\/signup\/(?:adopter|general|breeder)(?:\/[^/]+)?$/, '/signup/:type/:step', 'signup_step'],
 ]
 
 /** Only route templates leave the device. Queries, hashes and user-provided titles never do. */
@@ -59,6 +70,31 @@ export function analyticsPage(pathname: string): { path: string; screen: string 
   if (pages[path]) return { path, screen: pages[path] }
   const dynamic = dynamicPages.find(([pattern]) => pattern.test(path))
   return dynamic ? { path: dynamic[1], screen: dynamic[2] } : null
+}
+
+// utm_term is left out: it can carry a search keyword. fbclid is unused by GA.
+const CAMPAIGN_KEYS = [
+  'utm_source',
+  'utm_medium',
+  'utm_campaign',
+  'utm_content',
+  'utm_id',
+  'gclid',
+] as const
+
+/** Ad attribution for the landing view only: fixed keys, short plain values, never contact data or URLs. */
+export function analyticsCampaign(search: string): string {
+  const params = new URLSearchParams(search)
+  const kept = new URLSearchParams()
+  for (const key of CAMPAIGN_KEYS) {
+    const value = params.get(key)?.trim()
+    if (!value || value.length > 100) continue
+    if (key === 'gclid' ? !/^[\w-]+$/.test(value) : !/^[\p{L}\p{N} _.+:-]+$/u.test(value)) continue
+    // Numeric ad IDs stay; Korean mobile numbers do not.
+    if (key !== 'gclid' && /(^|\D)01[016789][-.\s]?\d{3,4}[-.\s]?\d{4}(\D|$)/.test(value)) continue
+    kept.set(key, value)
+  }
+  return kept.toString()
 }
 
 export function analyticsEnabled(

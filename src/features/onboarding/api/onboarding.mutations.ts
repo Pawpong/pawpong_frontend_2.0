@@ -1,5 +1,7 @@
 'use client'
 
+import { trackAction } from '@/shared/lib/analyticsEvents'
+
 import { useMutation } from '@tanstack/react-query'
 import type {
   BreederUploadDocumentType,
@@ -36,10 +38,16 @@ export const useVerifyCode = () =>
   })
 
 export const useRegisterAdopter = () =>
-  useMutation({ mutationFn: (data: RegisterAdopterRequest) => registerAdopter(data) })
+  useMutation({
+    mutationFn: (data: RegisterAdopterRequest) => registerAdopter(data),
+    onSuccess: () => trackAction('sign_up', 'adopter'),
+  })
 
 export const useRegisterBreeder = () =>
-  useMutation({ mutationFn: (data: RegisterBreederRequest) => registerBreeder(data) })
+  useMutation({
+    mutationFn: (data: RegisterBreederRequest) => registerBreeder(data),
+    onSuccess: () => trackAction('sign_up', 'breeder'),
+  })
 
 export const useUploadBreederDocuments = () =>
   useMutation({
