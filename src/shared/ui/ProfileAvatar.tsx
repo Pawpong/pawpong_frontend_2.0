@@ -22,18 +22,27 @@ export type ProfileAvatarSize = NonNullable<ProfileAvatarProps['size']>
 
 // Figma Avatar 사이즈 시스템 (node 817:103336) — box / 내부 글리프
 // glyph: PawPrintIcon(비율 1.2:1)로 교체하며 체감 축소를 보정하기 위해 한 단계씩 키움
+// width: box 의 가장 큰 폭(px). 사진을 이 크기에 맞춰 받으려면 숫자로도 알려줘야 한다.
 const AVATAR_SIZE = {
-  xsmall: { box: 'size-6', glyph: 'h-3.5 w-[0.8125rem]' }, // 24 / 14×13
-  small: { box: 'size-8', glyph: 'size-5' }, // 32 / 20
-  medium: { box: 'size-10', glyph: 'h-[1.625rem] w-[1.5625rem]' }, // 40 / 26×25
-  large: { box: 'size-[3.25rem]', glyph: 'h-[2.125rem] w-[2.0625rem]' }, // 52 / 34×33
-  xlarge: { box: 'size-[6.25rem]', glyph: 'h-[4rem] w-[3.875rem]' }, // 100 / 64×62
+  xsmall: { box: 'size-6', glyph: 'h-3.5 w-[0.8125rem]', width: 24 }, // 24 / 14×13
+  small: { box: 'size-8', glyph: 'size-5', width: 32 }, // 32 / 20
+  medium: { box: 'size-10', glyph: 'h-[1.625rem] w-[1.5625rem]', width: 40 }, // 40 / 26×25
+  large: { box: 'size-[3.25rem]', glyph: 'h-[2.125rem] w-[2.0625rem]', width: 52 }, // 52 / 34×33
+  xlarge: { box: 'size-[6.25rem]', glyph: 'h-[4rem] w-[3.875rem]', width: 100 }, // 100 / 64×62
   // small(32) → medium(40): 태블릿+ 커짐 (피드 카드)
-  responsive: { box: 'size-8 tab:size-10', glyph: 'size-5 tab:h-[1.625rem] tab:w-[1.5625rem]' },
+  responsive: {
+    box: 'size-8 tab:size-10',
+    glyph: 'size-5 tab:h-[1.625rem] tab:w-[1.5625rem]',
+    width: 40,
+  },
   // small(32) → medium(40): PC에서만 커짐 (홈 우리아이자랑 쇼케이스)
-  responsivePc: { box: 'size-8 pc:size-10', glyph: 'size-5 pc:h-[1.625rem] pc:w-[1.5625rem]' },
+  responsivePc: {
+    box: 'size-8 pc:size-10',
+    glyph: 'size-5 pc:h-[1.625rem] pc:w-[1.5625rem]',
+    width: 40,
+  },
   // 56 → 64: 태블릿+ 에서 커짐 (마이홈·공개홈 프로필 카드)
-  responsiveProfile: { box: 'size-14 tab:size-16', glyph: 'size-9 tab:size-10' },
+  responsiveProfile: { box: 'size-14 tab:size-16', glyph: 'size-9 tab:size-10', width: 64 },
 } as const
 
 /**
@@ -43,7 +52,7 @@ const AVATAR_SIZE = {
 const ProfileAvatar = ({ src, alt, size = 'small', className }: ProfileAvatarProps) => {
   return (
     <Avatar className={cn(AVATAR_SIZE[size].box, className)}>
-      {src && <AvatarImage src={src} alt={alt} />}
+      {src && <AvatarImage src={src} alt={alt} boxWidth={AVATAR_SIZE[size].width} />}
       {/* 빈 프로필 색은 Avatar 기본값 하나로 고정 — 호출부에서 바꾸지 않는다 */}
       <AvatarFallback>
         <PawPrintIcon className={AVATAR_SIZE[size].glyph} />

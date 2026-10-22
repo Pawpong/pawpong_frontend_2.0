@@ -135,7 +135,14 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
   const isDirectory = search.scope === 'directory'
   const regionLabel =
     summary.data?.regions.find((region) => region.id === search.region)?.label ?? '전국'
-  const nearbyLabel = nearbyOrigin === 'location' ? '내 위치 주변' : '지도 중심 주변'
+  const nearbyLabel =
+    nearbyOrigin === 'location'
+      ? '내 위치 주변'
+      : nearbyOrigin === 'map'
+        ? '지도 중심 주변'
+        : '서울 기준'
+  // 사용자가 고른 적 없는 기준점. 거리를 그대로 보여주면 자기 주변으로 읽힌다.
+  const isDefaultCenter = nearbyOrigin === 'default'
   const hasFilters =
     !favoritesOnly &&
     (!isDirectory || search.region !== 'all' || !!search.query || search.referralOnly)
@@ -352,8 +359,8 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
             <BookmarkIcon status={favoritesOnly ? 'fill' : 'default'} className="size-4" />
             즐겨찾기
           </button>
-          {!favoritesOnly && !isDirectory && nearbyOrigin === 'map' && (
-            <span className="care-map-scope-status">지도 중심 주변</span>
+          {!favoritesOnly && !isDirectory && nearbyOrigin !== 'location' && (
+            <span className="care-map-scope-status">{nearbyLabel}</span>
           )}
           {!favoritesOnly && search.scope === 'nearby' && (
             <select
@@ -454,7 +461,9 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
                 : isShelter && isDirectory
                   ? '관할 지자체 기준 · 공동 보호센터는 한 곳으로 표시'
                   : search.scope === 'nearby'
-                    ? `${nearbyOrigin === 'location' ? '확인한 내 위치' : '검색한 지도 중심'}에서 직선 거리순`
+                    ? isDefaultCenter
+                      ? '위치를 확인하면 가까운 순서로 보여드려요'
+                      : `${nearbyOrigin === 'location' ? '확인한 내 위치' : '검색한 지도 중심'}에서 직선 거리순`
                     : '반려동물 진료 가능 여부는 병원에 확인해 주세요'}
             </p>
           </div>
@@ -536,13 +545,15 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
                         <span className="mt-1 block text-xs leading-5 text-neutral-600">
                           {place.roadAddress || place.address || '공식 등록 주소 미제공'}
                         </span>
-                        {search.scope === 'nearby' && place.distanceMeters !== null && (
-                          <span className="mt-1 block text-xs text-primary-500">
-                            {place.distanceMeters < 1000
-                              ? `${place.distanceMeters}m`
-                              : `${(place.distanceMeters / 1000).toFixed(1)}km`}
-                          </span>
-                        )}
+                        {search.scope === 'nearby' &&
+                          !isDefaultCenter &&
+                          place.distanceMeters !== null && (
+                            <span className="mt-1 block text-xs text-primary-500">
+                              {place.distanceMeters < 1000
+                                ? `${place.distanceMeters}m`
+                                : `${(place.distanceMeters / 1000).toFixed(1)}km`}
+                            </span>
+                          )}
                         {place.latitude === null && (
                           <span className="mt-1 block text-[0.6875rem] text-neutral-600">
                             지도 위치 확인 필요 · 연락처 보기
@@ -671,7 +682,9 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
                   ? isShelter
                     ? '선택한 지자체의 등록 보호센터예요. 실제 시설은 다른 지역에 있을 수 있어요.'
                     : '선택한 지역의 등록 병원이에요. 방문 전 전화로 확인해 주세요.'
-                  : `${nearbyLabel} 반경 ${search.radius / 1000}km에서 찾아요. 거리는 직선 거리예요.`)}
+                  : isDefaultCenter
+                    ? `위치를 확인하지 못해 서울 기준 반경 ${search.radius / 1000}km를 보여주고 있어요. '내 주변 찾기' 를 누르거나 지역을 검색해 주세요.`
+                    : `${nearbyLabel} 반경 ${search.radius / 1000}km에서 찾아요. 거리는 직선 거리예요.`)}
           </p>
           {!favoritesOnly && result.data?.locationUnavailable && (
             <div

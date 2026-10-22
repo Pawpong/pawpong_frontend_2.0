@@ -74,7 +74,7 @@ const SiteFooter = () => {
             <p>경기도 김포시 김포한강9로75번길 66, 5층 (구래동, 국제프라자)</p>
             <a
               href="mailto:coldingcontact@gmail.com"
-              className="w-fit rounded focus-ring transition-colors hover:text-primary-600"
+              className="flex min-h-11 w-fit items-center rounded focus-ring transition-colors hover:text-primary-600"
             >
               coldingcontact@gmail.com
             </a>
@@ -91,7 +91,7 @@ const SiteFooter = () => {
                   href={link.href}
                   target="_blank"
                   rel="noreferrer"
-                  className="rounded text-xs font-semibold text-neutral-700 focus-ring transition-colors hover:text-primary-600"
+                  className="flex min-h-11 items-center rounded text-xs font-semibold text-neutral-700 focus-ring transition-colors hover:text-primary-600"
                 >
                   {link.label}
                 </a>

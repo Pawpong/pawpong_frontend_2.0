@@ -127,7 +127,12 @@ const Banner = ({ initial }: BannerProps) => {
 
       {/* 페이지 표시가 배너의 글자·캐릭터·스토어 버튼을 가리지 않도록 아래에 둔다. */}
       <div className="relative z-10 flex justify-center py-2.5">
-        <div className="flex h-4 items-center justify-center gap-1 rounded-full px-4 py-1">
+        {/*
+          gap-4(16px): 점은 8px 이라 touch-target 이 넓히는 44px 영역이 서로 겹친다.
+          겹친 자리는 DOM 뒤쪽 점이 가져가므로, 간격을 좁게 두면 첫 점을 눌러도 마지막 점이 넘어간다.
+          점 간 거리를 24px 이상 벌려 각 점이 자기 자리를 포함한 영역을 갖게 한다.
+        */}
+        <div className="flex h-4 items-center justify-center gap-4">
           {orderedBanners.map((banner, index) => (
             <button
               key={banner.bannerId}
@@ -136,7 +141,7 @@ const Banner = ({ initial }: BannerProps) => {
               aria-current={index === activeIndex ? 'true' : undefined}
               onClick={() => swiperRef.current?.slideTo(index)}
               className={cn(
-                'h-2 rounded-full focus-ring transition-[width,background-color]',
+                'touch-target relative h-2 rounded-full focus-ring transition-[width,background-color]',
                 index === activeIndex ? 'w-5 bg-point-500' : 'w-2 bg-[rgba(173,101,29,0.3)]',
               )}
             />

@@ -71,6 +71,7 @@ const ReviewDetailContent = ({ reviewId, backHref }: { reviewId: string; backHre
                       <AvatarImage
                         src={data.breederProfileImage}
                         alt={`${data.breederNickname || '브리더'} 프로필`}
+                        boxWidth={56}
                       />
                     )}
                     <AvatarFallback />

@@ -20,6 +20,7 @@ const BOTTOM_NAV_PATHS = new Set([
   '/community',
   '/ai-filter',
   '/playground',
+  '/care-map',
   '/home',
   '/settings',
   '/activity',

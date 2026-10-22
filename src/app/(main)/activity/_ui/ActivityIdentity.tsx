@@ -15,7 +15,7 @@ export const ActivityIdentity = ({
 }) => (
   <div className="flex min-w-0 items-start gap-3">
     <Avatar size="md" className="size-11 shrink-0 bg-primary-50 tab:size-12">
-      {image && <AvatarImage src={image} alt={`${name} 프로필`} />}
+      {image && <AvatarImage src={image} alt={`${name} 프로필`} boxWidth={48} />}
       <AvatarFallback />
     </Avatar>
     <div className="min-w-0 flex-1">
