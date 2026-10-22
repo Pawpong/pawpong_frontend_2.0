@@ -86,13 +86,19 @@ export interface GeneticTestInfo {
   results: GeneticTestResult[]
 }
 
+/**
+ * 브리더가 고른 확인 상태. 서버가 값을 주지 않으면(필드 자체가 없으면) 아직 입력하지 않은 것이다.
+ * 'incomplete'(브리더가 미완료라고 밝힘)와 미입력은 뜻이 다르므로 boolean 으로 합치지 않는다.
+ */
+export type HealthCheckStatus = 'completed' | 'incomplete'
+
 /** 건강 정보 */
 export interface HealthInfo {
-  vaccinationCompleted: boolean
+  vaccinationStatus?: HealthCheckStatus
   vaccinations: VaccinationRecord[]
   /** 미완료 시 브리더가 입력한 사유 */
   vaccinationIncompleteReason?: string
-  geneticTestCompleted: boolean
+  geneticTestStatus?: HealthCheckStatus
   geneticTest: GeneticTestInfo
   geneticTestIncompleteReason?: string
 }

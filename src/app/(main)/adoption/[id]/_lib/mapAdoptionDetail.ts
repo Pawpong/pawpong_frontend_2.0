@@ -22,7 +22,7 @@ export const mapAdoptionDetail = (
   otherPets: AdoptionPetCard[] = [],
 ): AdoptionDetailDto => {
   const health: HealthInfo = {
-    vaccinationCompleted: d.vaccinationStatus === 'completed',
+    vaccinationStatus: d.vaccinationStatus,
     vaccinations: (d.vaccinationRecords ?? []).map((r) => ({
       name: r.name,
       date: formatDate(r.date),
@@ -30,7 +30,7 @@ export const mapAdoptionDetail = (
     })),
     // 미완료 사유는 분양글 작성 시 브리더가 입력 — 기록이 없을 때 안내 문구 대신 노출
     vaccinationIncompleteReason: d.vaccinationIncompleteReason,
-    geneticTestCompleted: d.geneticTestStatus === 'completed',
+    geneticTestStatus: d.geneticTestStatus,
     geneticTestIncompleteReason: d.geneticTestIncompleteReason,
     geneticTest: {
       date: formatDate(d.geneticTestRecords?.[0]?.date ?? ''),
