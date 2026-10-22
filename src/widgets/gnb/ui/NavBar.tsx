@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { useRoutePathname } from '@/shared/lib/useRoutePathname'
 import { type MouseEvent } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { cn } from '@/shared/lib/cn'
@@ -18,7 +18,7 @@ interface NavBarProps {
 }
 
 const NavBar = ({ className }: NavBarProps) => {
-  const pathname = usePathname()
+  const pathname = useRoutePathname()
   const { me } = useMe()
   // 쿠키를 읽기 전에는 서버 렌더와 같은 화면을 유지한다 (로그인 사용자에게 버튼이 깜빡이지 않도록)
   const { isReady, isLoggedIn } = useAuthStatus()

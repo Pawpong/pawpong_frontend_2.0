@@ -9,6 +9,7 @@ import { SessionRecoveryBridge } from '@/shared/lib/SessionRecoveryBridge'
 import { NativePhotoPickerBridge } from '@/shared/lib/NativePhotoPickerBridge'
 import { NativeViewportBridge } from '@/shared/lib/NativeViewportBridge'
 import { PawpongAnalytics } from '@/shared/lib/PawpongAnalytics'
+import { AppFlagBridge } from '@/shared/lib/AppFlagBridge'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -31,6 +32,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         <script dangerouslySetInnerHTML={{ __html: APP_DETECT_SCRIPT }} />
       </head>
       <body className="min-w-0 bg-base-white text-neutral-850">
+        <AppFlagBridge />
         <PawpongAnalytics />
         <NativeViewportBridge />
         <SessionRecoveryBridge />

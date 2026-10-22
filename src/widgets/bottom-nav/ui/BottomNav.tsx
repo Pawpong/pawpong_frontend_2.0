@@ -3,7 +3,8 @@
 import { Suspense, useSyncExternalStore } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { usePathname, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
+import { useRoutePathname } from '@/shared/lib/useRoutePathname'
 import { useQuery } from '@tanstack/react-query'
 import { cn } from '@/shared/lib/cn'
 import { MAIN_NAV } from '@/shared/config'
@@ -136,7 +137,7 @@ const BottomNavContent = ({ pathname }: { pathname: string }) => {
 }
 
 const BottomNav = () => {
-  const pathname = usePathname()
+  const pathname = useRoutePathname()
 
   if (!shouldShowBottomNav(pathname)) return null
 
