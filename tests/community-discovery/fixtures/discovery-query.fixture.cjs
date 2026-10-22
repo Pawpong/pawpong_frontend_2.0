@@ -32,8 +32,11 @@ function renderDiscoveryQuery(config, query = 'media=map') {
       COMMUNITY_LOGIN_PROMPT: {},
       getFirstPhotoPostId: nothing,
     },
-    '@/entities/gamification': { ActivityBadgeRow: nothing },
-    '@/features/gamification': { usePublicActivityBadges: () => [] },
+    '@/entities/gamification': {
+      ActivityBadgeRow: nothing,
+      BreederLevelBadge: nothing,
+      toBreederLevel: () => null,
+    },
     '@/features/community': {
       useDeletePostConfirm: () => ({ modalProps: {} }),
       ConnectedFeedCard: nothing,

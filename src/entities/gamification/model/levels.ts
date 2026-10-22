@@ -15,6 +15,13 @@ export interface ActivityLevel {
   nextExp: number | null
 }
 export type BreederLevel = Pick<ActivityLevel, 'value' | 'family'>
+/** API 가 문자열로 준 레벨 계열을 알려진 계열일 때만 BreederLevel 로 바꾼다 (모르는 계열이면 숨김) */
+export const toBreederLevel = (
+  level: { value: number; family: string } | null | undefined,
+): BreederLevel | null => {
+  const family = LEVEL_FAMILIES.find((item) => item.key === level?.family)?.key
+  return level && family ? { value: level.value, family } : null
+}
 export interface ActivityCatalog {
   levels: Array<{ value: number; exp: number; family: ActivityLevel['family'] }>
   families: Array<{ key: ActivityLevel['family']; name: string }>

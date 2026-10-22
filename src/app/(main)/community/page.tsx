@@ -1,4 +1,5 @@
 import { createPageMetadata } from '@/shared/lib/metadata'
+import { getInitialCommunityExperience } from '@/entities/community/server'
 
 import { CommunityContent } from './_ui/CommunityContent'
 import { Suspense } from 'react'
@@ -9,7 +10,9 @@ export const metadata = createPageMetadata({
   path: '/community',
 })
 
-const CommunityPage = () => {
+const CommunityPage = async () => {
+  // 카테고리·말머리 줄이 첫 화면부터 보이도록 확장 기능 설정을 서버에서 미리 받는다
+  const initialExperience = await getInitialCommunityExperience()
   return (
     <Suspense
       fallback={
@@ -18,7 +21,7 @@ const CommunityPage = () => {
         </p>
       }
     >
-      <CommunityContent />
+      <CommunityContent initialExperience={initialExperience} />
     </Suspense>
   )
 }
