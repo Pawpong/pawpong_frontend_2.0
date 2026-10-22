@@ -32,7 +32,11 @@ const AuthorInfo = ({
   // 빈 프로필은 Avatar 기본값(primary-50 배경 + 발바닥) — 내비·다른 아바타와 같은 색
   const avatar = (
     <Avatar size={size === 'md' ? 'md' : 'sm'}>
-      {profileImageUrl ? <AvatarImage src={profileImageUrl} alt={nickname} /> : <AvatarFallback />}
+      {profileImageUrl ? (
+        <AvatarImage src={profileImageUrl} alt={nickname} boxWidth={40} />
+      ) : (
+        <AvatarFallback />
+      )}
     </Avatar>
   )
 
