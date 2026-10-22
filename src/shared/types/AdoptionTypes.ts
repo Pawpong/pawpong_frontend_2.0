@@ -212,7 +212,8 @@ export interface AdoptionPetCard {
   petType: CommunityPetType
   gender: PetGender
   birthDate: string
-  price: number
+  /** 브리더가 입력하지 않으면 서버가 null 또는 0 을 준다 */
+  price: number | null
   status: PetStatus
   primaryPhotoUrl: string
   photoUrls: string[]
