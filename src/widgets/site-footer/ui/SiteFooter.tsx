@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { useRoutePathname } from '@/shared/lib/useRoutePathname'
 import { Container } from '@/shared/ui'
 
 const FOOTER_PATHS = new Set([
@@ -34,7 +34,7 @@ const LEGAL_LINKS = [
  * 사업자 정보는 pawpong.kr에 현재 공개된 값만 사용하고, 계정·작성·채팅 흐름에는 노출하지 않는다.
  */
 const SiteFooter = () => {
-  const pathname = usePathname()
+  const pathname = useRoutePathname()
 
   if (!FOOTER_PATHS.has(pathname)) return null
 

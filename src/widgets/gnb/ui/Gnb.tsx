@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { usePathname } from 'next/navigation'
+import { useRoutePathname } from '@/shared/lib/useRoutePathname'
 import { MenuIcon } from '@/shared/assets'
 import { RESPONSIVE_SHELL_CLASS } from '@/shared/config'
 import { cn } from '@/shared/lib/cn'
@@ -20,7 +20,7 @@ const TINTED_HEADER_PATTERN = /^\/adoption\/(create|[^/]+\/edit)$/
 
 const Gnb = () => {
   const [menuOpen, setMenuOpen] = useState(false)
-  const pathname = usePathname()
+  const pathname = useRoutePathname()
 
   return (
     <>
