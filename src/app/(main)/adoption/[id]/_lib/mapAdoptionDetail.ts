@@ -7,6 +7,7 @@ import type {
   BreedingEnvironment,
 } from '@/shared/types'
 import { formatBirthDate } from '@/shared/lib/formatBirthDate'
+import { formatAdoptionPrice } from '@/shared/lib/formatAdoptionPrice'
 import { formatDate } from '@/shared/lib/formatDate'
 import { petTypeToCategory } from '@/shared/lib/petCategory'
 import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
@@ -62,7 +63,7 @@ export const mapAdoptionDetail = (
     listingId: d.petId,
     name: d.name,
     status: d.status,
-    price: `${d.price.toLocaleString('ko-KR')}원`,
+    price: formatAdoptionPrice(d.price),
     birthDate: formatBirthDate(d.birthDate),
     gender: d.gender,
     description: d.description,
