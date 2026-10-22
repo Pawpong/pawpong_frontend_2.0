@@ -1,5 +1,6 @@
 import { ProfileAvatar } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
+import { optimizedImageUrl } from '@/shared/lib/optimizedImageUrl'
 import { FileIcon, LocationPinIcon } from '@/shared/assets'
 import type { ChatMessageResponseDto } from '@/shared/types'
 import { formatFileSize, getLocationMapUrl, parseChatAttachment } from '../_lib/attachment'
@@ -76,10 +77,11 @@ const AttachmentBubble = ({
         )}
         aria-label={`${attachment.name} 원본 이미지 열기`}
       >
-        {/* 업로드 CDN 호스트가 환경별로 달라 native img로 표시한다. */}
+        {/* 업로드 CDN 호스트가 환경별로 달라 native img로 표시한다.
+            미리보기는 리사이즈본, 눌러서 여는 href 는 원본 — 말풍선 하나에 수 MB 가 오지 않게 한다. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={attachment.url}
+          src={optimizedImageUrl(attachment.url, 288)}
           alt={attachment.name}
           className="max-h-80 w-auto max-w-full object-contain"
         />
