@@ -66,8 +66,11 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
     cancelLocation.current()
     setLocating(false)
   }, [])
+  // 돌봄 지도의 기본값은 '내 주변'이라, 들어오면 바로 위치를 묻는다.
+  // 전국 목록을 먼저 띄워 두고 위치가 확인되면 내 주변으로 갈아탄다.
+  // 자동 시도라서 실패는 조용히 넘긴다 — 권한 안내는 직접 '내 주변 찾기'를 눌렀을 때만 띄운다.
   useEffect(() => {
-    const cancel = startCareLocation(navigator, 'granted-only', {
+    const cancel = startCareLocation(navigator, 'manual', {
       onChecking: () => setLocating(true),
       onLocated: (center) => {
         setLocating(false)
@@ -76,10 +79,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
         setCenterRequest(center)
         setLocationMessage(null)
       },
-      onFailure: (reason) => {
-        setLocating(false)
-        setLocationMessage(careLocationFailureMessage(reason, inNativeAppWebView()))
-      },
+      onFailure: () => setLocating(false),
     })
     cancelLocation.current = cancel
     return () => cancelLocation.current()
