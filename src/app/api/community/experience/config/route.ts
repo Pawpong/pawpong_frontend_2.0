@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
+import {
+  CLOSED_COMMUNITY_EXPERIENCE as closed,
+  parseCommunityExperienceConfig,
+} from '@/entities/community/server'
 export const dynamic = 'force-dynamic'
-const closed = { enabled: false, aiEnabled: false, topics: [], aiNotice: '' }
 export async function GET() {
   const headers = { 'Cache-Control': 'no-store' }
   const base = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/+$/, '')
@@ -13,18 +16,9 @@ export async function GET() {
     })
     const payload = await response.json()
     if (!response.ok || payload.success !== true) throw new Error('unavailable')
-    if (
-      payload.data?.enabled === true &&
-      (typeof payload.data.aiEnabled !== 'boolean' ||
-        typeof payload.data.aiNotice !== 'string' ||
-        !Array.isArray(payload.data.topics) ||
-        !payload.data.topics.every(
-          (topic: { key?: unknown; label?: unknown } | null) =>
-            topic && typeof topic.key === 'string' && typeof topic.label === 'string',
-        ))
-    )
-      throw new Error('invalid config')
-    return NextResponse.json(payload.data?.enabled === true ? payload.data : closed, { headers })
+    const config = parseCommunityExperienceConfig(payload.data)
+    if (!config) throw new Error('invalid config')
+    return NextResponse.json(config, { headers })
   } catch {
     return NextResponse.json(closed, { status: 503, headers })
   }

@@ -37,6 +37,7 @@ interface RawAuthor {
 
 interface RawCommunityPostCard {
   aiReview?: unknown
+  authorActivity?: import('@/shared/types').CommunityAuthorActivity | null
   experience?: import('@/shared/types').CommunityExperience | null
   postId: string
   author: RawAuthor
@@ -103,6 +104,7 @@ const flattenAuthor = (author: RawAuthor) => ({
 
 const mapCard = (raw: RawCommunityPostCard): CommunityPostCard => ({
   ...(raw.aiReview !== undefined ? { aiReview: parseCommunityPostReview(raw.aiReview) } : {}),
+  ...(raw.authorActivity !== undefined ? { authorActivity: raw.authorActivity } : {}),
   ...(raw.experience ? { experience: raw.experience } : {}),
   postId: raw.postId,
   ...flattenAuthor(raw.author),

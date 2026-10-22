@@ -3,6 +3,9 @@ const assert = require('node:assert/strict')
 const { NextRequest } = require('next/server')
 const { loadTypescript: load } = require('./helpers/load-typescript.cjs')
 
+const experienceModel = load('src/entities/community/model/communityExperience.ts')
+const experienceServer = { '@/entities/community/server': experienceModel }
+
 test('사용자 태그는 정규화·중복 제거·개수 제한 후 검색에 사용한다', () => {
   const { normalizeCommunityTags } = load('src/entities/community/model/discovery.ts')
   assert.deepEqual(normalizeCommunityTags('#산책, WALK, walk, , https://example.test, 노령견'), [
@@ -63,17 +66,13 @@ test('커뮤니티 체험 설정은 배포 환경의 API를 사용하고 잘못�
   for (const base of ['https://api.pawpong.kr', 'https://dev-api.pawpong.kr']) {
     const calls = []
     let data = config
-    const route = load(
-      'src/app/api/community/experience/config/route.ts',
-      {},
-      {
-        process: { env: { NEXT_PUBLIC_API_BASE_URL: `${base}/` } },
-        fetch: async (...args) => {
-          calls.push(args)
-          return Response.json({ success: true, data })
-        },
+    const route = load('src/app/api/community/experience/config/route.ts', experienceServer, {
+      process: { env: { NEXT_PUBLIC_API_BASE_URL: `${base}/` } },
+      fetch: async (...args) => {
+        calls.push(args)
+        return Response.json({ success: true, data })
       },
-    )
+    })
     const request = new NextRequest('https://pawpong.kr/api/community/experience/config', {
       headers: { host: 'untrusted.example', authorization: 'synthetic' },
     })
@@ -94,15 +93,44 @@ test('커뮤니티 체험 설정은 배포 환경의 API를 사용하고 잘못�
 })
 
 test('API 주소가 없으면 커뮤니티 체험 설정을 닫고 다른 환경으로 연결하지 않음', async () => {
-  const route = load(
-    'src/app/api/community/experience/config/route.ts',
-    {},
+  const route = load('src/app/api/community/experience/config/route.ts', experienceServer, {
+    process: { env: {} },
+    fetch: async () => assert.fail('설정되지 않은 API를 호출하면 안 됨'),
+  })
+  assert.equal((await (await route.GET()).json()).enabled, false)
+})
+
+test('카테고리 줄을 첫 화면에 그리도록 서버에서 설정을 1분 캐시로 미리 받고, 실패하면 클라이언트 조회에 맡김', async () => {
+  const config = {
+    enabled: true,
+    aiEnabled: false,
+    topics: [{ key: 'walk', label: '산책' }],
+    aiNotice: '',
+  }
+  let reply = () => Response.json({ success: true, data: config })
+  const calls = []
+  const { getInitialCommunityExperience } = load(
+    'src/entities/community/api/communityExperienceConfig.server.ts',
+    { 'server-only': {}, '../model/communityExperience': experienceModel },
     {
-      process: { env: {} },
-      fetch: async () => assert.fail('설정되지 않은 API를 호출하면 안 됨'),
+      process: { env: { NEXT_PUBLIC_API_BASE_URL: 'https://api.pawpong.kr/' } },
+      fetch: async (...args) => {
+        calls.push(args)
+        return reply()
+      },
     },
   )
-  assert.equal((await (await route.GET()).json()).enabled, false)
+  const initial = await getInitialCommunityExperience()
+  assert.deepEqual(initial.config, config)
+  assert.equal(typeof initial.fetchedAt, 'number')
+  assert.equal(calls[0][0], 'https://api.pawpong.kr/api/v2/community/experience/config')
+  assert.equal(calls[0][1].next.revalidate, 60)
+  reply = () => Response.json({ success: true, data: { enabled: true } })
+  assert.equal(await getInitialCommunityExperience(), null)
+  reply = () => {
+    throw new Error('timeout')
+  }
+  assert.equal(await getInitialCommunityExperience(), null)
 })
 
 test('기존 피드 쿼리 키를 유지하고 새 주제만 선택적으로 추가한다', async () => {

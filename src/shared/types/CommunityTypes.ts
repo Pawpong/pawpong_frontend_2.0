@@ -21,9 +21,16 @@ export type CommunityPostVisibility = 'public' | 'followers' | 'private'
 /** 발행 상태 — 발행 / 임시저장 */
 export type CommunityPostStatus = 'draft' | 'published'
 
+/** 작성자 공개 레벨·대표 배지 — 메인 피드 목록에만 실린다. 활동 단계가 꺼져 있으면 null */
+export interface CommunityAuthorActivity {
+  level: { value: number; family: string } | null
+  badges: { key: string; title: string; description: string; earnedAt: string }[]
+}
+
 /** 커뮤니티 게시글 카드 (목록용) */
 export interface CommunityPostCard {
   aiReview?: CommunityPostReview
+  authorActivity?: CommunityAuthorActivity | null
   experience?: CommunityExperience | null
   aiComparison?: CommunityAiComparison | null
   postId: string
