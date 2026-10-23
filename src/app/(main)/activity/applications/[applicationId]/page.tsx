@@ -4,30 +4,18 @@ import { ReceivedApplicationDetailContent } from './_ui/ReceivedApplicationDetai
 
 interface ApplicationDetailPageProps {
   params: Promise<{ applicationId: string }>
-  searchParams: Promise<{ view?: string }>
 }
 
-const ApplicationDetailPage = async ({ params, searchParams }: ApplicationDetailPageProps) => {
+const ApplicationDetailPage = async ({ params }: ApplicationDetailPageProps) => {
   const { applicationId } = await params
-  const { view } = await searchParams
-  const returnUrl = `/activity/applications/${applicationId}${
-    view === 'sent' || view === 'received' ? `?view=${view}` : ''
-  }`
-  const userRole = await requireAuth(returnUrl)
+  const userRole = await requireAuth(`/activity/applications/${applicationId}`)
 
-  // 브리더도 신청을 보낼 수 있게 되면서 role만으로는 보낸/받은 신청을 구분할 수 없다.
-  // 목록에서 넘겨준 view가 있으면 그걸 따르고, 없으면(직접 링크 등) role 기본값으로 되돌아간다.
-  const isReceived = view === 'sent' ? false : view === 'received' ? true : userRole === 'breeder'
-
-  return isReceived ? (
+  // 브리더는 신청을 보낼 수 없어(#497) 역할만으로 받은 신청(브리더)·보낸 신청(입양자)을 가른다.
+  // 알림 링크에 붙어 오는 예전 ?view= 값은 쓰지 않는다.
+  return userRole === 'breeder' ? (
     <ReceivedApplicationDetailContent applicationId={applicationId} />
   ) : (
-    <ApplicationDetailContent
-      applicationId={applicationId}
-      backHref={
-        userRole === 'breeder' ? '/activity?tab=sent-applications' : '/activity?tab=applications'
-      }
-    />
+    <ApplicationDetailContent applicationId={applicationId} backHref="/activity?tab=applications" />
   )
 }
 

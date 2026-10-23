@@ -11,8 +11,8 @@ import { isActivityTab, type ActivityTab } from '../_lib/activityTab'
 
 type ActivityUserRole = 'adopter' | 'breeder'
 
-// 입양자는 보낸 신청/작성한 후기만 본다. 브리더도 이제 다른 브리더에게 신청·후기를 보낼 수 있어
-// 받은 것(신청/후기)에 더해 자기가 보낸 것도 같은 라우터에서 탭으로 본다.
+// 입양자는 보낸 신청/작성한 후기를, 브리더는 받은 신청/받은 후기를 본다.
+// 브리더는 입양 신청을 보낼 수 없어(#497, 서버 403) 보낸 신청·보낸 후기 탭은 두지 않는다.
 const TABS_BY_ROLE: Record<
   ActivityUserRole,
   ReadonlyArray<{ value: ActivityTab; label: string }>
@@ -26,8 +26,6 @@ const TABS_BY_ROLE: Record<
   breeder: [
     { value: 'applications', label: '받은 신청' },
     { value: 'reviews', label: '받은 후기' },
-    { value: 'sent-applications', label: '보낸 신청' },
-    { value: 'sent-reviews', label: '보낸 후기' },
   ],
 }
 
@@ -61,16 +59,6 @@ const ActivityContent = ({
         <TabsContent value="reviews" className="mt-0">
           {isBreeder ? <ReceivedReviewList /> : <ReviewList />}
         </TabsContent>
-        {isBreeder && (
-          <TabsContent value="sent-applications" className="mt-0">
-            <ApplicationList />
-          </TabsContent>
-        )}
-        {isBreeder && (
-          <TabsContent value="sent-reviews" className="mt-0">
-            <ReviewList />
-          </TabsContent>
-        )}
         {/* 공통 신청서는 입양자 스키마(counselDefaultProfile)에만 있어 브리더 탭에서는 제외한다 */}
         {!isBreeder && (
           <TabsContent value="counsel-profile" className="mt-0">
