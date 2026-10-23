@@ -14,7 +14,7 @@ import { TEXT } from '@/shared/config'
 import { ActivityDetailLayout } from '../../../_ui/ActivityDetailLayout'
 import { ApplicationAnswers } from '../../../_ui/ApplicationAnswers'
 import { formatDate } from '@/shared/lib/formatDate'
-import { AlertMessage, Button, CtaModal } from '@/shared/ui'
+import { AlertMessage, Button, CtaModal, Textarea } from '@/shared/ui'
 import type { ApplicationStatus, ReceivedApplicationDetailDto } from '@/shared/types'
 import { ApplicationChatButton } from '@/features/chat-entry'
 
@@ -24,20 +24,30 @@ interface StatusAction {
   intent: 'primary' | 'secondary'
   /** 되돌리기 어려운 결정이라 확인창을 거친다 (상담 완료 표시는 바로 적용) */
   confirm?: { title: string; description: string }
+  /** 확인창에서 입양자에게 전할 말을 함께 받는다 — 입양자 신청 상세의 '브리더가 남긴 말'로 보인다 */
+  note?: { label: string; placeholder: string }
 }
+
+const REJECT_ACTION: StatusAction = {
+  label: '신청 거절',
+  nextStatus: 'adoption_rejected',
+  intent: 'secondary',
+  confirm: {
+    title: '신청을 거절할까요?',
+    description: '거절하면 입양자에게 진행 종료로 표시돼요.',
+  },
+  note: {
+    label: '입양자에게 전할 말 (선택)',
+    placeholder: '예: 이번에는 다른 가정과 먼저 진행하게 됐어요.',
+  },
+}
+
+const NOTE_MAX_LENGTH = 500
 
 const STATUS_ACTIONS: Partial<Record<ApplicationStatus, StatusAction[]>> = {
   consultation_pending: [
     { label: '상담 완료로 표시', nextStatus: 'consultation_completed', intent: 'primary' },
-    {
-      label: '신청 거절',
-      nextStatus: 'adoption_rejected',
-      intent: 'secondary',
-      confirm: {
-        title: '신청을 거절할까요?',
-        description: '거절하면 입양자에게 진행 종료로 표시돼요.',
-      },
-    },
+    REJECT_ACTION,
   ],
   consultation_completed: [
     {
@@ -49,15 +59,7 @@ const STATUS_ACTIONS: Partial<Record<ApplicationStatus, StatusAction[]>> = {
         description: '확정하면 입양자가 후기를 작성할 수 있어요.',
       },
     },
-    {
-      label: '신청 거절',
-      nextStatus: 'adoption_rejected',
-      intent: 'secondary',
-      confirm: {
-        title: '신청을 거절할까요?',
-        description: '거절하면 입양자에게 진행 종료로 표시돼요.',
-      },
-    },
+    REJECT_ACTION,
   ],
 }
 
@@ -73,14 +75,20 @@ const StatusActionSection = ({
   status: ApplicationStatus
 }) => {
   const [pendingAction, setPendingAction] = useState<StatusAction | null>(null)
+  const [note, setNote] = useState('')
   const updateStatus = useUpdateBreederApplicationStatus()
   const actions = STATUS_ACTIONS[status]
   if (!actions) return null
 
-  const applyStatus = (nextStatus: ApplicationStatus) => {
+  const closeConfirm = () => {
+    setPendingAction(null)
+    setNote('')
+  }
+
+  const applyStatus = (nextStatus: ApplicationStatus, notes?: string) => {
     updateStatus.mutate(
-      { applicationId, data: { status: nextStatus } },
-      { onSuccess: () => setPendingAction(null) },
+      { applicationId, data: { status: nextStatus, notes: notes?.trim() || undefined } },
+      { onSuccess: closeConfirm },
     )
   }
 
@@ -114,24 +122,40 @@ const StatusActionSection = ({
       {pendingAction?.confirm && (
         <CtaModal
           open
-          onOpenChange={(open) => !open && setPendingAction(null)}
+          onOpenChange={(open) => !open && closeConfirm()}
           title={pendingAction.confirm.title}
           description={pendingAction.confirm.description}
           actions={[
             {
               label: '취소',
               intent: 'secondary',
-              onClick: () => setPendingAction(null),
+              onClick: closeConfirm,
               disabled: updateStatus.isPending,
             },
             {
               label: pendingAction.label,
               intent: 'primary',
-              onClick: () => applyStatus(pendingAction.nextStatus),
+              onClick: () => applyStatus(pendingAction.nextStatus, note),
               disabled: updateStatus.isPending,
             },
           ]}
-        />
+        >
+          {pendingAction.note && (
+            <div className="flex flex-col gap-2">
+              <label htmlFor="status-note" className="text-sm font-semibold text-neutral-850">
+                {pendingAction.note.label}
+              </label>
+              <Textarea
+                id="status-note"
+                value={note}
+                onChange={(event) => setNote(event.target.value)}
+                placeholder={pendingAction.note.placeholder}
+                maxLength={NOTE_MAX_LENGTH}
+                state={note ? 'fill' : 'default'}
+              />
+            </div>
+          )}
+        </CtaModal>
       )}
     </div>
   )
@@ -208,7 +232,7 @@ const ReceivedApplicationDetailContent = ({ applicationId }: { applicationId: st
                 </p>
                 {data.breederNotes && (
                   <div className="mt-6 border-l-2 border-primary-200 bg-primary-50 px-4 py-3">
-                    <p className="mb-1 text-xs font-semibold text-primary-600">내 메모</p>
+                    <p className="mb-1 text-xs font-semibold text-primary-600">입양자에게 남긴 말</p>
                     <p className="text-sm leading-[1.6] font-medium whitespace-pre-wrap text-neutral-700">
                       {data.breederNotes}
                     </p>

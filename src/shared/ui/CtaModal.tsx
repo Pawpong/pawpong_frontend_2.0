@@ -63,6 +63,8 @@ interface CtaModalProps {
   direction?: CtaModalDirection
   /** 우상단 X 닫기 노출 (기본 true) */
   showClose?: boolean
+  /** 설명과 버튼 사이에 넣는 입력 등 추가 내용 (예: 거절 사유 입력) */
+  children?: ReactNode
   className?: string
 }
 
@@ -79,6 +81,7 @@ const CtaModal = ({
   actions,
   direction = 'column',
   showClose = true,
+  children,
   className,
 }: CtaModalProps) => (
   <Dialog open={open} onOpenChange={onOpenChange}>
@@ -131,6 +134,8 @@ const CtaModal = ({
             )}
           </div>
         </div>
+
+        {children && <div className="px-3 pt-2">{children}</div>}
 
         {/* 하단: 버튼 영역 */}
         <div className={cn('flex rounded-b-xl px-3 py-5', DIRECTION_CLASS[direction])}>

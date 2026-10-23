@@ -10,6 +10,8 @@ export type ApplicationStatus =
   | 'consultation_completed'
   | 'adoption_approved'
   | 'adoption_rejected'
+  /** 입양자가 직접 취소 — 상담 대기·상담 완료에서만 들어온다 */
+  | 'adoption_cancelled'
 
 /** adopterId 필드가 여러 DTO에서 동일하게 쓰이는 유니온 타입 */
 type AdopterIdField = string | { _id: string; nickname?: string } | null

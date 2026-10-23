@@ -3,9 +3,10 @@
 import { trackAction } from '@/shared/lib/analyticsEvents'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { adoptionQueries } from '@/entities/adoption'
 import { applicationQueries } from '@/entities/application'
 import type { ApplicationCreateRequest, ApplicationUpdateRequest } from '@/shared/types'
-import { createApplication, updateApplication } from './application.api'
+import { cancelApplication, createApplication, updateApplication } from './application.api'
 
 export const useCreateApplication = () => {
   const qc = useQueryClient()
@@ -31,5 +32,19 @@ export const useUpdateApplication = () => {
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: applicationQueries.all() })
     },
+  })
+}
+
+export const useCancelApplication = () => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: cancelApplication,
+    // 실패(409)도 화면이 낡았다는 뜻이라 함께 버린다 — 브리더가 먼저 확정·거절했으면 그 상태로 다시 그린다.
+    // 분양글 쪽은 예약이 풀리고 '내 신청 상태'가 바뀌어 재신청 버튼이 다시 열린다.
+    onSettled: () =>
+      Promise.all([
+        qc.invalidateQueries({ queryKey: applicationQueries.all() }),
+        qc.invalidateQueries({ queryKey: adoptionQueries.all() }),
+      ]),
   })
 }
