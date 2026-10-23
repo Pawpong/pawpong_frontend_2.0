@@ -44,7 +44,15 @@ const STATUS_COPY: Record<ApplicationStatus, { title: string; sent: string; rece
     sent: '이번 신청은 진행이 종료되었어요. 보냈던 신청 내용은 계속 확인할 수 있어요.',
     received: '진행이 종료된 신청이에요. 신청서와 상담 기록을 확인할 수 있어요.',
   },
+  adoption_cancelled: {
+    title: '신청을 취소했어요',
+    sent: '취소한 신청이에요. 보냈던 신청 내용은 계속 확인할 수 있고, 다시 신청할 수도 있어요.',
+    received: '신청자가 취소한 신청이에요. 신청서와 상담 기록은 계속 확인할 수 있어요.',
+  },
 }
+
+/** 진행 단계 막대를 그리지 않는 끝난 신청 (확정은 마지막 단계로 그린다) */
+const CLOSED_STATUSES: ApplicationStatus[] = ['adoption_rejected', 'adoption_cancelled']
 
 export const ApplicationProgress = ({
   status,
@@ -60,7 +68,7 @@ export const ApplicationProgress = ({
       <ApplicationStatusBadge status={status} />
       <h1 className={`${TEXT.display} mt-4`}>{copy.title}</h1>
       <p className={`${TEXT.sub} mt-3`}>{received ? copy.received : copy.sent}</p>
-      {status !== 'adoption_rejected' && (
+      {!CLOSED_STATUSES.includes(status) && (
         <ol aria-label="신청 진행 단계" className="mt-6 grid grid-cols-3 gap-2">
           {['상담 대기', '상담 완료', '입양 확정'].map((label, index) => (
             <li

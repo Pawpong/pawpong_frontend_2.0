@@ -12,6 +12,7 @@ const STATUS_BADGE: Record<
   consultation_completed: { label: '상담 완료', variant: 'pointFilled' },
   adoption_approved: { label: '입양 확정', variant: 'primaryFilled' },
   adoption_rejected: { label: '진행 종료', variant: 'neutralFilled' },
+  adoption_cancelled: { label: '신청 취소', variant: 'neutralFilled' },
 }
 
 const ApplicationStatusBadge = ({ status }: { status: ApplicationStatus }) => (
