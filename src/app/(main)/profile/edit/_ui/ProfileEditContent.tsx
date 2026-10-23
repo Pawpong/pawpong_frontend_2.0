@@ -170,6 +170,8 @@ const ProfileEditContent = () => {
   const uploadFile = useUploadSingleFile()
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
   const [photoFileName, setPhotoFileName] = useState<string | null>(null)
+  // 삭제도 다른 항목처럼 적용을 눌러야 저장된다 — 그전까지는 미리보기만 기본 이미지로 바꾼다
+  const [photoRemoved, setPhotoRemoved] = useState(false)
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     e.target.value = '' // 같은 파일 재선택 시에도 onChange 발생
@@ -178,10 +180,19 @@ const ProfileEditContent = () => {
       const res = await uploadFile.mutateAsync({ file, folder: 'profile' })
       setPhotoPreview(res.cdnUrl)
       setPhotoFileName(res.fileName)
+      setPhotoRemoved(false)
     } catch (error) {
       showError(error, '사진을 올리지 못했어요.')
     }
   }
+  const handlePhotoRemove = () => {
+    setPhotoPreview(null)
+    setPhotoFileName(null)
+    setPhotoRemoved(true)
+  }
+  const displayedPhoto = photoPreview ?? (photoRemoved ? undefined : myProfile?.profileImageUrl)
+  // 서버에 보낼 사진 변경 — 새 파일명, 삭제면 빈 문자열(서버가 사진 없음으로 저장), 그대로면 보내지 않음
+  const profileImageChange = photoFileName ?? (photoRemoved ? '' : undefined)
 
   // ── 변경 감지 ──
   const isLocationDirty =
@@ -194,7 +205,7 @@ const ProfileEditContent = () => {
     longDescription !== savedLongDescription ||
     isLocationDirty ||
     pendingPhotos !== null ||
-    !!photoFileName ||
+    profileImageChange !== undefined ||
     isBreederDetailDirty
 
   // 활동명(입양자)만 필수. 브리더명은 이 화면에서 바꾸지 않는다.
@@ -235,7 +246,7 @@ const ProfileEditContent = () => {
     return {
       // 공개 조회는 representativePhotos, 수정 요청은 profilePhotos 를 사용한다
       ...(profilePhotos !== undefined && { profilePhotos }),
-      ...(photoFileName && { profileImage: photoFileName }),
+      ...(profileImageChange !== undefined && { profileImage: profileImageChange }),
       ...(longDescription !== savedLongDescription && { profileDescription: longDescription }),
       ...(isLocationDirty && {
         locationInfo: {
@@ -259,11 +270,11 @@ const ProfileEditContent = () => {
       if (isBreeder) {
         const changes = await buildBreederChanges()
         if (Object.keys(changes).length > 0) tasks.push(updateBreederProfile.mutateAsync(changes))
-      } else if (name !== savedName || photoFileName) {
+      } else if (name !== savedName || profileImageChange !== undefined) {
         tasks.push(
           updateAdopterProfile.mutateAsync({
             name,
-            ...(photoFileName && { profileImage: photoFileName }),
+            ...(profileImageChange !== undefined && { profileImage: profileImageChange }),
           }),
         )
       }
@@ -271,6 +282,7 @@ const ProfileEditContent = () => {
       // 각 mutation 이 최신 프로필 refetch까지 기다리므로 서버 이미지로 안전하게 전환할 수 있다
       setPhotoFileName(null)
       setPhotoPreview(null)
+      setPhotoRemoved(false)
       await qc.invalidateQueries({ queryKey: breederQueries.all() })
       setPendingPhotos(null)
       // 저장된 값을 새 기준으로 다시 시드한다
@@ -332,7 +344,7 @@ const ProfileEditContent = () => {
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-5 pt-8 pb-36 tab:gap-12 tab:px-8 tab:pt-12">
         {/* ── 프로필 헤더: 사진 · 이름 · 계정 ── */}
         <header className="flex items-center gap-4 tab:gap-6">
-          <ProfileAvatar size="xlarge" src={photoPreview ?? myProfile?.profileImageUrl} />
+          <ProfileAvatar size="xlarge" src={displayedPhoto} />
           <div className="flex min-w-0 flex-1 flex-col items-start gap-1">
             <h1 className="truncate font-cafe24 text-xl text-neutral-850 tab:text-2xl">
               {savedName || '활동명을 입력해주세요'}
@@ -341,7 +353,7 @@ const ProfileEditContent = () => {
               {isBreeder ? '브리더' : '입양자'}
               {loginProvider && ` · ${AUTH_PROVIDER_LABEL[loginProvider]} 로그인`}
             </p>
-            <div className="mt-2">
+            <div className="mt-2 flex items-center gap-2">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -357,6 +369,17 @@ const ProfileEditContent = () => {
               >
                 {uploadFile.isPending ? '올리는 중…' : '사진 변경'}
               </Button>
+              {/* 지울 사진(저장된 사진이나 방금 올린 사진)이 있을 때만 — 기본 이미지로 돌아간다 */}
+              {displayedPhoto && (
+                <Button
+                  intent="ghost"
+                  size="sm"
+                  disabled={uploadFile.isPending || isSaving}
+                  onClick={handlePhotoRemove}
+                >
+                  사진 삭제
+                </Button>
+              )}
             </div>
           </div>
         </header>
