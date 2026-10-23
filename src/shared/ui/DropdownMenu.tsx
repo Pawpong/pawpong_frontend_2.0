@@ -4,6 +4,10 @@ import * as React from 'react'
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
 import { cn } from '@/shared/lib/cn'
 
+// 누른 버튼 쪽(Radix 가 계산한 transform-origin)에서 열리고 닫힌다. 동작 줄이기 설정이면 움직이지 않는다
+const MENU_MOTION =
+  'origin-[var(--radix-dropdown-menu-content-transform-origin)] data-[state=open]:animate-popover-in data-[state=closed]:animate-popover-out motion-reduce:animate-none'
+
 export const DropdownMenu = DropdownMenuPrimitive.Root
 
 export const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
@@ -55,6 +59,7 @@ export const DropdownMenuSubContent = React.forwardRef<
     ref={ref}
     className={cn(
       'z-dropdown min-w-[8rem] overflow-hidden rounded-lg border border-neutral-150 bg-white p-1 text-neutral-850 shadow-[0_7px_7px_rgba(55,55,55,0.1)]',
+      MENU_MOTION,
       className,
     )}
     {...props}
@@ -74,6 +79,7 @@ export const DropdownMenuContent = React.forwardRef<
         // 디자인시스템 드롭다운 (node 1159:48679): 흰 배경 · #e4e4e4 border · rounded-8 · 그림자
         // 상세 모달 안에서 열려도 포털 메뉴가 모달 뒤로 숨지 않도록 dropdown 레이어에 둔다.
         'z-dropdown min-w-[8rem] overflow-hidden rounded-lg border border-neutral-150 bg-white p-0 shadow-[0px_7px_7px_rgba(55,55,55,0.1)]',
+        MENU_MOTION,
         className,
       )}
       {...props}
