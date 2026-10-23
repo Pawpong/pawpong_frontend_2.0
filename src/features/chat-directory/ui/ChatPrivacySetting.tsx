@@ -23,12 +23,10 @@ export function ChatPrivacySetting() {
   })
   const error = update.error ?? settings.error
   return (
-    <div className="flex flex-col gap-2 px-4 py-4 tab:px-5">
-      <div className="flex items-center justify-between gap-4">
-        <label
-          htmlFor="chat-search-allowed"
-          className="text-sm font-semibold text-neutral-850 tab:text-base"
-        >
+    // 설정 화면의 행과 같은 여백·글자 (토스 설정처럼 제목 한 줄 + 아래 작은 설명)
+    <div className="flex flex-col gap-1 px-5 py-3.5">
+      <div className="flex min-h-7 items-center justify-between gap-4">
+        <label htmlFor="chat-search-allowed" className="text-body-lg font-medium text-neutral-850">
           닉네임 검색·새 채팅 허용
         </label>
         <Switch
@@ -38,7 +36,7 @@ export function ChatPrivacySetting() {
           onCheckedChange={(allowed) => update.mutate(allowed)}
         />
       </div>
-      <p className="text-xs leading-5 text-neutral-500 tab:text-sm">
+      <p className="pr-14 text-body-sm leading-5 text-neutral-700 tab:text-body-md">
         다른 사용자가 내 닉네임을 검색하고 새 대화를 시작할 수 있어요. 꺼도 기존 대화는 이어갈 수
         있어요.
       </p>
