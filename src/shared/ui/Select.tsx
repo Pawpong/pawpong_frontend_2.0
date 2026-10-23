@@ -99,6 +99,8 @@ export const SelectContent = React.forwardRef<
       ref={ref}
       className={cn(
         'relative z-dropdown max-h-96 min-w-[8rem] overflow-hidden rounded-[0.375rem] border border-neutral-500 bg-white text-neutral-850 shadow-[0_7px_7px_rgba(55,55,55,0.1)] tab:rounded-[1rem]',
+        // 더보기 메뉴와 같은 팝오버 움직임 (globals.css popover-in/out)
+        'origin-[var(--radix-select-content-transform-origin)] data-[state=closed]:animate-popover-out data-[state=open]:animate-popover-in motion-reduce:animate-none',
         position === 'popper' &&
           'data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1',
         className,

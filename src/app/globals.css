@@ -201,6 +201,23 @@
   --color-pressed-bookmark: #a9835a;
   --color-focus: var(--color-primary-500);
 
+  /* 더보기 메뉴·셀렉트 같은 팝오버 — 누른 버튼 쪽에서 살짝 튀며 커지고(토스 느낌), 닫힐 땐 빠르게 줄며 사라진다.
+     scale·opacity 만 움직여 팝오버의 위치용 translate(data-[side]) 와 겹치지 않는다 */
+  --animate-popover-in: popover-in 200ms cubic-bezier(0.34, 1.36, 0.64, 1);
+  --animate-popover-out: popover-out 120ms cubic-bezier(0.4, 0, 1, 1) forwards;
+  @keyframes popover-in {
+    from {
+      opacity: 0;
+      scale: 0.9;
+    }
+  }
+  @keyframes popover-out {
+    to {
+      opacity: 0;
+      scale: 0.95;
+    }
+  }
+
   /* 도트 선택 버튼(PixelChoiceButton)을 고른 순간 통 튀어 오른다 */
   --animate-pixel-pick: pixel-pick 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
   @keyframes pixel-pick {
