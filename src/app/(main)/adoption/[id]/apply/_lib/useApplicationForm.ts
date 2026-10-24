@@ -1,11 +1,12 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useQuery } from '@tanstack/react-query'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useCreateApplication } from '@/features/application'
+import { useMe } from '@/features/auth'
 import { adopterQueries } from '@/entities/adopter'
 import { breederQueries } from '@/entities/breeder'
 import { useExitGuard } from '@/shared/lib/useExitGuard'
@@ -16,6 +17,13 @@ import type { AdoptionDetailDto } from '@/shared/types'
 import { applicationSchema, type ApplicationFormValues } from './schema'
 import { toCreateApplicationRequest } from './applicationRequest'
 import { SUBMIT_ERROR_FALLBACK } from './constants'
+import {
+  applicationDraftKey,
+  clearApplicationDraft,
+  getDraftStorage,
+  readApplicationDraft,
+  writeApplicationDraft,
+} from './applicationDraft'
 
 const useApplicationForm = (detail: AdoptionDetailDto) => {
   const router = useRouter()
@@ -26,6 +34,9 @@ const useApplicationForm = (detail: AdoptionDetailDto) => {
     control,
     handleSubmit,
     watch,
+    reset,
+    getValues,
+    subscribe,
     formState: { isValid, isDirty },
   } = useForm<ApplicationFormValues>({
     resolver: zodResolver(applicationSchema),
@@ -95,6 +106,7 @@ const useApplicationForm = (detail: AdoptionDetailDto) => {
     createApplication(toCreateApplicationRequest(detail, data, customResponses), {
       onSuccess: () => {
         setShowConsultConfirm(false)
+        if (draftKey) clearApplicationDraft(getDraftStorage(), draftKey)
         router.push(`/adoption/${detail.listingId}`)
       },
       onError: (error) => {
@@ -122,8 +134,40 @@ const useApplicationForm = (detail: AdoptionDetailDto) => {
   const customFormQuery = useQuery(breederQueries.applicationForm(detail.breeder.id))
   const customQuestions = customFormQuery.data?.customQuestions ?? []
   const [customAnswers, setCustomAnswers] = useState<Record<string, string>>({})
-  const setCustomAnswer = (questionId: string, value: string) =>
-    setCustomAnswers((prev) => ({ ...prev, [questionId]: value }))
+  const setCustomAnswer = (questionId: string, value: string) => {
+    const next = { ...customAnswers, [questionId]: value }
+    setCustomAnswers(next)
+    if (draftKey) writeApplicationDraft(getDraftStorage(), draftKey, getValues(), next)
+  }
+
+  // 임시저장 — 계정이 확인되면 이 분양글에 쓰던 신청서를 한 번 불러오고, 그 뒤 입력이 바뀔 때마다 저장한다.
+  // 저장 콜백은 구독 시점에 고정되므로 브리더 질문 답은 ref 로 최신값을 읽는다.
+  const { me } = useMe()
+  const draftKey = me?.userId ? applicationDraftKey(me.userId, detail.listingId) : null
+  const [draftRestored, setDraftRestored] = useState(false)
+  const customAnswersRef = useRef(customAnswers)
+  useEffect(() => {
+    customAnswersRef.current = customAnswers
+  }, [customAnswers])
+  useEffect(() => {
+    if (!draftKey) return
+    const storage = getDraftStorage()
+    const draft = readApplicationDraft(storage, draftKey)
+    if (draft) {
+      // keepDefaultValues — 불러온 값도 '수정됨'으로 쳐서 나가기 확인이 그대로 동작한다
+      reset({ ...getValues(), ...draft.values }, { keepDefaultValues: true })
+      // 저장소는 서버 렌더에 없는 외부 자원이라 하이드레이션 뒤 effect 에서 한 번만 읽어 반영한다.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setCustomAnswers(draft.customAnswers)
+      setDraftRestored(true)
+    }
+    return subscribe({
+      formState: { values: true },
+      callback: ({ values }) =>
+        writeApplicationDraft(storage, draftKey, values, customAnswersRef.current),
+    })
+  }, [draftKey, reset, getValues, subscribe])
+
   const customQuestionsValid = customQuestions.every(
     (q) => !q.required || (customAnswers[q.id]?.trim().length ?? 0) > 0,
   )
@@ -149,6 +193,9 @@ const useApplicationForm = (detail: AdoptionDetailDto) => {
     customQuestions,
     customAnswers,
     setCustomAnswer,
+    canSaveDraft: !!draftKey,
+    draftRestored,
+    dismissDraftRestored: () => setDraftRestored(false),
     isProfilePending: adopterProfileQuery.isPending,
     isProfileError: adopterProfileQuery.isError,
     retryProfile: adopterProfileQuery.refetch,

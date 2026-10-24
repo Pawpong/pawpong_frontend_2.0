@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { AlertCircleIcon, PawPrintIcon } from '@/shared/assets'
+import { AlertCircleIcon, InfoIcon, PawPrintIcon } from '@/shared/assets'
 import {
   AlertMessage,
   AsyncState,
@@ -20,6 +20,7 @@ import {
   CONSENT_CHECKS_TITLE,
   CONSULT_CONFIRM_TITLE,
   EXIT_CONFIRM_TITLE,
+  EXIT_DRAFT_NOTICE,
   FAMILY_MEMBERS_FIELD,
   PET_FIELD_TITLE,
   SURVEY_FIELDS,
@@ -61,6 +62,9 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
     customQuestions,
     customAnswers,
     setCustomAnswer,
+    canSaveDraft,
+    draftRestored,
+    dismissDraftRestored,
     isProfilePending,
     isProfileError,
     retryProfile,
@@ -107,12 +111,23 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
       {stickyHeader}
 
       {/* ═══ 안내 배너 (정보 카드 하단) — px mo16/tab48/pc16, py32 / 정보 카드와 동일하게 max-w-[57.5rem] 중앙 컬럼, 텍스트 좌측 정렬 ═══ */}
-      <div className="flex flex-col items-center px-4 py-8 tab:px-12 pc:px-4">
+      <div className="flex flex-col items-center gap-4 px-4 py-8 tab:px-12 pc:px-4">
         <p className="w-full max-w-[55rem] font-cafe24 text-sm leading-[1.5] text-neutral-850">
           입양 신청서 작성 이후,
           <br />
           담당 브리더와 채팅을 통해 더 자세한 입양 계획을 세워보세요
         </p>
+        {draftRestored && (
+          <div className="w-full max-w-[55rem]">
+            <AlertMessage
+              status="info"
+              size="responsive"
+              icon={InfoIcon}
+              message="작성하던 신청서를 불러왔어요. 동의 항목은 다시 체크해 주세요."
+              onClose={dismissDraftRestored}
+            />
+          </div>
+        )}
       </div>
 
       {/* ═══ 폼 영역 (Figma 1237-41470) — 모바일: 박스 없음 / 탭+: point-50 카드(#fffff1 p40 rounded12 max-w880) ═══ */}
@@ -194,6 +209,7 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
         onClose={cancelExit}
         onConfirm={confirmExit}
         title={EXIT_CONFIRM_TITLE}
+        description={canSaveDraft ? EXIT_DRAFT_NOTICE : undefined}
       />
 
       {/* ═══ 입양 상담 확인 모달 (Figma 1955-262642) — 제출 버튼 → 이 모달 → "상담하기"로 실제 신청 ═══ */}

@@ -53,6 +53,8 @@ export const PET_FIELD_TITLE = '입양하는 동물'
 
 export const EXIT_CONFIRM_TITLE = '입양 신청을 그만두시나요?'
 
+export const EXIT_DRAFT_NOTICE = '쓰던 내용은 이 기기에 7일 동안 저장돼요.'
+
 export const CONSULT_CONFIRM_TITLE = '브리더와 더 자세한 입양 상담이\n이루어집니다.'
 
 export const SUBMIT_ERROR_FALLBACK = '입양 신청에 실패했습니다.'
