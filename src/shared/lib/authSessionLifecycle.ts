@@ -4,8 +4,6 @@ let logoutRequestInProgress = false
 const cookieWrites = new Set<Promise<unknown>>()
 const LOGOUT_PENDING_KEY = 'pawpong:logout-pending'
 export const AUTH_INTENT_KEY = 'pawpong:auth-intent'
-/** 계정별 작성 중 내용 키 접두사 — 로그아웃·탈퇴 때 한꺼번에 지운다 */
-export const USER_DRAFT_PREFIX = 'pawpong:user-draft:'
 
 function readAuthIntent(): string | null {
   try {
@@ -63,20 +61,7 @@ export function beginLogout(): void {
   } catch {
     /* 현재 문서의 signingOut은 계속 적용된다. */
   }
-  clearUserDrafts()
   publishAuthIntent()
-}
-
-/** 신청서처럼 개인정보가 담긴 작성 중 내용은 공용 기기에 남지 않게 로그아웃·탈퇴 때 지운다. */
-function clearUserDrafts(): void {
-  try {
-    if (typeof localStorage === 'undefined') return
-    Object.keys(localStorage)
-      .filter((key) => key.startsWith(USER_DRAFT_PREFIX))
-      .forEach((key) => localStorage.removeItem(key))
-  } catch {
-    /* 저장소가 막힌 환경에는 지울 것도 없다. */
-  }
 }
 
 /** 가입·소셜 로그인처럼 사용자가 새로 인증한 경우에만 세션을 다시 연다. */

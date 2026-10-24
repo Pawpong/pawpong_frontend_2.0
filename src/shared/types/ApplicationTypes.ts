@@ -171,6 +171,24 @@ export interface ReceivedApplicationDetailDto extends ApplicationDetailBase {
   adopterPhone?: string
 }
 
+// ==================== 임시저장 ====================
+
+/** 신청서 임시저장 내용 — 글자 입력과 브리더 질문 답만 (동의 체크는 제출 때 다시 받는다) */
+export interface ApplicationDraftForm {
+  adoptionPlan?: string
+  familyMembers?: string
+  selfIntroduction?: string
+  timeAwayFromHome?: string
+  livingSpaceDescription?: string
+  customResponses?: Array<{ questionId: string; answer: string }>
+}
+
+export interface ApplicationDraftDto {
+  petId: string
+  form: ApplicationDraftForm
+  updatedAt: string
+}
+
 // ==================== 상태 변경 ====================
 
 export interface ApplicationStatusUpdateRequest {
