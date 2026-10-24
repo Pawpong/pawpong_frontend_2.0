@@ -12,13 +12,12 @@ import {
 } from '@/shared/ui'
 import { breederQueries } from '@/entities/breeder'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
-import { flattenPages, getTotalItems } from '@/shared/lib/infiniteList'
+import { flattenPages } from '@/shared/lib/infiniteList'
 import { CATEGORY_TO_PET_TYPE } from '@/shared/lib/petCategory'
 import { BreederCard } from '@/app/(main)/home/_ui/BreederCard'
-import { TitledSection } from './TitledSection'
 import { ExploreListFilters } from './ExploreListFilters'
 import type { ExploreListFilter } from './ExploreListFilters'
-import { EXPLORE_SECTION_CONTAINER, EXPLORE_SECTION_TITLE_CLASS } from '../_lib/constants'
+import { EXPLORE_SECTION_CONTAINER } from '../_lib/constants'
 import type { AnimalCategory, Breeder, FavoriteBreeder } from '@/shared/types'
 
 // 필터 칩 → /breeder/explore 파라미터 (서버 필터링 — 클라이언트 slice 금지)
@@ -48,7 +47,7 @@ interface BreederExploreContentProps {
 }
 
 // 상단 카테고리/검색(픽셀 카테고리 + 큰 검색바)은 ExploreContent에서 공통 렌더.
-// 목록 레이아웃은 입양 탐색과 동일 — 제목+필터 칩 헤더 / 공용 그리드 / 무한스크롤.
+// 목록 레이아웃은 입양 탐색과 동일 — 필터 칩 / 공용 그리드 / 무한스크롤.
 const BreederExploreContent = ({ category, keyword }: BreederExploreContentProps) => {
   const [listFilter, setListFilter] = useState<ExploreListFilter>('all')
 
@@ -69,21 +68,15 @@ const BreederExploreContent = ({ category, keyword }: BreederExploreContentProps
   const levels = usePublicActivityBadges(
     breeders.map((breeder) => ({ ownerId: breeder.id, role: 'breeder' })),
   )
-  const totalCount = getTotalItems(data)
 
   return (
     <Container className={EXPLORE_SECTION_CONTAINER}>
-      <TitledSection
-        title={`전체 브리더 소식 ${totalCount}`}
-        titleClassName={EXPLORE_SECTION_TITLE_CLASS}
-        headerSlot={
-          <ExploreListFilters
-            value={listFilter}
-            onChange={setListFilter}
-            ariaLabel="브리더 소식 필터"
-          />
-        }
-      >
+      <section className="flex flex-col gap-3">
+        <ExploreListFilters
+          value={listFilter}
+          onChange={setListFilter}
+          ariaLabel="브리더 소식 필터"
+        />
         <ListState
           appPublicContent
           isPending={isPending}
@@ -106,7 +99,7 @@ const BreederExploreContent = ({ category, keyword }: BreederExploreContentProps
             )}
           />
         </ListState>
-      </TitledSection>
+      </section>
       <InfiniteScrollTrigger
         onIntersect={fetchNextPage}
         hasNextPage={hasNextPage ?? false}

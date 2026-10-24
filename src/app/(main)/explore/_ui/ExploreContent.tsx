@@ -28,15 +28,9 @@ import { BreederExploreContent } from './BreederExploreContent'
 import { ExploreFilterBar } from './ExploreFilterBar'
 import { ExploreListFilters } from './ExploreListFilters'
 import type { ExploreListFilter } from './ExploreListFilters'
-import { TitledSection } from './TitledSection'
-import {
-  EXPLORE_SECTION_CONTAINER,
-  EXPLORE_SECTION_TITLE_CLASS,
-  EXPLORE_TABS,
-  SEARCH_PLACEHOLDERS,
-} from '../_lib/constants'
+import { EXPLORE_SECTION_CONTAINER, EXPLORE_TABS, SEARCH_PLACEHOLDERS } from '../_lib/constants'
 import type { ExploreType } from '../_lib/constants'
-import { flattenPages, getTotalItems } from '@/shared/lib/infiniteList'
+import { flattenPages } from '@/shared/lib/infiniteList'
 
 // 필터 칩 → v2 /adoption 쿼리 파라미터 (서버 필터링 — 클라이언트 slice 금지)
 const FILTER_TO_QUERY = {
@@ -96,7 +90,6 @@ const ExploreContent = () => {
     () => dedupeBy(flattenPages(listData).map(mapAdoptionCard), (listing) => listing.listingId),
     [listData],
   )
-  const totalCount = getTotalItems(listData)
 
   const handleTypeChange = useCallback(
     (type: ExploreType) => {
@@ -220,17 +213,12 @@ const ExploreContent = () => {
         ) : (
           <>
             <Container className={EXPLORE_SECTION_CONTAINER}>
-              <TitledSection
-                title={`전체 분양 소식 ${totalCount}`}
-                titleClassName={EXPLORE_SECTION_TITLE_CLASS}
-                headerSlot={
-                  <ExploreListFilters
-                    value={adoptionListFilter}
-                    onChange={setAdoptionListFilter}
-                    ariaLabel="분양 소식 필터"
-                  />
-                }
-              >
+              <section className="flex flex-col gap-3">
+                <ExploreListFilters
+                  value={adoptionListFilter}
+                  onChange={setAdoptionListFilter}
+                  ariaLabel="분양 소식 필터"
+                />
                 <ListState
                   appPublicContent
                   isPending={isPending}
@@ -243,7 +231,7 @@ const ExploreContent = () => {
                 >
                   <AdoptionCardGrid listings={listings} />
                 </ListState>
-              </TitledSection>
+              </section>
               <InfiniteScrollTrigger
                 onIntersect={fetchNextPage}
                 hasNextPage={hasNextPage ?? false}
