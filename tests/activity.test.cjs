@@ -346,3 +346,14 @@ test('마이홈 이름 옆 내 레벨은 설정이 켜지고 세션 소유자가
   )
   assert.deepEqual(queries[1].queryKey, ['gamification', 'private', fixtureSession.scope])
 })
+
+test('글 목록에 실려 온 작성자 레벨은 알려진 계열일 때만 레벨 배지로 바꾼다', () => {
+  const { toBreederLevel } = load('src/entities/gamification/model/levels.ts')
+  assert.deepEqual(toBreederLevel({ value: 7, family: 'best_friend' }), {
+    value: 7,
+    family: 'best_friend',
+  })
+  assert.equal(toBreederLevel({ value: 7, family: 'unknown' }), null)
+  assert.equal(toBreederLevel(null), null)
+  assert.equal(toBreederLevel(undefined), null)
+})

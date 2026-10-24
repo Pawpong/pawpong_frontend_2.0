@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { AlertCircleIcon, PawPrintIcon } from '@/shared/assets'
+import { AlertCircleIcon, CheckIcon, InfoIcon, PawPrintIcon } from '@/shared/assets'
 import {
   AlertMessage,
   AsyncState,
@@ -20,6 +20,10 @@ import {
   CONSENT_CHECKS_TITLE,
   CONSULT_CONFIRM_TITLE,
   EXIT_CONFIRM_TITLE,
+  EXIT_DRAFT_NOTICE,
+  DRAFT_RESTORED_MESSAGE,
+  DRAFT_SAVE_LABEL,
+  DRAFT_SAVING_LABEL,
   FAMILY_MEMBERS_FIELD,
   PET_FIELD_TITLE,
   SURVEY_FIELDS,
@@ -61,6 +65,10 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
     customQuestions,
     customAnswers,
     setCustomAnswer,
+    saveDraft,
+    isSavingDraft,
+    draftRestored,
+    dismissDraftRestored,
     isProfilePending,
     isProfileError,
     retryProfile,
@@ -107,12 +115,23 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
       {stickyHeader}
 
       {/* ═══ 안내 배너 (정보 카드 하단) — px mo16/tab48/pc16, py32 / 정보 카드와 동일하게 max-w-[57.5rem] 중앙 컬럼, 텍스트 좌측 정렬 ═══ */}
-      <div className="flex flex-col items-center px-4 py-8 tab:px-12 pc:px-4">
+      <div className="flex flex-col items-center gap-4 px-4 py-8 tab:px-12 pc:px-4">
         <p className="w-full max-w-[55rem] font-cafe24 text-sm leading-[1.5] text-neutral-850">
           입양 신청서 작성 이후,
           <br />
           담당 브리더와 채팅을 통해 더 자세한 입양 계획을 세워보세요
         </p>
+        {draftRestored && (
+          <div className="w-full max-w-[55rem]">
+            <AlertMessage
+              status="info"
+              size="responsive"
+              icon={InfoIcon}
+              message={DRAFT_RESTORED_MESSAGE}
+              onClose={dismissDraftRestored}
+            />
+          </div>
+        )}
       </div>
 
       {/* ═══ 폼 영역 (Figma 1237-41470) — 모바일: 박스 없음 / 탭+: point-50 카드(#fffff1 p40 rounded12 max-w880) ═══ */}
@@ -174,13 +193,20 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
         </Container>
 
         {/* ═══ 하단 CTA 바 (Figma 1654-161691/97/03) ═══ */}
-        <FooterCtaBar onCancel={handleCloseClick} isValid={isValid} isPending={isPending}>
-          {/* 신청 실패 토스트 — 위치(바 높이 기준)는 FooterCtaBar가 잡는다 */}
+        {/* 나가기는 상단 X 가 맡고, 하단 보조 버튼은 분양글 작성처럼 임시저장으로 쓴다 */}
+        <FooterCtaBar
+          onCancel={saveDraft}
+          cancelLabel={isSavingDraft ? DRAFT_SAVING_LABEL : DRAFT_SAVE_LABEL}
+          cancelLabelPc={isSavingDraft ? DRAFT_SAVING_LABEL : DRAFT_SAVE_LABEL}
+          isValid={isValid}
+          isPending={isPending}
+        >
+          {/* 신청 실패·임시저장 결과 토스트 — 위치(바 높이 기준)는 FooterCtaBar가 잡는다 */}
           {toast.current && (
             <AlertMessage
-              status="error"
+              status={toast.current.status}
               size="responsive"
-              icon={AlertCircleIcon}
+              icon={toast.current.status === 'error' ? AlertCircleIcon : CheckIcon}
               message={toast.current.message}
               onClose={toast.hide}
             />
@@ -194,6 +220,7 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
         onClose={cancelExit}
         onConfirm={confirmExit}
         title={EXIT_CONFIRM_TITLE}
+        description={EXIT_DRAFT_NOTICE}
       />
 
       {/* ═══ 입양 상담 확인 모달 (Figma 1955-262642) — 제출 버튼 → 이 모달 → "상담하기"로 실제 신청 ═══ */}

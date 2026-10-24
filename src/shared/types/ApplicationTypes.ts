@@ -10,6 +10,8 @@ export type ApplicationStatus =
   | 'consultation_completed'
   | 'adoption_approved'
   | 'adoption_rejected'
+  /** 입양자가 직접 취소 — 상담 대기·상담 완료에서만 들어온다 */
+  | 'adoption_cancelled'
 
 /** adopterId 필드가 여러 DTO에서 동일하게 쓰이는 유니온 타입 */
 type AdopterIdField = string | { _id: string; nickname?: string } | null
@@ -167,6 +169,24 @@ export interface ReceivedApplicationDetailDto extends ApplicationDetailBase {
   adopterName: string
   adopterEmail: string
   adopterPhone?: string
+}
+
+// ==================== 임시저장 ====================
+
+/** 신청서 임시저장 내용 — 글자 입력과 브리더 질문 답만 (동의 체크는 제출 때 다시 받는다) */
+export interface ApplicationDraftForm {
+  adoptionPlan?: string
+  familyMembers?: string
+  selfIntroduction?: string
+  timeAwayFromHome?: string
+  livingSpaceDescription?: string
+  customResponses?: Array<{ questionId: string; answer: string }>
+}
+
+export interface ApplicationDraftDto {
+  petId: string
+  form: ApplicationDraftForm
+  updatedAt: string
 }
 
 // ==================== 상태 변경 ====================

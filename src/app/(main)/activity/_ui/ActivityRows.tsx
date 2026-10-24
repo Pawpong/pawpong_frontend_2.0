@@ -11,7 +11,7 @@ import { ActivityLinkCard } from './ActivityLinkCard'
 
 export const ApplicationRow = ({ application }: { application: ApplicationListItemDto }) => (
   <ActivityLinkCard
-    href={`/activity/applications/${application.applicationId}?view=sent`}
+    href={`/activity/applications/${application.applicationId}`}
     identity={
       <ActivityIdentity
         name={application.breederName}
@@ -41,7 +41,7 @@ export const ReceivedApplicationRow = ({
   application: ReceivedApplicationItemDto
 }) => (
   <ActivityLinkCard
-    href={`/activity/applications/${application.applicationId}?view=received`}
+    href={`/activity/applications/${application.applicationId}`}
     identity={
       <ActivityIdentity
         name={application.adopterName || application.adopterNickname}

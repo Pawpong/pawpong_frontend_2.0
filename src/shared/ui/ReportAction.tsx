@@ -18,6 +18,8 @@ import { IconButton } from './IconButton'
 
 interface ReportActionProps<Reason extends string> {
   triggerVariant?: 'menu' | 'flag'
+  /** menu(⋯) 아이콘 색 — 다른 ⋯ 메뉴와 같은 neutral 이 기본, 갈색 아이콘(공유 등) 옆에 붙으면 brand */
+  menuTone?: 'neutral' | 'brand'
   targetLabel: string
   options: readonly { value: Reason; label: string }[]
   onSubmit: (data: { reason: Reason; description?: string }) => Promise<string>
@@ -27,6 +29,7 @@ interface ReportActionProps<Reason extends string> {
 /** 신고 대상별 API와 사유만 주입하는 공통 신고 흐름. */
 export const ReportAction = <Reason extends string>({
   triggerVariant = 'menu',
+  menuTone = 'neutral',
   targetLabel,
   options,
   onSubmit,
@@ -100,7 +103,7 @@ export const ReportAction = <Reason extends string>({
       ) : (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <IconButton aria-label={`${targetLabel} 더보기`}>
+            <IconButton tone={menuTone} aria-label={`${targetLabel} 더보기`}>
               <MoreVertIcon className="size-6" />
             </IconButton>
           </DropdownMenuTrigger>

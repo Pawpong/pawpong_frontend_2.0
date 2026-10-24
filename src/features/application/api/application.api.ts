@@ -1,5 +1,25 @@
 import { apiClient, API_VERSION, unwrap } from '@/shared/api'
-import type { ApplicationCreateRequest, ApplicationUpdateRequest } from '@/shared/types'
+import type {
+  ApiResponseFull,
+  ApplicationCreateRequest,
+  ApplicationDraftDto,
+  ApplicationDraftForm,
+  ApplicationUpdateRequest,
+} from '@/shared/types'
+
+/** 신청서 임시저장 — 이 분양글에 저장한 내용을 덮어쓴다. 제출하면 서버가 지운다 */
+export const saveApplicationDraft = ({
+  petId,
+  form,
+}: {
+  petId: string
+  form: ApplicationDraftForm
+}) =>
+  apiClient
+    .put<
+      ApiResponseFull<ApplicationDraftDto>
+    >(`${API_VERSION}/adopter/application-drafts/${petId}`, form)
+    .then(unwrap)
 
 /** 입양 신청 제출 */
 export const createApplication = (data: ApplicationCreateRequest) =>
@@ -9,6 +29,14 @@ export const createApplication = (data: ApplicationCreateRequest) =>
       data: { applicationId: string; message: string }
       message?: string
     }>(`${API_VERSION}/adopter/application`, data)
+    .then(unwrap)
+
+/** 입양 신청 취소 — 상담 대기·상담 완료인 내 신청만 가능, 확정·거절은 409 */
+export const cancelApplication = (applicationId: string) =>
+  apiClient
+    .patch<
+      ApiResponseFull<{ applicationId: string; status: 'adoption_cancelled' }>
+    >(`${API_VERSION}/adopter/application/${applicationId}/cancel`)
     .then(unwrap)
 
 /** 입양 신청서 전체 수정 — 상담 대기 상태인 내 신청만 가능 */

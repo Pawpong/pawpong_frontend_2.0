@@ -7,15 +7,10 @@ interface ReviewDetailPageProps {
 
 const ReviewDetailPage = async ({ params }: ReviewDetailPageProps) => {
   const { reviewId } = await params
-  // 브리더도 다른 브리더에게 후기를 쓸 수 있어 입양자로 제한하지 않는다 — 소유권은 API가 검증한다.
-  const userRole = await requireAuth(`/activity/reviews/${reviewId}`)
+  // 내가 쓴 후기 상세 — 소유권은 API가 검증한다. 브리더가 받은 후기는 received-reviews 로 간다.
+  await requireAuth(`/activity/reviews/${reviewId}`)
 
-  return (
-    <ReviewDetailContent
-      reviewId={reviewId}
-      backHref={userRole === 'breeder' ? '/activity?tab=sent-reviews' : '/activity?tab=reviews'}
-    />
-  )
+  return <ReviewDetailContent reviewId={reviewId} backHref="/activity?tab=reviews" />
 }
 
 export default ReviewDetailPage

@@ -52,7 +52,7 @@ const ReviewDetailContent = ({ reviewId, backHref }: { reviewId: string; backHre
                     )}
                     {data.applicationId && (
                       <Link
-                        href={`/activity/applications/${data.applicationId}?view=sent`}
+                        href={`/activity/applications/${data.applicationId}`}
                         className={buttonVariants({
                           intent: 'primary',
                           size: 'lg',

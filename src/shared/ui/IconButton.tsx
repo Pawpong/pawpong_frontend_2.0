@@ -22,6 +22,9 @@ const iconButtonStyles = tv({
       overlay: 'bg-action-dark/60 text-base-white hover:bg-action-dark/80',
       surface:
         'border border-action-disabled bg-base-white text-action-dark hover:bg-action-subtle',
+      // 글자 버튼(secondary) 옆에 나란히 놓는 아이콘 버튼 — 같은 테두리로 한 줄 버튼처럼 보인다
+      outline:
+        'border border-action-border bg-base-white text-brand hover:bg-action-subtle active:bg-action-subtle-press',
       // 별만 표시하고, 선택하면 안쪽을 노랗게 채운다. 호버로 배경이나 색을 바꾸지 않는다.
       favorite:
         'bg-transparent text-brand transition-none [-webkit-tap-highlight-color:transparent] aria-disabled:cursor-wait',

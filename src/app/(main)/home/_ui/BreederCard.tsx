@@ -50,11 +50,13 @@ const BreederCard = ({ breeder, level, showPopularBadge, preload = false }: Bree
         </>
       }
     >
-      {/* 이름 mo 12 / pc 16 bold */}
-      <p className="truncate text-xs leading-[1.5] font-semibold text-neutral-850 tab:text-base">
-        {breeder.nickname}
-      </p>
-      <BreederLevelBadge level={level} />
+      {/* 이름 mo 12 / pc 16 bold. 레벨은 이름 앞 배지 그림만 (긴 이름은 이름만 줄인다) */}
+      <div className="flex min-w-0 items-center gap-1">
+        <BreederLevelBadge level={level} iconOnly />
+        <p className="min-w-0 truncate text-xs leading-[1.5] font-semibold text-neutral-850 tab:text-base">
+          {breeder.nickname}
+        </p>
+      </div>
       <LocationText location={formatJoinedBreederLocation(breeder.location)} size="compact" />
     </MediaCard>
   )

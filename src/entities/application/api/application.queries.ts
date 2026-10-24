@@ -1,6 +1,11 @@
-import { createQuery, createInfiniteQuery } from '@/shared/api'
+import { createQuery, createInfiniteQuery, STALE_TIME } from '@/shared/api'
 import type { ApplicationListItemDto } from '@/shared/types'
-import { getMyApplications, getApplicationDetail, getApplicationForm } from './application.api'
+import {
+  getMyApplications,
+  getApplicationDetail,
+  getApplicationDraft,
+  getApplicationForm,
+} from './application.api'
 
 export const applicationQueries = {
   all: () => ['application'] as const,
@@ -22,5 +27,16 @@ export const applicationQueries = {
     createQuery({
       queryKey: [...applicationQueries.all(), 'form'],
       queryFn: getApplicationForm,
+    }),
+
+  // 다른 기기에서 저장했을 수 있어 신청서를 열 때마다 새로 받는다
+  draft: (petId: string) =>
+    createQuery({
+      queryKey: [...applicationQueries.all(), 'draft', petId],
+      queryFn: () => getApplicationDraft(petId),
+      enabled: !!petId,
+      staleTime: STALE_TIME.REALTIME,
+      // 불러오지 못해도 빈 신청서로 쓰면 된다 — 화면을 막지 않는다
+      throwOnError: false,
     }),
 }

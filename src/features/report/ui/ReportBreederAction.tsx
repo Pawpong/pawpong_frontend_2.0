@@ -13,11 +13,20 @@ const BREEDER_REPORT_OPTIONS = [
   { value: 'other', label: '기타' },
 ] satisfies { value: ReportBreederPayload['reason']; label: string }[]
 
-export const ReportBreederAction = ({ breederId }: { breederId: string }) => {
+export const ReportBreederAction = ({
+  breederId,
+  triggerVariant = 'flag',
+}: {
+  breederId: string
+  /** flag: 깃발 아이콘, menu: ⋯ 메뉴 안의 '신고' (브리더 홈 상단) */
+  triggerVariant?: 'flag' | 'menu'
+}) => {
   const reportBreeder = useReportBreeder()
   return (
     <ReportAction
-      triggerVariant="flag"
+      triggerVariant={triggerVariant}
+      // ⋯ 메뉴는 브리더 홈 상단에서 갈색 공유 아이콘 옆에 붙는다
+      menuTone="brand"
       targetLabel="브리더"
       options={BREEDER_REPORT_OPTIONS}
       requireOtherDescription

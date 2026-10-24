@@ -1,8 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import { ActivityBadgeRow, BreederLevelBadge } from '@/entities/gamification'
-import { usePublicActivityBadges } from '@/features/gamification'
+import { ActivityBadgeRow, BreederLevelBadge, toBreederLevel } from '@/entities/gamification'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import {
@@ -12,6 +11,7 @@ import {
   communityFeedHref,
   communityWriteEntry,
   COMMUNITY_SEARCH_MAX_LENGTH,
+  type CommunityExperienceConfig,
   type CommunityFeedNavigation,
 } from '@/entities/community'
 import {
@@ -59,7 +59,12 @@ const PET_OPTIONS = [
   { value: 'reptile', label: '파충류 이야기', shortLabel: '파충류', icon: 'reptile' },
 ] as const
 
-const CommunityContent = () => {
+const CommunityContent = ({
+  initialExperience,
+}: {
+  /** 서버에서 미리 받은 확장 기능 설정 — 있으면 카테고리 줄을 첫 화면부터 그린다 */
+  initialExperience?: { config: CommunityExperienceConfig; fetchedAt: number } | null
+}) => {
   const router = useRouter()
   const parameters = useSearchParams()
   const query = parameters.toString()
@@ -74,7 +79,14 @@ const CommunityContent = () => {
   const setDiscovery = (next: CommunityDiscoveryFilters) => {
     changeNavigation({ discovery: next })
   }
-  const experience = useQuery({ ...communityExperienceConfigOptions, throwOnError: false })
+  const experience = useQuery({
+    ...communityExperienceConfigOptions,
+    throwOnError: false,
+    ...(initialExperience && {
+      initialData: initialExperience.config,
+      initialDataUpdatedAt: initialExperience.fetchedAt,
+    }),
+  })
   const experienceEnabled = experience.data?.enabled === true && !experience.isError
   const hasDiscovery = countCommunityDiscovery(discovery) > 0
   const filterUnavailable = hasDiscovery && experience.isError
@@ -107,15 +119,6 @@ const CommunityContent = () => {
     throwOnError: false,
   })
   const posts = flattenPages(data)
-  const authorBadges = usePublicActivityBadges(
-    posts.map((post) => ({
-      ownerId: post.authorId,
-      role: post.authorModel === 'Breeder' ? 'breeder' : 'adopter',
-    })),
-  )
-  const badgesByOwner = new Map(
-    authorBadges.map((owner) => [`${owner.role}:${owner.ownerId}`, owner.badges]),
-  )
   const firstPhotoPostId = getFirstPhotoPostId(posts)
   const writeEntry = communityWriteEntry(experienceEnabled ? discovery : {})
   const writePost = guard(() => {
@@ -352,25 +355,11 @@ const CommunityContent = () => {
                       key={post.postId}
                       preload={post.postId === firstPhotoPostId}
                       guard={guard}
+                      // 작성자 레벨·대표 배지는 글 목록 응답에 함께 실려 와 글과 같이 뜬다
                       badgeSlot={
                         <>
-                          <BreederLevelBadge
-                            level={
-                              authorBadges.find(
-                                (owner) =>
-                                  owner.ownerId === post.authorId &&
-                                  owner.role ===
-                                    (post.authorModel === 'Breeder' ? 'breeder' : 'adopter'),
-                              )?.level
-                            }
-                          />
-                          <ActivityBadgeRow
-                            badges={
-                              badgesByOwner.get(
-                                `${post.authorModel === 'Breeder' ? 'breeder' : 'adopter'}:${post.authorId}`,
-                              ) ?? []
-                            }
-                          />
+                          <BreederLevelBadge level={toBreederLevel(post.authorActivity?.level)} />
+                          <ActivityBadgeRow badges={post.authorActivity?.badges ?? []} />
                         </>
                       }
                       metaSlot={

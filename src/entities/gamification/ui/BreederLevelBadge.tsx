@@ -82,8 +82,8 @@ export function BreederLevelBadge({
   const label = `Lv.${level.value}${showFamily ? ` ${name}` : ''}`
   const content = (
     <>
-      {/* 그림만 보일 때는 글자 대신 그림이 뜻을 전하므로 크게 그린다 (아틀라스 칸에 여백이 있다) */}
-      <LevelIcon value={level.value} size={iconOnly ? 38 : 24} />
+      {/* 그림만 보일 때도 커뮤니티와 같은 크기 — 이름보다 튀지 않게 한다 */}
+      <LevelIcon value={level.value} size={24} />
       <span className={iconOnly ? 'sr-only' : undefined}>{label}</span>
     </>
   )
