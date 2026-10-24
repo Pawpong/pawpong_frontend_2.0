@@ -301,21 +301,23 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip', menu }: Profile
             {/* 내 홈만 모바일 이름 줄에 공유를 둔다 (2단에서는 아바타 줄로 옮겨가 숨긴다).
                 남의 홈은 이름만 — 공유·더보기는 상단 바(모바일)와 아바타 줄(tab+)이 맡는다 */}
             <div className="flex items-start gap-1">
-              {/* 내 홈은 이름 앞에 내 레벨 배지를 붙인다. 긴 이름은 이름만 줄인다 */}
+              {/* 이름 앞에 레벨 배지 그림만 붙인다 (남의 홈도 같은 자리). 긴 이름은 이름만 줄인다 */}
               <div className="flex min-w-0 flex-1 items-center gap-1.5">
                 {/* 입양자 'mine'·브리더 'mine-breeder' 모두 내 홈이다 */}
-                {!isVisitor && <MyLevelBadge userId={profileUserId} />}
+                {isVisitor ? (
+                  <PublicActivityLevel
+                    owner={{ ownerId: profileUserId, role: breederProfile ? 'breeder' : 'adopter' }}
+                    iconOnly
+                  />
+                ) : (
+                  <MyLevelBadge userId={profileUserId} />
+                )}
                 <p className="min-w-0 truncate text-lg leading-[1.5] font-semibold text-neutral-850 pc:text-xl">
                   {profile.nickname}
                 </p>
               </div>
               {!isVisitor && <div className={cn(isSidebar && 'tab:hidden')}>{profileActions}</div>}
             </div>
-            {isVisitor && (
-              <PublicActivityLevel
-                owner={{ ownerId: profileUserId, role: breederProfile ? 'breeder' : 'adopter' }}
-              />
-            )}
             {/* 위치 → 카운트 순으로 이름 아래에 각각 한 줄씩 (같은 줄에 묶지 않는다) */}
             {locationText && <LocationText location={locationText} />}
             <div className="flex">
