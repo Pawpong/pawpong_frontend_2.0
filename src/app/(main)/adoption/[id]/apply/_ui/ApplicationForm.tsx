@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { AlertCircleIcon, InfoIcon, PawPrintIcon } from '@/shared/assets'
+import { AlertCircleIcon, CheckIcon, InfoIcon, PawPrintIcon } from '@/shared/assets'
 import {
   AlertMessage,
   AsyncState,
@@ -21,6 +21,9 @@ import {
   CONSULT_CONFIRM_TITLE,
   EXIT_CONFIRM_TITLE,
   EXIT_DRAFT_NOTICE,
+  DRAFT_RESTORED_MESSAGE,
+  DRAFT_SAVE_LABEL,
+  DRAFT_SAVING_LABEL,
   FAMILY_MEMBERS_FIELD,
   PET_FIELD_TITLE,
   SURVEY_FIELDS,
@@ -62,7 +65,8 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
     customQuestions,
     customAnswers,
     setCustomAnswer,
-    canSaveDraft,
+    saveDraft,
+    isSavingDraft,
     draftRestored,
     dismissDraftRestored,
     isProfilePending,
@@ -123,7 +127,7 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
               status="info"
               size="responsive"
               icon={InfoIcon}
-              message="작성하던 신청서를 불러왔어요. 동의 항목은 다시 체크해 주세요."
+              message={DRAFT_RESTORED_MESSAGE}
               onClose={dismissDraftRestored}
             />
           </div>
@@ -189,13 +193,20 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
         </Container>
 
         {/* ═══ 하단 CTA 바 (Figma 1654-161691/97/03) ═══ */}
-        <FooterCtaBar onCancel={handleCloseClick} isValid={isValid} isPending={isPending}>
-          {/* 신청 실패 토스트 — 위치(바 높이 기준)는 FooterCtaBar가 잡는다 */}
+        {/* 나가기는 상단 X 가 맡고, 하단 보조 버튼은 분양글 작성처럼 임시저장으로 쓴다 */}
+        <FooterCtaBar
+          onCancel={saveDraft}
+          cancelLabel={isSavingDraft ? DRAFT_SAVING_LABEL : DRAFT_SAVE_LABEL}
+          cancelLabelPc={isSavingDraft ? DRAFT_SAVING_LABEL : DRAFT_SAVE_LABEL}
+          isValid={isValid}
+          isPending={isPending}
+        >
+          {/* 신청 실패·임시저장 결과 토스트 — 위치(바 높이 기준)는 FooterCtaBar가 잡는다 */}
           {toast.current && (
             <AlertMessage
-              status="error"
+              status={toast.current.status}
               size="responsive"
-              icon={AlertCircleIcon}
+              icon={toast.current.status === 'error' ? AlertCircleIcon : CheckIcon}
               message={toast.current.message}
               onClose={toast.hide}
             />
@@ -209,7 +220,7 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
         onClose={cancelExit}
         onConfirm={confirmExit}
         title={EXIT_CONFIRM_TITLE}
-        description={canSaveDraft ? EXIT_DRAFT_NOTICE : undefined}
+        description={EXIT_DRAFT_NOTICE}
       />
 
       {/* ═══ 입양 상담 확인 모달 (Figma 1955-262642) — 제출 버튼 → 이 모달 → "상담하기"로 실제 신청 ═══ */}

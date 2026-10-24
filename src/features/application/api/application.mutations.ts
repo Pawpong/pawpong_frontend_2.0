@@ -6,7 +6,21 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { adoptionQueries } from '@/entities/adoption'
 import { applicationQueries } from '@/entities/application'
 import type { ApplicationCreateRequest, ApplicationUpdateRequest } from '@/shared/types'
-import { cancelApplication, createApplication, updateApplication } from './application.api'
+import {
+  cancelApplication,
+  createApplication,
+  saveApplicationDraft,
+  updateApplication,
+} from './application.api'
+
+export const useSaveApplicationDraft = () => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: saveApplicationDraft,
+    onSuccess: (_, { petId }) =>
+      qc.invalidateQueries({ queryKey: applicationQueries.draft(petId).queryKey }),
+  })
+}
 
 export const useCreateApplication = () => {
   const qc = useQueryClient()

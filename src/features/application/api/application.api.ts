@@ -2,8 +2,24 @@ import { apiClient, API_VERSION, unwrap } from '@/shared/api'
 import type {
   ApiResponseFull,
   ApplicationCreateRequest,
+  ApplicationDraftDto,
+  ApplicationDraftForm,
   ApplicationUpdateRequest,
 } from '@/shared/types'
+
+/** 신청서 임시저장 — 이 분양글에 저장한 내용을 덮어쓴다. 제출하면 서버가 지운다 */
+export const saveApplicationDraft = ({
+  petId,
+  form,
+}: {
+  petId: string
+  form: ApplicationDraftForm
+}) =>
+  apiClient
+    .put<
+      ApiResponseFull<ApplicationDraftDto>
+    >(`${API_VERSION}/adopter/application-drafts/${petId}`, form)
+    .then(unwrap)
 
 /** 입양 신청 제출 */
 export const createApplication = (data: ApplicationCreateRequest) =>

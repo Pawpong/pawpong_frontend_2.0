@@ -5,9 +5,9 @@ import { useForm } from 'react-hook-form'
 import { useQuery } from '@tanstack/react-query'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
-import { useCreateApplication } from '@/features/application'
-import { useMe } from '@/features/auth'
+import { useCreateApplication, useSaveApplicationDraft } from '@/features/application'
 import { adopterQueries } from '@/entities/adopter'
+import { applicationQueries } from '@/entities/application'
 import { breederQueries } from '@/entities/breeder'
 import { useExitGuard } from '@/shared/lib/useExitGuard'
 import { useToast } from '@/shared/lib/useToast'
@@ -16,14 +16,7 @@ import { GENDER_LABEL } from '@/shared/types'
 import type { AdoptionDetailDto } from '@/shared/types'
 import { applicationSchema, type ApplicationFormValues } from './schema'
 import { toCreateApplicationRequest } from './applicationRequest'
-import { SUBMIT_ERROR_FALLBACK } from './constants'
-import {
-  applicationDraftKey,
-  clearApplicationDraft,
-  getDraftStorage,
-  readApplicationDraft,
-  writeApplicationDraft,
-} from './applicationDraft'
+import { DRAFT_SAVED_MESSAGE, DRAFT_SAVE_ERROR_FALLBACK, SUBMIT_ERROR_FALLBACK } from './constants'
 
 const useApplicationForm = (detail: AdoptionDetailDto) => {
   const router = useRouter()
@@ -36,7 +29,6 @@ const useApplicationForm = (detail: AdoptionDetailDto) => {
     watch,
     reset,
     getValues,
-    subscribe,
     formState: { isValid, isDirty },
   } = useForm<ApplicationFormValues>({
     resolver: zodResolver(applicationSchema),
@@ -106,7 +98,6 @@ const useApplicationForm = (detail: AdoptionDetailDto) => {
     createApplication(toCreateApplicationRequest(detail, data, customResponses), {
       onSuccess: () => {
         setShowConsultConfirm(false)
-        if (draftKey) clearApplicationDraft(getDraftStorage(), draftKey)
         router.push(`/adoption/${detail.listingId}`)
       },
       onError: (error) => {
@@ -134,39 +125,60 @@ const useApplicationForm = (detail: AdoptionDetailDto) => {
   const customFormQuery = useQuery(breederQueries.applicationForm(detail.breeder.id))
   const customQuestions = customFormQuery.data?.customQuestions ?? []
   const [customAnswers, setCustomAnswers] = useState<Record<string, string>>({})
-  const setCustomAnswer = (questionId: string, value: string) => {
-    const next = { ...customAnswers, [questionId]: value }
-    setCustomAnswers(next)
-    if (draftKey) writeApplicationDraft(getDraftStorage(), draftKey, getValues(), next)
-  }
+  const setCustomAnswer = (questionId: string, value: string) =>
+    setCustomAnswers((prev) => ({ ...prev, [questionId]: value }))
 
-  // 임시저장 — 계정이 확인되면 이 분양글에 쓰던 신청서를 한 번 불러오고, 그 뒤 입력이 바뀔 때마다 저장한다.
-  // 저장 콜백은 구독 시점에 고정되므로 브리더 질문 답은 ref 로 최신값을 읽는다.
-  const { me } = useMe()
-  const draftKey = me?.userId ? applicationDraftKey(me.userId, detail.listingId) : null
+  // 임시저장 — 저장 버튼을 누를 때만 서버에 남긴다 (제출하면 서버가 지운다).
+  // 신청서를 열 때 첫 조회 결과로 한 번만 채운다. 그 뒤 저장으로 다시 받아 온 값은 이미 화면에 있는 값이라 건너뛴다.
+  const draftQuery = useQuery(applicationQueries.draft(detail.listingId))
+  const { mutate: saveDraftMutate, isPending: isSavingDraft } = useSaveApplicationDraft()
   const [draftRestored, setDraftRestored] = useState(false)
-  const customAnswersRef = useRef(customAnswers)
+  const draftChecked = useRef(false)
   useEffect(() => {
-    customAnswersRef.current = customAnswers
-  }, [customAnswers])
-  useEffect(() => {
-    if (!draftKey) return
-    const storage = getDraftStorage()
-    const draft = readApplicationDraft(storage, draftKey)
-    if (draft) {
-      // keepDefaultValues — 불러온 값도 '수정됨'으로 쳐서 나가기 확인이 그대로 동작한다
-      reset({ ...getValues(), ...draft.values }, { keepDefaultValues: true })
-      // 저장소는 서버 렌더에 없는 외부 자원이라 하이드레이션 뒤 effect 에서 한 번만 읽어 반영한다.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setCustomAnswers(draft.customAnswers)
-      setDraftRestored(true)
-    }
-    return subscribe({
-      formState: { values: true },
-      callback: ({ values }) =>
-        writeApplicationDraft(storage, draftKey, values, customAnswersRef.current),
-    })
-  }, [draftKey, reset, getValues, subscribe])
+    if (draftChecked.current || !draftQuery.isFetched) return
+    draftChecked.current = true
+    if (!draftQuery.data) return
+    const { customResponses = [], ...values } = draftQuery.data.form
+    // keepDefaultValues — 불러온 값도 '수정됨'으로 쳐서 나가기 확인이 그대로 동작한다
+    reset({ ...getValues(), ...values }, { keepDefaultValues: true })
+    // 서버에서 받은 저장본을 폼 바깥 상태(브리더 질문 답)에 한 번 옮겨 담는다
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setCustomAnswers(Object.fromEntries(customResponses.map((r) => [r.questionId, r.answer])))
+    setDraftRestored(true)
+  }, [draftQuery.isFetched, draftQuery.data, reset, getValues])
+
+  const saveDraft = () => {
+    // 동의 체크는 남기지 않는다 — 제출 때마다 다시 확인받는다
+    const {
+      adoptionPlan,
+      familyMembers,
+      selfIntroduction,
+      timeAwayFromHome,
+      livingSpaceDescription,
+    } = getValues()
+    const customResponses = Object.entries(customAnswers).map(([questionId, answer]) => ({
+      questionId,
+      answer,
+    }))
+    saveDraftMutate(
+      {
+        petId: detail.listingId,
+        form: {
+          adoptionPlan,
+          familyMembers,
+          selfIntroduction,
+          timeAwayFromHome,
+          livingSpaceDescription,
+          customResponses,
+        },
+      },
+      {
+        onSuccess: () => toast.success(DRAFT_SAVED_MESSAGE),
+        onError: (error) =>
+          toast.error(normalizeApiError(error, DRAFT_SAVE_ERROR_FALLBACK).message),
+      },
+    )
+  }
 
   const customQuestionsValid = customQuestions.every(
     (q) => !q.required || (customAnswers[q.id]?.trim().length ?? 0) > 0,
@@ -193,7 +205,8 @@ const useApplicationForm = (detail: AdoptionDetailDto) => {
     customQuestions,
     customAnswers,
     setCustomAnswer,
-    canSaveDraft: !!draftKey,
+    saveDraft,
+    isSavingDraft,
     draftRestored,
     dismissDraftRestored: () => setDraftRestored(false),
     isProfilePending: adopterProfileQuery.isPending,

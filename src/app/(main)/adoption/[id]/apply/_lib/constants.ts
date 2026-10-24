@@ -53,7 +53,18 @@ export const PET_FIELD_TITLE = '입양하는 동물'
 
 export const EXIT_CONFIRM_TITLE = '입양 신청을 그만두시나요?'
 
-export const EXIT_DRAFT_NOTICE = '쓰던 내용은 이 기기에 7일 동안 저장돼요.'
+export const EXIT_DRAFT_NOTICE = '임시저장하지 않은 내용은 사라져요.'
+
+export const DRAFT_SAVE_LABEL = '임시저장'
+
+export const DRAFT_SAVING_LABEL = '저장 중…'
+
+export const DRAFT_SAVED_MESSAGE = '임시저장했어요. 다음에 이어서 쓸 수 있어요.'
+
+export const DRAFT_SAVE_ERROR_FALLBACK = '임시저장하지 못했어요.'
+
+export const DRAFT_RESTORED_MESSAGE =
+  '임시저장한 신청서를 불러왔어요. 동의 항목은 다시 체크해 주세요.'
 
 export const CONSULT_CONFIRM_TITLE = '브리더와 더 자세한 입양 상담이\n이루어집니다.'
 
