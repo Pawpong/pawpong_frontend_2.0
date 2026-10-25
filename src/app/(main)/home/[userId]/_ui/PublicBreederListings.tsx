@@ -65,7 +65,6 @@ const PublicBreederListings = ({ breederId, gridClassName }: PublicBreederListin
           loadingFallback={
             <ListingCardGridSkeleton
               label="분양글을 불러오는 중이에요."
-              layout="publicBreeder"
               className={gridClassName}
             />
           }
@@ -75,7 +74,6 @@ const PublicBreederListings = ({ breederId, gridClassName }: PublicBreederListin
           isRetrying={query.isFetching}
         >
           <ListingCardGrid
-            layout="publicBreeder"
             className={gridClassName}
             items={listings}
             getKey={(listing) => listing.listingId}

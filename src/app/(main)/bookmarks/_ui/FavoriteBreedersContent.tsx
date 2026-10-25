@@ -60,7 +60,6 @@ const FavoriteBreedersContent = ({
         loadingFallback={
           <ListingCardGridSkeleton
             label="즐겨찾는 브리더를 불러오는 중이에요."
-            layout="compact"
             className={gridClassName}
           />
         }
@@ -71,7 +70,6 @@ const FavoriteBreedersContent = ({
         isRetrying={isRetrying}
       >
         <ListingCardGrid
-          layout="compact"
           className={gridClassName}
           items={breeders}
           getKey={(breeder) => breeder.id}

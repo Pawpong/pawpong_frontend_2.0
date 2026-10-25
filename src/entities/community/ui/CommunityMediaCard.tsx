@@ -1,12 +1,9 @@
 'use client'
 
-import { useState, type MouseEventHandler } from 'react'
-import { SessionImage as Image } from '@/shared/ui/SessionImage'
-import Link from 'next/link'
-import { FavoriteIcon, PawPrintIcon, PixelMessageIcon } from '@/shared/assets'
+import type { MouseEventHandler } from 'react'
+import { FavoriteIcon, PixelMessageIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
-import { useAuthReadSession } from '@/shared/lib/useAuthReadSession'
-import { isSessionImageSource, sessionImageSource } from '@/shared/lib/sessionImageSource'
+import { PhotoTile } from '@/shared/ui'
 import type { CommunityPostReview } from '@/shared/types'
 import { CommunityReviewLabel } from './CommunityReviewLabel'
 
@@ -44,72 +41,39 @@ const CommunityMediaCard = ({
   onClick,
   className,
 }: CommunityMediaCardProps) => {
-  const [failedImageUrl, setFailedImageUrl] = useState<string>()
-  const session = useAuthReadSession()
-  const imageIdentity = isSessionImageSource(imageUrl)
-    ? sessionImageSource(imageUrl, session?.scope ?? 'anonymous')
-    : imageUrl
-  const showImage = Boolean(imageUrl) && failedImageUrl !== imageIdentity
   const isProfileGrid = variant === 'profileGrid'
-
   return (
-    <Link
-      href={href}
-      prefetch={false}
-      onClick={onClick}
-      aria-label={`${alt} 게시글 보기`}
+    <div
       className={cn(
-        'group relative block shrink-0 overflow-hidden focus-ring',
-        isProfileGrid
-          ? 'aspect-square w-full bg-neutral-700 pc:rounded-lg pc:border pc:border-neutral-300'
-          : 'size-[7.625rem] rounded-lg border border-neutral-300 bg-point-50 card-interactive transition-shadow duration-200 tab:aspect-square tab:size-auto tab:w-full',
+        isProfileGrid ? 'w-full min-w-0' : 'w-[7.625rem] shrink-0 tab:w-full',
         className,
       )}
     >
-      {showImage ? (
-        <Image
-          src={imageUrl!}
-          alt=""
-          fill
-          sizes="(min-width: 768px) 20vw, 122px"
-          loading={preload ? 'eager' : 'lazy'}
-          fetchPriority={preload ? 'high' : 'auto'}
-          onError={() => setFailedImageUrl(imageIdentity)}
-          className="object-cover"
-        />
-      ) : !isProfileGrid ? (
-        <span
-          className="absolute inset-0 flex items-center justify-center bg-point-50 text-primary-300"
-          aria-hidden="true"
-        >
-          <PawPrintIcon className="size-11 opacity-70 pc:size-20" />
-        </span>
-      ) : null}
-
-      {aiReview?.state === 'held' && (
-        <span className="absolute right-1 bottom-1 left-1">
-          <CommunityReviewLabel review={aiReview} />
-        </span>
-      )}
-      {imageCount > 1 && (
-        <span className="absolute top-1 right-1 flex h-[1.375rem] min-w-10 items-center justify-center rounded-full bg-neutral-850/90 px-2 text-[0.625rem] leading-[1.5] font-semibold text-white pc:top-2.5 pc:right-3">
-          {imageCount}장
-        </span>
-      )}
-
-      {isProfileGrid && (
-        <span className="pointer-events-none absolute inset-0 hidden items-center justify-center gap-2 bg-black/60 text-sm leading-[1.5] font-semibold text-neutral-50 opacity-0 transition-opacity pc:flex pc:group-hover:opacity-100">
-          <span className="flex items-center gap-1">
-            <FavoriteIcon className="size-8" />
-            {likeCount ?? 0}
-          </span>
-          <span className="flex items-center gap-1">
-            <PixelMessageIcon className="size-8" />
-            {commentCount ?? 0}
-          </span>
-        </span>
-      )}
-    </Link>
+      <PhotoTile
+        href={href}
+        imageUrl={imageUrl}
+        alt={alt}
+        count={imageCount}
+        preload={preload}
+        sizes={isProfileGrid ? '(max-width: 767px) 33vw, 25vw' : '(min-width: 768px) 20vw, 122px'}
+        onClick={onClick}
+        status={aiReview?.state === 'held' && <CommunityReviewLabel review={aiReview} />}
+        hoverContent={
+          isProfileGrid && (
+            <>
+              <span className="flex items-center gap-1">
+                <FavoriteIcon className="size-6" />
+                {likeCount ?? 0}
+              </span>
+              <span className="flex items-center gap-1">
+                <PixelMessageIcon className="size-6" />
+                {commentCount ?? 0}
+              </span>
+            </>
+          )
+        }
+      />
+    </div>
   )
 }
 

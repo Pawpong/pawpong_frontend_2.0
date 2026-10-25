@@ -1,11 +1,11 @@
 'use client'
 
-import Image from 'next/image'
 import { cn } from '@/shared/lib/cn'
 import type { AdoptionDetailDto } from '@/shared/types'
 import { EmptyState } from '@/shared/ui'
 import { TEXT } from '@/shared/config'
 import { PHOTO_GRID_COLS } from '../_lib/detailTypography'
+import { DetailPhotoButton } from './DetailPhotoButton'
 import { DetailSection } from './DetailSection'
 
 interface BreedingEnvironmentCardProps {
@@ -13,36 +13,6 @@ interface BreedingEnvironmentCardProps {
   onImageClick?: (images: string[], index?: number) => void
   className?: string
 }
-
-// [refactored] 사육 환경 이미지 버튼 — 모바일/데스크탑 중복 제거 (크기만 className)
-const EnvImageButton = ({
-  src,
-  index,
-  className,
-  onClick,
-}: {
-  src: string
-  index: number
-  className: string
-  onClick?: () => void
-}) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className={cn(
-      'relative shrink-0 overflow-hidden rounded-[0.5rem] bg-[#c6c6c6] focus-ring-inset',
-      className,
-    )}
-  >
-    <Image
-      src={src}
-      alt={`사육 환경 ${index + 1}`}
-      fill
-      sizes="(max-width: 1439px) 191px, 320px"
-      className="object-cover"
-    />
-  </button>
-)
 
 const BreedingEnvironmentCard = ({
   detail,
@@ -67,12 +37,13 @@ const BreedingEnvironmentCard = ({
         {imageUrls.length > 0 && (
           <div className={cn(PHOTO_GRID_COLS, 'order-2 gap-3 pc:order-1')}>
             {imageUrls.map((url, i) => (
-              <EnvImageButton
+              // [refactored] 부모 정보와 같은 사진 버튼 (EnvImageButton 대체)
+              <DetailPhotoButton
                 key={`env-${i}`}
                 src={url}
-                index={i}
+                alt={`사육 환경 ${i + 1}`}
+                sizes="(max-width: 1439px) 191px, 320px"
                 onClick={() => onImageClick?.(imageUrls, i)}
-                className="aspect-[4/3] w-full"
               />
             ))}
           </div>
