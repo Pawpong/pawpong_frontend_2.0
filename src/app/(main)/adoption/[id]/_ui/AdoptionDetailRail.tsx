@@ -78,9 +78,19 @@ const BreederRow = ({ breeder }: { breeder: AdoptionDetailDto['breeder'] }) => {
         size="responsivePc"
         className="shrink-0"
       />
-      <p className={cn(TEXT.body, 'min-w-0 flex-1 truncate')}>
-        {isWithdrawn ? '탈퇴한 브리더' : breeder.nickname}
-      </p>
+      {/* 마이홈처럼 이름 앞에 레벨 그림만 — 링크 안이라 안내 팝업 버튼은 끈다 */}
+      <div className="flex min-w-0 flex-1 items-center gap-1">
+        {!isWithdrawn && (
+          <PublicActivityLevel
+            owner={{ ownerId: breeder.id, role: 'breeder' }}
+            iconOnly
+            interactive={false}
+          />
+        )}
+        <p className={cn(TEXT.body, 'min-w-0 truncate')}>
+          {isWithdrawn ? '탈퇴한 브리더' : breeder.nickname}
+        </p>
+      </div>
     </>
   )
 
@@ -174,7 +184,6 @@ const AdoptionDetailRail = ({
 
       <hr className="border-neutral-200" />
       <BreederRow breeder={detail.breeder} />
-      <PublicActivityLevel owner={{ ownerId: detail.breeder.id, role: 'breeder' }} />
     </div>
   </aside>
 )
