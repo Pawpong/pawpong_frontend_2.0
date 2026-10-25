@@ -106,9 +106,9 @@ const FollowCounts = ({
 
 /* ── mode별 하단 액션 (디자인: pill border 버튼) ── */
 
-// 팔로우·메시지 공통 폭 — flex-1 + min-w 로 두어 컨테이너가 폭을 정한다.
-// (strip 은 w-auto 라 min-w 만큼, sidebar 는 w-full 이라 컬럼을 채운다)
-const ACTION_LAYOUT = 'flex min-w-0 flex-1 pc:min-w-30'
+// 팔로우·메시지 공통 폭 — flex-1 로 컨테이너 폭을 나눠 갖는다.
+// 최소 폭을 두면 PC 사이드바(260px)에서 별 버튼까지 한 줄이 넘쳐 본문을 침범한다
+const ACTION_LAYOUT = 'flex min-w-0 flex-1'
 
 /* ── 남의 홈에서 보이는 액션 (Figma 3349-2026986) ── */
 
