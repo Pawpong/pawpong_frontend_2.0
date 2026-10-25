@@ -39,11 +39,24 @@ const PublicBreederListings = ({ breederId, gridClassName }: PublicBreederListin
     refetchOnMount: 'always',
     throwOnError: false,
   })
+  // 공개 목록 API 는 상태를 비우면 분양완료를 뺀다(탐색 화면용). '전체'는 분양완료를 따로 받아
+  // 분양중·예약중을 다 넘긴 뒤에 잇는다 — 먼저 붙이면 다음 페이지가 그 사이로 끼어든다
+  const isAll = status === null
+  const adoptedQuery = useInfiniteQuery({
+    ...adoptionQueries.breederPets(breederId, undefined, HOME_LISTING_PAGE_SIZE, 'adopted'),
+    enabled: !!breederId && isAll,
+    refetchOnMount: 'always',
+    throwOnError: false,
+  })
+  const showAdopted = isAll && !query.hasNextPage
   const listings = dedupeBy(
-    flattenPages(query.data).map(mapAdoptionCard),
+    [...flattenPages(query.data), ...(showAdopted ? flattenPages(adoptedQuery.data) : [])].map(
+      mapAdoptionCard,
+    ),
     (listing) => listing.listingId,
   )
-  const totalItems = getTotalItems(query.data)
+  const totalItems = getTotalItems(query.data) + (isAll ? getTotalItems(adoptedQuery.data) : 0)
+  const next = query.hasNextPage ? query : showAdopted ? adoptedQuery : null
 
   return (
     <Container className="px-4 py-5 tab:py-10">
@@ -58,8 +71,8 @@ const PublicBreederListings = ({ breederId, gridClassName }: PublicBreederListin
         </div>
 
         <ListState
-          isPending={query.isPending}
-          isError={query.isError}
+          isPending={query.isPending || (isAll && adoptedQuery.isPending)}
+          isError={query.isError || (isAll && adoptedQuery.isError)}
           isEmpty={listings.length === 0}
           loadingText="분양글을 불러오는 중이에요."
           loadingFallback={
@@ -70,8 +83,11 @@ const PublicBreederListings = ({ breederId, gridClassName }: PublicBreederListin
           }
           errorText="분양글을 불러오지 못했어요."
           emptyText={status ? '해당 상태의 분양글이 없어요.' : '등록된 분양글이 없어요.'}
-          onRetry={() => void query.refetch()}
-          isRetrying={query.isFetching}
+          onRetry={() => {
+            void query.refetch()
+            if (isAll) void adoptedQuery.refetch()
+          }}
+          isRetrying={query.isFetching || adoptedQuery.isFetching}
         >
           <ListingCardGrid
             className={gridClassName}
@@ -83,9 +99,9 @@ const PublicBreederListings = ({ breederId, gridClassName }: PublicBreederListin
           />
         </ListState>
         <InfiniteScrollTrigger
-          onIntersect={() => void query.fetchNextPage()}
-          hasNextPage={query.hasNextPage ?? false}
-          isFetchingNextPage={query.isFetchingNextPage}
+          onIntersect={() => void next?.fetchNextPage()}
+          hasNextPage={next?.hasNextPage ?? false}
+          isFetchingNextPage={query.isFetchingNextPage || adoptedQuery.isFetchingNextPage}
         />
       </div>
     </Container>
