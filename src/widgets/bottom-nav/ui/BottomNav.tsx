@@ -2,7 +2,6 @@
 
 import { Suspense, useSyncExternalStore } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
 import { useRoutePathname } from '@/shared/lib/useRoutePathname'
 import { useQuery } from '@tanstack/react-query'
@@ -45,12 +44,7 @@ const shouldShowBottomNav = (pathname: string) =>
   (BOTTOM_NAV_PATHS.has(pathname) ||
     BOTTOM_NAV_PREFIXES.some((prefix) => pathname.startsWith(prefix)))
 
-// 하단 내비게이션 전용 Figma 원본. 데스크톱 헤더 아이콘은 유지한다.
-const BOTTOM_ICONS: Record<string, string> = {
-  '/': '/images/nav/bottom-home.svg',
-  '/chat': '/images/nav/bottom-chat.svg',
-}
-
+// 기존 인라인 아이콘은 currentColor를 사용해 비활성 색상을 라벨과 동일하게 맞춘다.
 const subscribeNothing = () => () => undefined
 const isClient = () => true
 const isServer = () => false
@@ -90,21 +84,11 @@ const BottomNavView = ({ pathname }: { pathname: string }) => {
               aria-current={isActive(pathname) ? 'page' : undefined}
             >
               <span className="relative flex size-[1.875rem] shrink-0 items-center justify-center">
-                {!isActive(pathname) && BOTTOM_ICONS[href] ? (
-                  <Image
-                    src={BOTTOM_ICONS[href]}
-                    alt=""
-                    width={30}
-                    height={30}
-                    className="size-[1.875rem]"
-                  />
-                ) : (
-                  <Icon
-                    className="size-[1.875rem] shrink-0"
-                    src={href === '/home' ? me?.profileImageUrl : undefined}
-                    active={isActive(pathname)}
-                  />
-                )}
+                <Icon
+                  className="size-[1.875rem] shrink-0"
+                  src={href === '/home' ? me?.profileImageUrl : undefined}
+                  active={isActive(pathname)}
+                />
                 {href === '/chat' && <UnreadCountBadge count={hydrated ? unreadChatCount : 0} />}
               </span>
               <span
