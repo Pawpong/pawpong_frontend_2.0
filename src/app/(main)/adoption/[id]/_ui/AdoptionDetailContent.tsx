@@ -135,9 +135,10 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
           <DetailSection title={`브리더의 다른 분양건 ${detail.otherListings.length}`}>
             {detail.otherListings.length > 0 ? (
               // 공개 브리더 홈 분양 목록과 같은 그리드 카드 — 같은 정보를 두 화면이 다른
-              // 모양으로 보여줄 이유가 없다. 컬럼 폭이 유동이라 열 수는 auto-fill 로 맞춘다
+              // 모양으로 보여줄 이유가 없다. 모바일은 auto-fill, 본문 칸이 좁은 태블릿·PC 는 3·4열로 둔다
+              // (공통 격자의 1024px 5열이 이 칸에서는 카드를 너무 잘게 쪼갠다)
               <ListingCardGrid
-                className={cn(PHOTO_GRID_COLS, 'max-w-none justify-normal gap-x-5')}
+                className={cn(PHOTO_GRID_COLS, 'gap-x-5 lap:grid-cols-3 pc:grid-cols-4')}
                 items={detail.otherListings}
                 getKey={(listing) => listing.listingId}
                 renderItem={(listing, index) => (

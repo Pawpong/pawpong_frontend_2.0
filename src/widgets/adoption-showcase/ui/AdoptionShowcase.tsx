@@ -7,9 +7,10 @@ import { flattenPages } from '@/shared/lib/infiniteList'
 import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
 import { FavoriteAdoptionGridCard } from '@/features/adoption'
 
-const CARD_COUNT = 4
-// 공통 격자에서 열 수만 덮는다 — 홈은 4장 한 줄이라 태블릿 3열이면 3+1 로 갈라진다.
-const SHOWCASE_GRID = 'tab:grid-cols-4'
+const CARD_COUNT = 5
+// 1024px 부터는 공통 격자 그대로 5장 한 줄. 그보다 좁으면 태블릿 4열·모바일 2×2 로 4장만 보여
+// 5번째가 혼자 다음 줄로 넘어가지 않게 한다.
+const SHOWCASE_GRID = 'tab:grid-cols-4 max-lap:[&>*:nth-child(5)]:hidden'
 
 const AdoptionShowcase = () => {
   // 홈 섹션은 비필수 — 실패해도 페이지는 렌더되어야 하므로 바운더리로 던지지 않음

@@ -2,8 +2,9 @@ import { Fragment, type Key, type ReactNode } from 'react'
 import { cn } from '@/shared/lib/cn'
 import { SkeletonBlock } from './Skeleton'
 
-// [refactored] 주석 한국어화 — 모든 카드 목록이 같은 열 규칙을 쓰고, 공간이 좁은 목록만 className 으로 열 수를 덮는다.
-const GRID_CLASS = 'grid grid-cols-2 w-full gap-4 tab:grid-cols-3 tab:gap-5 pc:grid-cols-4'
+// 모든 카드 목록이 같은 열 규칙을 쓰고, 공간이 좁은 목록만 className 으로 열 수를 덮는다.
+// mo 2열 / tab 3열 / 1024px 부터 5열 (그보다 좁은 5열은 카드가 125px 까지 줄어 생년월일이 잘린다)
+const GRID_CLASS = 'grid grid-cols-2 w-full gap-4 tab:grid-cols-3 tab:gap-5 lap:grid-cols-5'
 
 interface ListingCardGridProps<T> {
   items: readonly T[]
