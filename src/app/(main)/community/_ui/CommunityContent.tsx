@@ -305,7 +305,7 @@ const CommunityContent = ({
             {isPending && !filterUnavailable && (
               <div>
                 {[0, 1, 2].map((i) => (
-                  <CommunityFeedCardSkeleton key={i} wide />
+                  <CommunityFeedCardSkeleton key={i} />
                 ))}
               </div>
             )}
@@ -351,7 +351,6 @@ const CommunityContent = ({
                   const isMyPost = me?.userId === post.authorId
                   return (
                     <ConnectedFeedCard
-                      wide
                       key={post.postId}
                       preload={post.postId === firstPhotoPostId}
                       guard={guard}

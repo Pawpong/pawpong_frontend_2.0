@@ -69,32 +69,18 @@ interface CtaBannerProps {
   href?: string
   /** 지정하면 배너 전체가 버튼이 된다 (href 와 동시에 쓰지 않는다) */
   onClick?: () => void
-  /**
-   * secondary(기본, 홈 브리더 CTA) / point(문의하기 안내 배너, Figma 2752-266394 기본 override).
-   * 같은 컴포넌트를 가리키는 다른 색 override라 tone 으로 분기한다.
-   */
-  tone?: 'secondary' | 'point'
 }
 
-const TONE_CLASS = {
-  secondary: 'border border-secondary-400 bg-secondary-200',
-  point: 'border border-secondary-400 bg-secondary-200',
-} as const
+// 모바일·PC 발자국은 같은 그림을 크기만 달리 쓴다
+const CTA_PAW_SRC = '/images/category/cta-paw.svg'
 
 /**
  * 픽셀 발자국 CTA 스트립 (Figma 2937-336918 / 2752-266432 / 2752-266394).
  * 스트립 px-16 py-12(pc px-32) · 텍스트 12px -> pc 14px · PC 폭 1134.
  */
-const CtaBanner = ({ text, href, onClick, tone = 'secondary' }: CtaBannerProps) => {
-  const barClass = cn(
-    'focus-ring relative mx-auto flex h-[2.3125rem] w-full max-w-[70.875rem] items-center justify-between overflow-hidden rounded-xl px-4 pc:h-[2.8125rem] pc:px-8',
-    TONE_CLASS[tone],
-  )
-  // point 톤의 발자국 색(secondary-500)이 기본 톤과 같아져 동일 에셋을 재사용한다.
-  const pawSrc = {
-    compact: '/images/category/cta-paw.svg',
-    desktop: '/images/category/cta-paw.svg',
-  }
+const CtaBanner = ({ text, href, onClick }: CtaBannerProps) => {
+  const barClass =
+    'focus-ring relative mx-auto flex h-[2.3125rem] w-full max-w-[70.875rem] items-center justify-between overflow-hidden rounded-xl border border-secondary-400 bg-secondary-200 px-4 pc:h-[2.8125rem] pc:px-8'
 
   const content = (
     <>
@@ -102,12 +88,12 @@ const CtaBanner = ({ text, href, onClick, tone = 'secondary' }: CtaBannerProps) 
       <div className="pointer-events-none absolute inset-0" aria-hidden>
         <div className="absolute inset-y-[-0.65625rem] right-[1.18125rem] w-[9.693625rem] pc:hidden">
           {CTA_PAWS_COMPACT.map((position) => (
-            <CtaPaw key={position} src={pawSrc.compact} position={position} compact />
+            <CtaPaw key={position} src={CTA_PAW_SRC} position={position} compact />
           ))}
         </div>
         <div className="absolute inset-0 hidden pc:block">
           {CTA_PAWS_PC.map((position) => (
-            <CtaPaw key={position} src={pawSrc.desktop} position={position} />
+            <CtaPaw key={position} src={CTA_PAW_SRC} position={position} />
           ))}
         </div>
       </div>

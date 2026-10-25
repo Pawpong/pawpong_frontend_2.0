@@ -13,7 +13,7 @@ export {
   useToggleCommunityPostLike,
   useToggleCommunityPostBookmark,
 } from './api/communityReaction.mutations'
-export { ConnectedCommunityBox, ConnectedFeedCard, ConnectedPostCard } from './ui/ConnectedPostCard'
+export { ConnectedFeedCard, ConnectedPostCard } from './ui/ConnectedPostCard'
 export { ReportPostAction } from './ui/ReportPostAction'
 export { useSubmitCommunityPostForm } from './lib/useSubmitCommunityPostForm'
 export { useCommunityEditorNavigation } from './lib/useCommunityEditorNavigation'

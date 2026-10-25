@@ -13,9 +13,10 @@ import { flattenPages } from '@/shared/lib/infiniteList'
 
 const CARD_COUNT = 5
 
-// 불러온 타일과 같은 줄 배치를 스켈레톤과 함께 쓴다.
+// 불러온 타일과 같은 줄 배치를 스켈레톤과 함께 쓴다. 타일 폭은 이 줄이 정한다 —
+// mo 122px 칸을 가로로 이어 스크롤, tab 5열, pc 4열(5번째 칸은 숨김).
 const ROW_CLASS =
-  'flex w-max gap-3 tab:grid tab:w-full tab:grid-cols-5 tab:gap-[clamp(0.75rem,2vw,1.667rem)] pc:grid-cols-4'
+  'grid w-max auto-cols-[7.625rem] grid-flow-col gap-3 tab:w-full tab:grid-flow-row tab:grid-cols-5 tab:gap-[clamp(0.75rem,2vw,1.667rem)] pc:grid-cols-4 pc:[&>*:nth-child(n+5)]:hidden'
 
 const CommunityShowcase = () => {
   // 홈은 부분 실패 허용 — 오류를 전역 바운더리로 던지지 않고 섹션 안에서 안내한다.
@@ -45,11 +46,8 @@ const CommunityShowcase = () => {
           <div role="status" aria-busy="true" className="w-full overflow-hidden">
             <span className="sr-only">커뮤니티 게시글을 불러오는 중이에요.</span>
             <div className={ROW_CLASS} aria-hidden>
-              {Array.from({ length: 5 }, (_, index) => (
-                <SkeletonBlock
-                  key={index}
-                  className={`size-[7.625rem] tab:aspect-square tab:size-auto tab:w-full ${index >= 4 ? 'pc:hidden' : ''}`}
-                />
+              {Array.from({ length: CARD_COUNT }, (_, index) => (
+                <SkeletonBlock key={index} className="aspect-square w-full" />
               ))}
             </div>
           </div>
@@ -71,7 +69,6 @@ const CommunityShowcase = () => {
                 imageCount={post.images?.length ?? 0}
                 alt={`${post.author.nickname}의 게시글 이미지`}
                 preload={post.postId === firstPhotoPostId}
-                className={index >= 4 ? 'pc:hidden' : undefined}
               />
             ))}
           </div>
