@@ -14,9 +14,9 @@ import { flattenPages } from '@/shared/lib/infiniteList'
 const CARD_COUNT = 5
 
 // 불러온 타일과 같은 줄 배치를 스켈레톤과 함께 쓴다. 타일 폭은 이 줄이 정한다 —
-// mo 122px 칸을 가로로 이어 스크롤, tab 5열, pc 4열(5번째 칸은 숨김).
+// mo 122px 칸을 가로로 이어 스크롤, tab 부터 5열 — 간격은 분양중인 동물(공통 카드 격자)과 같아 세로 칸이 맞는다.
 const ROW_CLASS =
-  'grid w-max auto-cols-[7.625rem] grid-flow-col gap-3 tab:w-full tab:grid-flow-row tab:grid-cols-5 tab:gap-[clamp(0.75rem,2vw,1.667rem)] pc:grid-cols-4 pc:[&>*:nth-child(n+5)]:hidden'
+  'grid w-max auto-cols-[7.625rem] grid-flow-col gap-3 tab:w-full tab:grid-flow-row tab:grid-cols-5 tab:gap-5'
 
 const CommunityShowcase = () => {
   // 홈은 부분 실패 허용 — 오류를 전역 바운더리로 던지지 않고 섹션 안에서 안내한다.

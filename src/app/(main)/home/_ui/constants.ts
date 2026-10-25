@@ -60,8 +60,9 @@ const MY_HOME_LISTINGS_PANEL = 'py-5 tab:py-10'
 // 쪼개지지 않게 한다.
 // 클래스는 반드시 완성된 문자열로 둔다 — Tailwind 스캐너는 정적 문자열만 읽어서
 // `tab:${COLS}` 처럼 조립하면 CSS 가 생성되지 않는다(그런데 twMerge 는 충돌로 보고 원래 규칙을 지운다).
+// 공통 격자의 lap 5열도 덮어야 2단 오른쪽 칸에서 카드가 잘게 쪼개지지 않는다.
 const CARD_GRID =
-  'gap-x-5 grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))] tab:grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))] pc:grid-cols-4'
+  'gap-x-5 grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))] tab:grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))] lap:grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))] pc:grid-cols-4'
 
 // 게시글 사진 그리드. 모바일 3열 정사각은 시안 스펙이라 그대로 두고, 2단 컬럼(tab+)에서만
 // 컬럼 폭에 맞춰 채운다.
