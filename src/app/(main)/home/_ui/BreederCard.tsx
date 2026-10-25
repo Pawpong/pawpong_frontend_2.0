@@ -1,7 +1,7 @@
 'use client'
 
 import { BreederLevelBadge, type BreederLevel } from '@/entities/gamification'
-import { Badge, LocationText, MediaCard } from '@/shared/ui'
+import { Badge, MediaCard } from '@/shared/ui'
 import { formatJoinedBreederLocation } from '@/shared/lib/formatBreederLocation'
 import { FavoriteBreederIconButton } from './FavoriteBreederIconButton'
 import type { FavoriteBreeder } from '@/shared/types'
@@ -13,53 +13,31 @@ interface BreederCardProps {
   preload?: boolean
 }
 
-/**
- * 브리더 카드 (Figma CardStar 816-102863) — 즐겨찾기 탭·브리더 탐색 공용.
- *
- * 셸(이미지 + 본문 좌측 텍스트 + 우측 뱃지)은 분양 카드와 같아 MediaCard 로 공유하고,
- * 규격만 이 시안을 따른다: medium(모바일 164) / large(PC 282).
- * 즐겨찾기는 프로필과 같은 픽셀 별 버튼을 사용하며, 사진과 무관하게 상태가 읽히도록 바탕을 둔다.
- */
-const BreederCard = ({ breeder, level, showPopularBadge, preload = false }: BreederCardProps) => {
-  return (
-    <MediaCard
-      href={`/home/${breeder.id}`}
-      thumbnailUrl={breeder.imageUrl ?? undefined}
-      alt={breeder.nickname}
-      preload={preload}
-      // 시안: mo 164x133.84 / pc 282x230 (비율 동일), radius mo 4 / pc 8
-      thumbnailClassName="aspect-[282/230] rounded tab:rounded-lg"
-      overlay={
-        <>
-          {/* 인기 뱃지 — 좌상단, 박스 mo px-8 py-4 / pc px-12 py-8 */}
-          {showPopularBadge && (
-            <div className="absolute top-1 left-2 flex items-center tab:top-2 tab:left-3">
-              <Badge variant="primaryOutline" size="responsive">
-                인기
-              </Badge>
-            </div>
-          )}
-
-          <span className="absolute right-2 bottom-2 flex tab:right-3 tab:bottom-3">
-            <FavoriteBreederIconButton
-              breederId={breeder.id}
-              isFavorited={!!breeder.isFavorited}
-              size="card"
-            />
-          </span>
-        </>
-      }
-    >
-      {/* 이름 mo 12 / pc 16 bold. 레벨은 이름 앞 배지 그림만 (긴 이름은 이름만 줄인다) */}
-      <div className="flex min-w-0 items-center gap-1">
-        <BreederLevelBadge level={level} iconOnly />
-        <p className="min-w-0 truncate text-xs leading-[1.5] font-semibold text-neutral-850 tab:text-base">
-          {breeder.nickname}
-        </p>
-      </div>
-      <LocationText location={formatJoinedBreederLocation(breeder.location)} size="compact" />
-    </MediaCard>
-  )
-}
+/** 브리더 카드 — 즐겨찾기 탭·브리더 탐색 공용. 모양은 MediaCard 가 정하고 여기서는 내용만 넘긴다. */
+const BreederCard = ({ breeder, level, showPopularBadge, preload = false }: BreederCardProps) => (
+  <MediaCard
+    href={`/home/${breeder.id}`}
+    thumbnailUrl={breeder.imageUrl ?? undefined}
+    alt={breeder.nickname}
+    title={breeder.nickname}
+    description={formatJoinedBreederLocation(breeder.location)}
+    titleLeading={<BreederLevelBadge level={level} iconOnly />}
+    badge={
+      showPopularBadge && (
+        <Badge variant="primaryOutline" size="responsive">
+          인기
+        </Badge>
+      )
+    }
+    preload={preload}
+    action={
+      <FavoriteBreederIconButton
+        breederId={breeder.id}
+        isFavorited={!!breeder.isFavorited}
+        size="card"
+      />
+    }
+  />
+)
 
 export { BreederCard }

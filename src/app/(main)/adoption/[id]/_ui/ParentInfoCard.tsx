@@ -1,10 +1,10 @@
-import Image from 'next/image'
 import { Badge, EmptyState } from '@/shared/ui'
 import { GenderIcon } from '@/shared/assets'
 import type { AdoptionDetailDto } from '@/shared/types'
 import { cn } from '@/shared/lib/cn'
 import { TEXT } from '@/shared/config'
 import { PHOTO_GRID_COLS } from '../_lib/detailTypography'
+import { DetailPhotoButton } from './DetailPhotoButton'
 import { DetailSection } from './DetailSection'
 
 interface ParentInfoCardProps {
@@ -22,27 +22,17 @@ const ParentInfoCard = ({ detail, onImageClick }: ParentInfoCardProps) => {
         <EmptyState message="등록된 부모 정보가 없어요." size="compact" />
       )}
 
-      {/* 세로 배치: 4:3 이미지 → 배지(role + 성별 아이콘) + 이름/생일 — Figma 1240-45069 */}
+      {/* 세로 배치: 정사각 이미지 → 배지(role + 성별 아이콘) + 이름/생일 — Figma 1240-45069 */}
       <div className={cn(PHOTO_GRID_COLS, 'gap-4 tab:gap-5')}>
         {detail.parents.map((parent, i) => (
           <div key={parent.role} className="flex flex-col items-start gap-3">
-            {/* 이미지: 4:3 풀폭 (rounded-8) */}
-            <button
-              type="button"
+            {/* [refactored] 사육 환경과 같은 사진 버튼 */}
+            <DetailPhotoButton
+              src={parent.imageUrl}
+              alt={`${parent.role} 사진`}
+              sizes="(max-width: 767px) 40vw, 200px"
               onClick={() => onImageClick?.(parentImages, i)}
-              className="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-neutral-200 focus-ring-inset"
-            >
-              {/* 사진 미등록이면 회색 배경만 — 빈 src를 <Image>에 넘기지 않는다 */}
-              {parent.imageUrl && (
-                <Image
-                  src={parent.imageUrl}
-                  alt={`${parent.role} 사진`}
-                  fill
-                  sizes="(max-width: 767px) 40vw, 200px"
-                  className="object-cover"
-                />
-              )}
-            </button>
+            />
 
             {/* 배지(role + 성별 아이콘) + 이름/생일 */}
             <div className={cn('flex items-start gap-2', TEXT.body)}>
