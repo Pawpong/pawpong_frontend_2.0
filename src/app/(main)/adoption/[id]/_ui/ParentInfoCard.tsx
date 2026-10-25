@@ -1,4 +1,4 @@
-import { Badge, EmptyState } from '@/shared/ui'
+import { EmptyState } from '@/shared/ui'
 import { GenderIcon } from '@/shared/assets'
 import type { AdoptionDetailDto } from '@/shared/types'
 import { cn } from '@/shared/lib/cn'
@@ -22,7 +22,7 @@ const ParentInfoCard = ({ detail, onImageClick }: ParentInfoCardProps) => {
         <EmptyState message="등록된 부모 정보가 없어요." size="compact" />
       )}
 
-      {/* 세로 배치: 정사각 이미지 → 배지(role + 성별 아이콘) + 이름/생일 — Figma 1240-45069 */}
+      {/* 세로 배치: 정사각 이미지 → 이름 + 성별 아이콘 → 생일 */}
       <div className={cn(PHOTO_GRID_COLS, 'gap-4 tab:gap-5')}>
         {detail.parents.map((parent, i) => (
           <div key={parent.role} className="flex flex-col items-start gap-3">
@@ -34,19 +34,17 @@ const ParentInfoCard = ({ detail, onImageClick }: ParentInfoCardProps) => {
               onClick={() => onImageClick?.(parentImages, i)}
             />
 
-            {/* 배지(role + 성별 아이콘) + 이름/생일 */}
-            <div className={cn('flex items-start gap-2', TEXT.body)}>
-              <Badge variant="primaryOutline" size="lg" className="shrink-0">
-                {parent.role}
+            {/* 이전 프론트처럼 배지 없이 이름 + 성별 아이콘, 아래 생일. 엄마·아빠는 아이콘이 알린다 */}
+            <div className="flex w-full min-w-0 flex-col gap-0.5">
+              <div className={cn('flex items-center gap-0.5', TEXT.body)}>
+                <span className="min-w-0 truncate">{parent.name}</span>
+                <span className="sr-only">({parent.role})</span>
                 <GenderIcon
                   gender={parent.role === '엄마' ? 'female' : 'male'}
-                  className="size-[1.5rem]"
+                  className="size-5"
                 />
-              </Badge>
-              <div className="flex min-w-0 flex-col gap-[0.125rem]">
-                <span>{parent.name}</span>
-                <span className={TEXT.meta}>{parent.birthDate}</span>
               </div>
+              <span className={TEXT.meta}>{parent.birthDate}</span>
             </div>
           </div>
         ))}
