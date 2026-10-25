@@ -24,7 +24,6 @@ interface EmptyStateProps {
   illustration?: boolean
   role?: 'status' | 'alert'
   className?: string
-  illustrationClassName?: string
 }
 
 /** 조회 결과가 비어 있을 때 일러스트와 안내 문구를 함께 보여주는 공통 상태. */
@@ -35,14 +34,9 @@ const EmptyState = ({
   illustration = true,
   role = 'status',
   className,
-  illustrationClassName,
 }: EmptyStateProps) => (
   <div role={role} className={cn(emptyState({ size }), className)}>
-    {illustration && (
-      <EmptyIllustration
-        className={cn('h-[7.4325rem] w-[8.3165rem] shrink-0', illustrationClassName)}
-      />
-    )}
+    {illustration && <EmptyIllustration className="h-[7.4325rem] w-[8.3165rem] shrink-0" />}
     {message && <p>{message}</p>}
     {action}
   </div>

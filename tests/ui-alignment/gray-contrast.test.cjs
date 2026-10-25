@@ -22,7 +22,6 @@ const EXCLUDED = [
 // 실제로 비활성 상태에만 붙는 회색은 대비 기준 예외라 남긴다.
 const DISABLED_ONLY = [
   ['src/shared/ui/Badge.tsx', "disabled: 'bg-neutral-150"],
-  ['src/shared/ui/PixelTab.tsx', "disabled: { root: 'text-neutral-400'"],
   ['src/shared/ui/TextareaField.tsx', "disabled: 'text-neutral-400'"],
   // 아직 오지 않은 온보딩 단계 화살표. 단계 칩의 비활성 표시와 짝을 맞춘다.
   ['src/features/onboarding/ui/StepIndicator.tsx', ": 'text-neutral-400'"],

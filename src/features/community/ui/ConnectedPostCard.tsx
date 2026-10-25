@@ -1,7 +1,7 @@
 'use client'
 
 import type { ComponentProps } from 'react'
-import { CommunityBox, CommunityFeedCard, PostCard } from '@/entities/community'
+import { CommunityFeedCard, PostCard } from '@/entities/community'
 import {
   useToggleCommunityPostBookmark,
   useToggleCommunityPostLike,
@@ -30,20 +30,6 @@ const ConnectedPostCard = (props: Omit<ComponentProps<typeof PostCard>, Injected
       {...props}
       {...(props.aiReview?.state === 'held' ? {} : reactions)}
       moreAction={props.onDelete ? undefined : <ReportPostAction postId={props.postId} />}
-    />
-  )
-}
-
-const ConnectedCommunityBox = (
-  props: Omit<ComponentProps<typeof CommunityBox>, InjectedActions>,
-) => {
-  const reactions = useCardReactions(props.postId, props.isLiked, props.isSaved)
-
-  return (
-    <CommunityBox
-      {...props}
-      {...reactions}
-      moreAction={<ReportPostAction postId={props.postId} />}
     />
   )
 }
@@ -88,4 +74,4 @@ const ConnectedFeedCard = ({ guard, ...props }: ConnectedFeedCardProps) => {
   )
 }
 
-export { ConnectedCommunityBox, ConnectedFeedCard, ConnectedPostCard }
+export { ConnectedFeedCard, ConnectedPostCard }

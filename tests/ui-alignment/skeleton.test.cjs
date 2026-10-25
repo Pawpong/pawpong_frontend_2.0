@@ -72,7 +72,7 @@ test('탐색 목록은 불러오는 동안 같은 격자에 카드 모양 스켈
   )
   assert.match(html, /role="status" aria-busy="true"/)
   assert.match(html, /<span class="sr-only">분양글을 불러오는 중이에요\.<\/span>/)
-  assert.equal(html.match(/aspect-\[348\/284\]/g).length, 2)
+  assert.equal(html.match(/aspect-square/g).length, 2)
   assert.match(html, /grid grid-cols-2/)
   for (const file of [
     'src/app/(main)/explore/_ui/ExploreContent.tsx',
@@ -83,26 +83,29 @@ test('탐색 목록은 불러오는 동안 같은 격자에 카드 모양 스켈
 
 test('홈 분양·자랑하기 영역은 불러온 카드와 같은 배치의 스켈레톤으로 자리를 잡아 둠', () => {
   const adoption = source('src/widgets/adoption-showcase/ui/AdoptionShowcase.tsx')
-  assert.match(adoption, /<div className=\{GRID_CLASS\}>/)
-  assert.match(adoption, /loadingFallback=\{[\s\S]*?<div className=\{GRID_CLASS\} aria-hidden>/)
+  assert.match(adoption, /<ListingCardGrid\s+className=\{SHOWCASE_GRID\}/)
+  assert.match(
+    adoption,
+    /loadingFallback=\{\s*<ListingCardGridSkeleton[\s\S]*?className=\{SHOWCASE_GRID\}/,
+  )
   const community = source('src/widgets/community-showcase/ui/CommunityShowcase.tsx')
   assert.match(community, /<div className=\{ROW_CLASS\}>/)
   assert.match(community, /loadingFallback=\{[\s\S]*?<div className=\{ROW_CLASS\} aria-hidden>/)
-  for (const code of [adoption, community]) assert.match(code, /role="status" aria-busy="true"/)
+  assert.match(community, /role="status" aria-busy="true"/)
 })
 
-test('관심 입양글·즐겨찾는 브리더·브리더 홈 분양 목록도 각자 격자 배치의 카드 스켈레톤을 씀', () => {
+test('관심 입양글·즐겨찾는 브리더·브리더 홈 분양 목록도 공통 격자 배치의 카드 스켈레톤을 씀', () => {
   assert.match(
     source('src/app/(main)/bookmarks/_ui/FavoritesTab.tsx'),
     /loadingFallback=\{<ListingCardGridSkeleton label="관심 목록을 불러오는 중이에요\." \/>\}/,
   )
   assert.match(
     source('src/app/(main)/bookmarks/_ui/FavoriteBreedersContent.tsx'),
-    /<ListingCardGridSkeleton[\s\S]*?layout="compact"[\s\S]*?className=\{gridClassName\}/,
+    /loadingFallback=\{<ListingCardGridSkeleton label="즐겨찾는 브리더를 불러오는 중이에요\." \/>\}/,
   )
   assert.match(
     source('src/app/(main)/home/[userId]/_ui/PublicBreederListings.tsx'),
-    /<ListingCardGridSkeleton[\s\S]*?layout="publicBreeder"[\s\S]*?className=\{gridClassName\}/,
+    /<ListingCardGridSkeleton[\s\S]*?className=\{gridClassName\}/,
   )
 })
 

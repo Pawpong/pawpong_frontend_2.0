@@ -74,11 +74,7 @@ const FaqHero = ({ onInquiryClick }: { onInquiryClick: () => void }) => (
     {/* 얇은 밴드, 상하 8px만. CtaBanner 가 자체 max-w-[70.875rem](1134px) 로 가운데 정렬하므로
         폭을 다시 좁히지 않는다 */}
     <Container className="py-2">
-      <CtaBanner
-        text="AI에게 문의하기 · 운영팀도 함께 확인해요"
-        tone="point"
-        onClick={onInquiryClick}
-      />
+      <CtaBanner text="AI에게 문의하기 · 운영팀도 함께 확인해요" onClick={onInquiryClick} />
     </Container>
   </>
 )

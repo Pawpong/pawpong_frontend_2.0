@@ -22,20 +22,18 @@ export function GridSkeleton({
   label,
   count,
   className,
-  itemClassName,
 }: {
   label: ReactNode
   count: number
   /** 실제 목록 격자와 같은 클래스 */
   className?: string
-  itemClassName?: string
 }) {
   return (
     <div role="status" aria-busy="true">
       <span className="sr-only">{label}</span>
       <div className={className}>
         {Array.from({ length: count }, (_, index) => (
-          <SkeletonBlock key={index} className={cn('aspect-square w-full', itemClassName)} />
+          <SkeletonBlock key={index} className="aspect-square w-full" />
         ))}
       </div>
     </div>

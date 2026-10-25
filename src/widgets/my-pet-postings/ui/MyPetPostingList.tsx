@@ -10,7 +10,6 @@ import {
   ListHeader,
   ListState,
 } from '@/shared/ui'
-import { cn } from '@/shared/lib/cn'
 import { TEXT } from '@/shared/config'
 import { flattenPages, getTotalItems } from '@/shared/lib/infiniteList'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
@@ -24,16 +23,12 @@ const SORT_OPTIONS = [
   { value: 'popular', label: '관심 많은순' },
 ] satisfies Array<{ value: MyPetPostingSort; label: string }>
 
-const DEFAULT_GRID = 'flex flex-col'
-
 interface MyPetPostingListProps {
   pageSize: number
   /** 등록된 글이 없을 때 안내와 함께 보여줄 액션. */
   emptyAction?: ReactNode
   /** 라벨 옆에 필터 적용 후 전체 개수 표시 (분양 페이지 시안의 '분양 목록 109') */
   showTotalCount?: boolean
-  /** 그리드 간격 오버라이드 — 화면마다 시안 값이 다르다 */
-  gridClassName?: string
 }
 
 /**
@@ -44,7 +39,6 @@ const MyPetPostingList = ({
   pageSize,
   emptyAction,
   showTotalCount = false,
-  gridClassName,
 }: MyPetPostingListProps) => {
   const [sort, setSort] = useState<MyPetPostingSort>('latest')
   // 같은 칩을 다시 누르면 해제 -> 전체
@@ -107,7 +101,7 @@ const MyPetPostingList = ({
         onRetry={() => void refetch()}
         isRetrying={isRetrying}
       >
-        <div className={cn(DEFAULT_GRID, gridClassName)}>
+        <div className="flex flex-col">
           {postings.map((posting) => (
             <MyPetPostingCard key={posting.petId} posting={posting} />
           ))}

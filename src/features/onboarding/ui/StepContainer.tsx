@@ -17,10 +17,8 @@ interface StepContainerProps {
   nextDisabled?: boolean
   /** 검증 실패 등 nav 버튼 위 에러 메시지 */
   navError?: string
-  layoutClassName?: string
   /** 본문 여백 오버라이드 — 폭은 STEP_LAYOUT.content 로 통일돼 있다 */
   contentClassName?: string
-  navClassName?: string
   navExtraButtons?: React.ReactNode
 }
 
@@ -34,17 +32,10 @@ const StepContainer = ({
   backLabel,
   nextDisabled,
   navError,
-  layoutClassName,
   contentClassName,
-  navClassName,
   navExtraButtons,
 }: StepContainerProps) => (
-  <div
-    className={cn(
-      'mx-auto flex w-full max-w-3xl flex-1 flex-col px-5 pt-6 tab:px-10 tab:pt-10',
-      layoutClassName,
-    )}
-  >
+  <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-5 pt-6 tab:px-10 tab:pt-10">
     <StepIndicator />
     <StepTitle subtitle={subtitle}>{title}</StepTitle>
     <div
@@ -63,7 +54,6 @@ const StepContainer = ({
       backLabel={backLabel}
       nextDisabled={nextDisabled}
       error={navError}
-      className={navClassName}
       extraButtons={navExtraButtons}
     />
   </div>

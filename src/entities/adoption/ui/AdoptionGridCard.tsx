@@ -14,11 +14,9 @@ type AdoptionGridCardListing = Pick<
 interface AdoptionGridCardProps {
   listing: AdoptionGridCardListing
   isFavorite?: boolean
+  /** 없으면 관심 하트를 그리지 않는다 (하트가 클릭을 가로채므로) */
   onToggle?: () => void
-  /** 관심 하트 노출 (기본 true). 내 분양글처럼 관심 등록이 없는 화면은 false */
-  showFavorite?: boolean
   preload?: boolean
-  className?: string
 }
 
 /** 탐색/홈 공용 세로형 카드 (프레젠테이셔널). 관심 연결은 호출부(features 래퍼)가 담당한다. */
@@ -26,9 +24,7 @@ const AdoptionGridCard = ({
   listing,
   isFavorite,
   onToggle,
-  showFavorite = true,
   preload = false,
-  className,
 }: AdoptionGridCardProps) => {
   const { status } = listing
 
@@ -37,48 +33,33 @@ const AdoptionGridCard = ({
       href={`/adoption/${listing.listingId}`}
       thumbnailUrl={listing.thumbnailUrl}
       alt={listing.name}
-      preload={preload}
-      className={className}
-      overlay={
-        <>
-          {status === 'adopted' && <div className="absolute inset-0 bg-white/70" />}
-
-          <div className="absolute top-1 right-2 left-2 flex items-center gap-1 pc:top-2 pc:right-3 pc:left-3">
-            {listing.isPopular && (
-              // 같은 줄의 상태 뱃지와 크기를 맞춘다 (primaryOutline 에 bg-white 포함)
-              <PopularBadge variant="primaryOutline" size="responsive" iconSize="responsive" />
-            )}
-            <AdoptionStatusBadge status={status} className="shrink-0 pc:hidden" />
-          </div>
-
-          {/* 하트는 클릭을 가로채므로(preventDefault) 토글이 없는 화면에선 아예 그리지 않는다 */}
-          {showFavorite && (
-            <span className="absolute right-2 bottom-1 flex pc:right-3 pc:bottom-2">
-              <ToggleIconButton
-                icon={FavoriteIcon}
-                hasFillState
-                size="responsive"
-                tone="onImage"
-                aria-label="관심 등록"
-                pressed={isFavorite}
-                onClick={onToggle}
-              />
-            </span>
-          )}
-        </>
+      title={listing.name}
+      description={listing.birthDateText}
+      titleTrailing={
+        <GenderIcon gender={listing.gender} className="size-6 shrink-0 text-neutral-850" />
       }
-      trailing={<AdoptionStatusBadge status={status} className="hidden shrink-0 pc:inline-flex" />}
-    >
-      <div className="flex min-w-0 items-center">
-        <p className="truncate text-sm leading-[1.5] font-semibold text-neutral-850 pc:text-base">
-          {listing.name}
-        </p>
-        <GenderIcon gender={listing.gender} className="size-7 shrink-0 text-neutral-850" />
-      </div>
-      <p className="truncate text-xs leading-[1.5] font-medium text-neutral-850 pc:text-sm">
-        {listing.birthDateText}
-      </p>
-    </MediaCard>
+      preload={preload}
+      dimmed={status === 'adopted'}
+      badge={
+        listing.isPopular && (
+          <PopularBadge variant="primaryOutline" size="responsive" iconSize="responsive" />
+        )
+      }
+      status={<AdoptionStatusBadge status={status} />}
+      action={
+        onToggle && (
+          <ToggleIconButton
+            icon={FavoriteIcon}
+            hasFillState
+            size="responsive"
+            tone="onImage"
+            aria-label="관심 등록"
+            pressed={isFavorite}
+            onClick={onToggle}
+          />
+        )
+      }
+    />
   )
 }
 
