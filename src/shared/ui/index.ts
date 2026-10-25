@@ -72,7 +72,6 @@ export * from './FollowersModal'
 export * from './FollowButton'
 export * from './InfiniteScrollTrigger'
 export * from './PixelSelectCard'
-export * from './PixelTab'
 
 export * from './ComposerLayout'
 export * from './PhotoSelectPrompt'

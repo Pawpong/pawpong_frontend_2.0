@@ -5,7 +5,7 @@ import { adoptionQueries } from '@/entities/adoption'
 import { ListingCardGrid, ListingCardGridSkeleton, ListState, ShowcaseSection } from '@/shared/ui'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
-import { FavoriteAdoptionShowcaseCard } from '@/features/adoption'
+import { FavoriteAdoptionGridCard } from '@/features/adoption'
 
 const CARD_COUNT = 4
 // 공통 격자에서 열 수만 덮는다 — 홈은 4장 한 줄이라 태블릿 3열이면 3+1 로 갈라진다.
@@ -46,7 +46,7 @@ const AdoptionShowcase = () => {
           items={pets}
           getKey={(listing) => listing.listingId}
           renderItem={(listing, index) => (
-            <FavoriteAdoptionShowcaseCard listing={listing} preload={index === 0} />
+            <FavoriteAdoptionGridCard listing={listing} preload={index === 0} />
           )}
         />
       </ListState>

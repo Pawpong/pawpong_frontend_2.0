@@ -7,7 +7,6 @@ import { useQuery } from '@tanstack/react-query'
 import { aiImageQueries } from '@/entities/ai-image'
 import { useAuthReadSession } from '@/shared/lib/useAuthReadSession'
 import type { AuthReadSession } from '@/shared/lib/authReadSession'
-import { cn } from '@/shared/lib/cn'
 import {
   RetryButton,
   Button,
@@ -34,10 +33,12 @@ interface AiPhotoArchiveProps {
   moreHref?: string
   /** 목록 위에 'AI 사진 n장' 제목과 새 사진 만들기 + 버튼을 둔다(마이홈 탭처럼 만들기 화면 밖에서 볼 때). */
   createHref?: string
-  gridClassName?: string
   /** 크게 본 사진 아래 붙일 이어가기 버튼(예: 반려동물 캐릭터 만들기). 다른 기능은 화면 조립 계층에서 넣는다. */
   renderResultAction?: (jobId: string, className?: string) => ReactNode
 }
+
+// 불러오는 중 칸과 사진 목록이 같은 격자를 쓴다
+const ARCHIVE_GRID = 'grid grid-cols-3 gap-1.5 tab:grid-cols-4 tab:gap-3'
 
 const formatDate = (iso: string) =>
   new Intl.DateTimeFormat('ko-KR', {
@@ -58,7 +59,6 @@ export function AiPhotoArchive({
   limit,
   moreHref,
   createHref,
-  gridClassName,
   renderResultAction,
 }: AiPhotoArchiveProps) {
   const session = useAuthReadSession()
@@ -70,7 +70,6 @@ export function AiPhotoArchive({
       limit={limit}
       moreHref={moreHref}
       createHref={createHref}
-      gridClassName={gridClassName}
       renderResultAction={renderResultAction}
     />
   )
@@ -81,7 +80,6 @@ function AiArchiveContent({
   limit,
   moreHref,
   createHref,
-  gridClassName,
   renderResultAction,
 }: Omit<AiPhotoArchiveProps, 'enabled'> & { session: AuthReadSession }) {
   const generationsQuery = useQuery(aiImageQueries.myGenerations(true, session))
@@ -122,7 +120,7 @@ function AiArchiveContent({
         <GridSkeleton
           label="보관함을 불러오는 중이에요."
           count={limit ?? 8}
-          className={cn('grid grid-cols-3 gap-1.5 tab:grid-cols-4 tab:gap-3', gridClassName)}
+          className={ARCHIVE_GRID}
         />
       </>
     )
@@ -173,10 +171,7 @@ function AiArchiveContent({
         </div>
       )}
       {header}
-      <ul
-        className={cn('grid grid-cols-3 gap-1.5 tab:grid-cols-4 tab:gap-3', gridClassName)}
-        aria-label="내 AI 사진"
-      >
+      <ul className={ARCHIVE_GRID} aria-label="내 AI 사진">
         {visible.map((job) => {
           const done = job.status === 'succeeded' && !!job.resultImageUrl
           return (

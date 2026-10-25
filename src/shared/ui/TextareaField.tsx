@@ -28,24 +28,10 @@ interface TextareaFieldProps extends TextareaProps {
   required?: boolean
   error?: string
   currentLength?: number
-  wrapperClassName?: string
 }
 
 const TextareaField = React.forwardRef<HTMLTextAreaElement, TextareaFieldProps>(
-  (
-    {
-      label,
-      required,
-      error,
-      currentLength,
-      maxLength,
-      wrapperClassName,
-      state,
-      disabled,
-      ...props
-    },
-    ref,
-  ) => {
+  ({ label, required, error, currentLength, maxLength, state, disabled, ...props }, ref) => {
     const showCounter = maxLength !== undefined && currentLength !== undefined
     const filled = (currentLength ?? 0) > 0
 
@@ -65,12 +51,7 @@ const TextareaField = React.forwardRef<HTMLTextAreaElement, TextareaFieldProps>(
     return (
       // 라벨·필수 칩·에러 문구는 InputField 와 같은 컴포넌트를 써서 다른 필드(별명·주소·품종 등)와
       // 같은 위계(medium/neutral-700)를 갖는다 — 여기서 따로 그리지 않는다.
-      <InputField
-        label={label}
-        required={required}
-        error={error}
-        className={cn('group gap-[0.125rem]', wrapperClassName)}
-      >
+      <InputField label={label} required={required} error={error} className="group gap-[0.125rem]">
         <Textarea
           ref={ref}
           state={resolvedState}

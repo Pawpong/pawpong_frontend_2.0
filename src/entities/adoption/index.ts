@@ -1,8 +1,5 @@
-export { AdoptionCard, AdoptionCardHorizontal } from './ui/AdoptionCard'
 export { AdoptionGridCard } from './ui/AdoptionGridCard'
 export type { AdoptionGridCardListing } from './ui/AdoptionGridCard'
-export { AdoptionShowcaseCard } from './ui/AdoptionShowcaseCard'
-export type { AdoptionShowcaseCardProps } from './ui/AdoptionShowcaseCard'
 export { ADOPTION_CARD_STATUS } from './ui/adoptionCardStatus'
 export { AdoptionStatusBadge } from './ui/AdoptionStatusBadge'
 export { AdoptionSummaryCard } from './ui/AdoptionSummaryCard'

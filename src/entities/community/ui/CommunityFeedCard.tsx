@@ -1,11 +1,9 @@
 'use client'
 
 import { useRef, type ReactNode } from 'react'
-import { SessionImage as Image } from '@/shared/ui/SessionImage'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { BeforeAfterSlider, ImageCarousel, OwnerActionsMenu, ProfileAvatar } from '@/shared/ui'
-import { cn } from '@/shared/lib/cn'
 import { formatRelativeTime } from '@/shared/lib/formatRelativeTime'
 import type { CommunityPreviewProps } from '../model/communityPreview'
 import { CommunityPostActions } from './CommunityPostActions'
@@ -26,19 +24,13 @@ interface CommunityFeedCardProps extends CommunityPreviewProps {
   metaSlot?: ReactNode
   /** 남의 글 액션 줄 오른쪽 끝에 둘 기능 레이어 액션(신고 깃발) */
   reportAction?: ReactNode
-  /** 이미지 표현 — 커뮤니티 피드는 1:1 캐러셀, 마이홈처럼 카드가 넓은 곳은 가로 스크롤 썸네일 */
-  mediaLayout?: 'carousel' | 'row'
   /** 목록의 첫 카드처럼 LCP 후보인 첫 이미지만 선로딩 */
   preload?: boolean
-  /** 커뮤니티 메인의 본문 우선 피드 스타일 */
-  wide?: boolean
-  className?: string
 }
 
 /**
- * 인스타그램식 단일 컬럼 피드 카드 (Figma CommunityFeedCard, node 3606:622637)
- * - 이미지가 있으면 1:1 캐러셀, 없으면 본문을 큼직하게
- * - wide는 커뮤니티 메인의 본문 우선·구분선 스타일, 나머지 화면은 기본 카드 유지
+ * 커뮤니티 메인의 본문 우선 피드 카드 (Figma CommunityFeedCard, node 3606:622637)
+ * - 헤더 → 본문(최대 4줄) → 기록·주제 줄 → 4:3 사진 캐러셀 → 액션, 카드 사이는 구분선
  */
 const CommunityFeedCard = ({
   postId,
@@ -62,13 +54,9 @@ const CommunityFeedCard = ({
   badgeSlot,
   metaSlot,
   reportAction,
-  mediaLayout = 'carousel',
   preload = false,
-  wide = false,
-  className,
 }: CommunityFeedCardProps) => {
   const href = detailHref ?? `/community/post/${postId}`
-  const hasImages = images.length > 0
   const comparison =
     aiComparison && images[aiComparison.beforePhotoIndex] && images[aiComparison.afterPhotoIndex]
       ? aiComparison
@@ -102,15 +90,9 @@ const CommunityFeedCard = ({
   }
 
   return (
-    <article
-      className={cn(
-        'flex flex-col overflow-hidden rounded-2xl bg-white',
-        wide && 'rounded-none border-b border-neutral-100 py-6 tab:py-8',
-        className,
-      )}
-    >
+    <article className="flex flex-col overflow-hidden border-b border-neutral-100 bg-white py-6 tab:py-8">
       {/* 헤더 — 아바타·닉네임·작성시각. 작성자 영역은 그 사람의 홈으로 간다 (/home/[userId] 가 입양자·브리더를 가른다) */}
-      <div className={cn('flex items-center justify-between gap-2 p-3', wide && 'p-0 pb-4')}>
+      <div className="flex items-center justify-between gap-2 pb-4">
         <Link
           href={`/home/${author.id}`}
           prefetch={false}
@@ -142,53 +124,25 @@ const CommunityFeedCard = ({
       <div className="px-3">
         <CommunityReviewLabel review={aiReview} />
       </div>
-      {wide && text && (
+      {text && (
         <Link href={href} prefetch={false} className="mb-4 block rounded focus-ring">
           <p className="line-clamp-4 text-body-md font-normal whitespace-pre-line text-neutral-850 tab:text-body-lg">
             {text}
           </p>
         </Link>
       )}
-      {metaSlot && <div className={cn('px-3 pb-3', wide && 'mb-4 p-0')}>{metaSlot}</div>}
+      {metaSlot && <div className="mb-4">{metaSlot}</div>}
 
-      {/* 미디어 — 기본은 카드 폭을 채우는 1:1 캐러셀 (여러 장이면 우상단에 장수 배지),
-          row 는 사진을 원래 비율 그대로 가로로 늘어놓고 넘치면 스크롤한다 */}
+      {/* 미디어 — 카드 폭을 채우는 4:3 캐러셀 (여러 장이면 우상단에 장수 배지) */}
       {comparison && (
         <BeforeAfterSlider
           beforeSrc={images[comparison.beforePhotoIndex]}
           afterSrc={images[comparison.afterPhotoIndex]}
         />
       )}
-      {mediaImages.length > 0 && mediaLayout === 'row' && (
-        <Link href={href} prefetch={false} className="block px-3 pt-1">
-          <div className="flex gap-3 overflow-x-auto">
-            {mediaImages.map((src, index) => (
-              <div
-                key={index}
-                className="relative h-[13.1875rem] w-[17.5625rem] shrink-0 overflow-hidden rounded-lg bg-neutral-700 tab:h-60 tab:w-80"
-              >
-                {src && (
-                  <Image
-                    src={src}
-                    alt={`게시글 이미지 ${index + 1}`}
-                    fill
-                    sizes="(max-width: 767px) 281px, 320px"
-                    preload={preload && index === 0}
-                    className="object-cover"
-                  />
-                )}
-              </div>
-            ))}
-          </div>
-        </Link>
-      )}
-
-      {mediaImages.length > 0 && mediaLayout === 'carousel' && (
+      {mediaImages.length > 0 && (
         <div
-          className={cn(
-            'relative aspect-square w-full cursor-pointer overflow-hidden rounded-lg',
-            wide && 'aspect-[4/3] max-h-[26rem] rounded-xl',
-          )}
+          className="relative aspect-[4/3] max-h-[26rem] w-full cursor-pointer overflow-hidden rounded-xl"
           onPointerDown={handleImagePointerDown}
           onPointerUp={handleImagePointerUp}
         >
@@ -196,8 +150,8 @@ const CommunityFeedCard = ({
             images={mediaImages}
             alt={author.nickname}
             className="absolute inset-0"
-            bgClassName={wide ? 'bg-neutral-50' : 'bg-neutral-700'}
-            imageClassName={wide ? 'object-contain' : 'object-cover'}
+            bgClassName="bg-neutral-50"
+            imageClassName="object-contain"
             preloadFirstImage={preload}
             {...COMMUNITY_CAROUSEL_STYLE} // [refactored] 상세와 공유하는 상수로
           />
@@ -209,22 +163,8 @@ const CommunityFeedCard = ({
         </div>
       )}
 
-      {/* 사진이 없으면 본문을 큼직하게 (있으면 아래 캡션에서 보여준다) */}
-      {!hasImages && !wide && (
-        <Link href={href} prefetch={false} className="block px-3 py-5">
-          <p className="line-clamp-6 text-base leading-[1.5] font-semibold whitespace-pre-line text-neutral-850">
-            {text}
-          </p>
-        </Link>
-      )}
-
       {/* 액션 — 댓글 아이콘은 상세 링크 (community/@modal 인터셉트가 이 이동을 모달로 가로챈다) */}
-      <div
-        className={cn(
-          'flex items-center justify-between gap-2 px-3 py-2',
-          wide && 'px-0 pt-4 pb-0',
-        )}
-      >
+      <div className="flex items-center justify-between gap-2 pt-4">
         <CommunityPostActions
           likeCount={likeCount}
           commentCount={commentCount}
@@ -246,25 +186,6 @@ const CommunityFeedCard = ({
         />
         {reportAction}
       </div>
-
-      {/* 캡션 — 이미지가 있을 때만 (없으면 위에서 본문을 이미 보여줬다) */}
-      {hasImages && !wide && (
-        <Link href={href} prefetch={false} className="block px-3 pb-3">
-          <p className={cn('flex items-center gap-3 overflow-hidden', wide && 'tab:items-start')}>
-            <span className="shrink-0 text-sm leading-[1.5] font-semibold text-neutral-850">
-              {author.nickname}
-            </span>
-            <span
-              className={cn(
-                'min-w-0 flex-1 truncate text-xs leading-[1.5] font-semibold text-neutral-850',
-                wide && 'tab:line-clamp-3 tab:text-sm tab:font-medium tab:whitespace-pre-line',
-              )}
-            >
-              {text}
-            </span>
-          </p>
-        </Link>
-      )}
     </article>
   )
 }

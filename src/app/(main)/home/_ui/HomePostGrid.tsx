@@ -64,14 +64,7 @@ const HomePostGrid = ({
         isError={isError}
         isEmpty={posts.length === 0}
         loadingText={loadingText}
-        loadingFallback={
-          <GridSkeleton
-            label={loadingText}
-            count={6}
-            className={gridClasses}
-            itemClassName="rounded-none pc:rounded-lg"
-          />
-        }
+        loadingFallback={<GridSkeleton label={loadingText} count={6} className={gridClasses} />}
         errorText={errorText}
         emptyText={emptyText}
         emptyAction={emptyAction}
