@@ -21,7 +21,7 @@ const BreederCard = ({ breeder, level, showPopularBadge, preload = false }: Bree
     alt={breeder.nickname}
     title={breeder.nickname}
     description={formatJoinedBreederLocation(breeder.location)}
-    titleLeading={<BreederLevelBadge level={level} iconOnly />}
+    titleLeading={<BreederLevelBadge level={level} />}
     badge={
       showPopularBadge && (
         <Badge variant="primaryOutline" size="responsive">

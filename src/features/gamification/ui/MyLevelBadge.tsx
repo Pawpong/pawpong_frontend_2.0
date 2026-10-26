@@ -23,7 +23,7 @@ export function MyLevelBadge({ userId }: { userId?: string }) {
   if (!enabled || !view.data?.level) return null
   return (
     <Link href="/my-activity" className="inline-flex shrink-0 rounded focus-ring">
-      <BreederLevelBadge level={view.data.level} iconOnly showFamily />
+      <BreederLevelBadge level={view.data.level} showFamily />
       <span className="sr-only">나의 활동 보기</span>
     </Link>
   )

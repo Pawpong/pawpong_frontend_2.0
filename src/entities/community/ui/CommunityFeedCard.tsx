@@ -19,6 +19,9 @@ interface CommunityFeedCardProps extends CommunityPreviewProps {
   onToggleSave?: () => void
   /** 남의 글 헤더 오른쪽에 둘 기능 레이어 액션(팔로우) */
   followAction?: ReactNode
+  /** 닉네임 앞 (레벨 그림) */
+  nameLeading?: ReactNode
+  /** 닉네임 아래 (대표 배지 줄) */
   badgeSlot?: ReactNode
   /** 본문 아래에 둘 기록·주제·태그 줄 */
   metaSlot?: ReactNode
@@ -51,6 +54,7 @@ const CommunityFeedCard = ({
   onToggleLike,
   onToggleSave,
   followAction,
+  nameLeading,
   badgeSlot,
   metaSlot,
   reportAction,
@@ -106,8 +110,11 @@ const CommunityFeedCard = ({
             className="shrink-0"
           />
           <div className="flex min-w-0 flex-col">
-            <span className="truncate text-sm leading-[1.5] font-semibold text-neutral-850">
-              {author.nickname}
+            <span className="flex min-w-0 items-center gap-1">
+              {nameLeading}
+              <span className="min-w-0 truncate text-sm leading-[1.5] font-semibold text-neutral-850">
+                {author.nickname}
+              </span>
             </span>
             {badgeSlot}
             <span
