@@ -30,7 +30,7 @@ const CommentItem = ({
     <div className={`flex items-start gap-2 py-3 ${isReply ? 'pl-12' : ''}`}>
       <AuthorInfo
         size="sm"
-        badgeSlot={<BreederLevelBadge level={level} />}
+        nameLeading={<BreederLevelBadge level={level} />}
         className="flex min-w-0 flex-1 items-start gap-2"
         authorId={comment.authorId}
         nickname={comment.authorNickname}

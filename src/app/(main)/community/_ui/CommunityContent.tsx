@@ -355,12 +355,10 @@ const CommunityContent = ({
                       preload={post.postId === firstPhotoPostId}
                       guard={guard}
                       // 작성자 레벨·대표 배지는 글 목록 응답에 함께 실려 와 글과 같이 뜬다
-                      badgeSlot={
-                        <>
-                          <BreederLevelBadge level={toBreederLevel(post.authorActivity?.level)} />
-                          <ActivityBadgeRow badges={post.authorActivity?.badges ?? []} />
-                        </>
+                      nameLeading={
+                        <BreederLevelBadge level={toBreederLevel(post.authorActivity?.level)} />
                       }
+                      badgeSlot={<ActivityBadgeRow badges={post.authorActivity?.badges ?? []} />}
                       metaSlot={
                         experienceEnabled ? (
                           <CommunityFeedMeta

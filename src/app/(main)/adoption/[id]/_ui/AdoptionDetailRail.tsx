@@ -83,7 +83,6 @@ const BreederRow = ({ breeder }: { breeder: AdoptionDetailDto['breeder'] }) => {
         {!isWithdrawn && (
           <PublicActivityLevel
             owner={{ ownerId: breeder.id, role: 'breeder' }}
-            iconOnly
             interactive={false}
           />
         )}
