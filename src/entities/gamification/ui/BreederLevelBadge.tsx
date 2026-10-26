@@ -62,17 +62,18 @@ export function LevelIcon({ value, size = 24 }: { value: number; size?: number }
     />
   )
 }
+/**
+ * 닉네임 앞에 붙이는 레벨 그림. 어느 화면이든 그림만 보이고 'Lv.n' 문구는 화면 낭독기용으로만 남는다.
+ * 자리는 이름을 그리는 쪽이 정한다 — 항상 이름 앞(MediaCard titleLeading·AuthorInfo/피드 카드 nameLeading).
+ */
 export function BreederLevelBadge({
   level,
   showFamily = false,
   interactive = false,
-  iconOnly = false,
 }: {
   level?: BreederLevel | null
   showFamily?: boolean
   interactive?: boolean
-  /** 배지 그림만 보인다. 'Lv.n' 문구는 화면 낭독기용으로만 남는다 */
-  iconOnly?: boolean
 }) {
   const [open, setOpen] = useState(false)
   const router = useRouter()
@@ -82,9 +83,9 @@ export function BreederLevelBadge({
   const label = `Lv.${level.value}${showFamily ? ` ${name}` : ''}`
   const content = (
     <>
-      {/* 그림만 보일 때도 커뮤니티와 같은 크기 — 이름보다 튀지 않게 한다 */}
+      {/* 이름보다 튀지 않는 크기 */}
       <LevelIcon value={level.value} size={24} />
-      <span className={iconOnly ? 'sr-only' : undefined}>{label}</span>
+      <span className="sr-only">{label}</span>
     </>
   )
   // 이름 옆에 붙으므로 긴 이름 옆에서도 줄어들거나 줄바꿈되지 않는다

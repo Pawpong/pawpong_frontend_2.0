@@ -307,7 +307,6 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip', menu }: Profile
                 {isVisitor ? (
                   <PublicActivityLevel
                     owner={{ ownerId: profileUserId, role: breederProfile ? 'breeder' : 'adopter' }}
-                    iconOnly
                   />
                 ) : (
                   <MyLevelBadge userId={profileUserId} />

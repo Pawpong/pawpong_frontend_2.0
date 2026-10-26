@@ -168,8 +168,12 @@ const PostDetailPanel = ({
           className="shrink-0"
         />
         <span className="min-w-0">
-          <span className="block truncate text-body-lg font-semibold text-neutral-850">
-            {post.authorNickname} <BreederLevelBadge level={badges[0]?.level} />
+          {/* 다른 화면과 같이 레벨 그림을 이름 앞에 둔다. 긴 이름은 이름만 줄인다 */}
+          <span className="flex min-w-0 items-center gap-1">
+            <BreederLevelBadge level={badges[0]?.level} />
+            <span className="min-w-0 truncate text-body-lg font-semibold text-neutral-850">
+              {post.authorNickname}
+            </span>
           </span>
           <ActivityBadgeRow
             badges={
