@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { MOBILE_APP } from '@/shared/config/mobileApp'
 import { SHARE_IMAGE, SITE_URL } from '@/shared/config/site'
+import { MAKER_PEOPLE } from './makerCredit'
 
 /** 어드민 주소도 포퐁 앱의 공식 스토어인지 확인한다. */
 export function parseMobileStoreUrl(
@@ -53,6 +54,7 @@ export function createMobileAppStructuredData() {
       '@type': 'MobileApplication',
       '@id': `${SITE_URL}/app#${platform}`,
       name: MOBILE_APP.name,
+      creator: MAKER_PEOPLE,
       url: `${SITE_URL}/app`,
       description: '반려동물 탐색부터 브리더 상담, 일상 공유까지 포퐁에서 함께하세요.',
       operatingSystem: platform === 'ios' ? 'iOS' : 'Android',
