@@ -19,9 +19,14 @@ const load = (file, dependencies = {}, globals = {}) => {
 }
 const site = load('src/shared/config/site.ts')
 const mobileConfig = load('src/shared/config/mobileApp.ts')
+const makerCredit = load('src/shared/lib/makerCredit.ts', {
+  '@/shared/config/makers': load('src/shared/config/makers.ts'),
+  '@/shared/config/site': site,
+})
 const mobile = load('src/shared/lib/mobileApp.ts', {
   '@/shared/config/site': site,
   '@/shared/config/mobileApp': mobileConfig,
+  './makerCredit': makerCredit,
 })
 const meta = load('src/shared/lib/metadata.ts', {
   '@/shared/config/site': site,
