@@ -1,0 +1,38 @@
+name: 의존성 보안 목록 갱신
+
+on:
+  push:
+    branches: [dev, main]
+    paths:
+      - .github/workflows/dependency-graph.yml
+      - package.json
+      - pnpm-lock.yaml
+      - pnpm-workspace.yaml
+      - patches/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dependency-graph-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  submit:
+    # Dependabot은 기본 브랜치를 검사하므로 다른 브랜치의 목록으로 덮어쓰지 않는다.
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: 잠금 파일의 전체 직접·간접 의존성을 GitHub에 제출
+        uses: advanced-security/component-detection-dependency-submission-action@a02aeda7a175ad4dd38a13c4d3ff2df9da8f2cf0 # v0.2.0
+        with:
+          detectorsCategories: Npm
+          fail-on-empty: 'true'
+          correlator: pnpm-lock
