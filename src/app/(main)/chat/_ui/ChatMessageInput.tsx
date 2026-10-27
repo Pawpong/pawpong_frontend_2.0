@@ -100,16 +100,25 @@ const ChatMessageInput = ({ onSend, disabled, unavailableMessage }: ChatMessageI
   }
 
   const handleSubmit = async () => {
-    const trimmed = value.trim()
+    const el = textareaRef.current
+    // 제출 순간의 실제 입력값을 본다. 상태는 IME 확정이나 빠른 타이핑보다 한 박자 늦을 수 있어,
+    // 상태만 믿으면 마지막 글자를 빼고 보낸다.
+    const draft = el?.value ?? value
+    const trimmed = draft.trim()
     if (!trimmed || isDisabled) return
     const clientMessageId = textDraftId.current ?? createClientMessageId()
     textDraftId.current = clientMessageId
+    // 보낸 즉시 비운다. 전송 중에도 입력창이 살아 있으므로, 보낸 뒤에 "제출 때와 같은지"
+    // 비교해서 지우면 그사이 입력이 한 번만 들어와도 보낸 글이 입력창에 남는다.
+    setValue('')
     if (await send(trimmed, 'text', clientMessageId)) {
       textDraftId.current = null
-      setValue((current) => (current === value ? '' : current))
+    } else {
+      // 전송을 확인하지 못했으면 쓴 글을 돌려준다. 그사이 새로 친 글이 있으면 그쪽을 남긴다.
+      setValue((current) => (current === '' ? draft : current))
     }
     // 보내기 버튼을 눌렀으면 포커스가 버튼에 가 있다. 연달아 치려면 입력창으로 돌려놔야 한다.
-    textareaRef.current?.focus()
+    el?.focus()
   }
 
   // PC: Enter 전송, Shift+Enter 줄바꿈 / 터치 키보드: Enter 는 기본 동작(줄바꿈)
