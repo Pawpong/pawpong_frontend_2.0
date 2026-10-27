@@ -9,6 +9,9 @@ import type { ChatMessageResponseDto } from '@/shared/types'
  *
  * 내가 보낸 메시지 중 읽힌 것이 하나도 없으면 -1 이다. 상대가 자기 글을 읽은 것은
  * 알려줄 가치가 없고, 표시만 떠 있으면 내 메시지를 읽었다는 뜻으로 오해된다.
+ *
+ * @param messages 오래된 순이어야 한다. 서버 목록은 최신순으로 내려오므로 날것을 그대로
+ *   넘기면 표시가 거꾸로 붙는다. useChatRoom 이 mergeChatMessages 로 정렬한 값을 쓸 것.
  */
 export const findCounterpartReadIndex = (messages: ChatMessageResponseDto[]): number => {
   let readIndex = -1

@@ -47,6 +47,15 @@ test('전부 읽혔으면 마지막 메시지에 표시한다', () => {
   assert.equal(findCounterpartReadIndex(log([true, true], [false], [true, true])), 2)
 })
 
+test('오래된 순 입력을 전제한다', () => {
+  // 서버 목록은 최신순이고 useChatRoom 의 mergeChatMessages 가 오래된 순으로 뒤집는다.
+  // 날것을 그대로 넘기면 같은 대화에서 다른 자리를 가리킨다.
+  const oldestFirst = log([true, true], [false], [true, false])
+  const newestFirst = [...oldestFirst].reverse()
+  assert.equal(findCounterpartReadIndex(oldestFirst), 1)
+  assert.notEqual(findCounterpartReadIndex(newestFirst), 1)
+})
+
 test('표시는 대화 전체에서 한 자리뿐이다', () => {
   const messages = log([true, true], [false], [true, true], [true, false])
   const index = findCounterpartReadIndex(messages)
