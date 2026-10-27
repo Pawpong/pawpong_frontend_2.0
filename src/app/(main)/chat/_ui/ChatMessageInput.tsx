@@ -65,6 +65,8 @@ const ChatMessageInput = ({ onSend, disabled, unavailableMessage }: ChatMessageI
   const preparingAttachment = React.useRef(false)
   const textDraftId = React.useRef<string | null>(null)
   const textareaRef = React.useRef<HTMLTextAreaElement>(null)
+  /** 조합을 확정하느라 삼켜진 엔터가 있었는지 — 확정이 끝나면 그 엔터로 보낸다 */
+  const submitAfterComposition = React.useRef(false)
 
   // 줄 수에 맞춰 높이를 다시 잰다 — 전송 후 값이 비면 한 줄 높이로 돌아온다
   React.useLayoutEffect(() => {
@@ -123,10 +125,24 @@ const ChatMessageInput = ({ onSend, disabled, unavailableMessage }: ChatMessageI
 
   // PC: Enter 전송, Shift+Enter 줄바꿈 / 터치 키보드: Enter 는 기본 동작(줄바꿈)
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing && !isTouchKeyboard()) {
-      e.preventDefault()
-      void handleSubmit()
+    if (e.key !== 'Enter' || e.shiftKey || isTouchKeyboard()) return
+    if (e.nativeEvent.isComposing) {
+      // 한글처럼 조합하는 입력에서는 마지막 글자가 조합 중이라, 그 엔터를 브라우저가
+      // 조합을 확정하는 데 써 버린다. 그대로 두면 한 번 더 눌러야 보내져서, 친 글이
+      // 입력창에 남아 있는 것처럼 보인다. 이 엔터도 전송으로 받아 둔다.
+      submitAfterComposition.current = true
+      return
     }
+    e.preventDefault()
+    void handleSubmit()
+  }
+
+  const handleCompositionEnd = () => {
+    if (!submitAfterComposition.current) return
+    submitAfterComposition.current = false
+    // compositionend 바로 뒤에 확정된 글자가 input 으로 들어온다. 그걸 받기 전에 보내면
+    // 비운 입력창이 그 input 으로 다시 채워지므로 한 박자 뒤로 미룬다.
+    setTimeout(() => void handleSubmit(), 0)
   }
 
   // 사진은 정리(축소·JPG·위치 메타데이터 제거) 후 사진 말풍선으로, 그 밖의 파일은 원본 그대로 파일 카드로 보낸다
@@ -291,6 +307,7 @@ const ChatMessageInput = ({ onSend, disabled, unavailableMessage }: ChatMessageI
               setValue(e.target.value)
             }}
             onKeyDown={handleKeyDown}
+            onCompositionEnd={handleCompositionEnd}
             placeholder={
               uploadFile.isPending ? '파일을 업로드하는 중입니다.' : '메시지를 입력하세요'
             }
