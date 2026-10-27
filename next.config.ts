@@ -2,6 +2,9 @@ import type { NextConfig } from 'next'
 import { withSentryConfig } from '@sentry/nextjs/config'
 
 const nextConfig: NextConfig = {
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
+  },
   // 병렬 모바일 검증 서버가 기존 개발 서버의 빌드 잠금을 공유하지 않게 한다.
   distDir: process.env.PAWPONG_NEXT_DIST_DIR || '.next',
   // Android 에뮬레이터가 호스트 Mac의 로컬 개발 서버에 접근하는 주소.
