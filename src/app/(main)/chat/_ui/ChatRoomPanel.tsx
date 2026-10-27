@@ -9,6 +9,7 @@ import { adoptionQueries } from '@/entities/adoption'
 import { applicationQueries } from '@/entities/application'
 import type { ChatRoomResponseDto } from '@/shared/types'
 import { CHAT_CONTENT_WIDTH, CHAT_GUTTER_X } from '../_lib/constants'
+import { findCounterpartReadIndex } from '../_lib/readMarker'
 import { ChatRoomHeader } from './ChatRoomHeader'
 import { PetInfoCard } from './PetInfoCard'
 import { ChatNoticeBanner } from './ChatNoticeBanner'
@@ -55,6 +56,8 @@ const ChatRoomPanel = ({ room, currentUserId, onBack, onRoomClosed }: ChatRoomPa
 
   // 방을 다시 열 때 기존 채팅 알림도 정리하고, 보이는 동안 새 메시지를 읽음 처리한다.
   const hasUnread = messages.some((message) => !message.isMine && !message.isRead)
+  // 상대가 어디까지 읽었는지 — 그 말풍선 아래에만 상대 프로필을 작게 붙인다.
+  const counterpartReadIndex = React.useMemo(() => findCounterpartReadIndex(messages), [messages])
   React.useEffect(() => {
     const readVisibleMessages = () => {
       if (document.visibilityState !== 'hidden' && isConnected) markAsRead()
@@ -123,6 +126,7 @@ const ChatRoomPanel = ({ room, currentUserId, onBack, onRoomClosed }: ChatRoomPa
                   senderProfileImageUrl={room.counterpart.profileImageUrl}
                   // 상대 메시지가 연속되면 첫 말풍선에만 프로필을 노출한다.
                   showProfile={!msg.isMine && messages[idx - 1]?.isMine !== false}
+                  readByCounterpart={idx === counterpartReadIndex}
                 />
               ))
             )}

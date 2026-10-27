@@ -12,7 +12,27 @@ interface ChatMessageBubbleProps {
   senderName: string
   senderProfileImageUrl?: string
   showProfile?: boolean
+  /** 상대가 여기까지 읽었는지 — 대화 전체에서 한 말풍선에만 true 다 */
+  readByCounterpart?: boolean
 }
+
+/**
+ * 상대가 여기까지 읽었다는 표시. 상대 프로필을 작게 보여 준다.
+ *
+ * 사진만 두므로 눈으로 보지 않는 사람에게는 아무 뜻이 없다. 문장은 sr-only 로 따로 읽어 준다.
+ */
+const ReadMarker = ({
+  senderName,
+  senderProfileImageUrl,
+}: {
+  senderName: string
+  senderProfileImageUrl?: string
+}) => (
+  <span className="flex items-center self-end">
+    <span className="sr-only">{senderName}님이 여기까지 읽었어요</span>
+    <ProfileAvatar src={senderProfileImageUrl} alt="" size="xsmall" />
+  </span>
+)
 
 // [refactored] 말풍선 박스+텍스트를 단일 컴포넌트로 추출 — 배경·모서리만 isMine으로 분기
 const Bubble = ({ content, isMine }: { content: string; isMine: boolean }) => (
@@ -119,15 +139,22 @@ const ChatMessageBubble = ({
   senderName,
   senderProfileImageUrl,
   showProfile = false,
+  readByCounterpart = false,
 }: ChatMessageBubbleProps) => {
+  // 읽음 표시는 보낸 쪽·받은 쪽 어디에 붙어도 오른쪽 아래에 둔다.
+  const readMarker = readByCounterpart && (
+    <ReadMarker senderName={senderName} senderProfileImageUrl={senderProfileImageUrl} />
+  )
+
   // 보낸 메시지 (오른쪽 정렬, 노란 말풍선)
   if (isMine) {
     return (
-      <div className="flex w-full justify-end">
+      <div className="flex w-full flex-col items-end gap-1">
         <div className="flex max-w-[85%] items-end gap-2 pc:max-w-[26rem]">
           <RelativeTime dateStr={message.createdAt} className="text-neutral-500" />
           <AttachmentBubble message={message} isMine />
         </div>
+        {readMarker}
       </div>
     )
   }
@@ -145,6 +172,7 @@ const ChatMessageBubble = ({
         <AttachmentBubble message={message} isMine={false} />
         <RelativeTime dateStr={message.createdAt} className="text-neutral-500" />
       </div>
+      {readMarker}
     </div>
   )
 }
