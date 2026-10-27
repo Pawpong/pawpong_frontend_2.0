@@ -2,6 +2,26 @@ import type { NextConfig } from 'next'
 import { withSentryConfig } from '@sentry/nextjs/config'
 
 const nextConfig: NextConfig = {
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
+  },
+  turbopack: {
+    // SWC가 처리하지 않는 라이브러리의 간접 호출·HEIC Worker 로그도 운영에서 제거한다.
+    rules:
+      process.env.NODE_ENV === 'production'
+        ? {
+            '*.js': {
+              condition: {
+                all: [
+                  { path: /node_modules\/(?:heic-to|phaser)\// },
+                  { content: /console\.(?:log|info|debug)/ },
+                ],
+              },
+              loaders: ['./scripts/remove-vendor-console.cjs'],
+            },
+          }
+        : {},
+  },
   // 병렬 모바일 검증 서버가 기존 개발 서버의 빌드 잠금을 공유하지 않게 한다.
   distDir: process.env.PAWPONG_NEXT_DIST_DIR || '.next',
   // Android 에뮬레이터가 호스트 Mac의 로컬 개발 서버에 접근하는 주소.
