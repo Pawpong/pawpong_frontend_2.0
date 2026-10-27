@@ -17,12 +17,21 @@ function load(file, globals = {}, dependencies = {}) {
 }
 const mobileConfig = load('src/shared/config/mobileApp.ts')
 const site = load('src/shared/config/site.ts')
+const makerCredit = load(
+  'src/shared/lib/makerCredit.ts',
+  {},
+  {
+    '@/shared/config/makers': load('src/shared/config/makers.ts'),
+    '@/shared/config/site': site,
+  },
+)
 const mobile = load(
   'src/shared/lib/mobileApp.ts',
   {},
   {
     '@/shared/config/mobileApp': mobileConfig,
     '@/shared/config/site': site,
+    './makerCredit': makerCredit,
   },
 )
 const helpers = load(

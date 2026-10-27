@@ -10,6 +10,7 @@ import {
 import { ToolPage } from '@/features/playground-tools/ui/ToolPage'
 import { StructuredData } from '@/shared/ui/StructuredData'
 import { createPageMetadata } from '@/shared/lib/metadata'
+import { SITE_URL } from '@/shared/config/site'
 
 type Props = { params: Promise<{ cardId: string }> }
 export const generateStaticParams = () => ALL_PLAY_CARDS.map((card) => ({ cardId: card.id }))
@@ -71,7 +72,7 @@ export default async function SharedPlayCardPage({ params }: Props) {
           description: card.description,
           url: playCardUrl(card),
           inLanguage: 'ko-KR',
-          isPartOf: { '@type': 'WebSite', name: '포퐁', url: 'https://pawpong.kr' },
+          isPartOf: { '@id': `${SITE_URL}/#website` },
         }}
       />
       <StructuredData
