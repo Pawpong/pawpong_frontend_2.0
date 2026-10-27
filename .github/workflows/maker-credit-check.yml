@@ -1,4 +1,4 @@
-name: 제작자 표시 검증
+name: 웹 보안 및 제작자 표시 검증
 
 on:
   pull_request:
@@ -20,6 +20,9 @@ on:
       - tests/vercel-deployment-policy.test.cjs
       - package.json
       - pnpm-lock.yaml
+      - .nvmrc
+      - patches/**
+      - tests/steiger-security.test.mjs
 
 permissions:
   contents: read
@@ -37,15 +40,17 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: 전체 의존성 보안 검사
+        run: pnpm audit --audit-level low
       - name: 린트와 타입 확인
         run: |
           pnpm exec eslint next.config.ts src/shared/config/makers.ts src/shared/lib/makerCredit.ts src/shared/lib/MakerCreditConsole.tsx src/shared/lib/mobileApp.ts src/app/layout.tsx src/app/robots.ts src/app/humans.txt/route.ts 'src/app/(main)/playground/cards/[cardId]/page.tsx' --max-warnings 0
           pnpm type-check
       - name: 관련 회귀 테스트
-        run: node --test tests/share-metadata.test.cjs tests/managed-deep-link.test.cjs tests/growth-discovery.test.cjs tests/vercel-deployment-policy.test.cjs
+        run: node --test tests/share-metadata.test.cjs tests/managed-deep-link.test.cjs tests/growth-discovery.test.cjs tests/vercel-deployment-policy.test.cjs tests/steiger-security.test.mjs
       - name: 외부 API 없이 빌드
         run: pnpm build
         env:
