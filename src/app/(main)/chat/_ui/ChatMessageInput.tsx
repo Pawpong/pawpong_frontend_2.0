@@ -108,6 +108,8 @@ const ChatMessageInput = ({ onSend, disabled, unavailableMessage }: ChatMessageI
       textDraftId.current = null
       setValue((current) => (current === value ? '' : current))
     }
+    // 보내기 버튼을 눌렀으면 포커스가 버튼에 가 있다. 연달아 치려면 입력창으로 돌려놔야 한다.
+    textareaRef.current?.focus()
   }
 
   // PC: Enter 전송, Shift+Enter 줄바꿈 / 터치 키보드: Enter 는 기본 동작(줄바꿈)
@@ -283,7 +285,10 @@ const ChatMessageInput = ({ onSend, disabled, unavailableMessage }: ChatMessageI
             placeholder={
               uploadFile.isPending ? '파일을 업로드하는 중입니다.' : '메시지를 입력하세요'
             }
-            disabled={isDisabled}
+            // 전송·업로드 중에도 입력창은 살려 둔다. 포커스된 요소를 disabled 로 바꾸면
+            // 브라우저가 포커스를 풀고 되돌려주지 않아, 한 줄 보낼 때마다 다시 눌러야 했다.
+            // 실제로 보내는 것은 handleSubmit 과 sending ref 가 막는다.
+            disabled={disabled}
             aria-label="메시지"
             className="min-w-0 flex-1"
           />
