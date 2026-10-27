@@ -1,0 +1,54 @@
+diff --git a/dist/app.d.ts b/dist/app.d.ts
+index 581d23a6cff9ed8dd1edf8611bf7e846acd0a61a..88c56ca14c3d9b8a6773a899a4b5d5c0e683829a 100644
+--- a/dist/app.d.ts
++++ b/dist/app.d.ts
+@@ -1,6 +1,5 @@
+ import * as effector from 'effector';
+ import * as url from 'url';
+-import * as zod from 'zod';
+ 
+ interface File {
+     type: 'file';
+@@ -95,10 +94,10 @@ interface Plugin<Context = unknown, Rules extends Array<Rule<Context>> = Array<R
+     ruleDefinitions: Rules;
+ }
+ 
+-declare function processConfiguration(rawConfig: Config<Array<Rule>>, configLocationFolder: string | null): (zod.objectOutputType<{
+-    ignores: zod.ZodArray<zod.ZodString, "many">;
+-}, zod.ZodTypeAny, "passthrough"> | {
+-    rules: Record<string, "off" | "warn" | "error" | ["warn" | "error", zod.objectOutputType<{}, zod.ZodTypeAny, "passthrough">]>;
++declare function processConfiguration(rawConfig: Config<Array<Rule>>, configLocationFolder: string | null): (({
++    ignores: string[];
++} & Record<string, unknown>) | {
++    rules: Record<string, "off" | "warn" | "error" | ["warn" | "error", Record<string, unknown>]>;
+     files?: string[] | undefined;
+     ignores?: string[] | undefined;
+ } | {
+diff --git a/dist/chunk-ZD3CZEWV.mjs b/dist/chunk-ZD3CZEWV.mjs
+index 3270cab54b0ee6ff8eb0b7c271058ac1e277ba4f..47b3192d610b424be7d163bc68661c1b0b9fecf1 100644
+--- a/dist/chunk-ZD3CZEWV.mjs
++++ b/dist/chunk-ZD3CZEWV.mjs
+@@ -333,7 +333,7 @@ function buildValidationScheme(rawConfig) {
+         files: z.optional(z.array(z.string())),
+         ignores: z.optional(z.array(z.string())),
+         // zod.record requires at least one element in the array, so we need "as [string, ...string[]]"
+-        rules: z.record(
++        rules: z.partialRecord(
+           z.enum(allRuleNames),
+           z.union([
+             z.enum(["off", "error", "warn"]),
+@@ -349,7 +349,13 @@ function buildValidationScheme(rawConfig) {
+         ruleDefinitions: z.array(
+           z.object({
+             name: z.string(),
+-            check: z.function().args().returns(z.union([z.promise(ruleResultScheme), ruleResultScheme]))
++            check: z.custom((value) => typeof value === "function").transform((check) => function(...args) {
++              const result = Reflect.apply(check, this, args);
++              if (result && typeof result.then === "function" && typeof result.catch === "function") {
++                return Promise.resolve(result).then((value) => ruleResultScheme.parse(value));
++              }
++              return ruleResultScheme.parse(result);
++            })
+           })
+         )
+       })
