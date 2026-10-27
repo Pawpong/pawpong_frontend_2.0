@@ -5,6 +5,7 @@ on:
     branches: [dev, main]
     paths:
       - .github/workflows/maker-credit-check.yml
+      - .github/workflows/dependency-graph.yml
       - next.config.ts
       - src/shared/config/makers.ts
       - src/shared/lib/makerCredit.ts
