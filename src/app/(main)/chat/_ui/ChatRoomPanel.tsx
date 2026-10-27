@@ -10,6 +10,7 @@ import { applicationQueries } from '@/entities/application'
 import type { ChatRoomResponseDto } from '@/shared/types'
 import { CHAT_CONTENT_WIDTH, CHAT_GUTTER_X } from '../_lib/constants'
 import { findCounterpartReadIndex } from '../_lib/readMarker'
+import { isPinnedToBottom, shouldFollowNewMessage } from '../_lib/autoScroll'
 import { ChatRoomHeader } from './ChatRoomHeader'
 import { PetInfoCard } from './PetInfoCard'
 import { ChatNoticeBanner } from './ChatNoticeBanner'
@@ -35,7 +36,10 @@ const ChatRoomPanel = ({ room, currentUserId, onBack, onRoomClosed }: ChatRoomPa
     refetch,
     isFetching: isRetrying,
   } = useChatRoom(room.roomId, currentUserId)
-  const messagesEndRef = React.useRef<HTMLDivElement>(null)
+  const scrollRef = React.useRef<HTMLDivElement>(null)
+  // 사용자가 지금 맨 아래를 보고 있는지. 스크롤할 때마다 갱신하고 새 메시지가 올 때 참고한다.
+  const pinnedToBottom = React.useRef(true)
+  const paintedCount = React.useRef(0)
   const displayName = room.counterpart.nickname
   const [showNotice, setShowNotice] = React.useState(true)
 
@@ -50,9 +54,27 @@ const ChatRoomPanel = ({ room, currentUserId, onBack, onRoomClosed }: ChatRoomPa
     throwOnError: false,
   })
 
-  React.useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages.length])
+  const handleScroll = React.useCallback(() => {
+    const el = scrollRef.current
+    if (el) pinnedToBottom.current = isPinnedToBottom(el)
+  }, [])
+
+  // 새 메시지가 늘어난 순간에만 따라 내려간다.
+  // scrollIntoView 는 조상 스크롤 컨테이너까지 함께 움직이므로 목록만 직접 조작한다.
+  React.useLayoutEffect(() => {
+    const el = scrollRef.current
+    if (!el || messages.length === paintedCount.current) return
+    const firstPaint = paintedCount.current === 0
+    paintedCount.current = messages.length
+    const follow = shouldFollowNewMessage({
+      firstPaint,
+      pinnedToBottom: pinnedToBottom.current,
+      newestIsMine: Boolean(messages[messages.length - 1]?.isMine),
+    })
+    if (!follow) return
+    el.scrollTo({ top: el.scrollHeight, behavior: firstPaint ? 'auto' : 'smooth' })
+    pinnedToBottom.current = true
+  }, [messages])
 
   // 방을 다시 열 때 기존 채팅 알림도 정리하고, 보이는 동안 새 메시지를 읽음 처리한다.
   const hasUnread = messages.some((message) => !message.isMine && !message.isRead)
@@ -97,7 +119,11 @@ const ChatRoomPanel = ({ room, currentUserId, onBack, onRoomClosed }: ChatRoomPa
       )}
 
       {/* PC 알림은 Figma chatting-room 영역 안에서 대화 목록과 스크롤 면을 공유한다. */}
-      <div className={cn('flex-1 overflow-y-auto py-5 tab:py-7', CHAT_GUTTER_X)}>
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className={cn('flex-1 overflow-y-auto py-5 tab:py-7', CHAT_GUTTER_X)}
+      >
         <div className={cn(CHAT_CONTENT_WIDTH, 'flex flex-col gap-6')}>
           {showNotice && (
             <ChatNoticeBanner
@@ -130,7 +156,6 @@ const ChatRoomPanel = ({ room, currentUserId, onBack, onRoomClosed }: ChatRoomPa
                 />
               ))
             )}
-            <div ref={messagesEndRef} />
           </div>
         </div>
       </div>
