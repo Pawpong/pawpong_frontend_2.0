@@ -1,12 +1,7 @@
 import { createPageMetadata } from '@/shared/lib/metadata'
 
 import { getInitialBanners } from '@/entities/home/server'
-import { Banner } from '@/widgets/banner'
-import { HallOfFame } from '@/widgets/hall-of-fame'
-import { AdoptionShowcase } from '@/widgets/adoption-showcase'
-import { CommunityShowcase } from '@/widgets/community-showcase'
-import { CategoryBrowse } from '@/features/category-browse'
-import { ManagedFeatureHighlights } from './_ui/ManagedFeatureHighlights'
+import { HomeContent } from './_ui/home/HomeContent'
 
 export const metadata = createPageMetadata({
   title: '포퐁',
@@ -19,15 +14,8 @@ const HomePage = async () => {
   // 첫 배너를 HTML 에 바로 실어 이미지 요청이 화면 코드·배너 API 를 기다리지 않게 한다.
   const initialBanners = await getInitialBanners()
   return (
-    <div>
-      <Banner initial={initialBanners} />
-
-      <CategoryBrowse />
-      <ManagedFeatureHighlights placement="home" />
-
-      <HallOfFame />
-      <AdoptionShowcase />
-      <CommunityShowcase />
+    <div className="w-full flex-1 bg-white pb-16">
+      <HomeContent initial={initialBanners} />
     </div>
   )
 }

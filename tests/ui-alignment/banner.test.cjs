@@ -64,8 +64,8 @@ test('홈 첫 배너는 서버에서 익명으로 미리 받아 HTML 에 싣고 
 
   const page = source('src/app/(main)/page.tsx')
   assert.match(page, /await getInitialBanners\(\)/)
-  assert.match(page, /<Banner initial=\{initialBanners\} \/>/)
-  const banner = source('src/widgets/banner/ui/Banner.tsx')
+  assert.match(page, /<HomeContent initial=\{initialBanners\} \/>/)
+  const banner = source('src/app/(main)/_ui/home/PreviewBanner.tsx')
   assert.match(banner, /initialDataUpdatedAt: initial\.fetchedAt/)
 })
 

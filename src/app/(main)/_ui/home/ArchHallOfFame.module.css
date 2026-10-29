@@ -1,0 +1,308 @@
+.viewport {
+  width: 100%;
+  overflow-x: auto;
+  background: white;
+}
+.stage {
+  position: relative;
+  width: 100%;
+  min-width: 900px;
+  aspect-ratio: 5 / 2;
+  container-type: inline-size;
+  margin-inline: auto;
+}
+.desktopArt,
+.mobileArt {
+  object-fit: contain;
+  pointer-events: none;
+}
+.mobileArt {
+  display: none;
+}
+.slot {
+  position: absolute;
+  width: 16%;
+  transform: translateX(-50%);
+}
+.slot[data-rank='1'] {
+  left: 50%;
+  bottom: 36.5%;
+}
+.slot[data-rank='2'] {
+  left: 23.4%;
+  bottom: 30%;
+}
+.slot[data-rank='3'] {
+  left: 76.6%;
+  bottom: 30%;
+}
+.card {
+  padding: 5px;
+  border: 1px solid var(--color-secondary-400);
+  border-radius: 5px;
+  background: white;
+  box-shadow: 0 3px 0 rgb(69 40 12 / 10%);
+}
+.post {
+  display: block;
+  border-radius: 3px;
+}
+.photo {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--color-secondary-50, #fffaf0);
+}
+.rank {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  padding: 2px 5px;
+  background: var(--color-primary-800);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+}
+.excerpt {
+  margin: 7px 2px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+}
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 5px 2px 3px;
+  color: var(--color-neutral-600);
+  font-size: 11px;
+  line-height: 16px;
+}
+.author {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.likes {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+}
+.empty {
+  position: relative;
+  height: calc(16cqw + 54px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--color-neutral-600);
+  font-size: 12px;
+}
+@media (max-width: 767px) {
+  .desktopArt {
+    display: none;
+  }
+  .mobileArt {
+    display: block;
+  }
+  .slot {
+    width: 23%;
+  }
+  .slot[data-rank='1'] {
+    bottom: 38%;
+  }
+  .slot[data-rank='2'] {
+    left: 24%;
+    bottom: 33%;
+  }
+  .slot[data-rank='3'] {
+    left: 76%;
+    bottom: 30%;
+  }
+  .stage {
+    width: 600px;
+    min-width: 600px;
+    height: 400px;
+    aspect-ratio: 3 / 2;
+  }
+  .photo {
+    height: auto;
+    aspect-ratio: 1;
+  }
+  .empty {
+    height: 192px;
+  }
+}
+
+/* Match each post's rank badge to its podium medal. */
+.slot[data-rank='1'] .rank {
+  background: #f8d77d;
+  color: #59380e;
+  border: 1px solid #b78428;
+}
+.slot[data-rank='2'] .rank {
+  background: #e5e7eb;
+  color: #454b55;
+  border: 1px solid #9299a3;
+}
+.slot[data-rank='3'] .rank {
+  background: #eac09a;
+  color: #663c20;
+  border: 1px solid #ae7448;
+}
+
+/* Display the generated ornaments as sprites anchored to each card, not the scene. */
+.crest {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%);
+  width: 56.25%;
+  aspect-ratio: 2;
+  background-image: url('/images/hall-of-fame/concepts/stage-b-crests-v4.png');
+  background-size: 991.5% 793%;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+.slot[data-rank='2'] .crest {
+  background-position: 22.04% 7.215%;
+}
+.slot[data-rank='3'] .crest {
+  background-position: 78.13% 7.215%;
+}
+
+.slot[data-rank='1'] .crest {
+  display: none;
+  background-position: 50% 0%;
+}
+.mobilePodium {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .viewport {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 12px;
+  }
+  .stage {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    width: max-content;
+    min-width: 0;
+    height: auto;
+    aspect-ratio: auto;
+    margin: 0;
+    padding: 58px 20px 8px 12px;
+    container-type: normal;
+  }
+  .desktopArt,
+  .mobileArt {
+    display: none;
+  }
+  .slot,
+  .slot[data-rank='1'],
+  .slot[data-rank='2'],
+  .slot[data-rank='3'] {
+    position: relative;
+    left: auto;
+    bottom: auto;
+    transform: none;
+    width: min(54vw, 208px);
+    flex-shrink: 0;
+    scroll-snap-align: start;
+  }
+  .card {
+    margin-inline: 12px;
+    padding: 7px;
+  }
+  .photo {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+  }
+  .excerpt {
+    font-size: 14px;
+    line-height: 20px;
+  }
+  .meta {
+    font-size: 12px;
+    line-height: 18px;
+    margin-top: 8px;
+  }
+  .rank {
+    font-size: 12px;
+  }
+  .empty {
+    height: calc(min(54vw, 208px) + 40px);
+  }
+  .crest,
+  .slot[data-rank='1'] .crest {
+    display: block;
+    width: 92px;
+    bottom: auto;
+    top: -50px;
+    background-size: 991.5% 793%;
+  }
+  .slot[data-rank='1'] .crest {
+    background-position: 50% 0%;
+  }
+  .mobilePodium {
+    display: block;
+    width: 100%;
+    aspect-ratio: 2.2;
+    background-image: url('/images/hall-of-fame/concepts/stage-b-refined-v3.png');
+    background-size: 440.667% 396.5%;
+    background-repeat: no-repeat;
+  }
+  .slot[data-rank='1'] .mobilePodium {
+    background-size: 440.667% 330.417%;
+    aspect-ratio: 1.875;
+    background-position: 50% 87.16%;
+  }
+  .slot[data-rank='2'] .mobilePodium {
+    background-position: 15.59% 88.7%;
+  }
+  .slot[data-rank='3'] .mobilePodium {
+    background-position: 84.41% 88.7%;
+  }
+}
+
+@media (max-width: 767px) {
+  .stage {
+    padding-top: 40px;
+  }
+  .crest,
+  .slot[data-rank='1'] .crest {
+    width: 60px;
+    top: -34px;
+  }
+  .mobilePodium {
+    width: 66%;
+    margin-inline: auto;
+  }
+}
+
+.author {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.nickname {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
