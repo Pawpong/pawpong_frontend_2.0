@@ -1,0 +1,66 @@
+.banner {
+  position: relative;
+  display: block;
+  width: 100%;
+  container-type: inline-size;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #fff4ba;
+  color: var(--color-primary-900);
+  padding-top: 48px;
+}
+.art {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.copy {
+  position: absolute;
+  inset: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px;
+}
+.title {
+  margin: 0;
+  font-size: clamp(28px, 8.2cqw, 32px);
+  line-height: 1.1;
+}
+.description,
+.action {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.action {
+  font-weight: 600;
+}
+@media (min-width: 768px) {
+  .banner {
+    aspect-ratio: 5 / 1;
+    min-height: 152px;
+    padding-top: 0;
+  }
+  .art {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+  .copy {
+    inset: 0 auto 0 0;
+    width: 32%;
+    justify-content: center;
+    padding: 12px clamp(20px, 3cqw, 40px);
+  }
+  .title {
+    font-size: clamp(24px, 3.2cqw, 44px);
+    white-space: nowrap;
+  }
+  .description,
+  .action {
+    font-size: clamp(13px, 1.3cqw, 17px);
+  }
+}

@@ -176,4 +176,4 @@ const Banner = ({ initial }: BannerProps) => {
   )
 }
 
-export { Banner }
+export { Banner, ChevronRight }
