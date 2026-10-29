@@ -38,8 +38,8 @@ import { CommunityPostReviewPanel } from './CommunityPostReviewPanel'
 interface PostDetailPanelProps {
   postId: string
   publicPost?: CommunityPostDetail
-  /** side-by-side: pc 모달 · stacked: tab 모달·mo 페이지 공용 */
-  layout: 'side-by-side' | 'stacked'
+  /** page: 직접 진입 페이지 · side-by-side/stacked: 모달 */
+  layout: 'side-by-side' | 'stacked' | 'page'
   /** 헤더 오른쪽 끝 아이콘 — 모달은 닫기(X), mo 페이지는 목록으로 */
   trailingAction?: ReactNode
   className?: string
@@ -56,6 +56,7 @@ const PostDetailPanel = ({
   trailingAction,
   className,
 }: PostDetailPanelProps) => {
+  const isPage = layout === 'page'
   const {
     router,
     post,
@@ -104,7 +105,7 @@ const PostDetailPanel = ({
         role="status"
         aria-busy="true"
         className={cn(
-          'flex h-full min-h-0 w-full',
+          isPage ? 'flex w-full' : 'flex h-full min-h-0 w-full',
           sideBySide ? 'flex-row' : 'flex-col',
           className,
         )}
@@ -135,7 +136,12 @@ const PostDetailPanel = ({
 
   if (!post) {
     return (
-      <div className={cn('flex h-full min-h-0 w-full flex-col', className)}>
+      <div
+        className={cn(
+          isPage ? 'flex min-h-64 w-full flex-col' : 'flex h-full min-h-0 w-full flex-col',
+          className,
+        )}
+      >
         <div className="flex shrink-0 items-center justify-end px-4 py-2">{trailingAction}</div>
         <AsyncState
           status={isError ? 'error' : 'empty'}
@@ -154,7 +160,12 @@ const PostDetailPanel = ({
   const isSideBySide = layout === 'side-by-side'
 
   const header = (
-    <div className="flex shrink-0 items-center justify-between gap-2 px-4 py-2">
+    <div
+      className={cn(
+        'flex shrink-0 items-center justify-between gap-2',
+        isPage ? 'py-4' : 'px-4 py-2',
+      )}
+    >
       {/* 전체 페이지 이동으로 홈에서 연 모달과 인터셉트 모달 상태도 함께 정리한다. */}
       <a
         href={`/home/${post.authorId}`}
@@ -191,8 +202,18 @@ const PostDetailPanel = ({
   )
 
   const caption = (
-    <div className="flex shrink-0 items-center justify-between gap-2 px-4 py-3">
-      <p className="min-w-0 flex-1 text-body-md leading-relaxed font-medium whitespace-pre-wrap text-neutral-850">
+    <div
+      className={cn(
+        'flex shrink-0 justify-between',
+        isPage ? 'items-start gap-3 py-6' : 'items-center gap-2 px-4 py-3',
+      )}
+    >
+      <p
+        className={cn(
+          'min-w-0 flex-1 font-medium break-words whitespace-pre-wrap text-neutral-850',
+          isPage ? 'text-base leading-7' : 'text-body-md leading-relaxed',
+        )}
+      >
         {post.body}
       </p>
       {isOwner && (
@@ -206,7 +227,12 @@ const PostDetailPanel = ({
 
   // 인스타그램처럼 액션바는 본문 흐름 안에 두고, 하단에는 입력창만 고정한다
   const actionBar = interactive && (
-    <div className="border-b border-neutral-100 px-4 py-3">
+    <div
+      className={cn(
+        'border-b',
+        isPage ? 'border-neutral-150 py-4' : 'border-neutral-100 px-4 py-3',
+      )}
+    >
       <CommunityPostActions
         likeCount={post.likeCount}
         commentCount={post.commentCount}
@@ -261,7 +287,7 @@ const PostDetailPanel = ({
         <BeforeAfterSlider
           beforeSrc={post.photoUrls[comparison.beforePhotoIndex]}
           afterSrc={post.photoUrls[comparison.afterPhotoIndex]}
-          className="rounded-none"
+          className={isPage ? 'rounded-xl' : 'rounded-none'}
         />
         {extraImages.length > 0 && (
           <ImageCarousel
@@ -281,10 +307,56 @@ const PostDetailPanel = ({
         preloadFirstImage
         bgClassName="bg-white"
         imageClassName="object-contain"
-        className={isSideBySide ? 'h-full w-[60%] shrink-0' : 'aspect-square w-full shrink-0'}
+        className={
+          isSideBySide
+            ? 'h-full w-[60%] shrink-0'
+            : isPage
+              ? 'aspect-[4/3] w-full overflow-hidden rounded-xl'
+              : 'aspect-square w-full shrink-0'
+        }
         {...COMMUNITY_CAROUSEL_STYLE}
       />
     ))
+
+  if (isPage) {
+    return (
+      <article className={cn('w-full', className)}>
+        <header className="mb-5 lap:max-w-[calc(100%-20rem)]">
+          <h1 className="font-cafe24 text-2xl leading-[1.4] break-words text-neutral-850 tab:text-[1.75rem] pc:text-[2rem]">
+            {post.title || '커뮤니티 이야기'}
+          </h1>
+          {header}
+        </header>
+        <div className="grid min-w-0 gap-8 lap:grid-cols-[minmax(0,1fr)_18rem]">
+          <div className="min-w-0">
+            {imageCarousel}
+            {caption}
+            <CommunityPostReviewPanel post={post} isOwner={isOwner} />
+            {actionBar}
+          </div>
+          <aside className="min-w-0" aria-label="게시글의 주제와 관련 이야기">
+            <CommunityExperiencePanel post={post} isOwner={isOwner} presentation="page" />
+          </aside>
+        </div>
+        {interactive && (
+          <section
+            aria-labelledby="post-comments-title"
+            className="mt-10 border-t border-neutral-150 pt-6 lap:mr-[20rem]"
+          >
+            <h2 id="post-comments-title" className="mb-4 font-cafe24 text-xl text-neutral-850">
+              댓글 <span className="text-primary-700">{post.commentCount}</span>
+            </h2>
+            <CommentComposerBar
+              thread={thread}
+              className="mb-6 rounded-xl border border-neutral-150 bg-neutral-50 px-3 py-2"
+            />
+            <CommentList thread={thread} />
+          </section>
+        )}
+        {modals}
+      </article>
+    )
+  }
 
   if (isSideBySide) {
     return (

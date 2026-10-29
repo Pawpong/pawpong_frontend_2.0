@@ -23,9 +23,11 @@ const CHIP =
 export function CommunityExperiencePanel({
   post,
   isOwner,
+  presentation = 'panel',
 }: {
   post: CommunityPostDetail
   isOwner: boolean
+  presentation?: 'panel' | 'page'
 }) {
   const config = useQuery(communityExperienceConfigOptions)
   const autoApplied = useCommunityAutoApplied(post.postId, isOwner)
@@ -53,9 +55,16 @@ export function CommunityExperiencePanel({
 
   return (
     <section
-      className="space-y-4 border-b border-neutral-100 bg-secondary-50/60 p-4"
+      className={
+        presentation === 'page'
+          ? 'space-y-5'
+          : 'space-y-4 border-b border-neutral-100 bg-secondary-50/60 p-4'
+      }
       aria-label="이야기 정보"
     >
+      {presentation === 'page' && (
+        <h2 className="font-cafe24 text-lg text-neutral-850">이야기 정보</h2>
+      )}
       {(topics.length > 0 || tags.length > 0) && (
         <div className="space-y-2">
           <ul className="flex flex-wrap gap-2" aria-label="주제와 태그">
