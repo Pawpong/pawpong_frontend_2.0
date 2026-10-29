@@ -35,6 +35,15 @@ const filterRooms = (
 // mobile 말단은 공용 Container와 같이 704px에서 가둬 767→768 전환 시 목록 폭 역축소를 막는다.
 const CHAT_GUTTER_X = `${RESPONSIVE_SHELL_CLASS} px-4 tab:px-12 pc:px-20`
 
+// 헤더(Gnb) 아래를 꽉 채우는 높이. 헤더가 모바일 3rem · PC 4rem 이라 둘 다 맞춰 뺀다.
+// 4rem 으로만 빼면 모바일에서 16px 이 남아 화면 아래에 빈 자리가 생긴다.
+const CHAT_PANEL_HEIGHT = 'h-[calc(100dvh-3rem)] pc:h-[calc(100dvh-4rem)]'
+
+// 채팅 목록 화면은 하단 내비(모바일·태블릿 3.5rem + 노치)가 있어 그만큼 더 비켜야 한다.
+// PC 는 하단 내비가 없으므로 헤더만 뺀다.
+const CHAT_LIST_HEIGHT =
+  'h-[calc(100dvh-3rem-3.5rem-env(safe-area-inset-bottom))] pc:h-[calc(100dvh-4rem)]'
+
 // [refactored] 콘텐츠 폭 — 태블릿 이하는 꽉 채우고, PC에서만 880px 가운데 정렬
 const CHAT_CONTENT_WIDTH = 'mx-auto w-full pc:max-w-[55rem]'
 
@@ -45,5 +54,7 @@ export {
   isGeneralRoom,
   CHAT_GUTTER_X,
   CHAT_CONTENT_WIDTH,
+  CHAT_PANEL_HEIGHT,
+  CHAT_LIST_HEIGHT,
 }
 export type { FilterTab }
