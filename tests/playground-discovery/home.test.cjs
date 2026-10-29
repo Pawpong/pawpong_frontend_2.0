@@ -7,21 +7,22 @@ const { source } = require('./fixtures/discovery.fixture.cjs')
 
 const ui = 'src/features/playground-tools/ui'
 
-test('놀이터 첫 화면은 사진, 방, 놀이, 돌봄 도구 순으로 놓이고 병원 기록은 돌봄 도구에만 있음', () => {
+test('놀이터는 놀이와 돌봄 이미지 레일로 나누고 반려동물 기능 설정을 유지함', () => {
   const home = source('src/app/(main)/playground/_ui/PlaygroundContent.tsx')
-  const order = [
-    'headingId="playground-ai"',
-    '<PetEntryCard />',
-    '<PlaygroundPlayShelf />',
-    '<PlaygroundCareShelf />',
-  ].map((marker) => home.indexOf(marker))
-  assert.ok(order.every((index) => index > 0))
-  assert.deepEqual(
-    [...order].sort((a, b) => a - b),
-    order,
-  )
-  assert.doesNotMatch(source(`${ui}/PlaygroundPlayShelf.tsx`), /clinic|병원/)
-  assert.match(source(`${ui}/PlaygroundCareShelf.tsx`), /experience=clinic/)
+  assert.equal((home.match(/<PlaygroundFeatureRail/g) ?? []).length, 2)
+  for (const route of [
+    '/ai-filter',
+    '/playground/memory-card',
+    '/playground/pet',
+    '/playground/walk-card',
+    '/playground/taste',
+    '/playground/bti',
+    '/community/write?experience=walk',
+    '/playground/outing',
+    '/community/write?experience=clinic',
+  ])
+    assert.ok(home.includes(route), route)
+  assert.match(home, /petConfig.data\?\.enabled && !petConfig.isError/)
 })
 
 test('돌봄 도구는 세 목적지와 위치 공개 안내를 유지하고 링크 전체로 이동할 수 있음', () => {
@@ -50,17 +51,25 @@ test('돌봄 도구는 세 목적지와 위치 공개 안내를 유지하고 링
   assert.doesNotMatch(html, /<button/)
 })
 
-test('사진·반려동물 소개는 같은 쇼케이스 틀을 쓰고 놀이 카드는 티켓을 씀', () => {
-  const home = source('src/app/(main)/playground/_ui/PlaygroundContent.tsx')
-  const pet = source('src/features/playground-pet/ui/PetEntryCard.tsx')
-  for (const file of [home, pet]) {
-    assert.match(file, /<FeatureShowcase\b/)
-    assert.match(file, /<FeatureShowcaseTiles\b/)
-    assert.match(file, /steps=\{/)
-  }
-  assert.match(home, /label="AI PHOTO"/)
-  assert.match(pet, /label="MY PET"[\s\S]*?accent="peach"/)
-  assert.match(source(`${ui}/PlaygroundPlayShelf.tsx`), /<TicketLink\b/)
+test('놀이터 커버는 새 로컬 에셋을 사용하고 스크롤과 모션 줄이기를 지원함', () => {
+  const rail = source('src/app/(main)/playground/_ui/PlaygroundFeatureRail.tsx')
+  assert.ok(rail.includes('/images/playground/covers/'))
+  assert.match(rail, /snap-x snap-mandatory/)
+  assert.match(rail, /prefers-reduced-motion: reduce/)
+  assert.match(rail, /aria-controls=/)
+  const { existsSync } = require('node:fs')
+  for (const key of [
+    'ai-photo',
+    'memory',
+    'pet',
+    'walk',
+    'taste',
+    'bti',
+    'walk-photo',
+    'outing',
+    'clinic',
+  ])
+    assert.ok(existsSync('public/images/playground/covers/' + key + '-v1.png'), key)
 })
 
 test('서비스 소개와 앱 안내도 놀이터와 같은 소개 박스와 티켓 링크를 씀', () => {
