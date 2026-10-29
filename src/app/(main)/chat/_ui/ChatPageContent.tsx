@@ -6,6 +6,8 @@ import { chatQueries } from '@/entities/chat'
 import { profileQueries } from '@/entities/profile'
 import { useBreakpoint } from '@/shared/lib/useBreakpoint'
 import type { ChatRoomResponseDto } from '@/shared/types'
+import { cn } from '@/shared/lib/cn'
+import { CHAT_PANEL_HEIGHT } from '../_lib/constants'
 import { ChatRoomList } from './ChatRoomList'
 import { ChatSidebar } from './ChatSidebar'
 import { ChatRoomPanel } from './ChatRoomPanel'
@@ -51,7 +53,7 @@ const ChatPageContent = () => {
 
   if (roomsQuery.isLoading || profileQuery.isLoading) {
     return (
-      <div className="flex h-[calc(100dvh-4rem)] items-center justify-center">
+      <div className={cn(CHAT_PANEL_HEIGHT, 'flex items-center justify-center')}>
         <p className="text-sm text-neutral-700">채팅을 불러오는 중입니다.</p>
       </div>
     )
@@ -59,7 +61,12 @@ const ChatPageContent = () => {
 
   if (roomsQuery.isError || profileQuery.isError) {
     return (
-      <div className="flex h-[calc(100dvh-4rem)] flex-col items-center justify-center gap-3 px-5 text-center">
+      <div
+        className={cn(
+          CHAT_PANEL_HEIGHT,
+          'flex flex-col items-center justify-center gap-3 px-5 text-center',
+        )}
+      >
         <p className="text-sm text-neutral-700">채팅방을 불러오지 못했습니다.</p>
         <div className="flex items-center gap-2">
           <Button intent="secondary" size="sm" onClick={handleBack}>
@@ -79,7 +86,7 @@ const ChatPageContent = () => {
 
   if (!activeRoom || !profileQuery.data) {
     return (
-      <div className="flex h-[calc(100dvh-4rem)] flex-col items-center justify-center gap-3">
+      <div className={cn(CHAT_PANEL_HEIGHT, 'flex flex-col items-center justify-center gap-3')}>
         <p className="text-sm text-neutral-700">채팅방을 불러오지 못했습니다.</p>
         <Button intent="dark" size="sm" onClick={handleBack}>
           목록으로
@@ -103,7 +110,12 @@ const ChatPageContent = () => {
 
   // PC + room selected: sidebar + chat panel
   return (
-    <div className="mx-auto flex h-[calc(100dvh-4rem)] w-full max-w-[90rem] overflow-hidden border-x border-neutral-150 bg-white">
+    <div
+      className={cn(
+        CHAT_PANEL_HEIGHT,
+        'mx-auto flex w-full max-w-[90rem] overflow-hidden border-x border-neutral-150 bg-white',
+      )}
+    >
       <ChatSidebar
         activeRoomId={activeRoomId}
         onSelectRoom={handleSelectRoom}

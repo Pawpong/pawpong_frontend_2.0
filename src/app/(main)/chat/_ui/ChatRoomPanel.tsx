@@ -8,7 +8,7 @@ import { useChatRoom } from '@/features/chat-realtime'
 import { adoptionQueries } from '@/entities/adoption'
 import { applicationQueries } from '@/entities/application'
 import type { ChatRoomResponseDto } from '@/shared/types'
-import { CHAT_CONTENT_WIDTH, CHAT_GUTTER_X } from '../_lib/constants'
+import { CHAT_CONTENT_WIDTH, CHAT_GUTTER_X, CHAT_PANEL_HEIGHT } from '../_lib/constants'
 import { findCounterpartReadIndex } from '../_lib/readMarker'
 import { isPinnedToBottom, shouldFollowNewMessage } from '../_lib/autoScroll'
 import { ChatRoomHeader } from './ChatRoomHeader'
@@ -94,7 +94,7 @@ const ChatRoomPanel = ({ room, currentUserId, onBack, onRoomClosed }: ChatRoomPa
   }, [isConnected, hasUnread, markAsRead])
 
   return (
-    <div className="flex h-[calc(100dvh-4rem)] min-w-0 flex-col bg-point-50">
+    <div className={cn(CHAT_PANEL_HEIGHT, 'flex min-w-0 flex-col bg-point-50')}>
       {/* [refactored] 헤더 JSX를 ChatRoomHeader 컴포넌트로 추출 */}
       <ChatRoomHeader
         roomId={room.roomId}
