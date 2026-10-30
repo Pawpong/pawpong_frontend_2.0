@@ -60,7 +60,7 @@ const FaqItem = ({ faq, onInquiryClick }: { faq: FaqDto; onInquiryClick: () => v
 const FaqHero = ({ onInquiryClick }: { onInquiryClick: () => void }) => (
   <>
     {/* 독립 섹션 — 상하 패딩을 스스로 갖는다 */}
-    <div className="flex flex-col items-center justify-center px-4 py-8 tab:px-12 tab:py-10 pc:px-20 pc:py-12">
+    <div className="page-shell flex flex-col items-center justify-center py-8 tab:py-10 pc:py-12">
       <p
         className={cn(
           cafe24Proup.className,

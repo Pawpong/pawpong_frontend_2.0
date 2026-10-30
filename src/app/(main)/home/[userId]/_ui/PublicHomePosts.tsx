@@ -29,7 +29,7 @@ const PublicHomePosts = ({ userId, className, gridClassName }: PublicHomePostsPr
 
   return (
     // 공개 홈 피드는 모바일에서 좌우 여백 없이 3열 그리드를 꽉 채운다 (Figma 4145:721426)
-    <Container className={cn('px-0 py-5 tab:pt-6 tab:pb-10 pc:page-gutter-x pc:py-10', className)}>
+    <Container className={cn('py-5 [--page-gutter:0px] tab:pt-6 tab:pb-10 pc:py-10', className)}>
       <HomePostGrid
         posts={posts}
         isPending={query.isPending}

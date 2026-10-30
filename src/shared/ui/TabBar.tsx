@@ -1,7 +1,6 @@
 'use client'
 
 import type { CSSProperties, ReactNode } from 'react'
-import { PAGE_WIDTH_CLASS } from '@/shared/config'
 import { cn } from '@/shared/lib/cn'
 import { Tabs, TabsList, TabsTrigger } from './Tabs'
 
@@ -44,19 +43,15 @@ const TabBarList = ({
   barStyle,
   ariaLabel,
 }: TabBarListProps) => (
-  /* 탭과 하단선은 PAGE_WIDTH_CLASS 전체를 사용한다. 콘텐츠 카드 폭 상한을 탭에
-     재사용하면 넓은 화면에서 탭만 940px로 좁아지므로, 거터만 반응형으로 유지한다.
+  /* 탭과 하단선은 페이지 틀 폭(page-width) 전체를 사용한다. 콘텐츠 카드 폭 상한을 탭에
+     재사용하면 넓은 화면에서 탭만 940px로 좁아지므로, 거터만 페이지 틀과 맞춘다.
      모바일 116px 표시선은 탭이 4개 이상인 좁은 폰에서 화면 밖까지 나가 페이지가 가로로
      밀리므로, 모양은 그대로 두고 바 밖으로 나간 부분만 자른다(clip은 sticky를 깨지 않음). */
   <div
-    className={cn(
-      PAGE_WIDTH_CLASS,
-      'overflow-x-clip border-b border-neutral-300 bg-white',
-      barClassName,
-    )}
+    className={cn('page-width overflow-x-clip border-b border-neutral-300 bg-white', barClassName)}
     style={barStyle}
   >
-    <div className="w-full px-4 pt-3 tab:page-gutter-x tab:pt-4">
+    <div className="w-full page-gutter-x pt-3 tab:pt-4">
       <TabsList variant="underline" aria-label={ariaLabel}>
         {items.map((item) => (
           <TabsTrigger

@@ -2,7 +2,6 @@ import { createPageMetadata } from '@/shared/lib/metadata'
 
 import Link from 'next/link'
 import { ReviewLoginForm } from '@/features/auth'
-import { RESPONSIVE_SHELL_CLASS } from '@/shared/config'
 import { cn } from '@/shared/lib/cn'
 import { cafe24Proup } from '@/shared/lib/fonts'
 import { normalizeReturnUrl } from '@/shared/lib/normalizeReturnUrl'
@@ -22,9 +21,7 @@ export default async function ReviewLoginPage({
   return (
     <div className="flex min-h-dvh flex-col bg-base-white">
       <header className="h-12 shrink-0 bg-white pc:h-16">
-        <div
-          className={cn(RESPONSIVE_SHELL_CLASS, 'flex h-full items-center px-4 tab:px-12 pc:px-20')}
-        >
+        <div className="page-shell flex h-full items-center">
           <LogoButton />
         </div>
       </header>

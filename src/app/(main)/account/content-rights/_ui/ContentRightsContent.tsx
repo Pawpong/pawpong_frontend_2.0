@@ -59,7 +59,7 @@ export function ContentRightsContent({ onConsented }: { onConsented?: () => void
   }
 
   return (
-    <section className="mx-auto flex w-full max-w-168 flex-col gap-5 px-4 py-6 tab:px-8 tab:py-10">
+    <section className="mx-auto flex w-full max-w-168 flex-col gap-5 page-gutter-x py-6 tab:py-10">
       <div className="rounded-xl border border-secondary-400 bg-secondary-50 p-5 tab:p-7">
         <h1 className="font-cafe24 text-xl text-neutral-850 tab:text-2xl">
           내 게시물을 앱에서도 보여주세요

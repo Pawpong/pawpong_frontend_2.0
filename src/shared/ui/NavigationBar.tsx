@@ -60,8 +60,8 @@ const NavigationBar = ({
   const hasBack = Boolean(onBack || backHref)
 
   return (
-    // 좌우 여백은 공통 Container(tab 48 / pc 80) 사용, 모바일만 16으로 오버라이드
-    <Container className={cn('flex items-center bg-white px-4 py-1 tab:py-2', className)}>
+    // 좌우 폭·여백은 공통 Container(페이지 틀) 그대로
+    <Container className={cn('flex items-center bg-white py-1 tab:py-2', className)}>
       <div className="flex min-w-0 flex-1 items-center">
         {onBack && (
           <IconButton edge="both" onClick={onBack} aria-label={backLabel}>

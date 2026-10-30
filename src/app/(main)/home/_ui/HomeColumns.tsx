@@ -17,9 +17,9 @@ interface HomeColumnsProps {
  * 자기 좌우 여백을 손대지 않아도 된다.
  */
 const HomeColumns = ({ sidebar, stickyTop, children }: HomeColumnsProps) => (
-  <div className="tab:mx-auto tab:flex tab:w-full tab:max-w-[86rem] tab:items-start tab:gap-6 tab:page-gutter-x pc:max-w-[90rem] pc:gap-10">
+  <div className="tab:page-shell tab:flex tab:items-start tab:gap-6 pc:gap-10">
     <Container
-      className="px-4 py-5 tab:sticky tab:w-60 tab:shrink-0 tab:py-8 tab:[--page-gutter:0px] pc:w-65 pc:py-10"
+      className="py-5 tab:sticky tab:w-60 tab:shrink-0 tab:py-8 tab:[--page-gutter:0px] pc:w-65 pc:py-10"
       style={{ top: stickyTop }}
     >
       {sidebar}

@@ -23,22 +23,36 @@
   z-index: 80;
 }
 
-/* 페이지 좌우 여백. px-[var(--page-gutter)] 는 v4 가 길이로 추론하지 못해 유틸리티로 정의한다. */
-@utility page-gutter-x {
-  padding-inline: var(--page-gutter);
-}
-
-/* 페이지 좌우 여백(거터). Container·TabBar 등 페이지 폭 블록이 모두 이 값을 쓴다.
+/* 페이지 틀 — 상단바·본문·탭바 등 페이지 폭 블록이 모두 이 두 값만 쓴다 (KREAM 방식).
+   상자 폭은 여백을 포함한다: 1280 = 40 + 내용 1200 + 40. 화면이 더 넓으면 상자가 가운데로 모인다.
    2단 레이아웃처럼 이미 여백을 가진 컬럼 안에서는 래퍼에 [--page-gutter:0px] 한 번만 걸면
    그 안의 모든 블록이 따라간다 — 블록마다 px-0 을 덮어쓰지 않는다. */
 :root {
-  --page-gutter: 3rem;
+  --page-max-width: 80rem;
+  --page-gutter: 1rem;
 }
 
-@media (min-width: 1440px) {
+@media (min-width: 1024px) {
   :root {
-    --page-gutter: 5rem;
+    --page-gutter: 2.5rem;
   }
+}
+
+/* px-[var(--page-gutter)] 는 v4 가 길이로 추론하지 못해 유틸리티로 정의한다. */
+@utility page-gutter-x {
+  padding-inline: var(--page-gutter);
+}
+@utility page-width {
+  margin-inline: auto;
+  width: 100%;
+  max-width: var(--page-max-width);
+}
+/* 폭 + 좌우 여백. Container 와 같고, section·header 처럼 태그를 고를 때 쓴다. */
+@utility page-shell {
+  margin-inline: auto;
+  width: 100%;
+  max-width: var(--page-max-width);
+  padding-inline: var(--page-gutter);
 }
 
 @theme {

@@ -43,7 +43,7 @@ const EditApplicationFormFields = ({ applicationId, detail }: EditApplicationFor
     <div>
       <div className="sticky top-12 z-sticky tab:top-14">
         <NavigationBar title="신청서 수정" icon="close" onBack={handleCloseClick} />
-        <Container className="border-b border-neutral-150 bg-white px-4 py-3">
+        <Container className="border-b border-neutral-150 bg-white py-3">
           <p className="text-sm font-medium text-neutral-700">
             {detail.breederName} · {detail.petName || '입양 상담 신청'}
           </p>
@@ -51,7 +51,7 @@ const EditApplicationFormFields = ({ applicationId, detail }: EditApplicationFor
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        <Container className="px-4 pt-8 pb-32 tab:pb-28">
+        <Container className="pt-8 pb-32 tab:pb-28">
           <div className="mx-auto max-w-[55rem]">
             <div className="flex flex-col gap-10 tab:rounded-xl tab:bg-point-50 tab:p-10">
               <CountedTextareaField {...ADOPTION_PLAN_FIELD} register={register} watch={watch} />

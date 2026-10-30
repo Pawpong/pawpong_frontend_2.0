@@ -1,5 +1,4 @@
 import type { ChatRoomResponseDto } from '@/shared/types'
-import { RESPONSIVE_SHELL_CLASS } from '@/shared/config'
 
 type FilterTab = 'all' | 'unread' | 'adoption' | 'counsel' | 'general'
 
@@ -31,9 +30,8 @@ const filterRooms = (
   return rooms.filter((room) => !isAdoptionRoom(room) && !isGeneralRoom(room, userRole))
 }
 
-// [refactored] 채팅방 콘텐츠 반응형 가로 마진 (모바일 16 / 태블릿 48 / PC 80) — 섹션 4곳 공유.
-// mobile 말단은 공용 Container와 같이 704px에서 가둬 767→768 전환 시 목록 폭 역축소를 막는다.
-const CHAT_GUTTER_X = `${RESPONSIVE_SHELL_CLASS} px-4 tab:px-12 pc:px-20`
+// 채팅방 콘텐츠 가로 폭·여백 — 페이지 틀(page-shell)과 같다. 섹션 4곳 공유.
+const CHAT_GUTTER_X = 'page-shell'
 
 // 헤더(Gnb) 아래를 꽉 채우는 높이. 헤더가 모바일 3rem · PC 4rem 이라 둘 다 맞춰 뺀다.
 // 4rem 으로만 빼면 모바일에서 16px 이 남아 화면 아래에 빈 자리가 생긴다.

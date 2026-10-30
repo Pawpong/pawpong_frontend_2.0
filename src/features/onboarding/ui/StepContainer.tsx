@@ -35,7 +35,7 @@ const StepContainer = ({
   contentClassName,
   navExtraButtons,
 }: StepContainerProps) => (
-  <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-5 pt-6 tab:px-10 tab:pt-10">
+  <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col page-gutter-x pt-6 tab:pt-10">
     <StepIndicator />
     <StepTitle subtitle={subtitle}>{title}</StepTitle>
     <div

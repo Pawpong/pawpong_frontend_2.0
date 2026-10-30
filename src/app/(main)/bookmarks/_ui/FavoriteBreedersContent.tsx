@@ -43,7 +43,7 @@ const FavoriteBreedersContent = () => {
 
   return (
     /* 열 수·간격은 공통 카드 격자(ListingCardGrid)를 따른다 */
-    <Container className="px-4 py-5 tab:py-10 pc:pb-27">
+    <Container className="py-5 tab:py-10 pc:pb-27">
       {/* 조회 실패를 "즐겨찾는 브리더가 없습니다"로 뭉뚱그리면 권한·네트워크 문제가 빈 목록으로 위장된다 */}
       <ListState
         isPending={isPending}

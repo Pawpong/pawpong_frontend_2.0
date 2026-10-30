@@ -13,11 +13,7 @@ export function ManagedFeatureHighlights({ placement }: { placement: HighlightPl
     <FeatureHighlights
       placement={placement}
       renderMap={renderMap}
-      className={
-        placement === 'playground'
-          ? '-mt-8 max-w-[68rem] pt-0 pb-16 tab:max-w-[68rem] tab:px-8 tab:pt-0 tab:pb-16 pc:max-w-[68rem] pc:px-10'
-          : undefined
-      }
+      className={placement === 'playground' ? '-mt-8 pt-0 pb-16 tab:pt-0 tab:pb-16' : undefined}
     />
   )
 }

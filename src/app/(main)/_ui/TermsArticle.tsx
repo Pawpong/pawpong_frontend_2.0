@@ -37,7 +37,7 @@ interface TermsArticleProps {
 const TermsArticle = ({ title, intro, sections }: TermsArticleProps) => (
   <div className="flex w-full flex-col">
     <NavigationBar title={title} backHref="/" />
-    <Container className="px-4 py-6 tab:py-10">
+    <Container className="py-6 tab:py-10">
       <div className="mx-auto flex w-full max-w-[41.25rem] flex-col gap-6">
         <h1 className="text-xl font-semibold text-neutral-850 tab:text-2xl">{title}</h1>
         <p className={BODY_CLASS}>{intro}</p>

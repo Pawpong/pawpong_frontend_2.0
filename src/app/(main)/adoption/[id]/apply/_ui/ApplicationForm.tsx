@@ -114,8 +114,8 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
       {/* top 값 = GNB 높이(모바일 48px / 탭+ ≈56px) 기준 오프셋 */}
       {stickyHeader}
 
-      {/* ═══ 안내 배너 (정보 카드 하단) — px mo16/tab48/pc16, py32 / 정보 카드와 동일하게 max-w-[57.5rem] 중앙 컬럼, 텍스트 좌측 정렬 ═══ */}
-      <div className="flex flex-col items-center gap-4 px-4 py-8 tab:px-12 pc:px-4">
+      {/* ═══ 안내 배너 (정보 카드 하단) — 좌우는 페이지 여백, py32 / 정보 카드와 동일하게 max-w-[57.5rem] 중앙 컬럼, 텍스트 좌측 정렬 ═══ */}
+      <div className="flex flex-col items-center gap-4 page-gutter-x py-8">
         <p className="w-full max-w-[55rem] font-cafe24 text-sm leading-[1.5] text-neutral-850">
           입양 신청서 작성 이후,
           <br />
@@ -137,7 +137,7 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
       {/* ═══ 폼 영역 (Figma 1237-41470) — 모바일: 박스 없음 / 탭+: point-50 카드(#fffff1 p40 rounded12 max-w880) ═══ */}
       <form onSubmit={handleSubmit(onSubmit)}>
         {/* 하단 여백 48px — CTA 바가 fixed 라 바 높이(mo 80 / tab+ 64)를 더해야 실제로 48px 남는다 */}
-        <Container className="px-[1rem] pb-32 tab:pb-28">
+        <Container className="pb-32 tab:pb-28">
           <div className="mx-auto max-w-[55rem]">
             {/* 폼 박스 — 섹션 간 gap 40 */}
             <div className="flex flex-col gap-10 tab:rounded-xl tab:bg-point-50 tab:p-10">

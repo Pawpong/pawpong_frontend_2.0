@@ -216,7 +216,7 @@ export function CareMapContent({ initialKind = 'hospital' }: { initialKind?: Car
   }
 
   return (
-    <div className="care-map-page mx-auto w-full max-w-[68rem] px-5 pt-6 pb-16 tab:px-8 tab:pt-10 pc:px-10">
+    <div className="care-map-page page-shell pt-6 pb-16 tab:pt-10">
       <FeatureIntro eyebrow="우리 아이 곁에" title="전국 돌봄 지도">
         아플 때 찾아갈 병원, 새 가족을 기다리는 보호소,
         <br className="tab:hidden" /> 함께 떠날 카페·여행지·숙소까지 포퐁에서 가까이 만나보세요.

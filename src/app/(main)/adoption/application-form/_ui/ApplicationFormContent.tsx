@@ -104,7 +104,7 @@ const ApplicationFormContent = () => {
 
   return (
     <div className="flex w-full flex-col">
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-8 px-5 pt-8 pb-36 tab:gap-10 tab:px-8 tab:pt-12">
+      <div className="mx-auto flex w-full max-w-3xl flex-col gap-8 page-gutter-x pt-8 pb-36 tab:gap-10 tab:pt-12">
         <header>
           <p className={cn(TEXT.meta, 'mb-2')}>입양 신청서 설정</p>
           <h1 className={TEXT.display}>입양자에게 궁금한 점을 물어보세요</h1>
@@ -206,7 +206,7 @@ const ApplicationFormContent = () => {
       </div>
 
       <div className="fixed inset-x-0 bottom-0 z-sticky border-t border-neutral-100 bg-white pb-[env(safe-area-inset-bottom)]">
-        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 px-5 py-4 tab:px-8">
+        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 page-gutter-x py-4">
           <p role="status" className="hidden text-body-md text-neutral-700 tab:block">
             {updateForm.isPending
               ? '질문을 저장하고 있어요.'

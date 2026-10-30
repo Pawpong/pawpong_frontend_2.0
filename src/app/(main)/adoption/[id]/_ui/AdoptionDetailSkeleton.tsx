@@ -10,7 +10,7 @@ export function AdoptionDetailSkeleton() {
     <div role="status" aria-busy="true" className="pb-24 lap:pb-10">
       <span className="sr-only">분양글을 불러오는 중이에요.</span>
       {/* 빈 칸은 SkeletonBlock 이 각자 aria-hidden 이라 낭독기에는 안내 문구만 읽힌다. */}
-      <Container className="px-4 py-4 lap:flex lap:items-start lap:gap-8 lap:py-8 pc:gap-10 pc:py-10">
+      <Container className="py-4 lap:flex lap:items-start lap:gap-8 lap:py-8 pc:gap-10 pc:py-10">
         <div className="-mx-4 flex flex-col gap-4 tab:mx-0 lap:w-[20rem] lap:shrink-0 pc:w-[24rem]">
           <SkeletonBlock className="aspect-[375/279] w-full rounded-none tab:aspect-square tab:rounded-lg" />
           <div className="space-y-3 px-4 tab:px-0">

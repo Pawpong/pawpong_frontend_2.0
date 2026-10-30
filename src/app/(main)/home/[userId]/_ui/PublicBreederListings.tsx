@@ -59,7 +59,7 @@ const PublicBreederListings = ({ breederId, gridClassName }: PublicBreederListin
   const next = query.hasNextPage ? query : showAdopted ? adoptedQuery : null
 
   return (
-    <Container className="px-4 py-5 tab:py-10">
+    <Container className="py-5 tab:py-10">
       <div className="mx-auto flex w-full max-w-[74.625rem] flex-col gap-5">
         {/* 라벨 + 상태 필터 — 마이홈 분양 목록(MyPetPostingList)과 같은 배치 */}
         <div className="flex items-center justify-between gap-2">

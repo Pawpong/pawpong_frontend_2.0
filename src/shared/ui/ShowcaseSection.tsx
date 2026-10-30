@@ -21,7 +21,7 @@ const ShowcaseSection = ({
   className,
   titleClassName,
 }: ShowcaseSectionProps) => (
-  <Container className={cn('px-4 py-4 pc:px-20 pc:py-10', className)}>
+  <Container className={cn('py-4 pc:py-10', className)}>
     <section className="flex flex-col gap-3">
       <SectionHeader
         title={title}

@@ -85,7 +85,7 @@ export const usePlayFeatures = () => {
 export function PlaygroundContent() {
   const features = usePlayFeatures()
   return (
-    <div className="mx-auto w-full max-w-[90rem] space-y-10 px-5 pt-6 pb-16 tab:space-y-12 tab:px-8 tab:pt-10 pc:px-10">
+    <div className="page-shell space-y-10 pt-6 pb-16 tab:space-y-12 tab:pt-10">
       <header>
         <h1 className="font-cafe24 text-2xl text-neutral-850 tab:text-3xl">포퐁 놀이터</h1>
         <p className="mt-2 text-body-md text-neutral-700 tab:text-body-lg">

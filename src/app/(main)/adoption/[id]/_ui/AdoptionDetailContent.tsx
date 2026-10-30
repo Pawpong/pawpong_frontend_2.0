@@ -105,7 +105,7 @@ const AdoptionDetailContent = ({ detail }: AdoptionDetailContentProps) => {
 
   return (
     <div className="pb-24 lap:pb-10">
-      <Container className="px-4 py-4 lap:flex lap:items-start lap:gap-8 lap:py-8 pc:gap-10 pc:py-10">
+      <Container className="py-4 lap:flex lap:items-start lap:gap-8 lap:py-8 pc:gap-10 pc:py-10">
         <AdoptionDetailRail
           detail={detail}
           onImageClick={openImageModal}

@@ -158,7 +158,7 @@ const CommunityContent = ({
           </>
         }
       />
-      <div className="mx-auto w-full max-w-[68rem] px-5 pt-5 pb-28 tab:px-8 tab:pt-8 pc:px-10">
+      <div className="page-shell pt-5 pb-28 tab:pt-8">
         <div className="grid min-w-0 grid-cols-1 pc:grid-cols-[13rem_minmax(0,1fr)] pc:items-start pc:gap-12">
           <aside className="sticky top-24 hidden pc:block" aria-label="커뮤니티 탐색">
             <p aria-hidden className="mb-2 px-4 text-xs font-semibold text-neutral-700">
