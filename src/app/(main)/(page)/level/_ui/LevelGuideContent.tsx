@@ -14,6 +14,7 @@ import { useAuthStatus } from '@/features/auth'
 import { SupportInquiryModal } from '@/features/inquiry'
 import { AsyncState, Badge, Button, DetailLink, NavigationBar } from '@/shared/ui'
 import { FeatureIntro } from '@/shared/ui/FeatureIntro'
+import { TEXT } from '@/shared/config'
 
 const BREEDER_KINDS = ['listing', 'listing_detail', 'consult_review', 'adoption_review']
 const PER_EVENT_LIMIT: Record<string, string> = {
@@ -37,7 +38,7 @@ const limitText = (kind: string, rule: Rule) => {
 }
 
 const SectionTitle = ({ id, children }: { id: string; children: string }) => (
-  <h2 id={id} className="font-cafe24 text-xl text-neutral-850 tab:text-2xl">
+  <h2 id={id} className={TEXT.title}>
     {children}
   </h2>
 )

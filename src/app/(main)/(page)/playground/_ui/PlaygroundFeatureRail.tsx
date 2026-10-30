@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState, type Ref } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { PixelArrowRightIcon } from '@/shared/assets'
+import { TEXT } from '@/shared/config'
 
 export interface PlaygroundFeature {
   key: string
@@ -57,7 +58,7 @@ export function PlaygroundFeatureRail({
     <section aria-labelledby={`${id}-title`} className="min-w-0">
       <header className="mb-4 flex items-end justify-between gap-3 tab:mb-5">
         <div className="min-w-0">
-          <h2 id={`${id}-title`} className="font-cafe24 text-xl text-neutral-850 tab:text-2xl">
+          <h2 id={`${id}-title`} className={TEXT.title}>
             {title}
           </h2>
           <p className="mt-1 text-body-sm text-neutral-700 tab:text-body-md">{description}</p>

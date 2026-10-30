@@ -4,6 +4,7 @@ import { PawPrintIcon, PixelMessageIcon, PixelPencilIcon } from '@/shared/assets
 import { NavigationBar } from '@/shared/ui'
 import { FeatureIntro } from '@/shared/ui/FeatureIntro'
 import { TicketLink } from '@/shared/ui/Ticket'
+import { TEXT } from '@/shared/config'
 
 export const metadata = createPageMetadata({
   title: '서비스 소개',
@@ -61,7 +62,7 @@ const AboutPage = () => (
         </FeatureIntro>
 
         <section aria-labelledby="about-steps">
-          <h2 id="about-steps" className="font-cafe24 text-xl text-neutral-850 tab:text-2xl">
+          <h2 id="about-steps" className={TEXT.title}>
             이렇게 이용해 보세요
           </h2>
           <ol className="mt-4 grid gap-3 tab:grid-cols-2">
@@ -83,7 +84,7 @@ const AboutPage = () => (
         </section>
 
         <section aria-labelledby="about-start">
-          <h2 id="about-start" className="font-cafe24 text-xl text-neutral-850 tab:text-2xl">
+          <h2 id="about-start" className={TEXT.title}>
             바로 시작하기
           </h2>
           <ul className="mt-4 grid gap-4 lap:grid-cols-3">

@@ -56,8 +56,8 @@ const SectionHeader = ({
           <DetailLink
             href={linkHref}
             label={linkText}
-            size="sm"
-            className={cn('tab:text-[0.875rem]', linkClassName)}
+            size="responsive"
+            className={linkClassName}
           />
         )}
         {/* 부제가 없으면 우측 슬롯을 타이틀 줄(링크 자리)에 붙인다 */}

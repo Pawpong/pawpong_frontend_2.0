@@ -80,3 +80,28 @@ test('옛 틀 부품·복제 패턴은 남지 않는다', () => {
     [],
   )
 })
+
+test('홈 섹션은 공통 글자·간격 토큰을 쓴다 (제목 TEXT.title · 설명 text-body-s · 간격 section-stack)', () => {
+  const css = source('src/app/globals.css')
+  assert.match(css, /--section-space: 3rem;\s*--section-head-gap: 1rem;/)
+  assert.match(css, /@utility section-stack \{[^}]*gap: var\(--section-space\);/)
+  const header = source('src/app/(main)/_ui/home/HomeSectionHeader.tsx')
+  assert.match(header, /TEXT\.title/)
+  assert.match(header, /size="responsive"/)
+  // 페이지 안 섹션 제목(20 → 24)은 손으로 적지 않고 TEXT.title 하나를 쓴다
+  assert.deepEqual(
+    files.filter((file) => /font-cafe24 text-xl text-neutral-850 tab:text-2xl/.test(source(file))),
+    [],
+  )
+  assert.match(header, /text-body-s/)
+  assert.match(header, /<DetailLink /)
+  const home = ['HomeContent.tsx', 'PreviewFeeds.tsx'].map((file) =>
+    source(`src/app/(main)/_ui/home/${file}`),
+  )
+  assert.match(home[0], /className="section-stack"/)
+  for (const file of home) {
+    // 화면마다 직접 적던 제목 크기·섹션 여백이 돌아오지 않게 한다
+    assert.doesNotMatch(file, /text-2xl leading-\[1\.4\]|py-12 tab:py-16|pb-12 tab:pb-16/)
+    assert.doesNotMatch(file, /<h2 [^>]*className=/)
+  }
+})
