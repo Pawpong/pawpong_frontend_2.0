@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { cn } from '@/shared/lib/cn'
-import { Container } from './Container'
+import { PageShell } from './PageShell'
 import { SectionHeader } from './SectionHeader'
 
 interface ShowcaseSectionProps {
@@ -21,7 +21,7 @@ const ShowcaseSection = ({
   className,
   titleClassName,
 }: ShowcaseSectionProps) => (
-  <Container className={cn('px-4 py-4 pc:px-20 pc:py-10', className)}>
+  <PageShell className={cn('py-4 pc:py-10', className)}>
     <section className="flex flex-col gap-3">
       <SectionHeader
         title={title}
@@ -37,7 +37,7 @@ const ShowcaseSection = ({
       />
       {children}
     </section>
-  </Container>
+  </PageShell>
 )
 
 export { ShowcaseSection }

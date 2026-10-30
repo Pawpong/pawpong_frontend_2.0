@@ -33,7 +33,7 @@ interface MyPetPostingListProps {
 
 /**
  * 내 분양글 목록 (상태 필터 + 그리드 + 무한 스크롤). 브리더 마이홈의 분양중 탭이 쓴다.
- * 바깥 여백은 호출부의 Container 가 담당한다.
+ * 바깥 여백은 호출부(PageShell·페이지 틀)가 담당한다.
  */
 const MyPetPostingList = ({
   pageSize,

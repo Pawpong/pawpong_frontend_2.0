@@ -6,7 +6,7 @@ const { load } = require('./fixtures/navigation.fixture.cjs')
 const { hooks, nodes } = require('../fixtures/react-hooks.fixture.cjs')
 
 function recovery(runtime = React) {
-  return load('src/app/(main)/community/_ui/CommunityPhotoRecovery.tsx', {
+  return load('src/app/(main)/(page)/community/_ui/CommunityPhotoRecovery.tsx', {
     react: runtime,
     'react/jsx-runtime': require('react/jsx-runtime'),
     'next/link': { default: ({ children, ...props }) => React.createElement('a', props, children) },

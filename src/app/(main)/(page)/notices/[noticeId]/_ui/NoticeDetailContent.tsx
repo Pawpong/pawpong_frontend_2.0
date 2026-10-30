@@ -1,0 +1,63 @@
+'use client'
+
+import { useQuery } from '@tanstack/react-query'
+import { noticeQueries } from '@/entities/notice'
+import { formatDate } from '@/shared/lib/formatDate'
+import { AsyncState, Badge, NavigationBar } from '@/shared/ui'
+
+/** 공지사항 상세. GET /api/v2/notice/{noticeId} */
+const NoticeDetailContent = ({ noticeId }: { noticeId: string }) => {
+  const {
+    data,
+    isPending,
+    isError,
+    refetch,
+    isFetching: isRetrying,
+  } = useQuery(noticeQueries.detail(noticeId))
+
+  return (
+    <div>
+      <NavigationBar title="공지사항" backHref="/notices" />
+
+      <div>
+        <div className="mx-auto flex w-full max-w-168 flex-col gap-5 pc:max-w-[59.25rem]">
+          {isPending && <AsyncState status="loading" message="공지사항을 불러오는 중이에요." />}
+          {isError && !data && (
+            <AsyncState
+              status="error"
+              message="공지사항을 불러오지 못했어요."
+              onRetry={() => void refetch()}
+              isRetrying={isRetrying}
+            />
+          )}
+
+          {data && (
+            <section className="rounded-xl border border-neutral-150 bg-white p-4 shadow-[0_7px_7px_rgba(55,55,55,0.06)] tab:p-6">
+              <div className="flex flex-col gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  {data.isPinned && (
+                    <Badge variant="primaryFilled" size="md">
+                      고정
+                    </Badge>
+                  )}
+                  <h1 className="truncate font-cafe24 text-lg text-neutral-850 tab:text-xl">
+                    {data.title}
+                  </h1>
+                </div>
+                <p className="text-xs font-medium text-neutral-700">
+                  {formatDate(data.publishedAt ?? data.createdAt)} · {data.authorName}
+                </p>
+              </div>
+
+              <p className="mt-4 border-t border-neutral-150 pt-4 text-sm leading-[1.6] font-medium whitespace-pre-wrap text-neutral-850 tab:text-base">
+                {data.content}
+              </p>
+            </section>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export { NoticeDetailContent }

@@ -9,7 +9,7 @@ const nothing = () => null
 
 function renderDiscoveryQuery(config, query = 'media=map') {
   let options, configOptions
-  const { CommunityContent } = load('src/app/(main)/community/_ui/CommunityContent.tsx', {
+  const { CommunityContent } = load('src/app/(main)/(page)/community/_ui/CommunityContent.tsx', {
     'next/navigation': {
       useRouter: () => ({ replace: nothing, push: nothing }),
       useSearchParams: () => new URLSearchParams(query),

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import type { CommunityHallOfFame } from '@/shared/types'
 import { ArrowRightIcon } from '@/shared/assets'
-import { Container, InfiniteScrollTrigger, ListState, NavigationBar } from '@/shared/ui'
+import { PageShell, InfiniteScrollTrigger, ListState, NavigationBar } from '@/shared/ui'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import { communityQueries, formatHallOfFamePeriod } from '@/entities/community'
 import { contestQueries } from '@/entities/contest'
@@ -79,10 +79,13 @@ const HallOfFameContent = () => {
 
   return (
     <div className="flex w-full flex-col bg-base-white">
-      <NavigationBar title="명예의 전당" titleVariant="page" />
+      {/* 아래 회차 목록이 화면 끝까지 가는 띠라 이 화면은 페이지 틀을 직접 조립한다 */}
+      <PageShell>
+        <NavigationBar title="명예의 전당" titleVariant="page" />
+      </PageShell>
 
       <section className="w-full">
-        <Container className="px-4 py-4 tab:px-12 tab:py-10 pc:max-w-[80rem] pc:px-0">
+        <PageShell className="py-4 tab:py-10">
           <div className="flex w-full flex-col items-start gap-2.5 tab:gap-4 pc:flex-row pc:gap-9">
             <div className="flex w-full shrink-0 flex-col gap-1 pc:w-min pc:min-w-[12.75rem]">
               <h2 className="font-cafe24 text-sm leading-[1.5] font-normal text-neutral-850 tab:text-base pc:text-xl pc:whitespace-nowrap">
@@ -126,11 +129,11 @@ const HallOfFameContent = () => {
               </ListState>
             </div>
           </div>
-        </Container>
+        </PageShell>
       </section>
 
       <section aria-labelledby="hall-of-fame-history" className="w-full bg-secondary-50">
-        <Container className="px-4 py-10 tab:px-12 tab:py-14 pc:max-w-[80rem] pc:px-0">
+        <PageShell className="py-10 tab:py-14">
           <div className="mb-8 flex flex-col gap-3 tab:mb-12">
             <h2 id="hall-of-fame-history" className="font-cafe24 text-body-xl text-neutral-850">
               지난 명예의 전당
@@ -160,7 +163,7 @@ const HallOfFameContent = () => {
               isFetchingNextPage={history.isFetchingNextPage}
             />
           </ListState>
-        </Container>
+        </PageShell>
       </section>
     </div>
   )

@@ -2,7 +2,7 @@ const { test } = require('node:test')
 const assert = require('node:assert/strict')
 const fs = require('node:fs')
 
-const ui = 'src/app/(main)/community/_ui'
+const ui = 'src/app/(main)/(page)/community/_ui'
 const read = (file) => fs.readFileSync(file, 'utf8')
 const visibleFiles = [
   `${ui}/CommunityRoutePicker.tsx`,

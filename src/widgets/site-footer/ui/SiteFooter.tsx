@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRoutePathname } from '@/shared/lib/useRoutePathname'
-import { Container } from '@/shared/ui'
+import { PageShell } from '@/shared/ui'
 
 const FOOTER_PATHS = new Set([
   '/',
@@ -40,7 +40,7 @@ const SiteFooter = () => {
 
   return (
     <footer className="bg-secondary-50 in-data-app:hidden">
-      <Container className="py-8 tab:py-10 pc:py-12">
+      <PageShell className="py-8 tab:py-10 pc:py-12">
         <div className="flex flex-col gap-8 pc:flex-row pc:items-start pc:justify-between">
           <div className="flex max-w-md flex-col gap-3">
             <Link href="/" aria-label="Pawpong 서비스 홈" className="w-fit rounded focus-ring">
@@ -99,7 +99,7 @@ const SiteFooter = () => {
             </nav>
           </div>
         </div>
-      </Container>
+      </PageShell>
     </footer>
   )
 }

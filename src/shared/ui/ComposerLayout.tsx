@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react'
 import { PawPrintIcon } from '@/shared/assets'
-import { Container } from './Container'
 import { NavigationBar } from './NavigationBar'
 import { TicketStrip, ticketStyles, type TicketAccent } from './Ticket'
 
@@ -28,48 +27,46 @@ export function ComposerLayout({
   children,
 }: ComposerLayoutProps) {
   return (
-    <div className="min-h-dvh bg-white text-neutral-850">
+    <div className="text-neutral-850">
       <NavigationBar title={title} mobileTitle={mobileTitle} icon="close" onBack={onBack} />
-      <Container className="py-5 pb-10 tab:py-8 pc:py-10">
-        <div className="mx-auto max-w-264">
-          {introTicket ? (
-            <header
-              data-accent={introTicket.accent}
-              className={`${ticketStyles.ticket} mb-6 tab:mb-8`}
-            >
-              <TicketStrip label={introTicket.label} icon={introTicket.icon} />
-              <div className="px-5 py-5 tab:px-8 tab:py-6">
-                <h1 className="font-cafe24 text-xl leading-[1.5] break-keep tab:text-2xl">
-                  {introTitle}
-                </h1>
-                <p className="mt-2 text-sm leading-relaxed break-keep text-neutral-700 tab:text-base">
-                  {description}
+      <div className="mx-auto max-w-264">
+        {introTicket ? (
+          <header
+            data-accent={introTicket.accent}
+            className={`${ticketStyles.ticket} mb-6 tab:mb-8`}
+          >
+            <TicketStrip label={introTicket.label} icon={introTicket.icon} />
+            <div className="px-5 py-5 tab:px-8 tab:py-6">
+              <h1 className="font-cafe24 text-xl leading-[1.5] break-keep tab:text-2xl">
+                {introTitle}
+              </h1>
+              <p className="mt-2 text-sm leading-relaxed break-keep text-neutral-700 tab:text-base">
+                {description}
+              </p>
+            </div>
+          </header>
+        ) : (
+          <header className="relative mb-6 overflow-hidden rounded-xl bg-point-100 px-5 py-6 tab:mb-8 tab:px-8 tab:py-8">
+            <div className="relative z-10 pc:pr-28">
+              {category && (
+                <p className="mb-3 flex items-center gap-2 text-sm font-semibold text-primary-600">
+                  <PawPrintIcon aria-hidden="true" className="size-6" />
+                  {category}
                 </p>
-              </div>
-            </header>
-          ) : (
-            <header className="relative mb-6 overflow-hidden rounded-xl bg-point-100 px-5 py-6 tab:mb-8 tab:px-8 tab:py-8">
-              <div className="relative z-10 pc:pr-28">
-                {category && (
-                  <p className="mb-3 flex items-center gap-2 text-sm font-semibold text-primary-600">
-                    <PawPrintIcon aria-hidden="true" className="size-6" />
-                    {category}
-                  </p>
-                )}
-                <h1 className="font-cafe24 text-xl leading-[1.5] tab:text-2xl">{introTitle}</h1>
-                <p className="mt-3 text-sm leading-relaxed text-neutral-700 tab:text-base">
-                  {description}
-                </p>
-              </div>
-              <PawPrintIcon
-                aria-hidden="true"
-                className="pointer-events-none absolute right-8 bottom-5 hidden size-28 -rotate-12 text-point-300 pc:block"
-              />
-            </header>
-          )}
-          {children}
-        </div>
-      </Container>
+              )}
+              <h1 className="font-cafe24 text-xl leading-[1.5] tab:text-2xl">{introTitle}</h1>
+              <p className="mt-3 text-sm leading-relaxed text-neutral-700 tab:text-base">
+                {description}
+              </p>
+            </div>
+            <PawPrintIcon
+              aria-hidden="true"
+              className="pointer-events-none absolute right-8 bottom-5 hidden size-28 -rotate-12 text-point-300 pc:block"
+            />
+          </header>
+        )}
+        {children}
+      </div>
     </div>
   )
 }

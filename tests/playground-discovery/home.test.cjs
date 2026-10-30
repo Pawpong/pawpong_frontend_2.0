@@ -8,7 +8,7 @@ const { source } = require('./fixtures/discovery.fixture.cjs')
 const ui = 'src/features/playground-tools/ui'
 
 test('놀이터는 놀이와 돌봄 이미지 레일로 나누고 반려동물 기능 설정을 유지함', () => {
-  const home = source('src/app/(main)/playground/_ui/PlaygroundContent.tsx')
+  const home = source('src/app/(main)/(page)/playground/_ui/PlaygroundContent.tsx')
   assert.equal((home.match(/<PlaygroundFeatureRail/g) ?? []).length, 2)
   for (const route of [
     '/ai-filter',
@@ -52,7 +52,7 @@ test('돌봄 도구는 세 목적지와 위치 공개 안내를 유지하고 링
 })
 
 test('놀이터 커버는 새 로컬 에셋을 사용하고 스크롤과 모션 줄이기를 지원함', () => {
-  const rail = source('src/app/(main)/playground/_ui/PlaygroundFeatureRail.tsx')
+  const rail = source('src/app/(main)/(page)/playground/_ui/PlaygroundFeatureRail.tsx')
   assert.ok(rail.includes('/images/playground/covers/'))
   assert.match(rail, /snap-x snap-mandatory/)
   assert.match(rail, /prefers-reduced-motion: reduce/)
@@ -73,7 +73,10 @@ test('놀이터 커버는 새 로컬 에셋을 사용하고 스크롤과 모션 
 })
 
 test('서비스 소개와 앱 안내도 놀이터와 같은 소개 박스와 티켓 링크를 씀', () => {
-  for (const file of ['src/app/(main)/about/page.tsx', 'src/app/(main)/app/page.tsx']) {
+  for (const file of [
+    'src/app/(main)/(page)/about/page.tsx',
+    'src/app/(main)/(page)/app/page.tsx',
+  ]) {
     const page = source(file)
     assert.match(page, /<FeatureIntro\b/, file)
     assert.match(page, /<TicketLink\b/, file)
@@ -141,7 +144,10 @@ test('홈·놀이터 돌봄 지도 입구는 같은 함께 갈 곳 배너 하나
   assert.match(html, /<h2 id="care-map-entry-title"/)
   assert.doesNotMatch(html, /<button|<a [^>]*>[^<]*<a /)
   assert.match(source('src/app/(main)/_ui/home/HomeContent.tsx'), /<CareMapEntry \/>/)
-  assert.match(source('src/app/(main)/_ui/ManagedFeatureHighlights.tsx'), /<CareMapEntry \/>/)
+  assert.match(
+    source('src/app/(main)/(page)/_ui/ManagedFeatureHighlights.tsx'),
+    /<CareMapEntry \/>/,
+  )
   // 새 기능 소개 버튼 폭은 계약을 우회하지 않고 감싸는 칸으로 정한다.
   for (const file of [
     'src/shared/ui/TicketActionCard.tsx',

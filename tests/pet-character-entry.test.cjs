@@ -66,7 +66,7 @@ test('공개 잠금과 비로그인 및 검증 대기나 오류 상태에서는 
 })
 
 test('제작 페이지는 캐릭터 모드의 올바른 작업 ID만 사진 선택으로 전달함', async () => {
-  const { default: Page } = loadModule('src/app/(main)/ai-filter/page.tsx', {
+  const { default: Page } = loadModule('src/app/(main)/(page)/ai-filter/page.tsx', {
     'react/jsx-runtime': jsx,
     '@/shared/lib/metadata': { createPageMetadata: (value) => value },
     './_ui/AiFilterContent': { AiFilterContent: () => null },
@@ -88,18 +88,21 @@ test('제작 화면은 사진과 계정 세션별로 분리하고 공개 잠금�
   let config = { data: { enabled: true } }
   let scope = 'owner-session'
   const billing = { memberId: 'owner', generation: 3, refresh: async () => {}, account: {} }
-  const { AiFilterContent } = loadModule('src/app/(main)/ai-filter/_ui/AiFilterContent.tsx', {
-    react: { useEffect() {} },
-    'react/jsx-runtime': jsx,
-    '@tanstack/react-query': { useQuery: () => config },
-    '@/features/ai-image': { AiFilterStudio: () => null },
-    '@/features/playground-pet': { PetResultLink: () => null },
-    '@/features/auth': { useMe: () => ({ isLoggedIn: true }) },
-    '@/features/in-app-purchase': { usePurchases: () => billing },
-    '@/entities/iap': { featureAllowance: () => undefined },
-    '@/entities/playground-pet': { petConfigOptions: {} },
-    '@/shared/lib/useAuthReadSession': { useAuthReadSession: () => ({ scope }) },
-  })
+  const { AiFilterContent } = loadModule(
+    'src/app/(main)/(page)/ai-filter/_ui/AiFilterContent.tsx',
+    {
+      react: { useEffect() {} },
+      'react/jsx-runtime': jsx,
+      '@tanstack/react-query': { useQuery: () => config },
+      '@/features/ai-image': { AiFilterStudio: () => null },
+      '@/features/playground-pet': { PetResultLink: () => null },
+      '@/features/auth': { useMe: () => ({ isLoggedIn: true }) },
+      '@/features/in-app-purchase': { usePurchases: () => billing },
+      '@/entities/iap': { featureAllowance: () => undefined },
+      '@/entities/playground-pet': { petConfigOptions: {} },
+      '@/shared/lib/useAuthReadSession': { useAuthReadSession: () => ({ scope }) },
+    },
+  )
   const props = { gameCharacter: true, sourceJobId }
   const first = AiFilterContent(props)
   assert.equal(first.props.sourceJobId, sourceJobId)

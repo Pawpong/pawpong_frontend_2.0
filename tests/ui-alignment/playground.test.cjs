@@ -30,7 +30,7 @@ test('외출 준비함은 공통 아이콘 버튼과 그룹 이름을 쓰고 장
 
 test('버튼 폭은 계약을 우회하지 않고 감싸는 칸으로 정하며 이야기 쓰기 버튼은 줄을 채움', () => {
   for (const file of [
-    'src/app/(main)/playground/_ui/PlaygroundContent.tsx',
+    'src/app/(main)/(page)/playground/_ui/PlaygroundContent.tsx',
     'src/features/playground-tools/ui/PlayResultActions.tsx',
   ])
     assert.doesNotMatch(source(file), /cn\(buttonVariants/, file)

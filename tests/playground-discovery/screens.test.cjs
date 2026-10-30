@@ -37,10 +37,13 @@ test('놀이 카드 문구는 건강·응급 판단을 놀이로 만들지 않�
 })
 
 test('기존 외출 준비함 주소와 저장 데이터는 그대로 두고 새 놀이는 별도 주소를 씀', () => {
-  assert.match(source('src/app/(main)/playground/outing/page.tsx'), /<OutingChecklist \/>/)
-  assert.match(source('src/app/(main)/playground/walk-card/page.tsx'), /<OutingDiscovery \/>/)
-  assert.match(source('src/app/(main)/playground/taste/page.tsx'), /<PetTasteDiscovery \/>/)
-  assert.match(source('src/app/(main)/playground/bti/page.tsx'), /<PetBtiDiscovery \/>/)
+  assert.match(source('src/app/(main)/(page)/playground/outing/page.tsx'), /<OutingChecklist \/>/)
+  assert.match(
+    source('src/app/(main)/(page)/playground/walk-card/page.tsx'),
+    /<OutingDiscovery \/>/,
+  )
+  assert.match(source('src/app/(main)/(page)/playground/taste/page.tsx'), /<PetTasteDiscovery \/>/)
+  assert.match(source('src/app/(main)/(page)/playground/bti/page.tsx'), /<PetBtiDiscovery \/>/)
   assert.match(
     source('src/features/playground-tools/model/checklistStore.ts'),
     /`pawpong:outing:v1:\$\{encodeURIComponent\(owner\)\}`/,

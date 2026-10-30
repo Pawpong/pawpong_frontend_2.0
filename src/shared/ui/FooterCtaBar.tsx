@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react'
 import { cn } from '@/shared/lib/cn'
-import { Container } from './Container'
+import { PageShell } from './PageShell'
 import { Button } from './Button'
 
 interface FooterCtaAction {
@@ -26,14 +26,14 @@ interface FooterCtaBarProps {
 
 /**
  * 화면 하단 고정 CTA 바 (Figma 1054-36832 / 모바일 1056-47239).
- * - 바: 높이 94(tab+), 좌우 여백은 Container 기본(mo16 / tab48 / pc80)
+ * - 바: 높이 94(tab+), 좌우 폭·여백은 페이지 틀(PageShell)과 같다
  * - 버튼: 모바일 h-48 풀 너비(보조 117 고정), tab+ h-40 · 170 · gap 20 (그룹 360)
  */
 const FooterCtaBar = ({ leftSlot, secondary, primary, children, className }: FooterCtaBarProps) => (
   <div className={cn('fixed inset-x-0 bottom-0 z-sticky bg-white', className)}>
     {children}
 
-    <Container className="flex items-center py-4 tab:h-[5.875rem] tab:justify-between tab:py-0">
+    <PageShell className="flex items-center py-4 tab:h-[5.875rem] tab:justify-between tab:py-0">
       {/* 좌측 슬롯 자리는 비어 있어도 유지해 버튼 그룹이 우측에 붙게 한다 */}
       <div className="hidden tab:block">{leftSlot}</div>
 
@@ -58,7 +58,7 @@ const FooterCtaBar = ({ leftSlot, secondary, primary, children, className }: Foo
           </Button>
         </div>
       </div>
-    </Container>
+    </PageShell>
   </div>
 )
 

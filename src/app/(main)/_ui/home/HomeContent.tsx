@@ -67,7 +67,7 @@ export function Journey({ dark = false }: { dark?: boolean }) {
   ]
   return (
     <section className={dark ? 'bg-primary-800 text-white' : 'bg-secondary-50 text-neutral-850'}>
-      <div className="mx-auto max-w-[80rem] px-5 py-12 tab:px-12 tab:py-16 pc:px-20">
+      <div className="page-shell py-12 tab:py-16">
         <div className="mb-7 flex flex-wrap items-end justify-between gap-3">
           <h2 className="font-cafe24 text-2xl leading-[1.4] tab:text-[1.75rem]">
             만나기 전, 이렇게 확인해요
@@ -107,12 +107,12 @@ export function Journey({ dark = false }: { dark?: boolean }) {
 export function HomeContent({ initial }: { initial: InitialBanners | null }) {
   return (
     <>
-      <div className="mx-auto max-w-[80rem] px-5 pt-6 tab:px-12 tab:pt-8 pc:px-20">
+      <div className="page-shell pt-6 tab:pt-8">
         <PreviewBanner initial={initial} />
       </div>
       <section
         aria-labelledby="home-explore-title"
-        className="mx-auto max-w-[80rem] px-5 pt-8 pb-12 tab:px-12 tab:pt-10 tab:pb-16 pc:px-20"
+        className="page-shell pt-8 pb-12 tab:pt-10 tab:pb-16"
       >
         <div className="mb-6 flex flex-col gap-5 tab:flex-row tab:items-center tab:justify-between tab:gap-8">
           <div className="shrink-0">
@@ -139,7 +139,7 @@ export function HomeContent({ initial }: { initial: InitialBanners | null }) {
       <PreviewPlayground />
       <Journey />
       <PreviewCommunity />
-      <div className="mx-auto max-w-[80rem] px-5 pb-14 tab:px-12 pc:px-20">
+      <div className="page-shell pb-14">
         <CareMapEntry />
       </div>
     </>

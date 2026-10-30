@@ -8,7 +8,7 @@ test('모바일 상세도 목록을 새로 불러오지 않고 닫을 때 이전
   let properties,
     backs = 0
   const { PostDetailModal } = load(
-    'src/app/(main)/community/@modal/(.)post/[postId]/_ui/PostDetailModal.tsx',
+    'src/app/(main)/(page)/community/@modal/(.)post/[postId]/_ui/PostDetailModal.tsx',
     {
       'next/navigation': { useRouter: () => ({ back: () => backs++ }) },
       '../../../../_ui/PostDetailDialog': {

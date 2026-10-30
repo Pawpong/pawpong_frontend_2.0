@@ -4,14 +4,17 @@ const ts = require('typescript')
 const { loadTypescript: load } = require('../../helpers/load-typescript.cjs')
 const { notificationFixture } = require('../../notifications/fixtures/notification.fixture.cjs')
 const auth = notificationFixture()
-const model = load('src/app/(main)/community/post/[postId]/_ui/commentThread.ts')
-const feedback = load('src/app/(main)/community/post/[postId]/_ui/commentSubmitFeedback.ts', {
-  '@/shared/api': {
-    isApiError: (value) => value instanceof auth.ApiError,
-    AuthWriteRetryRequiredError: auth.AuthWriteRetryRequiredError,
+const model = load('src/app/(main)/(page)/community/post/[postId]/_ui/commentThread.ts')
+const feedback = load(
+  'src/app/(main)/(page)/community/post/[postId]/_ui/commentSubmitFeedback.ts',
+  {
+    '@/shared/api': {
+      isApiError: (value) => value instanceof auth.ApiError,
+      AuthWriteRetryRequiredError: auth.AuthWriteRetryRequiredError,
+    },
+    './commentThread': model,
   },
-  './commentThread': model,
-})
+)
 // 실제 컴포넌트의 이벤트/비동기 상태를 실행한다. 브라우저의 터치 → click 변환은
 // 별도 iOS WKWebView 검증으로 확인하며, 여기서는 저장 전후 계약과 중복 제출을 검증한다.
 function mount(onSubmit, overrides = {}) {
@@ -55,7 +58,10 @@ function mount(onSubmit, overrides = {}) {
     './CommentComposerShell': { CommentComposerShell: 'shell' },
   }
   const code = ts.transpileModule(
-    fs.readFileSync('src/app/(main)/community/post/[postId]/_ui/CommentComposer.tsx', 'utf8'),
+    fs.readFileSync(
+      'src/app/(main)/(page)/community/post/[postId]/_ui/CommentComposer.tsx',
+      'utf8',
+    ),
     {
       compilerOptions: {
         module: ts.ModuleKind.CommonJS,

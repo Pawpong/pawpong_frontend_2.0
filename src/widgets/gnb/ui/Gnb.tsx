@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { useRoutePathname } from '@/shared/lib/useRoutePathname'
 import { MenuIcon } from '@/shared/assets'
-import { RESPONSIVE_SHELL_CLASS } from '@/shared/config'
 import { cn } from '@/shared/lib/cn'
 import { AppBadgeSync } from './AppBadgeSync'
 import { AuthActions } from './AuthActions'
@@ -24,8 +23,8 @@ const Gnb = () => {
 
   return (
     <>
-      {/* 높이·좌우 여백은 Figma 740-66523 디바이스 프레임 기준
-          (mo-375 h48/px16 · tab-768 py8/px48 · pc-1440 h64/py8/px80) */}
+      {/* 높이는 Figma 740-66523 디바이스 프레임 기준 (mo h48 · tab py8 · pc h64).
+          좌우 폭·여백은 본문과 같은 페이지 틀(page-shell)이라 로고와 본문 왼쪽 끝이 맞는다. */}
       <header
         data-gnb
         className={cn(
@@ -33,12 +32,7 @@ const Gnb = () => {
           TINTED_HEADER_PATTERN.test(pathname) ? 'bg-point-50' : 'bg-white',
         )}
       >
-        <div
-          className={cn(
-            RESPONSIVE_SHELL_CLASS,
-            'flex items-center justify-between px-4 tab:px-12 pc:px-20',
-          )}
-        >
+        <div className="page-shell flex items-center justify-between">
           <LogoButton />
           {/* Figma 3349:1763537 — pc 는 nav·로그인·메뉴 아이콘 사이 20px.
               mo·tab 은 헤더가 좁아 12px 로 줄인다.

@@ -124,8 +124,8 @@ const FollowersModal = ({
             <NavigationBar
               title={isMutual ? '함께 팔로우하는 사람' : '친구 목록'}
               onBack={() => onOpenChange(false)}
-              // 상단 여백 — Figma header 영역 (모바일 48px / 탭 64px)
-              className="mt-12 shrink-0 tab:mt-16 pc:hidden"
+              // 상단 여백 — Figma header 영역 (모바일 48px / 탭 64px). 좌우는 아래 목록과 같은 모달 안쪽 여백
+              className="mt-12 shrink-0 px-4 tab:mt-16 tab:px-12 pc:hidden"
             />
 
             {/* pc: 닫기 */}

@@ -15,8 +15,8 @@ import { FavoriteAdoptionGridCard } from '@/features/adoption'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
 import { ListingCardGrid, ListingCardGridSkeleton, ListState } from '@/shared/ui'
-import { CARE_FEATURES, usePlayFeatures } from '../../playground/_ui/PlaygroundContent'
-import { PlaygroundFeatureCards } from '../../playground/_ui/PlaygroundFeatureRail'
+import { CARE_FEATURES, usePlayFeatures } from '../../(page)/playground/_ui/PlaygroundContent'
+import { PlaygroundFeatureCards } from '../../(page)/playground/_ui/PlaygroundFeatureRail'
 
 const sectionHeading = 'font-cafe24 text-2xl leading-[1.4] text-neutral-850 tab:text-[1.75rem]'
 const moreLink =
@@ -34,10 +34,7 @@ export function PreviewPets({ title = '지금 만날 수 있는 친구들' }: { 
   const pets = flattenPages(data).slice(0, PET_COUNT).map(mapAdoptionCard)
 
   return (
-    <section
-      aria-labelledby="preview-pets-title"
-      className="mx-auto w-full max-w-[80rem] px-5 py-12 tab:px-12 tab:py-16 pc:px-20"
-    >
+    <section aria-labelledby="preview-pets-title" className="page-shell py-12 tab:py-16">
       <div className="mb-6 flex items-end justify-between gap-4">
         <h2 id="preview-pets-title" className={sectionHeading}>
           {title}
@@ -84,10 +81,7 @@ export function PreviewCommunity() {
   const firstPhotoPostId = getFirstPhotoPostId(posts)
 
   return (
-    <section
-      aria-labelledby="preview-community-title"
-      className="mx-auto w-full max-w-[80rem] px-5 py-12 tab:px-12 tab:py-16 pc:px-20"
-    >
+    <section aria-labelledby="preview-community-title" className="page-shell py-12 tab:py-16">
       <div className="mb-2 flex items-end justify-between gap-4">
         <h2 id="preview-community-title" className={sectionHeading}>
           함께 살아가는 이야기
@@ -143,10 +137,7 @@ export function PreviewCommunity() {
 export function PreviewPlayground() {
   const playFeatures = usePlayFeatures()
   return (
-    <section
-      aria-labelledby="preview-playground-title"
-      className="mx-auto w-full max-w-[80rem] px-5 pb-12 tab:px-12 tab:pb-16 pc:px-20"
-    >
+    <section aria-labelledby="preview-playground-title" className="page-shell pb-12 tab:pb-16">
       <div className="mb-2 flex items-end justify-between gap-4">
         <h2 id="preview-playground-title" className={sectionHeading}>
           포퐁 놀이터
@@ -181,10 +172,7 @@ export function PreviewHallOfFame() {
     result && (result.winners.length > 0 || result.unavailableRanks?.length),
   )
   return (
-    <section
-      className="mx-auto w-full max-w-[80rem] px-5 py-12 tab:px-12 tab:py-16 pc:px-20"
-      aria-labelledby="preview-hall-title"
-    >
+    <section className="page-shell py-12 tab:py-16" aria-labelledby="preview-hall-title">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 id="preview-hall-title" className={sectionHeading}>

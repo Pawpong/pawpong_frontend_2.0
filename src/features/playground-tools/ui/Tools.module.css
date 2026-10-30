@@ -1,8 +1,5 @@
+/* 폭·여백은 페이지 틀(PageFrame)이 정한다 */
 .page {
-  width: 100%;
-  max-width: 68rem;
-  margin: 0 auto;
-  padding: 1.5rem 1.25rem 5rem;
   color: var(--color-neutral-850, #3e3e3e);
 }
 .back {
@@ -461,9 +458,6 @@
   font-size: 0.8rem;
 }
 @media (min-width: 768px) {
-  .page {
-    padding: 2rem 2rem 5rem;
-  }
   .header h1 {
     font-size: 2.2rem;
   }

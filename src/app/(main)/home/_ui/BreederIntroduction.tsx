@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { PixelArrowRightIcon } from '@/shared/assets'
-import { Container, RepresentativePhoto, Button } from '@/shared/ui'
+import { PageShell, RepresentativePhoto, Button } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 
 interface BreederIntroductionProps {
@@ -127,10 +127,10 @@ const BreederIntroduction = ({
     </section>
   )
 
-  // 사이드바 컬럼은 이미 좌우 여백을 가져서 Container 를 또 두르면 여백이 겹친다
+  // 사이드바 컬럼은 이미 좌우 여백을 가져서 PageShell 을 또 두르면 여백이 겹친다
   if (placement === 'profile') return <div className="pt-5 tab:hidden">{section}</div>
 
-  return <Container className="hidden pt-5 tab:block">{section}</Container>
+  return <PageShell className="hidden pt-5 tab:block">{section}</PageShell>
 }
 
 export { BreederIntroduction }

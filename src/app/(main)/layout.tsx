@@ -1,7 +1,7 @@
 import { Gnb } from '@/widgets/gnb'
 import { BottomNav } from '@/widgets/bottom-nav'
 import { SiteFooter } from '@/widgets/site-footer'
-import { AppContentRightsNotice } from './account/content-rights/_ui/AppContentRightsNotice'
+import { AppContentRightsNotice } from './(narrow)/account/content-rights/_ui/AppContentRightsNotice'
 import { PlaygroundPayments } from './_ui/PlaygroundPayments'
 
 // min-h-screen(100vh) 은 주소창이 보이거나 키보드가 올라와도 줄지 않아, 모바일에서 화면보다
