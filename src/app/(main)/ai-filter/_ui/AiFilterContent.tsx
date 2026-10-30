@@ -31,7 +31,7 @@ export const AiFilterContent = ({
   }, [refresh])
   if (gameCharacter && (petConfig.isError || !petConfig.data?.enabled))
     return (
-      <p role="status" className="mx-auto max-w-xl px-5 py-12 text-center">
+      <p role="status" className="mx-auto max-w-xl page-gutter-x py-12 text-center">
         {petConfig.isPending
           ? '캐릭터 만들기를 준비하고 있어요…'
           : '지금은 캐릭터 만들기를 이용할 수 없어요.'}

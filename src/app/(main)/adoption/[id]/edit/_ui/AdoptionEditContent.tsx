@@ -44,7 +44,7 @@ const AdoptionEditContent = ({ petId }: AdoptionEditContentProps) => {
           onBack={handleCloseClick}
           className="bg-transparent"
         />
-        <Container className="flex flex-1 items-center justify-center px-4 py-12">
+        <Container className="flex flex-1 items-center justify-center py-12">
           <div className="flex flex-col items-center gap-4 text-center">
             <p
               role={isLoadError ? 'alert' : 'status'}

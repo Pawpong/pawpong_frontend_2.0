@@ -12,7 +12,7 @@ export const metadata = createPageMetadata({
 
 const TermsOfPrivacyPage = () => (
   <>
-    <aside className="mx-auto mt-5 w-full max-w-168 px-4 text-sm leading-relaxed text-neutral-700">
+    <aside className="mx-auto mt-5 w-full max-w-168 page-gutter-x text-sm leading-relaxed text-neutral-700">
       포퐁 계정과 서비스 데이터의 영구삭제는{' '}
       <Link href="/account/delete" className="underline underline-offset-4">
         계정 영구삭제 안내

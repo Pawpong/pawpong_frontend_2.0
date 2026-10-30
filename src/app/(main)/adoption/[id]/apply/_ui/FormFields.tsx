@@ -147,10 +147,10 @@ const FooterCtaBar = ({
   submitLabelPc?: string
   pendingLabel?: string
 }) => (
-  <div className="fixed inset-x-0 bottom-0 z-10 flex items-center gap-2.5 bg-white px-4 py-4 tab:justify-end tab:gap-5 tab:px-12 tab:py-3 pc:px-20">
+  <div className="fixed inset-x-0 bottom-0 z-10 flex items-center gap-2.5 bg-white page-gutter-x py-4 tab:justify-end tab:gap-5 tab:py-3">
     {/* [refactored] bottom 값은 바 높이(mo 80 / tab+ 64)에서 나오므로 호출부가 아니라 여기서 관리 */}
     {children && (
-      <Container className="absolute inset-x-0 bottom-20 px-4 tab:bottom-16">{children}</Container>
+      <Container className="absolute inset-x-0 bottom-20 tab:bottom-16">{children}</Container>
     )}
     {/* 좌측 스페이서 (tab+) */}
     <div className="hidden h-[2.8125rem] flex-1 tab:block" />

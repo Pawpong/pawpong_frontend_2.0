@@ -18,7 +18,7 @@ export const Separator = React.forwardRef<
     className={cn(
       'shrink-0',
       orientation === 'horizontal' ? 'h-px w-full' : 'h-full w-px',
-      fullWidth && '-mx-[1.25rem] w-[calc(100%+2.5rem)]',
+      fullWidth && '-mx-[var(--page-gutter)] w-[calc(100%+var(--page-gutter)*2)]',
       className,
     )}
     {...props}

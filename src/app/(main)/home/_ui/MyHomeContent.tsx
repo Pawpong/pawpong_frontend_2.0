@@ -69,7 +69,7 @@ const MyHomeContent = () => {
         {profileQuery.isPending ? (
           <HomeSkeleton />
         ) : (
-          <Container className="flex min-h-60 items-center justify-center px-4 py-10">
+          <Container className="flex min-h-60 items-center justify-center py-10">
             <div role="alert" className="flex flex-col items-center gap-3 text-center">
               <p className="text-sm font-medium text-neutral-700">프로필을 불러오지 못했어요.</p>
               <RetryButton
@@ -99,7 +99,7 @@ const MyHomeContent = () => {
           title="마이홈"
           titleVariant="page"
           titleClassName="px-10"
-          className="relative min-h-12 px-4 tab:px-12"
+          className="relative min-h-12"
           right={
             <div className="absolute top-1/2 right-4 -translate-y-1/2">
               <MyHomeActionMenu isBreeder={isBreeder} />

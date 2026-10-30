@@ -341,7 +341,7 @@ const ProfileEditContent = () => {
       <NavigationBar title="프로필 편집" onBack={handleClose} />
 
       {/* 하단 고정 바(약 80px)만큼 아래 여백을 둔다 */}
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-5 pt-8 pb-36 tab:gap-12 tab:px-8 tab:pt-12">
+      <div className="mx-auto flex w-full max-w-3xl flex-col gap-10 page-gutter-x pt-8 pb-36 tab:gap-12 tab:pt-12">
         {/* ── 프로필 헤더: 사진 · 이름 · 계정 ── */}
         <header className="flex items-center gap-4 tab:gap-6">
           <ProfileAvatar size="xlarge" src={displayedPhoto} />
@@ -509,7 +509,7 @@ const ProfileEditContent = () => {
       {/* ── 하단 고정 바 — 브리더 심사와 같은 구성 ── */}
       <div className="fixed inset-x-0 bottom-0 z-sticky border-t border-neutral-100 bg-white pb-[env(safe-area-inset-bottom)]">
         {toast.current && (
-          <div className="absolute inset-x-0 bottom-full mx-auto w-full max-w-3xl px-5 pb-3 tab:px-8">
+          <div className="absolute inset-x-0 bottom-full mx-auto w-full max-w-3xl page-gutter-x pb-3">
             <AlertMessage
               status={toast.current.status}
               size="responsive"
@@ -519,7 +519,7 @@ const ProfileEditContent = () => {
             />
           </div>
         )}
-        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 px-5 py-4 tab:px-8">
+        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 page-gutter-x py-4">
           <p className="hidden text-body-md text-neutral-700 tab:block">
             {isSaving
               ? '프로필을 적용하고 있어요.'

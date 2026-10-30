@@ -19,7 +19,7 @@ const NoticeDetailContent = ({ noticeId }: { noticeId: string }) => {
     <div className="flex w-full flex-1 flex-col bg-white pb-16">
       <NavigationBar title="공지사항" backHref="/notices" />
 
-      <Container className="px-4 py-5 tab:py-8 pc:py-10">
+      <Container className="py-5 tab:py-8 pc:py-10">
         <div className="mx-auto flex w-full max-w-168 flex-col gap-5 pc:max-w-[59.25rem]">
           {isPending && <AsyncState status="loading" message="공지사항을 불러오는 중이에요." />}
           {isError && !data && (

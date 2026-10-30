@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react'
-import { PAGE_WIDTH_CLASS } from '@/shared/config'
 import { RetryButton, AlertMessage, AsyncState, Container, NavigationBar } from '@/shared/ui'
 
 interface ActivityDetailLayoutProps {
@@ -25,12 +24,8 @@ export const ActivityDetailLayout = ({
   children,
 }: ActivityDetailLayoutProps) => (
   <div className="flex w-full flex-1 flex-col bg-white pb-16">
-    <NavigationBar
-      title={title}
-      backHref={backHref}
-      className={`${PAGE_WIDTH_CLASS} tab:max-w-[90rem]`}
-    />
-    <Container className={`${PAGE_WIDTH_CLASS} px-4 py-8 tab:max-w-[90rem] tab:py-10 pc:py-12`}>
+    <NavigationBar title={title} backHref={backHref} />
+    <Container className="py-8 tab:py-10 pc:py-12">
       {isPending && !hasData && (
         <AsyncState status="loading" message="상세 내용을 불러오는 중이에요." />
       )}

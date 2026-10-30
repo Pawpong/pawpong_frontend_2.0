@@ -101,7 +101,7 @@ const CounselProfileForm = () => {
   } = useQuery(adopterQueries.profile())
 
   return (
-    <Container className="px-4 py-5 tab:py-8 pc:py-10">
+    <Container className="py-5 tab:py-8 pc:py-10">
       <ListState
         isPending={isPending}
         isError={isError}

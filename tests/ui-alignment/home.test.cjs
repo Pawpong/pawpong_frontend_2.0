@@ -10,6 +10,6 @@ test('마이홈 게시글 격자는 375px 시안 폭을 지키면서 360px 이�
 
 test('공통 탭 바는 116px 표시선 모양을 유지하되 좁은 폰에서 바 밖으로 나간 부분만 잘라 페이지를 밀지 않음', () => {
   const bar = source('src/shared/ui/TabBar.tsx')
-  assert.match(bar, /'overflow-x-clip border-b border-neutral-300 bg-white'/)
+  assert.match(bar, /'page-width overflow-x-clip border-b border-neutral-300 bg-white'/)
   assert.match(bar, /after:w-\[7\.25rem\]/)
 })

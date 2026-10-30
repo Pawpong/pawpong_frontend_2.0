@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { PAGE_WIDTH_CLASS, TEXT } from '@/shared/config'
+import { TEXT } from '@/shared/config'
 import { RetryButton, AlertMessage, Container, InfiniteScrollTrigger, ListState } from '@/shared/ui'
 import { ListRowsSkeleton } from '@/shared/ui/Skeleton'
 
@@ -36,7 +36,7 @@ export const ActivityListLayout = ({
   onLoadMore,
   children,
 }: ActivityListLayoutProps) => (
-  <Container className={`${PAGE_WIDTH_CLASS} px-4 py-8 tab:max-w-[90rem] tab:py-10 pc:py-12`}>
+  <Container className="py-8 tab:py-10 pc:py-12">
     <section aria-label={title} className="w-full">
       <header className="mb-6 flex flex-col gap-2 tab:mb-8">
         <h2 className={TEXT.section}>{title}</h2>

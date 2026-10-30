@@ -15,7 +15,7 @@ const DraftsPage = async () => {
     <div className="flex w-full flex-col">
       <NavigationBar title="임시저장한 글" backHref="/home" />
 
-      <Container className="px-4 pt-5 pb-10 tab:pt-8 tab:pb-16">
+      <Container className="pt-5 pb-10 tab:pt-8 tab:pb-16">
         <div className="mx-auto flex w-full flex-col gap-10 pc:max-w-[59.25rem]">
           {role === 'breeder' && <AdoptionDraftSection />}
           <CommunityDraftSection />

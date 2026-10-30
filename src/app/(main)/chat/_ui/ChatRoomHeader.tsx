@@ -32,7 +32,7 @@ const ChatRoomHeader = ({
   onRoomClosed,
 }: ChatRoomHeaderProps) => {
   return (
-    <header className="shrink-0 border-b border-neutral-150 bg-white px-4 py-2 tab:px-12 pc:px-5 pc:py-3">
+    <header className="shrink-0 border-b border-neutral-150 bg-white page-gutter-x py-2 pc:py-3 pc:[--page-gutter:1.25rem]">
       <div className={cn(CHAT_CONTENT_WIDTH, 'flex min-h-12 items-center justify-between')}>
         <div className="flex min-w-0 items-center gap-5 pc:gap-7">
           <div className="flex items-center gap-1">

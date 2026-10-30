@@ -477,7 +477,7 @@ const CommunityPostEditor = ({
     return (
       <div className="flex min-h-screen flex-col bg-white">
         <NavigationBar title="게시글 수정" icon="close" backHref="/home" />
-        <Container className="flex flex-1 items-center justify-center px-4 py-10">
+        <Container className="flex flex-1 items-center justify-center py-10">
           <p role="status" className="text-sm font-medium text-neutral-700">
             게시글을 불러오는 중이에요.
           </p>
@@ -489,7 +489,7 @@ const CommunityPostEditor = ({
     return (
       <div className="flex min-h-screen flex-col bg-white">
         <NavigationBar title="게시글 수정" icon="close" backHref="/home" />
-        <Container className="flex flex-1 items-center justify-center px-4 py-10">
+        <Container className="flex flex-1 items-center justify-center py-10">
           <div role="alert" className="flex flex-col items-center gap-3 text-center">
             <p className="text-sm font-medium text-neutral-700">게시글을 불러오지 못했어요.</p>
             <RetryButton

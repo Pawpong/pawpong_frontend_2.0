@@ -15,7 +15,7 @@ interface ChatRoomListProps {
 const ChatRoomList = ({ activeRoomId, onSelectRoom }: ChatRoomListProps) => {
   return (
     // 상단바 + 필터 탭은 고정, 방 목록만 스크롤 (고정 높이 flex 컬럼)
-    <div className={cn(CHAT_LIST_HEIGHT, 'mx-auto flex w-full max-w-[90rem] flex-col bg-white')}>
+    <div className={cn(CHAT_LIST_HEIGHT, 'page-width flex flex-col bg-white')}>
       {/* Header — 채팅 전용 상단바 (고정). 새 채팅은 커뮤니티처럼 상단바 오른쪽 + 버튼 */}
       <NavigationBar
         title="채팅"

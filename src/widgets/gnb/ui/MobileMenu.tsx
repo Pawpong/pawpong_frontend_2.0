@@ -4,7 +4,6 @@ import Link from 'next/link'
 import Image from 'next/image'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { useQuery } from '@tanstack/react-query'
-import { RESPONSIVE_SHELL_CLASS } from '@/shared/config'
 import { activityConfigOptions } from '@/entities/gamification'
 import { useAuthStatus } from '@/features/auth'
 import { MobileSupportInquiry } from '@/features/inquiry'
@@ -43,20 +42,15 @@ const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
             'fixed inset-0 z-modal flex min-w-0 flex-col overflow-y-auto bg-white',
             'data-[state=closed]:opacity-0 data-[state=open]:opacity-100',
             // pc: 링크 8개 때문에 1440px 화면을 통째로 덮을 이유가 없다 — 우측 상단 패널로 띄운다.
-            // right 는 뷰포트가 셸(1440)보다 넓을 때(브라우저 축소 등) ☰ 버튼을 따라가도록
-            // 셸 우측 거터 기준으로 계산한다: max(80px, (100vw-1440)/2 + 80px) = max(5rem, 50vw-40rem)
-            'pc:inset-auto pc:top-[4.5rem] pc:right-[max(5rem,50vw_-_40rem)] pc:h-auto pc:w-[18rem] pc:rounded-2xl pc:border pc:border-neutral-150 pc:shadow-[0_12px_24px_rgba(55,55,55,0.12)]',
+            // right 는 뷰포트가 페이지 틀보다 넓을 때 ☰ 버튼을 따라가도록 틀의 우측 여백 기준으로 계산한다:
+            // max(여백, (100vw - 틀 폭)/2 + 여백)
+            'pc:inset-auto pc:top-[4.5rem] pc:right-[max(var(--page-gutter),calc(50vw_-_var(--page-max-width)/2_+_var(--page-gutter)))] pc:h-auto pc:w-[18rem] pc:rounded-2xl pc:border pc:border-neutral-150 pc:shadow-[0_12px_24px_rgba(55,55,55,0.12)]',
           )}
         >
           <DialogPrimitive.Title className="sr-only">전체 메뉴</DialogPrimitive.Title>
           {/* QA: border-b 제거 */}
           <header className="sticky top-0 z-10 bg-white pc:hidden">
-            <div
-              className={cn(
-                RESPONSIVE_SHELL_CLASS,
-                'flex h-12 items-center justify-between px-4 tab:h-16 tab:px-12 pc:px-20',
-              )}
-            >
+            <div className="page-shell flex h-12 items-center justify-between tab:h-16">
               {/* 다른 메뉴 항목과 같이 이동하면서 시트도 닫는다 — 안 닫으면 홈으로 가도 메뉴가 덮는다 */}
               <LogoButton onNavigate={close} />
               <div className="flex items-center gap-2">
@@ -72,12 +66,8 @@ const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
           </header>
 
           {/* Figma 3555:416834 — 카드 없이 항목만 32px 간격으로 세운다 (본문 px16 / py40) */}
-          <div
-            className={cn(
-              RESPONSIVE_SHELL_CLASS,
-              'flex flex-1 flex-col gap-8 px-4 py-10 tab:px-12 pc:gap-5 pc:px-5 pc:py-5',
-            )}
-          >
+          {/* pc 는 18rem 패널이라 여백만 20px 로 줄인다 */}
+          <div className="page-shell flex flex-1 flex-col gap-8 py-10 pc:gap-5 pc:py-5 pc:[--page-gutter:1.25rem]">
             <nav className="flex flex-col gap-8 pc:gap-4" aria-label="설정">
               {items.map((item) => (
                 <Link

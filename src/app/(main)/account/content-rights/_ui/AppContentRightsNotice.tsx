@@ -59,8 +59,8 @@ export function AppContentRightsNotice() {
   if (!isApp || !isLoggedIn || !needsConsent) return null
   return (
     <>
-      <aside className="border-y border-secondary-400 bg-secondary-50 px-4 py-3 text-sm text-neutral-850">
-        <div className="mx-auto flex w-full max-w-[80rem] flex-wrap items-center justify-between gap-2">
+      <aside className="border-y border-secondary-400 bg-secondary-50 py-3 text-sm text-neutral-850">
+        <div className="page-shell flex flex-wrap items-center justify-between gap-2">
           <span>동의해야 올린 게시글이 다른 앱 사용자에게 보여요.</span>
           <Link
             href="/account/content-rights"

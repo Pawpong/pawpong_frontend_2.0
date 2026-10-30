@@ -28,18 +28,14 @@ const HallOfFame = () => {
     throwOnError: false,
   })
 
-  const hallOfFame = isCurrentEmpty
-    ? flattenPages(history.data).find(hasAnyWinner)
-    : current.data
+  const hallOfFame = isCurrentEmpty ? flattenPages(history.data).find(hasAnyWinner) : current.data
   const winners = hallOfFame?.winners ?? []
   const hasWinners = Boolean(hallOfFame && hasAnyWinner(hallOfFame))
   const period = hallOfFame && formatHallOfFamePeriod(hallOfFame)
 
   return (
     <section className="w-full bg-white">
-      <Container
-        className={cn('px-4 py-4 tab:py-[0.625rem] pc:py-10', hasWinners && 'pc:h-[31rem]')}
-      >
+      <Container className={cn('py-4 tab:py-[0.625rem] pc:py-10', hasWinners && 'pc:h-[31rem]')}>
         <div
           className={cn(
             'flex w-full flex-col items-start gap-[0.625rem] tab:gap-4',

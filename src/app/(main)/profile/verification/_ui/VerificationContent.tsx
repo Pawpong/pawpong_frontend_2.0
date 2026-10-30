@@ -179,7 +179,7 @@ const VerificationContent = () => {
     <div className="flex w-full flex-col">
       <div
         className={cn(
-          'mx-auto flex w-full max-w-3xl flex-col gap-8 px-5 pt-8 tab:gap-10 tab:px-8 tab:pt-12',
+          'mx-auto flex w-full max-w-3xl flex-col gap-8 page-gutter-x pt-8 tab:gap-10 tab:pt-12',
           canEdit ? 'pb-36' : 'pb-12',
         )}
       >
@@ -277,7 +277,7 @@ const VerificationContent = () => {
 
       {canEdit && (
         <div className="fixed inset-x-0 bottom-0 z-sticky border-t border-neutral-100 bg-white pb-[env(safe-area-inset-bottom)]">
-          <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 px-5 py-4 tab:px-8">
+          <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 page-gutter-x py-4">
             <p className="hidden text-body-md text-neutral-700 tab:block">
               {isSubmitting ? '서류를 제출하고 있어요.' : '등록한 서류를 확인하고 제출해주세요.'}
             </p>
