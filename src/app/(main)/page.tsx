@@ -14,7 +14,7 @@ const HomePage = async () => {
   // 첫 배너를 HTML 에 바로 실어 이미지 요청이 화면 코드·배너 API 를 기다리지 않게 한다.
   const initialBanners = await getInitialBanners()
   return (
-    <div className="w-full flex-1 bg-white pb-16">
+    <div className="w-full flex-1 bg-white">
       <HomeContent initial={initialBanners} />
     </div>
   )

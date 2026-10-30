@@ -15,6 +15,8 @@ const detailLinkVariants = tv({
       sm: 'text-[0.75rem] leading-[1.5]',
       md: 'text-[0.875rem] leading-[1.5]',
       lg: 'text-[1rem] leading-[1.5]',
+      /** 섹션 머리 더보기 — 12 → 14 */
+      responsive: 'text-[0.75rem] leading-[1.5] tab:text-[0.875rem]',
     },
   },
   defaultVariants: {
@@ -24,6 +26,8 @@ const detailLinkVariants = tv({
 })
 
 type DetailLinkVariants = VariantProps<typeof detailLinkVariants>
+
+const SMALL_SIZES = new Set<DetailLinkVariants['size']>(['sm', 'responsive'])
 
 interface DetailLinkAsLink extends DetailLinkVariants {
   variant?: 'link'
@@ -56,7 +60,10 @@ const DetailLink = ({
   const content = (
     <>
       {label}
-      <ArrowRightIcon className="size-[1.25rem] shrink-0" />
+      {/* 작은 글자 옆에서는 화살표도 줄인다 — 20px 고정이면 글자보다 화살표가 앞선다 */}
+      <ArrowRightIcon
+        className={cn('shrink-0', SMALL_SIZES.has(size) ? 'size-4' : 'size-[1.25rem]')}
+      />
     </>
   )
 

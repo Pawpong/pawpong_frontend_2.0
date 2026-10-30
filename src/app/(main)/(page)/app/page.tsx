@@ -11,6 +11,7 @@ import { createMobileAppStructuredData } from '@/shared/lib/mobileApp'
 import { NavigationBar, buttonVariants } from '@/shared/ui'
 import { FeatureIntro } from '@/shared/ui/FeatureIntro'
 import { TicketLink } from '@/shared/ui/Ticket'
+import { TEXT } from '@/shared/config'
 
 export const metadata = createPageMetadata({
   title: '포퐁 앱 다운로드 · iOS와 Android',
@@ -65,10 +66,7 @@ export default function AppDownloadPage() {
             aria-labelledby="app-download-title"
             className="rounded-2xl border border-secondary-200 bg-base-white p-5 tab:p-8"
           >
-            <h2
-              id="app-download-title"
-              className="font-cafe24 text-xl text-neutral-850 tab:text-2xl"
-            >
+            <h2 id="app-download-title" className={TEXT.title}>
               포퐁 앱 다운로드
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-neutral-700">
@@ -94,10 +92,7 @@ export default function AppDownloadPage() {
           </section>
 
           <section aria-labelledby="app-features-title">
-            <h2
-              id="app-features-title"
-              className="font-cafe24 text-xl text-neutral-850 tab:text-2xl"
-            >
+            <h2 id="app-features-title" className={TEXT.title}>
               포퐁에서 함께하는 하루
             </h2>
             <ul className="mt-4 grid gap-4 lap:grid-cols-3">

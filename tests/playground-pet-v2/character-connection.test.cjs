@@ -58,6 +58,7 @@ test('후보 링크는 부적격 또는 다른 계정의 그림을 전송하지 
     '@/shared/ui/Button': { Button: noop, buttonVariants: () => '' },
     '@/shared/ui/Input': { Input: noop },
     '@/shared/assets': { PawPrintIcon: noop, PixelCheckIcon: noop },
+    '@/shared/config': load('src/shared/config/typography.ts'),
     '../lib/usePetSession': { inPetSession: (_session, read) => read() },
     '../lib/usePetController': { petPrivateKey: () => [] },
     '../lib/useServerClock': { petRequestKey: () => 'explicit-command-key' },

@@ -27,6 +27,8 @@
    - 폭: 1280 상자(여백 포함: 1280 = 40 + 내용 1200 + 40). 화면이 더 넓으면 가운데로 모인다.
    - 좁은 틀: 폼·약관·계정 화면 768.
    - 좌우 여백: 1024 미만 16 / 이상 40. 위아래 여백: 768 미만 24·64 / 이상 40·80.
+   - 섹션 간격: 섹션 사이 48 / 64 / 80, 섹션 머리(제목·설명) → 내용 16 / 20.
+     (KREAM 실측 섹션 사이 48~72 / 80~92, 제목 → 내용 8~12 를 기준으로 잡았다)
    틀은 라우트 레이아웃((page)·(narrow))의 PageFrame 이 씌운다 — 페이지·컴포넌트는 폭과 여백을 정하지 않는다.
    2단 레이아웃처럼 이미 여백을 가진 컬럼 안에서는 래퍼에 [--page-gutter:0px] 한 번만 걸면 안쪽이 따라간다. */
 :root {
@@ -35,18 +37,23 @@
   --page-gutter: 1rem;
   --page-pad-top: 1.5rem;
   --page-pad-bottom: 4rem;
+  --section-space: 3rem;
+  --section-head-gap: 1rem;
 }
 
 @media (min-width: 768px) {
   :root {
     --page-pad-top: 2.5rem;
     --page-pad-bottom: 5rem;
+    --section-space: 4rem;
+    --section-head-gap: 1.25rem;
   }
 }
 
 @media (min-width: 1024px) {
   :root {
     --page-gutter: 2.5rem;
+    --section-space: 5rem;
   }
 }
 
@@ -98,6 +105,22 @@
     var(--page-gutter),
     calc((100% - var(--frame-max-width, var(--page-max-width))) / 2 + var(--page-gutter))
   );
+}
+/* 섹션을 쌓는 화면(홈 같은 띠 페이지) — 섹션 사이 간격과 화면 위아래 끝 여백을 한 곳에서 준다.
+   섹션은 위아래 여백을 따로 두지 않는다. */
+@utility section-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--section-space);
+  padding-block: var(--page-pad-top) var(--page-pad-bottom);
+}
+/* 배경색이 화면 끝까지 가는 띠 섹션 — 띠 안쪽 위아래 여백도 섹션 간격과 같다 */
+@utility section-band {
+  padding-block: var(--section-space);
+}
+/* 섹션 머리(제목·설명·더보기)와 내용 사이 */
+@utility section-head-gap {
+  margin-bottom: var(--section-head-gap);
 }
 /* 틀 안에서 사진처럼 내용 자체를 틀 가장자리까지 채운다 */
 @utility frame-bleed-edge {

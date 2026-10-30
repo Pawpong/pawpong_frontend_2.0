@@ -26,6 +26,7 @@ function guide(configQuery, catalogQuery = { isPending: false, isError: false, d
       },
       '@/features/auth': { useAuthStatus: () => ({ userRole: 'adopter' }) },
       '@/features/inquiry': { SupportInquiryModal: () => null },
+      '@/shared/config': loadTypescript('src/shared/config/typography.ts'),
       '@/shared/ui': {
         AsyncState: ({ status, message, action, onRetry }) =>
           createElement(

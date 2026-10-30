@@ -37,6 +37,7 @@ function selectionFixture(initialSourceJobId = 'requested') {
     '@/shared/ui/Button': { Button: noop, buttonVariants: () => '' },
     '@/shared/ui/Input': { Input: noop },
     '@/shared/assets': { PawPrintIcon: noop, PixelCheckIcon: noop },
+    '@/shared/config': load('src/shared/config/typography.ts'),
     '../lib/usePetSession': { inPetSession: (_session, read) => read() },
     '../lib/usePetController': { petPrivateKey: () => ['private', 'synthetic-owner'] },
     '../lib/useServerClock': { petRequestKey: () => 'synthetic-key' },
