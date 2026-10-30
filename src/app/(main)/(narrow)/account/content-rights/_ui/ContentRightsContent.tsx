@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { apiClient, API_VERSION, normalizeApiError, unwrap } from '@/shared/api'
 import { Button } from '@/shared/ui/Button'
 import { Checkbox } from '@/shared/ui/Checkbox'
+import { TEXT } from '@/shared/config'
 
 type ConsentStatus = { version: string; accepted: boolean; consentedAt: string | null }
 
@@ -61,9 +62,7 @@ export function ContentRightsContent({ onConsented }: { onConsented?: () => void
   return (
     <section className="flex flex-col gap-5">
       <div className="rounded-xl border border-secondary-400 bg-secondary-50 p-5 tab:p-7">
-        <h1 className="font-cafe24 text-xl text-neutral-850 tab:text-2xl">
-          내 게시물을 앱에서도 보여주세요
-        </h1>
+        <h1 className={TEXT.title}>내 게시물을 앱에서도 보여주세요</h1>
         <p className="mt-3 text-sm leading-6 text-neutral-700">
           기존 게시물과 사진은 작성자가 허락하기 전까지 포퐁 앱의 공개 목록과 상세 화면에 표시하지
           않아요. 동의하지 않아도 계정 조회와 삭제 요청은 계속 이용할 수 있어요.

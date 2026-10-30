@@ -17,6 +17,7 @@ import { inPetSession, type PetSession } from '../lib/usePetSession'
 import { petPrivateKey } from '../lib/usePetController'
 import { petRequestKey } from '../lib/useServerClock'
 import { PetImage } from './PetImage'
+import { TEXT } from '@/shared/config'
 
 export function PetAdoption({
   session,
@@ -83,7 +84,7 @@ export function PetAdoption({
       aria-labelledby="adopt-heading"
       className="rounded-2xl border border-secondary-200 bg-base-white p-5 tab:p-8"
     >
-      <h2 id="adopt-heading" className="font-cafe24 text-xl text-neutral-850 tab:text-2xl">
+      <h2 id="adopt-heading" className={TEXT.title}>
         {connectRevision ? '우리 아이의 캐릭터 고르기' : '함께할 캐릭터를 골라 주세요'}
       </h2>
       <ol className="mt-4 grid gap-2 text-sm text-neutral-700 tab:grid-cols-3">

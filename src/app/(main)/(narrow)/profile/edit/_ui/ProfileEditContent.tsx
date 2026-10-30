@@ -346,9 +346,7 @@ const ProfileEditContent = () => {
         <header className="flex items-center gap-4 tab:gap-6">
           <ProfileAvatar size="xlarge" src={displayedPhoto} />
           <div className="flex min-w-0 flex-1 flex-col items-start gap-1">
-            <h1 className="truncate font-cafe24 text-xl text-neutral-850 tab:text-2xl">
-              {savedName || '활동명을 입력해주세요'}
-            </h1>
+            <h1 className={`truncate ${TEXT.title}`}>{savedName || '활동명을 입력해주세요'}</h1>
             <p className={TEXT.meta}>
               {isBreeder ? '브리더' : '입양자'}
               {loginProvider && ` · ${AUTH_PROVIDER_LABEL[loginProvider]} 로그인`}

@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { adoptionQueries } from '@/entities/adoption'
 import {
@@ -11,16 +10,13 @@ import {
   toCommunityPreviewProps,
 } from '@/entities/community'
 import { ArchHallOfFame } from './ArchHallOfFame'
+import { HomeSectionHeader } from './HomeSectionHeader'
 import { FavoriteAdoptionGridCard } from '@/features/adoption'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
 import { ListingCardGrid, ListingCardGridSkeleton, ListState } from '@/shared/ui'
 import { CARE_FEATURES, usePlayFeatures } from '../../(page)/playground/_ui/PlaygroundContent'
 import { PlaygroundFeatureCards } from '../../(page)/playground/_ui/PlaygroundFeatureRail'
-
-const sectionHeading = 'font-cafe24 text-2xl leading-[1.4] text-neutral-850 tab:text-[1.75rem]'
-const moreLink =
-  'shrink-0 rounded text-sm font-semibold text-primary-700 underline underline-offset-4 focus-ring'
 
 const PET_COUNT = 5
 // 기존 홈 AdoptionShowcase 와 같은 규칙 — 1024px 부터 공통 격자 5열 한 줄, 그보다 좁으면 4장만.
@@ -34,15 +30,13 @@ export function PreviewPets({ title = '지금 만날 수 있는 친구들' }: { 
   const pets = flattenPages(data).slice(0, PET_COUNT).map(mapAdoptionCard)
 
   return (
-    <section aria-labelledby="preview-pets-title" className="page-shell py-12 tab:py-16">
-      <div className="mb-6 flex items-end justify-between gap-4">
-        <h2 id="preview-pets-title" className={sectionHeading}>
-          {title}
-        </h2>
-        <Link href="/explore?type=adoption" className={moreLink}>
-          전체 보기
-        </Link>
-      </div>
+    <section aria-labelledby="preview-pets-title" className="page-shell">
+      <HomeSectionHeader
+        id="preview-pets-title"
+        title={title}
+        href="/explore?type=adoption"
+        linkLabel="전체 보기"
+      />
       <ListState
         appPublicContent
         isPending={isPending}
@@ -81,18 +75,14 @@ export function PreviewCommunity() {
   const firstPhotoPostId = getFirstPhotoPostId(posts)
 
   return (
-    <section aria-labelledby="preview-community-title" className="page-shell py-12 tab:py-16">
-      <div className="mb-2 flex items-end justify-between gap-4">
-        <h2 id="preview-community-title" className={sectionHeading}>
-          함께 살아가는 이야기
-        </h2>
-        <Link href="/community" className={moreLink}>
-          커뮤니티 보기
-        </Link>
-      </div>
-      <p className="mb-6 text-sm leading-6 text-neutral-700 tab:text-base">
-        새 가족을 만난 뒤의 일상도 포퐁에서 이어져요.
-      </p>
+    <section aria-labelledby="preview-community-title" className="page-shell">
+      <HomeSectionHeader
+        id="preview-community-title"
+        title="함께 살아가는 이야기"
+        description="새 가족을 만난 뒤의 일상도 포퐁에서 이어져요."
+        href="/community"
+        linkLabel="커뮤니티 보기"
+      />
       <ListState
         appPublicContent
         isPending={isPending}
@@ -137,18 +127,14 @@ export function PreviewCommunity() {
 export function PreviewPlayground() {
   const playFeatures = usePlayFeatures()
   return (
-    <section aria-labelledby="preview-playground-title" className="page-shell pb-12 tab:pb-16">
-      <div className="mb-2 flex items-end justify-between gap-4">
-        <h2 id="preview-playground-title" className={sectionHeading}>
-          포퐁 놀이터
-        </h2>
-        <Link href="/playground" className={moreLink}>
-          놀이터 가기
-        </Link>
-      </div>
-      <p className="mb-6 text-sm leading-6 text-neutral-700 tab:text-base">
-        우리 아이와 함께할 작은 즐거움을 골라보세요.
-      </p>
+    <section aria-labelledby="preview-playground-title" className="page-shell">
+      <HomeSectionHeader
+        id="preview-playground-title"
+        title="포퐁 놀이터"
+        description="우리 아이와 함께할 작은 즐거움을 골라보세요."
+        href="/playground"
+        linkLabel="놀이터 가기"
+      />
       <PlaygroundFeatureCards items={[...playFeatures, ...CARE_FEATURES]} />
     </section>
   )
@@ -172,25 +158,23 @@ export function PreviewHallOfFame() {
     result && (result.winners.length > 0 || result.unavailableRanks?.length),
   )
   return (
-    <section className="page-shell py-12 tab:py-16" aria-labelledby="preview-hall-title">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h2 id="preview-hall-title" className={sectionHeading}>
-            명예의 동물들
-          </h2>
-          <p className="mt-2 text-sm leading-6 text-neutral-700">
+    <section className="page-shell" aria-labelledby="preview-hall-title">
+      <HomeSectionHeader
+        id="preview-hall-title"
+        title="명예의 동물들"
+        description={
+          <>
             {isCurrentEmpty
               ? '지난 회차의 주인공들을 소개해요.'
               : '이번 회차의 주인공들을 소개해요.'}
             {hasWinners && result && (
-              <span className="mt-1 block">{formatHallOfFamePeriod(result).summary}</span>
+              <span className="block">{formatHallOfFamePeriod(result).summary}</span>
             )}
-          </p>
-        </div>
-        <Link href="/hall-of-fame" className={moreLink}>
-          명예의 전당 둘러보기
-        </Link>
-      </div>
+          </>
+        }
+        href="/hall-of-fame"
+        linkLabel="명예의 전당 둘러보기"
+      />
       <ListState
         isPending={current.isPending || Boolean(isCurrentEmpty && history.isPending)}
         isError={current.isError || history.isError}
