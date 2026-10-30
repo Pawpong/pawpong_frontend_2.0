@@ -1,0 +1,51 @@
+import type { ReactNode } from 'react'
+import { RetryButton, AlertMessage, AsyncState, NavigationBar } from '@/shared/ui'
+
+interface ActivityDetailLayoutProps {
+  title: string
+  backHref: string
+  isPending: boolean
+  isError: boolean
+  hasData: boolean
+  onRetry: () => void
+  isRetrying: boolean
+  children: ReactNode
+}
+
+/** 목록과 같은 기준선을 쓰고 구분선으로 이어지는 활동 상세 문서. */
+export const ActivityDetailLayout = ({
+  title,
+  backHref,
+  isPending,
+  isError,
+  hasData,
+  onRetry,
+  isRetrying,
+  children,
+}: ActivityDetailLayoutProps) => (
+  <div>
+    <NavigationBar title={title} backHref={backHref} />
+    <div>
+      {isPending && !hasData && (
+        <AsyncState status="loading" message="상세 내용을 불러오는 중이에요." />
+      )}
+      {isError && !hasData && (
+        <AsyncState
+          status="error"
+          message="상세 내용을 불러오지 못했어요."
+          onRetry={onRetry}
+          isRetrying={isRetrying}
+        />
+      )}
+      {isError && hasData && (
+        <div className="mb-6 flex flex-wrap items-center gap-3">
+          <AlertMessage status="error" message="최신 정보를 불러오지 못했어요." />
+          <RetryButton onRetry={onRetry} isRetrying={isRetrying} />
+        </div>
+      )}
+      <div className="flex min-w-0 flex-col gap-8 [overflow-wrap:anywhere] tab:gap-10">
+        {children}
+      </div>
+    </div>
+  </div>
+)

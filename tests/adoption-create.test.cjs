@@ -7,7 +7,7 @@ const ts = require('typescript')
 // 공유 폼은 widgets/adoption-form 으로 옮겼고, 임시저장 변환만 작성 라우트에 남았다
 const roots = [
   path.resolve('src/widgets/adoption-form/lib'),
-  path.resolve('src/app/(main)/adoption/create/_lib'),
+  path.resolve('src/app/(main)/(page)/adoption/create/_lib'),
 ]
 const load = (file) => {
   const filename = roots

@@ -1,7 +1,6 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
 import { ReactivateAccountPrompt, SocialLoginList } from '@/features/auth'
-import { RESPONSIVE_SHELL_CLASS } from '@/shared/config'
 import { AlertMessage } from '@/shared/ui'
 import { CheckRoundedIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
@@ -45,9 +44,7 @@ const LoginPage = async ({
   return (
     <div className="flex min-h-dvh flex-col bg-base-white">
       <header className="h-12 shrink-0 bg-white pc:h-16">
-        <div
-          className={cn(RESPONSIVE_SHELL_CLASS, 'flex h-full items-center px-4 tab:px-12 pc:px-20')}
-        >
+        <div className="page-shell flex h-full items-center">
           <LogoButton />
         </div>
       </header>

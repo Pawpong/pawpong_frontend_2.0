@@ -8,7 +8,7 @@ test('캐시된 설정이 활성화여도 재조회 실패 시 캐릭터 생성�
   const { petConfigOptions } = load('src/entities/playground-pet/api/pet.queries.ts', {
     './pet.api': { getPetConfig: async () => config.data },
   })
-  const { AiFilterContent } = load('src/app/(main)/ai-filter/_ui/AiFilterContent.tsx', {
+  const { AiFilterContent } = load('src/app/(main)/(page)/ai-filter/_ui/AiFilterContent.tsx', {
     react: { useEffect() {} },
     'react/jsx-runtime': require('react/jsx-runtime'),
     '@/features/ai-image': { AiFilterStudio: studio },
@@ -58,7 +58,7 @@ test('캐릭터 생성은 설정 폴링과 화면 복귀 갱신 및 캐시된 �
     },
   })
   const studio = () => null
-  const { AiFilterContent } = load('src/app/(main)/ai-filter/_ui/AiFilterContent.tsx', {
+  const { AiFilterContent } = load('src/app/(main)/(page)/ai-filter/_ui/AiFilterContent.tsx', {
     react: { useEffect() {} },
     'react/jsx-runtime': require('react/jsx-runtime'),
     '@/features/ai-image': { AiFilterStudio: studio },

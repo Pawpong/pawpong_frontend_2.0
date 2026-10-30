@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { iconButtonVariants } from './IconButton'
 import { ArrowBackIcon } from '@/shared/assets'
-import { Container } from './Container'
 
 interface PageHeaderProps {
   title: string
@@ -9,7 +8,7 @@ interface PageHeaderProps {
 }
 
 const PageHeader = ({ title, backHref }: PageHeaderProps) => (
-  <Container className="px-4">
+  <div>
     <div className="flex items-center gap-[0.625rem] py-3 tab:justify-center tab:pt-[1.5rem] tab:pb-[2rem]">
       <div className="-m-2.5 flex tab:mx-0 tab:-my-2 tab:flex-1">
         <Link href={backHref} className={iconButtonVariants()} aria-label="뒤로 가기">
@@ -21,7 +20,7 @@ const PageHeader = ({ title, backHref }: PageHeaderProps) => (
       </h1>
       <div className="hidden flex-1 tab:block" />
     </div>
-  </Container>
+  </div>
 )
 
 export { PageHeader }

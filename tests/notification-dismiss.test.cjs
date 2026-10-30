@@ -295,7 +295,7 @@ test('center deletion reports failure in the confirmation dialog and succeeds on
     },
   }
   const { NotificationsContent } = load(
-    'src/app/(main)/notifications/_ui/NotificationsContent.tsx',
+    'src/app/(main)/(page)/notifications/_ui/NotificationsContent.tsx',
     {
       'react/jsx-runtime': jsxRuntime,
       react: {

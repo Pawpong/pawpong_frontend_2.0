@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { RetryButton, buttonVariants, Container, NavigationBar } from '@/shared/ui'
+import { RetryButton, buttonVariants, PageShell, NavigationBar } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { transientQueryRecoveryOptions } from '@/shared/api'
 import { profileQueries } from '@/entities/profile'
@@ -65,11 +65,11 @@ const MyHomeContent = () => {
   if (!profileCardProps) {
     return (
       <div className="flex w-full flex-col">
-        <NavigationBar title="마이홈" />
+        <NavigationBar title="마이홈" className="page-shell" />
         {profileQuery.isPending ? (
           <HomeSkeleton />
         ) : (
-          <Container className="flex min-h-60 items-center justify-center px-4 py-10">
+          <PageShell className="flex min-h-60 items-center justify-center py-10">
             <div role="alert" className="flex flex-col items-center gap-3 text-center">
               <p className="text-sm font-medium text-neutral-700">프로필을 불러오지 못했어요.</p>
               <RetryButton
@@ -77,7 +77,7 @@ const MyHomeContent = () => {
                 isRetrying={profileQuery.isFetching}
               />
             </div>
-          </Container>
+          </PageShell>
         )}
       </div>
     )
@@ -99,7 +99,7 @@ const MyHomeContent = () => {
           title="마이홈"
           titleVariant="page"
           titleClassName="px-10"
-          className="relative min-h-12 px-4 tab:px-12"
+          className="relative page-shell min-h-12"
           right={
             <div className="absolute top-1/2 right-4 -translate-y-1/2">
               <MyHomeActionMenu isBreeder={isBreeder} />
@@ -132,7 +132,7 @@ const MyHomeContent = () => {
             <BreederIntroduction {...introProps} placement="tab" />
 
             {/* 작성 진입점은 + 메뉴(모바일 상단 바·2단 프로필 카드)가 맡는다 */}
-            <Container className={MY_HOME_LISTINGS_PANEL}>
+            <PageShell className={MY_HOME_LISTINGS_PANEL}>
               <MyPetPostingList
                 pageSize={HOME_LISTING_PAGE_SIZE}
                 showTotalCount
@@ -145,7 +145,7 @@ const MyHomeContent = () => {
                   </Link>
                 }
               />
-            </Container>
+            </PageShell>
           </TabsContent>
         )}
 
@@ -153,20 +153,20 @@ const MyHomeContent = () => {
         <TabsContent value="posts" className="mt-0">
           {/* 작성한 글 / 댓글 단 글 / 좋아요한 글 / 저장한 글 칩 전환 — 내 글 조회는 profile 로드 후 활성화.
               분양 목록·AI 사진 탭과 같은 여백이라 제목 줄이 탭을 바꿔도 같은 자리에 온다 */}
-          <Container className={MY_HOME_TAB_PANEL}>
+          <PageShell className={MY_HOME_TAB_PANEL}>
             <MyPostsTab enabled={!!myProfile} gridClassName={MY_PHOTO_GRID} />
-          </Container>
+          </PageShell>
         </TabsContent>
 
         <TabsContent value="ai-photos" className="mt-0">
           {/* 분양 목록 탭과 같은 여백 — 제목 줄이 탭을 바꿔도 같은 자리에 온다 */}
-          <Container className={MY_HOME_TAB_PANEL}>
+          <PageShell className={MY_HOME_TAB_PANEL}>
             <AiPhotoArchive
               enabled={!!myProfile}
               createHref="/ai-filter"
               renderResultAction={(jobId) => <PetResultLink sourceJobId={jobId} />}
             />
-          </Container>
+          </PageShell>
         </TabsContent>
       </HomeTabs>
     </div>

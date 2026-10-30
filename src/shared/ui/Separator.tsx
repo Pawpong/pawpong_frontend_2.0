@@ -3,7 +3,7 @@ import * as SeparatorPrimitive from '@radix-ui/react-separator'
 import { cn } from '@/shared/lib/cn'
 
 interface SeparatorProps extends React.ComponentPropsWithoutRef<typeof SeparatorPrimitive.Root> {
-  /** Container 패딩을 무시하고 화면 끝까지 확장 */
+  /** 페이지 틀 좌우 여백을 무시하고 틀 가장자리까지 확장 */
   fullWidth?: boolean
 }
 
@@ -18,7 +18,7 @@ export const Separator = React.forwardRef<
     className={cn(
       'shrink-0',
       orientation === 'horizontal' ? 'h-px w-full' : 'h-full w-px',
-      fullWidth && '-mx-[1.25rem] w-[calc(100%+2.5rem)]',
+      fullWidth && 'frame-bleed-edge w-auto',
       className,
     )}
     {...props}

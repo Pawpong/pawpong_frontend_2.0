@@ -6,7 +6,7 @@ import { dedupeBy } from '@/shared/lib/dedupeBy'
 import { flattenPages, getTotalItems } from '@/shared/lib/infiniteList'
 import { formatDate } from '@/shared/lib/formatDate'
 // [refactored] 타입 배지는 공용 ReviewTypeBadge 사용 (라우트마다 복붙하던 매핑 제거)
-import { Container, InfiniteScrollTrigger, ListState, ReviewTypeBadge } from '@/shared/ui'
+import { PageShell, InfiniteScrollTrigger, ListState, ReviewTypeBadge } from '@/shared/ui'
 import type { PublicReviewDto } from '@/shared/types'
 
 const REVIEW_PAGE_SIZE = 10
@@ -62,7 +62,7 @@ const PublicBreederReviews = ({ breederId }: PublicBreederReviewsProps) => {
   const totalItems = getTotalItems(query.data)
 
   return (
-    <Container className="px-4 py-5 tab:px-20 tab:py-10 pc:px-0">
+    <PageShell className="py-5 tab:py-10 tab:[--page-gutter:5rem] pc:[--page-gutter:0px]">
       <div className="mx-auto flex w-full max-w-[74.625rem] flex-col gap-5">
         <p className="px-0.5 text-sm leading-6 font-semibold text-neutral-850 tab:text-base">
           전체 후기 {totalItems}
@@ -93,7 +93,7 @@ const PublicBreederReviews = ({ breederId }: PublicBreederReviewsProps) => {
           isFetchingNextPage={query.isFetchingNextPage}
         />
       </div>
-    </Container>
+    </PageShell>
   )
 }
 

@@ -1,7 +1,6 @@
 'use client'
 
 import type { CSSProperties, ReactNode } from 'react'
-import { PAGE_WIDTH_CLASS } from '@/shared/config'
 import { cn } from '@/shared/lib/cn'
 import { Tabs, TabsList, TabsTrigger } from './Tabs'
 
@@ -27,7 +26,7 @@ interface TabBarProps {
  * Figma TabBarLayout(976:32388)을 구현한 공통 탭 바.
  *
  * - medium: 116px indicator, 37px 높이
- * - large: 1440px 레이아웃 안에서 PC 좌우 80px, 61px 높이 (탭 개수와 무관하게 페이지 폭)
+ * - large: 61px 높이, 탭 개수와 무관하게 페이지 틀 폭 (좌우 여백은 페이지 틀과 같다)
  * - 하단 구분선과 sticky 같은 페이지 배치는 barClassName으로 제어
  */
 type TabBarListProps = Omit<TabBarProps, 'value' | 'onValueChange' | 'children' | 'className'>
@@ -44,19 +43,16 @@ const TabBarList = ({
   barStyle,
   ariaLabel,
 }: TabBarListProps) => (
-  /* 탭과 하단선은 PAGE_WIDTH_CLASS 전체를 사용한다. 콘텐츠 카드 폭 상한을 탭에
-     재사용하면 넓은 화면에서 탭만 940px로 좁아지므로, 거터만 반응형으로 유지한다.
+  /* 탭과 하단선은 페이지 틀 가장자리까지(frame-bleed) 쓰고, 탭 글자는 본문과 같은 줄에 둔다.
+     화면 맨 위에 놓이면 틀 위 여백 자리에 붙는다(data-page-top).
      모바일 116px 표시선은 탭이 4개 이상인 좁은 폰에서 화면 밖까지 나가 페이지가 가로로
      밀리므로, 모양은 그대로 두고 바 밖으로 나간 부분만 자른다(clip은 sticky를 깨지 않음). */
   <div
-    className={cn(
-      PAGE_WIDTH_CLASS,
-      'overflow-x-clip border-b border-neutral-300 bg-white',
-      barClassName,
-    )}
+    data-page-top
+    className={cn('frame-bleed overflow-x-clip border-b border-neutral-300 bg-white', barClassName)}
     style={barStyle}
   >
-    <div className="w-full px-4 pt-3 tab:page-gutter-x tab:pt-4">
+    <div className="w-full pt-3 tab:pt-4">
       <TabsList variant="underline" aria-label={ariaLabel}>
         {items.map((item) => (
           <TabsTrigger

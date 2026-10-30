@@ -1,0 +1,150 @@
+import Link from 'next/link'
+import { ApplicationChatButton } from '@/features/chat-entry'
+import { FavoriteIcon } from '@/shared/assets'
+import { buttonVariants, ToggleIconButton, Button } from '@/shared/ui'
+import { cn } from '@/shared/lib/cn'
+import { getActionLayout } from '../_lib/actionLayout'
+
+interface AdoptionCtaBarProps {
+  listingId: string
+  /** 이 개체를 등록한 브리더의 userId — 신청 전에도 "문의하기"로 바로 채팅을 시작할 때 쓴다 */
+  breederUserId: string
+  isFavorite: boolean
+  onToggleFavorite: () => void
+  /**
+   * 신청이 불가능한 사유. 지정되면 신청 버튼 대신 이 문구를 비활성 상태로 보여준다.
+   * (서버가 어차피 거절하는 요청을 폼까지 다 채운 뒤에 알게 되는 걸 막는다)
+   */
+  applyBlockedReason?: string
+  /** 신청 버튼만 막는 사유. applyBlockedReason 과 달리 문의하기는 그대로 둔다 (브리더 계정) */
+  applyDisabledReason?: string
+  /**
+   * 로그인 사용자가 이 개체에 이미 넣어둔 신청. 있으면 신청 버튼 대신
+   * 채팅·신청서 보기로 바꾼다 — 다시 신청해도 서버가 409 로 막기 때문이다.
+   */
+  myApplication?: { applicationId: string; breederUserId: string }
+  /**
+   * fixed  — 하단 고정 바 (1024 미만)
+   * inline — 결정 레일 안에 그대로 놓는 형태 (1024+). 고정 위치·스페이서·하트를 뺀다
+   *          (관심 버튼은 레일이 이미 갖고 있다)
+   */
+  variant?: 'fixed' | 'inline'
+}
+
+/* ── 하단 고정 CTA 바 (입양 신청) ──
+   피그마 btn layout — 모바일(1654:148608) / 탭(1654:148637) / pc(1654:148643)
+   - 모바일: px-16 py-16, 가운데 정렬 · 하트(48) + 노란 버튼(h-48, 가득 max-297)
+   - 탭:    px-48 py-12, 우측 정렬 · 노란 버튼만 (h-40, max-258) — 하트 없음
+   - pc:    px-80 py-12, 우측 정렬 · 노란 버튼만 (하트 숨김)
+   세 상태를 한 트리에서 반응형 클래스로만 분기 (중복 최소화) */
+const AdoptionCtaBar = ({
+  listingId,
+  breederUserId,
+  isFavorite,
+  onToggleFavorite,
+  applyBlockedReason,
+  applyDisabledReason,
+  myApplication,
+  variant = 'fixed',
+}: AdoptionCtaBarProps) => {
+  const isInline = variant === 'inline'
+  const ACTION_LAYOUT = getActionLayout(isInline)
+
+  return (
+    <div
+      className={cn(
+        'flex items-center gap-[0.625rem]',
+        isInline
+          ? 'w-full'
+          : // 바는 전폭이지만 내용은 페이지 틀에 맞춘다 — 뷰포트가 틀보다 넓어도 버튼이 창 끝에 붙지 않게
+            'fixed right-0 bottom-0 left-0 z-10 justify-center bg-white page-inset-x py-[1rem] tab:justify-end tab:gap-[1.25rem] tab:py-[0.75rem]',
+      )}
+    >
+      {/* 탭·pc 우측 정렬용 좌측 스페이서 (피그마 flex-1 h-45) */}
+      {!isInline && <div className="hidden tab:block tab:h-[2.8125rem] tab:flex-1" />}
+
+      {/* 하트 + 버튼 그룹 — 모바일: 가득 / 탭·pc: w-360 우측 고정 */}
+      <div
+        className={cn(
+          'flex w-full items-center justify-center gap-[0.625rem]',
+          !isInline &&
+            'tab:w-[22.5rem] tab:max-w-[33.5rem] tab:min-w-[22.5rem] tab:justify-end tab:gap-[1.25rem]',
+        )}
+      >
+        {/* 관심(하트) — 모바일 전용(탭·pc는 없음), Figma 48px.
+            상태가 예약중·분양완료여도 관심 등록은 계속 가능하다(서버도 isActive 만 본다) */}
+        <span className={cn('tab:hidden', isInline && 'hidden')}>
+          <ToggleIconButton
+            icon={FavoriteIcon}
+            hasFillState
+            size="lg"
+            aria-label="관심있어요"
+            pressed={isFavorite}
+            onClick={onToggleFavorite}
+          />
+        </span>
+
+        {myApplication ? (
+          // 이미 신청한 개체 — 신청 버튼을 다시 보여주면 폼을 다 채운 뒤에야 409 로 막힌다.
+          // 신청 이후 할 일은 대화이므로 채팅을 주 액션으로 두고, 신청서 확인 경로를 함께 남긴다.
+          <div className="flex flex-1 items-center justify-end gap-[0.625rem] tab:gap-[0.75rem]">
+            <div className={ACTION_LAYOUT}>
+              <Link
+                href={`/activity/applications/${myApplication.applicationId}`}
+                className={buttonVariants({ intent: 'secondary', size: 'lg', width: 'full' })}
+              >
+                내 신청서 보기
+              </Link>
+            </div>
+            <div className={ACTION_LAYOUT}>
+              <ApplicationChatButton
+                counterpartUserId={myApplication.breederUserId}
+                applicationId={myApplication.applicationId}
+                intent="primary"
+                size="lg"
+                width="full"
+              />
+            </div>
+          </div>
+        ) : applyBlockedReason ? (
+          // 신청할 수 없는 사유 — 신청 버튼 자리에 같은 틀의 비활성 버튼으로 보여준다.
+          // 사유가 길어도 남는 폭(flex-1)을 다 쓰고 한 줄을 넘치면 잘라낸다.
+          <div className="min-w-0 flex-1">
+            <Button disabled aria-live="polite" width="full">
+              <span className="truncate">{applyBlockedReason}</span>
+            </Button>
+          </div>
+        ) : (
+          // 신청 전에도 브리더에게 먼저 물어볼 수 있게, 신청 버튼 옆에 문의하기를 함께 둔다.
+          <div className="flex flex-1 items-center justify-end gap-[0.625rem] tab:gap-[0.75rem]">
+            <div className={ACTION_LAYOUT}>
+              <ApplicationChatButton
+                counterpartUserId={breederUserId}
+                petId={listingId}
+                label="문의하기"
+                size="lg"
+                width="full"
+              />
+            </div>
+            <div className={ACTION_LAYOUT}>
+              {applyDisabledReason ? (
+                <Button disabled aria-live="polite" width="full">
+                  <span className="truncate">{applyDisabledReason}</span>
+                </Button>
+              ) : (
+                <Link
+                  href={`/adoption/${listingId}/apply`}
+                  className={buttonVariants({ width: 'full' })}
+                >
+                  입양 신청하기
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+export { AdoptionCtaBar }

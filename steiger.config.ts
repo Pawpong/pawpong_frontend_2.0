@@ -28,14 +28,14 @@ export default defineConfig([
      * Steiger 는 슬라이스당 진입점을 하나로만 보므로 이 두 곳만 예외로 둔다.
      */
     files: [
-      './src/app/(main)/adoption/create/layout.tsx',
-      './src/app/(main)/adoption/drafts/page.tsx',
-      './src/app/(main)/adoption/my-listings/page.tsx',
-      './src/app/(main)/settings/page.tsx',
-      './src/app/(main)/activity/page.tsx',
-      './src/app/(main)/activity/applications/[applicationId]/page.tsx',
-      './src/app/(main)/activity/applications/[applicationId]/edit/page.tsx',
-      './src/app/(main)/activity/reviews/[reviewId]/page.tsx',
+      './src/app/(main)/(page)/adoption/create/layout.tsx',
+      './src/app/(main)/(page)/adoption/drafts/page.tsx',
+      './src/app/(main)/(page)/adoption/my-listings/page.tsx',
+      './src/app/(main)/(narrow)/settings/page.tsx',
+      './src/app/(main)/(page)/activity/page.tsx',
+      './src/app/(main)/(page)/activity/applications/[applicationId]/page.tsx',
+      './src/app/(main)/(page)/activity/applications/[applicationId]/edit/page.tsx',
+      './src/app/(main)/(page)/activity/reviews/[reviewId]/page.tsx',
       // 비로그인 마이홈 진입을 서버에서 바로 로그인으로 보낸다(#488)
       './src/app/(main)/home/page.tsx',
     ],

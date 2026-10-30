@@ -58,7 +58,7 @@ const CommunityShowcase = () => {
         {/* Figma Community Feed Card-my home:
             mo는 122px 타일을 12px 간격으로 스크롤, tab부터는 화면 폭에 비례해 확대
             (분양중인 동물 카드와 같은 보간) — tab 5열, pc 4열(≈300px).
-            스크롤 뷰포트에 자체 max-w를 두면 섹션 타이틀과 좌우 여백이 어긋난다 — Container 폭 그대로 둔다. */}
+            스크롤 뷰포트에 자체 max-w를 두면 섹션 타이틀과 좌우 여백이 어긋난다 — PageShell 폭 그대로 둔다. */}
         <div className="w-full overflow-x-auto">
           <div className={ROW_CLASS}>
             {fetched.map((post, index) => (

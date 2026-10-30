@@ -21,7 +21,7 @@ const PublicHomeProfileSection = ({ kind, profile }: PublicHomeProfileSectionPro
       title={`${profile.nickname}의 홈`}
       onBack={kind === 'breeder' ? () => router.back() : undefined}
       right={<PublicProfileActions profile={profile} />}
-      className="tab:hidden"
+      className="page-shell tab:hidden"
     />
   )
 }

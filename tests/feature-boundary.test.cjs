@@ -14,10 +14,14 @@ test('AI 사진 기능은 반려동물 기능을 직접 가져오지 않고 화�
   }
   assert.match(source('src/features/playground-pet/index.ts'), /export \{ PetResultLink \}/)
   for (const file of [
-    'src/app/(main)/ai-filter/_ui/AiFilterContent.tsx',
+    'src/app/(main)/(page)/ai-filter/_ui/AiFilterContent.tsx',
     'src/app/(main)/home/_ui/MyHomeContent.tsx',
   ]) {
-    assert.match(source(file), /import \{ PetResultLink \} from '@\/features\/playground-pet'/, file)
+    assert.match(
+      source(file),
+      /import \{ PetResultLink \} from '@\/features\/playground-pet'/,
+      file,
+    )
     assert.match(source(file), /renderResultAction=\{\(jobId[^)]*\) =>/, file)
   }
 })

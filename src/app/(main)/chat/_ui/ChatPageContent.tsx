@@ -113,7 +113,7 @@ const ChatPageContent = () => {
     <div
       className={cn(
         CHAT_PANEL_HEIGHT,
-        'mx-auto flex w-full max-w-[90rem] overflow-hidden border-x border-neutral-150 bg-white',
+        'page-width flex overflow-hidden border-x border-neutral-150 bg-white',
       )}
     >
       <ChatSidebar

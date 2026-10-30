@@ -21,19 +21,22 @@ function editor(isReady) {
       '@/widgets/post-form',
     ].map((name) => [name, {}]),
   )
-  const { CommunityPostEditor } = load('src/app/(main)/community/_ui/CommunityPostEditor.tsx', {
-    ...empty,
-    react: { ...React, useEffect: () => {} },
-    'next/navigation': { useRouter: () => ({ replace: () => {} }) },
-    '@tanstack/react-query': { useQuery: () => ({ isPending: true }) },
-    '@/features/auth': { useAuthStatus: () => ({ isReady }) },
-    '@/shared/lib/useAuthSessionGeneration': { useAuthSessionGeneration: () => 0 },
-    '@/entities/community': { communityQueries: { detail: () => ({}) } },
-    '@/entities/profile': { profileQueries: { me: () => ({}) } },
-    '@/shared/ui': {
-      Container: ({ children }) => React.createElement('main', null, children),
+  const { CommunityPostEditor } = load(
+    'src/app/(main)/(page)/community/_ui/CommunityPostEditor.tsx',
+    {
+      ...empty,
+      react: { ...React, useEffect: () => {} },
+      'next/navigation': { useRouter: () => ({ replace: () => {} }) },
+      '@tanstack/react-query': { useQuery: () => ({ isPending: true }) },
+      '@/features/auth': { useAuthStatus: () => ({ isReady }) },
+      '@/shared/lib/useAuthSessionGeneration': { useAuthSessionGeneration: () => 0 },
+      '@/entities/community': { communityQueries: { detail: () => ({}) } },
+      '@/entities/profile': { profileQueries: { me: () => ({}) } },
+      '@/shared/ui': {
+        Container: ({ children }) => React.createElement('main', null, children),
+      },
     },
-  })
+  )
   return CommunityPostEditor({ photoSource: 'memory-card' })
 }
 

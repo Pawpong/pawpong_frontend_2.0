@@ -1,6 +1,5 @@
 'use client'
 
-import { Container } from '@/shared/ui'
 import { CategoryFilter } from './CategoryFilter'
 import type { AnimalCategory } from '@/shared/types'
 
@@ -10,9 +9,9 @@ interface CategorySectionProps {
 }
 
 const CategorySection = ({ selected, onChange }: CategorySectionProps) => (
-  <Container className="flex flex-col items-center justify-center px-4 py-3 tab:py-5 pc:py-8">
+  <div className="flex flex-col items-center justify-center pb-3 tab:pb-5 pc:pb-8">
     <CategoryFilter selected={selected} onChange={onChange} />
-  </Container>
+  </div>
 )
 
 export { CategorySection }

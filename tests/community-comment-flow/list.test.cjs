@@ -2,8 +2,10 @@ const { test } = require('node:test')
 const assert = require('node:assert/strict')
 const { loadTypescript: load } = require('../helpers/load-typescript.cjs')
 const { nodes } = require('../fixtures/react-hooks.fixture.cjs')
-const { buildCommentTree } = load('src/app/(main)/community/post/[postId]/_ui/commentThread.ts')
-const { CommentList } = load('src/app/(main)/community/post/[postId]/_ui/CommentList.tsx', {
+const { buildCommentTree } = load(
+  'src/app/(main)/(page)/community/post/[postId]/_ui/commentThread.ts',
+)
+const { CommentList } = load('src/app/(main)/(page)/community/post/[postId]/_ui/CommentList.tsx', {
   '@/shared/ui': {
     Button: 'button',
     DeleteConfirmModal: 'delete',

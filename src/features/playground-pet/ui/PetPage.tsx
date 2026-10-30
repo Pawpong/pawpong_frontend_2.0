@@ -140,7 +140,7 @@ export function PetPage() {
   const session = usePetSession()
   const navigation = usePetNavigation()
   return (
-    <div className="mx-auto w-full max-w-[68rem] space-y-6 px-5 pt-4 pb-20 tab:px-8 tab:pt-6 pc:px-10">
+    <div className="space-y-6">
       <Link
         href="/playground"
         className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-primary-600 focus-ring"
