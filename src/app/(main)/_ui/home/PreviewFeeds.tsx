@@ -158,7 +158,7 @@ export function PreviewPlayground() {
       <p className="mb-6 text-sm leading-6 text-neutral-700 tab:text-base">
         우리 아이와 함께할 작은 즐거움을 골라보세요.
       </p>
-      <PlaygroundFeatureCards items={[...playFeatures, ...CARE_FEATURES]} cover="v4" />
+      <PlaygroundFeatureCards items={[...playFeatures, ...CARE_FEATURES]} />
     </section>
   )
 }
