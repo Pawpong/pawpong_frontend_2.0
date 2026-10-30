@@ -2,8 +2,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { InitialBanners } from '@/entities/home/server'
 import { SearchBar } from '@/shared/ui'
+import { CareMapEntry } from '@/widgets/care-map-entry'
 import { PreviewBanner } from './PreviewBanner'
-import { PlacesBanner } from './PlacesBanner'
 import { PreviewCommunity, PreviewPets, PreviewHallOfFame, PreviewPlayground } from './PreviewFeeds'
 
 export const species = [
@@ -139,7 +139,9 @@ export function HomeContent({ initial }: { initial: InitialBanners | null }) {
       <PreviewPlayground />
       <Journey />
       <PreviewCommunity />
-      <PlacesBanner />
+      <div className="mx-auto max-w-[80rem] px-5 pb-14 tab:px-12 pc:px-20">
+        <CareMapEntry />
+      </div>
     </>
   )
 }

@@ -103,13 +103,10 @@ export function PlaygroundFeatureCards({
   items,
   ref,
   id,
-  cover = 'v1',
 }: {
   items: PlaygroundFeature[]
   ref?: Ref<HTMLUListElement>
   id?: string
-  /** 표지 그림 — v1 놀이터 일러스트 / v4 배너 캐릭터 (홈) */
-  cover?: 'v1' | 'v4'
 }) {
   return (
     <ul
@@ -127,7 +124,7 @@ export function PlaygroundFeatureCards({
             className="group relative block aspect-[3/4] overflow-hidden rounded-lg bg-primary-800 focus-ring-inset"
           >
             <Image
-              src={`/images/playground/covers/${item.key}-${cover}.png`}
+              src={`/images/playground/covers/${item.key}-v4.png`}
               alt=""
               fill
               sizes="(max-width: 767px) 56vw, (max-width: 1439px) 30vw, 22vw"

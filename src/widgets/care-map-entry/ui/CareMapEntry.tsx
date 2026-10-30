@@ -1,58 +1,48 @@
-import { LocationPinIcon } from '@/shared/assets'
-import { Container } from '@/shared/ui'
-import { TicketActionCard } from '@/shared/ui/TicketActionCard'
+import { getImageProps } from 'next/image'
+import Link from 'next/link'
+import styles from './CareMapEntry.module.css'
 
-interface CareMapEntryProps {
-  title?: string
-  description?: string
-  eyebrow?: string
-  actions?: readonly { label: string; href: string }[]
-  /** 관리형 소개 목록이 이미 Container를 제공할 때 사용한다. */
-  embedded?: boolean
-}
+const desktop = getImageProps({
+  src: '/images/banners/places/places-b-desktop-v2.png',
+  alt: '',
+  width: 2048,
+  height: 683,
+  sizes: '(min-width: 1440px) 1120px, 90vw',
+}).props
+const mobile = getImageProps({
+  src: '/images/banners/places/places-b-mobile-v1.png',
+  alt: '',
+  width: 1122,
+  height: 1402,
+  sizes: '(max-width: 767px) 90vw, 1120px',
+}).props
 
-const DEFAULT_ACTIONS = [
-  { label: '동물병원 찾기', href: '/care-map' },
-  { label: '보호시설 찾기', href: '/care-map?kind=shelter' },
-] as const
-
-// 노출·배치·데이터 조회는 호출자가 관리하고, 지도 카드의 표현만 담당한다.
-// 놀이터 돌봄 도구와 같은 초록 티켓 틀을 쓴다.
-export function CareMapEntry({
-  title = '우리 동네 돌봄 지도',
-  description = '가까운 동물병원과 보호시설을 한눈에 찾아보세요.',
-  eyebrow,
-  actions = DEFAULT_ACTIONS,
-  embedded = false,
-}: CareMapEntryProps = {}) {
-  const card = (
-    <TicketActionCard
-      label="CARE MAP"
-      stripIcon={<LocationPinIcon aria-hidden className="size-4" />}
-      accent="green"
-      icon={
-        <svg
-          viewBox="0 0 32 40"
-          className="h-[3.4375rem] w-11 flex-none text-primary-500 tab:h-[4.375rem] tab:w-14"
-          aria-hidden="true"
-          focusable="false"
-          shapeRendering="crispEdges"
-        >
-          <path
-            d="M10 2h12v2h4v4h2v14h-2v4h-4v4h-4v4h-4v-4h-4v-4H6v-4H4V8h2V4h4Z"
-            fill="currentColor"
-          />
-          <path d="M10 6h12v4h2v10h-2v4h-4v4h-4v-4h-4v-4H8V10h2Z" className="fill-point-500" />
-          <path d="M14 10h4v4h4v4h-4v4h-4v-4h-4v-4h4Z" fill="currentColor" />
-          <path d="M8 36h16v2H8Z" className="fill-primary-200" />
-        </svg>
-      }
-      eyebrow={eyebrow}
-      title={title}
-      description={description}
-      actions={actions}
-    />
+// 돌봄 지도 입구 배너. 노출·배치는 호출자가 정하고, 문구는 그림과 짝이라 고정한다.
+// PC는 가로 배너, 모바일은 세로 그림을 picture 로 나눠 쓴다.
+export function CareMapEntry() {
+  return (
+    <Link
+      href="/care-map"
+      aria-labelledby="care-map-entry-title"
+      className={`${styles.banner} focus-ring`}
+    >
+      <picture>
+        <source media="(min-width: 768px)" srcSet={desktop.srcSet} sizes={desktop.sizes} />
+        <img {...mobile} alt="" loading="lazy" className={styles.art} />
+      </picture>
+      <div className={styles.copy}>
+        <h2 id="care-map-entry-title" className={`font-cafe24 ${styles.title}`}>
+          우리 아이와
+          <br />
+          함께 갈 곳
+        </h2>
+        <p className={styles.description}>
+          병원과 보호시설부터
+          <br />
+          카페·여행지·숙소까지.
+        </p>
+        <span className={styles.action}>지도에서 찾아보기</span>
+      </div>
+    </Link>
   )
-
-  return embedded ? card : <Container className="py-4 tab:py-6">{card}</Container>
 }
