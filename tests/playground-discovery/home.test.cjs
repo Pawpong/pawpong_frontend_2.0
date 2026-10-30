@@ -69,7 +69,7 @@ test('놀이터 커버는 새 로컬 에셋을 사용하고 스크롤과 모션 
     'outing',
     'clinic',
   ])
-    assert.ok(existsSync('public/images/playground/covers/' + key + '-v1.png'), key)
+    assert.ok(existsSync('public/images/playground/covers/' + key + '-v4.png'), key)
 })
 
 test('서비스 소개와 앱 안내도 놀이터와 같은 소개 박스와 티켓 링크를 씀', () => {
@@ -125,30 +125,24 @@ test('기능 소개도 PLAY CARD 와 같은 티켓 틀에 띠 라벨과 절취�
   assert.match(shelf, /tab:last:odd:col-span-2 lap:last:odd:col-span-1/)
 })
 
-test('놀이터 아래 돌봄 지도 카드도 초록 CARE MAP 티켓에 버튼 두 개를 둠', () => {
-  // 돌봄 지도 입구와 새 기능 소개는 같은 공통 카드(TicketActionCard)를 쓴다.
-  const ticketActionCard = loadTypescript('src/shared/ui/TicketActionCard.tsx', {
-    'next/link': { __esModule: true, default: (props) => createElement('a', props) },
-    '@/shared/assets': { PixelArrowRightIcon: () => null },
-    './Button': { buttonVariants: ({ intent }) => `button-${intent}` },
-    './Ticket': {
-      ticketStyles: { ticket: 'ticket' },
-      TicketStrip: ({ label }) => createElement('span', { className: 'strip' }, label),
-    },
-  })
+test('홈·놀이터 돌봄 지도 입구는 같은 함께 갈 곳 배너 하나로 지도에 이어짐', () => {
+  // PC는 가로 배너, 모바일은 세로 그림을 picture 로 나눠 쓴다. 배너 전체가 링크라 안에 버튼을 두지 않는다.
   const { CareMapEntry } = loadTypescript('src/widgets/care-map-entry/ui/CareMapEntry.tsx', {
-    '@/shared/assets': { LocationPinIcon: () => null },
-    '@/shared/ui': { Container: ({ children }) => createElement('div', {}, children) },
-    '@/shared/ui/TicketActionCard': ticketActionCard,
+    'next/link': { __esModule: true, default: (props) => createElement('a', props) },
+    'next/image': {
+      getImageProps: ({ src, sizes }) => ({ props: { src, srcSet: `${src} 1x`, sizes } }),
+    },
+    './CareMapEntry.module.css': { default: {} },
   })
-  const html = renderToStaticMarkup(createElement(CareMapEntry, { embedded: true }))
-  assert.match(
-    html,
-    /^<section aria-label="우리 동네 돌봄 지도" data-accent="green" class="ticket"><span class="strip">CARE MAP<\/span>/,
-  )
-  assert.match(html, /<div><a href="\/care-map" class="button-primary">동물병원 찾기/)
-  assert.match(html, /<a href="\/care-map\?kind=shelter" class="button-secondary">보호시설 찾기/)
-  // 버튼 폭은 계약을 우회하지 않고 감싸는 칸으로 정한다.
+  const html = renderToStaticMarkup(createElement(CareMapEntry))
+  assert.match(html, /^<a href="\/care-map" aria-labelledby="care-map-entry-title"/)
+  assert.match(html, /places-b-desktop-v2\.png 1x/)
+  assert.match(html, /places-b-mobile-v1\.png/)
+  assert.match(html, /<h2 id="care-map-entry-title"/)
+  assert.doesNotMatch(html, /<button|<a [^>]*>[^<]*<a /)
+  assert.match(source('src/app/(main)/_ui/home/HomeContent.tsx'), /<CareMapEntry \/>/)
+  assert.match(source('src/app/(main)/_ui/ManagedFeatureHighlights.tsx'), /<CareMapEntry \/>/)
+  // 새 기능 소개 버튼 폭은 계약을 우회하지 않고 감싸는 칸으로 정한다.
   for (const file of [
     'src/shared/ui/TicketActionCard.tsx',
     'src/widgets/care-map-entry/ui/CareMapEntry.tsx',
