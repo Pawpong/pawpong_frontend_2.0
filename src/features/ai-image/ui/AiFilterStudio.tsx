@@ -202,7 +202,7 @@ export function AiFilterStudio({
       : Math.max(2, Math.round(Math.min(0.9, elapsed / EXPECTED_SECONDS) * PROGRESS_BLOCKS))
 
   return (
-    <div className="page-shell pt-6 pb-16 tab:pt-10">
+    <div>
       {/* 소개 */}
       <section className="rounded-2xl bg-point-50 p-5 tab:p-8">
         <div className="flex flex-wrap items-start justify-between gap-3">

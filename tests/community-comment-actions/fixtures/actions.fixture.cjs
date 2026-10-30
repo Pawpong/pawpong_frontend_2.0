@@ -5,7 +5,7 @@ const {
   token,
   deferred,
 } = require('../../notifications/fixtures/notification.fixture.cjs')
-const directory = 'src/app/(main)/community/post/[postId]/_ui/'
+const directory = 'src/app/(main)/(page)/community/post/[postId]/_ui/'
 const comment = (id = '댓글', owner = 'account-a') => ({
   commentId: id,
   postId: '글',

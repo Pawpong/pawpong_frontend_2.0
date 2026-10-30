@@ -1,5 +1,6 @@
 import { createPageMetadata } from '@/shared/lib/metadata'
 
+import { PageFrame } from '@/shared/ui'
 import { SignupLogoLink } from './_ui/SignupLogoLink'
 
 export const metadata = createPageMetadata({ title: '회원가입', noIndex: true })
@@ -13,7 +14,10 @@ const SignupLayout = ({ children }: { children: React.ReactNode }) => {
           <span className="text-body-md text-neutral-700">포퐁과 함께하는 첫걸음</span>
         </div>
       </header>
-      <main className="flex flex-1 flex-col">{children}</main>
+      {/* 가입 단계는 폼처럼 한 줄로 읽는 화면이라 좁은 페이지 틀을 쓴다 */}
+      <main className="flex flex-1 flex-col">
+        <PageFrame narrow>{children}</PageFrame>
+      </main>
     </div>
   )
 }

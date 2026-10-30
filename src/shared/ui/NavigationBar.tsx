@@ -3,7 +3,6 @@ import { tv, type VariantProps } from '@/shared/lib/tv'
 import Link from 'next/link'
 import { cn } from '@/shared/lib/cn'
 import { ArrowBackIcon, CloseIcon } from '@/shared/assets'
-import { Container } from './Container'
 import { TextLabel } from './TextLabel'
 import { IconButton } from './IconButton'
 
@@ -60,8 +59,9 @@ const NavigationBar = ({
   const hasBack = Boolean(onBack || backHref)
 
   return (
-    // 좌우 폭·여백은 공통 Container(페이지 틀) 그대로
-    <Container className={cn('flex items-center bg-white py-1 tab:py-2', className)}>
+    // 화면 맨 위 제목 바(data-page-top) — 폭·여백은 페이지 틀이 정하고, 틀 위 여백 자리에 붙는다.
+    // 틀 밖(띠 페이지)에서 쓸 때는 감싸는 쪽이 PageShell 로 여백을 준다.
+    <div data-page-top className={cn('flex items-center bg-white py-1 tab:py-2', className)}>
       <div className="flex min-w-0 flex-1 items-center">
         {onBack && (
           <IconButton edge="both" onClick={onBack} aria-label={backLabel}>
@@ -94,7 +94,7 @@ const NavigationBar = ({
           hasBack && <div className="size-6 shrink-0" aria-hidden />
         )}
       </div>
-    </Container>
+    </div>
   )
 }
 

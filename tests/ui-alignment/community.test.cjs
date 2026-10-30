@@ -2,7 +2,7 @@ const { test } = require('node:test')
 const assert = require('node:assert/strict')
 const { source } = require('./fixtures/alignment.fixture.cjs')
 
-const ui = 'src/app/(main)/community/_ui'
+const ui = 'src/app/(main)/(page)/community/_ui'
 
 test('AI 참고 답변 요청은 대비가 보장된 공통 버튼을 씀', () => {
   const answer = source(`${ui}/CommunityAiAnswer.tsx`)
@@ -18,10 +18,12 @@ test('재심사 요청과 설정 재확인은 공통 버튼과 재시도 버튼�
 })
 
 test('댓글 수정 입력과 처리 안내는 공통 입력칸과 focus-ring을 씀', () => {
-  const form = source('src/app/(main)/community/post/[postId]/_ui/CommentEditForm.tsx')
+  const form = source('src/app/(main)/(page)/community/post/[postId]/_ui/CommentEditForm.tsx')
   assert.match(form, /<Textarea\s+ref=\{field\}\s+aria-label="댓글 수정 내용"/)
   assert.doesNotMatch(form, /<textarea/)
-  const feedback = source('src/app/(main)/community/post/[postId]/_ui/CommentActionFeedback.tsx')
+  const feedback = source(
+    'src/app/(main)/(page)/community/post/[postId]/_ui/CommentActionFeedback.tsx',
+  )
   assert.match(feedback, /focus-ring/)
   assert.doesNotMatch(feedback, /focus-visible:ring-2/)
 })

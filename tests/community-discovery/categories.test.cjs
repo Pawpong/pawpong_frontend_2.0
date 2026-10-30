@@ -3,7 +3,7 @@ const assert = require('node:assert/strict')
 const { loadTypescript: load } = require('../helpers/load-typescript.cjs')
 
 const discovery = load('src/entities/community/model/discovery.ts')
-const categories = load('src/app/(main)/community/_ui/discovery/categories.ts', {
+const categories = load('src/app/(main)/(page)/community/_ui/discovery/categories.ts', {
   '@/entities/community': { countCommunityDiscovery: discovery.countCommunityDiscovery },
 })
 const { COMMUNITY_CATEGORIES } = categories

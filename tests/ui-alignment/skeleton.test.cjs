@@ -71,8 +71,8 @@ test('탐색 목록은 불러오는 동안 같은 격자에 카드 모양 스켈
   assert.equal(html.match(/aspect-square/g).length, 2)
   assert.match(html, /grid grid-cols-2/)
   for (const file of [
-    'src/app/(main)/explore/_ui/ExploreContent.tsx',
-    'src/app/(main)/explore/_ui/BreederExploreContent.tsx',
+    'src/app/(main)/(page)/explore/_ui/ExploreContent.tsx',
+    'src/app/(main)/(page)/explore/_ui/BreederExploreContent.tsx',
   ])
     assert.match(source(file), /loadingFallback=\{<ListingCardGridSkeleton label=/, file)
 })
@@ -92,11 +92,11 @@ test('홈 분양·자랑하기 영역은 불러온 카드와 같은 배치의 �
 
 test('관심 입양글·즐겨찾는 브리더·브리더 홈 분양 목록도 공통 격자 배치의 카드 스켈레톤을 씀', () => {
   assert.match(
-    source('src/app/(main)/bookmarks/_ui/FavoritesTab.tsx'),
+    source('src/app/(main)/(page)/bookmarks/_ui/FavoritesTab.tsx'),
     /loadingFallback=\{<ListingCardGridSkeleton label="관심 목록을 불러오는 중이에요\." \/>\}/,
   )
   assert.match(
-    source('src/app/(main)/bookmarks/_ui/FavoriteBreedersContent.tsx'),
+    source('src/app/(main)/(page)/bookmarks/_ui/FavoriteBreedersContent.tsx'),
     /loadingFallback=\{<ListingCardGridSkeleton label="즐겨찾는 브리더를 불러오는 중이에요\." \/>\}/,
   )
   assert.match(
@@ -106,7 +106,7 @@ test('관심 입양글·즐겨찾는 브리더·브리더 홈 분양 목록도 �
 })
 
 test('알림센터는 불러오는 동안 알림 행과 같은 틀의 스켈레톤을 보여줌', () => {
-  const page = source('src/app/(main)/notifications/_ui/NotificationsContent.tsx')
+  const page = source('src/app/(main)/(page)/notifications/_ui/NotificationsContent.tsx')
   assert.match(
     page,
     /loadingFallback=\{[\s\S]*?<span className="sr-only">알림을 불러오는 중이에요\.<\/span>/,
@@ -115,16 +115,16 @@ test('알림센터는 불러오는 동안 알림 행과 같은 틀의 스켈레�
 })
 
 test('분양 상세는 불러오는 동안 실제 화면과 같은 틀의 스켈레톤을 보여줌', () => {
-  const client = source('src/app/(main)/adoption/[id]/_ui/AdoptionDetailPageClient.tsx')
+  const client = source('src/app/(main)/(page)/adoption/[id]/_ui/AdoptionDetailPageClient.tsx')
   assert.match(client, /if \(detailQuery\.isPending\) return <AdoptionDetailSkeleton \/>/)
-  const skeleton = source('src/app/(main)/adoption/[id]/_ui/AdoptionDetailSkeleton.tsx')
+  const skeleton = source('src/app/(main)/(page)/adoption/[id]/_ui/AdoptionDetailSkeleton.tsx')
   assert.match(skeleton, /role="status" aria-busy="true"/)
   assert.match(skeleton, /aspect-\[375\/279\] w-full rounded-none tab:aspect-square/)
   assert.match(skeleton, /lap:w-\[20rem\] lap:shrink-0 pc:w-\[24rem\]/)
 })
 
 test('게시글 상세는 불러오는 동안 두 배치 모두 실제 글 모양의 스켈레톤을 보여주고 빈 글 문구는 해요체', () => {
-  const panel = source('src/app/(main)/community/_ui/PostDetailPanel.tsx')
+  const panel = source('src/app/(main)/(page)/community/_ui/PostDetailPanel.tsx')
   assert.match(panel, /if \(!post && isPending && !isError\) \{/)
   assert.match(panel, /<SkeletonBlock className="h-full w-\[60%\] shrink-0 rounded-none" \/>/)
   assert.match(panel, /<SkeletonBlock className="aspect-square w-full shrink-0 rounded-none" \/>/)
@@ -136,7 +136,7 @@ test('마이홈·다른 회원 홈은 프로필을 불러오는 동안 실제 2�
   const skeleton = loadTypescript('src/shared/ui/Skeleton.tsx', { '@/shared/lib/cn': { cn } })
   const columns = loadTypescript('src/app/(main)/home/_ui/HomeColumns.tsx', {
     '@/shared/ui': {
-      Container: ({ children, className }) => createElement('div', { className }, children),
+      PageShell: ({ children, className }) => createElement('div', { className }, children),
     },
   })
   const { HomeSkeleton } = loadTypescript('src/app/(main)/home/_ui/HomeSkeleton.tsx', {
@@ -178,15 +178,15 @@ test('공지·자주 묻는 질문·임시저장은 줄 모양 스켈레톤으�
   assert.equal(html.match(/py-4/g).length, 3)
   for (const [file, pattern] of [
     [
-      'src/app/(main)/faq/_ui/FaqContent.tsx',
+      'src/app/(main)/(page)/faq/_ui/FaqContent.tsx',
       /<ListRowsSkeleton label="자주 묻는 질문을 불러오는 중이에요\." rows=\{6\} \/>/,
     ],
     [
-      'src/app/(main)/notices/_ui/NoticesContent.tsx',
+      'src/app/(main)/(page)/notices/_ui/NoticesContent.tsx',
       /<ListRowsSkeleton label="공지사항을 불러오는 중이에요\." \/>/,
     ],
     [
-      'src/app/(main)/drafts/_ui/DraftSection.tsx',
+      'src/app/(main)/(page)/drafts/_ui/DraftSection.tsx',
       /<ListRowsSkeleton label=\{loadingText\} rows=\{3\} \/>/,
     ],
   ])
@@ -204,18 +204,18 @@ test('상단 알림 드롭다운도 불러오는 동안 줄 스켈레톤을 쓰�
 })
 
 test('신청·후기 목록은 줄 스켈레톤으로 불러오고 보낸 신청이 없으면 분양중인 동물로 안내함', () => {
-  const layout = source('src/app/(main)/activity/_ui/ActivityListLayout.tsx')
+  const layout = source('src/app/(main)/(page)/activity/_ui/ActivityListLayout.tsx')
   assert.match(
     layout,
     /loadingFallback=\{<ListRowsSkeleton label=\{`\$\{title\}을 불러오는 중이에요\.`\} rows=\{3\} \/>\}/,
   )
   assert.match(layout, /emptyAction=\{emptyAction\}/)
   assert.match(
-    source('src/app/(main)/activity/_ui/ActivityInfiniteList.tsx'),
+    source('src/app/(main)/(page)/activity/_ui/ActivityInfiniteList.tsx'),
     /emptyAction=\{emptyAction\}/,
   )
   assert.match(
-    source('src/app/(main)/activity/_ui/ApplicationList.tsx'),
+    source('src/app/(main)/(page)/activity/_ui/ApplicationList.tsx'),
     /<EmptyStateLink href="\/explore\?type=adoption">분양중인 동물 보기<\/EmptyStateLink>/,
   )
 })

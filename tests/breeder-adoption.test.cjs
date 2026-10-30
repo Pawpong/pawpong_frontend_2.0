@@ -6,23 +6,26 @@ const { loadTypescript } = require('./helpers/load-typescript.cjs')
 
 // 입양 신청·입양목록은 입양자 전용 API 라 브리더는 403 을 받는다 — 화면이 미리 내리는지 확인한다.
 const bookmarks = (userRole, initialTab) => {
-  const { BookmarksContent } = loadTypescript('src/app/(main)/bookmarks/_ui/BookmarksContent.tsx', {
-    '@/shared/ui': {
-      TabBar: ({ items, value, children }) =>
-        createElement(
-          'nav',
-          { 'data-value': value },
-          items.map((item) => item.label).join(','),
-          children,
-        ),
-      TabsContent: () => null,
+  const { BookmarksContent } = loadTypescript(
+    'src/app/(main)/(page)/bookmarks/_ui/BookmarksContent.tsx',
+    {
+      '@/shared/ui': {
+        TabBar: ({ items, value, children }) =>
+          createElement(
+            'nav',
+            { 'data-value': value },
+            items.map((item) => item.label).join(','),
+            children,
+          ),
+        TabsContent: () => null,
+      },
+      '@/features/auth': { useAuthStatus: () => ({ userRole }) },
+      './constants': loadTypescript('src/app/(main)/(page)/bookmarks/_ui/constants.ts'),
+      './FavoritesTab': { FavoritesTab: () => null },
+      './FavoriteBreedersContent': { FavoriteBreedersContent: () => null },
+      './AdoptionListTab': { AdoptionListTab: () => null },
     },
-    '@/features/auth': { useAuthStatus: () => ({ userRole }) },
-    './constants': loadTypescript('src/app/(main)/bookmarks/_ui/constants.ts'),
-    './FavoritesTab': { FavoritesTab: () => null },
-    './FavoriteBreedersContent': { FavoriteBreedersContent: () => null },
-    './AdoptionListTab': { AdoptionListTab: () => null },
-  })
+  )
   return renderToStaticMarkup(createElement(BookmarksContent, { initialTab }))
 }
 
@@ -34,23 +37,26 @@ test('브리더의 저장목록에는 입양목록 탭이 없고, 그 탭으로 
 })
 
 const ctaBar = (props) => {
-  const { AdoptionCtaBar } = loadTypescript('src/app/(main)/adoption/[id]/_ui/AdoptionCtaBar.tsx', {
-    'next/link': {
-      __esModule: true,
-      default: ({ href, children }) => createElement('a', { href }, children),
+  const { AdoptionCtaBar } = loadTypescript(
+    'src/app/(main)/(page)/adoption/[id]/_ui/AdoptionCtaBar.tsx',
+    {
+      'next/link': {
+        __esModule: true,
+        default: ({ href, children }) => createElement('a', { href }, children),
+      },
+      '@/features/chat-entry': {
+        ApplicationChatButton: ({ label }) => createElement('button', null, label),
+      },
+      '@/shared/assets': { FavoriteIcon: () => null },
+      '@/shared/ui': {
+        buttonVariants: () => '',
+        ToggleIconButton: () => null,
+        Button: ({ disabled, children }) => createElement('button', { disabled }, children),
+      },
+      '@/shared/lib/cn': { cn: (...values) => values.filter(Boolean).join(' ') },
+      '../_lib/actionLayout': { getActionLayout: () => '' },
     },
-    '@/features/chat-entry': {
-      ApplicationChatButton: ({ label }) => createElement('button', null, label),
-    },
-    '@/shared/assets': { FavoriteIcon: () => null },
-    '@/shared/ui': {
-      buttonVariants: () => '',
-      ToggleIconButton: () => null,
-      Button: ({ disabled, children }) => createElement('button', { disabled }, children),
-    },
-    '@/shared/lib/cn': { cn: (...values) => values.filter(Boolean).join(' ') },
-    '../_lib/actionLayout': { getActionLayout: () => '' },
-  })
+  )
   return renderToStaticMarkup(
     createElement(AdoptionCtaBar, {
       listingId: 'pet-1',
@@ -63,7 +69,7 @@ const ctaBar = (props) => {
 }
 
 const applyPage = (userRole) => {
-  const page = loadTypescript('src/app/(main)/adoption/[id]/apply/page.tsx', {
+  const page = loadTypescript('src/app/(main)/(page)/adoption/[id]/apply/page.tsx', {
     'next/navigation': { useParams: () => ({ id: 'pet-1' }) },
     '@tanstack/react-query': { useQuery: () => ({ isPending: false, data: { id: 'pet-1' } }) },
     '@/shared/ui': {

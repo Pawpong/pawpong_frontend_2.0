@@ -15,7 +15,7 @@ const CompleteStep = () => {
   // 미완료로 판단해 홈 이동과 경쟁하며 /signup으로 돌려보낸다.
 
   return (
-    <StepLayout className="mx-auto w-full max-w-3xl flex-1 page-gutter-x pt-8">
+    <StepLayout className="flex-1">
       <StepTitle subtitle="포퐁에 오신 걸 환영해요. 이제 새로운 만남을 시작해보세요.">
         가입이 완료되었어요
       </StepTitle>

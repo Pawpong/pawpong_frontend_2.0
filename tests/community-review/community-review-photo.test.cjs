@@ -123,7 +123,7 @@ test('개발 심사 발행과 임시저장은 인증 사진을 쓰며 운영 구
 
 test('작성 화면은 설정이 켜졌을 때만 인증 사진 경로를 선택함', () => {
   const source = require('node:fs').readFileSync(
-    'src/app/(main)/community/_ui/CommunityPostEditor.tsx',
+    'src/app/(main)/(page)/community/_ui/CommunityPostEditor.tsx',
     'utf8',
   )
   assert.match(source, /reviewEnabled \? \{ useOwnedPhotoUpload: true \} : \{\}/)
