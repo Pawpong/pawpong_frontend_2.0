@@ -1,5 +1,5 @@
 /**
- * 화면 공통 타이포 스케일 (5단계).
+ * 화면 공통 타이포 스케일.
  *
  * 상세·온보딩 모두 "상위 제목이 그 안의 라벨·표보다 작고 흐린" 역전이 있었다.
  * (예: 카드 제목 12px medium 안에 표 14px semibold / 스텝 제목 14px 안에 필드 라벨 16px)
@@ -12,7 +12,9 @@
 export const TEXT = {
   /** 화면에서 유일한 디스플레이 (개체 이름, 스텝 질문). 24 → 28 → 32 */
   display: 'font-cafe24 text-2xl leading-[1.4] text-neutral-850 tab:text-[1.75rem] pc:text-[2rem]',
-  /** 섹션 제목. 18 → 20 */
+  /** 페이지 안 섹션 제목 — 카드 묶음·소개 단락의 머리 (홈 섹션·놀이터 카드 줄·서비스 소개). 20 → 24 */
+  title: 'font-cafe24 text-xl leading-[1.4] text-neutral-850 tab:text-2xl',
+  /** 카드·상세 안의 섹션 제목. 18 → 20 */
   section: 'font-cafe24 text-lg leading-[1.4] text-neutral-850 tab:text-xl',
   /** 라벨·소제목 — medium 고정. 14 → 15 → 16 */
   sub: 'text-sm leading-[1.5] font-medium text-neutral-700 tab:text-[0.9375rem] pc:text-base',
