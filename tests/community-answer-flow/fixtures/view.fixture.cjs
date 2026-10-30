@@ -1,7 +1,7 @@
 const { createElement } = require('react')
 const { renderToStaticMarkup } = require('react-dom/server')
 const { loadTypescript: load } = require('../../helpers/load-typescript.cjs')
-const context = load('src/app/(main)/community/_ui/answer/communityAnswerContext.ts')
+const context = load('src/app/(main)/(page)/community/_ui/answer/communityAnswerContext.ts')
 const session = { scope: '합성 세션', identity: JSON.stringify(['adopter', '합성 보호자']) }
 const post = {
   postId: '합성 질문',
@@ -27,7 +27,7 @@ function answerViewFixture(overrides = {}, owner = session) {
     recheck() {},
     ...overrides,
   }
-  const { CommunityAnswer } = load('src/app/(main)/community/_ui/CommunityAiAnswer.tsx', {
+  const { CommunityAnswer } = load('src/app/(main)/(page)/community/_ui/CommunityAiAnswer.tsx', {
     '@/shared/lib/useAuthReadSession': { useAuthReadSession: () => owner },
     '@/shared/ui/Button': { Button: buttonStub },
     './answer/communityAnswerContext': context,

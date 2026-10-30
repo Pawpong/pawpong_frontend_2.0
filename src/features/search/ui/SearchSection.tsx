@@ -21,7 +21,7 @@ const SearchSection = ({
   showPopularKeywords,
 }: SearchSectionProps) => {
   return (
-    <section className="page-shell my-3 flex flex-col items-center">
+    <section className="my-3 flex flex-col items-center">
       <div className="flex w-full max-w-[21.4375rem] flex-col gap-[0.4375rem] tab:max-w-[30.125rem] pc:max-w-[52.875rem]">
         <SearchBar placeholder={placeholder} defaultValue={defaultValue} onSubmit={onSubmit} />
         {showPopularKeywords && <PopularKeywords onSelect={onSubmit} />}

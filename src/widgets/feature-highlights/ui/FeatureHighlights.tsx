@@ -8,16 +8,13 @@ import {
   type FeatureHighlight,
   type HighlightPlacement,
 } from '@/entities/feature-highlight'
-import { Container } from '@/shared/ui'
 import { TicketActionCard } from '@/shared/ui/TicketActionCard'
 
 export function FeatureHighlights({
   placement,
   renderMap,
-  className,
 }: {
   placement: HighlightPlacement
-  className?: string
   renderMap: (card: FeatureHighlight) => ReactNode
 }) {
   const query = useQuery({
@@ -37,7 +34,7 @@ export function FeatureHighlights({
   if (cards.length === 0) return null
 
   return (
-    <Container className={`py-4 tab:py-6 ${className ?? ''}`}>
+    <div className="py-4 tab:py-6">
       <div className="grid gap-5" aria-label="포퐁의 새로운 기능">
         {cards.map((card) =>
           card.icon === 'map' ? (
@@ -82,6 +79,6 @@ export function FeatureHighlights({
           ),
         )}
       </div>
-    </Container>
+    </div>
   )
 }

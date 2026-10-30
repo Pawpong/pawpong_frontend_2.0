@@ -1,6 +1,6 @@
 'use client'
 
-import { PostDetailDialog } from '../../community/_ui/PostDetailDialog'
+import { PostDetailDialog } from '../../(page)/community/_ui/PostDetailDialog'
 
 interface HomePostDetailModalProps {
   postId: string | null

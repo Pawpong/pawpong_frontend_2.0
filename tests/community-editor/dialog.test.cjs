@@ -3,7 +3,7 @@ const assert = require('node:assert/strict')
 const { renderToStaticMarkup } = require('react-dom/server')
 const { loadTypescript: load } = require('../helpers/load-typescript.cjs')
 const { CommunityEditorExitDialog } = load(
-  'src/app/(main)/community/_ui/CommunityEditorExitDialog.tsx',
+  'src/app/(main)/(page)/community/_ui/CommunityEditorExitDialog.tsx',
   {
     '@/shared/ui': { CtaModal: () => null },
   },

@@ -232,7 +232,7 @@ test('자동으로 붙은 태그는 보낸 값과 저장된 값의 차이로만 
 
 test('피드 카드의 기록·주제·태그 줄은 같은 조건의 필터를 건다', () => {
   const Icon = () => null
-  const Meta = load('src/app/(main)/community/_ui/CommunityFeedMeta.tsx', {
+  const Meta = load('src/app/(main)/(page)/community/_ui/CommunityFeedMeta.tsx', {
     '@/entities/community': {
       CommunityPixelIcon: Icon,
       summarizeCommunityRecords: records.summarizeCommunityRecords,

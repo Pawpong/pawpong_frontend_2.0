@@ -4,7 +4,7 @@ const { createElement } = require('react')
 const { renderToStaticMarkup } = require('react-dom/server')
 const { load, held, post, model } = require('./fixtures/community-review.fixture.cjs')
 const Link = ({ children, href }) => createElement('a', { href }, children)
-const consent = load('src/app/(main)/community/_ui/CommunityReviewConsent.tsx')
+const consent = load('src/app/(main)/(page)/community/_ui/CommunityReviewConsent.tsx')
 
 test('심사 동의 전 자동 카테고리 분류는 호출하지 않고 직접 선택은 유지함', () => {
   const flags = []
@@ -36,7 +36,7 @@ test('심사 동의 전 자동 카테고리 분류는 호출하지 않고 직접
 })
 function panel(config = { enabled: true, dailyLimit: 10, notice: 'OpenAI 처리 안내' }) {
   let calls = 0
-  const component = load('src/app/(main)/community/_ui/CommunityPostReviewPanel.tsx', {
+  const component = load('src/app/(main)/(page)/community/_ui/CommunityPostReviewPanel.tsx', {
     '@tanstack/react-query': { useQuery: () => ({ data: config }) },
     '@/entities/community': {
       communityReviewConfigOptions: {},
@@ -144,7 +144,7 @@ test('보류 카드의 공유와 반응 콜백은 열지 않고 기존 글은 �
 })
 test('보류 상세는 두 레이아웃 모두 댓글 작성과 반응 및 공유를 렌더하지 않음', () => {
   const enabled = []
-  const component = load('src/app/(main)/community/_ui/PostDetailPanel.tsx', {
+  const component = load('src/app/(main)/(page)/community/_ui/PostDetailPanel.tsx', {
     '@/shared/ui': {
       ImageCarousel: () => null,
       ProfileAvatar: () => null,

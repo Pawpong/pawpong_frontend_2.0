@@ -65,7 +65,7 @@ test('날짜·통계·작성자·하단 메뉴 같은 공통 보조 글자도 �
     'src/shared/ui/AuthorInfo.tsx',
     'src/shared/ui/Breadcrumb.tsx',
     'src/widgets/post-form/ui/VisibilitySelect.tsx',
-    'src/app/(main)/community/post/[postId]/_ui/CommentList.tsx',
+    'src/app/(main)/(page)/community/post/[postId]/_ui/CommentList.tsx',
   ])
     assert.doesNotMatch(source(file), /text-text-(secondary|muted)\b/, file)
   // 분양완료 같은 상태 뱃지는 비활성 버튼이 아니라 읽어야 하는 정보다.

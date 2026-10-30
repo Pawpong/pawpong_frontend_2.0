@@ -8,42 +8,45 @@ const { source } = require('./fixtures/alignment.fixture.cjs')
 // 설정·레벨표 조회 상태를 바꿔 가며 안내 화면이 무엇을 보여주는지 확인한다.
 function guide(configQuery, catalogQuery = { isPending: false, isError: false, data: undefined }) {
   const retried = []
-  const { LevelGuideContent } = loadTypescript('src/app/(main)/level/_ui/LevelGuideContent.tsx', {
-    '@tanstack/react-query': {
-      useQuery: (options) =>
-        options.queryKey?.[1] === 'catalog'
-          ? { ...catalogQuery, refetch: async () => retried.push('catalog') }
-          : { ...configQuery, refetch: async () => retried.push('config') },
+  const { LevelGuideContent } = loadTypescript(
+    'src/app/(main)/(page)/level/_ui/LevelGuideContent.tsx',
+    {
+      '@tanstack/react-query': {
+        useQuery: (options) =>
+          options.queryKey?.[1] === 'catalog'
+            ? { ...catalogQuery, refetch: async () => retried.push('catalog') }
+            : { ...configQuery, refetch: async () => retried.push('config') },
+      },
+      '@/entities/gamification': {
+        activityConfigOptions: { queryKey: ['gamification', 'config'] },
+        getActivityCatalog: async () => ({}),
+        LevelIcon: () => createElement('i'),
+        ACTIVITY_LABELS: { post: '공개 이야기' },
+        LEVEL_NOTICE: '활동 단계 안내 문구',
+      },
+      '@/features/auth': { useAuthStatus: () => ({ userRole: 'adopter' }) },
+      '@/features/inquiry': { SupportInquiryModal: () => null },
+      '@/shared/ui': {
+        AsyncState: ({ status, message, action, onRetry }) =>
+          createElement(
+            'div',
+            { 'data-state': status },
+            message,
+            onRetry && createElement('button', { onClick: onRetry }, '다시 시도'),
+            action,
+          ),
+        Badge: ({ children }) => createElement('b', null, children),
+        Button: ({ children }) => createElement('button', null, children),
+        Container: ({ children }) => createElement('div', null, children),
+        DetailLink: ({ href, label }) => createElement('a', { href }, label),
+        NavigationBar: ({ title }) => createElement('nav', null, title),
+      },
+      '@/shared/ui/FeatureIntro': {
+        FeatureIntro: ({ title, children }) =>
+          createElement('header', null, createElement('h1', null, title), children),
+      },
     },
-    '@/entities/gamification': {
-      activityConfigOptions: { queryKey: ['gamification', 'config'] },
-      getActivityCatalog: async () => ({}),
-      LevelIcon: () => createElement('i'),
-      ACTIVITY_LABELS: { post: '공개 이야기' },
-      LEVEL_NOTICE: '활동 단계 안내 문구',
-    },
-    '@/features/auth': { useAuthStatus: () => ({ userRole: 'adopter' }) },
-    '@/features/inquiry': { SupportInquiryModal: () => null },
-    '@/shared/ui': {
-      AsyncState: ({ status, message, action, onRetry }) =>
-        createElement(
-          'div',
-          { 'data-state': status },
-          message,
-          onRetry && createElement('button', { onClick: onRetry }, '다시 시도'),
-          action,
-        ),
-      Badge: ({ children }) => createElement('b', null, children),
-      Button: ({ children }) => createElement('button', null, children),
-      Container: ({ children }) => createElement('div', null, children),
-      DetailLink: ({ href, label }) => createElement('a', { href }, label),
-      NavigationBar: ({ title }) => createElement('nav', null, title),
-    },
-    '@/shared/ui/FeatureIntro': {
-      FeatureIntro: ({ title, children }) =>
-        createElement('header', null, createElement('h1', null, title), children),
-    },
-  })
+  )
   return { html: renderToStaticMarkup(createElement(LevelGuideContent)), retried }
 }
 
@@ -89,7 +92,7 @@ test('활동 단계 안내 본문은 공통 소개 영역 아래 레벨표·적�
   assert.match(html, /공개 이야기[\s\S]*하루 2번[\s\S]*\+5 EXP/)
   assert.match(html, /id="inquiry"[\s\S]*<button>레벨\/EXP 문의하기<\/button>/)
   assert.doesNotMatch(html, /<main/)
-  assert.doesNotMatch(source('src/app/(main)/level/_ui/LevelGuideContent.tsx'), /<main/)
+  assert.doesNotMatch(source('src/app/(main)/(page)/level/_ui/LevelGuideContent.tsx'), /<main/)
 })
 
 test('활동 대시보드 바로가기는 이름 있는 묶음 안의 공통 링크로 44px 높이를 가짐', () => {

@@ -34,7 +34,7 @@ const SignupTypeSelect = () => {
   }
 
   return (
-    <StepLayout className="mx-auto w-full max-w-3xl flex-1 page-gutter-x pt-8 tab:pt-12">
+    <StepLayout className="flex-1">
       <OnboardingProgressBar percent={0} />
       <StepTitle subtitle="어떤 만남을 위해 오셨나요? 나에게 맞는 회원 유형을 선택해주세요.">
         회원 유형을 선택해주세요

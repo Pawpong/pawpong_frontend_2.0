@@ -22,6 +22,7 @@ const ChatRoomList = ({ activeRoomId, onSelectRoom }: ChatRoomListProps) => {
         backHref="/"
         titleVariant="page"
         right={<ChatUserSearch onSelectRoom={onSelectRoom} />}
+        className="page-shell"
       />
 
       {/* 필터 탭(고정) + 방 목록(스크롤) */}

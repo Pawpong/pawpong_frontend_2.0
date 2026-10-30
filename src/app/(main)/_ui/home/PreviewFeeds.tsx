@@ -15,8 +15,8 @@ import { FavoriteAdoptionGridCard } from '@/features/adoption'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
 import { ListingCardGrid, ListingCardGridSkeleton, ListState } from '@/shared/ui'
-import { CARE_FEATURES, usePlayFeatures } from '../../playground/_ui/PlaygroundContent'
-import { PlaygroundFeatureCards } from '../../playground/_ui/PlaygroundFeatureRail'
+import { CARE_FEATURES, usePlayFeatures } from '../../(page)/playground/_ui/PlaygroundContent'
+import { PlaygroundFeatureCards } from '../../(page)/playground/_ui/PlaygroundFeatureRail'
 
 const sectionHeading = 'font-cafe24 text-2xl leading-[1.4] text-neutral-850 tab:text-[1.75rem]'
 const moreLink =

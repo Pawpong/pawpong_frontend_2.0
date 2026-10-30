@@ -7,8 +7,8 @@ const { source } = require('./fixtures/alignment.fixture.cjs')
 test('개인 목록이 비면 같은 모양의 버튼으로 다음 행동을 안내함', () => {
   const cases = [
     ['src/app/(main)/home/_ui/MyPostsTab.tsx', '/community/write'],
-    ['src/app/(main)/bookmarks/_ui/FavoriteBreedersContent.tsx', '/explore'],
-    ['src/app/(main)/bookmarks/_ui/FavoritesTab.tsx', '/explore?type=adoption'],
+    ['src/app/(main)/(page)/bookmarks/_ui/FavoriteBreedersContent.tsx', '/explore'],
+    ['src/app/(main)/(page)/bookmarks/_ui/FavoritesTab.tsx', '/explore?type=adoption'],
     // 저장 피드 탭은 마이홈 게시글 탭의 '저장한 글' 칩으로 옮겼다
     ['src/app/(main)/home/_ui/MyPostsTab.tsx', '/community'],
     ['src/features/ai-image/ui/AiPhotoArchive.tsx', '/ai-filter'],
@@ -23,12 +23,12 @@ test('개인 목록이 비면 같은 모양의 버튼으로 다음 행동을 안
 test('목록 화면의 로딩·오류·빈 상태 문구는 해요체로 맞춤', () => {
   const roots = [
     'src/app/(main)/home',
-    'src/app/(main)/bookmarks',
-    'src/app/(main)/drafts',
-    'src/app/(main)/notices',
-    'src/app/(main)/notifications',
-    'src/app/(main)/explore',
-    'src/app/(main)/faq',
+    'src/app/(main)/(page)/bookmarks',
+    'src/app/(main)/(page)/drafts',
+    'src/app/(main)/(page)/notices',
+    'src/app/(main)/(page)/notifications',
+    'src/app/(main)/(page)/explore',
+    'src/app/(main)/(page)/faq',
     'src/widgets/community-showcase',
     'src/widgets/adoption-showcase',
     'src/widgets/my-pet-postings',
@@ -61,8 +61,8 @@ test('링크 티켓은 누르면 그림자 쪽으로 내려앉고 움직임을 �
 
 test('활동 화면의 이어가기 링크도 글자 화살표 대신 읽지 않는 픽셀 화살표를 씀', () => {
   for (const file of [
-    'src/app/(main)/activity/applications/[applicationId]/_ui/ApplicationDetailContent.tsx',
-    'src/app/(main)/activity/_ui/ReceivedReviewRow.tsx',
+    'src/app/(main)/(page)/activity/applications/[applicationId]/_ui/ApplicationDetailContent.tsx',
+    'src/app/(main)/(page)/activity/_ui/ReceivedReviewRow.tsx',
   ]) {
     const code = source(file)
     assert.doesNotMatch(code, /→/, file)
@@ -96,10 +96,10 @@ test('토스트·안내·확인 문구는 해요체로 맞추고 동의·약관 
     'src/shared/ui/ReportAction.tsx',
     'src/features/community/ui/ReportPostAction.tsx',
     'src/features/report/ui/ReportBreederAction.tsx',
-    'src/app/(main)/notifications/_ui/NotificationsContent.tsx',
-    'src/app/(main)/settings/_ui/SettingsContent.tsx',
-    'src/app/(main)/profile/edit/_ui/ProfileEditContent.tsx',
-    'src/app/(main)/adoption/application-form/_ui/ApplicationFormContent.tsx',
+    'src/app/(main)/(page)/notifications/_ui/NotificationsContent.tsx',
+    'src/app/(main)/(narrow)/settings/_ui/SettingsContent.tsx',
+    'src/app/(main)/(narrow)/profile/edit/_ui/ProfileEditContent.tsx',
+    'src/app/(main)/(narrow)/adoption/application-form/_ui/ApplicationFormContent.tsx',
     'src/features/auth/ui/ReactivateAccountPrompt.tsx',
     'src/features/onboarding/ui/InfoStep.tsx',
     'src/features/onboarding/ui/KennelInfoStep.tsx',

@@ -33,7 +33,7 @@ interface HomePostGridProps {
 
 /**
  * 모든 홈 화면에서 같은 카드 크기·상세 동작을 보장하는 게시글 그리드.
- * 바깥 여백(Container)은 호출부가 정한다 — 마이홈은 다른 탭과 같은 여백, 공개 홈은 모바일 꽉 찬 그리드.
+ * 바깥 여백(PageShell)은 호출부가 정한다 — 마이홈은 다른 탭과 같은 여백, 공개 홈은 모바일 꽉 찬 그리드.
  */
 const HomePostGrid = ({
   posts,

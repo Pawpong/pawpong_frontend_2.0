@@ -23,13 +23,25 @@
   z-index: 80;
 }
 
-/* 페이지 틀 — 상단바·본문·탭바 등 페이지 폭 블록이 모두 이 두 값만 쓴다 (KREAM 방식).
-   상자 폭은 여백을 포함한다: 1280 = 40 + 내용 1200 + 40. 화면이 더 넓으면 상자가 가운데로 모인다.
-   2단 레이아웃처럼 이미 여백을 가진 컬럼 안에서는 래퍼에 [--page-gutter:0px] 한 번만 걸면
-   그 안의 모든 블록이 따라간다 — 블록마다 px-0 을 덮어쓰지 않는다. */
+/* 페이지 틀 — 값은 여기서만 정한다 (KREAM 방식).
+   - 폭: 1280 상자(여백 포함: 1280 = 40 + 내용 1200 + 40). 화면이 더 넓으면 가운데로 모인다.
+   - 좁은 틀: 폼·약관·계정 화면 768.
+   - 좌우 여백: 1024 미만 16 / 이상 40. 위아래 여백: 768 미만 24·64 / 이상 40·80.
+   틀은 라우트 레이아웃((page)·(narrow))의 PageFrame 이 씌운다 — 페이지·컴포넌트는 폭과 여백을 정하지 않는다.
+   2단 레이아웃처럼 이미 여백을 가진 컬럼 안에서는 래퍼에 [--page-gutter:0px] 한 번만 걸면 안쪽이 따라간다. */
 :root {
   --page-max-width: 80rem;
+  --page-narrow-width: 48rem;
   --page-gutter: 1rem;
+  --page-pad-top: 1.5rem;
+  --page-pad-bottom: 4rem;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --page-pad-top: 2.5rem;
+    --page-pad-bottom: 5rem;
+  }
 }
 
 @media (min-width: 1024px) {
@@ -38,6 +50,30 @@
   }
 }
 
+/* 페이지 틀 — PageFrame 전용. 좁은 틀은 --frame-max-width 로 폭만 바꾼다.
+   안쪽 고정 바(page-shell)·frame-bleed 가 같은 틀에 맞도록 --frame-gutter 를 내려준다. */
+@utility page-frame {
+  --frame-gutter: var(--page-gutter);
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+  margin-inline: auto;
+  width: 100%;
+  max-width: var(--frame-max-width, var(--page-max-width));
+  padding: var(--page-pad-top) var(--page-gutter) var(--page-pad-bottom);
+  /* 화면 높이를 채우는 페이지(회원가입 단계 등)는 flex-1 로 늘어난다.
+     mx-auto 로 가운데 둔 좁은 내용도 폭이 줄지 않게 채운다 (넓히는 블록은 제외). */
+  & > :not(.frame-bleed, .frame-bleed-edge) {
+    width: 100%;
+  }
+}
+/* 가로 틀(폭 + 좌우 여백) — 상단바·푸터·고정 바·띠 페이지용. 좁은 틀 안이면 좁은 폭을 따른다. */
+@utility page-shell {
+  margin-inline: auto;
+  width: 100%;
+  max-width: var(--frame-max-width, var(--page-max-width));
+  padding-inline: var(--page-gutter);
+}
 /* px-[var(--page-gutter)] 는 v4 가 길이로 추론하지 못해 유틸리티로 정의한다. */
 @utility page-gutter-x {
   padding-inline: var(--page-gutter);
@@ -47,12 +83,47 @@
   width: 100%;
   max-width: var(--page-max-width);
 }
-/* 폭 + 좌우 여백. Container 와 같고, section·header 처럼 태그를 고를 때 쓴다. */
-@utility page-shell {
-  margin-inline: auto;
-  width: 100%;
-  max-width: var(--page-max-width);
-  padding-inline: var(--page-gutter);
+/* 틀 안에서 배경·밑줄만 틀 가장자리까지 넓힌다(내용 정렬은 그대로) — 탭 바·고정 머리.
+   틀 밖에서는 페이지 여백만 둔다. 안쪽 블록은 다시 넓히지 않는다. */
+@utility frame-bleed {
+  margin-inline: calc(var(--frame-gutter, 0px) * -1);
+  padding-inline: var(--frame-gutter, var(--page-gutter));
+  & > * {
+    --frame-gutter: 0px;
+  }
+}
+/* 화면 끝까지 가는 줄(하단 고정 바 등)의 안쪽 내용만 페이지 틀에 맞춘다 */
+@utility page-inset-x {
+  padding-inline: max(
+    var(--page-gutter),
+    calc((100% - var(--frame-max-width, var(--page-max-width))) / 2 + var(--page-gutter))
+  );
+}
+/* 틀 안에서 사진처럼 내용 자체를 틀 가장자리까지 채운다 */
+@utility frame-bleed-edge {
+  margin-inline: calc(var(--frame-gutter, 0px) * -1);
+}
+
+/* 맨 위 제목 바·탭 바(data-page-top — 화면 맨 위에만 둔다)가 있으면 틀의 위 여백 자리에 붙고,
+   그 아래에 같은 여백을 둔다. 제목 바를 품은 고정 머리는 바깥 하나만 여백을 갖는다. */
+.page-frame:has([data-page-top]) {
+  padding-top: 0;
+}
+.page-frame [data-page-top] {
+  margin-bottom: var(--page-pad-top);
+}
+.page-frame [data-page-top] [data-page-top] {
+  margin-bottom: 0;
+}
+
+/* 배경색이 있는 화면은 틀 바깥까지 같은 색으로 칠한다 — point: 분양글 작성·수정 / cream: 설정(tab+) */
+main:has([data-page-tint='point']) {
+  background-color: var(--color-point-50);
+}
+@media (min-width: 768px) {
+  main:has([data-page-tint='cream']) {
+    background-color: var(--color-secondary-50);
+  }
 }
 
 @theme {

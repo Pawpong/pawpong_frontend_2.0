@@ -4,7 +4,7 @@ import { useInfiniteQuery } from '@tanstack/react-query'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import { communityQueries } from '@/entities/community'
-import { Container } from '@/shared/ui'
+import { PageShell } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { HomePostGrid } from '../../_ui/HomePostGrid'
 
@@ -29,7 +29,7 @@ const PublicHomePosts = ({ userId, className, gridClassName }: PublicHomePostsPr
 
   return (
     // 공개 홈 피드는 모바일에서 좌우 여백 없이 3열 그리드를 꽉 채운다 (Figma 4145:721426)
-    <Container className={cn('py-5 [--page-gutter:0px] tab:pt-6 tab:pb-10 pc:py-10', className)}>
+    <PageShell className={cn('py-5 [--page-gutter:0px] tab:pt-6 tab:pb-10 pc:py-10', className)}>
       <HomePostGrid
         posts={posts}
         isPending={query.isPending}
@@ -43,7 +43,7 @@ const PublicHomePosts = ({ userId, className, gridClassName }: PublicHomePostsPr
         }}
         gridClassName={gridClassName}
       />
-    </Container>
+    </PageShell>
   )
 }
 

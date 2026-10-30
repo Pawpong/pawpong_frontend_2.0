@@ -23,7 +23,7 @@ function threadFixture(write = async () => {}) {
     query: { isPending: false, isError: false, isFetching: false },
   }
   const { useCommentThread } = load(
-    'src/app/(main)/community/post/[postId]/_ui/useCommentThread.ts',
+    'src/app/(main)/(page)/community/post/[postId]/_ui/useCommentThread.ts',
     {
       react: { ...runtime.react, useLayoutEffect: runtime.react.useEffect },
       '@tanstack/react-query': {
@@ -50,7 +50,7 @@ function threadFixture(write = async () => {}) {
       '@/shared/lib/infiniteList': {
         flattenPages: (data) => data.pages.flatMap((page) => page.items),
       },
-      './commentThread': load('src/app/(main)/community/post/[postId]/_ui/commentThread.ts'),
+      './commentThread': load('src/app/(main)/(page)/community/post/[postId]/_ui/commentThread.ts'),
       './useCommentActions': { useCommentActions: () => ({ active: null, notice: null }) },
     },
   )

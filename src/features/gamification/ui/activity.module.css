@@ -2,9 +2,7 @@
   --ink: #184c38;
   --mint: #dff4e7;
   --cream: #fffaf0;
-  max-width: 1088px;
-  margin: auto;
-  padding: 24px 20px 80px;
+  /* 폭·여백은 페이지 틀(PageFrame)이 정한다 */
   color: var(--ink);
 }
 .hero {

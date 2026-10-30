@@ -3,7 +3,7 @@ const assert = require('node:assert/strict')
 const fs = require('node:fs')
 
 const read = (file) => fs.readFileSync(file, 'utf8')
-const ui = 'src/app/(main)/community/_ui'
+const ui = 'src/app/(main)/(page)/community/_ui'
 
 test('커뮤니티 알약 버튼은 공통 터치 영역을 씀', () => {
   for (const file of [
