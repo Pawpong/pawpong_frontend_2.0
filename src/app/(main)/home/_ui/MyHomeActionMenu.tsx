@@ -16,14 +16,13 @@ const MENU_ITEMS = [
   { href: '/community/write', label: '게시글 등록' },
   { href: '/drafts', label: '임시저장한 글' },
   { href: '/ai-filter', label: 'AI 필터로 만들기' },
-  { href: '/profile/edit', label: '프로필 수정' },
 ]
 
-/** 마이홈 작성·수정 진입점 — 모바일은 상단 바, 2단(tab+)은 프로필 카드 우상단에 둔다 */
+/** 마이홈 작성 진입점 — 모바일은 상단 바, 2단(tab+)은 프로필 카드 우상단에 둔다 */
 const MyHomeActionMenu = ({ isBreeder }: { isBreeder: boolean }) => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
-      <IconButton tone="brand" aria-label="마이홈 작성 및 수정 메뉴">
+      <IconButton tone="brand" aria-label="마이홈 작성 메뉴">
         <PlusIcon aria-hidden className="size-7.5" />
       </IconButton>
     </DropdownMenuTrigger>
