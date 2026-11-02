@@ -19,6 +19,13 @@ export function addRepresentativePhotos(slots: PhotoSlot[], files: File[], start
   return next
 }
 
+// 한 칸만 비우고 나머지 칸 위치는 그대로 둔다
+export function removeRepresentativePhoto(slots: PhotoSlot[], index: number) {
+  return Array.from({ length: MAX_REPRESENTATIVE_PHOTOS }, (_, i) =>
+    i === index ? null : (slots[i] ?? null),
+  )
+}
+
 export async function resolveRepresentativePhotos(
   slots: PhotoSlot[],
   upload: (file: File) => Promise<string>,
