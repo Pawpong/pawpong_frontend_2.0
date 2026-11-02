@@ -50,9 +50,18 @@ const LEAVE_DESCRIPTION = (
   </>
 )
 
-// 토스 설정처럼 글자 한 줄 + 오른쪽 화살표. 누르는 동안 옅은 회색이 깔린다 (hover 는 마우스 기기에서만)
-const ROW =
-  'flex min-h-14 w-full items-center gap-3 px-5 text-left focus-ring-inset transition-colors hover:bg-neutral-50 active:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50'
+// 누르는 동안 옅은 회색이 깔린다 (hover 는 마우스 기기에서만) — 행과 프로필 줄이 같이 쓴다
+const PRESSABLE = 'focus-ring-inset transition-colors hover:bg-neutral-50 active:bg-neutral-100'
+
+// 토스 설정처럼 글자 한 줄 + 오른쪽 화살표
+const ROW = cn(
+  'flex min-h-14 w-full items-center gap-3 px-5 text-left disabled:cursor-not-allowed disabled:opacity-50',
+  PRESSABLE,
+)
+
+// 목록 밖 작은 글자 링크 (탈퇴하기·계정 영구삭제)
+const FOOT_LINK =
+  'flex min-h-11 items-center rounded px-3 text-body-sm font-medium text-neutral-700 underline-offset-4 focus-ring hover:underline disabled:opacity-50'
 
 const RowArrow = () => (
   <PixelArrowRightIcon aria-hidden className="size-3 shrink-0 text-neutral-300" />
@@ -66,7 +75,7 @@ const SettingsRow = ({ href, label }: SettingsLink) => (
 )
 
 /**
- * 묶음 하나 — 모바일은 흰 바탕에 여백과 제목으로만 나누고, 2단(tab+)은 크림 바탕 위 둥근 흰 카드.
+ * 묶음 하나 — 흰 바탕에 여백과 제목으로만 나눈다.
  * 묶음 제목은 포퐁 제목 글꼴(cafe24) 갈색으로 둔다.
  */
 const SettingsGroup = ({
@@ -78,7 +87,7 @@ const SettingsGroup = ({
   className?: string
   children: ReactNode
 }) => (
-  <section className={cn('bg-white py-2 tab:overflow-hidden tab:rounded-2xl', className)}>
+  <section className={cn('py-2', className)}>
     {title && (
       <h2 className="px-5 pt-3 pb-1 font-cafe24 text-body-md text-primary-600 tab:text-body-lg">
         {title}
@@ -92,11 +101,8 @@ const SettingsGroup = ({
 const ProfileSummary = ({ userRole }: SettingsContentProps) => {
   const { data: me } = useQuery({ ...profileQueries.me(), throwOnError: false })
   return (
-    <section className="bg-white tab:overflow-hidden tab:rounded-2xl">
-      <Link
-        href="/profile/edit"
-        className="flex items-center gap-4 px-5 py-5 focus-ring-inset transition-colors hover:bg-neutral-50 active:bg-neutral-100"
-      >
+    <section>
+      <Link href="/profile/edit" className={cn('flex items-center gap-4 px-5 py-5', PRESSABLE)}>
         <ProfileAvatar size="large" src={me?.profileImageUrl} alt="" />
         <span className="flex min-w-0 flex-1 flex-col gap-1">
           <span className="truncate font-cafe24 text-body-xl text-neutral-850">
@@ -138,10 +144,10 @@ const SettingsContent = ({ userRole }: SettingsContentProps) => {
   }
 
   return (
-    <div data-page-tint="cream">
+    <div>
       <NavigationBar title="설정" backHref="/home" />
 
-      {/* 모바일은 흰 바탕 꽉 찬 목록(묶음 사이는 여백만), tab+ 는 크림 바탕 위 가운데 한 줄 카드 */}
+      {/* 흰 바탕 목록 — 묶음 사이는 여백만 둔다 */}
       <div className="frame-bleed-edge flex flex-col gap-3 tab:mx-0 tab:gap-4">
         <ProfileSummary userRole={userRole} />
 
@@ -176,17 +182,14 @@ const SettingsContent = ({ userRole }: SettingsContentProps) => {
             type="button"
             onClick={() => setShowLeave(true)}
             disabled={isLeavePending}
-            className="min-h-11 rounded px-3 text-body-sm font-medium text-neutral-700 underline-offset-4 focus-ring hover:underline disabled:opacity-50"
+            className={FOOT_LINK}
           >
             탈퇴하기
           </button>
           <span aria-hidden className="text-body-sm text-neutral-300">
             |
           </span>
-          <Link
-            href="/account/delete"
-            className="flex min-h-11 items-center rounded px-3 text-body-sm font-medium text-neutral-700 underline-offset-4 focus-ring hover:underline"
-          >
+          <Link href="/account/delete" className={FOOT_LINK}>
             계정 영구삭제
           </Link>
         </div>

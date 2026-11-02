@@ -27,7 +27,11 @@ new Function('require', 'module', 'exports', outputText)(
   loaded,
   loaded.exports,
 )
-const { addRepresentativePhotos: add, resolveRepresentativePhotos: resolve } = loaded.exports
+const {
+  addRepresentativePhotos: add,
+  removeRepresentativePhoto: remove,
+  resolveRepresentativePhotos: resolve,
+} = loaded.exports
 const photo = (name) => new File(['photo'], name, { type: 'image/png' })
 
 test('successive selections retain saved photo and both new files', () => {
@@ -101,4 +105,9 @@ test('failed uploads reject saving and leave the draft intact', async () => {
   )
   assert.equal(draft[0], 'existing-url')
   assert.equal(draft[1].name, 'new.png')
+})
+
+test('사진 하나를 빼면 그 칸만 비고 나머지 칸 위치는 그대로', () => {
+  const second = photo('second.png')
+  assert.deepEqual(remove(['saved-url', second, 'other-url'], 0), [null, second, 'other-url', null])
 })
