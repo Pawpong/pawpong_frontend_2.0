@@ -4,8 +4,13 @@ import { tv, type VariantProps } from '@/shared/lib/tv'
 // 아이콘 전용 버튼 — 정사각 터치 영역 + tone 별 hover. 아이콘 크기는 넘겨주는 아이콘이 정한다.
 // aria-label 필수. edge는 아이콘을 가장자리에 맞추며 버튼의 터치 영역 크기는 유지한다.
 const iconButtonStyles = tv({
-  base: 'focus-ring touch-target relative inline-flex shrink-0 rounded-lg items-center justify-center transition-colors disabled:cursor-not-allowed disabled:text-action-disabled-fg',
+  base: 'focus-ring touch-target relative inline-flex shrink-0 items-center justify-center transition-colors disabled:cursor-not-allowed disabled:text-action-disabled-fg',
   variants: {
+    // 사진에 겹쳐 얹는 동그란 버튼은 circle
+    shape: {
+      square: 'rounded-lg',
+      circle: 'rounded-full',
+    },
     edge: {
       none: '',
       start: '-ml-2',
@@ -43,7 +48,7 @@ const iconButtonStyles = tv({
     { size: 'sm', edge: 'end', className: '-mr-1' },
     { size: 'sm', edge: 'both', className: '-m-1' },
   ],
-  defaultVariants: { tone: 'neutral', size: 'md', edge: 'none' },
+  defaultVariants: { shape: 'square', tone: 'neutral', size: 'md', edge: 'none' },
 })
 
 type IconButtonVariantProps = VariantProps<typeof iconButtonStyles> & {
@@ -52,7 +57,8 @@ type IconButtonVariantProps = VariantProps<typeof iconButtonStyles> & {
   style?: never
 }
 const iconButtonVariants = Object.assign(
-  ({ tone, size, edge }: IconButtonVariantProps = {}) => iconButtonStyles({ tone, size, edge }),
+  ({ shape, tone, size, edge }: IconButtonVariantProps = {}) =>
+    iconButtonStyles({ shape, tone, size, edge }),
   { variants: iconButtonStyles.variants },
 )
 
@@ -62,8 +68,8 @@ type IconButtonProps = Omit<
 > &
   IconButtonVariantProps & { 'aria-label': string; className?: never; style?: never }
 
-const IconButton = ({ tone, size, edge, type = 'button', ...props }: IconButtonProps) => (
-  <button {...props} type={type} className={iconButtonVariants({ tone, size, edge })} />
+const IconButton = ({ shape, tone, size, edge, type = 'button', ...props }: IconButtonProps) => (
+  <button {...props} type={type} className={iconButtonVariants({ shape, tone, size, edge })} />
 )
 
 export { IconButton, iconButtonVariants, type IconButtonProps }

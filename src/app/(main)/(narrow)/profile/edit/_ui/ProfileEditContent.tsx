@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, type ChangeEvent } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { adopterQueries } from '@/entities/adopter'
@@ -27,7 +27,6 @@ import {
   InputField,
   KeywordTextField,
   NavigationBar,
-  ProfileAvatar,
   Switch,
   TextareaField,
 } from '@/shared/ui'
@@ -42,6 +41,7 @@ import {
   NAME_MAX_LENGTH,
   PET_TYPE_LABEL,
 } from '../_lib/profileEditOptions'
+import { ProfilePhotoPicker } from './ProfilePhotoPicker'
 import { ProfileSection } from './ProfileSection'
 import { RepresentativePhotosField } from './RepresentativePhotosField'
 
@@ -166,16 +166,13 @@ const ProfileEditContent = () => {
   }
 
   // ── 프로필 사진 — 선택 즉시 업로드하고 적용 시 파일명만 저장한다 ──
-  const fileInputRef = useRef<HTMLInputElement>(null)
   const uploadFile = useUploadSingleFile()
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
   const [photoFileName, setPhotoFileName] = useState<string | null>(null)
   // 삭제도 다른 항목처럼 적용을 눌러야 저장된다 — 그전까지는 미리보기만 기본 이미지로 바꾼다
   const [photoRemoved, setPhotoRemoved] = useState(false)
-  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    e.target.value = '' // 같은 파일 재선택 시에도 onChange 발생
-    if (!file) return
+  // 파일 고르기(input)는 ProfilePhotoPicker 가 맡고, 여기서는 고른 파일을 올리기만 한다
+  const handlePhotoPick = async (file: File) => {
     try {
       const res = await uploadFile.mutateAsync({ file, folder: 'profile' })
       setPhotoPreview(res.cdnUrl)
@@ -344,41 +341,19 @@ const ProfileEditContent = () => {
       <div className="flex flex-col gap-10 pb-20 tab:gap-12">
         {/* ── 프로필 헤더: 사진 · 이름 · 계정 ── */}
         <header className="flex items-center gap-4 tab:gap-6">
-          <ProfileAvatar size="xlarge" src={displayedPhoto} />
+          <ProfilePhotoPicker
+            src={displayedPhoto}
+            isUploading={uploadFile.isPending}
+            disabled={isSaving}
+            onPick={handlePhotoPick}
+            onRemove={handlePhotoRemove}
+          />
           <div className="flex min-w-0 flex-1 flex-col items-start gap-1">
             <h1 className={`truncate ${TEXT.title}`}>{savedName || '활동명을 입력해주세요'}</h1>
             <p className={TEXT.meta}>
               {isBreeder ? '브리더' : '입양자'}
               {loginProvider && ` · ${AUTH_PROVIDER_LABEL[loginProvider]} 로그인`}
             </p>
-            <div className="mt-2 flex items-center gap-2">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleFileChange}
-              />
-              <Button
-                intent="secondary"
-                size="sm"
-                disabled={uploadFile.isPending}
-                onClick={() => fileInputRef.current?.click()}
-              >
-                {uploadFile.isPending ? '올리는 중…' : '사진 변경'}
-              </Button>
-              {/* 지울 사진(저장된 사진이나 방금 올린 사진)이 있을 때만 — 기본 이미지로 돌아간다 */}
-              {displayedPhoto && (
-                <Button
-                  intent="ghost"
-                  size="sm"
-                  disabled={uploadFile.isPending || isSaving}
-                  onClick={handlePhotoRemove}
-                >
-                  사진 삭제
-                </Button>
-              )}
-            </div>
           </div>
         </header>
 

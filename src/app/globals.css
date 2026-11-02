@@ -139,14 +139,9 @@
   margin-bottom: 0;
 }
 
-/* 배경색이 있는 화면은 틀 바깥까지 같은 색으로 칠한다 — point: 분양글 작성·수정 / cream: 설정(tab+) */
+/* 배경색이 있는 화면은 틀 바깥까지 같은 색으로 칠한다 — point: 분양글 작성·수정 */
 main:has([data-page-tint='point']) {
   background-color: var(--color-point-50);
-}
-@media (min-width: 768px) {
-  main:has([data-page-tint='cream']) {
-    background-color: var(--color-secondary-50);
-  }
 }
 
 @theme {
