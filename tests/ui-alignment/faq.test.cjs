@@ -2,11 +2,9 @@ const { test } = require('node:test')
 const assert = require('node:assert/strict')
 const { source } = require('./fixtures/alignment.fixture.cjs')
 
-test('FAQ 이용자 유형 탭은 같은 Tabs 안의 질문 목록 패널을 가리킴', () => {
+test('FAQ 이용자 유형은 목록 필터와 같은 FilterTab 으로 고르고 탭 부품을 쓰지 않음', () => {
   const faq = source('src/app/(main)/(page)/faq/_ui/FaqContent.tsx')
-  assert.match(faq, /<Tabs value=\{audience\} onValueChange=/)
-  assert.match(faq, /<TabsContent value=\{audience\} className="mt-7">/)
-  // 유형 탭 컴포넌트는 Tabs 루트를 따로 만들지 않는다(패널과 떨어지면 aria-controls가 없는 ID를 가리킴)
-  const tabs = faq.slice(faq.indexOf('const FaqAudienceTabs'), faq.indexOf('const FaqContent'))
-  assert.doesNotMatch(tabs, /<Tabs\b/)
+  assert.match(faq, /role="group" aria-label="FAQ 이용자 유형"/)
+  assert.match(faq, /<FilterTab\s+key=\{tab\.value\}\s+selected=\{value === tab\.value\}/)
+  assert.doesNotMatch(faq, /<Tabs\b|<TabsTrigger|badgeVariants/)
 })

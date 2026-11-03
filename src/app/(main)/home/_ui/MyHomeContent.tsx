@@ -29,7 +29,7 @@ import {
   MY_PHOTO_GRID,
   MY_HOME_TAB_PANEL,
   MY_HOME_LISTINGS_PANEL,
-} from './constants'
+} from '../_lib/constants'
 
 const HOME_LISTING_PAGE_SIZE = 16
 
@@ -59,7 +59,7 @@ const MyHomeContent = () => {
   // AI 필터 화면의 '보관함 →' 처럼 특정 탭으로 바로 들어오는 링크(?tab=ai-photos)를 받는다
   const requestedTab = useSearchParams().get('tab')
   const [selectedTab, setSelectedTab] = useState<string | null>(requestedTab)
-  const activeTab = tabs.find((tab) => tab.id === selectedTab)?.id ?? defaultTab
+  const activeTab = tabs.find((tab) => tab.value === selectedTab)?.value ?? defaultTab
   const profileCardProps = myProfile ? toMyProfileCardProps(myProfile) : null
 
   if (!profileCardProps) {
@@ -128,7 +128,7 @@ const MyHomeContent = () => {
             standalone /adoption/my-listings 페이지는 이 탭과 완전히 중복이라 제거했다 —
             분양 페이지 진입점은 전부 이 탭(/home)으로 온다 */}
         {isBreeder && (
-          <TabsContent value="listings" className="mt-0">
+          <TabsContent value="listings">
             <BreederIntroduction {...introProps} placement="tab" />
 
             {/* 작성 진입점은 + 메뉴(모바일 상단 바·2단 프로필 카드)가 맡는다 */}
@@ -150,7 +150,7 @@ const MyHomeContent = () => {
         )}
 
         {/* Figma 4145:721426 — 모바일·태블릿 3열, PC 4열의 정사각 미디어 그리드 */}
-        <TabsContent value="posts" className="mt-0">
+        <TabsContent value="posts">
           {/* 작성한 글 / 댓글 단 글 / 좋아요한 글 / 저장한 글 칩 전환 — 내 글 조회는 profile 로드 후 활성화.
               분양 목록·AI 사진 탭과 같은 여백이라 제목 줄이 탭을 바꿔도 같은 자리에 온다 */}
           <PageShell className={MY_HOME_TAB_PANEL}>
@@ -158,7 +158,7 @@ const MyHomeContent = () => {
           </PageShell>
         </TabsContent>
 
-        <TabsContent value="ai-photos" className="mt-0">
+        <TabsContent value="ai-photos">
           {/* 분양 목록 탭과 같은 여백 — 제목 줄이 탭을 바꿔도 같은 자리에 온다 */}
           <PageShell className={MY_HOME_TAB_PANEL}>
             <AiPhotoArchive

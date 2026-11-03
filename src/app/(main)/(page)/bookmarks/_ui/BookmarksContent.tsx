@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { TabBar, TabsContent } from '@/shared/ui'
 import { useAuthStatus } from '@/features/auth'
-import { BOOKMARK_TABS } from './constants'
+import { BOOKMARK_TABS } from '../_lib/constants'
 import { FavoritesTab } from './FavoritesTab'
 import { AdoptionListTab } from './AdoptionListTab'
 import { FavoriteBreedersContent } from './FavoriteBreedersContent'
@@ -13,7 +13,7 @@ import { FavoriteBreedersContent } from './FavoriteBreedersContent'
 const BookmarksContent = ({ initialTab }: { initialTab?: string }) => {
   // 특정 탭으로 바로 들어오는 링크(?tab=breeders 등)를 받는다.
   const [activeTab, setActiveTab] = useState(
-    BOOKMARK_TABS.some((tab) => tab.id === initialTab) && initialTab ? initialTab : 'favorites',
+    BOOKMARK_TABS.some((tab) => tab.value === initialTab) && initialTab ? initialTab : 'favorites',
   )
 
   // 입양 신청이 입양자 전용이라 브리더에게는 입양목록이 생기지 않는다(서버도 403) — 탭을 빼고,
@@ -21,27 +21,22 @@ const BookmarksContent = ({ initialTab }: { initialTab?: string }) => {
   const { userRole } = useAuthStatus()
   const tabs =
     userRole === 'breeder'
-      ? BOOKMARK_TABS.filter((tab) => tab.id !== 'adoption-list')
+      ? BOOKMARK_TABS.filter((tab) => tab.value !== 'adoption-list')
       : BOOKMARK_TABS
-  const currentTab = tabs.some((tab) => tab.id === activeTab) ? activeTab : 'favorites'
+  const currentTab = tabs.some((tab) => tab.value === activeTab) ? activeTab : 'favorites'
 
   return (
     <div>
-      <TabBar
-        items={tabs.map((tab) => ({ value: tab.id, label: tab.label }))}
-        value={currentTab}
-        onValueChange={setActiveTab}
-        ariaLabel="관심 목록"
-      >
-        <TabsContent value="favorites" className="mt-0">
+      <TabBar items={tabs} value={currentTab} onValueChange={setActiveTab} ariaLabel="관심 목록">
+        <TabsContent value="favorites">
           <FavoritesTab />
         </TabsContent>
 
-        <TabsContent value="adoption-list" className="mt-0">
+        <TabsContent value="adoption-list">
           <AdoptionListTab />
         </TabsContent>
 
-        <TabsContent value="breeders" className="mt-0">
+        <TabsContent value="breeders">
           <FavoriteBreedersContent />
         </TabsContent>
       </TabBar>

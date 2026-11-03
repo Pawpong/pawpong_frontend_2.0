@@ -8,16 +8,7 @@ import { ChevronDownIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { cafe24Proup } from '@/shared/lib/fonts'
 import type { FaqDto } from '@/shared/types'
-import {
-  badgeVariants,
-  Button,
-  CtaBanner,
-  ListState,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/shared/ui'
+import { Button, CtaBanner, FilterTab, ListState } from '@/shared/ui'
 import { ListRowsSkeleton } from '@/shared/ui/Skeleton'
 
 type FaqAudience = 'adopter' | 'breeder'
@@ -78,27 +69,29 @@ const FaqHero = ({ onInquiryClick }: { onInquiryClick: () => void }) => (
   </>
 )
 
-// [refactored] 유형 탭 토글을 별도 컴포넌트로 추출 (Figma 3395:638598 — 배지형 필, 언더라인 탭 아님)
-// 탭이 가리키는 질문 목록 패널이 같은 Tabs 안에 있어야 하므로 Tabs 루트는 FaqContent가 둔다.
-const FaqAudienceTabs = ({ value }: { value: FaqAudience }) => (
+// 이용자 유형 고르기 — 목록을 거르는 선택이라 다른 목록 필터와 같은 FilterTab 을 쓴다
+const FaqAudienceTabs = ({
+  value,
+  onChange,
+}: {
+  value: FaqAudience
+  onChange: (next: FaqAudience) => void
+}) => (
   <div className="flex flex-col items-start gap-3">
     <p className={cn(cafe24Proup.className, 'text-base leading-[1.5] text-primary-500')}>
       자주 묻는 질문
     </p>
-    <TabsList aria-label="FAQ 이용자 유형" className="gap-2">
+    <div role="group" aria-label="FAQ 이용자 유형" className="flex items-center gap-2">
       {FAQ_TABS.map((tab) => (
-        <TabsTrigger
+        <FilterTab
           key={tab.value}
-          value={tab.value}
-          className={badgeVariants({
-            variant: value === tab.value ? 'primaryFilled' : 'primaryOutline',
-            size: 'lg',
-          })}
+          selected={value === tab.value}
+          onClick={() => onChange(tab.value)}
         >
           {tab.label}
-        </TabsTrigger>
+        </FilterTab>
       ))}
-    </TabsList>
+    </div>
   </div>
 )
 
@@ -119,35 +112,29 @@ const FaqContent = () => {
       <div className="pt-5 tab:pt-8 pc:pt-10">
         {/* FAQ 프레임도 배너와 같은 1134px 열 — 태블릿·모바일은 페이지 틀 폭을 그대로 쓴다 */}
         <div className="mx-auto w-full pc:max-w-[70.875rem]">
-          <Tabs value={audience} onValueChange={(next) => setAudience(next as FaqAudience)}>
-            <FaqAudienceTabs value={audience} />
+          <FaqAudienceTabs value={audience} onChange={setAudience} />
 
-            <TabsContent value={audience} className="mt-7">
-              <ListState
-                isPending={query.isPending}
-                isError={query.isError}
-                isEmpty={faqs.length === 0}
-                loadingText="자주 묻는 질문을 불러오는 중이에요."
-                loadingFallback={
-                  <ListRowsSkeleton label="자주 묻는 질문을 불러오는 중이에요." rows={6} />
-                }
-                errorText="자주 묻는 질문을 불러오지 못했어요."
-                emptyText="등록된 질문이 없어요."
-                onRetry={() => void query.refetch()}
-                isRetrying={query.isFetching}
-              >
-                <div>
-                  {faqs.map((faq) => (
-                    <FaqItem
-                      key={faq.faqId}
-                      faq={faq}
-                      onInquiryClick={() => setInquiryOpen(true)}
-                    />
-                  ))}
-                </div>
-              </ListState>
-            </TabsContent>
-          </Tabs>
+          <div className="mt-7">
+            <ListState
+              isPending={query.isPending}
+              isError={query.isError}
+              isEmpty={faqs.length === 0}
+              loadingText="자주 묻는 질문을 불러오는 중이에요."
+              loadingFallback={
+                <ListRowsSkeleton label="자주 묻는 질문을 불러오는 중이에요." rows={6} />
+              }
+              errorText="자주 묻는 질문을 불러오지 못했어요."
+              emptyText="등록된 질문이 없어요."
+              onRetry={() => void query.refetch()}
+              isRetrying={query.isFetching}
+            >
+              <div>
+                {faqs.map((faq) => (
+                  <FaqItem key={faq.faqId} faq={faq} onInquiryClick={() => setInquiryOpen(true)} />
+                ))}
+              </div>
+            </ListState>
+          </div>
         </div>
       </div>
 

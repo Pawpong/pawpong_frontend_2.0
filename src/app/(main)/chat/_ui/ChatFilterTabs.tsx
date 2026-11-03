@@ -1,7 +1,7 @@
 import { useAuthStatus } from '@/features/auth'
 import { FilterTab } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
-import { FILTER_TABS, type FilterTab as ChatFilter } from '../_lib/constants'
+import { FILTER_TABS, type ChatFilter } from '../_lib/constants'
 
 interface ChatFilterTabsProps {
   value: ChatFilter
