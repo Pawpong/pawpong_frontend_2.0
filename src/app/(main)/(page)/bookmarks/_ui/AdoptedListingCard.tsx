@@ -127,7 +127,7 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
               <p className="truncate text-xl leading-[1.5] font-bold text-neutral-850">
                 {`${listing.name} | ${GENDER_LABEL[listing.gender]} ${listing.birthDateText}`}
               </p>
-              <AdoptionStatusBadge status={listing.status} className="shrink-0" />
+              <AdoptionStatusBadge status={listing.status} />
             </div>
             {listing.description && (
               <p className="line-clamp-3 text-base leading-[1.5] font-semibold text-neutral-850">

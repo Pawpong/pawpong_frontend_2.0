@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react'
 import { cn } from '@/shared/lib/cn'
-import { Badge, EmptyState } from '@/shared/ui'
-import { CheckIcon } from '@/shared/assets'
+import { StatusLabel, EmptyState } from '@/shared/ui'
 import type { AdoptionDetailDto, HealthCheckStatus } from '@/shared/types'
 import { TEXT } from '@/shared/config'
 import { DetailSection } from './DetailSection'
@@ -57,10 +56,9 @@ const HealthBlock = ({
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
         <p className={TEXT.sub}>{title}</p>
-        <Badge variant={completed ? 'primaryOutline' : 'neutralFilled'} size="lg">
-          {completed && <CheckIcon className="size-4" />}
-          <span>{badgeLabel}</span>
-        </Badge>
+        <StatusLabel tone={completed ? 'done' : status === 'incomplete' ? 'waiting' : 'neutral'}>
+          {badgeLabel}
+        </StatusLabel>
       </div>
 
       {!isEmpty ? (

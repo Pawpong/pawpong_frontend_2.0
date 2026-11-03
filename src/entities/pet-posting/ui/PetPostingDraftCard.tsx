@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { ArrowRightIcon, PawPrintIcon } from '@/shared/assets'
 import { TEXT } from '@/shared/config'
 import { formatDate } from '@/shared/lib/formatDate'
-import { Badge, OwnerActionsMenu } from '@/shared/ui'
+import { StatusLabel, OwnerActionsMenu } from '@/shared/ui'
 import type { PetPostingDraftCard as PetPostingDraft } from '@/shared/types'
 
 interface PetPostingDraftCardProps {
@@ -43,9 +43,7 @@ const PetPostingDraftCard = ({ draft, onDelete }: PetPostingDraftCardProps) => {
 
       <div className="min-w-0 flex-1">
         <div className="mb-1.5 flex items-center gap-2">
-          <Badge variant="primarySoft" className="shrink-0">
-            작성 중
-          </Badge>
+          <StatusLabel tone="writing">작성 중</StatusLabel>
           <span className="truncate text-xs font-medium text-neutral-700">
             {formatDate(draft.updatedAt)} 저장
           </span>
