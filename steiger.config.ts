@@ -4,7 +4,13 @@ import { defineConfig } from 'steiger'
 export default defineConfig([
   ...fsd.configs.recommended,
   {
-    ignores: ['**/*.md'],
+    // 로컬에만 두는 시안·실험 페이지(git 에 올리지 않음)는 검사하지 않는다
+    ignores: [
+      '**/*.md',
+      './src/app/dev/**',
+      './src/app/lab/**',
+      './src/app/(main)/home-preview/**',
+    ],
   },
   {
     files: ['./src/**'],
@@ -19,41 +25,26 @@ export default defineConfig([
       // 위반이 아니라 구조 권고라 CI 실패 사유로 삼지 않는다
       'fsd/insignificant-slice': 'off',
       'fsd/shared-lib-grouping': 'off',
+      'fsd/excessive-slicing': 'off',
     },
   },
   {
     /**
-     * features/auth/server.ts 는 next/headers 를 쓰는 서버 전용 public API 라
-     * 클라이언트 배럴(index.ts)과 의도적으로 분리돼 있다. 합치면 빌드가 깨진다.
-     * Steiger 는 슬라이스당 진입점을 하나로만 보므로 이 두 곳만 예외로 둔다.
+     * 서버 전용 공개 API(<슬라이스>/server.ts, shared/lib/server)는 next/headers·server-only 를 써서
+     * 클라이언트 배럴(index.ts)과 합칠 수 없다. Steiger 는 슬라이스당 진입점을 하나로만 보므로
+     * 서버 코드가 사는 app 계층에서만 이 규칙을 끈다.
+     * 대신 tests/fsd.test.cjs 가 "app 계층의 안쪽 import 는 /server 진입점뿐"인지 따로 검사한다.
      */
-    files: [
-      './src/app/(main)/(page)/adoption/create/layout.tsx',
-      './src/app/(main)/(page)/adoption/drafts/page.tsx',
-      './src/app/(main)/(page)/adoption/my-listings/page.tsx',
-      './src/app/(main)/(narrow)/settings/page.tsx',
-      './src/app/(main)/(page)/activity/page.tsx',
-      './src/app/(main)/(page)/activity/applications/[applicationId]/page.tsx',
-      './src/app/(main)/(page)/activity/applications/[applicationId]/edit/page.tsx',
-      './src/app/(main)/(page)/activity/reviews/[reviewId]/page.tsx',
-      // 비로그인 마이홈 진입을 서버에서 바로 로그인으로 보낸다(#488)
-      './src/app/(main)/home/page.tsx',
-    ],
+    files: ['./src/app/**'],
     rules: {
       'fsd/no-public-api-sidestep': 'off',
     },
   },
   {
-    // 상담과 사진 BFF는 각 도메인의 server 공개 API와 shared/lib/server 검사만 쓴다.
-    // UI를 노출하는 클라이언트 배럴과 서버 전용 진입점을 합치지 않기 위한 경로 한정 예외다.
-    files: [
-      './src/app/api/support/conversations/**/route.ts',
-      './src/app/api/community/photos/**/route.ts',
-      // 홈은 entities/home 의 서버 전용 진입점으로 첫 배너를 받아 HTML 에 싣는다.
-      './src/app/(main)/page.tsx',
-    ],
+    // app/api 아래 폴더 이름은 API 주소(/api/.../config)라 세그먼트 이름과 겹쳐도 바꿀 수 없다
+    files: ['./src/app/api/**'],
     rules: {
-      'fsd/no-public-api-sidestep': 'off',
+      'fsd/no-reserved-folder-names': 'off',
     },
   },
 ])
