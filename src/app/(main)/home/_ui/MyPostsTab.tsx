@@ -6,7 +6,7 @@ import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { communityQueries } from '@/entities/community'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
 import { flattenPages, getTotalItems } from '@/shared/lib/infiniteList'
-import { Chip, ListHeader } from '@/shared/ui'
+import { FilterTab, ListHeader } from '@/shared/ui'
 import { EmptyStateLink } from '@/shared/ui/EmptyStateLink'
 import { useAuthReadSession } from '@/shared/lib/useAuthReadSession'
 import type { AuthReadSession } from '@/shared/api'
@@ -152,14 +152,13 @@ const MyPostsTab = ({ enabled, gridClassName }: { enabled: boolean; gridClassNam
     >
       <div role="group" aria-label="내 글 보기" className="flex flex-wrap items-center gap-2">
         {POST_FILTERS.map((option) => (
-          <Chip
+          <FilterTab
             key={option.value}
-            size="responsive"
             selected={filter === option.value}
             onClick={() => setFilter(option.value)}
           >
             {option.label}
-          </Chip>
+          </FilterTab>
         ))}
       </div>
     </ListHeader>
