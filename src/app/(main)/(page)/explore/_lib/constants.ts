@@ -1,12 +1,14 @@
+import type { TabBarItem } from '@/shared/ui'
+
 export type ExploreType = 'adoption' | 'breeder'
 
 // 목록 섹션 위아래 간격 — 세로 mo 20px(spacing/20)→tab+ 40px(spacing/40). 좌우는 페이지 틀이 정한다.
 // (그리드/featured 레이아웃 클래스는 단일 소비자인 ExploreListingSection 로컬 상수로 이동)
 export const EXPLORE_SECTION_CONTAINER = 'pt-2 pb-5 tab:pt-2 tab:pb-10'
 
-export const EXPLORE_TABS: Array<{ type: ExploreType; label: string }> = [
-  { type: 'breeder', label: '브리더 탐색' },
-  { type: 'adoption', label: '입양 탐색' },
+export const EXPLORE_TABS: ReadonlyArray<TabBarItem & { value: ExploreType }> = [
+  { value: 'breeder', label: '브리더 탐색' },
+  { value: 'adoption', label: '입양 탐색' },
 ]
 
 export const SEARCH_PLACEHOLDERS: Record<ExploreType, { mobile: string; desktop: string }> = {

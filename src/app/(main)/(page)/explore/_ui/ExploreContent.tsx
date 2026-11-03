@@ -180,10 +180,7 @@ const ExploreContent = () => {
         className="sticky z-sticky frame-bleed bg-white"
         style={{ top: stickyHeaderTop }}
       >
-        <TabBarList
-          items={EXPLORE_TABS.map((tab) => ({ value: tab.type, label: tab.label }))}
-          ariaLabel="탐색 유형"
-        />
+        <TabBarList items={EXPLORE_TABS} ariaLabel="탐색 유형" />
         <div className={cn('absolute top-full right-0 left-0 hidden bg-white', isStuck && 'block')}>
           <div className="page-gutter-x">
             <ExploreFilterBar
@@ -196,7 +193,7 @@ const ExploreContent = () => {
         </div>
       </div>
 
-      <TabsContent value={selectedType} className="mt-0">
+      <TabsContent value={selectedType}>
         {/* ══════ 콘텐츠 영역 — 좌우 폭·여백은 페이지 틀이 정한다 ══════ */}
         {/* 검색바를 위에, 카테고리를 아래에 둔다 */}
         <div>
