@@ -7,7 +7,7 @@ import { HomeSkeleton } from '../../_ui/HomeSkeleton'
 import { transientQueryRecoveryOptions } from '@/shared/api'
 import { breederQueries } from '@/entities/breeder'
 import { HomeTabs, TabsContent } from '../../_ui/HomeTabs'
-import { BREEDER_HOME_TABS, CARD_GRID, PHOTO_GRID } from '../../_ui/constants'
+import { BREEDER_HOME_TABS, CARD_GRID, PHOTO_GRID } from '../../_lib/constants'
 import { ProfileCard } from '../../_ui/ProfileCard'
 import { BreederIntroduction } from '../../_ui/BreederIntroduction'
 import { PublicBreederListings } from './PublicBreederListings'
@@ -62,16 +62,16 @@ const BreederHomeContent = ({ userId }: BreederHomeContentProps) => {
           </>
         }
       >
-        <TabsContent value="listings" className="mt-0">
+        <TabsContent value="listings">
           <BreederIntroduction {...introProps} placement="tab" />
           <PublicBreederListings breederId={profile.breederId} gridClassName={CARD_GRID} />
         </TabsContent>
 
-        <TabsContent value="posts" className="mt-0">
+        <TabsContent value="posts">
           <PublicHomePosts userId={userId} gridClassName={PHOTO_GRID} />
         </TabsContent>
 
-        <TabsContent value="reviews" className="mt-0">
+        <TabsContent value="reviews">
           <PublicBreederReviews breederId={profile.breederId} />
         </TabsContent>
       </HomeTabs>

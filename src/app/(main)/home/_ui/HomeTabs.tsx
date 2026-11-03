@@ -2,16 +2,21 @@
 
 import type { ReactNode } from 'react'
 import Link from 'next/link'
-import { TabBar, TabBarList, TabsContent, TabsList, TabsTrigger, Tabs } from '@/shared/ui'
+import {
+  TabBar,
+  TabBarList,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+  Tabs,
+  type TabBarItem,
+} from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { useGnbHeight } from '@/shared/lib/useGnbHeight'
 import { HomeColumns } from './HomeColumns'
 
-interface HomeTabConfig {
-  id: string
-  label: string
-  mobileLabel?: string
-}
+/** 공통 탭 항목에 모바일용 짧은 이름만 더한다 */
+type HomeTabConfig = TabBarItem & { label: string; mobileLabel?: string }
 
 interface HomeSideLink {
   label: string
@@ -36,7 +41,7 @@ interface HomeTabsProps {
 
 const toBarItems = (tabs: HomeTabConfig[]) =>
   tabs.map((tab) => ({
-    value: tab.id,
+    value: tab.value,
     label: (
       <span className="flex items-center justify-center gap-2.5">
         {tab.mobileLabel ? (
@@ -63,8 +68,8 @@ const SideNav = ({ tabs, sideLinks }: { tabs: HomeTabConfig[]; sideLinks: HomeSi
     >
       {tabs.map((tab) => (
         <TabsTrigger
-          key={tab.id}
-          value={tab.id}
+          key={tab.value}
+          value={tab.value}
           className={cn(
             SIDE_ITEM,
             'justify-start text-neutral-700 hover:bg-neutral-50',
@@ -109,7 +114,7 @@ const HomeTabs = ({
   // [refactored] 두 분기가 같은 값을 두 벌 쓰던 것을 하나로
   const barProps = {
     items: toBarItems(tabs),
-    triggerClassName: 'tab:h-[3.1264rem] tab:text-sm',
+    size: 'compact' as const,
     barStyle: { top: Math.max(stickyOffset - 1, 0) },
     ariaLabel: '홈 콘텐츠',
   }

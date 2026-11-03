@@ -20,7 +20,7 @@ const bookmarks = (userRole, initialTab) => {
         TabsContent: () => null,
       },
       '@/features/auth': { useAuthStatus: () => ({ userRole }) },
-      './constants': loadTypescript('src/app/(main)/(page)/bookmarks/_ui/constants.ts'),
+      '../_lib/constants': loadTypescript('src/app/(main)/(page)/bookmarks/_lib/constants.ts'),
       './FavoritesTab': { FavoritesTab: () => null },
       './FavoriteBreedersContent': { FavoriteBreedersContent: () => null },
       './AdoptionListTab': { AdoptionListTab: () => null },

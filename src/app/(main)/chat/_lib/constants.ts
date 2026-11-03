@@ -1,8 +1,9 @@
 import type { ChatRoomResponseDto } from '@/shared/types'
+import type { TabBarItem } from '@/shared/ui'
 
-type FilterTab = 'all' | 'unread' | 'adoption' | 'counsel' | 'general'
+type ChatFilter = 'all' | 'unread' | 'adoption' | 'counsel' | 'general'
 
-const FILTER_TABS: { value: FilterTab; label: string }[] = [
+const FILTER_TABS: ReadonlyArray<TabBarItem & { value: ChatFilter }> = [
   { value: 'all', label: '전체' },
   { value: 'unread', label: '안읽음' },
   { value: 'adoption', label: '입양' },
@@ -20,7 +21,7 @@ const isGeneralRoom = (room: ChatRoomResponseDto, userRole: string | null) =>
 
 const filterRooms = (
   rooms: ChatRoomResponseDto[],
-  filter: FilterTab,
+  filter: ChatFilter,
   userRole: string | null,
 ): ChatRoomResponseDto[] => {
   if (filter === 'all') return rooms
@@ -55,4 +56,4 @@ export {
   CHAT_PANEL_HEIGHT,
   CHAT_LIST_HEIGHT,
 }
-export type { FilterTab }
+export type { ChatFilter }
