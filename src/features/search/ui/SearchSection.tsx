@@ -21,7 +21,8 @@ const SearchSection = ({
   showPopularKeywords,
 }: SearchSectionProps) => {
   return (
-    <section className="my-3 flex flex-col items-center">
+    // 탐색 맨 위(탭 바 바로 아래)에 놓여 위 여백은 페이지 틀이 준다
+    <section className="mb-3 flex flex-col items-center">
       <div className="flex w-full max-w-[21.4375rem] flex-col gap-[0.4375rem] tab:max-w-[30.125rem] pc:max-w-[52.875rem]">
         <SearchBar placeholder={placeholder} defaultValue={defaultValue} onSubmit={onSubmit} />
         {showPopularKeywords && <PopularKeywords onSelect={onSubmit} />}

@@ -9,7 +9,7 @@ interface CategorySectionProps {
 }
 
 const CategorySection = ({ selected, onChange }: CategorySectionProps) => (
-  <div className="flex flex-col items-center justify-center pb-3 tab:pb-5 pc:pb-8">
+  <div className="flex flex-col items-center justify-center pb-3">
     <CategoryFilter selected={selected} onChange={onChange} />
   </div>
 )
