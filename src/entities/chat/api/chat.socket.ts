@@ -5,7 +5,7 @@ import { io, type Socket } from 'socket.io-client'
 import { useQueryClient } from '@tanstack/react-query'
 import type { ChatMessageResponseDto, WsChatMessage } from '@/shared/types'
 import { chatQueries } from './chat.queries'
-import { getApiBaseUrl } from '@/shared/config/apiBaseUrl'
+import { getApiBaseUrl } from '@/shared/config'
 
 /** accessToken 쿠키 읽기 (WebSocket 핸드셰이크 인증용) */
 const getAccessToken = (): string | undefined => {

@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { chatQueries } from '@/entities/chat'
-import { useAuthStatus } from '@/features/auth'
+import { useAuthStatus } from '@/shared/lib/useAuthStatus'
 import { type ChatFilter, filterRooms } from './constants'
 
 // [refactored] sidebar/list가 동일하게 가지고 있던 필터 상태 + 방 필터링 로직을 훅으로 추출

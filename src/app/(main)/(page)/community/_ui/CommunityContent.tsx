@@ -34,7 +34,8 @@ import {
   toCommunityPreviewProps,
 } from '@/entities/community'
 import { ConnectedFeedCard, useDeletePostConfirm } from '@/features/community'
-import { useLoginGuard, useMe } from '@/features/auth'
+import { useMe } from '@/features/auth'
+import { useLoginGuard } from '@/shared/lib/useLoginGuard'
 import { FeedFollowButton } from './FeedFollowButton'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import type { CommunityDiscoveryFilters } from '@/shared/types'

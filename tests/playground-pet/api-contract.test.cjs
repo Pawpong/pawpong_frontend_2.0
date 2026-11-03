@@ -27,6 +27,24 @@ test('API는 계약된 경로와 본문만 전송하고 클라이언트 보상�
     },
     '@/shared/api/unwrap': { ApiError, unwrap },
     '@/shared/api/token': { getAccessToken: () => 'fixture-pet-session' },
+    '@/shared/api': {
+      ...{
+        API_VERSION: '/api/v2',
+        apiClient: {
+          get: async (...args) => {
+            calls.push(['GET', ...args])
+            return response
+          },
+          post: async (...args) => {
+            calls.push(['POST', ...args])
+            return response
+          },
+        },
+      },
+      ApiError,
+      unwrap,
+      getAccessToken: () => 'fixture-pet-session',
+    },
   })
   await api.getPet()
   await api.getEligiblePetImages('page-2')
@@ -64,6 +82,27 @@ test('캐릭터 자격은 서버 커서로 조회하고 입력 주소와 필터 
     },
     '@/shared/api/unwrap': { ApiError, unwrap },
     '@/shared/api/token': { getAccessToken: () => 'fixture-pet-session' },
+    '@/shared/api': {
+      ...{
+        API_VERSION: '/api/v2',
+        apiClient: {
+          get: async (_url, options) => {
+            cursors.push(options.params?.cursor ?? null)
+            return {
+              data: {
+                success: true,
+                data: options.params?.cursor
+                  ? { images: [{ sourceJobId: 'allowed' }], nextCursor: null }
+                  : { images: [], nextCursor: 'page2' },
+              },
+            }
+          },
+        },
+      },
+      ApiError,
+      unwrap,
+      getAccessToken: () => 'fixture-pet-session',
+    },
   })
   assert.equal(await api.isEligiblePetImage('allowed'), true)
   assert.deepEqual(cursors, [null, 'page2'])

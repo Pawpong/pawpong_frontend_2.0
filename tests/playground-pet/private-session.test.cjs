@@ -15,6 +15,7 @@ test('개인 응답 대기 중 세션이 바뀌면 이전 계정 자료를 거�
     react: {},
     '@/shared/api/token': { getAccessToken: () => token },
     '@/shared/api/unwrap': { ApiError },
+    '@/shared/api': { getAccessToken: () => token, ApiError },
     '@/shared/lib/authStateEvents': { AUTH_STATE_CHANGED: 'auth', notifyAuthStateChanged() {} },
     '@/shared/lib/authSessionRecovery': { refreshAuthSession: async () => token },
     '@/shared/lib/authSessionLifecycle': {

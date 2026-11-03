@@ -14,3 +14,5 @@ export {
   COMMUNITY_PHOTO_RESPONSE_HEADERS,
   COMMUNITY_PHOTO_TIMEOUT_MS,
 } from './api/communityPhotoRead.server'
+// 공개 게시글 서버 조회(app/_lib/publicCommunityPost)가 쓰는 응답 변환
+export { mapCommunityPostDetail, type RawCommunityPostDetail } from './api/community.api'

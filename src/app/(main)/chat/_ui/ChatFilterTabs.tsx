@@ -1,4 +1,4 @@
-import { useAuthStatus } from '@/features/auth'
+import { useAuthStatus } from '@/shared/lib/useAuthStatus'
 import { FilterTab } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { FILTER_TABS, type ChatFilter } from '../_lib/constants'

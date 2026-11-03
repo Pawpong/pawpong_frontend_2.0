@@ -22,7 +22,7 @@ import { cn } from '@/shared/lib/cn'
 import { normalizeApiError } from '@/shared/api'
 import { formatBreederLocation } from '@/shared/lib/formatBreederLocation'
 import { profileQueries } from '@/entities/profile'
-import { useLoginGuard } from '@/features/auth'
+import { useLoginGuard } from '@/shared/lib/useLoginGuard'
 import { useFollowUser, useUnfollowUser, useRemoveFollower } from '@/features/profile'
 import { useCreateOrGetChatRoom } from '@/features/send-message'
 import type {

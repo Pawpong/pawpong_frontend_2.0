@@ -7,9 +7,9 @@ test('백엔드 미제공 응답은 설정 비활성으로 처리하고 장애�
   try {
     const { GET } = load('src/app/api/playground/pet/config/route.ts', {
       'next/server': { NextResponse: { json: (body, options) => ({ body, ...options }) } },
-      '@/features/playground-pet/lib/server': load('src/features/playground-pet/lib/server.ts', {
+      '@/features/playground-pet/server': load('src/features/playground-pet/server.ts', {
         'server-only': {},
-        './environment': { petExposureMode: () => 'development' },
+        './lib/environment': { petExposureMode: () => 'development' },
       }),
     })
     for (const status of [404, 503]) {
@@ -29,9 +29,9 @@ test('운영은 개발 미리보기와 기본값을 거부하고 명시적인 �
   const oldFetch = global.fetch
   const oldBase = process.env.NEXT_PUBLIC_API_BASE_URL
   process.env.NEXT_PUBLIC_API_BASE_URL = 'https://production-api.example.test'
-  const server = load('src/features/playground-pet/lib/server.ts', {
+  const server = load('src/features/playground-pet/server.ts', {
     'server-only': {},
-    './environment': { petExposureMode: () => 'public' },
+    './lib/environment': { petExposureMode: () => 'public' },
   })
   try {
     for (const data of [
@@ -86,9 +86,9 @@ test('개발 설정은 운영 공개가 꺼진 동안 비공개 미리보기를 
   const oldFetch = global.fetch
   const oldBase = process.env.NEXT_PUBLIC_API_BASE_URL
   process.env.NEXT_PUBLIC_API_BASE_URL = 'https://dev-api.example.test'
-  const server = load('src/features/playground-pet/lib/server.ts', {
+  const server = load('src/features/playground-pet/server.ts', {
     'server-only': {},
-    './environment': { petExposureMode: () => 'development' },
+    './lib/environment': { petExposureMode: () => 'development' },
   })
   try {
     global.fetch = async () => ({

@@ -2,7 +2,8 @@
 
 import Link from 'next/link'
 import { cn } from '@/shared/lib/cn'
-import { useAuthStatus, useLogoutAndRedirect } from '@/features/auth'
+import { useLogoutAndRedirect } from '@/features/auth'
+import { useAuthStatus } from '@/shared/lib/useAuthStatus'
 import { AuthMenuIcon } from './AuthMenuIcon'
 
 interface AuthActionsProps {

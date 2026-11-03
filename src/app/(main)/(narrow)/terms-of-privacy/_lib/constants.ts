@@ -1,4 +1,4 @@
 export {
   PRIVACY_POLICY_INTRO as TERMS_OF_PRIVACY_INTRO,
   PRIVACY_POLICY_SECTIONS as TERMS_OF_PRIVACY_SECTIONS,
-} from '@/shared/config/privacyPolicy'
+} from '@/shared/content'

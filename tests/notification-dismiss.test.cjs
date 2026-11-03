@@ -83,6 +83,8 @@ function bellHarness(api, records) {
     },
     '@/shared/lib/cn': { cn: (...parts) => parts.filter(Boolean).join(' ') },
     '@/features/auth': { useAuthStatus: () => ({ isLoggedIn: true }) },
+    '@/shared/lib/useAuthStatus': { useAuthStatus: () => ({ isLoggedIn: true }) },
+    '@/shared/lib/useLoginGuard': { useAuthStatus: () => ({ isLoggedIn: true }) },
     '@/entities/notification': {
       NotificationListItem: 'NotificationListItem',
       notificationQueries: { unreadCount: () => ({}), list: (filter) => ({ filter }) },

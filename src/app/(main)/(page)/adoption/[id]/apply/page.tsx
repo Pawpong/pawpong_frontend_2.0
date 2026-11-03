@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { AsyncState, DetailLink } from '@/shared/ui'
 import { adoptionQueries } from '@/entities/adoption'
-import { useAuthStatus } from '@/features/auth'
+import { useAuthStatus } from '@/shared/lib/useAuthStatus'
 import { mapAdoptionDetail } from '../_lib/mapAdoptionDetail'
 import { ApplicationForm } from './_ui/ApplicationForm'
 

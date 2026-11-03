@@ -9,7 +9,8 @@ import { cn } from '@/shared/lib/cn'
 import { MAIN_NAV } from '@/shared/config'
 import { UnreadCountBadge } from '@/shared/ui'
 import { chatQueries } from '@/entities/chat'
-import { useAuthStatus, useMe } from '@/features/auth'
+import { useMe } from '@/features/auth'
+import { useAuthStatus } from '@/shared/lib/useAuthStatus'
 
 // 하단 네비를 노출할 화면. 전체 메뉴로 들어가는 화면들도 포함해, 메뉴를 거쳐 온 뒤에도
 // 탐색·커뮤니티·마이홈으로 돌아갈 진입점이 사라지지 않게 한다.

@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next'
 import { ALL_PLAY_CARDS } from '@/features/playground-tools/model/discovery'
 import { playCardHref } from '@/features/playground-tools/model/playCardLinks'
 import { collectPublicPostIds, searchIndexEnabled } from '@/shared/lib/searchIndex'
-import { SITE_URL } from '@/shared/config/site'
+import { SITE_URL } from '@/shared/config'
 
 export const revalidate = 300
 

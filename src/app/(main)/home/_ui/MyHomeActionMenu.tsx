@@ -8,7 +8,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from '@/shared/ui'
-import { PlusIcon } from '@/shared/assets/icons'
+import { PlusIcon } from '@/shared/assets'
 
 // [refactored] 같은 Link 메뉴 항목 5개 나열 → 배열 + map
 const MENU_ITEMS = [

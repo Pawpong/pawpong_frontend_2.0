@@ -35,11 +35,11 @@ function roomUiHarness() {
     react: hooks,
     'react/jsx-runtime': require('react/jsx-runtime'),
     '@/shared/ui/PixelProgressBar': { PixelProgressBar: () => null },
-    '@/entities/playground-pet': presentation,
-    '@/entities/playground-pet/model/room': room,
-    '@/entities/playground-pet/model/shop': load('src/entities/playground-pet/model/shop.ts', {
-      './room': room,
-    }),
+    '@/entities/playground-pet': {
+      ...presentation,
+      ...room,
+      ...load('src/entities/playground-pet/model/shop.ts', { './room': room }),
+    },
     '../lib/useServerClock': { useServerClock: (iso) => Date.parse(iso) },
     '../lib/usePetCharacter': {
       usePetCharacter: (_session, _pet, _source, enabled) => {

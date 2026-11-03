@@ -16,7 +16,7 @@ import { ApplicationAnswers } from '../../../_ui/ApplicationAnswers'
 import { formatDate } from '@/shared/lib/formatDate'
 import { AlertMessage, Button, CtaModal, Textarea } from '@/shared/ui'
 import type { ApplicationStatus, ReceivedApplicationDetailDto } from '@/shared/types'
-import { ApplicationChatButton } from '@/features/chat-entry'
+import { ApplicationChatButton } from '@/features/send-message'
 
 interface StatusAction {
   label: string

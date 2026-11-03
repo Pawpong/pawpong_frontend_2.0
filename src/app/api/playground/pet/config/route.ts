@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getPetServerConfig } from '@/features/playground-pet/lib/server'
+import { getPetServerConfig } from '@/features/playground-pet/server'
 
 export const dynamic = 'force-dynamic'
 

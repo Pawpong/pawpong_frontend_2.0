@@ -6,7 +6,7 @@ import {
   type PetTab,
   type PetView,
 } from '@/entities/playground-pet'
-import { PET_SLOT_LABELS, PET_SLOTS } from '@/entities/playground-pet/model/room'
+import { PET_SLOT_LABELS, PET_SLOTS } from '@/entities/playground-pet'
 import { PetGlyph } from './PetGlyph'
 import { PixelProgressBar } from '@/shared/ui/PixelProgressBar'
 import styles from './PetRoom.module.css'

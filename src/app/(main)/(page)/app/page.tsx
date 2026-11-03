@@ -5,7 +5,7 @@ import {
   PixelMessageIcon,
   PixelPencilIcon,
 } from '@/shared/assets'
-import { MOBILE_APP } from '@/shared/config/mobileApp'
+import { MOBILE_APP } from '@/shared/config'
 import { createPageMetadata } from '@/shared/lib/metadata'
 import { createMobileAppStructuredData } from '@/shared/lib/mobileApp'
 import { NavigationBar, buttonVariants } from '@/shared/ui'

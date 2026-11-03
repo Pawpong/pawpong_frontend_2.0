@@ -140,6 +140,7 @@ function studio(remaining = 1, isLoggedIn = true) {
     '@/features/playground-pet/ui/PetResultLink': { PetResultLink: () => null },
     '@/shared/assets': { PawPrintIcon: () => null },
     '@/shared/config/playground': { PLAYGROUND_BILLING_ENABLED: false },
+    '@/shared/config': { PLAYGROUND_BILLING_ENABLED: false },
     '@/shared/lib/fonts': { cafe24Proup: { className: '' } },
     '@/shared/lib/cn': { cn: (...args) => args.join(' ') },
     '@/shared/lib/authReadSession': { isAuthReadSessionCurrent: () => true },

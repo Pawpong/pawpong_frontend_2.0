@@ -235,6 +235,7 @@ test('direct billing component renders no purchase UI and starts no billing hook
     '@/shared/lib/nativeIap': {},
     '@/shared/ui': {},
     '@/shared/config/playground': load('src/shared/config/playground.ts'),
+    '@/shared/config': load('src/shared/config/playground.ts'),
     './PurchaseProvider': { usePurchases: forbidden },
     '../model/storeProducts': {},
   })

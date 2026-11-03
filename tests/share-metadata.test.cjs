@@ -45,7 +45,7 @@ const content = (fetch) =>
           'server-only': {},
           react: { cache: (fn) => fn },
           'next/headers': { headers: async () => new Headers() },
-          '@/entities/community/api/community.api': { mapCommunityPostDetail: (value) => value },
+          '@/entities/community/server': { mapCommunityPostDetail: (value) => value },
         },
         { fetch, process: { env: { NEXT_PUBLIC_API_BASE_URL: 'https://api.example.test/' } } },
       ),
