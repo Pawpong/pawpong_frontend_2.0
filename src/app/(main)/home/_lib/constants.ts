@@ -1,0 +1,88 @@
+import type { HomeTabConfig } from '../_ui/HomeTabs'
+
+// [refactored] 탭 항목 단일 출처 — 여러 탭셋에서 공유하는 항목 중복 제거
+// (라벨·아이콘 변경 시 한 곳만 고치면 됨. posts는 공개/마이홈에서 라벨이 달라 분리)
+const HOME_TAB = {
+  listings: { value: 'listings', label: '분양 목록' },
+  publicListings: { value: 'listings', label: '분양 목록', mobileLabel: '분양목록' },
+  posts: { value: 'posts', label: '게시글' },
+  feed: { value: 'posts', label: '피드' },
+  reviews: { value: 'reviews', label: '후기' },
+  myPosts: { value: 'posts', label: '내가 쓴 글' },
+  aiPhotos: { value: 'ai-photos', label: 'AI 사진' },
+} satisfies Record<string, HomeTabConfig>
+
+// [refactored] 배열은 항목 조합만 담당
+// 마이홈 탭은 내가 만든 콘텐츠만 둔다 — 즐겨찾는 브리더는 저장목록, 나의 활동은 /my-activity 로 옮겼다
+const MY_HOME_TABS: HomeTabConfig[] = [HOME_TAB.myPosts, HOME_TAB.aiPhotos]
+
+const BREEDER_HOME_TABS: HomeTabConfig[] = [
+  HOME_TAB.publicListings,
+  HOME_TAB.feed,
+  HOME_TAB.reviews,
+]
+
+// 브리더 마이홈은 시안(3170-825849)이 '게시글' 표기 — 입양자 마이홈의 '내가 쓴 글'과 다르다
+const BREEDER_MY_HOME_TABS: HomeTabConfig[] = [HOME_TAB.listings, HOME_TAB.posts, HOME_TAB.aiPhotos]
+
+// 마이홈 사이드바 하단 이동 링크 — 전체메뉴에만 있던 내 계정 화면들을 마이홈에 모은다.
+// 나의 활동은 활동 단계 기능이 켜져 있을 때만 MyHomeContent 가 남긴다
+const MY_ACTIVITY_HREF = '/my-activity'
+
+const MY_HOME_SIDE_LINKS = [
+  { label: '관심 목록', href: '/bookmarks' },
+  { label: '신청·후기', href: '/activity' },
+  { label: '나의 활동', href: MY_ACTIVITY_HREF },
+  { label: '설정', href: '/settings' },
+]
+
+// 브리더 마이홈 전용 — 신청서 질문 관리·인증 서류는 브리더만 쓴다
+const BREEDER_MY_HOME_SIDE_LINKS = [
+  { label: '관심 목록', href: '/bookmarks' },
+  { label: '신청·후기', href: '/activity' },
+  { label: '나의 활동', href: MY_ACTIVITY_HREF },
+  { label: '신청서 질문 관리', href: '/adoption/application-form' },
+  { label: '인증 서류 관리', href: '/profile/verification' },
+  { label: '설정', href: '/settings' },
+]
+
+// 마이홈 탭 본문(분양 목록·게시글·AI 사진) 공통 위아래 여백 — PageShell 과 함께 쓴다.
+// 2단(tab+)은 오른쪽 컬럼이 이미 위 여백을 가져 위를 0으로 둬야 왼쪽 프로필 카드와 윗선이 맞는다
+const MY_HOME_TAB_PANEL = 'py-5 tab:pt-0 tab:pb-10'
+
+// 브리더 분양 목록 탭만 예외 — 2단에서는 소개 명패(BreederIntroduction placement="tab")가 제목 줄 위에 온다.
+// 위를 0으로 두면 제목 줄이 명패 그림자에 붙으므로, 같은 명패를 쓰는 공개 홈(PublicBreederListings)처럼 40px 를 둔다
+const MY_HOME_LISTINGS_PANEL = 'py-5 tab:py-10'
+
+// 카드 그리드(분양·브리더). 폭에 맞춰 열 수가 늘도록 모든 구간에서 auto-fill 로 채운다.
+// 최소 152px: 320→1열, 375→2열, 710→4열. PC 2단(우측 980px)에서만 4열로 고정해 카드가 더 잘게
+// 쪼개지지 않게 한다.
+// 클래스는 반드시 완성된 문자열로 둔다 — Tailwind 스캐너는 정적 문자열만 읽어서
+// `tab:${COLS}` 처럼 조립하면 CSS 가 생성되지 않는다(그런데 twMerge 는 충돌로 보고 원래 규칙을 지운다).
+// 공통 격자의 lap 5열도 덮어야 2단 오른쪽 칸에서 카드가 잘게 쪼개지지 않는다.
+const CARD_GRID =
+  'gap-x-5 grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))] tab:grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))] lap:grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))] pc:grid-cols-4'
+
+// 게시글 사진 그리드. 모바일 3열 정사각은 시안 스펙이라 그대로 두고, 2단 컬럼(tab+)에서만
+// 컬럼 폭에 맞춰 채운다.
+const PHOTO_GRID =
+  'tab:max-w-none tab:justify-normal tab:gap-x-5 tab:grid-cols-[repeat(auto-fill,minmax(12rem,1fr))] pc:grid-cols-[repeat(auto-fill,minmax(12rem,1fr))]'
+
+// 마이홈 게시글 탭은 분양 목록·AI 사진 탭과 같은 PageShell 여백 안에 들어가므로
+// 모바일에서도 375px 상한 대신 폭을 꽉 채워 제목 줄과 그리드 양끝을 맞춘다 (AI 사진 그리드와 같은 3열)
+const MY_PHOTO_GRID =
+  'max-w-none grid-cols-3 tab:max-w-none tab:justify-normal tab:gap-x-5 tab:grid-cols-[repeat(auto-fill,minmax(12rem,1fr))] pc:grid-cols-[repeat(auto-fill,minmax(12rem,1fr))]'
+
+export {
+  MY_HOME_TABS,
+  BREEDER_HOME_TABS,
+  BREEDER_MY_HOME_TABS,
+  MY_ACTIVITY_HREF,
+  MY_HOME_SIDE_LINKS,
+  BREEDER_MY_HOME_SIDE_LINKS,
+  MY_HOME_TAB_PANEL,
+  MY_HOME_LISTINGS_PANEL,
+  CARD_GRID,
+  PHOTO_GRID,
+  MY_PHOTO_GRID,
+}
