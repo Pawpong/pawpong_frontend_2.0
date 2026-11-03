@@ -52,9 +52,9 @@ interface FollowListPaging {
   onLoadMore: () => void
 }
 
-const TABS: { key: FollowTab; label: string }[] = [
-  { key: 'followers', label: '팔로워' },
-  { key: 'following', label: '팔로잉' },
+const TABS: { value: FollowTab; label: string }[] = [
+  { value: 'followers', label: '팔로워' },
+  { value: 'following', label: '팔로잉' },
 ]
 
 // [refactored] 확인 모달 문구/액션 라벨을 mode 룩업으로 통합 (삼항 3곳 제거)
@@ -138,10 +138,10 @@ const FollowersModal = ({
             {/* 탭 */}
             <div className="flex shrink-0 border-b border-neutral-150 px-4 tab:px-12">
               {(isMutual
-                ? [{ key: 'followers' as const, label: '함께 팔로우하는 사람' }]
+                ? [{ value: 'followers' as const, label: '함께 팔로우하는 사람' }]
                 : TABS
-              ).map(({ key, label }) => {
-                const active = activeTab === key
+              ).map(({ value, label }) => {
+                const active = activeTab === value
                 // [refactored] 라벨·개수가 공유하는 active 스타일을 한 번만 계산
                 const textClass = cn(
                   'text-sm leading-[1.5]',
@@ -149,9 +149,9 @@ const FollowersModal = ({
                 )
                 return (
                   <button
-                    key={key}
+                    key={value}
                     type="button"
-                    onClick={() => setTab(key)}
+                    onClick={() => setTab(value)}
                     className={cn(
                       // 모바일·탭: 한 줄(라벨 개수) / pc: 라벨 위, 개수 아래
                       'flex flex-1 items-center justify-center gap-1 p-3 focus-ring-inset pc:flex-col pc:gap-0 pc:py-2',
@@ -159,7 +159,7 @@ const FollowersModal = ({
                     )}
                   >
                     <span className={cn(textClass, 'pc:text-base')}>{label}</span>
-                    {!isMutual && <span className={textClass}>{LISTS[key].count}</span>}
+                    {!isMutual && <span className={textClass}>{LISTS[value].count}</span>}
                   </button>
                 )
               })}

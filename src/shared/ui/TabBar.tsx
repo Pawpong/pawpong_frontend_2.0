@@ -17,7 +17,8 @@ interface TabBarProps {
   children?: ReactNode
   className?: string
   barClassName?: string
-  triggerClassName?: string
+  /** 태블릿 이상 탭 크기 — 기본 61px · 16px, compact 50px · 14px */
+  size?: 'responsive' | 'compact'
   barStyle?: CSSProperties
   ariaLabel?: string
 }
@@ -25,8 +26,8 @@ interface TabBarProps {
 /**
  * Figma TabBarLayout(976:32388)을 구현한 공통 탭 바.
  *
- * - medium: 116px indicator, 37px 높이
- * - large: 61px 높이, 탭 개수와 무관하게 페이지 틀 폭 (좌우 여백은 페이지 틀과 같다)
+ * - 탭 크기·표시선 값은 Tabs.tsx 의 underline 변형 한 곳에서 정한다 (size 로 고른다)
+ * - 탭 개수와 무관하게 페이지 틀 폭 (좌우 여백은 페이지 틀과 같다)
  * - 하단 구분선과 sticky 같은 페이지 배치는 barClassName으로 제어
  */
 type TabBarListProps = Omit<TabBarProps, 'value' | 'onValueChange' | 'children' | 'className'>
@@ -36,13 +37,7 @@ type TabBarListProps = Omit<TabBarProps, 'value' | 'onValueChange' | 'children' 
  * 한 Tabs 안에서 가로 바와 세로 메뉴를 해상도별로 갈아끼워야 하는 화면(마이홈 2단)이 있어,
  * 루트 없이 리스트만 렌더할 수 있어야 한다. TabBar 는 이 컴포넌트에 루트만 씌운 것이다.
  */
-const TabBarList = ({
-  items,
-  barClassName,
-  triggerClassName,
-  barStyle,
-  ariaLabel,
-}: TabBarListProps) => (
+const TabBarList = ({ items, barClassName, size, barStyle, ariaLabel }: TabBarListProps) => (
   /* 탭과 하단선은 페이지 틀 가장자리까지(frame-bleed) 쓰고, 탭 글자는 본문과 같은 줄에 둔다.
      화면 맨 위에 놓이면 틀 위 여백 자리에 붙는다(data-page-top).
      모바일 116px 표시선은 탭이 4개 이상인 좁은 폰에서 화면 밖까지 나가 페이지가 가로로
@@ -60,11 +55,7 @@ const TabBarList = ({
             value={item.value}
             disabled={item.disabled}
             variant="underline"
-            size="md"
-            className={cn(
-              'after:left-1/2 after:w-[7.25rem] after:-translate-x-1/2 tab:h-[3.8125rem] tab:pt-2 tab:text-base tab:after:left-0 tab:after:h-[0.5625rem] tab:after:w-full tab:after:translate-x-0',
-              triggerClassName,
-            )}
+            size={size}
           >
             {item.label}
           </TabsTrigger>
