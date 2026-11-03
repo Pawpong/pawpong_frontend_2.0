@@ -1,0 +1,151 @@
+.label {
+  --label-fill: #fff0cd;
+  --label-ink: #683d11;
+  --label-icon: #ad651d;
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 5px;
+  min-height: 26px;
+  padding: 2px 8px 2px 0;
+  color: var(--label-ink);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 20px;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.label::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 3px 0 3px 10px;
+  background: var(--label-fill);
+  clip-path: polygon(
+    0 0,
+    calc(100% - 4px) 0,
+    calc(100% - 4px) 2px,
+    calc(100% - 2px) 2px,
+    calc(100% - 2px) 4px,
+    100% 4px,
+    100% calc(100% - 4px),
+    calc(100% - 2px) calc(100% - 4px),
+    calc(100% - 2px) calc(100% - 2px),
+    calc(100% - 4px) calc(100% - 2px),
+    calc(100% - 4px) 100%,
+    0 100%
+  );
+}
+.label[data-tone='waiting'],
+.label[data-tone='talk'],
+.label[data-tone='writing'] {
+  --label-fill: #fce6d8;
+  --label-icon: #8a5117;
+}
+.label[data-tone='done'],
+.label[data-tone='neutral'] {
+  --label-fill: #f1eeeb;
+  --label-ink: #64605c;
+  --label-icon: #8b8176;
+}
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  color: var(--label-icon);
+}
+.icon > svg {
+  width: 20px;
+  height: 20px;
+}
+.rule {
+  height: 12px;
+  border-left: 2px dotted currentColor;
+  opacity: 0.35;
+}
+.text {
+  position: relative;
+}
+.seal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 21px;
+  height: 21px;
+  background: var(--label-icon);
+  color: white;
+  clip-path: polygon(
+    6px 0,
+    15px 0,
+    15px 3px,
+    18px 3px,
+    18px 6px,
+    21px 6px,
+    21px 15px,
+    18px 15px,
+    18px 18px,
+    15px 18px,
+    15px 21px,
+    6px 21px,
+    6px 18px,
+    3px 18px,
+    3px 15px,
+    0 15px,
+    0 6px,
+    3px 6px,
+    3px 3px,
+    6px 3px
+  );
+}
+.seal svg {
+  width: 12px;
+  height: 10px;
+}
+.message {
+  position: relative;
+  display: inline-flex;
+  width: 22px;
+  height: 22px;
+}
+.message > svg:first-child {
+  width: 22px;
+  height: 22px;
+}
+.messageCheck {
+  position: absolute;
+  right: -2px;
+  bottom: 0;
+  width: 12px;
+  height: 10px;
+  color: #ad651d;
+  background: #fffaf3;
+}
+@media (min-width: 768px) {
+  .label {
+    font-size: 14px;
+    min-height: 28px;
+  }
+}
+
+.original {
+  --sprite-scale: 0.28;
+  display: inline-block;
+  flex-shrink: 0;
+  width: calc(var(--sprite-width) * var(--sprite-scale));
+  height: calc(102px * var(--sprite-scale));
+  background-image: url('/images/status/status-badges-original-v1.png');
+  background-repeat: no-repeat;
+  background-size: calc(1944px * var(--sprite-scale)) calc(184px * var(--sprite-scale));
+  background-position: calc(var(--sprite-x) * var(--sprite-scale) * -1)
+    calc(-16px * var(--sprite-scale));
+  vertical-align: middle;
+}
+@media (min-width: 768px) {
+  .original {
+    --sprite-scale: 0.3;
+  }
+}

@@ -198,9 +198,8 @@ const ExploreContent = () => {
 
       <TabsContent value={selectedType} className="mt-0">
         {/* ══════ 콘텐츠 영역 — 좌우 폭·여백은 페이지 틀이 정한다 ══════ */}
-        {/* //QA: 상단 카테고리 수정 — 모바일도 4개 한 줄 가운데 정렬, 스크롤 시 컴팩트 칩바로 전환한다. */}
+        {/* 검색바를 위에, 카테고리를 아래에 둔다 */}
         <div>
-          <CategorySection selected={selectedCategory} onChange={handleCategoryChange} />
           {/* 검색바: 홈과 동작 공유 — 화면별 placeholder와 스타일은 SearchSection variant로 분리한다. */}
           <SearchSection
             placeholder={SEARCH_PLACEHOLDERS[selectedType]}
@@ -208,6 +207,8 @@ const ExploreContent = () => {
             onSubmit={handleSearch}
             showPopularKeywords
           />
+          {/* //QA: 상단 카테고리 수정 — 모바일도 4개 한 줄 가운데 정렬, 스크롤 시 컴팩트 칩바로 전환한다. */}
+          <CategorySection selected={selectedCategory} onChange={handleCategoryChange} />
         </div>
         {/* 스크롤 트리거 sentinel (상단 영역 끝) */}
         <div ref={sentinelRef} aria-hidden />
@@ -218,11 +219,13 @@ const ExploreContent = () => {
           <>
             <div className={EXPLORE_SECTION_CONTAINER}>
               <section className="flex flex-col gap-3">
-                <ExploreListFilters
-                  value={adoptionListFilter}
-                  onChange={setAdoptionListFilter}
-                  ariaLabel="분양 소식 필터"
-                />
+                <div className="mb-1">
+                  <ExploreListFilters
+                    value={adoptionListFilter}
+                    onChange={setAdoptionListFilter}
+                    ariaLabel="분양 소식 필터"
+                  />
+                </div>
                 <ListState
                   appPublicContent
                   isPending={isPending}

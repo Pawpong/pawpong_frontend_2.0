@@ -1,6 +1,6 @@
 'use client'
 
-import { Chip, PopularBadgeContent } from '@/shared/ui'
+import { FilterTab, PopularBadgeContent } from '@/shared/ui'
 
 export type ExploreListFilter = 'all' | 'available' | 'popular'
 
@@ -16,18 +16,17 @@ interface ExploreListFiltersProps {
   ariaLabel: string
 }
 
-/** 목록 바로 위 필터 칩 — 입양 탭·브리더 탭 공용 */
+/** 목록 바로 위 오른쪽 필터 — 입양 탭·브리더 탭 공용 */
 const ExploreListFilters = ({ value, onChange, ariaLabel }: ExploreListFiltersProps) => (
-  <div className="flex shrink-0 items-center gap-2" aria-label={ariaLabel}>
+  <div className="flex shrink-0 items-center justify-end gap-2" aria-label={ariaLabel}>
     {FILTERS.map((filter) => (
-      <Chip
+      <FilterTab
         key={filter.value}
         selected={value === filter.value}
         onClick={() => onChange(filter.value)}
-        size="responsive"
       >
         {filter.value === 'popular' ? <PopularBadgeContent size="responsive" /> : filter.label}
-      </Chip>
+      </FilterTab>
     ))}
   </div>
 )

@@ -26,7 +26,7 @@ import { flattenPages } from '@/shared/lib/infiniteList'
 import {
   RetryButton,
   Button,
-  Chip,
+  FilterTab,
   CtaModal,
   DeleteConfirmModal,
   InfiniteScrollTrigger,
@@ -178,22 +178,17 @@ const NotificationsContent = () => {
               aria-label="알림 분류"
               className="-mx-1 flex [scrollbar-width:none] gap-2 overflow-x-auto px-1 pb-1"
             >
-              <Chip
-                size="responsive"
-                selected={category === undefined}
-                onClick={() => setCategory(undefined)}
-              >
+              <FilterTab selected={category === undefined} onClick={() => setCategory(undefined)}>
                 전체
-              </Chip>
+              </FilterTab>
               {NOTIFICATION_CATEGORY_OPTIONS.map((option) => (
-                <Chip
+                <FilterTab
                   key={option.value}
-                  size="responsive"
                   selected={category === option.value}
                   onClick={() => setCategory(option.value)}
                 >
                   {option.label}
-                </Chip>
+                </FilterTab>
               ))}
             </div>
             <div className="flex flex-wrap items-center justify-between gap-2">

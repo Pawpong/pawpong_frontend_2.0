@@ -71,11 +71,13 @@ const BreederExploreContent = ({ category, keyword }: BreederExploreContentProps
   return (
     <div className={EXPLORE_SECTION_CONTAINER}>
       <section className="flex flex-col gap-3">
-        <ExploreListFilters
-          value={listFilter}
-          onChange={setListFilter}
-          ariaLabel="브리더 소식 필터"
-        />
+        <div className="mb-1">
+          <ExploreListFilters
+            value={listFilter}
+            onChange={setListFilter}
+            ariaLabel="브리더 소식 필터"
+          />
+        </div>
         <ListState
           appPublicContent
           isPending={isPending}
