@@ -25,6 +25,8 @@ test('페이지 폭·여백 값은 globals.css 에만 있다 (KREAM 방식 1280 
   assert.match(css, /@utility page-shell \{[^}]*padding-inline: var\(--page-gutter\);/)
   // 맨 위 제목 바·탭 바는 틀 위 여백 자리에 붙는다
   assert.match(css, /\.page-frame:has\(\[data-page-top\]\) \{\s*padding-top: 0;/)
+  // 바 밑 여백도 여기 한 곳에서만 준다 — 지우면 바에 기대는 화면이 전부 바에 붙는다
+  assert.match(css, /\.page-frame \[data-page-top\] \{\s*margin-bottom: var\(--page-pad-top\);/)
   assert.match(source('src/shared/ui/NavigationBar.tsx'), /<div data-page-top /)
   assert.match(source('src/shared/ui/TabBar.tsx'), /data-page-top\s+className=\{cn\('frame-bleed /)
 })
