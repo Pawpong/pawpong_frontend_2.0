@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { useAuthStatus } from '@/features/auth'
+import { useAuthStatus } from '@/shared/lib/useAuthStatus'
 import { notificationQueries } from '@/entities/notification'
 import { setNativeAppBadge, subscribeNativeCapabilities } from '@/shared/lib/nativeBridge'
 import { useAuthReadSession } from '@/shared/lib/useAuthReadSession'

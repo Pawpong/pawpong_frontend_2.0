@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react'
 import { PublicActivityLevel } from '@/features/gamification'
 import Link from 'next/link'
-import { useAuthStatus } from '@/features/auth'
+import { useAuthStatus } from '@/shared/lib/useAuthStatus'
 import { ReportBreederAction } from '@/features/report'
 import {
   DropdownMenu,

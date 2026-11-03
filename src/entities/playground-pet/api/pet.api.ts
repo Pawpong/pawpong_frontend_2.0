@@ -1,6 +1,11 @@
-import { apiClient, API_VERSION, type ApiRequestConfig } from '@/shared/api/client'
-import { getAccessToken } from '@/shared/api/token'
-import { ApiError, unwrap } from '@/shared/api/unwrap'
+import {
+  apiClient,
+  API_VERSION,
+  ApiError,
+  getAccessToken,
+  unwrap,
+  type ApiRequestConfig,
+} from '@/shared/api'
 import type { ApiResponse } from '@/shared/types'
 import type {
   EligiblePetImages,

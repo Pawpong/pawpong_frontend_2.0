@@ -39,7 +39,7 @@ interface ConnectedFeedCardProps extends Omit<
   'onToggleLike' | 'onToggleSave' | 'reportAction'
 > {
   /**
-   * 로그인이 필요한 동작을 감싸는 가드 (features/auth의 useLoginGuard).
+   * 로그인이 필요한 동작을 감싸는 가드 (shared/lib 의 useLoginGuard).
    * 같은 레이어의 auth 슬라이스를 직접 참조하지 않도록 앱 레이어에서 주입받는다.
    */
   guard?: (action: () => void) => () => void

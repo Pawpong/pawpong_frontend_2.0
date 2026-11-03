@@ -1,5 +1,5 @@
 import { apiClient, API_VERSION, unwrap, type ApiRequestConfig } from '@/shared/api'
-import { ApiError } from '@/shared/api/unwrap'
+import { ApiError } from '@/shared/api'
 import { notifyAuthStateChanged } from '@/shared/lib/authStateEvents'
 import { refreshAuthSession } from '@/shared/lib/authSessionRecovery'
 import type { ApiResponseFull } from '@/shared/types'

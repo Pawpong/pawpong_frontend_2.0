@@ -8,7 +8,8 @@ import {
   nextCommunityCreateAttempt,
   type CommunityCreateAttempt,
 } from '@/features/community'
-import { useLoginGuard, useMe } from '@/features/auth'
+import { useMe } from '@/features/auth'
+import { useLoginGuard } from '@/shared/lib/useLoginGuard'
 import { ApiError } from '@/shared/api'
 import { useAuthReadSession } from '@/shared/lib/useAuthReadSession'
 import { isAuthReadSessionCurrent } from '@/shared/lib/authReadSession'

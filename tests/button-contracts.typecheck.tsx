@@ -5,7 +5,7 @@ import { ToggleIconButton } from '@/shared/ui/ToggleIconButton'
 import { Chip, chipVariants } from '@/shared/ui/Chip'
 import { ActionSheetItem } from '@/shared/ui/ActionSheetItem'
 import { FollowButton } from '@/shared/ui/FollowButton'
-import { ApplicationChatButton } from '@/features/chat-entry'
+import { ApplicationChatButton } from '@/features/send-message'
 
 const Icon = () => null
 const overrides = { className: 'h-10 bg-red-500' }

@@ -22,7 +22,7 @@ test('만료된 게임은 새로고침과 취소를 안내하고 복원된 간�
       },
     },
     'react/jsx-runtime': jsx,
-    '@/entities/playground-pet/model/snack': snack,
+    '@/entities/playground-pet': snack,
     '../lib/useServerClock': { petRequestKey() {} },
     '../lib/usePetStartIntent':
       require('../pet-start-intent/fixtures/intent.fixture.cjs').intentHookFixture(React),

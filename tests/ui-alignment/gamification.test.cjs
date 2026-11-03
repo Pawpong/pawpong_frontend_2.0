@@ -25,6 +25,8 @@ function guide(configQuery, catalogQuery = { isPending: false, isError: false, d
         LEVEL_NOTICE: '활동 단계 안내 문구',
       },
       '@/features/auth': { useAuthStatus: () => ({ userRole: 'adopter' }) },
+      '@/shared/lib/useAuthStatus': { useAuthStatus: () => ({ userRole: 'adopter' }) },
+      '@/shared/lib/useLoginGuard': { useAuthStatus: () => ({ userRole: 'adopter' }) },
       '@/features/inquiry': { SupportInquiryModal: () => null },
       '@/shared/config': loadTypescript('src/shared/config/typography.ts'),
       '@/shared/ui': {

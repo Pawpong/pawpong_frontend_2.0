@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useAuthStatus } from '@/features/auth'
+import { useAuthStatus } from '@/shared/lib/useAuthStatus'
 import { apiClient, API_VERSION, unwrap } from '@/shared/api'
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/shared/ui'
 import { ContentRightsContent } from './ContentRightsContent'

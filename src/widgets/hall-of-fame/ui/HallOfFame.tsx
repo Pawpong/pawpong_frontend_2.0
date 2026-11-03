@@ -2,7 +2,7 @@
 
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { communityQueries, formatHallOfFamePeriod } from '@/entities/community'
-import type { CommunityHallOfFame } from '@/shared/types/CommunityTypes'
+import type { CommunityHallOfFame } from '@/shared/types'
 import { DetailLink, ListState, PageShell } from '@/shared/ui'
 import { flattenPages } from '@/shared/lib/infiniteList'
 import { cn } from '@/shared/lib/cn'

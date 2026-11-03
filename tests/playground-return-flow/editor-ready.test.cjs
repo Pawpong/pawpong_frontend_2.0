@@ -29,6 +29,8 @@ function editor(isReady) {
       'next/navigation': { useRouter: () => ({ replace: () => {} }) },
       '@tanstack/react-query': { useQuery: () => ({ isPending: true }) },
       '@/features/auth': { useAuthStatus: () => ({ isReady }) },
+      '@/shared/lib/useAuthStatus': { useAuthStatus: () => ({ isReady }) },
+      '@/shared/lib/useLoginGuard': { useAuthStatus: () => ({ isReady }) },
       '@/shared/lib/useAuthSessionGeneration': { useAuthSessionGeneration: () => 0 },
       '@/entities/community': { communityQueries: { detail: () => ({}) } },
       '@/entities/profile': { profileQueries: { me: () => ({}) } },

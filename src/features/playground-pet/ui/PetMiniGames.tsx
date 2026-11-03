@@ -12,12 +12,8 @@ import type {
   SnackInput,
   SnackLane,
 } from '@/entities/playground-pet'
-import type { PetCommandResult } from '@/entities/playground-pet/model/commandQueue'
-import {
-  nextSnackInput,
-  previewSnack,
-  snackTapDirection,
-} from '@/entities/playground-pet/model/snack'
+import type { PetCommandResult } from '@/entities/playground-pet'
+import { nextSnackInput, previewSnack, snackTapDirection } from '@/entities/playground-pet'
 import { petRequestKey } from '../lib/useServerClock'
 import { usePetStartIntent } from '../lib/usePetStartIntent'
 import type { PetStageSnapshot } from '../lib/petGameEngine'

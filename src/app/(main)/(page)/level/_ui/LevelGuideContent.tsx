@@ -10,7 +10,7 @@ import {
   getActivityCatalog,
   type ActivityCatalog,
 } from '@/entities/gamification'
-import { useAuthStatus } from '@/features/auth'
+import { useAuthStatus } from '@/shared/lib/useAuthStatus'
 import { SupportInquiryModal } from '@/features/inquiry'
 import { AsyncState, Badge, Button, DetailLink, NavigationBar } from '@/shared/ui'
 import { FeatureIntro } from '@/shared/ui/FeatureIntro'

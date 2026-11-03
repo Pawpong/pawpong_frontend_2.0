@@ -39,6 +39,7 @@ const helpers = load(
   {},
   {
     '@/shared/config/mobileApp': mobileConfig,
+    '@/shared/config': mobileConfig,
     '@/shared/lib/mobileApp': mobile,
   },
 )

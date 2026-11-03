@@ -20,6 +20,8 @@ const bookmarks = (userRole, initialTab) => {
         TabsContent: () => null,
       },
       '@/features/auth': { useAuthStatus: () => ({ userRole }) },
+      '@/shared/lib/useAuthStatus': { useAuthStatus: () => ({ userRole }) },
+      '@/shared/lib/useLoginGuard': { useAuthStatus: () => ({ userRole }) },
       '../_lib/constants': loadTypescript('src/app/(main)/(page)/bookmarks/_lib/constants.ts'),
       './FavoritesTab': { FavoritesTab: () => null },
       './FavoriteBreedersContent': { FavoriteBreedersContent: () => null },
@@ -44,7 +46,7 @@ const ctaBar = (props) => {
         __esModule: true,
         default: ({ href, children }) => createElement('a', { href }, children),
       },
-      '@/features/chat-entry': {
+      '@/features/send-message': {
         ApplicationChatButton: ({ label }) => createElement('button', null, label),
       },
       '@/shared/assets': { FavoriteIcon: () => null },
@@ -79,6 +81,8 @@ const applyPage = (userRole) => {
     },
     '@/entities/adoption': { adoptionQueries: { detail: () => ({}) } },
     '@/features/auth': { useAuthStatus: () => ({ userRole }) },
+    '@/shared/lib/useAuthStatus': { useAuthStatus: () => ({ userRole }) },
+    '@/shared/lib/useLoginGuard': { useAuthStatus: () => ({ userRole }) },
     '../_lib/mapAdoptionDetail': { mapAdoptionDetail: (data) => data },
     './_ui/ApplicationForm': { ApplicationForm: () => createElement('form') },
   })

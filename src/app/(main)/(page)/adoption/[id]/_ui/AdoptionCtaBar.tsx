@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ApplicationChatButton } from '@/features/chat-entry'
+import { ApplicationChatButton } from '@/features/send-message'
 import { FavoriteIcon } from '@/shared/assets'
 import { buttonVariants, ToggleIconButton, Button } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'

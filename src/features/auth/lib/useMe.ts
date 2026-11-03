@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { profileQueries } from '@/entities/profile'
-import { useAuthStatus } from './useAuthStatus'
+import { useAuthStatus } from '@/shared/lib/useAuthStatus'
 
 /**
  * [refactored] 로그인 사용자의 프로필.

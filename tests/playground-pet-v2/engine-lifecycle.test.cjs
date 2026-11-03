@@ -19,7 +19,7 @@ test('엔진 가져오기는 재시도하고 상태 갱신은 인스턴스를 �
   const dependencies = {
     react: runtime.react,
     'react/jsx-runtime': require('react/jsx-runtime'),
-    '@/entities/playground-pet/model/room': room,
+    '@/entities/playground-pet': room,
     './PetRoom.module.css': { default: new Proxy({}, { get: (_, key) => String(key) }) },
   }
   Object.defineProperty(dependencies, '../lib/petGameEngine', {

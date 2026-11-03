@@ -1,6 +1,6 @@
 import { headers } from 'next/headers'
 import { notFound } from 'next/navigation'
-import { isPetServerEnabled } from '@/features/playground-pet/lib/server'
+import { isPetServerEnabled } from '@/features/playground-pet/server'
 import { PetPage } from '@/features/playground-pet/ui/PetPage'
 
 export const metadata = {

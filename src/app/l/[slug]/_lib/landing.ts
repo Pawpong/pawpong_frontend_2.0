@@ -1,4 +1,4 @@
-import { MOBILE_APP } from '@/shared/config/mobileApp'
+import { MOBILE_APP } from '@/shared/config'
 import { parseMobileStoreUrl } from '@/shared/lib/mobileApp'
 
 const SITE_ORIGIN = 'https://pawpong.kr'

@@ -15,7 +15,7 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { iapApi, type IapProduct } from '@/entities/iap'
 import { getAccessToken, ApiError } from '@/shared/api'
-import { PLAYGROUND_BILLING_ENABLED } from '@/shared/config/playground'
+import { PLAYGROUND_BILLING_ENABLED } from '@/shared/config'
 import { getAuthSessionGeneration, isAuthSessionCurrent } from '@/shared/lib/authSessionLifecycle'
 import {
   getNativePlatform,

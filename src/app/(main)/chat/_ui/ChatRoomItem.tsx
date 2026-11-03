@@ -1,6 +1,6 @@
 'use client'
 
-import { useAuthStatus } from '@/features/auth'
+import { useAuthStatus } from '@/shared/lib/useAuthStatus'
 import { cn } from '@/shared/lib/cn'
 import type { ChatRoomResponseDto } from '@/shared/types'
 import { Badge, ProfileAvatar } from '@/shared/ui'
