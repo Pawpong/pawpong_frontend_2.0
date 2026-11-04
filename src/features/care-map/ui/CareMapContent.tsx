@@ -12,7 +12,7 @@ import {
   type FormEvent,
 } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { useLoginGuard } from '@/features/auth'
+import { useLoginGuard } from '@/shared/lib/useLoginGuard'
 import { normalizeApiError } from '@/shared/api'
 import { BookmarkIcon } from '@/shared/assets'
 import { cafe24Proup } from '@/shared/lib/fonts'

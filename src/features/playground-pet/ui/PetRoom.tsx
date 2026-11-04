@@ -22,20 +22,20 @@ import {
   type PetGameKind,
   type PetRoomSlot,
 } from '@/entities/playground-pet'
-import type { PetCommandResult } from '@/entities/playground-pet/model/commandQueue'
+import type { PetCommandResult } from '@/entities/playground-pet'
 import {
   PET_SLOT_AREAS,
   PET_SLOT_LABELS,
   PET_SLOTS,
   previewPetRoom,
-} from '@/entities/playground-pet/model/room'
+} from '@/entities/playground-pet'
 import { useServerClock } from '../lib/useServerClock'
 import { usePetCharacter } from '../lib/usePetCharacter'
 import { usePetAssets } from '../lib/usePetAssets'
 import { usePetSound } from '../lib/usePetSound'
 import type { PetSession } from '../lib/usePetSession'
 import type { PetGameHandle, PetStageSnapshot } from '../lib/petGameEngine'
-import { newlyAvailablePetItems } from '@/entities/playground-pet/model/shop'
+import { newlyAvailablePetItems } from '@/entities/playground-pet'
 import { PetImage } from './PetImage'
 import { PetStage } from './PetStage'
 import { PetDecorations } from './PetDecorations'

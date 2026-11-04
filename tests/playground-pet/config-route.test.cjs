@@ -10,9 +10,9 @@ test('프런트엔드 환경이 닫혀 있으면 설정 경로가 백엔드에 �
   try {
     const { GET } = load('src/app/api/playground/pet/config/route.ts', {
       'next/server': { NextResponse: { json: (body, options) => ({ body, ...options }) } },
-      '@/features/playground-pet/lib/server': load('src/features/playground-pet/lib/server.ts', {
+      '@/features/playground-pet/server': load('src/features/playground-pet/server.ts', {
         'server-only': {},
-        './environment': {
+        './lib/environment': {
           petExposureMode: ({ hostname }) => petExposureMode({ ...env, hostname }),
         },
       }),

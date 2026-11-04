@@ -45,10 +45,11 @@ function apiHarness() {
   })
   const sessions = load('src/entities/gamification/model/session.ts', {
     '@/shared/api/token': tokens,
+    '@/shared/api': tokens,
     '@/shared/lib/authSessionLifecycle': auth,
   })
   const api = load('src/entities/gamification/api/activity.api.ts', {
-    '@/shared/api': { apiClient, API_VERSION, unwrap: unwrap.unwrap },
+    '@/shared/api': { apiClient, API_VERSION, unwrap: unwrap.unwrap, ApiError: unwrap.ApiError },
     '@/shared/api/unwrap': unwrap,
     '@/shared/lib/authStateEvents': { notifyAuthStateChanged: () => notifications++ },
     '@/shared/lib/authSessionRecovery': recovery,

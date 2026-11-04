@@ -1,7 +1,4 @@
-import type {
-  PetCatalogFilters,
-  PetCatalogStatus,
-} from '@/entities/playground-pet/model/shop.types'
+import type { PetCatalogFilters, PetCatalogStatus } from '@/entities/playground-pet'
 
 export const PET_CATALOG_DEFAULT_FILTERS: PetCatalogFilters = {
   slot: 'all',

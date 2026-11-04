@@ -42,7 +42,7 @@ function snackUiHarness() {
     'react-dom': { createPortal: (node) => node },
     'react/jsx-runtime': require('react/jsx-runtime'),
     '@/shared/ui/PixelProgressBar': { PixelProgressBar: () => null },
-    '@/entities/playground-pet/model/snack': snack,
+    '@/entities/playground-pet': snack,
     '../lib/useServerClock': { petRequestKey: () => `explicit-key-${++key}` },
     '../lib/usePetStartIntent':
       require('../../pet-start-intent/fixtures/intent.fixture.cjs').intentHookFixture(

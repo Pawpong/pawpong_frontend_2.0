@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
-import { ApiError } from '@/shared/api/unwrap'
+import { ApiError } from '@/shared/api'
 import { AsyncState } from '@/shared/ui/AsyncState'
 import { Button, buttonVariants } from '@/shared/ui/Button'
 import { EmptyState } from '@/shared/ui/EmptyState'

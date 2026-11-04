@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { TicketLink } from '@/shared/ui/Ticket'
 import { PawPrintIcon } from '@/shared/assets'
-import { useAuthStatus } from '@/features/auth'
+import { useAuthStatus } from '@/shared/lib/useAuthStatus'
 import {
   communityQueries,
   communityEditorExitHref,

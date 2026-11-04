@@ -93,7 +93,7 @@ test('server post reads are anonymous, no-store and keep app consent filtering o
         'next/headers': {
           headers: async () => new Headers({ 'user-agent': ua, cookie: 'private' }),
         },
-        '@/entities/community/api/community.api': { mapCommunityPostDetail: (value) => value },
+        '@/entities/community/server': { mapCommunityPostDetail: (value) => value },
       },
       {
         process: { env: { NEXT_PUBLIC_API_BASE_URL: 'https://api.test' } },

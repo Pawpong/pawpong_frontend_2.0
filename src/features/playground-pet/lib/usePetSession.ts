@@ -1,8 +1,7 @@
 'use client'
 
 import { useMemo, useSyncExternalStore } from 'react'
-import { getAccessToken } from '@/shared/api/token'
-import { ApiError } from '@/shared/api/unwrap'
+import { ApiError, getAccessToken } from '@/shared/api'
 import { AUTH_STATE_CHANGED, notifyAuthStateChanged } from '@/shared/lib/authStateEvents'
 import { getAuthSessionGeneration, isAuthSessionCurrent } from '@/shared/lib/authSessionLifecycle'
 import { refreshAuthSession } from '@/shared/lib/authSessionRecovery'

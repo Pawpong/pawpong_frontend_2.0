@@ -1,6 +1,6 @@
 import 'server-only'
-import type { PetConfig } from '@/entities/playground-pet/model/types'
-import { petExposureMode } from './environment'
+import type { PetConfig } from '@/entities/playground-pet'
+import { petExposureMode } from './lib/environment'
 
 export async function getPetServerConfig(
   hostname: string,

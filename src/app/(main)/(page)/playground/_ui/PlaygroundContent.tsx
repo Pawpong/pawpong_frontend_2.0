@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { PlaygroundBilling } from '@/features/in-app-purchase'
 import { petConfigOptions } from '@/entities/playground-pet'
-import { PLAYGROUND_BILLING_ENABLED } from '@/shared/config/playground'
+import { PLAYGROUND_BILLING_ENABLED } from '@/shared/config'
 import { PlaygroundFeatureRail, type PlaygroundFeature } from './PlaygroundFeatureRail'
 
 export const PLAY_FEATURES: PlaygroundFeature[] = [

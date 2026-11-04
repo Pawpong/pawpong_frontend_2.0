@@ -1,6 +1,6 @@
 'use client'
 
-import { useAuthStatus } from '@/features/auth'
+import { useAuthStatus } from '@/shared/lib/useAuthStatus'
 import { ReportBreederAction } from '@/features/report'
 import { ShareButton } from '@/shared/ui'
 import type { AdopterPublicProfile, BreederPublicProfile } from '@/shared/types'

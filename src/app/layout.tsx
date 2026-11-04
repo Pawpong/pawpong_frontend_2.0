@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { createPageMetadata } from '@/shared/lib/metadata'
-import { SITE_URL } from '@/shared/config/site'
+import { SITE_URL } from '@/shared/config'
 import { QueryProvider } from '@/shared/lib/QueryProvider'
 import { NavigationGuardProvider } from '@/shared/lib/NavigationGuardContext'
 import { cafe24Proup, pretendard } from '@/shared/lib/fonts'

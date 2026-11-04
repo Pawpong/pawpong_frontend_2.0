@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { AppleIcon, GoogleIcon, KakaoIcon, NaverIcon } from '@/shared/assets'
 import { normalizeReturnUrl } from '@/shared/lib/normalizeReturnUrl'
 import { Button } from '@/shared/ui/Button'
-import { getApiBaseUrl as getConfiguredApiBaseUrl } from '@/shared/config/apiBaseUrl'
+import { getApiBaseUrl as getConfiguredApiBaseUrl } from '@/shared/config'
 import { restoreAuthSession } from '@/shared/lib/authSessionRecovery'
 
 /**

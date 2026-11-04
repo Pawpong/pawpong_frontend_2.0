@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, type PointerEvent, type ReactNode } from 'react'
-import { petStagePoint } from '@/entities/playground-pet/model/room'
+import { petStagePoint } from '@/entities/playground-pet'
 import type { PetGameHandle, PetStageSnapshot } from '../lib/petGameEngine'
 import styles from './PetRoom.module.css'
 

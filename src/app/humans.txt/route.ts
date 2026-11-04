@@ -1,4 +1,4 @@
-import { PAWPONG_MAKERS } from '@/shared/config/makers'
+import { PAWPONG_MAKERS } from '@/shared/config'
 
 export const dynamic = 'force-static'
 

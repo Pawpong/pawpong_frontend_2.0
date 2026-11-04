@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useAuthStatus } from '@/features/auth'
+import { useAuthStatus } from '@/shared/lib/useAuthStatus'
 import { SKIP_ONBOARDING_VALIDATION } from '@/features/onboarding'
 
 /** 로그인한 회원의 일반 가입 진입은 홈으로. 새 OAuth 가입 세션은 별도로 허용한다. */

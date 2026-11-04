@@ -13,7 +13,7 @@ import {
   type PetGameOutcome,
   type PetAction,
 } from '@/entities/playground-pet'
-import { PetCommandQueue } from '@/entities/playground-pet/model/commandQueue'
+import { PetCommandQueue } from '@/entities/playground-pet'
 import { inPetSession, petSessionIsCurrent, type PetSession } from './usePetSession'
 
 export { petConfigOptions }

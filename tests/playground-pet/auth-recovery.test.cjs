@@ -140,8 +140,8 @@ test('쿠키가 조용히 만료되면 돌봄 쓰기 없이 조작 잠금을 해
       getPetConfig() {},
       petConfigOptions: { queryKey: ['playground-pet', 'config'] },
       runPetCommand: async () => sent++,
+      PetCommandQueue,
     },
-    '@/entities/playground-pet/model/commandQueue': { PetCommandQueue },
     './usePetSession': auth,
   })
   const controller = usePetController(session)

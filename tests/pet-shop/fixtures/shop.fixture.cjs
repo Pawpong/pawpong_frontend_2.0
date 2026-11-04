@@ -68,7 +68,7 @@ function decorations(runtime = React) {
   const common = { react: runtime, 'react/jsx-runtime': jsx, './PetRoom.module.css': css }
   const { PetCatalogFilters } = load('src/features/playground-pet/ui/PetCatalogFilters.tsx', {
     ...common,
-    '@/entities/playground-pet/model/room': room,
+    '@/entities/playground-pet': room,
     '../constants/pet-shop': constants,
   })
   const { PetPurchaseDialog } = load('src/features/playground-pet/ui/PetPurchaseDialog.tsx', common)
@@ -86,8 +86,7 @@ function decorations(runtime = React) {
       ...common,
       'next/image': { default: (props) => React.createElement('img', props) },
       '@/shared/ui/PixelProgressBar': { PixelProgressBar: () => null },
-      '@/entities/playground-pet/model/room': room,
-      '@/entities/playground-pet/model/shop': shop,
+      '@/entities/playground-pet': { ...room, ...shop },
       '../constants/pet-shop': constants,
       '../lib/useServerClock': { petRequestKey: () => crypto.randomUUID() },
       '../lib/gameAssets': { petAsset: () => null },

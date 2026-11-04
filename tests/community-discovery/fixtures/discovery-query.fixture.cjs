@@ -42,6 +42,14 @@ function renderDiscoveryQuery(config, query = 'media=map') {
       ConnectedFeedCard: nothing,
     },
     '@/features/auth': { useMe: () => ({}), useLoginGuard: () => ({ guard: (value) => value }) },
+    '@/shared/lib/useAuthStatus': {
+      useMe: () => ({}),
+      useLoginGuard: () => ({ guard: (value) => value }),
+    },
+    '@/shared/lib/useLoginGuard': {
+      useMe: () => ({}),
+      useLoginGuard: () => ({ guard: (value) => value }),
+    },
     '@/shared/ui': Object.fromEntries(
       [
         'Button',

@@ -1,4 +1,4 @@
-import { PRIVACY_POLICY_BODY } from '@/shared/config/privacyPolicy'
+import { PRIVACY_POLICY_BODY } from '@/shared/content'
 
 /* 가입 동의 항목의 "자세히" 모달 기본 본문. 서비스 약관 제5조의2는 발행 전 검토 초안이다. */
 
