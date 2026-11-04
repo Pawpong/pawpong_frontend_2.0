@@ -5,21 +5,12 @@ import { PublicActivityLevel } from '@/features/gamification'
 import Link from 'next/link'
 import { useAuthStatus } from '@/shared/lib/useAuthStatus'
 import { ReportBreederAction } from '@/features/report'
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  ListingStats,
-  PopularBadge,
-  ProfileAvatar,
-  Chip,
-} from '@/shared/ui'
-import { ArrowRightIcon, CheckIcon } from '@/shared/assets'
+import { ListingStats, PopularBadge, ProfileAvatar } from '@/shared/ui'
+import { ArrowRightIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { CATEGORY_LABEL } from '@/shared/types'
-import type { AdoptionDetailDto, PetStatus } from '@/shared/types'
-import { ADOPTION_CARD_STATUS } from '@/entities/adoption'
+import type { AdoptionDetailDto } from '@/shared/types'
+import { AdoptionStatusBadge } from '@/entities/adoption'
 import { TEXT } from '@/shared/config'
 import { HeroImageCarousel } from './HeroImageCarousel'
 import { FavoriteShareActions } from './FavoriteShareActions'
@@ -33,31 +24,6 @@ interface AdoptionDetailRailProps {
   /** 1024+ 전용 신청 CTA — 그 아래에서는 하단 고정 바가 맡는다 */
   cta?: ReactNode
 }
-
-/* ── 상태 변경 드롭다운 (브리더용) ── */
-const STATUS_OPTIONS: PetStatus[] = ['reserved', 'available', 'adopted']
-
-const StatusDropdown = ({ currentStatus }: { currentStatus: PetStatus }) => (
-  <DropdownMenu>
-    <DropdownMenuTrigger asChild>
-      <Chip>{ADOPTION_CARD_STATUS[currentStatus].label}</Chip>
-    </DropdownMenuTrigger>
-    <DropdownMenuContent
-      align="start"
-      className="w-[7rem] rounded-2xl border-none bg-neutral-800 px-[0.625rem] py-2 shadow-[3px_3px_11px_0px_rgba(0,0,0,0.15)]"
-    >
-      {STATUS_OPTIONS.map((status) => (
-        <DropdownMenuItem
-          key={status}
-          className="flex items-center justify-between rounded-none px-0 py-0 text-sm leading-[1.375rem] font-medium text-white hover:bg-transparent focus:bg-transparent"
-        >
-          <span>{ADOPTION_CARD_STATUS[status].label}</span>
-          {status === currentStatus && <CheckIcon className="size-5" />}
-        </DropdownMenuItem>
-      ))}
-    </DropdownMenuContent>
-  </DropdownMenu>
-)
 
 /* ── 브리더 행 ── 아바타 + 닉네임 ··· 브리더홈 > + 신고 */
 const BreederRow = ({ breeder }: { breeder: AdoptionDetailDto['breeder'] }) => {
@@ -141,7 +107,7 @@ const AdoptionDetailRail = ({
 
       <div className="flex flex-wrap items-center gap-2">
         <h1 className={TEXT.display}>{detail.name}</h1>
-        <StatusDropdown currentStatus={detail.status} />
+        <AdoptionStatusBadge status={detail.status} />
         {detail.isPopular && (
           <PopularBadge
             variant="outline"
