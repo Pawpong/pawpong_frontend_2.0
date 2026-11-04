@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 import { iapApi, type IapProduct, type IapPlatform } from '@/entities/iap'
 import { nativeIap, type NativeIapProduct } from '@/shared/lib/nativeIap'
 import { Button, buttonVariants } from '@/shared/ui'
-import { PLAYGROUND_BILLING_ENABLED } from '@/shared/config/playground'
+import { PLAYGROUND_BILLING_ENABLED } from '@/shared/config'
 import { usePurchases } from './PurchaseProvider'
 import { loadStoreProducts, purchaseOptions } from '../model/storeProducts'
 

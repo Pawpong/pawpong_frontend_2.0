@@ -62,6 +62,24 @@ function renderer(getResult) {
         setPromptOpen() {},
       }),
     },
+    '@/shared/lib/useAuthStatus': {
+      useLoginGuard: () => ({
+        isLoggedIn: false,
+        guard: (action) => action,
+        openPrompt() {},
+        isPromptOpen: false,
+        setPromptOpen() {},
+      }),
+    },
+    '@/shared/lib/useLoginGuard': {
+      useLoginGuard: () => ({
+        isLoggedIn: false,
+        guard: (action) => action,
+        openPrompt() {},
+        isPromptOpen: false,
+        setPromptOpen() {},
+      }),
+    },
     '@/shared/api': { normalizeApiError: (error) => error },
     '@/shared/assets': { BookmarkIcon: () => null },
     '../api/care-place-favorite.mutations': {

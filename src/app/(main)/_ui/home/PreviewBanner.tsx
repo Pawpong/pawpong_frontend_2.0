@@ -8,8 +8,7 @@ import { useQuery } from '@tanstack/react-query'
 import { homeQueries } from '@/entities/home'
 import type { InitialBanners } from '@/entities/home/server'
 import type { BannerDto } from '@/shared/types'
-import { ChevronRight } from '@/widgets/banner/ui/Banner'
-import { BannerSlide } from '@/widgets/banner/ui/BannerSlide'
+import { BannerSlide, ChevronRight } from '@/widgets/banner'
 
 const fallbackBanner: BannerDto = {
   bannerId: 'home-preview-welcome',

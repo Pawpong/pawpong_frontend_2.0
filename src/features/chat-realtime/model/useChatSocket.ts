@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { io, type Socket } from 'socket.io-client'
 import type { WsChatMessage, WsMessagesRead } from '@/shared/types'
-import { getApiBaseUrl } from '@/shared/config/apiBaseUrl'
+import { getApiBaseUrl } from '@/shared/config'
 import { getAccessToken } from '@/shared/api'
 import { restoreAuthSession } from '@/shared/lib/authSessionRecovery'
 import {

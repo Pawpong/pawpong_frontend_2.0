@@ -7,8 +7,8 @@ import type {
   PetAction,
   PetGameKind,
 } from '@/entities/playground-pet'
-import { PET_SLOT_AREAS, PET_SLOT_POSITIONS } from '@/entities/playground-pet/model/room'
-import { SNACK_LANE_X, snackDropResult } from '@/entities/playground-pet/model/snack'
+import { PET_SLOT_AREAS, PET_SLOT_POSITIONS } from '@/entities/playground-pet'
+import { SNACK_LANE_X, snackDropResult } from '@/entities/playground-pet'
 import { petAsset, type PetAssetManifest } from './gameAssets'
 import { loadPetAssetImage } from './petAssetImage'
 import { advancePetMotion, callPetTo, initialPetMotion, petMotionPose } from './petMotion'

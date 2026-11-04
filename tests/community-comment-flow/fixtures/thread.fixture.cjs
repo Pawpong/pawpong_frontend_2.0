@@ -44,6 +44,14 @@ function threadFixture(write = async () => {}) {
         useMe: () => ({ isLoggedIn: true, me: { userId: 'account-a', role: 'adopter' } }),
         useLoginGuard: () => ({ openPrompt() {} }),
       },
+      '@/shared/lib/useAuthStatus': {
+        useMe: () => ({ isLoggedIn: true, me: { userId: 'account-a', role: 'adopter' } }),
+        useLoginGuard: () => ({ openPrompt() {} }),
+      },
+      '@/shared/lib/useLoginGuard': {
+        useMe: () => ({ isLoggedIn: true, me: { userId: 'account-a', role: 'adopter' } }),
+        useLoginGuard: () => ({ openPrompt() {} }),
+      },
       '@/shared/lib/useAuthReadSession': { useAuthReadSession: h.session.getAuthReadSession },
       '@/shared/lib/authReadSession': h.session,
       '@/shared/api': { ApiError: h.ApiError },

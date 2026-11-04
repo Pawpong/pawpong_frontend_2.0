@@ -46,6 +46,7 @@ function notificationFixture(get = async () => ({ data: { unreadCount: 7 } })) {
       API_VERSION: '/api/v2',
       unwrap: (response) => response.data,
       withAuthReadSession,
+      ApiError,
     },
     '@/shared/api/unwrap': { ApiError },
     '@/shared/lib/authReadSession': session,

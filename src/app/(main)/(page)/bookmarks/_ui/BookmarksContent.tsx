@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { TabBar, TabsContent } from '@/shared/ui'
-import { useAuthStatus } from '@/features/auth'
+import { useAuthStatus } from '@/shared/lib/useAuthStatus'
 import { BOOKMARK_TABS } from '../_lib/constants'
 import { FavoritesTab } from './FavoritesTab'
 import { AdoptionListTab } from './AdoptionListTab'

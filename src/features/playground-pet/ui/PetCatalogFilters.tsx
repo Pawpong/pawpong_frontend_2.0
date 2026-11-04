@@ -1,8 +1,5 @@
-import { PET_COLLECTION_LABELS } from '@/entities/playground-pet/model/room'
-import type {
-  PetCatalogFilters as Filters,
-  PetCatalogMode,
-} from '@/entities/playground-pet/model/shop.types'
+import { PET_COLLECTION_LABELS } from '@/entities/playground-pet'
+import type { PetCatalogFilters as Filters, PetCatalogMode } from '@/entities/playground-pet'
 import { PET_INVENTORY_STATUSES, PET_SHOP_STATUSES } from '../constants/pet-shop'
 import styles from './PetRoom.module.css'
 

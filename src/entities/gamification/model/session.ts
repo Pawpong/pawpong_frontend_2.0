@@ -1,4 +1,4 @@
-import { getAccessToken } from '@/shared/api/token'
+import { getAccessToken } from '@/shared/api'
 import { getAuthSessionGeneration, isAuthSessionCurrent } from '@/shared/lib/authSessionLifecycle'
 
 export type ActivitySession = {

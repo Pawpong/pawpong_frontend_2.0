@@ -1,5 +1,5 @@
 import { apiClient, API_VERSION, unwrap, withAuthReadSession } from '@/shared/api'
-import { ApiError } from '@/shared/api/unwrap'
+import { ApiError } from '@/shared/api'
 import { getAuthReadSession, type AuthReadSession } from '@/shared/lib/authReadSession'
 import type {
   ApiResponseFull,
@@ -18,9 +18,10 @@ export const getNotifications = async (
   if (filter.isRead !== undefined) params.isRead = filter.isRead
   if (filter.category) params.category = filter.category
   return apiClient
-    .get<
-      ApiResponseFull<PaginationResponse<NotificationResponseDto>>
-    >(`${API_VERSION}/notification`, { params })
+    .get<ApiResponseFull<PaginationResponse<NotificationResponseDto>>>(
+      `${API_VERSION}/notification`,
+      { params },
+    )
     .then((res) => unwrap(res, '알림 목록 조회에 실패했습니다.'))
 }
 

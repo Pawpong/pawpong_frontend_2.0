@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import type { BannerTextOverlay } from '@/shared/types/HomeTypes'
+import type { BannerTextOverlay } from '@/shared/types'
 import styles from './BannerCopy.module.css'
 
 /** Text stays selectable, accessible and crisp at every image density. */

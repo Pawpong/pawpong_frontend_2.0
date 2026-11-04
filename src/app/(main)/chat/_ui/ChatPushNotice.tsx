@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { useAuthStatus } from '@/features/auth'
+import { useAuthStatus } from '@/shared/lib/useAuthStatus'
 import { apiClient, API_VERSION, unwrap } from '@/shared/api'
 import { getAccessToken } from '@/shared/api/token'
 import {

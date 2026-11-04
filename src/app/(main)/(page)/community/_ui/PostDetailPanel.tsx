@@ -19,7 +19,7 @@ import {
   COMMUNITY_LOGIN_PROMPT,
   CommunityPostActions,
 } from '@/entities/community'
-import { useLoginGuard } from '@/features/auth'
+import { useLoginGuard } from '@/shared/lib/useLoginGuard'
 import { cn } from '@/shared/lib/cn'
 import { SkeletonBlock } from '@/shared/ui/Skeleton'
 import { usePostDetail } from '../post/[postId]/_ui/usePostDetail'

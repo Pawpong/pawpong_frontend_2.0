@@ -11,6 +11,7 @@ test('같은 토큰이어도 새 로그인은 캐시를 분리하고 로그아�
     },
     '@/shared/api/token': { getAccessToken: () => token },
     '@/shared/api/unwrap': { ApiError },
+    '@/shared/api': { getAccessToken: () => token, ApiError },
     '@/shared/lib/authStateEvents': { AUTH_STATE_CHANGED: 'auth', notifyAuthStateChanged() {} },
     '@/shared/lib/authSessionRecovery': { refreshAuthSession: async () => token },
     '@/shared/lib/authSessionLifecycle': {

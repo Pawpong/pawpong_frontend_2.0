@@ -7,22 +7,19 @@ import type {
   PetGameState,
   PetRoomSlot,
 } from '@/entities/playground-pet'
-import type { PetCommandResult } from '@/entities/playground-pet/model/commandQueue'
+import type { PetCommandResult } from '@/entities/playground-pet'
 import {
   itemAvailability,
   PET_COLLECTION_LABELS,
   PET_SLOT_LABELS,
   PET_SLOTS,
-} from '@/entities/playground-pet/model/room'
+} from '@/entities/playground-pet'
 import {
   filterPetCatalog,
   nextPetCollection,
   petCollectionProgress,
-} from '@/entities/playground-pet/model/shop'
-import type {
-  PetCatalogFilters as Filters,
-  PetCatalogMode,
-} from '@/entities/playground-pet/model/shop.types'
+} from '@/entities/playground-pet'
+import type { PetCatalogFilters as Filters, PetCatalogMode } from '@/entities/playground-pet'
 import { PET_CATALOG_DEFAULT_FILTERS } from '../constants/pet-shop'
 import { petRequestKey } from '../lib/useServerClock'
 import type { PetAssetManifest } from '../lib/gameAssets'

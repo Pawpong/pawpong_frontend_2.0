@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useCreateOrGetChatRoom } from '@/features/send-message'
+import { useCreateOrGetChatRoom } from '../api/send-message.mutations'
 import { AlertMessage, Button, type ButtonVariantProps } from '@/shared/ui'
 import { tv } from '@/shared/lib/tv'
 import { BUTTON_WIDTH_CLASSES } from '@/shared/ui/Button'

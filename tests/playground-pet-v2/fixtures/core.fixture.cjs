@@ -65,11 +65,13 @@ function sessionHarness() {
     '@/shared/api/client': { apiClient, API_VERSION: '/api/v2' },
     '@/shared/api/token': token,
     '@/shared/api/unwrap': { ApiError, unwrap },
+    '@/shared/api': { apiClient, API_VERSION: '/api/v2', ...token, ApiError, unwrap },
   })
   const auth = load('src/features/playground-pet/lib/usePetSession.ts', {
     react: {},
     '@/shared/api/token': token,
     '@/shared/api/unwrap': { ApiError },
+    '@/shared/api': { ...token, ApiError },
     '@/shared/lib/authSessionLifecycle': lifecycle,
     '@/shared/lib/authSessionRecovery': recovery,
     '@/shared/lib/authStateEvents': {

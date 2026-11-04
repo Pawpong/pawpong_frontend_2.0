@@ -1,10 +1,7 @@
 import 'server-only'
 import { cache } from 'react'
 import { headers } from 'next/headers'
-import {
-  mapCommunityPostDetail,
-  type RawCommunityPostDetail,
-} from '@/entities/community/api/community.api'
+import { mapCommunityPostDetail, type RawCommunityPostDetail } from '@/entities/community/server'
 import type { CommunityPostDetail } from '@/shared/types'
 
 /** A request-scoped anonymous snapshot. Native requests retain the API's content-rights filter. */
