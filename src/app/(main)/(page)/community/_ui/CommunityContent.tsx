@@ -64,7 +64,7 @@ const CommunityContent = ({
   initialExperience,
 }: {
   /** 서버에서 미리 받은 확장 기능 설정 — 있으면 카테고리 줄을 첫 화면부터 그린다 */
-  initialExperience?: { config: CommunityExperienceConfig; fetchedAt: number } | null
+  initialExperience?: { config: CommunityExperienceConfig } | null| null
 }) => {
   const router = useRouter()
   const parameters = useSearchParams()
@@ -83,9 +83,10 @@ const CommunityContent = ({
   const experience = useQuery({
     ...communityExperienceConfigOptions,
     throwOnError: false,
+    // HTML 은 얼마나 오래됐는지 알 수 없으니 오래된 값으로 보고, 화면에 뜬 뒤 다시 조회하게 한다.
     ...(initialExperience && {
       initialData: initialExperience.config,
-      initialDataUpdatedAt: initialExperience.fetchedAt,
+      initialDataUpdatedAt: 0,
     }),
   })
   const experienceEnabled = experience.data?.enabled === true && !experience.isError
