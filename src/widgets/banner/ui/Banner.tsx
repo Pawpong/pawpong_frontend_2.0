@@ -55,14 +55,14 @@ const ChevronRight = ({ className }: { className?: string }) => (
 
 interface BannerProps {
   /** 서버에서 미리 받은 배너. 없으면 기존처럼 브라우저에서 조회한다. */
-  initial?: { banners: BannerDto[]; fetchedAt: number } | null
+  initial?: { banners: BannerDto[] } | null| null
 }
 
 const Banner = ({ initial }: BannerProps) => {
   const { data: banners } = useQuery({
     ...homeQueries.banners(),
-    // 서버가 받은 시각을 넘겨, 캐시된 HTML 이 오래됐으면 화면에 뜬 뒤 다시 조회하게 한다.
-    ...(initial && { initialData: initial.banners, initialDataUpdatedAt: initial.fetchedAt }),
+    // HTML 은 얼마나 오래됐는지 알 수 없으니 오래된 값으로 보고, 화면에 뜬 뒤 다시 조회하게 한다.
+    ...(initial && { initialData: initial.banners, initialDataUpdatedAt: 0 }),
   })
   const swiperRef = useRef<SwiperInstance | null>(null)
   const [activeIndex, setActiveIndex] = useState(0)
