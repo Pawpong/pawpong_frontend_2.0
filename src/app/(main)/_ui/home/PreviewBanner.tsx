@@ -37,7 +37,8 @@ const NAV_ARROWS = [
 export function PreviewBanner({ initial }: { initial: InitialBanners | null }) {
   const { data } = useQuery({
     ...homeQueries.banners(),
-    ...(initial && { initialData: initial.banners, initialDataUpdatedAt: initial.fetchedAt }),
+    // HTML 은 얼마나 오래됐는지 알 수 없으니 오래된 값으로 보고, 화면에 뜬 뒤 다시 조회하게 한다.
+    ...(initial && { initialData: initial.banners, initialDataUpdatedAt: 0 }),
   })
   const swiper = useRef<SwiperInstance | null>(null)
   const [activeIndex, setActiveIndex] = useState(0)
