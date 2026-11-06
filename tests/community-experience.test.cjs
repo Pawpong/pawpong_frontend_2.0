@@ -122,9 +122,9 @@ test('카테고리 줄을 첫 화면에 그리도록 서버에서 설정을 1분
   )
   const initial = await getInitialCommunityExperience()
   assert.deepEqual(initial.config, config)
-  assert.equal(typeof initial.fetchedAt, 'number')
+  assert.equal('fetchedAt' in initial, false)
   assert.equal(calls[0][0], 'https://api.pawpong.kr/api/v2/community/experience/config')
-  assert.equal(calls[0][1].next.revalidate, 60)
+  assert.equal(calls[0][1].next.revalidate, 300)
   reply = () => Response.json({ success: true, data: { enabled: true } })
   assert.equal(await getInitialCommunityExperience(), null)
   reply = () => {

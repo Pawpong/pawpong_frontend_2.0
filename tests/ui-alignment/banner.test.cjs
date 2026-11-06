@@ -43,10 +43,10 @@ test('홈 첫 배너는 서버에서 익명으로 미리 받아 HTML 에 싣고 
     json: async () => ({ success: true, data: banners }),
   }))
   assert.deepEqual(ok.result.banners, banners)
-  assert.equal(typeof ok.result.fetchedAt, 'number')
+  assert.equal('fetchedAt' in ok.result, false)
   assert.equal(ok.calls[0].url, 'https://api.example/api/v2/home/banners')
   assert.equal(ok.calls[0].init.credentials, 'omit')
-  assert.equal(ok.calls[0].init.next.revalidate, 60)
+  assert.equal(ok.calls[0].init.next.revalidate, 300)
   assert.ok(ok.calls[0].init.signal)
 
   assert.equal((await initialBanners(async () => ({ ok: false }))).result, null)
@@ -66,7 +66,7 @@ test('홈 첫 배너는 서버에서 익명으로 미리 받아 HTML 에 싣고 
   assert.match(page, /await getInitialBanners\(\)/)
   assert.match(page, /<HomeContent initial=\{initialBanners\} \/>/)
   const banner = source('src/app/(main)/_ui/home/PreviewBanner.tsx')
-  assert.match(banner, /initialDataUpdatedAt: initial\.fetchedAt/)
+  assert.match(banner, /initialDataUpdatedAt: 0/)
 })
 
 test('서버가 그린 배너는 스와이퍼가 붙기 전에도 첫 장을 가운데에 둬 자리가 튀지 않음', () => {
