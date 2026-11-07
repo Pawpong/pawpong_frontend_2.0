@@ -71,8 +71,6 @@ interface ToggleIconButtonProps {
   size?: 'sm' | 'md' | 'lg' | 'responsive'
   /** 보이는 라벨 (예: '관심있어요') */
   label?: string
-  /** tablet: 태블릿 이상에서만 라벨을 표시한다. */
-  labelVisibility?: 'always' | 'tablet'
   count?: number
   /** 라벨이 없을 때 필수 */
   'aria-label'?: string
@@ -91,7 +89,6 @@ const ToggleIconButton = ({
   tone,
   size,
   label,
-  labelVisibility = 'always',
   count,
   'aria-label': ariaLabel,
   onClick,
@@ -136,15 +133,7 @@ const ToggleIconButton = ({
           className={styles.icon()}
         />
       )}
-      {label && (
-        <span
-          className={styles.label({
-            className: labelVisibility === 'tablet' ? 'hidden tab:inline' : undefined,
-          })}
-        >
-          {label}
-        </span>
-      )}
+      {label && <span className={styles.label()}>{label}</span>}
       {count !== undefined && <span className={styles.count()}>{count}</span>}
     </>
   )
