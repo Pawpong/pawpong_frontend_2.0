@@ -141,7 +141,6 @@ const AdoptionDetailRail = ({
           onToggle={onToggleFavorite}
           showFavorite={showFavoriteAction}
           className="gap-2"
-          labelVisibility="tablet"
         />
       </div>
 
