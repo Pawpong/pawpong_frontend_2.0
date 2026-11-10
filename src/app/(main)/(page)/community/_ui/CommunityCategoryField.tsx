@@ -13,6 +13,7 @@ import { cn } from '@/shared/lib/cn'
 import { ClinicRecordFields, LifeRecordFields, WalkRecordFields } from './CommunityRecordFields'
 import { CommunityPlaceSearch } from './CommunityPlaceSearch'
 import { COMMUNITY_CATEGORIES } from './discovery/categories'
+import { Button } from '@/shared/ui'
 
 /** 목록과 같은 분류를 탐색하되, 글에는 선택한 세부 주제만 저장한다. */
 export function CommunityCategoryField({
@@ -217,13 +218,9 @@ export function CommunityCategoryField({
                 }
               />
               {current.clinic && (
-                <button
-                  type="button"
-                  onClick={() => removeRecord('clinic')}
-                  className="min-h-11 text-body-sm text-neutral-700 underline focus-ring"
-                >
+                <Button intent="ghost" size="inline" onClick={() => removeRecord('clinic')}>
                   병원 기록 지우기
-                </button>
+                </Button>
               )}
             </div>
           )}
@@ -234,13 +231,9 @@ export function CommunityCategoryField({
                 onChange={(walk) => saveRecord({ walk })}
               />
               {current.walk && (
-                <button
-                  type="button"
-                  onClick={() => removeRecord('walk')}
-                  className="min-h-11 text-body-sm text-neutral-700 underline focus-ring"
-                >
+                <Button intent="ghost" size="inline" onClick={() => removeRecord('walk')}>
                   산책 기록 지우기
-                </button>
+                </Button>
               )}
             </div>
           )}
@@ -251,13 +244,9 @@ export function CommunityCategoryField({
                 onChange={(life) => saveRecord({ life })}
               />
               {current.life && (
-                <button
-                  type="button"
-                  onClick={() => removeRecord('life')}
-                  className="min-h-11 text-body-sm text-neutral-700 underline focus-ring"
-                >
+                <Button intent="ghost" size="inline" onClick={() => removeRecord('life')}>
                   일상 기록 지우기
-                </button>
+                </Button>
               )}
             </div>
           )}

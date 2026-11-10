@@ -105,14 +105,14 @@ const CommentComposer = ({
         </Link>
       )}
       {feedbackMessage.canCheck && onCheckComments && (
-        <button
-          type="button"
-          className="min-h-11 rounded font-semibold underline focus-ring disabled:opacity-40"
+        <Button
+          intent="link"
+          size="inline"
           disabled={isCheckingComments || busy}
           onClick={onCheckComments}
         >
           {isCheckingComments ? '댓글 확인 중…' : '댓글 목록 다시 확인'}
-        </button>
+        </Button>
       )}
     </div>
   )

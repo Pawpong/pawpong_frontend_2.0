@@ -236,13 +236,9 @@ const CommunityContent = ({
                 className="mb-4 rounded-xl bg-neutral-50 p-3 text-xs leading-relaxed text-neutral-700"
               >
                 이 환경에서는 상세 필터를 사용할 수 없어 기본 이야기를 보여드려요.
-                <button
-                  type="button"
-                  onClick={() => setDiscovery({})}
-                  className="ml-2 min-h-8 font-semibold underline focus-ring"
-                >
+                <Button intent="ghost" size="inline" onClick={() => setDiscovery({})}>
                   상세 조건 해제
-                </button>
+                </Button>
               </p>
             )}
 

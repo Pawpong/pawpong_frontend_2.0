@@ -16,6 +16,7 @@ import { CommunityPlaceSearch } from './CommunityPlaceSearch'
 import type { CarePlaceKind } from '@/entities/care-place'
 import { CommunityPhotoPlaces } from './CommunityPhotoPlaces'
 import { CommunityRoutePlaceItem } from './CommunityRoutePlaceItem'
+import { Button } from '@/shared/ui'
 
 /** 다녀온 장소 연결 — 작성자가 직접 고른 공개 장소만 방문 순서대로 담는다. */
 export function CommunityRoutePicker({
@@ -91,13 +92,9 @@ export function CommunityRoutePicker({
       {editingIndex !== null && (
         <p role="status" className="rounded-lg bg-secondary-200 p-3 text-sm text-primary-700">
           {editingIndex + 1}번 장소의 새 위치를 지도에서 눌러 주세요.
-          <button
-            type="button"
-            onClick={() => setEditingIndex(null)}
-            className="ml-2 min-h-11 rounded px-2 font-bold underline focus-ring"
-          >
+          <Button intent="link" size="inline" onClick={() => setEditingIndex(null)}>
             위치 변경 취소
-          </button>
+          </Button>
         </p>
       )}
       <p className="text-xs leading-relaxed text-neutral-700">
@@ -142,45 +139,45 @@ export function CommunityRoutePicker({
       {undo && (
         <p role="status" className="rounded-lg bg-secondary-100 p-3 text-sm text-neutral-850">
           담은 장소 {undo.length}곳을 모두 뺐어요. 이 글에는 위치가 공유되지 않아요.
-          <button
-            type="button"
+          <Button
+            intent="link"
+            size="inline"
             disabled={disabled}
             onClick={() => {
               onChange({ route: undo, publicPlaceConfirmed: false })
               setCleared(null)
             }}
-            className="ml-2 min-h-11 rounded px-2 font-bold text-primary-700 underline focus-ring"
           >
             되돌리기
-          </button>
+          </Button>
         </p>
       )}
       {route.length > 0 && (
         <div className="flex flex-wrap items-center justify-between gap-2">
           {canSortRouteByPhotoTime(route, photos) ? (
-            <button
-              type="button"
+            <Button
+              intent="link"
+              size="inline"
               disabled={disabled}
               onClick={() => setRoute(sortRouteByPhotoTime(route, photos))}
-              className="min-h-11 rounded-lg px-2 text-xs font-semibold text-primary-700 underline focus-ring"
             >
               사진 촬영 시간 순으로 정렬
-            </button>
+            </Button>
           ) : (
             <span />
           )}
-          <button
-            type="button"
+          <Button
+            intent="ghost"
+            size="inline"
             disabled={disabled}
             onClick={() => {
               const previous = route
               setRoute([])
               setCleared({ route: previous, photoKey })
             }}
-            className="min-h-11 rounded-lg px-2 text-xs font-semibold text-neutral-700 underline focus-ring"
           >
             장소 모두 빼고 위치 공유 끄기
-          </button>
+          </Button>
         </div>
       )}
       {route.length > 0 && (

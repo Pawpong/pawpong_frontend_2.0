@@ -12,6 +12,7 @@ import {
 import type { CommunityPhotoLocationOption } from '@/features/community'
 import { CommunityRoutePicker } from './CommunityRoutePicker'
 import { CommunityTagField } from './CommunityTagField'
+import { Button } from '@/shared/ui'
 
 /** on: 올릴 때 자동으로 붙음 · consent: 동의하면 붙음 · off: 지금은 쓸 수 없음 */
 export type CommunityAutoTagging = 'on' | 'consent' | 'off'
@@ -71,14 +72,14 @@ export function CommunityExperienceEditor({
                 다녀온 장소 연결 {current.route.length > 0 && `· ${current.route.length}곳`}
               </h3>
               {current.route.length === 0 && (
-                <button
-                  type="button"
+                <Button
+                  intent="link"
+                  size="inline"
                   aria-expanded={showPlace}
                   onClick={() => setPlaceOpen(!placeOpen)}
-                  className="touch-target relative min-h-9 rounded-lg px-2 text-sm font-semibold text-primary-700 underline focus-ring"
                 >
                   {showPlace ? '지도 접기' : '지도에서 담기'}
-                </button>
+                </Button>
               )}
             </div>
             {showPlace ? (
