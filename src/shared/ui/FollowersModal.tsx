@@ -192,7 +192,6 @@ const FollowersModal = ({
                       <div className="flex w-[4.5625rem] shrink-0">
                         <FollowButton
                           status={user.mutual ? 'mutual' : 'following'}
-                          size="sm"
                           onClick={() => setPending({ user, mode: 'unfollow' })}
                           width="full"
                         />

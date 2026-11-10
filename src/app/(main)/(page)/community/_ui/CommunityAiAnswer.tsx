@@ -95,17 +95,17 @@ function AnswerContent({
           <p role="alert" className="text-sm leading-relaxed">
             답변 상태를 확인하지 못했어요. 중복 생성을 막기 위해 상태부터 다시 확인해 주세요.
           </p>
-          <button
-            type="button"
+          <Button
+            intent="link"
+            size="inline"
             disabled={result.isFetching}
-            className="min-h-11 rounded px-2 text-sm font-semibold underline focus-ring disabled:opacity-40"
             onClick={() => {
               panel.current?.focus({ preventScroll: true })
               void recheck()
             }}
           >
             {result.isFetching ? '답변 상태 확인 중…' : '답변 상태를 다시 확인하기'}
-          </button>
+          </Button>
         </div>
       )}
       {canRequest &&

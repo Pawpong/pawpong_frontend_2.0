@@ -16,7 +16,6 @@ const toggleIconVariants = tv({
   slots: {
     root: 'focus-ring touch-target relative inline-flex shrink-0 items-center gap-1 rounded-lg font-semibold text-action-dark [-webkit-tap-highlight-color:transparent] disabled:cursor-not-allowed',
     icon: 'shrink-0',
-    label: 'text-body-sm',
     count: 'text-body-md',
   },
   variants: {
@@ -50,12 +49,12 @@ const toggleIconVariants = tv({
     {
       pressed: true,
       pressedTone: 'favorite',
-      className: { icon: 'text-pressed-favorite', label: 'text-pressed-favorite' },
+      className: { icon: 'text-pressed-favorite' },
     },
     {
       pressed: true,
       pressedTone: 'bookmark',
-      className: { icon: 'text-brand', label: 'text-brand' },
+      className: { icon: 'text-brand' },
     },
   ],
   defaultVariants: { size: 'sm', pressed: false, pressedTone: 'favorite', tone: 'default' },
@@ -69,10 +68,7 @@ interface ToggleIconButtonProps {
   pressedTone?: 'favorite' | 'bookmark'
   tone?: 'default' | 'onImage'
   size?: 'sm' | 'md' | 'lg' | 'responsive'
-  /** 보이는 라벨 (예: '관심있어요') */
-  label?: string
   count?: number
-  /** 라벨이 없을 때 필수 */
   'aria-label'?: string
   onClick?: () => void
   href?: string
@@ -88,7 +84,6 @@ const ToggleIconButton = ({
   pressedTone,
   tone,
   size,
-  label,
   count,
   'aria-label': ariaLabel,
   onClick,
@@ -133,7 +128,6 @@ const ToggleIconButton = ({
           className={styles.icon()}
         />
       )}
-      {label && <span className={styles.label()}>{label}</span>}
       {count !== undefined && <span className={styles.count()}>{count}</span>}
     </>
   )
