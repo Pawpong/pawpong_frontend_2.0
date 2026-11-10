@@ -284,18 +284,22 @@ main:has([data-page-tint='point']) {
 
   /* action — 버튼류(Button·IconButton·ToggleIconButton·Chip·ActionSheetItem) 전용 시맨틱 토큰.
      새 색을 만들지 않고 팔레트를 역할 이름으로 다시 부른다. 버튼 스타일은 이 토큰만 쓴다. */
-  --color-action-primary: var(--color-point-500);
-  --color-action-primary-hover: var(--color-point-300);
-  --color-action-primary-press: var(--color-point-600);
+  /* 버튼 노랑은 로고 노랑(point-500)보다 형광기를 뺀 색. 눌림은 검정을 섞으면 탁해져서 같은 노랑의 진한 단계를 쓴다 */
+  --color-action-primary: #fff46a;
+  --color-action-primary-hover: color-mix(in srgb, var(--color-action-primary) 60%, white);
+  --color-action-primary-press: #ffe53a;
   --color-action-dark: var(--color-neutral-850);
   --color-action-dark-hover: var(--color-neutral-950);
-  --color-action-neutral: var(--color-fill-muted);
-  --color-action-border: var(--color-neutral-300);
+  /* 노랑 옆 흰 버튼 테두리 — neutral-300 은 노랑 옆에서 회색 선만 떠 보여서 더 연하게 */
+  --color-action-border: #e0e0e0;
   --color-action-subtle: var(--color-neutral-50);
   --color-action-subtle-press: var(--color-neutral-100);
   --color-action-disabled: var(--color-neutral-150);
   --color-action-disabled-fg: var(--color-neutral-400);
   --color-action-muted-fg: var(--color-neutral-500);
+  /* 글자 버튼 갈색 — brand(primary-500)는 연한 바탕에서 대비 4.5:1 미만이라 한 단계 진하게 */
+  --color-action-link: var(--color-primary-700);
+  --color-action-link-hover: var(--color-primary-800);
   --color-brand: var(--color-primary-500);
   --color-brand-hover: var(--color-primary-700);
   --color-brand-subtle: var(--color-primary-50);
