@@ -34,13 +34,13 @@ export function CommunityRelatedPosts({
   const items = posts.filter((post) => post.postId !== postId).slice(0, 4)
   if (!items.length) return null
   return (
-    <aside aria-label="함께 읽을 글" className="rounded-xl border border-primary-200 bg-white p-4">
+    <aside aria-label="함께 읽을 글" className="rounded-xl border border-neutral-150 bg-white p-4">
       <div className="flex items-center justify-between gap-2">
-        <h3 className="font-cafe24 text-sm text-primary-700">함께 읽을 글</h3>
+        <h3 className="font-cafe24 text-body-md text-neutral-850">함께 읽을 글</h3>
         {moreHref && (
           <Link
             href={moreHref}
-            className="rounded text-xs font-semibold text-primary-700 underline focus-ring"
+            className="rounded text-body-sm font-semibold text-action-link focus-ring hover:text-action-link-hover"
           >
             비슷한 글 더 보기
           </Link>
@@ -51,7 +51,7 @@ export function CommunityRelatedPosts({
           <li key={post.postId}>
             <Link
               href={`/community/post/${post.postId}`}
-              className="flex min-h-14 items-center gap-3 rounded-lg py-2 focus-ring hover:bg-secondary-50"
+              className="flex min-h-14 items-center gap-3 rounded-lg py-2 focus-ring hover:bg-action-subtle"
             >
               {post.photoUrls[0] && (
                 <span className="relative size-12 shrink-0 overflow-hidden rounded-lg bg-neutral-50">
