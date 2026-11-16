@@ -21,6 +21,7 @@ import {
 } from '@/entities/community'
 import { useLoginGuard } from '@/shared/lib/useLoginGuard'
 import { cn } from '@/shared/lib/cn'
+import { formatRelativeTime } from '@/shared/lib/formatRelativeTime'
 import { SkeletonBlock } from '@/shared/ui/Skeleton'
 import { usePostDetail } from '../post/[postId]/_ui/usePostDetail'
 import { useCommentThread } from '../post/[postId]/_ui/useCommentThread'
@@ -159,6 +160,13 @@ const PostDetailPanel = ({
   const hasImages = post.photoUrls.length > 0
   const isSideBySide = layout === 'side-by-side'
 
+  const ownerMenu = isOwner && (
+    <OwnerActionsMenu
+      onEdit={() => router.push(`/community/post/${postId}/edit`)}
+      onDelete={() => setConfirmDeletePost(true)}
+    />
+  )
+
   const header = (
     <div
       className={cn(
@@ -185,6 +193,14 @@ const PostDetailPanel = ({
             <span className="min-w-0 truncate text-body-lg font-semibold text-neutral-850">
               {post.authorNickname}
             </span>
+            {/* 상대 시각은 서버와 브라우저 시계가 달라 글자가 어긋날 수 있다 */}
+            <time
+              dateTime={post.createdAt}
+              suppressHydrationWarning
+              className="shrink-0 text-body-sm text-neutral-700"
+            >
+              · {formatRelativeTime(post.createdAt)}
+            </time>
           </span>
           <ActivityBadgeRow
             badges={
@@ -197,7 +213,7 @@ const PostDetailPanel = ({
           />
         </span>
       </a>
-      {trailingAction}
+      {trailingAction ?? (isPage && ownerMenu)}
     </div>
   )
 
@@ -205,33 +221,25 @@ const PostDetailPanel = ({
     <div
       className={cn(
         'flex shrink-0 justify-between',
-        isPage ? 'items-start gap-3 py-6' : 'items-center gap-2 px-4 py-3',
+        isPage ? 'items-start gap-3 pt-4' : 'items-center gap-2 px-4 py-3',
       )}
     >
       <p
         className={cn(
           'min-w-0 flex-1 font-medium break-words whitespace-pre-wrap text-neutral-850',
-          isPage ? 'text-base leading-7' : 'text-body-md leading-relaxed',
+          isPage ? 'text-body-lg leading-relaxed' : 'text-body-md leading-relaxed',
         )}
       >
         {post.body}
       </p>
-      {isOwner && (
-        <OwnerActionsMenu
-          onEdit={() => router.push(`/community/post/${postId}/edit`)}
-          onDelete={() => setConfirmDeletePost(true)}
-        />
-      )}
+      {!isPage && ownerMenu}
     </div>
   )
 
   // 인스타그램처럼 액션바는 본문 흐름 안에 두고, 하단에는 입력창만 고정한다
   const actionBar = interactive && (
     <div
-      className={cn(
-        'border-b',
-        isPage ? 'border-neutral-150 py-4' : 'border-neutral-100 px-4 py-3',
-      )}
+      className={isPage ? 'py-2' : 'border-b border-neutral-100 px-4 py-3'}
     >
       <CommunityPostActions
         likeCount={post.likeCount}
@@ -305,7 +313,7 @@ const PostDetailPanel = ({
         images={post.photoUrls}
         alt={post.authorNickname}
         preloadFirstImage
-        bgClassName="bg-white"
+        bgClassName={isPage ? 'bg-neutral-50' : 'bg-white'}
         imageClassName="object-contain"
         className={
           isSideBySide
@@ -321,8 +329,14 @@ const PostDetailPanel = ({
   if (isPage) {
     return (
       <article className={cn('w-full', className)}>
-        <header className="mb-5 lap:max-w-[calc(100%-20rem)]">
-          <h1 className="font-cafe24 text-2xl leading-[1.4] break-words text-neutral-850 tab:text-[1.75rem] pc:text-[2rem]">
+        <header className="mb-2 lap:max-w-[calc(100%-20rem)]">
+          {/* 제목 없는 글은 대신 문구를 보이지 않고 화면 읽기 프로그램용 제목만 둔다 */}
+          <h1
+            className={cn(
+              'font-cafe24 text-2xl leading-[1.4] break-words text-neutral-850 tab:text-[1.75rem] pc:text-[2rem]',
+              !post.title && 'sr-only',
+            )}
+          >
             {post.title || '커뮤니티 이야기'}
           </h1>
           {header}
@@ -341,14 +355,14 @@ const PostDetailPanel = ({
         {interactive && (
           <section
             aria-labelledby="post-comments-title"
-            className="mt-10 border-t border-neutral-150 pt-6 lap:mr-[20rem]"
+            className="mt-6 border-t border-neutral-150 pt-6 lap:mr-[20rem]"
           >
-            <h2 id="post-comments-title" className="mb-4 font-cafe24 text-xl text-neutral-850">
-              댓글 <span className="text-primary-700">{post.commentCount}</span>
+            <h2 id="post-comments-title" className="mb-1 font-cafe24 text-lg text-neutral-850">
+              댓글 <span className="text-neutral-700">{post.commentCount}</span>
             </h2>
             <CommentComposerBar
               thread={thread}
-              className="mb-6 rounded-xl border border-neutral-150 bg-neutral-50 px-3 py-2"
+              className="mb-2"
             />
             <CommentList thread={thread} />
           </section>

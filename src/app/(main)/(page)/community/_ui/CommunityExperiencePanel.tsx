@@ -62,9 +62,6 @@ export function CommunityExperiencePanel({
       }
       aria-label="이야기 정보"
     >
-      {presentation === 'page' && (
-        <h2 className="font-cafe24 text-lg text-neutral-850">이야기 정보</h2>
-      )}
       {(topics.length > 0 || tags.length > 0) && (
         <div className="space-y-2">
           <ul className="flex flex-wrap gap-2" aria-label="주제와 태그">
