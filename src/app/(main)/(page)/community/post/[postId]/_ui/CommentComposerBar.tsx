@@ -1,6 +1,6 @@
 'use client'
 
-import { Button, LoginPromptModal } from '@/shared/ui'
+import { Button, Input, LoginPromptModal } from '@/shared/ui'
 import { COMMUNITY_LOGIN_PROMPT } from '@/entities/community'
 import { CommentComposer } from './CommentComposer'
 import { CommentComposerShell } from './CommentComposerShell'
@@ -38,11 +38,22 @@ const CommentComposerBar = ({ thread, className }: CommentComposerBarProps) => {
           isCheckingComments={thread.isFetching}
         />
       ) : (
-        // [refactored] 마크업 복제 대신 CommentComposer와 같은 Shell을 공유한다
+        // 로그인 상태와 같은 입력칸을 보여 주고, 누르면 로그인 안내를 띄운다 (유튜브·인스타그램 방식)
         <CommentComposerShell>
-          <Button intent="secondary" size="md" width="full" onClick={openPrompt}>
-            로그인하고 댓글을 남겨보세요
-          </Button>
+          <div className="flex min-w-0 flex-1 items-center gap-2">
+            <Input
+              readOnly
+              onClick={openPrompt}
+              aria-label="댓글 입력 — 로그인이 필요해요"
+              placeholder="로그인하고 댓글을 남겨보세요"
+              className="min-w-0 flex-1 cursor-pointer"
+            />
+            <div className="flex min-w-14 shrink-0">
+              <Button size="md" width="full" onClick={openPrompt}>
+                게시
+              </Button>
+            </div>
+          </div>
         </CommentComposerShell>
       )}
 
