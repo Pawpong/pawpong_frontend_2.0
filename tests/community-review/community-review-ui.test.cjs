@@ -161,6 +161,7 @@ test('보류 상세는 두 레이아웃 모두 댓글 작성과 반응 및 공�
     '@/shared/lib/useAuthStatus': { useLoginGuard: () => ({ guard: (value) => value }) },
     '@/shared/lib/useLoginGuard': { useLoginGuard: () => ({ guard: (value) => value }) },
     '@/shared/lib/cn': { cn: (...values) => values.filter(Boolean).join(' ') },
+    '@/shared/lib/formatRelativeTime': { formatRelativeTime: () => '방금 전' },
     '@/shared/ui/Skeleton': { SkeletonBlock: () => null },
     '../post/[postId]/_ui/usePostDetail': {
       usePostDetail: () => ({
