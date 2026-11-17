@@ -1,14 +1,17 @@
 'use client'
 
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
-import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { CloseIcon, PawPrintIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import {
   Button,
   Dialog,
+  DialogBareContent,
+  DialogBareDescription,
+  DialogBareTitle,
   DialogOverlay,
   DialogPortal,
+  DialogTrigger,
   ExitConfirmModal,
   Textarea,
   IconButton,
@@ -97,10 +100,10 @@ const SupportChat = ({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        {trigger && <DialogPrimitive.Trigger asChild>{trigger}</DialogPrimitive.Trigger>}
+        {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
         <DialogPortal>
           <DialogOverlay />
-          <DialogPrimitive.Content
+          <DialogBareContent
             ref={contentRef}
             onOpenAutoFocus={(event) => {
               const active = document.activeElement
@@ -137,9 +140,7 @@ const SupportChat = ({
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2 text-primary-700">
                   <PawPrintIcon aria-hidden className="size-6" />
-                  <DialogPrimitive.Title className="font-cafe24 text-xl">
-                    AI 문의하기
-                  </DialogPrimitive.Title>
+                  <DialogBareTitle className="font-cafe24 text-xl">AI 문의하기</DialogBareTitle>
                 </div>
                 <IconButton
                   tone="brand"
@@ -150,9 +151,9 @@ const SupportChat = ({
                   <CloseIcon className="size-5" />
                 </IconButton>
               </div>
-              <DialogPrimitive.Description className="mt-1 text-xs leading-relaxed text-neutral-700">
+              <DialogBareDescription className="mt-1 text-xs leading-relaxed text-neutral-700">
                 AI와 이야기하며 궁금한 점을 풀고, 필요한 문의를 운영팀에 전달해요.
-              </DialogPrimitive.Description>
+              </DialogBareDescription>
               <div role="group" aria-label="문의 유형" className="mt-3 grid grid-cols-4 gap-1">
                 {SUPPORT_TOPICS.map((item) => (
                   <button
@@ -296,7 +297,7 @@ const SupportChat = ({
                 </form>
               )}
             </footer>
-          </DialogPrimitive.Content>
+          </DialogBareContent>
         </DialogPortal>
       </Dialog>
       <ExitConfirmModal

@@ -2,13 +2,20 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { useQuery } from '@tanstack/react-query'
 import { activityConfigOptions } from '@/entities/gamification'
 import { useAuthStatus } from '@/shared/lib/useAuthStatus'
 import { MobileSupportInquiry } from '@/features/inquiry'
 import { cn } from '@/shared/lib/cn'
-import { Dialog, DialogOverlay, DialogPortal, iconButtonVariants } from '@/shared/ui'
+import {
+  Dialog,
+  DialogBareContent,
+  DialogBareTitle,
+  DialogClose,
+  DialogOverlay,
+  DialogPortal,
+  iconButtonVariants,
+} from '@/shared/ui'
 import { LogoButton } from './LogoButton'
 import { AuthActions } from './AuthActions'
 import { MOBILE_MENU_ITEMS } from './NavItems'
@@ -36,7 +43,7 @@ const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
         {/* mo·tab 은 전체화면 시트라 뒤 페이지가 비치지 않게 불투명 base 를 깐다.
             pc 는 우측 상단 드롭다운이라 화면을 가리지 않고 흐릿한 딤만 둔다. */}
         <DialogOverlay className="bg-base-white pc:bg-neutral-850/20" />
-        <DialogPrimitive.Content
+        <DialogBareContent
           aria-describedby={undefined}
           className={cn(
             'fixed inset-0 z-modal flex min-w-0 flex-col overflow-y-auto bg-white',
@@ -47,7 +54,7 @@ const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
             'pc:inset-auto pc:top-[4.5rem] pc:right-[max(var(--page-gutter),calc(50vw_-_var(--page-max-width)/2_+_var(--page-gutter)))] pc:h-auto pc:w-[18rem] pc:rounded-2xl pc:border pc:border-neutral-150 pc:shadow-[0_12px_24px_rgba(55,55,55,0.12)]',
           )}
         >
-          <DialogPrimitive.Title className="sr-only">전체 메뉴</DialogPrimitive.Title>
+          <DialogBareTitle className="sr-only">전체 메뉴</DialogBareTitle>
           {/* QA: border-b 제거 */}
           <header className="sticky top-0 z-10 bg-white pc:hidden">
             <div className="page-shell flex h-12 items-center justify-between tab:h-16">
@@ -55,12 +62,12 @@ const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
               <LogoButton onNavigate={close} />
               <div className="flex items-center gap-2">
                 <AuthActions placement="menu-header" />
-                <DialogPrimitive.Close
+                <DialogClose
                   className={iconButtonVariants({ tone: 'muted' })}
                   aria-label="메뉴 닫기"
                 >
                   <Image src="/images/nav/menu-close.svg" alt="" width={24} height={24} />
-                </DialogPrimitive.Close>
+                </DialogClose>
               </div>
             </div>
           </header>
@@ -87,7 +94,7 @@ const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
             </div>
           </div>
           <MobileSupportInquiry audience={userRole === 'breeder' ? 'breeder' : 'adopter'} />
-        </DialogPrimitive.Content>
+        </DialogBareContent>
       </DialogPortal>
     </Dialog>
   )
