@@ -148,8 +148,7 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
     }
 
     const navigation = performance.getEntriesByType('navigation')[0] as
-      | PerformanceNavigationTiming
-      | undefined
+      PerformanceNavigationTiming | undefined
 
     // BFCache 복원은 기존 listener가 pageshow를 받고, 문서 자체가 다시 로드된
     // back/forward 탐색은 effect가 pageshow 이후 붙으므로 navigation type으로 보완한다.

@@ -97,7 +97,10 @@ test('본문을 읽는 동안 바뀐 계정도 쿠키 저장 직전에 확인함
   const pending = app.refreshAuthSession()
   await Promise.resolve()
   app.cookie.set('accessToken', token('second'))
-  body.resolve({ success: true, data: { accessToken: token('first', 2), refreshToken: 'synthetic' } })
+  body.resolve({
+    success: true,
+    data: { accessToken: token('first', 2), refreshToken: 'synthetic' },
+  })
   await assert.rejects(pending, { status: 401 })
   assert.deepEqual(app.calls, ['/api/auth/refresh'])
 })

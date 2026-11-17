@@ -166,11 +166,7 @@ export interface CommunityUnsaveResponse {
 
 /** 커뮤니티 게시글 신고 사유 — 백엔드 CommunityReportReason과 동일 */
 export type CommunityReportReason =
-  | 'spam'
-  | 'inappropriate_content'
-  | 'false_info'
-  | 'hateful_content'
-  | 'other'
+  'spam' | 'inappropriate_content' | 'false_info' | 'hateful_content' | 'other'
 
 /** 게시글 신고 요청 */
 export interface CommunityPostReportRequest {
@@ -276,13 +272,7 @@ export interface CommunityClinicRecord {
 }
 
 export type CommunityLifeActivity =
-  | 'meal'
-  | 'grooming'
-  | 'training'
-  | 'play'
-  | 'rest'
-  | 'habitat'
-  | 'other'
+  'meal' | 'grooming' | 'training' | 'play' | 'rest' | 'habitat' | 'other'
 
 /** 반려생활 기록 */
 export interface CommunityLifeRecord {

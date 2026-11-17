@@ -1,6 +1,14 @@
 const { test } = require('node:test')
 const assert = require('node:assert/strict')
-const { load, policy, credentials, session, setupRoute, setupClient, NextRequest } = require('./fixtures/session.fixture.cjs')
+const {
+  load,
+  policy,
+  credentials,
+  session,
+  setupRoute,
+  setupClient,
+  NextRequest,
+} = require('./fixtures/session.fixture.cjs')
 
 for (const status of [400, 401, 429, 503, 500, 302]) {
   test(`BFF가 상위 서버의 ${status} 오류에서 내부 내용과 비밀번호를 노출하지 않음`, async () => {

@@ -9,10 +9,11 @@ test('위치 권한 거부 안내는 앱에서는 휴대폰 설정, 웹에서는
   assert.match(careFor(true), /휴대폰 설정에서 포퐁 앱의 위치 권한/)
   assert.match(careFor(false), /브라우저에서 위치 권한/)
   assert.equal(care.careLocationFailureMessage('denied'), careFor(false))
+  // 들어올 때 자동으로 묻다가 실패한 건 조용히 넘기고, 직접 '내 주변 찾기'를 눌렀을 때만 안내한다
   const map = fs.readFileSync('src/features/care-map/ui/CareMapContent.tsx', 'utf8')
   assert.equal(
     (map.match(/careLocationFailureMessage\(reason, inNativeAppWebView\(\)\)/g) ?? []).length,
-    2,
+    1,
   )
   const chat = fs.readFileSync('src/app/(main)/chat/_ui/ChatMessageInput.tsx', 'utf8')
   assert.match(

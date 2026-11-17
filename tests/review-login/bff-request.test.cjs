@@ -1,6 +1,14 @@
 const { test } = require('node:test')
 const assert = require('node:assert/strict')
-const { load, policy, credentials, session, setupRoute, setupClient, NextRequest } = require('./fixtures/session.fixture.cjs')
+const {
+  load,
+  policy,
+  credentials,
+  session,
+  setupRoute,
+  setupClient,
+  NextRequest,
+} = require('./fixtures/session.fixture.cjs')
 
 for (const role of ['adopter', 'breeder']) {
   test(`BFF가 백엔드의 ${role} 인증을 유지하고 예상하지 않은 필드를 제거함`, async () => {

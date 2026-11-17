@@ -45,8 +45,7 @@ const purchaseSchema = z.object({
 export type NativeIapProduct = z.infer<typeof productSchema>
 export type NativeIapPurchase = z.infer<typeof purchaseSchema>
 export type NativeIapOutcome =
-  | { status: 'cancelled' }
-  | { status: 'purchased' | 'pending'; purchase: NativeIapPurchase }
+  { status: 'cancelled' } | { status: 'purchased' | 'pending'; purchase: NativeIapPurchase }
 
 const failureMessages: Record<string, string> = {
   busy: '이미 결제창이 열려 있어요. 진행 중인 결제를 먼저 마쳐 주세요.',

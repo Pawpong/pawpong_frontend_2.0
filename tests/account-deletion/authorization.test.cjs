@@ -1,6 +1,13 @@
 const { test } = require('node:test')
 const assert = require('node:assert/strict')
-const { status, receiptToken, body, authCookie, receiptCookie, setup } = require('./fixtures/deletion.fixture.cjs')
+const {
+  status,
+  receiptToken,
+  body,
+  authCookie,
+  receiptCookie,
+  setup,
+} = require('./fixtures/deletion.fixture.cjs')
 
 test('탈퇴 BFF가 명시적 확인과 현재 쿠키를 요구하고 전달받은 사용자나 토큰을 신뢰하지 않음', async () => {
   const app = setup()

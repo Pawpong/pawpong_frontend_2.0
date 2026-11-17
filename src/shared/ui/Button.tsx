@@ -24,14 +24,10 @@ const buttonStyles = tv({
         'border-action-border bg-base-white text-action-dark hover:bg-action-subtle active:bg-action-subtle-press',
       dark: 'bg-action-dark text-neutral-50 hover:bg-action-dark-hover',
       // 소셜 로그인: 기존 Figma FillButton(2609:258329/258347) 및 각 사 브랜드 규격.
-      google:
-        'bg-[#F0F0F0] text-neutral-850 hover:bg-neutral-150 active:bg-neutral-300',
-      kakao:
-        'bg-[#FFE812] text-neutral-850 hover:brightness-[0.98] active:brightness-95',
-      naver:
-        'bg-[#03C75A] text-base-white hover:brightness-[0.98] active:brightness-95',
-      apple:
-        'bg-black text-base-white hover:brightness-[1.15] active:brightness-125',
+      google: 'bg-[#F0F0F0] text-neutral-850 hover:bg-neutral-150 active:bg-neutral-300',
+      kakao: 'bg-[#FFE812] text-neutral-850 hover:brightness-[0.98] active:brightness-95',
+      naver: 'bg-[#03C75A] text-base-white hover:brightness-[0.98] active:brightness-95',
+      apple: 'bg-black text-base-white hover:brightness-[1.15] active:brightness-125',
       // txt btn — 배경 없이 hover/press 에만 옅은 배경
       ghost:
         'text-action-dark hover:bg-action-subtle active:bg-action-subtle-press disabled:bg-transparent',

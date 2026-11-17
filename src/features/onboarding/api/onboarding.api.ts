@@ -75,9 +75,12 @@ export const verifyEmailVerificationCode = async (
   code: string,
 ): Promise<EmailVerificationProof> =>
   apiClient
-    .post<
-      ApiResponse<EmailVerificationProof>
-    >(`${API_VERSION}/auth/email/verify-code`, { email, tempId, challengeId, code })
+    .post<ApiResponse<EmailVerificationProof>>(`${API_VERSION}/auth/email/verify-code`, {
+      email,
+      tempId,
+      challengeId,
+      code,
+    })
     .then((res) => parseEmailProof(unwrap(res, '이메일 인증번호 확인에 실패했습니다.')))
 
 export const uploadBreederDocuments = async (
@@ -88,9 +91,11 @@ export const uploadBreederDocuments = async (
   files.forEach(({ file }) => formData.append('files', file))
   formData.append('types', JSON.stringify(files.map(({ type }) => type)))
   return apiClient
-    .post<
-      ApiResponse<UploadBreederDocumentsResponse>
-    >(`${API_VERSION}/auth/upload-breeder-documents`, formData, { params: { tempId } })
+    .post<ApiResponse<UploadBreederDocumentsResponse>>(
+      `${API_VERSION}/auth/upload-breeder-documents`,
+      formData,
+      { params: { tempId } },
+    )
     .then((res) => unwrap(res, '서류 업로드에 실패했습니다.'))
 }
 

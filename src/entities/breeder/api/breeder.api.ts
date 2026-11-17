@@ -30,9 +30,9 @@ export const getBreederPublicProfile = (breederId: string) =>
 /** 브리더 상세 프로필 조회 (기존) */
 export const getBreederProfile = (breederId: string) =>
   apiClient
-    .get<
-      ApiResponseFull<BreederProfileResponseDto>
-    >(`${API_VERSION}/breeder/${breederId}`, { skipAuth: true } as ApiRequestConfig)
+    .get<ApiResponseFull<BreederProfileResponseDto>>(`${API_VERSION}/breeder/${breederId}`, {
+      skipAuth: true,
+    } as ApiRequestConfig)
     .then(unwrap)
 
 /** 내 브리더 프로필 조회 */
@@ -113,23 +113,25 @@ export const getBreederApplicationForm = (breederId: string) =>
 /** 받은 신청 목록 (브리더용) */
 export const getReceivedApplications = (page = 1, limit = 10) =>
   apiClient
-    .get<
-      ApiResponseFull<PaginationResponse<ReceivedApplicationItemDto>>
-    >(`${API_VERSION}/breeder-management/applications`, { params: { page, limit } })
+    .get<ApiResponseFull<PaginationResponse<ReceivedApplicationItemDto>>>(
+      `${API_VERSION}/breeder-management/applications`,
+      { params: { page, limit } },
+    )
     .then(unwrap)
 
 /** 받은 신청 상세 (브리더용) */
 export const getReceivedApplicationDetail = (applicationId: string) =>
   apiClient
-    .get<
-      ApiResponseFull<ReceivedApplicationDetailDto>
-    >(`${API_VERSION}/breeder-management/applications/${applicationId}`)
+    .get<ApiResponseFull<ReceivedApplicationDetailDto>>(
+      `${API_VERSION}/breeder-management/applications/${applicationId}`,
+    )
     .then(unwrap)
 
 /** 내게 달린 후기 목록 조회 (브리더 관리) */
 export const getMyReceivedReviews = (params: MyReviewsParams = {}) =>
   apiClient
-    .get<
-      ApiResponseFull<PaginationResponse<BreederMyReviewItem>>
-    >(`${API_VERSION}/breeder-management/my-reviews`, { params })
+    .get<ApiResponseFull<PaginationResponse<BreederMyReviewItem>>>(
+      `${API_VERSION}/breeder-management/my-reviews`,
+      { params },
+    )
     .then(unwrap)

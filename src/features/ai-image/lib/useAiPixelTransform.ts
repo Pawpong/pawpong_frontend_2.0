@@ -27,14 +27,7 @@ const POLL_TIMEOUT_MS = 4 * 60 * 1000
 const DOWNLOAD_TIMEOUT_MS = 2 * 60 * 1000
 
 export type AiPixelTransformPhase =
-  | 'idle'
-  | 'uploading'
-  | 'checking'
-  | 'generating'
-  | 'reconnecting'
-  | 'pending'
-  | 'done'
-  | 'failed'
+  'idle' | 'uploading' | 'checking' | 'generating' | 'reconnecting' | 'pending' | 'done' | 'failed'
 
 export interface AiPixelTransformResult {
   session: AuthReadSession

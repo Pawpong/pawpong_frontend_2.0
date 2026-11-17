@@ -21,7 +21,8 @@ export async function withAuthReadSession<T>(
       notifyAuthStateChanged()
       throw new ApiError('조회하는 계정이 변경되었습니다.', 401)
     }
-    if (signal?.aborted) throw signal.reason ?? new DOMException('조회가 취소되었습니다.', 'AbortError')
+    if (signal?.aborted)
+      throw signal.reason ?? new DOMException('조회가 취소되었습니다.', 'AbortError')
   }
   const request = async () => {
     assertCurrent()
