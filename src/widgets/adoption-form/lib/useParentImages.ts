@@ -9,8 +9,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
  * - `existing`: 임시저장에서 복원한, 이미 올라간 사진. 키를 그대로 재사용한다.
  */
 type ParentImage =
-  | { kind: 'new'; url: string; file: File }
-  | { kind: 'existing'; url: string; fileName: string }
+  { kind: 'new'; url: string; file: File } | { kind: 'existing'; url: string; fileName: string }
 
 const isBlobUrl = (url: string) => url.startsWith('blob:')
 

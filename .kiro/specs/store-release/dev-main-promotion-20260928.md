@@ -12,8 +12,8 @@
 - 변경된 동의/AI/Hall of Fame 컴포넌트 ESLint 통과.
 - 백엔드 새 API를 먼저 배포한 뒤 프론트를 main에 반영한다.
 
-
 ## 앱 연결·문의 보완
+
 - dev.pawpong.kr만 Vercel alias-protection-override로 공개. 프로젝트 전체 보호는 유지. 쿠키 없는 HEAD 302→200 확인; 다른 preview 예외는 추가하지 않음.
 - 운영 main d2429b2e Vercel READY.
 - FAQ 답변의 긴 링크 줄바꿈, 각 항목에서 AI 문의 열기. AI 안내 전에 서버에 문의 접수; 실패 시 원문·접수번호 유지. 개별 회신 경로는 기존 담당자 이메일.

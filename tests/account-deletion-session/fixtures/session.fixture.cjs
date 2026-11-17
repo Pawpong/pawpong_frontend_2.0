@@ -44,7 +44,10 @@ function setup({ rejectDeletion = false, loseResponse = false, offlineClear = fa
     removeItem: (key) => storage.delete(key),
   }
   const lifecycle = load('src/shared/lib/authSessionLifecycle.ts', {}, { localStorage })
-  const boundary = authCookieFixture({ getAccessToken: () => cookie.get('accessToken') ?? null }, lifecycle)
+  const boundary = authCookieFixture(
+    { getAccessToken: () => cookie.get('accessToken') ?? null },
+    lifecycle,
+  )
   const authEvents = {
     AUTH_STATE_CHANGED: 'auth',
     notifyAuthStateChanged: () => window.dispatchEvent(new Event('auth')),

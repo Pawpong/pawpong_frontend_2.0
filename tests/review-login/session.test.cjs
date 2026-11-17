@@ -1,7 +1,15 @@
 const { test } = require('node:test')
 const assert = require('node:assert/strict')
 const { authCookieFixture } = require('../fixtures/auth-cookie.fixture.cjs')
-const { load, policy, credentials, session, setupRoute, setupClient, NextRequest } = require('./fixtures/session.fixture.cjs')
+const {
+  load,
+  policy,
+  credentials,
+  session,
+  setupRoute,
+  setupClient,
+  NextRequest,
+} = require('./fixtures/session.fixture.cjs')
 
 test('심사 로그인 실패와 취소가 오프라인 로그아웃을 유지하고 이전 계정 복구를 차단함', async () => {
   for (const outcome of ['offline', 'rejected', 'cancelled']) {

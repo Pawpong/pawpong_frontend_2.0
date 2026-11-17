@@ -55,7 +55,7 @@ const ChevronRight = ({ className }: { className?: string }) => (
 
 interface BannerProps {
   /** 서버에서 미리 받은 배너. 없으면 기존처럼 브라우저에서 조회한다. */
-  initial?: { banners: BannerDto[] } | null| null
+  initial?: { banners: BannerDto[] } | null | null
 }
 
 const Banner = ({ initial }: BannerProps) => {

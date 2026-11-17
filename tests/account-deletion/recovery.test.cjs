@@ -1,6 +1,14 @@
 const { test } = require('node:test')
 const assert = require('node:assert/strict')
-const { status, receiptToken, accepted, body, authCookie, setup, setupClient } = require('./fixtures/deletion.fixture.cjs')
+const {
+  status,
+  receiptToken,
+  accepted,
+  body,
+  authCookie,
+  setup,
+  setupClient,
+} = require('./fixtures/deletion.fixture.cjs')
 
 test('사전 확인 재시도는 기존 영수증을 유지하고 계정 변경이나 백엔드 호출을 수행하지 않음', async () => {
   const app = setup()

@@ -8,8 +8,7 @@ export interface OutgoingChatMessage {
   clientMessageId: string
 }
 export type ChatDeliveryResult =
-  | { status: 'sent'; messageId: string }
-  | { status: 'failed' | 'unconfirmed'; message?: string }
+  { status: 'sent'; messageId: string } | { status: 'failed' | 'unconfirmed'; message?: string }
 
 export function createClientMessageId(): string {
   const bytes = crypto.getRandomValues(new Uint8Array(16))

@@ -8,11 +8,7 @@
 export type AuthProvider = 'local' | 'google' | 'kakao' | 'naver' | 'apple'
 
 export type BreederVerificationStatus =
-  | 'pending'
-  | 'reviewing'
-  | 'approved'
-  | 'rejected'
-  | 'not_submitted'
+  'pending' | 'reviewing' | 'approved' | 'rejected' | 'not_submitted'
 
 export type PetGender = 'male' | 'female'
 

@@ -74,17 +74,17 @@ Figma 변수, 컴포넌트 치수 및 시각 언어를 디자인·코딩 에이�
 임의의 HEX 대신 아래 Primitive 또는 이를 참조하는 시맨틱 토큰을 사용해야 한다.
 
 | 단계 | `Colors/main/*` | `Colors/sub/*` | `Colors/point/*` |
-|---:|---:|---:|---:|
-| 50 | `#F5EADF` | `#FEF9EF` | `#FFFFF1` |
-| 100 | `#EDDBCA` | `#FDF4DF` | `#FFFFE3` |
-| 200 | `#DDBE9F` | `#FBE8BE` | `#FFFFC7` |
-| 300 | `#CDA073` | `#FADD9E` | `#FFFEAA` |
-| 400 | `#BD8348` | `#F8D17D` | `#FFFE8E` |
-| 500 | `#AD651D` | `#F6C65D` | `#FFFE72` |
-| 600 | `#8A5117` | `#CDA44B` | `#DBDA5B` |
-| 700 | `#683D11` | `#A48239` | `#B6B644` |
-| 800 | `#45280C` | `#7B6126` | `#92912E` |
-| 900 | `#231406` | `#523F14` | `#6D6D17` |
+| ---: | --------------: | -------------: | ---------------: |
+|   50 |       `#F5EADF` |      `#FEF9EF` |        `#FFFFF1` |
+|  100 |       `#EDDBCA` |      `#FDF4DF` |        `#FFFFE3` |
+|  200 |       `#DDBE9F` |      `#FBE8BE` |        `#FFFFC7` |
+|  300 |       `#CDA073` |      `#FADD9E` |        `#FFFEAA` |
+|  400 |       `#BD8348` |      `#F8D17D` |        `#FFFE8E` |
+|  500 |       `#AD651D` |      `#F6C65D` |        `#FFFE72` |
+|  600 |       `#8A5117` |      `#CDA44B` |        `#DBDA5B` |
+|  700 |       `#683D11` |      `#A48239` |        `#B6B644` |
+|  800 |       `#45280C` |      `#7B6126` |        `#92912E` |
+|  900 |       `#231406` |      `#523F14` |        `#6D6D17` |
 
 역할:
 
@@ -95,10 +95,10 @@ Figma 변수, 컴포넌트 치수 및 시각 언어를 디자인·코딩 에이�
 
 ### 4.2 현재 등록된 시맨틱 토큰
 
-| 역할 | 기본 | Hover | Press | Selected | Inverse |
-|---|---:|---:|---:|---:|---:|
-| `main color` | `#AD651D` | `#BD8348` | `#8A5117` | `#683D11` | `#FFFFFF` |
-| `sub color` | `#F6C65D` | `#F8D17D` | `#CDA44B` | `#A48239` | `#FFFFFF` |
+| 역할          |      기본 |     Hover |     Press |  Selected |   Inverse |
+| ------------- | --------: | --------: | --------: | --------: | --------: |
+| `main color`  | `#AD651D` | `#BD8348` | `#8A5117` | `#683D11` | `#FFFFFF` |
+| `sub color`   | `#F6C65D` | `#F8D17D` | `#CDA44B` | `#A48239` | `#FFFFFF` |
 | `point color` | `#FFFE72` | `#FFFEAA` | `#DBDA5B` | `#B6B644` | `#FFFFFF` |
 
 위 값은 `Colors/text/interactive/*`, `Colors/icon/interactive/*`,
@@ -108,22 +108,22 @@ Figma 변수, 컴포넌트 치수 및 시각 언어를 디자인·코딩 에이�
 
 중립 및 상태 토큰:
 
-| Figma 토큰 | 값 | 필수 역할 |
-|---|---:|---|
-| `Colors/text/primary` | `#3E3E3E` | 제목 및 핵심 본문 |
-| `Colors/text/secondary` | `#6B6B6B` | 보조 설명 및 메타데이터 |
-| `Colors/text/tertiary` | `#A6A6A6` | 플레이스홀더 및 낮은 강조 텍스트 |
-| `Colors/text/disabled` | `#B8B8B8` | 비활성 텍스트 |
-| `Colors/text/invert` | `#F6F6F6` | 어두운 표면 위 텍스트 |
-| `Colors/bg/primary` | `#FFFFFF` | 기본 페이지 및 카드 표면 |
-| `Colors/bg/secondary` | `#F6F6F6` | 보조 표면 |
-| `Colors/bg/tertiary` | `#EDEDED` | 3차 표면 |
-| `Colors/bg/disabled` | `#E4E4E4` | 비활성 표면 |
-| `Colors/border/primary` | `#A6A6A6` | 기본 입력창 테두리 |
-| `Colors/border/secondary` | `#CACACA` | 카드 및 구분선 테두리 |
-| `Colors/text/error` | `#D63D4A` | 오류 텍스트 |
-| `Colors/text/info` | `#256EF4` | 정보 텍스트 |
-| `Colors/text/success` | `#00AE00` | 성공 텍스트 |
+| Figma 토큰                |        값 | 필수 역할                        |
+| ------------------------- | --------: | -------------------------------- |
+| `Colors/text/primary`     | `#3E3E3E` | 제목 및 핵심 본문                |
+| `Colors/text/secondary`   | `#6B6B6B` | 보조 설명 및 메타데이터          |
+| `Colors/text/tertiary`    | `#A6A6A6` | 플레이스홀더 및 낮은 강조 텍스트 |
+| `Colors/text/disabled`    | `#B8B8B8` | 비활성 텍스트                    |
+| `Colors/text/invert`      | `#F6F6F6` | 어두운 표면 위 텍스트            |
+| `Colors/bg/primary`       | `#FFFFFF` | 기본 페이지 및 카드 표면         |
+| `Colors/bg/secondary`     | `#F6F6F6` | 보조 표면                        |
+| `Colors/bg/tertiary`      | `#EDEDED` | 3차 표면                         |
+| `Colors/bg/disabled`      | `#E4E4E4` | 비활성 표면                      |
+| `Colors/border/primary`   | `#A6A6A6` | 기본 입력창 테두리               |
+| `Colors/border/secondary` | `#CACACA` | 카드 및 구분선 테두리            |
+| `Colors/text/error`       | `#D63D4A` | 오류 텍스트                      |
+| `Colors/text/info`        | `#256EF4` | 정보 텍스트                      |
+| `Colors/text/success`     | `#00AE00` | 성공 텍스트                      |
 
 ### 4.3 화면 전용 및 일러스트 원시값
 
@@ -131,17 +131,17 @@ Figma 변수, 컴포넌트 치수 및 시각 언어를 디자인·코딩 에이�
 있지 않다. Figma에서 변수로 승격되기 전까지 표에 지정된 역할에만 사용할 수
 있다.
 
-| 값 | 승인 역할 | 제안 시맨틱 토큰 |
-|---|---|---|
-| `#8BA7FF` | 히어로 배너 배경 | `Colors/bg/brand/hero` |
-| `#FFEABD` | 명예 동물 패널 배경 | `Colors/bg/brand/warm` |
-| `#FFF8E8` | 명예 카드 및 따뜻한 크림 표면 | `Colors/bg/brand/cream` |
-| `#F28A2E` | 기존 오렌지 동물 채움 | `Colors/illustration/orange/base` |
+| 값        | 승인 역할                        | 제안 시맨틱 토큰                   |
+| --------- | -------------------------------- | ---------------------------------- |
+| `#8BA7FF` | 히어로 배너 배경                 | `Colors/bg/brand/hero`             |
+| `#FFEABD` | 명예 동물 패널 배경              | `Colors/bg/brand/warm`             |
+| `#FFF8E8` | 명예 카드 및 따뜻한 크림 표면    | `Colors/bg/brand/cream`            |
+| `#F28A2E` | 기존 오렌지 동물 채움            | `Colors/illustration/orange/base`  |
 | `#C76516` | 치즈태비 무늬와 기존 오렌지 음영 | `Colors/illustration/orange/shade` |
-| `#A85A13` | 짙은 갈색 디테일 | `Colors/illustration/brown/deep` |
-| `#FFD84D` | 노란 털, 배 및 축하 강조 | `Colors/illustration/yellow/base` |
-| `#FF8FA3` | 귀, 코, 볼 및 애정 표현 강조 | `Colors/illustration/pink/accent` |
-| `#FFFFFF` | 동물 얼굴 및 픽셀 하이라이트 | 기존 inverse 토큰의 alias |
+| `#A85A13` | 짙은 갈색 디테일                 | `Colors/illustration/brown/deep`   |
+| `#FFD84D` | 노란 털, 배 및 축하 강조         | `Colors/illustration/yellow/base`  |
+| `#FF8FA3` | 귀, 코, 볼 및 애정 표현 강조     | `Colors/illustration/pink/accent`  |
+| `#FFFFFF` | 동물 얼굴 및 픽셀 하이라이트     | 기존 inverse 토큰의 alias          |
 
 규칙:
 
@@ -158,16 +158,16 @@ Figma 변수, 컴포넌트 치수 및 시각 언어를 디자인·코딩 에이�
 
 다음 토큰은 현재 최종 메인 페이지 시스템이 아니라 Figma 과거 이력 영역에서 확인됐다.
 
-| 토큰 | 값 | 충돌 |
-|---|---:|---|
-| `color/text/primary` | `#171717` | 현재 `#3E3E3E`와 충돌 |
-| `color/bg/primary` | `#FFFFFF` | namespace 중복 |
-| `color/border/teritary` | `#E5E5E5` | 오탈자이며 테두리 의미 중복 |
-| `color/bg/interactive/inverse` | `#FFFFFF` | inverse namespace 중복 |
-| `Secondary/700` | `#4E9CF1` | 현재 Main/Sub/Point 역할과 충돌 |
-| `Alpha/Primary 80` | `#4F3B2ECC` | 현재 역할이 정의되지 않음 |
-| `Colors/.../interactive/primary color/*` | 기존 블루 계열 | 현재 `main color` namespace와 충돌 |
-| `Colors/.../interactive/secondary color/*` | 기존 보조 계열 | 현재 `sub color` namespace와 충돌 |
+| 토큰                                       |             값 | 충돌                               |
+| ------------------------------------------ | -------------: | ---------------------------------- |
+| `color/text/primary`                       |      `#171717` | 현재 `#3E3E3E`와 충돌              |
+| `color/bg/primary`                         |      `#FFFFFF` | namespace 중복                     |
+| `color/border/teritary`                    |      `#E5E5E5` | 오탈자이며 테두리 의미 중복        |
+| `color/bg/interactive/inverse`             |      `#FFFFFF` | inverse namespace 중복             |
+| `Secondary/700`                            |      `#4E9CF1` | 현재 Main/Sub/Point 역할과 충돌    |
+| `Alpha/Primary 80`                         |    `#4F3B2ECC` | 현재 역할이 정의되지 않음          |
+| `Colors/.../interactive/primary color/*`   | 기존 블루 계열 | 현재 `main color` namespace와 충돌 |
+| `Colors/.../interactive/secondary color/*` | 기존 보조 계열 | 현재 `sub color` namespace와 충돌  |
 
 금지(MUST NOT):
 
@@ -182,15 +182,15 @@ Figma 변수, 컴포넌트 치수 및 시각 언어를 디자인·코딩 에이�
 
 ### 5.1 디스플레이 스타일
 
-| 스타일 | 서체 | 크기 | Figma 스타일 | 용도 |
-|---|---|---:|---:|---|
-| `Heading/display/2xl` | Cafe24 ProUp | 40px | Bold | 히어로 헤드라인 |
-| `Heading/display/xl` | Cafe24 ProUp | 32px | Bold | 큰 브랜드 제목 |
-| `Heading/display/lg` | Cafe24 ProUp | 24px | Bold | 브랜드 섹션 제목 |
-| `Heading/display/md` | Cafe24 ProUp | 20px | Bold | 브랜드 섹션 제목 |
-| `Heading/display/sm` | Cafe24 ProUp | 16px | Bold | 픽셀 탭 및 브랜드 라벨 |
-| `Heading/display/xs` | Cafe24 ProUp | 14px | Bold | 작은 브랜드 라벨 |
-| `Heading/display/2xs` | Cafe24 ProUp | 12px | Bold | 최소 크기 브랜드 라벨 |
+| 스타일                | 서체         | 크기 | Figma 스타일 | 용도                   |
+| --------------------- | ------------ | ---: | -----------: | ---------------------- |
+| `Heading/display/2xl` | Cafe24 ProUp | 40px |         Bold | 히어로 헤드라인        |
+| `Heading/display/xl`  | Cafe24 ProUp | 32px |         Bold | 큰 브랜드 제목         |
+| `Heading/display/lg`  | Cafe24 ProUp | 24px |         Bold | 브랜드 섹션 제목       |
+| `Heading/display/md`  | Cafe24 ProUp | 20px |         Bold | 브랜드 섹션 제목       |
+| `Heading/display/sm`  | Cafe24 ProUp | 16px |         Bold | 픽셀 탭 및 브랜드 라벨 |
+| `Heading/display/xs`  | Cafe24 ProUp | 14px |         Bold | 작은 브랜드 라벨       |
+| `Heading/display/2xs` | Cafe24 ProUp | 12px |         Bold | 최소 크기 브랜드 라벨  |
 
 Cafe24 ProUp은 Figma 스타일명이 Bold이더라도 생성 코드에서 숫자 weight
 `400`으로 해석될 수 있다. 다른 font weight를 강제로 지정하지 말고 승인된
@@ -198,12 +198,12 @@ Cafe24 ProUp은 Figma 스타일명이 Bold이더라도 생성 코드에서 숫�
 
 ### 5.2 타이틀 스타일
 
-| 스타일 | 서체 | 크기 | 굵기 | 용도 |
-|---|---|---:|---:|---|
-| `Heading/title/lg` | Pretendard | 40px | 700 | 큰 UI 제목 |
-| `Heading/title/md` | Pretendard | 32px | 700 | 주요 UI 제목 |
-| `Heading/title/sm` | Pretendard | 24px | 700 | 배너 부제 또는 주요 UI 제목 |
-| `Heading/title/xs` | Pretendard | 20px | 700 | 표준 섹션 제목 |
+| 스타일             | 서체       | 크기 | 굵기 | 용도                        |
+| ------------------ | ---------- | ---: | ---: | --------------------------- |
+| `Heading/title/lg` | Pretendard | 40px |  700 | 큰 UI 제목                  |
+| `Heading/title/md` | Pretendard | 32px |  700 | 주요 UI 제목                |
+| `Heading/title/sm` | Pretendard | 24px |  700 | 배너 부제 또는 주요 UI 제목 |
+| `Heading/title/xs` | Pretendard | 20px |  700 | 표준 섹션 제목              |
 
 확인된 부채: `Heading/title/sm`은 현재
 `typography/heading/title/md/font weight` 변수를 참조한다. 새로운 토큰
@@ -211,16 +211,16 @@ Cafe24 ProUp은 Figma 스타일명이 Bold이더라도 생성 코드에서 숫�
 
 ### 5.3 본문 스타일
 
-| 스타일 | 서체 | 크기 | 굵기 | 용도 |
-|---|---|---:|---:|---|
-| `Body/2xlarge/*` | Pretendard | 24px | 700/600/400 | 큰 본문 및 강조 |
-| `Body/xlarge/*` | Pretendard | 20px | 700/600/500/400 | 큰 UI 본문 |
-| `Body/large/bold` | Pretendard | 16px | 600 | 프로필 이름 및 강조 라벨 |
-| `Body/large/medium` | Pretendard | 16px | 500 | 내비게이션 및 입력 텍스트 |
-| `Body/medium/bold` | Pretendard | 14px | 600 | 뱃지, 텍스트 버튼 및 카드 강조 |
-| `Body/medium/medium` | Pretendard | 14px | 500 | 메타데이터 및 보조 콘텐츠 |
-| `Body/small/medium` | Pretendard | 12px | 500 | 시간 및 3차 메타데이터 |
-| `Body/xsmall/*` | Pretendard | 10px | 700/600/500/400 | 제한적인 최소 보조 라벨 |
+| 스타일               | 서체       | 크기 |            굵기 | 용도                           |
+| -------------------- | ---------- | ---: | --------------: | ------------------------------ |
+| `Body/2xlarge/*`     | Pretendard | 24px |     700/600/400 | 큰 본문 및 강조                |
+| `Body/xlarge/*`      | Pretendard | 20px | 700/600/500/400 | 큰 UI 본문                     |
+| `Body/large/bold`    | Pretendard | 16px |             600 | 프로필 이름 및 강조 라벨       |
+| `Body/large/medium`  | Pretendard | 16px |             500 | 내비게이션 및 입력 텍스트      |
+| `Body/medium/bold`   | Pretendard | 14px |             600 | 뱃지, 텍스트 버튼 및 카드 강조 |
+| `Body/medium/medium` | Pretendard | 14px |             500 | 메타데이터 및 보조 콘텐츠      |
+| `Body/small/medium`  | Pretendard | 12px |             500 | 시간 및 3차 메타데이터         |
+| `Body/xsmall/*`      | Pretendard | 10px | 700/600/500/400 | 제한적인 최소 보조 라벨        |
 
 `Body`의 `bolder/bold/medium/regular`는 각각 700/600/500/400을 의미한다.
 단, 일부 크기에는 현재 모든 굵기의 로컬 Text Style이 존재하지 않을 수 있으므로
@@ -239,21 +239,21 @@ Cafe24 ProUp은 Figma 스타일명이 Bold이더라도 생성 코드에서 숫�
 현재 등록된 간격 값:
 `0 / 2 / 4 / 8 / 12 / 16 / 20 / 24 / 28 / 32 / 36 / 40 / 44 / 48px`
 
-| 값 | 주요 역할 |
-|---:|---|
-| 2px | 뱃지 미세 간격 |
-| 4px | 아이콘·숫자 및 컴팩트 컨트롤 간격 |
-| 8px | 기본 컴포넌트 간격 |
-| 12px | 입력창 및 카드 padding |
-| 16px | 큰 카드의 가로 padding |
-| 20px | 내비게이션 및 콘텐츠 그룹 |
-| 24px | 큰 컴포넌트 내부 간격 |
-| 28px | 승인된 중간 간격 |
-| 32px | 강조 패널 padding |
-| 36px | 큰 열 간격 |
-| 40px | 표준 섹션 세로 padding |
-| 44px | 큰 터치 대상 및 특수 간격 |
-| 48px | 큰 섹션 또는 반응형 margin |
+|   값 | 주요 역할                         |
+| ---: | --------------------------------- |
+|  2px | 뱃지 미세 간격                    |
+|  4px | 아이콘·숫자 및 컴팩트 컨트롤 간격 |
+|  8px | 기본 컴포넌트 간격                |
+| 12px | 입력창 및 카드 padding            |
+| 16px | 큰 카드의 가로 padding            |
+| 20px | 내비게이션 및 콘텐츠 그룹         |
+| 24px | 큰 컴포넌트 내부 간격             |
+| 28px | 승인된 중간 간격                  |
+| 32px | 강조 패널 padding                 |
+| 36px | 큰 열 간격                        |
+| 40px | 표준 섹션 세로 padding            |
+| 44px | 큰 터치 대상 및 특수 간격         |
+| 48px | 큰 섹션 또는 반응형 margin        |
 
 현재 확인된 중복 alias:
 
@@ -266,16 +266,16 @@ Cafe24 ProUp은 Figma 스타일명이 Bold이더라도 생성 코드에서 숫�
 
 ## 7. radius 및 형태 시스템
 
-| 토큰 | 값 | 용도 |
-|---|---:|---|
-| `radius/0` | 0px | 직각 형태 |
-| `radius/2` | 2px | 미세 radius |
-| `radius/4` | 4px | 컴팩트 컨트롤 |
-| `radius/8` | 8px | 입력창, 이미지 및 표준 카드 |
-| `radius/12` | 12px | 배너, 강조 패널 및 명예 카드 |
-| `radius/16` | 16px | 대상 노드가 지정한 큰 표면 |
-| `radius/20` | 20px | 대상 노드가 지정한 큰 표면 |
-| `radius/999` | 999px | 뱃지 및 chip |
+| 토큰         |    값 | 용도                         |
+| ------------ | ----: | ---------------------------- |
+| `radius/0`   |   0px | 직각 형태                    |
+| `radius/2`   |   2px | 미세 radius                  |
+| `radius/4`   |   4px | 컴팩트 컨트롤                |
+| `radius/8`   |   8px | 입력창, 이미지 및 표준 카드  |
+| `radius/12`  |  12px | 배너, 강조 패널 및 명예 카드 |
+| `radius/16`  |  16px | 대상 노드가 지정한 큰 표면   |
+| `radius/20`  |  20px | 대상 노드가 지정한 큰 표면   |
+| `radius/999` | 999px | 뱃지 및 chip                 |
 
 규칙:
 
@@ -307,16 +307,16 @@ spread: 0
 
 확인된 데스크톱 primitive:
 
-| 토큰·값 | 설정 |
-|---|---:|
-| `device width/pc` | 1440px |
-| `device width/tab` | 768px |
-| `device width/mo` | 375px |
-| `margin/pc` | 80px |
-| `margin/tab` | 48px |
-| `margin/mo` | 16px |
-| 최대 콘텐츠 너비 | 1280px |
-| 헤더 높이 | 64px |
+| 토큰·값                |                            설정 |
+| ---------------------- | ------------------------------: |
+| `device width/pc`      |                          1440px |
+| `device width/tab`     |                           768px |
+| `device width/mo`      |                           375px |
+| `margin/pc`            |                            80px |
+| `margin/tab`           |                            48px |
+| `margin/mo`            |                            16px |
+| 최대 콘텐츠 너비       |                          1280px |
+| 헤더 높이              |                            64px |
 | 표준 섹션 세로 padding | 대상 노드에 따라 40px 또는 80px |
 
 규칙:
@@ -435,14 +435,14 @@ Variant:
 
 ### 11.1 기능성 아이콘 크기
 
-| 컨테이너 | 용도 |
-|---:|---|
-| 20px | 작은 화살표 |
-| 24px | 메뉴 및 더보기 |
-| 32px | 헤더 내비게이션 및 커뮤니티 행동 |
-| 40px | 아바타 및 왕관 패밀리 |
-| 48px | 주요 하트 행동 |
-| 154px | 홈 동물 캐릭터 |
+| 컨테이너 | 용도                             |
+| -------: | -------------------------------- |
+|     20px | 작은 화살표                      |
+|     24px | 메뉴 및 더보기                   |
+|     32px | 헤더 내비게이션 및 커뮤니티 행동 |
+|     40px | 아바타 및 왕관 패밀리            |
+|     48px | 주요 하트 행동                   |
+|    154px | 홈 동물 캐릭터                   |
 
 ### 11.2 에셋 분류
 
@@ -479,16 +479,16 @@ Variant:
 포퐁 표준 픽셀 동물 캐릭터의 공식 기하 기준은
 [Figma 노드 `3504:103765` — `pawpong-pixel-cat (grid-adjusted)`](https://www.figma.com/design/7VXGIjqr1eZBEmsp3OPNie/2026-pawpong?node-id=3504-103765)다.
 
-| 속성 | 필수값 |
-|---|---:|
-| SVG 캔버스 및 `viewBox` | `155 x 155px` / `0 0 155 155` |
-| 물리 픽셀 모듈 | `5 x 5px` |
-| 논리 캔버스 그리드 | `31 x 31칸` |
-| 전체 논리 캔버스 셀 | `961개` |
-| 표준 캐릭터 영역 | `100 x 95px` |
-| 표준 캐릭터 그리드 | `20 x 19칸` |
-| 캐릭터 시작점 | `x=25px`, `y=30px` |
-| 캔버스 여백 | 왼쪽 `25px`, 오른쪽 `30px`, 위 `30px`, 아래 `30px` |
+| 속성                    |                                             필수값 |
+| ----------------------- | -------------------------------------------------: |
+| SVG 캔버스 및 `viewBox` |                      `155 x 155px` / `0 0 155 155` |
+| 물리 픽셀 모듈          |                                          `5 x 5px` |
+| 논리 캔버스 그리드      |                                        `31 x 31칸` |
+| 전체 논리 캔버스 셀     |                                            `961개` |
+| 표준 캐릭터 영역        |                                       `100 x 95px` |
+| 표준 캐릭터 그리드      |                                        `20 x 19칸` |
+| 캐릭터 시작점           |                                 `x=25px`, `y=30px` |
+| 캔버스 여백             | 왼쪽 `25px`, 오른쪽 `30px`, 위 `30px`, 아래 `30px` |
 
 규칙:
 
@@ -533,13 +533,13 @@ Variant:
 브랜드 인터랙션은 `main`, `sub`, `point` 중 컴포넌트에 지정된 한 계열 안에서
 상태 단계를 전환한다. 서로 다른 계열을 상태 변화처럼 임의 교차 사용하면 안 된다.
 
-| 상태 | Main 예시 | Sub 예시 | Point 예시 |
-|---|---:|---:|---:|
-| Default | `#AD651D` | `#F6C65D` | `#FFFE72` |
-| Hover | `#BD8348` | `#F8D17D` | `#FFFEAA` |
-| Press | `#8A5117` | `#CDA44B` | `#DBDA5B` |
-| Selected | `#683D11` | `#A48239` | `#B6B644` |
-| Inverse | `#FFFFFF` | `#FFFFFF` | `#FFFFFF` |
+| 상태     |                      Main 예시 |                     Sub 예시 |                               Point 예시 |
+| -------- | -----------------------------: | ---------------------------: | ---------------------------------------: |
+| Default  |                      `#AD651D` |                    `#F6C65D` |                                `#FFFE72` |
+| Hover    |                      `#BD8348` |                    `#F8D17D` |                                `#FFFEAA` |
+| Press    |                      `#8A5117` |                    `#CDA44B` |                                `#DBDA5B` |
+| Selected |                      `#683D11` |                    `#A48239` |                                `#B6B644` |
+| Inverse  |                      `#FFFFFF` |                    `#FFFFFF` |                                `#FFFFFF` |
 | Disabled | `Colors/text/disabled #B8B8B8` | `Colors/bg/disabled #E4E4E4` | 브랜드 계열 대신 공통 disabled 토큰 사용 |
 
 규칙:

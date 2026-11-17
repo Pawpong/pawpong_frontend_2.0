@@ -26,14 +26,14 @@
 
 데스크톱 기준 렌더 순서(코드 주석에 명시된 순서와 동일):
 
-| 영역 | 설명 | 코드 위치 |
-|---|---|---|
-| 검색 섹션 | 검색바 + 인기 검색어 칩 | `features/search/ui/SearchSection.tsx` |
-| 배너 | 슬라이드형 프로모션 배너 | `widgets/banner/ui/Banner.tsx` |
-| 카테고리 브라우즈 | 브리더 CTA 스트립 + 동물 카테고리 4버튼(고양이/강아지/도마뱀/브리더 탐색) | `features/category-browse/ui/CategoryBrowse.tsx` |
-| 명예의 동물 | 이번 주 상위 3마리 포디움 + "투표하기" 링크, 카드 클릭 시 이미지 상세 모달 | `widgets/hall-of-fame/ui/HallOfFame.tsx` |
-| 분양중인 동물 | 분양 리스팅 4개(모바일 2열/탭·PC 4열) + "탐색 바로가기" | `widgets/adoption-showcase/ui/AdoptionShowcase.tsx` |
-| 커뮤니티 미리보기 | 최신 글 3개(3번째 카드는 pc에서만 노출) + "커뮤니티 바로가기" | `widgets/community-showcase/ui/CommunityShowcase.tsx` |
+| 영역              | 설명                                                                       | 코드 위치                                             |
+| ----------------- | -------------------------------------------------------------------------- | ----------------------------------------------------- |
+| 검색 섹션         | 검색바 + 인기 검색어 칩                                                    | `features/search/ui/SearchSection.tsx`                |
+| 배너              | 슬라이드형 프로모션 배너                                                   | `widgets/banner/ui/Banner.tsx`                        |
+| 카테고리 브라우즈 | 브리더 CTA 스트립 + 동물 카테고리 4버튼(고양이/강아지/도마뱀/브리더 탐색)  | `features/category-browse/ui/CategoryBrowse.tsx`      |
+| 명예의 동물       | 이번 주 상위 3마리 포디움 + "투표하기" 링크, 카드 클릭 시 이미지 상세 모달 | `widgets/hall-of-fame/ui/HallOfFame.tsx`              |
+| 분양중인 동물     | 분양 리스팅 4개(모바일 2열/탭·PC 4열) + "탐색 바로가기"                    | `widgets/adoption-showcase/ui/AdoptionShowcase.tsx`   |
+| 커뮤니티 미리보기 | 최신 글 3개(3번째 카드는 pc에서만 노출) + "커뮤니티 바로가기"              | `widgets/community-showcase/ui/CommunityShowcase.tsx` |
 
 ## 인터랙션 · 상태
 
@@ -47,7 +47,7 @@
 
 - 배너: Swiper `autoplay`(4초 간격, `disableOnInteraction: false` — 사용자가
   조작해도 자동재생 안 꺼짐), `loop` 무한 순환. 하단 도트는 `transition-[width,
-  background-color]`로 활성 도트 전환 시 애니메이션(지속시간은 Tailwind 기본값,
+background-color]`로 활성 도트 전환 시 애니메이션(지속시간은 Tailwind 기본값,
   코드에 별도 수치 지정 없음).
 - 카테고리 버튼: hover 시 default/hover 이미지가 `transition-opacity`로 교차
   전환(지속시간 미지정, 브라우저 기본값).
@@ -95,11 +95,11 @@
 
 ## 엣지 케이스
 
-| 상황 | 현재 처리 상태 |
-|---|---|
-| 모바일 배너 이미지 로드 실패 | 처리됨 — `onError`로 데스크톱 이미지 URL로 자동 대체(`BannerSlide`) |
-| 배너 자체가 하나도 없음 | 처리됨 — 배너 섹션을 통째로 숨김(`banners.length === 0`이면 `null`) |
-| 명예의 동물/분양/커뮤니티 API 실패·빈 응답 | 처리됨 — 각각 목업 데이터로 폴백(스켈레톤처럼 항상 콘텐츠가 보임) |
+| 상황                                       | 현재 처리 상태                                                       |
+| ------------------------------------------ | -------------------------------------------------------------------- |
+| 모바일 배너 이미지 로드 실패               | 처리됨 — `onError`로 데스크톱 이미지 URL로 자동 대체(`BannerSlide`)  |
+| 배너 자체가 하나도 없음                    | 처리됨 — 배너 섹션을 통째로 숨김(`banners.length === 0`이면 `null`)  |
+| 명예의 동물/분양/커뮤니티 API 실패·빈 응답 | 처리됨 — 각각 목업 데이터로 폴백(스켈레톤처럼 항상 콘텐츠가 보임)    |
 | 카테고리 아이콘 중 "도마뱀" 전용 아트 없음 | 미구현 — 강아지 SVG를 임시로 재사용 중, 리자드 아트 나오면 교체 필요 |
 
 ## 접근성

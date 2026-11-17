@@ -75,7 +75,7 @@ test('이전 계정의 401은 새 계정으로 갱신하거나 재전송하지 �
 test('잘못된 알림 숫자를 캐시나 앱 배지로 전달하지 않음', async () => {
   for (const count of [-1, 1.5, NaN, Infinity, '3', null]) {
     const h = notificationFixture(async () => ({ data: { unreadCount: count } }))
-    await assert.rejects(h.api.getUnreadCount(), error => error.status === 502)
+    await assert.rejects(h.api.getUnreadCount(), (error) => error.status === 502)
     assert.equal(h.state.refreshes, 0)
   }
 })
@@ -99,8 +99,17 @@ test('계정별 알림 쿼리는 캐시 범위를 분리하고 조회 취소 신
   const h = notificationFixture()
   let request
   const { notificationQueries } = load('src/entities/notification/api/notification.queries.ts', {
-    '@/shared/api': { createQuery: options => options, createInfiniteQuery: options => options, STALE_TIME: { REALTIME: 0 } },
-    './notification.api': { getUnreadCount: async (...args) => { request = args; return 0 } },
+    '@/shared/api': {
+      createQuery: (options) => options,
+      createInfiniteQuery: (options) => options,
+      STALE_TIME: { REALTIME: 0 },
+    },
+    './notification.api': {
+      getUnreadCount: async (...args) => {
+        request = args
+        return 0
+      },
+    },
     '@/shared/lib/authReadSession': h.session,
   })
   const first = notificationQueries.unreadCount()

@@ -1,8 +1,16 @@
 const { test } = require('node:test')
 const assert = require('node:assert/strict')
-const { communitySessionFixture, token, deferred, page } = require('./fixtures/community-session.fixture.cjs')
+const {
+  communitySessionFixture,
+  token,
+  deferred,
+  page,
+} = require('./fixtures/community-session.fixture.cjs')
 
-for (const [label, method] of [['좋아요한 글 조회', 'getMyLikedPosts'], ['댓글 단 글 조회', 'getMyCommentedPosts']]) {
+for (const [label, method] of [
+  ['좋아요한 글 조회', 'getMyLikedPosts'],
+  ['댓글 단 글 조회', 'getMyCommentedPosts'],
+]) {
   test(`${label}는 계정 전환 뒤 도착한 이전 결과를 폐기함`, async () => {
     const response = deferred()
     const h = communitySessionFixture(() => response.promise)
@@ -14,7 +22,10 @@ for (const [label, method] of [['좋아요한 글 조회', 'getMyLikedPosts'], [
 
   test(`${label}는 로그아웃 의도 이후 조회하지 않음`, async () => {
     let calls = 0
-    const h = communitySessionFixture(async () => { calls++; return page() })
+    const h = communitySessionFixture(async () => {
+      calls++
+      return page()
+    })
     h.state.active = false
     await assert.rejects(h.api[method](), /로그인/)
     assert.equal(calls, 0)
@@ -22,7 +33,10 @@ for (const [label, method] of [['좋아요한 글 조회', 'getMyLikedPosts'], [
 
   test(`${label}는 페이지와 크기를 유지하고 인증 및 취소 신호를 고정함`, async () => {
     let received
-    const h = communitySessionFixture(async (path, config) => { received = { path, config }; return page() })
+    const h = communitySessionFixture(async (path, config) => {
+      received = { path, config }
+      return page()
+    })
     const signal = new AbortController().signal
     await h.api[method]({ page: 2, pageSize: 24 }, h.session.getAuthReadSession(), signal)
     assert.match(received.path, /page=2&pageSize=24/)

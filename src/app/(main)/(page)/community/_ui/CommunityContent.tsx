@@ -64,7 +64,7 @@ const CommunityContent = ({
   initialExperience,
 }: {
   /** 서버에서 미리 받은 확장 기능 설정 — 있으면 카테고리 줄을 첫 화면부터 그린다 */
-  initialExperience?: { config: CommunityExperienceConfig } | null| null
+  initialExperience?: { config: CommunityExperienceConfig } | null | null
 }) => {
   const router = useRouter()
   const parameters = useSearchParams()

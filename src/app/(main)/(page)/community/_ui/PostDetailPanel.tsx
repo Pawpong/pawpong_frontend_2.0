@@ -238,9 +238,7 @@ const PostDetailPanel = ({
 
   // 인스타그램처럼 액션바는 본문 흐름 안에 두고, 하단에는 입력창만 고정한다
   const actionBar = interactive && (
-    <div
-      className={isPage ? 'py-2' : 'border-b border-neutral-100 px-4 py-3'}
-    >
+    <div className={isPage ? 'py-2' : 'border-b border-neutral-100 px-4 py-3'}>
       <CommunityPostActions
         likeCount={post.likeCount}
         commentCount={post.commentCount}
@@ -360,10 +358,7 @@ const PostDetailPanel = ({
             <h2 id="post-comments-title" className="mb-1 font-cafe24 text-lg text-neutral-850">
               댓글 <span className="text-neutral-700">{post.commentCount}</span>
             </h2>
-            <CommentComposerBar
-              thread={thread}
-              className="mb-2"
-            />
+            <CommentComposerBar thread={thread} className="mb-2" />
             <CommentList thread={thread} />
           </section>
         )}
