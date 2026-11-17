@@ -1,7 +1,11 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
-import { ReactivateAccountPrompt, SocialLoginList, SocialProviderPrompt } from '@/features/auth'
-import { isSocialProvider } from '@/features/auth/lib/socialLogin'
+import {
+  isSocialProvider,
+  ReactivateAccountPrompt,
+  SocialLoginList,
+  SocialProviderPrompt,
+} from '@/features/auth'
 import { AlertMessage } from '@/shared/ui'
 import { CheckRoundedIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
