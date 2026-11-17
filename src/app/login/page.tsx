@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
-import { ReactivateAccountPrompt, SocialLoginList } from '@/features/auth'
+import { ReactivateAccountPrompt, SocialLoginList, SocialProviderPrompt } from '@/features/auth'
+import { isSocialProvider } from '@/features/auth/lib/socialLogin'
 import { AlertMessage } from '@/shared/ui'
 import { CheckRoundedIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
@@ -37,12 +38,21 @@ import { LogoButton } from '@/widgets/gnb'
 const LoginPage = async ({
   searchParams,
 }: {
-  searchParams: Promise<{ signup?: string; returnUrl?: string; error?: string; type?: string }>
+  searchParams: Promise<{
+    signup?: string
+    returnUrl?: string
+    error?: string
+    type?: string
+    provider?: string
+  }>
 }) => {
-  const { signup, returnUrl: requestedReturnUrl, error, type } = await searchParams
+  const { signup, returnUrl: requestedReturnUrl, error, type, provider } = await searchParams
   const returnUrl = normalizeReturnUrl(requestedReturnUrl)
-  // 탈퇴 계정은 ReactivateAccountPrompt 가 복구 모달과 함께 따로 안내한다.
-  const loginError = type === 'deleted_account' ? undefined : error
+  // 탈퇴 계정은 ReactivateAccountPrompt 가 복구 모달로, 다른 소셜로 가입된 계정은
+  // SocialProviderPrompt 가 그 제공자로 보내는 모달로 따로 안내한다.
+  // 모르는 provider 는 모달이 뜨지 않으므로, 사유가 사라지지 않게 인라인으로 남긴다.
+  const handledByModal = type === 'deleted_account' || isSocialProvider(provider)
+  const loginError = handledByModal ? undefined : error
   const reviewHref =
     returnUrl === '/' ? '/login/review' : `/login/review?returnUrl=${encodeURIComponent(returnUrl)}`
 
@@ -93,6 +103,11 @@ const LoginPage = async ({
             {/* 탈퇴 계정 복구 안내 — useSearchParams 를 쓰므로 Suspense 필요 (Next 16) */}
             <Suspense fallback={null}>
               <ReactivateAccountPrompt />
+            </Suspense>
+
+            {/* 다른 소셜로 가입된 계정 — 그 제공자로 바로 보내는 모달 */}
+            <Suspense fallback={null}>
+              <SocialProviderPrompt />
             </Suspense>
 
             {/* SocialLoginList 는 useSearchParams(returnUrl) 를 쓰므로 Suspense 로 감싼다 (Next 16 요구사항) */}
