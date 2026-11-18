@@ -6,7 +6,8 @@ import { termsQueries } from '@/entities/term'
 import { useRegisterBreeder, useUploadBreederDocuments } from '../api/onboarding.mutations'
 import { updateMyProfile } from '@/entities/profile'
 import { useOnboarding } from './OnboardingContext'
-import { existingProviderOf, useSignupCompletion } from './useSignupCompletion' // [refactored]
+import { useSignupCompletion } from './useSignupCompletion' // [refactored]
+import { existingProviderOf } from './existingProvider'
 import { SIGNUP_ERROR } from './signupErrors' // [refactored]
 import type { SocialProvider } from '@/shared/lib/socialLogin'
 import type { DocumentsFormData } from './schema'
