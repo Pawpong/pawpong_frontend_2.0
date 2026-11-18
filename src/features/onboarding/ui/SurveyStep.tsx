@@ -7,6 +7,7 @@ import { surveySchema, SURVEY_TEXT_MAX_LENGTH, type SurveyFormData } from '../mo
 import { cn } from '@/shared/lib/cn'
 import { STEP_LAYOUT } from '../model/stepLayout'
 import { StepContainer } from './StepContainer'
+import { ExistingAccountLoginButton } from './ExistingAccountLoginButton'
 import { TextareaField, TextLabel, Button } from '@/shared/ui'
 import { CheckboxField } from './CheckboxField'
 import { FieldError } from './FieldError'
@@ -70,7 +71,7 @@ const SurveyTextarea = ({
 
 const SurveyStep = () => {
   // 입양자 플로우의 마지막 데이터 단계 — 실제 가입 호출은 useAdopterSignup 이 담당한다
-  const { submit, isPending, error } = useAdopterSignup()
+  const { submit, isPending, error, existingProvider } = useAdopterSignup()
 
   const { register, control, watch, setValue, handleSubmit, formState, goBack } = useStepForm(
     'survey',
@@ -100,6 +101,9 @@ const SurveyStep = () => {
       nextLabel={isPending ? '가입 중…' : '가입 완료하기'}
       nextDisabled={isPending}
       navError={error ?? undefined}
+      navExtraButtons={
+        existingProvider && <ExistingAccountLoginButton provider={existingProvider} />
+      }
     >
       {/* 콘텐츠 영역 — 섹션 간 gap: 모바일 32px / tab+ 58px (Figma root gap, mt 대신 gap) */}
       <div className={cn('flex w-full flex-col', STEP_LAYOUT.blockGap)}>

@@ -92,3 +92,74 @@ test('토큰 저장 결과와 실제 쿠키를 확인한 뒤에만 로그인 상
     else global.document = originalDocument
   }
 })
+
+test('이미 가입된 이메일(409)이면 응답 data 의 기존 가입 방법만 꺼내 그 제공자 로그인으로 보냄', () => {
+  const { loadTypescript } = require('./helpers/load-typescript.cjs')
+  const { ApiError } = loadTypescript('src/shared/api/unwrap.ts')
+  const { existingProviderOf } = loadTypescript(
+    'src/features/onboarding/model/useSignupCompletion.ts',
+    {
+      'next/navigation': {},
+      '@/shared/api': { isApiError: (error) => error instanceof ApiError },
+      '@/shared/lib/saveAuthTokens': {},
+      '@/shared/lib/socialLogin': loadTypescript('src/shared/lib/socialLogin.ts', {
+        '@/shared/config': { getApiBaseUrl: () => '' },
+      }),
+      '@/shared/lib/socialSignupSession': {},
+      './OnboardingContext': {},
+      './useOnboardingForm': {},
+      './signupErrors': {},
+    },
+  )
+  // 백엔드 409 본문: { success, code, error, data: { errorCode, existingProvider } }
+  const conflict = (data) =>
+    new ApiError('이미 카카오 계정으로 가입되어 있어요.', 409, undefined, {
+      success: false,
+      code: 409,
+      error: '이미 카카오 계정으로 가입되어 있어요.',
+      data,
+    })
+  assert.equal(
+    existingProviderOf(
+      conflict({ errorCode: 'SOCIAL_PROVIDER_MISMATCH', existingProvider: 'kakao' }),
+    ),
+    'kakao',
+  )
+  // 버튼을 만들 수 없는 값·다른 오류는 문구만 보여 준다
+  for (const error of [
+    conflict({ errorCode: 'SOCIAL_PROVIDER_MISMATCH', existingProvider: 'local' }),
+    conflict(undefined),
+    new ApiError('잘못된 요청', 400, undefined, { data: { existingProvider: 'kakao' } }),
+    new Error('network'),
+  ]) {
+    assert.equal(existingProviderOf(error), undefined)
+  }
+})
+
+test('토큰 저장 요청에 제공자를 함께 실어 최근 사용 쿠키를 심게 함 (없으면 싣지 않음)', async () => {
+  const { saveAuthTokens } = load('src/shared/lib/saveAuthTokens.ts')
+  const originalFetch = global.fetch
+  const originalWindow = global.window
+  const originalDocument = global.document
+  const bodies = []
+  global.window = { dispatchEvent: () => {} }
+  global.document = { cookie: 'accessToken=access' }
+  global.fetch = async (_, init) => {
+    bodies.push(JSON.parse(init.body))
+    return { ok: true }
+  }
+  try {
+    await saveAuthTokens({ accessToken: 'access', refreshToken: 'refresh', provider: 'kakao' })
+    await saveAuthTokens({ accessToken: 'access', refreshToken: 'refresh' })
+    assert.deepEqual(bodies, [
+      { accessToken: 'access', refreshToken: 'refresh', provider: 'kakao' },
+      { accessToken: 'access', refreshToken: 'refresh' },
+    ])
+  } finally {
+    global.fetch = originalFetch
+    if (originalWindow === undefined) delete global.window
+    else global.window = originalWindow
+    if (originalDocument === undefined) delete global.document
+    else global.document = originalDocument
+  }
+})
