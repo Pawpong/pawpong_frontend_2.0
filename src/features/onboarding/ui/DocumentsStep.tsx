@@ -10,6 +10,7 @@ import { POLICIES } from '../model/policyContent'
 import { cn } from '@/shared/lib/cn'
 import { STEP_LAYOUT } from '../model/stepLayout'
 import { StepContainer } from './StepContainer'
+import { ExistingAccountLoginButton } from './ExistingAccountLoginButton'
 import { DocumentUploadButton } from './DocumentUploadButton'
 import { CheckboxField } from './CheckboxField'
 import { FieldError } from './FieldError'
@@ -17,7 +18,7 @@ import { BREEDER_DOCUMENT_FIELDS } from '../model/breederDocuments'
 
 const DocumentsStep = () => {
   // 브리더 플로우의 마지막 데이터 단계 — 서류 업로드 + 가입 호출은 useBreederSignup 이 담당한다
-  const { submit, isPending, error } = useBreederSignup()
+  const { submit, isPending, error, existingProvider } = useBreederSignup()
   const [pledgeOpen, setPledgeOpen] = useState(false)
 
   const { control, handleSubmit, watch, setValue, goBack } = useStepForm(
@@ -42,6 +43,9 @@ const DocumentsStep = () => {
       nextLabel={isPending ? '가입 중…' : '가입 완료하기'}
       nextDisabled={isPending}
       navError={error ?? undefined}
+      navExtraButtons={
+        existingProvider && <ExistingAccountLoginButton provider={existingProvider} />
+      }
     >
       <p className="w-full rounded-xl bg-secondary-50 p-4 text-body-md text-neutral-700">
         서류 첨부는 선택사항이에요.

@@ -1,10 +1,12 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { isSameOriginRequest, readBoundedJson } from '@/shared/lib/server'
 import { AUTH_BFF_NO_STORE, AUTH_COOKIE_BODY_MAX_BYTES } from '../_constants/auth-bff'
-import { authCookieTokensSchema } from '../_lib/auth-token.schema'
+import { LAST_SOCIAL_PROVIDER_COOKIE } from '@/shared/lib/lastSocialProvider'
+import { authSetCookieBodySchema } from '../_lib/auth-token.schema'
 
 const DEFAULT_ACCESS_TOKEN_MAX_AGE_SECONDS = 60 * 60 * 24
 const DEFAULT_REFRESH_TOKEN_MAX_AGE_SECONDS = 60 * 60 * 24 * 7
+const LAST_PROVIDER_MAX_AGE_SECONDS = 60 * 60 * 24 * 365
 
 /** 백엔드가 예전에 운영 로그인에서 굽던 쿠키의 Domain — 잔여분을 지우려면 이 값이 정확히 같아야 한다 */
 const PRODUCTION_COOKIE_DOMAIN = '.pawpong.kr'
@@ -154,7 +156,7 @@ export async function POST(req: NextRequest) {
       { ok: false, message: '올바른 JSON 요청이 필요합니다.' },
       { status: 400, headers: AUTH_BFF_NO_STORE },
     )
-  const parsed = authCookieTokensSchema.safeParse(
+  const parsed = authSetCookieBodySchema.safeParse(
     await readBoundedJson(req, AUTH_COOKIE_BODY_MAX_BYTES).catch(() => null),
   )
   if (!parsed.success)
@@ -162,7 +164,7 @@ export async function POST(req: NextRequest) {
       { ok: false, message: '올바른 토큰이 필요합니다.' },
       { status: 400, headers: AUTH_BFF_NO_STORE },
     )
-  const { accessToken, refreshToken } = parsed.data
+  const { accessToken, refreshToken, provider } = parsed.data
 
   const userRole = decodeJwtRole(accessToken)
   const accessTokenMaxAge = resolveJwtMaxAgeSeconds(
@@ -194,6 +196,20 @@ export async function POST(req: NextRequest) {
     appendProductionCookies(res, cookies, isSecure)
   } else {
     setHostOnlyCookies(res, cookies, isSecure)
+  }
+
+  // '최근 사용' 표시용 — 인증 쿠키가 아니라 위 목록에 넣지 않는다(로그아웃 정리 대상이 아님).
+  // 운영 경로가 헤더를 직접 붙이므로 cookies.set 대신 맨 끝에 append 해 앞 줄들을 덮지 않게 한다.
+  if (provider) {
+    const attrs = [
+      `${LAST_SOCIAL_PROVIDER_COOKIE}=${provider}`,
+      'Path=/',
+      `Max-Age=${LAST_PROVIDER_MAX_AGE_SECONDS}`,
+      'SameSite=Lax',
+      'HttpOnly',
+    ]
+    if (isSecure) attrs.push('Secure')
+    res.headers.append('Set-Cookie', attrs.join('; '))
   }
 
   return res

@@ -4,9 +4,10 @@ import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { AppleIcon, GoogleIcon, KakaoIcon, NaverIcon } from '@/shared/assets'
 import { normalizeReturnUrl } from '@/shared/lib/normalizeReturnUrl'
+import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { restoreAuthSession } from '@/shared/lib/authSessionRecovery'
-import { socialLoginUrl, type SocialProvider } from '../lib/socialLogin'
+import { socialLoginUrl, type SocialProvider } from '@/shared/lib/socialLogin'
 
 /**
  * 소셜 로그인 버튼 목록 (카카오 / 네이버 / 구글)
@@ -57,7 +58,12 @@ const SOCIAL_BUTTONS: {
   },
 ]
 
-export const SocialLoginList = () => {
+interface SocialLoginListProps {
+  /** 마지막으로 로그인한 제공자 (서버가 pawpong_last_provider 쿠키에서 읽어 넘긴다) — 그 버튼에 '최근 사용' 배지 */
+  lastProvider?: SocialProvider
+}
+
+export const SocialLoginList = ({ lastProvider }: SocialLoginListProps) => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const returnUrl = normalizeReturnUrl(searchParams.get('returnUrl'))
@@ -124,17 +130,27 @@ export const SocialLoginList = () => {
         </p>
       )}
       {SOCIAL_BUTTONS.map(({ provider, label, Icon }) => (
-        <Button
-          size="md"
-          key={provider}
-          intent={provider}
-          width="full"
-          disabled={restoring}
-          onClick={() => startSocialLogin(provider)}
-        >
-          <Icon className="size-4" />
-          {label}
-        </Button>
+        <div key={provider} className="relative">
+          <Button
+            size="md"
+            intent={provider}
+            width="full"
+            disabled={restoring}
+            onClick={() => startSocialLogin(provider)}
+          >
+            <Icon className="size-4" />
+            {label}
+            {provider === lastProvider && <span className="sr-only">(최근 사용)</span>}
+          </Button>
+          {/* 어느 버튼으로 가입했는지 잊은 사용자를 위해 지난번 버튼을 표시한다 */}
+          {provider === lastProvider && (
+            <span className="pointer-events-none absolute -top-2 right-3" aria-hidden="true">
+              <Badge variant="pointFilled" size="md">
+                최근 사용
+              </Badge>
+            </span>
+          )}
+        </div>
       ))}
     </div>
   )

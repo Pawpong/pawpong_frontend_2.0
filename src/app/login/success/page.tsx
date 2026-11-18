@@ -30,6 +30,8 @@ const LoginSuccessContent = () => {
       const accessToken = searchParams.get('accessToken')
       const refreshToken = searchParams.get('refreshToken')
       const returnUrl = normalizeReturnUrl(searchParams.get('returnUrl'))
+      // 백엔드가 이번에 로그인한 제공자를 실어 보낸다 — 로그인 화면 '최근 사용' 표시용
+      const provider = searchParams.get('provider')
 
       if (!accessToken || !refreshToken) {
         router.replace('/login')
@@ -37,7 +39,7 @@ const LoginSuccessContent = () => {
       }
 
       try {
-        const saved = await saveAuthTokens({ accessToken, refreshToken })
+        const saved = await saveAuthTokens({ accessToken, refreshToken, provider })
         if (cancelled) return
         if (!saved) {
           throw new Error('인증 쿠키 저장 실패')

@@ -7,8 +7,9 @@ import { useRegisterAdopter } from '../api/onboarding.mutations'
 import { useOnboarding } from './OnboardingContext'
 import { buildTermsAgreements, REQUIRED_ADOPTER_TERM_CODES } from './termsAgreements'
 import { buildAdopterRegistrationRequest } from './buildAdopterRegistrationRequest'
-import { useSignupCompletion } from './useSignupCompletion' // [refactored]
+import { existingProviderOf, useSignupCompletion } from './useSignupCompletion' // [refactored]
 import { SIGNUP_ERROR } from './signupErrors' // [refactored]
+import type { SocialProvider } from '@/shared/lib/socialLogin'
 import type { SurveyFormData } from './schema'
 import { hasContactVerification } from './contactVerification'
 
@@ -24,6 +25,8 @@ export const useAdopterSignup = () => {
   const { data: activeTerms } = useQuery(termsQueries.list())
   const { mutateAsync: registerAdopter, isPending } = useRegisterAdopter()
   const [error, setError] = useState<string | null>(null)
+  // 이미 가입된 이메일이면 그 가입 방법 — 화면이 그 제공자 로그인 버튼을 띄운다
+  const [existingProvider, setExistingProvider] = useState<SocialProvider>()
   // [refactored] 세션 확인 + 가입 마무리는 브리더 플로우와 동일 — 공통 훅으로
   const { requireSocialSession, complete } = useSignupCompletion(setError)
 
@@ -31,6 +34,7 @@ export const useAdopterSignup = () => {
     if (isPending) return
     setFormData('survey', surveyData)
     setError(null)
+    setExistingProvider(undefined)
 
     const social = requireSocialSession()
     if (!social) return
@@ -94,8 +98,9 @@ export const useAdopterSignup = () => {
       await complete(tokens) // [refactored]
     } catch (err) {
       setError(err instanceof Error ? err.message : SIGNUP_ERROR.registerFailed)
+      setExistingProvider(existingProviderOf(err))
     }
   }
 
-  return { submit, isPending, error }
+  return { submit, isPending, error, existingProvider }
 }
