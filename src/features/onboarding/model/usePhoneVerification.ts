@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { CheckRoundedIcon } from '@/shared/assets'
+import type { SocialProvider } from '@/shared/lib/socialLogin'
 import { useSendVerificationCode, useVerifyCode } from '../api/onboarding.mutations'
+import { existingProviderOf, isAlreadyRegisteredError } from './existingProvider'
 import type { HelpMessageState } from '@/shared/ui'
 
 /** 백엔드 인증코드 만료(3분)와 동일 */
@@ -34,6 +36,8 @@ export const usePhoneVerification = ({
   const [secondsLeft, setSecondsLeft] = useState(0)
   const [phoneMessage, setPhoneMessage] = useState<HelpMessageState | null>(null)
   const [codeMessage, setCodeMessage] = useState<HelpMessageState | null>(null)
+  // 인증번호를 맞혔는데 이미 가입된 번호면 그 가입 방법 — 화면이 그 제공자 로그인 버튼을 띄운다
+  const [existingProvider, setExistingProvider] = useState<SocialProvider>()
 
   // 인증코드 유효시간 카운트다운
   useEffect(() => {
@@ -50,6 +54,7 @@ export const usePhoneVerification = ({
       return
     }
     setPhoneMessage(null)
+    setExistingProvider(undefined)
     sendCodeMutate(phone, {
       onSuccess: () => {
         setIsCodeSent(true)
@@ -94,7 +99,10 @@ export const usePhoneVerification = ({
           setCodeMessage({ text: '인증되었습니다.', status: 'success' })
         },
         onError: (error) => {
-          onFailure?.()
+          // 이미 가입된 번호(409)는 실패로 세지 않는다. 세면 2번 뒤 이메일 인증이 열려
+          // 다른 이메일로 두 번째 계정을 만들 수 있게 된다 — 대신 기존 가입 방법으로 보낸다
+          if (isAlreadyRegisteredError(error)) setExistingProvider(existingProviderOf(error))
+          else onFailure?.()
           setCodeMessage({
             text: error instanceof Error ? error.message : '인증번호를 다시 입력해주세요',
             status: 'error',
@@ -112,6 +120,7 @@ export const usePhoneVerification = ({
     isExpired: isCodeSent && !isVerified && secondsLeft <= 0,
     phoneMessage,
     codeMessage,
+    existingProvider,
     /** 남은 시간 m:ss */
     timer: `${Math.floor(secondsLeft / 60)}:${String(secondsLeft % 60).padStart(2, '0')}`,
     sendCode,

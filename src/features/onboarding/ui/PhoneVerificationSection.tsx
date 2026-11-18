@@ -23,6 +23,7 @@ import {
   shouldOfferEmailVerification,
 } from '../model/contactVerification'
 import { EmailVerificationSection } from './EmailVerificationSection'
+import { ExistingAccountLoginButton } from './ExistingAccountLoginButton'
 import { FieldError } from './FieldError'
 import { useOnboardingForm } from '../model/useOnboardingForm'
 
@@ -198,6 +199,11 @@ const PhoneVerificationSection = ({
               <HelpMessage status={verification.codeMessage.status} className="mt-1">
                 {verification.codeMessage.text}
               </HelpMessage>
+            )}
+            {verification.existingProvider && (
+              <div className="mt-2">
+                <ExistingAccountLoginButton provider={verification.existingProvider} />
+              </div>
             )}
             <FieldError
               message={errors.verificationCode?.message ?? errors.phoneVerified?.message}
