@@ -1,11 +1,19 @@
 import type { SVGProps } from 'react'
-import { PixelActionIcon } from './PixelActionIcon'
 
+// 2px 도트 별. 채움 상태에서는 안쪽만 포인트 색으로 칠하고 윤곽은 currentColor 를 유지한다.
 export const ProfileStarIcon = ({
   filled = false,
   ...props
 }: SVGProps<SVGSVGElement> & { filled?: boolean }) => (
-  <PixelActionIcon glyph="star" filled={filled} selectedFill="var(--color-point-500)" {...props} />
+  <svg width="30" height="30" viewBox="0 0 30 30" fill="currentColor" aria-hidden="true" {...props}>
+    {filled && (
+      <path
+        fill="var(--color-point-500)"
+        d="M14 6h2v2h-2ZM14 8h2v2h-2ZM12 10h6v2h-6ZM6 12h18v2h-18ZM8 14h14v2h-14ZM10 16h10v2h-10ZM10 18h10v2h-10ZM8 20h6v2h-6ZM16 20h6v2h-6ZM8 22h2v2h-2ZM20 22h2v2h-2Z"
+      />
+    )}
+    <path d="M14 4h2v2h-2ZM12 6h2v2h-2ZM16 6h2v2h-2ZM12 8h2v2h-2ZM16 8h2v2h-2ZM4 10h8v2h-8ZM18 10h8v2h-8ZM4 12h2v2h-2ZM24 12h2v2h-2ZM6 14h2v2h-2ZM22 14h2v2h-2ZM8 16h2v2h-2ZM20 16h2v2h-2ZM8 18h2v2h-2ZM20 18h2v2h-2ZM6 20h2v2h-2ZM14 20h2v2h-2ZM22 20h2v2h-2ZM6 22h2v2h-2ZM10 22h4v2h-4ZM16 22h4v2h-4ZM22 22h2v2h-2ZM6 24h4v2h-4ZM20 24h4v2h-4Z" />
+  </svg>
 )
 
 // 가져온 사이렌 경로는 유지하고, 실제 도형의 중심에 맞춰 여백을 정규화한다.

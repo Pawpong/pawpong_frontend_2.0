@@ -16,25 +16,29 @@ import { LoginPromptModal } from './LoginPromptModal'
 import { TextareaField } from './TextareaField'
 import { IconButton } from './IconButton'
 
-interface ReportActionProps<Reason extends string> {
-  triggerVariant?: 'menu' | 'flag'
-  /** menu(⋯) 아이콘 색 — 다른 ⋯ 메뉴와 같은 neutral 이 기본, 갈색 아이콘(공유 등) 옆에 붙으면 brand */
-  menuTone?: 'neutral' | 'brand'
+interface ReportFlowOptions<Reason extends string> {
   targetLabel: string
   options: readonly { value: Reason; label: string }[]
   onSubmit: (data: { reason: Reason; description?: string }) => Promise<string>
   requireOtherDescription?: boolean
 }
 
-/** 신고 대상별 API와 사유만 주입하는 공통 신고 흐름. */
-export const ReportAction = <Reason extends string>({
-  triggerVariant = 'menu',
-  menuTone = 'neutral',
+interface ReportActionProps<Reason extends string> extends ReportFlowOptions<Reason> {
+  triggerVariant?: 'menu' | 'flag'
+  /** menu(⋯) 아이콘 색 — 다른 ⋯ 메뉴와 같은 neutral 이 기본, 갈색 아이콘(공유 등) 옆에 붙으면 brand */
+  menuTone?: 'neutral' | 'brand'
+}
+
+/**
+ * 신고 대상별 API와 사유만 주입하는 공통 신고 흐름.
+ * 다른 ⋮ 메뉴 안에 신고 항목을 넣을 때는 request 를 항목에 걸고 dialogs 를 메뉴 바깥에 둔다.
+ */
+export const useReportFlow = <Reason extends string>({
   targetLabel,
   options,
   onSubmit,
   requireOtherDescription = false,
-}: ReportActionProps<Reason>) => {
+}: ReportFlowOptions<Reason>) => {
   const id = useId()
   const [open, setOpen] = useState(false)
   const [loginOpen, setLoginOpen] = useState(false)
@@ -88,36 +92,10 @@ export const ReportAction = <Reason extends string>({
     }
   }
 
-  return (
-    <>
-      {triggerVariant === 'flag' ? (
-        <IconButton
-          tone="brand"
-          aria-label={`${targetLabel} 신고`}
-          title="신고하기"
-          aria-haspopup="dialog"
-          onClick={() => (getAccessToken() ? changeOpen(true) : setLoginOpen(true))}
-        >
-          <ReportFlagIcon className="size-6" />
-        </IconButton>
-      ) : (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <IconButton tone={menuTone} aria-label={`${targetLabel} 더보기`}>
-              <MoreVertIcon className="size-6" />
-            </IconButton>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onSelect={() => (getAccessToken() ? changeOpen(true) : setLoginOpen(true))}
-              className="text-error-500 focus:text-error-600"
-            >
-              신고
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )}
+  const request = () => (getAccessToken() ? changeOpen(true) : setLoginOpen(true))
 
+  const dialogs = (
+    <>
       <Dialog open={open} onOpenChange={changeOpen}>
         <DialogContent
           overlayClassName="z-confirm"
@@ -213,6 +191,48 @@ export const ReportAction = <Reason extends string>({
         description={result ?? undefined}
         actions={[{ label: '확인', intent: 'primary', onClick: () => setResult(null) }]}
       />
+    </>
+  )
+
+  return { request, dialogs }
+}
+
+/** 신고 흐름을 ⋮ 메뉴 또는 깃발 버튼으로 여는 기본 트리거. */
+export const ReportAction = <Reason extends string>({
+  triggerVariant = 'menu',
+  menuTone = 'neutral',
+  ...flow
+}: ReportActionProps<Reason>) => {
+  const { request, dialogs } = useReportFlow(flow)
+  const { targetLabel } = flow
+  return (
+    <>
+      {triggerVariant === 'flag' ? (
+        <IconButton
+          tone="brand"
+          aria-label={`${targetLabel} 신고`}
+          title="신고하기"
+          aria-haspopup="dialog"
+          onClick={request}
+        >
+          <ReportFlagIcon className="size-6" />
+        </IconButton>
+      ) : (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <IconButton tone={menuTone} aria-label={`${targetLabel} 더보기`}>
+              <MoreVertIcon className="size-6" />
+            </IconButton>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onSelect={request} className="text-error-500 focus:text-error-600">
+              신고
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
+
+      {dialogs}
     </>
   )
 }

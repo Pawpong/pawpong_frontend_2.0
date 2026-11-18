@@ -133,7 +133,7 @@ test('보류 카드의 공유와 반응 콜백은 열지 않고 기존 글은 �
       useToggleCommunityPostLike: () => ({ toggleLike: () => {} }),
       useToggleCommunityPostBookmark: () => ({ toggleBookmark: () => {} }),
     },
-    './ReportPostAction': { ReportPostAction: () => null },
+    './ReportPostAction': { useReportPost: () => ({ request: () => {}, dialogs: null }) },
   })
   const card = cards.ConnectedFeedCard({
     ...preview.toCommunityPreviewProps(raw),
@@ -156,6 +156,7 @@ test('보류 상세는 두 레이아웃 모두 댓글 작성과 반응 및 공�
       COMMUNITY_LOGIN_PROMPT: { reaction: '합성 인증 안내' },
       isCommunityPostHeld: model.isCommunityPostHeld,
       CommunityPostActions: () => createElement('button', null, '반응 기능'),
+      PostMoreMenu: () => null,
     },
     '@/features/auth': { useLoginGuard: () => ({ guard: (value) => value }) },
     '@/shared/lib/useAuthStatus': { useLoginGuard: () => ({ guard: (value) => value }) },

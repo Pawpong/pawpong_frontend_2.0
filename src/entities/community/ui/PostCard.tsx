@@ -4,10 +4,11 @@ import type { ReactNode } from 'react'
 
 import { SessionImage as Image } from '@/shared/ui/SessionImage'
 import Link from 'next/link'
-import { BeforeAfterSlider, OwnerActionsMenu, ProfileHeader, TextLabel } from '@/shared/ui'
+import { BeforeAfterSlider, ProfileHeader, TextLabel } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import type { CommunityPreviewProps } from '../model/communityPreview'
 import { CommunityPostActions } from './CommunityPostActions'
+import { PostMoreMenu } from './PostMoreMenu'
 import { CommunityPostProfile } from './CommunityPostProfile'
 import { CommunityReviewLabel } from './CommunityReviewLabel'
 
@@ -24,8 +25,9 @@ interface PostCardProps extends CommunityPreviewProps {
   /** 좋아요·북마크 토글 — features의 ConnectedPostCard에서 주입 */
   onToggleLike?: () => void
   onToggleSave?: () => void
-  /** 남의 글에 표시할 기능 레이어 액션(예: 신고 메뉴) */
-  moreAction?: ReactNode
+  /** 남의 글 ⋮ 메뉴의 신고 항목 — 다이얼로그는 reportDialog 로 받는다 */
+  onReport?: () => void
+  reportDialog?: ReactNode
   className?: string
 }
 
@@ -73,7 +75,7 @@ const ImagesRow = ({
  * 커뮤니티 게시글 카드 (Figma node 1054-28522 · community box -게시글)
  * - 헤더: 아바타 + [이름·작성시각] / 본문 미리보기 + 더보기(⋯)
  * - 이미지: 가로 스크롤 (모바일 281×211 / 탭·PC 320×240)
- * - 액션: 좋아요 · 댓글 · 북마크 (32px)
+ * - 액션: 좋아요 · 댓글 (32px), 저장·공유는 ⋮ 메뉴
  */
 const PostCard = ({
   author,
@@ -95,7 +97,8 @@ const PostCard = ({
   onDelete,
   onToggleLike,
   onToggleSave,
-  moreAction,
+  onReport,
+  reportDialog,
   className,
 }: PostCardProps) => {
   const hasImages = images.length > 0
@@ -105,6 +108,26 @@ const PostCard = ({
           index !== aiComparison.beforePhotoIndex && index !== aiComparison.afterPhotoIndex,
       )
     : []
+
+  const moreMenu = (
+    <PostMoreMenu
+      saved={isSaved}
+      onToggleSave={onToggleSave}
+      share={
+        shareable && detailHref
+          ? {
+              url: detailHref,
+              title: `${author.nickname}님의 게시글`,
+              description: text,
+              imageUrl: images[0],
+            }
+          : undefined
+      }
+      onEdit={onEdit}
+      onDelete={onDelete}
+      onReport={onDelete ? undefined : onReport}
+    />
+  )
 
   const profileCluster = (
     <CommunityPostProfile
@@ -128,7 +151,7 @@ const PostCard = ({
           profileImageUrl={author.profileImageUrl}
           detailHref={detailHref}
           showMore={showMore}
-          action={onDelete ? <OwnerActionsMenu onEdit={onEdit} onDelete={onDelete} /> : moreAction}
+          action={moreMenu}
           className="p-2 pc:px-0"
         />
       ) : (
@@ -140,7 +163,7 @@ const PostCard = ({
           ) : (
             profileCluster
           )}
-          {onDelete ? <OwnerActionsMenu onEdit={onEdit} onDelete={onDelete} /> : moreAction}
+          {moreMenu}
         </div>
       )}
 
@@ -176,24 +199,12 @@ const PostCard = ({
 
         {/* 액션 + 댓글 미리보기 — 아이콘↔댓글 4px gap */}
         <div className="flex flex-col gap-1">
-          {/* 액션: 좋아요 · 댓글 · 북마크 (픽셀 아이콘) */}
+          {/* 액션: 좋아요 · 댓글 (저장·공유는 ⋮ 메뉴) */}
           <CommunityPostActions
             likeCount={likeCount}
             commentCount={commentCount}
             liked={isLiked}
-            saved={isSaved}
             onToggleLike={onToggleLike}
-            onToggleSave={onToggleSave}
-            share={
-              shareable && detailHref
-                ? {
-                    url: detailHref,
-                    title: `${author.nickname}님의 게시글`,
-                    description: text,
-                    imageUrl: images[0],
-                  }
-                : undefined
-            }
             detailHref={detailHref}
           />
 
@@ -208,6 +219,7 @@ const PostCard = ({
           )}
         </div>
       </div>
+      {reportDialog}
     </article>
   )
 }

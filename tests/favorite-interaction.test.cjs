@@ -30,9 +30,7 @@ function renderFavoriteButton(props) {
   const { ToggleIconButton } = load('src/shared/ui/ToggleIconButton.tsx', {
     '@/shared/lib/tv': { tv },
   })
-  const { FavoriteIcon } = load('src/shared/assets/icons/FavoriteIcon.tsx', {
-    './PixelActionIcon': load('src/shared/assets/icons/PixelActionIcon.tsx'),
-  })
+  const { FavoriteIcon } = load('src/shared/assets/icons/FavoriteIcon.tsx')
   return renderToStaticMarkup(
     React.createElement(ToggleIconButton, {
       icon: FavoriteIcon,
@@ -58,7 +56,7 @@ test('heart hover is removed without removing other shared action feedback', () 
 test('hearts share the action grid at both medium and large sizes', () => {
   const medium = renderFavoriteButton({ size: 'md' })
   assert.match(medium, /width="30" height="30" viewBox="0 0 30 30"/)
-  assert.match(medium, /stroke-width="1.5"/)
+  assert.match(medium, /stroke-width="2"/)
   assert.doesNotMatch(medium, /size-8/)
   const large = renderFavoriteButton({ size: 'lg' })
   assert.match(large, /width="48" height="48" viewBox="0 0 30 30"/)

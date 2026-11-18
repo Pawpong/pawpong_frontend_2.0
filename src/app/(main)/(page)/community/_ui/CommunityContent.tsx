@@ -1,7 +1,6 @@
 'use client'
 
 import { useMemo } from 'react'
-import { ActivityBadgeRow, BreederLevelBadge, toBreederLevel } from '@/entities/gamification'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import {
@@ -352,11 +351,9 @@ const CommunityContent = ({
                       key={post.postId}
                       preload={post.postId === firstPhotoPostId}
                       guard={guard}
-                      // 작성자 레벨·대표 배지는 글 목록 응답에 함께 실려 와 글과 같이 뜬다
-                      nameLeading={
-                        <BreederLevelBadge level={toBreederLevel(post.authorActivity?.level)} />
+                      mediaLayout={
+                        post.experience?.topics.includes('question') ? 'compact' : 'photo'
                       }
-                      badgeSlot={<ActivityBadgeRow badges={post.authorActivity?.badges ?? []} />}
                       metaSlot={
                         experienceEnabled ? (
                           <CommunityFeedMeta

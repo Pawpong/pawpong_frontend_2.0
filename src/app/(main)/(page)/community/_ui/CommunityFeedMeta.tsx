@@ -22,9 +22,13 @@ export function CommunityFeedMeta({
   onFilter: (filters: CommunityDiscoveryFilters) => void
 }) {
   if (!experience) return null
-  const records = summarizeCommunityRecords(experience)
-  const topics = experience.topics.slice(0, 3)
-  const tags = (experience.tags ?? []).slice(0, 3)
+  const records = summarizeCommunityRecords(experience).filter(
+    (record) => !record.facts.some((fact) => fact.label === '활동' && fact.value === '기타'),
+  )
+  const topics = experience.topics.filter((topic) => !['other', 'etc'].includes(topic)).slice(0, 1)
+  const tags = (experience.tags ?? [])
+    .filter((tag) => !topics.some((topic) => topicLabel(topic) === tag))
+    .slice(0, 2)
   if (!records.length && !topics.length && !tags.length) return null
   return (
     <ul className="flex flex-wrap items-center gap-x-3" aria-label="이야기 정보">
@@ -71,7 +75,7 @@ export function CommunityFeedMeta({
             type="button"
             aria-label={`${tag} 태그 글만 보기`}
             onClick={() => onFilter({ tags: [tag] })}
-            className={`${LINK} font-medium text-primary-700`}
+            className={`${LINK} font-normal text-neutral-700`}
           >
             #{tag}
           </button>
