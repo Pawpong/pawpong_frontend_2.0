@@ -127,11 +127,14 @@ function createApiClient(): AxiosInstance {
       }
 
       // 로그아웃 등 세션 복구를 원치 않는 요청은 refresh 인터셉터를 타지 않고 그대로 실패시킨다.
+      // Next 서버(서버 프리패치)에서도 갱신하지 않는다 — 갱신은 브라우저 쿠키를 다시 심는 흐름이라, 실패로 두면 브라우저가 다시 받는다.
+      // NEXT_RUNTIME 은 Next 가 서버 번들에만 채우고 브라우저 번들에는 빈 값으로 넣는다
       if (
         error.response?.status === 401 &&
         (originalRequest.skipAuthRefresh ||
           originalRequest.skipAuth ||
-          originalRequest.signal?.aborted)
+          originalRequest.signal?.aborted ||
+          !!process.env.NEXT_RUNTIME)
       ) {
         return Promise.reject(new ApiError(errorMessage || '인증이 필요합니다.', 401))
       }

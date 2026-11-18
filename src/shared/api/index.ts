@@ -5,7 +5,7 @@ export { withAuthWriteSession } from './authWriteRequest'
 export { AuthWriteRetryRequiredError } from './authWriteRetryRequiredError'
 export { getAuthReadSession } from '../lib/authReadSession'
 export type { AuthReadSession } from '../lib/authReadSession'
-export { getAccessToken } from './token'
+export { getAccessToken, setServerTokenReader } from './token'
 export {
   ApiError,
   createApiError,
