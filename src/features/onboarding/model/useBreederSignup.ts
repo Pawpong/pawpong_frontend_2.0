@@ -6,8 +6,9 @@ import { termsQueries } from '@/entities/term'
 import { useRegisterBreeder, useUploadBreederDocuments } from '../api/onboarding.mutations'
 import { updateMyProfile } from '@/entities/profile'
 import { useOnboarding } from './OnboardingContext'
-import { useSignupCompletion } from './useSignupCompletion' // [refactored]
+import { existingProviderOf, useSignupCompletion } from './useSignupCompletion' // [refactored]
 import { SIGNUP_ERROR } from './signupErrors' // [refactored]
+import type { SocialProvider } from '@/shared/lib/socialLogin'
 import type { DocumentsFormData } from './schema'
 import { buildBreederRegistrationRequest } from './buildBreederRegistrationRequest'
 import { getBreederDocumentsSignature, getSelectedBreederDocuments } from './breederDocuments'
@@ -33,6 +34,8 @@ export const useBreederSignup = () => {
   } | null>(null)
   const isPending = isCompleting || isUploading
   const [error, setError] = useState<string | null>(null)
+  // 이미 가입된 이메일이면 그 가입 방법 — 화면이 그 제공자 로그인 버튼을 띄운다
+  const [existingProvider, setExistingProvider] = useState<SocialProvider>()
   // [refactored] 세션 확인 + 가입 마무리는 입양자 플로우와 동일 — 공통 훅으로
   const { requireSocialSession, complete } = useSignupCompletion(setError)
 
@@ -40,6 +43,7 @@ export const useBreederSignup = () => {
     if (isPending) return
     setFormData('documents', documentsData)
     setError(null)
+    setExistingProvider(undefined)
 
     const social = requireSocialSession()
     if (!social) return
@@ -142,8 +146,9 @@ export const useBreederSignup = () => {
       }) // [refactored]
     } catch (err) {
       setError(err instanceof Error ? err.message : SIGNUP_ERROR.registerFailed)
+      setExistingProvider(existingProviderOf(err))
     }
   }
 
-  return { submit, isPending, error }
+  return { submit, isPending, error, existingProvider }
 }

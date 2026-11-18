@@ -1,7 +1,9 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { isApiError } from '@/shared/api'
 import { saveAuthTokens } from '@/shared/lib/saveAuthTokens'
+import { isSocialProvider, type SocialProvider } from '@/shared/lib/socialLogin'
 import {
   clearSocialSignupSession,
   loadSocialSignupSession,
@@ -11,6 +13,21 @@ import type { RegisterTokens } from '@/shared/types'
 import { useOnboarding } from './OnboardingContext'
 import { useOnboardingForm } from './useOnboardingForm'
 import { SIGNUP_ERROR } from './signupErrors'
+
+/**
+ * 이미 가입된 이메일로 가입하면 백엔드가 409 응답 data 에 기존 가입 방법만 실어 보낸다
+ * (`{ errorCode: 'SOCIAL_PROVIDER_MISMATCH', existingProvider: 'kakao' }`). 화면은 그 제공자 로그인 버튼을 띄운다.
+ */
+export const existingProviderOf = (error: unknown): SocialProvider | undefined => {
+  if (!isApiError(error) || error.status !== 409) return undefined
+  const body = error.details
+  const data = typeof body === 'object' && body !== null && 'data' in body ? body.data : undefined
+  const provider =
+    typeof data === 'object' && data !== null && 'existingProvider' in data
+      ? data.existingProvider
+      : undefined
+  return typeof provider === 'string' && isSocialProvider(provider) ? provider : undefined
+}
 
 /**
  * 입양자·브리더 가입의 공통 앞뒤 처리.
@@ -41,7 +58,11 @@ export const useSignupCompletion = (setError: (message: string) => void) => {
     tokens: RegisterTokens,
     afterSignIn?: () => Promise<void>,
   ): Promise<boolean> => {
-    const signedIn = await saveAuthTokens(tokens)
+    // 가입한 제공자도 넘겨 다음 로그인 때 '최근 사용' 으로 보이게 한다 (세션은 아래에서 지운다)
+    const signedIn = await saveAuthTokens({
+      ...tokens,
+      provider: loadSocialSignupSession()?.provider,
+    })
     if (signedIn) await afterSignIn?.()
 
     clearSocialSignupSession()

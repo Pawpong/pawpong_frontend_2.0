@@ -1,4 +1,5 @@
 import { Suspense } from 'react'
+import { cookies } from 'next/headers'
 import Link from 'next/link'
 import {
   isSocialProvider,
@@ -11,6 +12,7 @@ import { CheckRoundedIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { cafe24Proup } from '@/shared/lib/fonts'
 import { normalizeReturnUrl } from '@/shared/lib/normalizeReturnUrl'
+import { LAST_SOCIAL_PROVIDER_COOKIE } from '@/shared/lib/lastSocialProvider'
 import { LogoButton } from '@/widgets/gnb'
 
 /**
@@ -59,6 +61,9 @@ const LoginPage = async ({
   const loginError = handledByModal ? undefined : error
   const reviewHref =
     returnUrl === '/' ? '/login/review' : `/login/review?returnUrl=${encodeURIComponent(returnUrl)}`
+  // 지난번에 로그인한 제공자 — 어느 버튼으로 가입했는지 잊은 사용자를 위해 '최근 사용' 으로 표시한다
+  const lastProvider = (await cookies()).get(LAST_SOCIAL_PROVIDER_COOKIE)?.value
+  const lastSocialProvider = isSocialProvider(lastProvider) ? lastProvider : undefined
 
   return (
     <div className="flex min-h-dvh flex-col bg-base-white">
@@ -116,7 +121,7 @@ const LoginPage = async ({
 
             {/* SocialLoginList 는 useSearchParams(returnUrl) 를 쓰므로 Suspense 로 감싼다 (Next 16 요구사항) */}
             <Suspense fallback={<SocialLoginFallback />}>
-              <SocialLoginList />
+              <SocialLoginList lastProvider={lastSocialProvider} />
             </Suspense>
 
             <p className="mt-3 text-center text-sm leading-[1.5] font-medium text-neutral-700 tab:text-base">

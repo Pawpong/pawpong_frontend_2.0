@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { CtaModal } from '@/shared/ui'
 import { normalizeReturnUrl } from '@/shared/lib/normalizeReturnUrl'
-import { SOCIAL_PROVIDER_LABEL, isSocialProvider, socialLoginUrl } from '../lib/socialLogin'
+import { SOCIAL_PROVIDER_LABEL, isSocialProvider, socialLoginUrl } from '@/shared/lib/socialLogin'
 
 /**
  * 같은 이메일이 다른 소셜로 가입돼 있을 때 어디로 로그인할지 알려 주는 모달.

@@ -13,7 +13,7 @@ function load(path, dependencies = {}) {
 }
 
 const withBase = (base) =>
-  load('src/features/auth/lib/socialLogin.ts', {
+  load('src/shared/lib/socialLogin.ts', {
     '@/shared/config': { getApiBaseUrl: () => base },
   })
 
