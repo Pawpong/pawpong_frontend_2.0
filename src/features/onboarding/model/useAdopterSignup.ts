@@ -7,7 +7,8 @@ import { useRegisterAdopter } from '../api/onboarding.mutations'
 import { useOnboarding } from './OnboardingContext'
 import { buildTermsAgreements, REQUIRED_ADOPTER_TERM_CODES } from './termsAgreements'
 import { buildAdopterRegistrationRequest } from './buildAdopterRegistrationRequest'
-import { existingProviderOf, useSignupCompletion } from './useSignupCompletion' // [refactored]
+import { useSignupCompletion } from './useSignupCompletion' // [refactored]
+import { existingProviderOf } from './existingProvider'
 import { SIGNUP_ERROR } from './signupErrors' // [refactored]
 import type { SocialProvider } from '@/shared/lib/socialLogin'
 import type { SurveyFormData } from './schema'
