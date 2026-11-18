@@ -66,7 +66,9 @@ const UserHomeRouter = ({ userId }: UserHomeRouterProps) => {
   // transientQueryRecoveryOptions 로 재조회가 성공하면 /home 으로 리다이렉트된다.
   // (신고 버튼은 쿠키의 userRole 로 이미 막혀 있어 이 경로와 무관하다)
 
-  if (knownBreeder || (isAdopterError && isNotAdopter)) {
+  // 서버가 브리더 프로필을 받아 왔거나, 입양자 조회가 '입양자 아님'으로 끝났으면 브리더다
+  const isBreeder = !!knownBreeder || (isAdopterError && isNotAdopter)
+  if (isBreeder) {
     return <BreederHomeContent userId={userId} />
   }
 

@@ -36,6 +36,8 @@ const { fetchForRequest, dehydrateForRequest } = load('src/app/_lib/requestQueri
 })
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+// apiClient 가 던지는 ApiError 처럼 상태 코드를 가진 오류
+const apiError = (status) => Object.assign(new Error(String(status)), { name: 'ApiError', status })
 const dataOf = (state, key) => state.queries.find((query) => query.queryKey[0] === key)?.state.data
 
 test('메타데이터와 화면이 한 번의 조회를 같이 쓰고, 동시에 들어온 요청끼리 토큰이 섞이지 않음', async () => {
@@ -95,8 +97,7 @@ test('만료된 토큰으로 거절되면 익명으로 한 번 더 받아 공개
     queryFn: async () => {
       const who = token.getAccessToken()
       calls.push(who)
-      if (who === 'expired')
-        throw Object.assign(new Error('401'), { name: 'ApiError', status: 401 })
+      if (who === 'expired') throw apiError(401)
       return `seen-as-${who}`
     },
   }
@@ -115,7 +116,7 @@ test('입양자로 먼저 찾고 아니면 브리더 — 찾은 쪽만 화면으
     queryKey: [kind],
     queryFn: async () => {
       calls.push(kind)
-      if (!ok) throw Object.assign(new Error('400'), { name: 'ApiError', status: 400 })
+      if (!ok) throw apiError(400)
       return kind
     },
   })
@@ -148,7 +149,7 @@ test('로그인 전용 쿼리는 로그인 요청에서만 부름', async () => 
     queryKey: ['me'],
     queryFn: async () => {
       rejected.push(token.getAccessToken())
-      throw Object.assign(new Error('401'), { name: 'ApiError', status: 401 })
+      throw apiError(401)
     },
   }
   await asRequest('expired', () => dehydrateForRequest([], [expiredMe]))
