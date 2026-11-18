@@ -12,7 +12,6 @@ export const SOCIAL_PROVIDER_LABEL: Record<SocialProvider, string> = {
 
 export const isSocialProvider = (value: string | null | undefined): value is SocialProvider =>
   value === 'kakao' || value === 'naver' || value === 'google' || value === 'apple'
-
 /**
  * 백엔드 OAuth 진입 주소.
  *
