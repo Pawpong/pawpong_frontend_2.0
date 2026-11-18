@@ -97,18 +97,12 @@ test('이미 가입된 이메일(409)이면 응답 data 의 기존 가입 방법
   const { loadTypescript } = require('./helpers/load-typescript.cjs')
   const { ApiError } = loadTypescript('src/shared/api/unwrap.ts')
   const { existingProviderOf } = loadTypescript(
-    'src/features/onboarding/model/useSignupCompletion.ts',
+    'src/features/onboarding/model/existingProvider.ts',
     {
-      'next/navigation': {},
       '@/shared/api': { isApiError: (error) => error instanceof ApiError },
-      '@/shared/lib/saveAuthTokens': {},
       '@/shared/lib/socialLogin': loadTypescript('src/shared/lib/socialLogin.ts', {
         '@/shared/config': { getApiBaseUrl: () => '' },
       }),
-      '@/shared/lib/socialSignupSession': {},
-      './OnboardingContext': {},
-      './useOnboardingForm': {},
-      './signupErrors': {},
     },
   )
   // 백엔드 409 본문: { success, code, error, data: { errorCode, existingProvider } }
