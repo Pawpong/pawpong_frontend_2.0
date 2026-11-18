@@ -11,9 +11,6 @@ interface FavoriteShareActionsProps {
   // 피그마 Frame1707484443 like/share 토글 — 화면별 중복 액션은 showFavorite/className으로 제어한다.
   showFavorite?: boolean
   showShare?: boolean
-  // 라벨 스타일 — 모바일은 아이콘만, 탭+는 라벨 노출이라 boolean이 아닌 반응형 클래스로 제어
-  // (피그마 모바일 1943:112830 라벨 없음 / 탭 1654:148613 라벨 12px neutral-700)
-  labelVisibility?: 'always' | 'tablet'
   // 공유 모달 메타 (카카오/OS 공유용) — 없으면 현재 페이지 URL·title 기본값
   shareUrl?: string
   shareTitle?: string
@@ -29,7 +26,6 @@ const FavoriteShareActions = ({
   onToggle,
   showFavorite = true,
   showShare = true,
-  labelVisibility,
   shareUrl,
   shareTitle,
   shareDescription,
@@ -45,8 +41,7 @@ const FavoriteShareActions = ({
           icon={FavoriteIcon}
           hasFillState
           size="md"
-          label="관심있어요"
-          labelVisibility={labelVisibility}
+          aria-label="관심있어요"
           pressed={isFavorite}
           onClick={onToggle}
         />

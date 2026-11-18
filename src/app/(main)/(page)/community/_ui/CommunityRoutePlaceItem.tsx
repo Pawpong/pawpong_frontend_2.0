@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { photoPlacePrecisionOf, type CommunityPhotoLocationOption } from '@/features/community'
 import type { CommunityRoutePoint } from '@/shared/types'
+import { Button } from '@/shared/ui'
 
 /** 담은 장소 한 줄. 목록 상태와 공개 확인 규칙은 CommunityRoutePicker가 갖고 이 줄은 보여주고 알리기만 한다. */
 export function CommunityRoutePlaceItem({
@@ -60,15 +61,15 @@ export function CommunityRoutePlaceItem({
           onChange={(event) => onRename(event.target.value)}
           className="min-h-11 min-w-0 flex-1 rounded-lg border border-neutral-200 bg-white px-3 text-base focus-ring tab:text-sm"
         />
-        <button
-          type="button"
+        <Button
+          intent="ghost"
+          size="inline"
           disabled={disabled}
           aria-label={`${index + 1}번 장소 빼기`}
           onClick={onRemove}
-          className="min-h-11 shrink-0 rounded-lg px-3 text-sm font-semibold text-neutral-700 focus-ring hover:bg-neutral-50"
         >
           빼기
-        </button>
+        </Button>
       </div>
       {precision && (
         <p className="mt-1 text-xs text-neutral-700">
@@ -78,41 +79,36 @@ export function CommunityRoutePlaceItem({
         </p>
       )}
       <div className="mt-2 flex flex-wrap items-center gap-1">
-        <button
-          type="button"
-          disabled={disabled}
-          onClick={onShow}
-          className="min-h-11 rounded-lg px-2 text-xs font-semibold text-primary-700 focus-ring"
-        >
+        <Button intent="link" size="inline" disabled={disabled} onClick={onShow}>
           지도에서 보기
-        </button>
-        <button
-          type="button"
+        </Button>
+        <Button
+          intent="link"
+          size="inline"
           disabled={disabled}
           aria-label={`${index + 1}번 장소 위치 바꾸기`}
           onClick={onEditLocation}
-          className="min-h-11 rounded-lg px-2 text-xs font-semibold text-primary-700 focus-ring"
         >
           위치 바꾸기
-        </button>
-        <button
-          type="button"
+        </Button>
+        <Button
+          intent="ghost"
+          size="inline"
           disabled={disabled || index === 0}
           aria-label={`${index + 1}번 장소를 앞으로`}
           onClick={() => onMove(-1)}
-          className="min-h-11 rounded-lg px-2 text-xs focus-ring disabled:opacity-40"
         >
           앞으로
-        </button>
-        <button
-          type="button"
+        </Button>
+        <Button
+          intent="ghost"
+          size="inline"
           disabled={disabled || index === count - 1}
           aria-label={`${index + 1}번 장소를 뒤로`}
           onClick={() => onMove(1)}
-          className="min-h-11 rounded-lg px-2 text-xs focus-ring disabled:opacity-40"
         >
           뒤로
-        </button>
+        </Button>
         {photos.length > 0 && (
           <select
             aria-label={`${index + 1}번 장소에 연결할 사진`}

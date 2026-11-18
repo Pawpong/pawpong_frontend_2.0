@@ -16,9 +16,10 @@ export const saveApplicationDraft = ({
   form: ApplicationDraftForm
 }) =>
   apiClient
-    .put<
-      ApiResponseFull<ApplicationDraftDto>
-    >(`${API_VERSION}/adopter/application-drafts/${petId}`, form)
+    .put<ApiResponseFull<ApplicationDraftDto>>(
+      `${API_VERSION}/adopter/application-drafts/${petId}`,
+      form,
+    )
     .then(unwrap)
 
 /** 입양 신청 제출 */
@@ -34,9 +35,9 @@ export const createApplication = (data: ApplicationCreateRequest) =>
 /** 입양 신청 취소 — 상담 대기·상담 완료인 내 신청만 가능, 확정·거절은 409 */
 export const cancelApplication = (applicationId: string) =>
   apiClient
-    .patch<
-      ApiResponseFull<{ applicationId: string; status: 'adoption_cancelled' }>
-    >(`${API_VERSION}/adopter/application/${applicationId}/cancel`)
+    .patch<ApiResponseFull<{ applicationId: string; status: 'adoption_cancelled' }>>(
+      `${API_VERSION}/adopter/application/${applicationId}/cancel`,
+    )
     .then(unwrap)
 
 /** 입양 신청서 전체 수정 — 상담 대기 상태인 내 신청만 가능 */

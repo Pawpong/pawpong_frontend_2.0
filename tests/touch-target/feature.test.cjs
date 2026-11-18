@@ -11,12 +11,16 @@ test('커뮤니티 알약 버튼은 공통 터치 영역을 씀', () => {
     `${ui}/CommunityFeedMeta.tsx`,
     `${ui}/CommunityExperiencePanel.tsx`,
     `${ui}/CommunityRecordFields.tsx`,
-    `${ui}/CommunityExperienceEditor.tsx`,
   ]) {
     const code = read(file)
     assert.match(code, /touch-target/, file)
     assert.match(code, /\brelative\b/, file)
   }
+  // 지도 접기·담기 글자 버튼은 공통 Button 으로 옮겨 터치 영역을 Button 이 맡는다
+  assert.match(
+    read(`${ui}/CommunityExperienceEditor.tsx`),
+    /<Button\s+intent="link"\s+size="inline"/,
+  )
 })
 
 test('가로 스크롤 줄은 터치 영역이 잘리지 않게 여유를 두되 바깥 배치는 그대로 둠', () => {

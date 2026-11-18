@@ -25,15 +25,15 @@
 
 렌더 순서(입양 탐색 기준):
 
-| 영역 | 설명 | 코드 위치 |
-|---|---|---|
-| 탭 바 | 입양 탐색/브리더 탐색 전환, tab+에서 상단 고정(sticky) | `_ui/ExploreContent.tsx` (`TabBar`) |
-| 컴팩트 필터바(스크롤 시) | 카테고리 칩 + 검색 버튼, GNB/탭바 아래 fixed로만 노출 | `_ui/ExploreFilterBar.tsx` |
-| 카테고리 섹션 | 픽셀 카테고리 버튼(모바일 2×2 / tab+ 4열 가운데) | `features/category-filter` (`CategorySection`) |
-| 검색바 | 홈과 동일 컴포넌트, 탭별 placeholder만 다름 | `features/search/ui/SearchSection.tsx` |
-| (입양) 전체 분양 소식 | 정렬/상태 필터 칩 + 카드 그리드 + 무한스크롤 | `_ui/ExploreContent.tsx`, `features/adoption` (`AdoptionCardGrid`) |
-| (브리더) 인기 브리더 | 인기 브리더 가로 스크롤/그리드(뱃지 표시) | `_ui/BreederExploreContent.tsx`, `_ui/ExploreListingSection.tsx` |
-| (브리더) 전체 브리더 소식 | 전체 브리더 카드 그리드 | `_ui/BreederExploreContent.tsx` |
+| 영역                      | 설명                                                   | 코드 위치                                                          |
+| ------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------ |
+| 탭 바                     | 입양 탐색/브리더 탐색 전환, tab+에서 상단 고정(sticky) | `_ui/ExploreContent.tsx` (`TabBar`)                                |
+| 컴팩트 필터바(스크롤 시)  | 카테고리 칩 + 검색 버튼, GNB/탭바 아래 fixed로만 노출  | `_ui/ExploreFilterBar.tsx`                                         |
+| 카테고리 섹션             | 픽셀 카테고리 버튼(모바일 2×2 / tab+ 4열 가운데)       | `features/category-filter` (`CategorySection`)                     |
+| 검색바                    | 홈과 동일 컴포넌트, 탭별 placeholder만 다름            | `features/search/ui/SearchSection.tsx`                             |
+| (입양) 전체 분양 소식     | 정렬/상태 필터 칩 + 카드 그리드 + 무한스크롤           | `_ui/ExploreContent.tsx`, `features/adoption` (`AdoptionCardGrid`) |
+| (브리더) 인기 브리더      | 인기 브리더 가로 스크롤/그리드(뱃지 표시)              | `_ui/BreederExploreContent.tsx`, `_ui/ExploreListingSection.tsx`   |
+| (브리더) 전체 브리더 소식 | 전체 브리더 카드 그리드                                | `_ui/BreederExploreContent.tsx`                                    |
 
 ## 인터랙션 · 상태
 
@@ -99,17 +99,17 @@ grep 기준으로 `transition`/`duration` 클래스가 이 페이지 코드 자�
 
 ## 엣지 케이스
 
-| 상황 | 현재 처리 상태 |
-|---|---|
-| URL `category` 쿼리에 유효하지 않은 값이 들어옴(직접 주소 조작 등) | 처리됨 — `ANIMAL_CATEGORIES.includes` 검증 후 `'all'`로 폴백 |
-| 입양 목록 API 실패·빈 목록 | 처리됨 — `ListState`로 에러/빈 문구 노출 |
-| 브리더 탐색 API 실패 | 미구현/해당 없음 — 현재 목업 고정이라 실패 상태 자체가 존재하지 않음(실 API 연결 시 별도 처리 필요) |
-| 무한스크롤 페이지 경계에서 항목 중복 | 처리됨 — `listingId` 기준 `dedupeBy`로 중복 제거 |
+| 상황                                                               | 현재 처리 상태                                                                                      |
+| ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- |
+| URL `category` 쿼리에 유효하지 않은 값이 들어옴(직접 주소 조작 등) | 처리됨 — `ANIMAL_CATEGORIES.includes` 검증 후 `'all'`로 폴백                                        |
+| 입양 목록 API 실패·빈 목록                                         | 처리됨 — `ListState`로 에러/빈 문구 노출                                                            |
+| 브리더 탐색 API 실패                                               | 미구현/해당 없음 — 현재 목업 고정이라 실패 상태 자체가 존재하지 않음(실 API 연결 시 별도 처리 필요) |
+| 무한스크롤 페이지 경계에서 항목 중복                               | 처리됨 — `listingId` 기준 `dedupeBy`로 중복 제거                                                    |
 
 ## 접근성
 
 - 확인됨: 탭 바(`ariaLabel="탐색 유형"`), 분양 소식 필터 그룹(`aria-label="분양
-  소식 필터"`)에 라벨 있음.
+소식 필터"`)에 라벨 있음.
 - 확인 안 됨: 카테고리 칩(`FilterChip`)·검색 버튼·`ExploreFilterBar`의 검색/필터
   토글 버튼에 `aria-label`이 있는지는 이 문서 갱신 시점에 확인 안 됨 — 아이콘만
   있고 텍스트가 없는 버튼(`SearchIcon`만 있는 경우)이라면 라벨이 필요할 수

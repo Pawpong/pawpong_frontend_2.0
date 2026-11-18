@@ -16,8 +16,8 @@ const toggleIconVariants = tv({
   slots: {
     root: 'focus-ring touch-target relative inline-flex shrink-0 items-center gap-1 rounded-lg font-semibold text-action-dark [-webkit-tap-highlight-color:transparent] disabled:cursor-not-allowed',
     icon: 'shrink-0',
-    label: 'text-body-sm',
-    count: 'text-body-md',
+    // 숫자는 아이콘을 받쳐 주는 보조 정보라 회색 보통 굵기로 둔다
+    count: 'text-body-md font-medium text-neutral-700',
   },
   variants: {
     size: {
@@ -50,12 +50,12 @@ const toggleIconVariants = tv({
     {
       pressed: true,
       pressedTone: 'favorite',
-      className: { icon: 'text-pressed-favorite', label: 'text-pressed-favorite' },
+      className: { icon: 'text-pressed-favorite' },
     },
     {
       pressed: true,
       pressedTone: 'bookmark',
-      className: { icon: 'text-brand', label: 'text-brand' },
+      className: { icon: 'text-brand' },
     },
   ],
   defaultVariants: { size: 'sm', pressed: false, pressedTone: 'favorite', tone: 'default' },
@@ -69,12 +69,7 @@ interface ToggleIconButtonProps {
   pressedTone?: 'favorite' | 'bookmark'
   tone?: 'default' | 'onImage'
   size?: 'sm' | 'md' | 'lg' | 'responsive'
-  /** 보이는 라벨 (예: '관심있어요') */
-  label?: string
-  /** tablet: 태블릿 이상에서만 라벨을 표시한다. */
-  labelVisibility?: 'always' | 'tablet'
   count?: number
-  /** 라벨이 없을 때 필수 */
   'aria-label'?: string
   onClick?: () => void
   href?: string
@@ -90,8 +85,6 @@ const ToggleIconButton = ({
   pressedTone,
   tone,
   size,
-  label,
-  labelVisibility = 'always',
   count,
   'aria-label': ariaLabel,
   onClick,
@@ -135,15 +128,6 @@ const ToggleIconButton = ({
           {...(isHeart && { size: size === 'lg' ? ('lg' as const) : ('md' as const) })}
           className={styles.icon()}
         />
-      )}
-      {label && (
-        <span
-          className={styles.label({
-            className: labelVisibility === 'tablet' ? 'hidden tab:inline' : undefined,
-          })}
-        >
-          {label}
-        </span>
       )}
       {count !== undefined && <span className={styles.count()}>{count}</span>}
     </>

@@ -14,7 +14,6 @@ export {
   useToggleCommunityPostBookmark,
 } from './api/communityReaction.mutations'
 export { ConnectedFeedCard, ConnectedPostCard } from './ui/ConnectedPostCard'
-export { ReportPostAction } from './ui/ReportPostAction'
 export { useSubmitCommunityPostForm } from './lib/useSubmitCommunityPostForm'
 export { useCommunityEditorNavigation } from './lib/useCommunityEditorNavigation'
 export { useCommunityEditorConfig } from './lib/useCommunityEditorConfig'

@@ -11,13 +11,13 @@ import {
   DeleteConfirmModal,
   ImageCarousel,
   LoginPromptModal,
-  OwnerActionsMenu,
   ProfileAvatar,
 } from '@/shared/ui'
 import {
   COMMUNITY_CAROUSEL_STYLE,
   COMMUNITY_LOGIN_PROMPT,
   CommunityPostActions,
+  PostMoreMenu,
 } from '@/entities/community'
 import { useLoginGuard } from '@/shared/lib/useLoginGuard'
 import { cn } from '@/shared/lib/cn'
@@ -160,10 +160,23 @@ const PostDetailPanel = ({
   const hasImages = post.photoUrls.length > 0
   const isSideBySide = layout === 'side-by-side'
 
-  const ownerMenu = isOwner && (
-    <OwnerActionsMenu
-      onEdit={() => router.push(`/community/post/${postId}/edit`)}
-      onDelete={() => setConfirmDeletePost(true)}
+  // 저장·공유는 반응을 열 수 있는 글에만, 수정·삭제는 내 글에만 둔다
+  const moreMenu = (
+    <PostMoreMenu
+      saved={post.isSaved}
+      onToggleSave={interactive && !isBookmarkPending ? guard(toggleBookmark) : undefined}
+      share={
+        interactive && post.visibility === 'public'
+          ? {
+              url: `/community/post/${postId}`,
+              title: post.title || `${post.authorNickname}님의 게시글`,
+              description: post.body,
+              imageUrl: post.photoUrls[0],
+            }
+          : undefined
+      }
+      onEdit={isOwner ? () => router.push(`/community/post/${postId}/edit`) : undefined}
+      onDelete={isOwner ? () => setConfirmDeletePost(true) : undefined}
     />
   )
 
@@ -213,7 +226,7 @@ const PostDetailPanel = ({
           />
         </span>
       </a>
-      {trailingAction ?? (isPage && ownerMenu)}
+      {trailingAction ?? (isPage && moreMenu)}
     </div>
   )
 
@@ -232,32 +245,18 @@ const PostDetailPanel = ({
       >
         {post.body}
       </p>
-      {!isPage && ownerMenu}
+      {!isPage && moreMenu}
     </div>
   )
 
   // 인스타그램처럼 액션바는 본문 흐름 안에 두고, 하단에는 입력창만 고정한다
   const actionBar = interactive && (
-    <div
-      className={isPage ? 'py-2' : 'border-b border-neutral-100 px-4 py-3'}
-    >
+    <div className={isPage ? 'py-2' : 'border-b border-neutral-100 px-4 py-3'}>
       <CommunityPostActions
         likeCount={post.likeCount}
         commentCount={post.commentCount}
         liked={post.isLiked}
-        saved={post.isSaved}
-        share={
-          post.visibility === 'public' && post.status === 'published'
-            ? {
-                url: `/community/post/${postId}`,
-                title: post.title || `${post.authorNickname}님의 게시글`,
-                description: post.body,
-                imageUrl: post.photoUrls[0],
-              }
-            : undefined
-        }
         onToggleLike={isLikePending ? undefined : guard(toggleLike)}
-        onToggleSave={isBookmarkPending ? undefined : guard(toggleBookmark)}
       />
     </div>
   )
@@ -360,10 +359,7 @@ const PostDetailPanel = ({
             <h2 id="post-comments-title" className="mb-1 font-cafe24 text-lg text-neutral-850">
               댓글 <span className="text-neutral-700">{post.commentCount}</span>
             </h2>
-            <CommentComposerBar
-              thread={thread}
-              className="mb-2"
-            />
+            <CommentComposerBar thread={thread} className="mb-2" />
             <CommentList thread={thread} />
           </section>
         )}

@@ -1,6 +1,14 @@
 const { test } = require('node:test')
 const assert = require('node:assert/strict')
-const { load, policy, credentials, session, setupRoute, setupClient, NextRequest } = require('./fixtures/session.fixture.cjs')
+const {
+  load,
+  policy,
+  credentials,
+  session,
+  setupRoute,
+  setupClient,
+  NextRequest,
+} = require('./fixtures/session.fixture.cjs')
 
 test('클라이언트가 비밀번호를 POST 본문으로만 전달하고 공통 쿠키 저장을 사용함', async () => {
   const app = setupClient(async () => Response.json(session))

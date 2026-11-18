@@ -1,7 +1,6 @@
 'use client'
 
 import { useMemo } from 'react'
-import { ActivityBadgeRow, BreederLevelBadge, toBreederLevel } from '@/entities/gamification'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import {
@@ -64,7 +63,7 @@ const CommunityContent = ({
   initialExperience,
 }: {
   /** 서버에서 미리 받은 확장 기능 설정 — 있으면 카테고리 줄을 첫 화면부터 그린다 */
-  initialExperience?: { config: CommunityExperienceConfig } | null| null
+  initialExperience?: { config: CommunityExperienceConfig } | null | null
 }) => {
   const router = useRouter()
   const parameters = useSearchParams()
@@ -236,13 +235,9 @@ const CommunityContent = ({
                 className="mb-4 rounded-xl bg-neutral-50 p-3 text-xs leading-relaxed text-neutral-700"
               >
                 이 환경에서는 상세 필터를 사용할 수 없어 기본 이야기를 보여드려요.
-                <button
-                  type="button"
-                  onClick={() => setDiscovery({})}
-                  className="ml-2 min-h-8 font-semibold underline focus-ring"
-                >
+                <Button intent="ghost" size="inline" onClick={() => setDiscovery({})}>
                   상세 조건 해제
-                </button>
+                </Button>
               </p>
             )}
 
@@ -356,11 +351,9 @@ const CommunityContent = ({
                       key={post.postId}
                       preload={post.postId === firstPhotoPostId}
                       guard={guard}
-                      // 작성자 레벨·대표 배지는 글 목록 응답에 함께 실려 와 글과 같이 뜬다
-                      nameLeading={
-                        <BreederLevelBadge level={toBreederLevel(post.authorActivity?.level)} />
+                      mediaLayout={
+                        post.experience?.topics.includes('question') ? 'compact' : 'photo'
                       }
-                      badgeSlot={<ActivityBadgeRow badges={post.authorActivity?.badges ?? []} />}
                       metaSlot={
                         experienceEnabled ? (
                           <CommunityFeedMeta

@@ -106,11 +106,12 @@ for (const [kind, radius] of [
   ['travel', 20000],
   ['stay', 20000],
 ]) {
-  test(`${kind} has no nationwide directory, so it starts and switches into a map-centred nearby search`, () => {
+  test(`${kind} has no nationwide directory, so it starts and switches into a nearby search without inventing a map centre`, () => {
+    // 위치도 못 받고 지도도 안 옮겼으면 기준은 'default'(서울 시청) — 사용자가 고른 '지도 중심' 이 아니다
     const initial = createCareSearchState(kind)
     assert.equal(initial.search.scope, 'nearby')
     assert.equal(initial.search.radius, radius)
-    assert.equal(initial.nearbyOrigin, 'map')
+    assert.equal(initial.nearbyOrigin, 'default')
 
     const fromDirectory = apply(
       { type: 'region', region: 'seoul' },
@@ -120,7 +121,18 @@ for (const [kind, radius] of [
     )
     assert.equal(fromDirectory.search.kind, kind)
     assert.equal(fromDirectory.search.scope, 'nearby')
-    assert.equal(fromDirectory.nearbyOrigin, 'map')
+    // 종류를 바꿔도 기준점 출처는 덮어쓰지 않는다
+    assert.equal(fromDirectory.nearbyOrigin, 'default')
+
+    // 위치를 확인한 뒤 전국 목록을 보다가 넘어오면 기준은 여전히 내 위치다
+    const locatedThenDirectory = apply(
+      { type: 'nearby', center, origin: 'location' },
+      { type: 'directory' },
+      { type: 'kind', kind },
+    )
+    assert.equal(locatedThenDirectory.search.scope, 'nearby')
+    assert.equal(locatedThenDirectory.nearbyOrigin, 'location')
+    assert.equal(locatedThenDirectory.search.latitude, center.latitude)
     assert.equal(fromDirectory.search.referralOnly, false)
     assert.equal(fromDirectory.search.query, '성수')
 

@@ -2,6 +2,7 @@ import { COMMUNITY_RECORD_LABELS, type CommunityExperienceConfig } from '@/entit
 import type { CommunityDiscoveryFilters } from '@/shared/types'
 import { KIND_LABELS, MEDIA_LABELS, PERIOD_LABELS } from './constants'
 import { categoryOf, keepCategory } from './categories'
+import { Button } from '@/shared/ui'
 
 export function AppliedFilters({
   value,
@@ -51,13 +52,9 @@ export function AppliedFilters({
           <span aria-hidden>×</span>
         </button>
       ))}
-      <button
-        type="button"
-        onClick={() => onChange(keepCategory(value))}
-        className="min-h-8 px-2 text-xs font-medium text-neutral-700 underline focus-ring"
-      >
+      <Button intent="ghost" size="inline" onClick={() => onChange(keepCategory(value))}>
         필터 초기화
-      </button>
+      </Button>
     </div>
   )
 }

@@ -1,6 +1,11 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
-import { ReactivateAccountPrompt, SocialLoginList } from '@/features/auth'
+import {
+  isSocialProvider,
+  ReactivateAccountPrompt,
+  SocialLoginList,
+  SocialProviderPrompt,
+} from '@/features/auth'
 import { AlertMessage } from '@/shared/ui'
 import { CheckRoundedIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
@@ -27,6 +32,9 @@ import { LogoButton } from '@/widgets/gnb'
  *   - reactivationToken 이 함께 오면 → 복구 확인 모달 (ReactivateAccountPrompt)
  *   - 없으면(정지 계정 등 복구 불가) → error 사유만 안내
  *
+ * ?error= 는 백엔드 콜백이 로그인을 막은 사유다. 탈퇴 계정 외의 사유(다른 소셜로 가입된
+ * 이메일 등)는 지금까지 화면에 아무것도 뜨지 않아, 사용자는 왜 안 되는지 알 수 없었다.
+ *
  * Figma: PC 3414:750712 / Tablet 3414:751419 / Mobile 3414:751420
  * 원본의 이메일·비밀번호 안내와 별도 회원가입 링크는 현재 소셜 전용 인증 계약에 맞게
  * 소셜 로그인 및 신규 사용자 온보딩 안내로 치환한다.
@@ -34,10 +42,21 @@ import { LogoButton } from '@/widgets/gnb'
 const LoginPage = async ({
   searchParams,
 }: {
-  searchParams: Promise<{ signup?: string; returnUrl?: string }>
+  searchParams: Promise<{
+    signup?: string
+    returnUrl?: string
+    error?: string
+    type?: string
+    provider?: string
+  }>
 }) => {
-  const { signup, returnUrl: requestedReturnUrl } = await searchParams
+  const { signup, returnUrl: requestedReturnUrl, error, type, provider } = await searchParams
   const returnUrl = normalizeReturnUrl(requestedReturnUrl)
+  // 탈퇴 계정은 ReactivateAccountPrompt 가 복구 모달로, 다른 소셜로 가입된 계정은
+  // SocialProviderPrompt 가 그 제공자로 보내는 모달로 따로 안내한다.
+  // 모르는 provider 는 모달이 뜨지 않으므로, 사유가 사라지지 않게 인라인으로 남긴다.
+  const handledByModal = type === 'deleted_account' || isSocialProvider(provider)
+  const loginError = handledByModal ? undefined : error
   const reviewHref =
     returnUrl === '/' ? '/login/review' : `/login/review?returnUrl=${encodeURIComponent(returnUrl)}`
 
@@ -79,9 +98,20 @@ const LoginPage = async ({
               />
             )}
 
+            {loginError && (
+              <div role="alert">
+                <AlertMessage status="error" size="responsive" message={loginError} />
+              </div>
+            )}
+
             {/* 탈퇴 계정 복구 안내 — useSearchParams 를 쓰므로 Suspense 필요 (Next 16) */}
             <Suspense fallback={null}>
               <ReactivateAccountPrompt />
+            </Suspense>
+
+            {/* 다른 소셜로 가입된 계정 — 그 제공자로 바로 보내는 모달 */}
+            <Suspense fallback={null}>
+              <SocialProviderPrompt />
             </Suspense>
 
             {/* SocialLoginList 는 useSearchParams(returnUrl) 를 쓰므로 Suspense 로 감싼다 (Next 16 요구사항) */}

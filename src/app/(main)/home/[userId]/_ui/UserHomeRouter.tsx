@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { profileQueries } from '@/entities/profile'
 import { adopterQueries } from '@/entities/adopter'
+import { breederQueries } from '@/entities/breeder'
 import { useAuthStatus } from '@/shared/lib/useAuthStatus'
 import { isApiError, transientQueryRecoveryOptions } from '@/shared/api'
 import { AsyncState } from '@/shared/ui'
@@ -29,11 +30,18 @@ const UserHomeRouter = ({ userId }: UserHomeRouterProps) => {
   const { data: myProfile, isPending: isMyProfilePending } = myProfileQuery
   const isMine = myProfile?.userId === userId
 
+  // 서버(ServerPrefetch)가 브리더 프로필을 받아 왔으면 브리더다 — 입양자 조회(브리더 ID 면 400)를
+  // 기다리지 않고 바로 브리더 홈을 그린다. 조회는 BreederHomeContent 가 하므로 여기서는 캐시만 본다.
+  const { data: knownBreeder } = useQuery({
+    ...breederQueries.publicProfile(userId),
+    enabled: false,
+  })
+
   const adopterProfileQuery = useQuery({
     ...adopterQueries.publicProfile(userId),
     ...transientQueryRecoveryOptions,
     // 내 홈이면 곧바로 /home 으로 보내므로 조회할 필요가 없다 (브리더 ID 로 조회하면 400)
-    enabled: !!userId && !isMine,
+    enabled: !!userId && !isMine && !knownBreeder,
     refetchOnMount: 'always',
     throwOnError: false,
   })
@@ -58,7 +66,9 @@ const UserHomeRouter = ({ userId }: UserHomeRouterProps) => {
   // transientQueryRecoveryOptions 로 재조회가 성공하면 /home 으로 리다이렉트된다.
   // (신고 버튼은 쿠키의 userRole 로 이미 막혀 있어 이 경로와 무관하다)
 
-  if (isAdopterError && isNotAdopter) {
+  // 서버가 브리더 프로필을 받아 왔거나, 입양자 조회가 '입양자 아님'으로 끝났으면 브리더다
+  const isBreeder = !!knownBreeder || (isAdopterError && isNotAdopter)
+  if (isBreeder) {
     return <BreederHomeContent userId={userId} />
   }
 

@@ -15,54 +15,54 @@
 
 ## 페이지별 목록
 
-| 경로 | 소스 metadata | 운영 응답 메타 또는 확인 범위 |
-|---|---|---|
-| `/about` | 없음 | HTTP 200 · title: Pawpong · OG 없음 |
-| `/account/content-rights` | 있음 | HTTP 200 · title: Pawpong · OG 없음 |
-| `/account/delete` | 있음 | HTTP 200 · title: 계정 영구삭제 | 포퐁 · OG 없음 |
-| `/activity/applications/[applicationId]/edit` | 없음 | 동적 경로: 소스 확인, 개별 ID 운영 미검증 |
-| `/activity/applications/[applicationId]` | 없음 | 동적 경로: 소스 확인, 개별 ID 운영 미검증 |
-| `/activity` | 없음 | HTTP 200 · title: Pawpong · OG 없음 |
-| `/activity/received-reviews/[reviewId]` | 없음 | 동적 경로: 소스 확인, 개별 ID 운영 미검증 |
-| `/activity/reviews/[reviewId]` | 없음 | 동적 경로: 소스 확인, 개별 ID 운영 미검증 |
-| `/adoption/[id]/apply` | 없음 | 동적 경로: 소스 확인, 개별 ID 운영 미검증 |
-| `/adoption/[id]/edit` | 없음 | 동적 경로: 소스 확인, 개별 ID 운영 미검증 |
-| `/adoption/[id]` | 없음 | 동적 경로: 소스 확인, 개별 ID 운영 미검증 |
-| `/adoption/application-form` | 없음 | HTTP 200 · title: Pawpong · OG 없음 |
-| `/adoption/create` | 없음 | HTTP 200 · title: Pawpong · OG 없음 |
-| `/adoption/create/success` | 없음 | HTTP 200 · title: Pawpong · OG 없음 |
-| `/ai-filter` | 있음 | HTTP 200 · title: AI 필터 · OG 없음 |
-| `/bookmarks` | 없음 | HTTP 200 · title: Pawpong · OG 없음 |
-| `/care-map` | 있음 | HTTP 200 · title: 우리 동네 돌봄 지도 | 포퐁 · OG 없음 |
-| `/chat` | 없음 | HTTP 200 · title: Pawpong · OG 없음 |
-| `/community/@modal/[postId]` | 없음 | 인터셉트 모달: 직접 상세 경로에서 공유 |
-| `/community` | 없음 | HTTP 200 · title: Pawpong · OG 없음 |
-| `/community/post/[postId]/edit` | 없음 | 동적 경로: 소스 확인, 개별 ID 운영 미검증 |
-| `/community/post/[postId]` | 없음 | 동적 경로: 소스 확인, 개별 ID 운영 미검증 |
-| `/community/write` | 없음 | HTTP 200 · title: Pawpong · OG 없음 |
-| `/drafts` | 없음 | HTTP 200 · title: Pawpong · OG 없음 |
-| `/explore` | 없음 | HTTP 200 · title: Pawpong · OG 없음 |
-| `/faq` | 없음 | HTTP 200 · title: Pawpong · OG 없음 |
-| `/hall-of-fame` | 없음 | HTTP 200 · title: Pawpong · OG 없음 |
-| `/hall-of-fame/participate` | 없음 | HTTP 200 · title: Pawpong · OG 없음 |
-| `/home/[userId]` | 없음 | 동적 경로: 소스 확인, 개별 ID 운영 미검증 |
-| `/home` | 없음 | HTTP 200 · title: Pawpong · OG 없음 |
-| `/notices/[noticeId]` | 없음 | 동적 경로: 소스 확인, 개별 ID 운영 미검증 |
-| `/notices` | 없음 | HTTP 200 · title: Pawpong · OG 없음 |
-| `/notifications` | 없음 | HTTP 200 · title: Pawpong · OG 없음 |
-| `/` | 없음 | HTTP 200 · title: Pawpong · OG 없음 |
-| `/playground` | 있음 | HTTP 200 · title: 놀이터 · OG 없음 |
-| `/profile/edit` | 없음 | HTTP 200 · title: Pawpong · OG 없음 |
-| `/profile/verification` | 없음 | HTTP 200 · title: Pawpong · OG 없음 |
-| `/settings` | 없음 | HTTP 200 · title: Pawpong · OG 없음 |
-| `/terms-of-privacy` | 있음 | HTTP 200 · title: 개인정보처리방침 | Pawpong · OG 없음 |
-| `/terms-of-service` | 있음 | HTTP 200 · title: 이용약관 | Pawpong · OG 없음 |
-| `/login` | 없음 | HTTP 200 · title: Pawpong · OG 없음 |
-| `/login/review` | 있음 | HTTP 200 · title: 심사용 계정 로그인 | 포퐁 · OG 없음 · noindex |
-| `/login/success` | 없음 | HTTP 200 · title: Pawpong · OG 없음 |
-| `/signup/[type]/[step]` | 없음 | 동적 경로: 소스 확인, 개별 ID 운영 미검증 |
-| `/signup/[type]` | 없음 | 동적 경로: 소스 확인, 개별 ID 운영 미검증 |
-| `/signup` | 없음 | HTTP 200 · title: Pawpong · OG 없음 |
+| 경로                                          | 소스 metadata | 운영 응답 메타 또는 확인 범위             |
+| --------------------------------------------- | ------------- | ----------------------------------------- |
+| `/about`                                      | 없음          | HTTP 200 · title: Pawpong · OG 없음       |
+| `/account/content-rights`                     | 있음          | HTTP 200 · title: Pawpong · OG 없음       |
+| `/account/delete`                             | 있음          | HTTP 200 · title: 계정 영구삭제           | 포퐁 · OG 없음           |
+| `/activity/applications/[applicationId]/edit` | 없음          | 동적 경로: 소스 확인, 개별 ID 운영 미검증 |
+| `/activity/applications/[applicationId]`      | 없음          | 동적 경로: 소스 확인, 개별 ID 운영 미검증 |
+| `/activity`                                   | 없음          | HTTP 200 · title: Pawpong · OG 없음       |
+| `/activity/received-reviews/[reviewId]`       | 없음          | 동적 경로: 소스 확인, 개별 ID 운영 미검증 |
+| `/activity/reviews/[reviewId]`                | 없음          | 동적 경로: 소스 확인, 개별 ID 운영 미검증 |
+| `/adoption/[id]/apply`                        | 없음          | 동적 경로: 소스 확인, 개별 ID 운영 미검증 |
+| `/adoption/[id]/edit`                         | 없음          | 동적 경로: 소스 확인, 개별 ID 운영 미검증 |
+| `/adoption/[id]`                              | 없음          | 동적 경로: 소스 확인, 개별 ID 운영 미검증 |
+| `/adoption/application-form`                  | 없음          | HTTP 200 · title: Pawpong · OG 없음       |
+| `/adoption/create`                            | 없음          | HTTP 200 · title: Pawpong · OG 없음       |
+| `/adoption/create/success`                    | 없음          | HTTP 200 · title: Pawpong · OG 없음       |
+| `/ai-filter`                                  | 있음          | HTTP 200 · title: AI 필터 · OG 없음       |
+| `/bookmarks`                                  | 없음          | HTTP 200 · title: Pawpong · OG 없음       |
+| `/care-map`                                   | 있음          | HTTP 200 · title: 우리 동네 돌봄 지도     | 포퐁 · OG 없음           |
+| `/chat`                                       | 없음          | HTTP 200 · title: Pawpong · OG 없음       |
+| `/community/@modal/[postId]`                  | 없음          | 인터셉트 모달: 직접 상세 경로에서 공유    |
+| `/community`                                  | 없음          | HTTP 200 · title: Pawpong · OG 없음       |
+| `/community/post/[postId]/edit`               | 없음          | 동적 경로: 소스 확인, 개별 ID 운영 미검증 |
+| `/community/post/[postId]`                    | 없음          | 동적 경로: 소스 확인, 개별 ID 운영 미검증 |
+| `/community/write`                            | 없음          | HTTP 200 · title: Pawpong · OG 없음       |
+| `/drafts`                                     | 없음          | HTTP 200 · title: Pawpong · OG 없음       |
+| `/explore`                                    | 없음          | HTTP 200 · title: Pawpong · OG 없음       |
+| `/faq`                                        | 없음          | HTTP 200 · title: Pawpong · OG 없음       |
+| `/hall-of-fame`                               | 없음          | HTTP 200 · title: Pawpong · OG 없음       |
+| `/hall-of-fame/participate`                   | 없음          | HTTP 200 · title: Pawpong · OG 없음       |
+| `/home/[userId]`                              | 없음          | 동적 경로: 소스 확인, 개별 ID 운영 미검증 |
+| `/home`                                       | 없음          | HTTP 200 · title: Pawpong · OG 없음       |
+| `/notices/[noticeId]`                         | 없음          | 동적 경로: 소스 확인, 개별 ID 운영 미검증 |
+| `/notices`                                    | 없음          | HTTP 200 · title: Pawpong · OG 없음       |
+| `/notifications`                              | 없음          | HTTP 200 · title: Pawpong · OG 없음       |
+| `/`                                           | 없음          | HTTP 200 · title: Pawpong · OG 없음       |
+| `/playground`                                 | 있음          | HTTP 200 · title: 놀이터 · OG 없음        |
+| `/profile/edit`                               | 없음          | HTTP 200 · title: Pawpong · OG 없음       |
+| `/profile/verification`                       | 없음          | HTTP 200 · title: Pawpong · OG 없음       |
+| `/settings`                                   | 없음          | HTTP 200 · title: Pawpong · OG 없음       |
+| `/terms-of-privacy`                           | 있음          | HTTP 200 · title: 개인정보처리방침        | Pawpong · OG 없음        |
+| `/terms-of-service`                           | 있음          | HTTP 200 · title: 이용약관                | Pawpong · OG 없음        |
+| `/login`                                      | 없음          | HTTP 200 · title: Pawpong · OG 없음       |
+| `/login/review`                               | 있음          | HTTP 200 · title: 심사용 계정 로그인      | 포퐁 · OG 없음 · noindex |
+| `/login/success`                              | 없음          | HTTP 200 · title: Pawpong · OG 없음       |
+| `/signup/[type]/[step]`                       | 없음          | 동적 경로: 소스 확인, 개별 ID 운영 미검증 |
+| `/signup/[type]`                              | 없음          | 동적 경로: 소스 확인, 개별 ID 운영 미검증 |
+| `/signup`                                     | 없음          | HTTP 200 · title: Pawpong · OG 없음       |
 
 ## 근거 파일
 

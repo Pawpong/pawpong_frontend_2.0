@@ -10,9 +10,7 @@
       "containerId": "265988640",
       "name": "pawpong.kr",
       "publicId": "GTM-52KZQGJJ",
-      "usageContext": [
-        "WEB"
-      ]
+      "usageContext": ["WEB"]
     },
     "variable": [
       {
@@ -243,9 +241,7 @@
             ]
           }
         ],
-        "firingTriggerId": [
-          "2147479573"
-        ],
+        "firingTriggerId": ["2147479573"],
         "tagFiringOption": "ONCE_PER_LOAD"
       },
       {
@@ -344,9 +340,7 @@
             ]
           }
         ],
-        "firingTriggerId": [
-          "1"
-        ],
+        "firingTriggerId": ["1"],
         "tagFiringOption": "ONCE_PER_EVENT"
       }
     ]

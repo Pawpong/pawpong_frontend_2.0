@@ -8,7 +8,7 @@ export function ActivityBadgeRow({ badges }: { badges: PublicActivityBadge[] }) 
         <span
           key={badge.key}
           title={`${badge.title}: ${badge.description}`}
-          className="inline-flex items-center gap-1 rounded bg-emerald-50 px-1.5 py-1 text-[10px] font-semibold text-emerald-900"
+          className="inline-flex items-center gap-1 rounded bg-emerald-50 px-1.5 py-1 text-[0.625rem] font-semibold text-emerald-900"
         >
           <PixelActivityBadge badgeKey={badge.key} title={badge.title} size={18} />
           {badge.title}

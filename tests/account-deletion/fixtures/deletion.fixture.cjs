@@ -132,4 +132,17 @@ function setupClient(
   return { ...client, events }
 }
 
-module.exports = { load, policy, cookiePolicy, status, receiptToken, accepted, body, authCookie, receiptCookie, setup, setupClient, NextRequest }
+module.exports = {
+  load,
+  policy,
+  cookiePolicy,
+  status,
+  receiptToken,
+  accepted,
+  body,
+  authCookie,
+  receiptCookie,
+  setup,
+  setupClient,
+  NextRequest,
+}

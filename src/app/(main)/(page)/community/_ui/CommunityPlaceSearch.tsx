@@ -3,6 +3,7 @@
 import { useId, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { carePlaceQueries, type CarePlace, type CarePlaceKind } from '@/entities/care-place'
+import { Button } from '@/shared/ui'
 
 /** 돌봄 지도와 같은 공개 장소 목록에서 방문한 곳을 고른다. */
 export function CommunityPlaceSearch({
@@ -76,14 +77,14 @@ export function CommunityPlaceSearch({
           }}
           className="min-h-11 min-w-0 flex-1 rounded-lg border border-neutral-200 bg-white px-3 text-base focus-ring tab:text-sm"
         />
-        <button
-          type="button"
+        <Button
+          intent="secondary"
+          size="lg"
           disabled={disabled || searching || !query.trim()}
           onClick={search}
-          className="min-h-11 shrink-0 rounded-lg border border-primary-500 bg-white px-4 text-sm font-bold text-primary-700 focus-ring hover:bg-primary-50 disabled:border-neutral-200 disabled:text-neutral-400"
         >
           {searching ? '찾는 중' : '찾기'}
-        </button>
+        </Button>
       </div>
       {error && (
         <p role="alert" className="mt-2 text-xs font-medium text-error-500">

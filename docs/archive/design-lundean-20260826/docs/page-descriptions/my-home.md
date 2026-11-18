@@ -22,15 +22,15 @@
 
 ## 화면 구성
 
-| 영역 | 설명 | 코드 위치 |
-|---|---|---|
-| 네비게이션 바 | 타이틀 "마이홈" + 우측 북마크 아이콘, tab+에서 GNB 아래 sticky | `_ui/MyHomeContent.tsx` (`NavigationBar`) |
-| 프로필 카드 | 역할별 프로필 정보(닉네임/소개/BPM/팔로워 등) | `_ui/ProfileCard.tsx` |
-| 탭 바 | 역할별 탭 구성(`MY_HOME_TABS` / `BREEDER_MY_HOME_TABS`), tab+ sticky(GNB+navbar 아래) | `_ui/HomeTabs.tsx`, `_ui/constants.ts` |
-| 작성 유도 바 | "게시글을 올려보세요"(입양자→`/community/write`) 또는 "분양글을 올려보세요"(브리더→`/adoption/create`) | `_ui/MyHomeContent.tsx` (`InputUpload`) |
-| 분양목록 탭(브리더만) | mo 2열 그리드 카드 / tab+ 3열 즐겨찾기형 카드 | `_ui/BreederListingCard.tsx`, `features/adoption` |
-| 게시글 탭 | 임시저장 배너(있을 때만) + 내가 쓴 글 목록 | `_ui/PostList.tsx` |
-| 즐겨찾는 브리더 탭 | 즐겨찾기한 브리더 목록 | `_ui/FavoriteBreedersContent.tsx` |
+| 영역                  | 설명                                                                                                   | 코드 위치                                         |
+| --------------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------- |
+| 네비게이션 바         | 타이틀 "마이홈" + 우측 북마크 아이콘, tab+에서 GNB 아래 sticky                                         | `_ui/MyHomeContent.tsx` (`NavigationBar`)         |
+| 프로필 카드           | 역할별 프로필 정보(닉네임/소개/BPM/팔로워 등)                                                          | `_ui/ProfileCard.tsx`                             |
+| 탭 바                 | 역할별 탭 구성(`MY_HOME_TABS` / `BREEDER_MY_HOME_TABS`), tab+ sticky(GNB+navbar 아래)                  | `_ui/HomeTabs.tsx`, `_ui/constants.ts`            |
+| 작성 유도 바          | "게시글을 올려보세요"(입양자→`/community/write`) 또는 "분양글을 올려보세요"(브리더→`/adoption/create`) | `_ui/MyHomeContent.tsx` (`InputUpload`)           |
+| 분양목록 탭(브리더만) | mo 2열 그리드 카드 / tab+ 3열 즐겨찾기형 카드                                                          | `_ui/BreederListingCard.tsx`, `features/adoption` |
+| 게시글 탭             | 임시저장 배너(있을 때만) + 내가 쓴 글 목록                                                             | `_ui/PostList.tsx`                                |
+| 즐겨찾는 브리더 탭    | 즐겨찾기한 브리더 목록                                                                                 | `_ui/FavoriteBreedersContent.tsx`                 |
 
 ## 인터랙션 · 상태
 
@@ -63,12 +63,12 @@ sticky 등장 모두 즉시 전환. **모션 요소 없음.**
 
 이 페이지 전체가 사실상 역할 분기로 이루어져 있다 — 표로 모아서 본다.
 
-| 역할/상황 | 노출 결과 |
-|---|---|
-| 브리더 | 탭: 분양목록·게시글·즐겨찾는 브리더(`BREEDER_MY_HOME_TABS`), 기본 탭 `listings`, 작성 유도 바 "분양글을 올려보세요" → `/adoption/create` |
-| 입양자 | 탭: 게시글·즐겨찾는 브리더(`MY_HOME_TABS`), 기본 탭 `posts`, 작성 유도 바 "게시글을 올려보세요" → `/community/write` |
-| 프로필 조회 실패(비로그인 포함 추정) | 화면 자체가 렌더되지 않음(`return null`) — 안내 문구 없이 빈 화면, 아래 엣지 케이스 참고 |
-| 게시글 소유자 본인 | "⋯" 메뉴로 수정/삭제 가능(`PostList` 내부) |
+| 역할/상황                            | 노출 결과                                                                                                                                |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| 브리더                               | 탭: 분양목록·게시글·즐겨찾는 브리더(`BREEDER_MY_HOME_TABS`), 기본 탭 `listings`, 작성 유도 바 "분양글을 올려보세요" → `/adoption/create` |
+| 입양자                               | 탭: 게시글·즐겨찾는 브리더(`MY_HOME_TABS`), 기본 탭 `posts`, 작성 유도 바 "게시글을 올려보세요" → `/community/write`                     |
+| 프로필 조회 실패(비로그인 포함 추정) | 화면 자체가 렌더되지 않음(`return null`) — 안내 문구 없이 빈 화면, 아래 엣지 케이스 참고                                                 |
+| 게시글 소유자 본인                   | "⋯" 메뉴로 수정/삭제 가능(`PostList` 내부)                                                                                               |
 
 ## 반응형 정책
 
@@ -85,7 +85,7 @@ sticky 등장 모두 즉시 전환. **모션 요소 없음.**
 ## 데이터 · 상태
 
 - 내 프로필: `profileQueries.me()` — 응답 없으면(`!adopterPublicProfile &&
-  !breederPublicProfile`) 화면 자체를 렌더하지 않음(`return null`).
+!breederPublicProfile`) 화면 자체를 렌더하지 않음(`return null`).
 - 내가 쓴 글: `communityQueries.myPosts(!!myProfile)` — 프로필 로드 후에만 활성화.
 - 임시저장 글 수: `communityQueries.drafts(!!myProfile)` — 0개면 이어쓰기 배너
   자체를 숨김.
@@ -96,13 +96,13 @@ sticky 등장 모두 즉시 전환. **모션 요소 없음.**
 
 ## 엣지 케이스
 
-| 상황 | 현재 처리 상태 |
-|---|---|
+| 상황                                                                  | 현재 처리 상태                                                                                     |
+| --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | 내 프로필 조회 실패(`!adopterPublicProfile && !breederPublicProfile`) | 미흡 — 안내 문구 없이 화면 전체가 빈 화면(`return null`)이 됨, 사용자가 뭐가 잘못됐는지 알 수 없음 |
-| 임시저장 글 0개 | 처리됨 — 이어쓰기 배너 자체를 숨김 |
-| 닉네임 등 긴 텍스트 | 처리됨 — `BreederCard` 등에서 `truncate` |
-| 게시글 삭제 API 실패 | 처리됨 — 확인 모달을 닫지 않고 재시도 가능하게 유지 |
-| 브리더 분양목록 API 실패 | 해당 없음 — 현재 목업 고정이라 실패 상태 자체가 없음 |
+| 임시저장 글 0개                                                       | 처리됨 — 이어쓰기 배너 자체를 숨김                                                                 |
+| 닉네임 등 긴 텍스트                                                   | 처리됨 — `BreederCard` 등에서 `truncate`                                                           |
+| 게시글 삭제 API 실패                                                  | 처리됨 — 확인 모달을 닫지 않고 재시도 가능하게 유지                                                |
+| 브리더 분양목록 API 실패                                              | 해당 없음 — 현재 목업 고정이라 실패 상태 자체가 없음                                               |
 
 ## 접근성
 

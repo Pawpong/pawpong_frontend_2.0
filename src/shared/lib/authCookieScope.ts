@@ -27,6 +27,5 @@ export function isAuthCookieScopeCurrent(scope: AuthCookieScope, allowMissingTok
 }
 
 export function assertAuthCookieScopeCurrent(scope: AuthCookieScope, allowMissingToken = false) {
-  if (!isAuthCookieScopeCurrent(scope, allowMissingToken))
-    throw new AuthCookieSessionChangedError()
+  if (!isAuthCookieScopeCurrent(scope, allowMissingToken)) throw new AuthCookieSessionChangedError()
 }

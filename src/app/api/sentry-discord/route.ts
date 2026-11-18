@@ -64,7 +64,11 @@ export async function POST(request: NextRequest) {
   const url = event?.web_url ?? payload.url
   const culprit = event?.culprit ?? payload.culprit
   const fields = [
-    { name: '프로젝트', value: payload.project_name ?? payload.project ?? 'pawpong-web', inline: true },
+    {
+      name: '프로젝트',
+      value: payload.project_name ?? payload.project ?? 'pawpong-web',
+      inline: true,
+    },
     { name: '레벨', value: level, inline: true },
     { name: '환경', value: event?.environment ?? '-', inline: true },
   ]

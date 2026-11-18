@@ -17,7 +17,6 @@ const FeedFollowButton = ({ userId, isFollowing, guard }: FeedFollowButtonProps)
 
   return (
     <FollowButton
-      size="sm"
       status={isFollowing ? 'following' : 'follow'}
       disabled={isPending}
       onClick={guard(() => (isFollowing ? unfollow : follow).mutate(userId))}

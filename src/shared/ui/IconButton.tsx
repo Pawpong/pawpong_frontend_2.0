@@ -13,7 +13,6 @@ const iconButtonStyles = tv({
     },
     edge: {
       none: '',
-      start: '-ml-2',
       end: '-mr-2',
       both: '-m-2',
     },
@@ -40,11 +39,9 @@ const iconButtonStyles = tv({
       md: 'size-10',
       touch: 'size-11',
       lg: 'size-12',
-      responsive: 'size-8 tab:size-12',
     },
   },
   compoundVariants: [
-    { size: 'sm', edge: 'start', className: '-ml-1' },
     { size: 'sm', edge: 'end', className: '-mr-1' },
     { size: 'sm', edge: 'both', className: '-m-1' },
   ],
@@ -56,11 +53,8 @@ type IconButtonVariantProps = VariantProps<typeof iconButtonStyles> & {
   className?: never
   style?: never
 }
-const iconButtonVariants = Object.assign(
-  ({ shape, tone, size, edge }: IconButtonVariantProps = {}) =>
-    iconButtonStyles({ shape, tone, size, edge }),
-  { variants: iconButtonStyles.variants },
-)
+const iconButtonVariants = ({ shape, tone, size, edge }: IconButtonVariantProps = {}) =>
+  iconButtonStyles({ shape, tone, size, edge })
 
 type IconButtonProps = Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,

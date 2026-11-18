@@ -5,8 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { AppleIcon, GoogleIcon, KakaoIcon, NaverIcon } from '@/shared/assets'
 import { normalizeReturnUrl } from '@/shared/lib/normalizeReturnUrl'
 import { Button } from '@/shared/ui/Button'
-import { getApiBaseUrl as getConfiguredApiBaseUrl } from '@/shared/config'
 import { restoreAuthSession } from '@/shared/lib/authSessionRecovery'
+import { socialLoginUrl, type SocialProvider } from '../lib/socialLogin'
 
 /**
  * 소셜 로그인 버튼 목록 (카카오 / 네이버 / 구글)
@@ -25,8 +25,6 @@ import { restoreAuthSession } from '@/shared/lib/authSessionRecovery'
  * Figma: PC 3414:750712 / Tablet 3414:751419 / Mobile 3414:751420.
  * Figma에 없는 네이버는 같은 FillButton 규격에 공식 브랜드 색을 적용한다.
  */
-type SocialProvider = 'kakao' | 'naver' | 'google' | 'apple'
-
 const SOCIAL_BUTTONS: {
   provider: SocialProvider
   label: string
@@ -58,8 +56,6 @@ const SOCIAL_BUTTONS: {
     Icon: AppleIcon,
   },
 ]
-
-const getApiBaseUrl = () => getConfiguredApiBaseUrl() || 'http://localhost:8080'
 
 export const SocialLoginList = () => {
   const router = useRouter()
@@ -116,13 +112,8 @@ export const SocialLoginList = () => {
 
   const startSocialLogin = (provider: SocialProvider) => {
     if (redirectIfLoggedIn()) return
-    const base = getApiBaseUrl()
-    const url =
-      returnUrl !== '/'
-        ? `${base}/api/auth/${provider}?returnUrl=${encodeURIComponent(returnUrl)}`
-        : `${base}/api/auth/${provider}`
     // href 할당 대신 assign() 사용 (react-hooks/immutability 규칙 회피, 동작 동일)
-    window.location.assign(url)
+    window.location.assign(socialLoginUrl(provider, returnUrl))
   }
 
   return (

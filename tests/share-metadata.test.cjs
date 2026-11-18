@@ -32,12 +32,33 @@ const meta = load('src/shared/lib/metadata.ts', {
   '@/shared/config/site': site,
   './mobileApp': mobile,
 })
+// 분양·프로필·공지는 화면과 같은 Query Factory 로 받는다. 여기서는 백엔드 응답(fetch)만 흉내 낸다
+const entityQueries = (fetch) => {
+  const get = (path) => async () => {
+    const res = await fetch(`https://api.example.test/api/v2${path}`)
+    const body = await res.json()
+    if (!res.ok || !body.success) throw new Error(`HTTP ${res.status}`)
+    return body.data
+  }
+  const query = (key, path) => ({ queryKey: [key, path], queryFn: get(path) })
+  return {
+    '@/entities/adoption': { adoptionQueries: { detail: (id) => query('a', `/adoption/${id}`) } },
+    '@/entities/adopter': {
+      adopterQueries: { publicProfile: (id) => query('u', `/profile/users/${id}`) },
+    },
+    '@/entities/breeder': {
+      breederQueries: { publicProfile: (id) => query('b', `/profile/breeders/${id}`) },
+    },
+    '@/entities/notice': { noticeQueries: { detail: (id) => query('n', `/notice/${id}`) } },
+    './requestQueries': { fetchForRequest: (q) => q.queryFn().catch(() => null) },
+  }
+}
 const content = (fetch) =>
   load(
     'src/app/_lib/contentMetadata.ts',
     {
       'server-only': {},
-      react: { cache: (fn) => fn },
+      ...entityQueries(fetch),
       '@/shared/lib/metadata': meta,
       './publicCommunityPost': load(
         'src/app/_lib/publicCommunityPost.ts',

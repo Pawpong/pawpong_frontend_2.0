@@ -1,10 +1,23 @@
+import { adoptionQueries } from '@/entities/adoption'
 import { getAdoptionMetadata } from '@/app/_lib/contentMetadata'
+import { ServerPrefetch } from '@/app/_lib/ServerPrefetch'
 import { AdoptionDetailPageClient } from './_ui/AdoptionDetailPageClient'
 
-// 공유 미리보기용 메타만 서버에서 만들고, 화면은 기존 클라이언트 조회 그대로 그린다
-export const generateMetadata = async ({ params }: { params: Promise<{ id: string }> }) =>
+interface AdoptionDetailPageProps {
+  params: Promise<{ id: string }>
+}
+
+export const generateMetadata = async ({ params }: AdoptionDetailPageProps) =>
   getAdoptionMetadata((await params).id)
 
-const AdoptionDetailPage = () => <AdoptionDetailPageClient />
+// 분양글 본문은 서버에서 받아 HTML 에 바로 싣는다. 받는 동안은 loading.tsx 의 스켈레톤이 먼저 간다
+const AdoptionDetailPage = async ({ params }: AdoptionDetailPageProps) => {
+  const { id } = await params
+  return (
+    <ServerPrefetch queries={[adoptionQueries.detail(id)]}>
+      <AdoptionDetailPageClient />
+    </ServerPrefetch>
+  )
+}
 
 export default AdoptionDetailPage
