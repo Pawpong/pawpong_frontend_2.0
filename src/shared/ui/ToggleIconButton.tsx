@@ -16,7 +16,8 @@ const toggleIconVariants = tv({
   slots: {
     root: 'focus-ring touch-target relative inline-flex shrink-0 items-center gap-1 rounded-lg font-semibold text-action-dark [-webkit-tap-highlight-color:transparent] disabled:cursor-not-allowed',
     icon: 'shrink-0',
-    count: 'text-body-md',
+    // 숫자는 아이콘을 받쳐 주는 보조 정보라 회색 보통 굵기로 둔다
+    count: 'text-body-md font-medium text-neutral-700',
   },
   variants: {
     size: {

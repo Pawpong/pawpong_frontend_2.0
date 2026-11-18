@@ -1,7 +1,7 @@
 'use client'
 
 import type { CommunityReportReason } from '@/shared/types'
-import { ReportAction } from '@/shared/ui'
+import { useReportFlow } from '@/shared/ui'
 import { useReportCommunityPost } from '../api/community.mutations'
 
 const REPORT_REASON_OPTIONS = [
@@ -12,24 +12,15 @@ const REPORT_REASON_OPTIONS = [
   { value: 'other', label: '기타' },
 ] satisfies { value: CommunityReportReason; label: string }[]
 
-export const ReportPostAction = ({
-  postId,
-  triggerVariant,
-}: {
-  postId: string
-  /** menu: 더보기(⋮) 메뉴 안 / flag: 신고 깃발 아이콘 버튼 */
-  triggerVariant?: 'menu' | 'flag'
-}) => {
+/** 게시글 ⋮ 메뉴의 신고 항목에 request 를 걸고, dialogs 는 메뉴 바깥에 렌더한다. */
+export const useReportPost = (postId: string) => {
   const reportPost = useReportCommunityPost(postId)
-  return (
-    <ReportAction
-      triggerVariant={triggerVariant}
-      targetLabel="게시글"
-      options={REPORT_REASON_OPTIONS}
-      onSubmit={async (data) => {
-        const { reported } = await reportPost.mutateAsync(data)
-        return reported ? '신고를 접수했어요.' : '이미 접수된 신고예요. 검토를 기다려 주세요.'
-      }}
-    />
-  )
+  return useReportFlow({
+    targetLabel: '게시글',
+    options: REPORT_REASON_OPTIONS,
+    onSubmit: async (data) => {
+      const { reported } = await reportPost.mutateAsync(data)
+      return reported ? '신고를 접수했어요.' : '이미 접수된 신고예요. 검토를 기다려 주세요.'
+    },
+  })
 }

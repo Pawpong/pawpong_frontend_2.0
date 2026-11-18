@@ -6,9 +6,9 @@ import {
   useToggleCommunityPostBookmark,
   useToggleCommunityPostLike,
 } from '../api/communityReaction.mutations'
-import { ReportPostAction } from './ReportPostAction'
+import { useReportPost } from './ReportPostAction'
 
-type InjectedActions = 'onToggleLike' | 'onToggleSave' | 'moreAction'
+type InjectedActions = 'onToggleLike' | 'onToggleSave' | 'onReport' | 'reportDialog'
 
 /** entities 카드가 표시만 하는 좋아요·북마크를 mutation에 연결한다. */
 const useCardReactions = (postId: string, isLiked: boolean, isSaved: boolean) => {
@@ -24,19 +24,21 @@ const useCardReactions = (postId: string, isLiked: boolean, isSaved: boolean) =>
  */
 const ConnectedPostCard = (props: Omit<ComponentProps<typeof PostCard>, InjectedActions>) => {
   const reactions = useCardReactions(props.postId, props.isLiked, props.isSaved)
+  const report = useReportPost(props.postId)
 
   return (
     <PostCard
       {...props}
       {...(props.aiReview?.state === 'held' ? {} : reactions)}
-      moreAction={props.onDelete ? undefined : <ReportPostAction postId={props.postId} />}
+      onReport={report.request}
+      reportDialog={report.dialogs}
     />
   )
 }
 
 interface ConnectedFeedCardProps extends Omit<
   ComponentProps<typeof CommunityFeedCard>,
-  'onToggleLike' | 'onToggleSave' | 'reportAction'
+  InjectedActions
 > {
   /**
    * 로그인이 필요한 동작을 감싸는 가드 (shared/lib 의 useLoginGuard).
@@ -47,6 +49,7 @@ interface ConnectedFeedCardProps extends Omit<
 
 const ConnectedFeedCard = ({ guard, ...props }: ConnectedFeedCardProps) => {
   const reactions = useCardReactions(props.postId, props.isLiked, props.isSaved)
+  const report = useReportPost(props.postId)
 
   return (
     <CommunityFeedCard
@@ -65,11 +68,8 @@ const ConnectedFeedCard = ({ guard, ...props }: ConnectedFeedCardProps) => {
             ? guard(reactions.onToggleSave)
             : reactions.onToggleSave
       }
-      reportAction={
-        props.onDelete ? undefined : (
-          <ReportPostAction postId={props.postId} triggerVariant="flag" />
-        )
-      }
+      onReport={report.request}
+      reportDialog={report.dialogs}
     />
   )
 }
