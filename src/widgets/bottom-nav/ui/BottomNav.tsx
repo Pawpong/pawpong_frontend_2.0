@@ -115,14 +115,8 @@ const BottomNavView = ({ pathname }: { pathname: string }) => {
                       <UnreadCountBadge count={hydrated ? unreadChatCount : 0} />
                     )}
                   </span>
-                  <span
-                    className={cn(
-                      'text-[0.6875rem] leading-4 font-medium',
-                      active && 'font-semibold text-primary-700',
-                    )}
-                  >
-                    {bottomLabel ?? label}
-                  </span>
+                  {/* iOS 26 탭 바처럼 아이콘만 보인다 — 이름은 화면 읽기용으로만 남긴다 */}
+                  <span className="sr-only">{bottomLabel ?? label}</span>
                 </Link>
               )
             })}

@@ -2,7 +2,8 @@
   "_comment": "웹(pawpong_frontend)과 앱(pawpong_rn)이 같은 내용으로 두는 탭 바 메시지 예시. 한쪽을 바꾸면 다른 쪽도 같이 바꾼다.",
   "TAB_CONFIG": {
     "type": "TAB_CONFIG",
-    "pillOverhang": 9,
+    "pillOverhang": 0,
+    "showLabels": false,
     "tabs": [
       {
         "href": "/chat",
