@@ -1,14 +1,12 @@
 import type { ReactNode } from 'react'
-import Image from 'next/image'
 import { cn } from '@/shared/lib/cn'
 import { ProfileAvatar } from '@/shared/ui'
-import { PixelPencilIcon } from '@/shared/assets'
+import { NAV_ICON_DATA, NavIconSvg, type NavIconData } from '@/shared/assets'
 
 // Figma nav icon 세트 (1019:38520) — status=Default / hover-press 두 변형.
 // Default 는 단색이라 currentColor 로 그린다 (하단 내비 회색 / PC 헤더 브라운).
-// hover-press 는 노란 채움 + 브라운 외곽의 투톤이라 currentColor 로 표현할 수 없어
-// Figma 에서 뽑은 SVG 를 그대로 쓴다 (public/images/nav/*).
-// 헤더(데스크탑)와 BottomNav(모바일/탭)가 공유한다.
+// hover-press 는 노란 채움 + 브라운 외곽의 투톤이다.
+// [refactored] 그림은 NAV_ICON_DATA 한 곳에 두고 헤더·하단바·앱 탭 바(TAB_CONFIG)가 같이 쓴다.
 
 interface NavIconProps {
   className?: string
@@ -18,68 +16,24 @@ interface NavIconProps {
   active?: boolean
 }
 
-const NavHomeIcon = ({ className }: NavIconProps) => (
-  <svg viewBox="0 0 30 30" fill="currentColor" className={className} aria-hidden>
-    <path d="M13.8857 25.813H5V24.188H13.8857V25.813ZM25 25.813H16.1055V24.188H25V25.813ZM7.22266 24.187H5V13.0767H7.22266V24.187ZM13.8887 24.187H11.667V19.7427H13.8887V24.187ZM18.333 24.187H16.1113V19.7427H18.333V24.187ZM25 24.187H22.7773V13.0767H25V24.187ZM16.1113 19.7427H13.8887V17.521H16.1113V19.7427ZM9.44434 13.0767H7.22266V10.854H9.44434V13.0767ZM22.7773 13.0767H20.5557V10.854H22.7773V13.0767ZM11.667 10.854H9.44434V8.63135H11.667V10.854ZM20.5557 10.854H18.333V8.63135H20.5557V10.854ZM13.8887 8.63135H11.667V6.40967H13.8887V8.63135ZM18.333 8.63135H16.1113V6.40967H18.333V8.63135ZM16.1113 6.40967H13.8887V4.18701H16.1113V6.40967Z" />
-  </svg>
-)
+/** 기본·선택 그림 한 쌍. 마이홈은 그림 대신 프로필 사진(avatar)을 쓴다 */
+export type NavGlyphs = { icon: NavIconData; active: NavIconData } | 'avatar'
 
-const NavSearchIcon = ({ className }: NavIconProps) => (
-  <svg viewBox="0 0 32 32" fill="currentColor" className={className} aria-hidden>
-    <g transform="translate(6 6)">
-      <path d="M11.8181 0H4.54536V2.72727H11.8181V0Z" />
-      <path d="M4.54553 2.72739H1.81826V5.45466H4.54553V2.72739Z" />
-      <path d="M14.5455 2.72739H11.8183V5.45466H14.5455V2.72739Z" />
-      <path d="M2.72727 5.45478H0V10.9093H2.72727V5.45478Z" />
-      <path d="M16.3636 5.45478H13.6364V10.9093H16.3636V5.45478Z" />
-      <path d="M4.54553 10.9096H1.81826V13.6368H4.54553V10.9096Z" />
-      <path d="M14.5454 10.9096H10.909V14.5459H14.5454V10.9096Z" />
-      <path d="M11.8181 13.6364H4.54536V16.3636H11.8181V13.6364Z" />
-      <path d="M17.2727 13.6364H13.6364V17.2727H17.2727V13.6364Z" />
-      <path d="M20 16.3638H16.3636V20.0001H20V16.3638Z" />
-    </g>
-  </svg>
-)
-
-const NavChatIcon = ({ className }: NavIconProps) => (
-  <svg viewBox="0 0 30 30" fill="currentColor" className={className} aria-hidden>
-    <path d="M7.02637 24.9785H5.03125V23.9834H6.02246V22.9766H7.02637V21.9814H5.01465V19.9746H5.01953V8.00684H5V6H25.0049V8.00684H25.0195V21.9814H11.0283V22.9766H9.03711V23.9834H7.02637V24.9785ZM7.02637 19.9746H23.0137V8.00684H7.02637V19.9746ZM12.0225 14.9902H10.0254V12.9922H12.0225V14.9902ZM16.0186 14.9902H14.0205V12.9922H16.0186V14.9902ZM20.0137 14.9902H18.0156V12.9922H20.0137V14.9902Z" />
-  </svg>
-)
-
-/** AI 필터 — 픽셀 반짝이. 활성 투톤은 public/images/nav/nav-ai-active.svg */
-const NavSparkleIcon = ({ className }: NavIconProps) => (
-  <svg viewBox="0 0 30 30" fill="currentColor" className={className} aria-hidden>
-    <path d="M15 7V12H17V14H22V17H17V19H15V25H12V19H10V17H5V14H10V12H12V7H15ZM12 17H15V14H12V17Z" />
-    <path d="M24 4V6H26V8H24V10H22V8H20V6H22V4H24Z" />
-    <rect x="24" y="17" width="2" height="2" />
-  </svg>
-)
-
-/**
- * 비활성 글리프는 다른 nav 아이콘과 같이 인라인 SVG 로 그린다.
- *
- * 이전에는 CSS `mask` 로 외부 SVG 를 씌웠는데, 축약 속성 `mask` 는 Safari 가
- * `-webkit-mask` 없이는 적용하지 않아 마스크가 통째로 무시됐다. 그러면 아래 깔린
- * `bg-current` 만 남아 아이콘이 글자색 사각형 덩어리로 보인다. (경로는 bottom-community.svg 원본)
- */
-const NavCommunityGlyph = ({ className }: NavIconProps) => <PixelPencilIcon className={className} />
-
-const NavCommunityIcon = ({ className, active }: NavIconProps) => (
-  <span className={cn('flex items-center justify-center', className)} aria-hidden>
-    {active ? (
-      <Image
-        src="/images/nav/bottom-community-active.svg"
-        alt=""
-        width={18}
-        height={18}
-        className="size-3/5"
-      />
-    ) : (
-      <NavCommunityGlyph className="size-full" />
-    )}
-  </span>
-)
+/** 상태에 맞는 그림을 그린다. scale 이 있는 그림(커뮤니티 선택)은 칸 가운데에 그 비율로 작게 놓는다 */
+const NavGlyphIcon = ({
+  glyphs,
+  className,
+  active,
+}: NavIconProps & { glyphs: Exclude<NavGlyphs, 'avatar'> }) => {
+  const data = active ? glyphs.active : glyphs.icon
+  if (!data.scale) return <NavIconSvg data={data} className={className} />
+  const size = `${data.scale * 100}%`
+  return (
+    <span className={cn('flex items-center justify-center', className)} aria-hidden>
+      <NavIconSvg data={data} style={{ width: size, height: size }} />
+    </span>
+  )
+}
 
 /**
  * 마이홈 — 프로필 사진이 있으면 사진, 없으면 기본 paw 아바타.
@@ -96,60 +50,67 @@ const NavMyHomeIcon = ({ className, src, active }: NavIconProps) => (
   </span>
 )
 
-/** Default(단색 글리프) ↔ hover-press(투톤 SVG) 를 상태에 따라 바꿔 그린다 */
-const withActiveIcon = (Glyph: (props: NavIconProps) => ReactNode, activeSrc: string) => {
-  const NavIcon = ({ className, active }: NavIconProps) =>
-    active ? (
-      <Image src={activeSrc} alt="" width={30} height={30} className={className} />
-    ) : (
-      <Glyph className={className} />
-    )
+const glyphIcon = (glyphs: NavGlyphs) => {
+  const NavIcon = (props: NavIconProps) =>
+    glyphs === 'avatar' ? <NavMyHomeIcon {...props} /> : <NavGlyphIcon glyphs={glyphs} {...props} />
   NavIcon.displayName = 'NavIcon'
   return NavIcon
 }
+
+const pair = (icon: NavIconData, active: NavIconData) => ({ icon, active })
 
 export interface MainNavItem {
   href: string
   label: string
   bottomLabel?: string
+  /** 그림 데이터 — 앱 탭 바에도 그대로 보낸다 */
+  glyphs: NavGlyphs
   Icon: (props: NavIconProps) => ReactNode
   isActive: (pathname: string) => boolean
 }
 
-export const MAIN_NAV: MainNavItem[] = [
+const NAV_ITEMS: Omit<MainNavItem, 'Icon'>[] = [
   {
     href: '/',
     label: '홈',
-    Icon: withActiveIcon(NavHomeIcon, '/images/nav/nav-home-active.svg'),
+    glyphs: pair(NAV_ICON_DATA.home, NAV_ICON_DATA.homeActive),
     isActive: (p) => p === '/',
   },
   {
     href: '/explore',
     label: '탐색',
-    Icon: withActiveIcon(NavSearchIcon, '/images/nav/nav-search-active.svg'),
+    glyphs: pair(NAV_ICON_DATA.search, NAV_ICON_DATA.searchActive),
     isActive: (p) => p.startsWith('/explore') || p.startsWith('/care-map'),
   },
   {
     href: '/chat',
     label: '채팅',
     bottomLabel: '채팅방',
-    Icon: withActiveIcon(NavChatIcon, '/images/nav/nav-chat-active.svg'),
+    glyphs: pair(NAV_ICON_DATA.chat, NAV_ICON_DATA.chatActive),
     isActive: (p) => p.startsWith('/chat'),
   },
   {
     href: '/community',
     label: '커뮤니티',
-    Icon: NavCommunityIcon,
+    glyphs: pair(NAV_ICON_DATA.community, NAV_ICON_DATA.communityActive),
     isActive: (p) => p.startsWith('/community'),
   },
   {
     href: '/playground',
     label: '놀이터',
-    Icon: withActiveIcon(NavSparkleIcon, '/images/nav/nav-ai-active.svg'),
+    glyphs: pair(NAV_ICON_DATA.sparkle, NAV_ICON_DATA.sparkleActive),
     isActive: (p) => p.startsWith('/playground') || p.startsWith('/ai-filter'),
   },
-  { href: '/home', label: '마이홈', Icon: NavMyHomeIcon, isActive: (p) => p.startsWith('/home') },
+  { href: '/home', label: '마이홈', glyphs: 'avatar', isActive: (p) => p.startsWith('/home') },
 ]
+
+export const MAIN_NAV: MainNavItem[] = NAV_ITEMS.map((item) => ({
+  ...item,
+  Icon: glyphIcon(item.glyphs),
+}))
 
 // 데스크탑 헤더 nav — 홈(로고가 대신)만 제외
 export const HEADER_NAV = MAIN_NAV.filter((item) => item.href !== '/')
+
+// 모바일 하단 탭 — 유리 캡슐에 5칸만 두려고 놀이터는 전체 메뉴로 보낸다
+export const BOTTOM_NAV = MAIN_NAV.filter((item) => item.href !== '/playground')

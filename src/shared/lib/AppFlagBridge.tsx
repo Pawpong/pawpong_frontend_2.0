@@ -11,6 +11,7 @@ import { useEffect } from 'react'
 export function AppFlagBridge() {
   useEffect(() => {
     if (/PawpongApp\//.test(navigator.userAgent)) document.documentElement.dataset.app = ''
+    if (/PawpongTabs\//.test(navigator.userAgent)) document.documentElement.dataset.nativeTabs = ''
   }, [])
   return null
 }

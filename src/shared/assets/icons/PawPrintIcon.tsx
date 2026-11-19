@@ -1,25 +1,10 @@
 import type { SVGProps } from 'react'
+import { NavIconSvg } from './NavIconSvg'
+import { NAV_ICON_DATA } from './navIconData'
 
-// Figma 3312-1228576 icon/paw (디자인시스템 발바닥) — 프로젝트 공통 paw 아이콘.
-// viewBox 비율이 세로로 긴 타원(7.44x9.84 발가락)이라 정사각 컨테이너에서는
-// 상하 레터박싱이 생기므로, 기존 PawIcon(1019-20799) 대체 시 각 자리 사이즈를
-// 한 단계씩 키워 체감 축소를 보정했다.
-const PawPrintIcon = (props: SVGProps<SVGSVGElement>) => {
-  return (
-    <svg
-      width="34"
-      height="28"
-      viewBox="0 0 33.4863 27.8037"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      {...props}
-    >
-      <path
-        d="M13.6992 12.7227H19.7871V12.7217H21.8164V14.876H19.7871V14.877H21.8164V14.876H23.8457V17.0312H25.875V19.1855H27.9053V25.6484H25.875V27.8037H19.7871V25.6494H13.6992V27.8037H7.61035V25.6484H5.58105V19.1855H7.61035V17.0312H9.63965V14.876H11.6689V14.877H13.6992V14.876H11.6689V12.7217H13.6992V12.7227ZM5.58105 7.86816H7.44141V13.7686H5.58105V15.7354H1.86035V13.7686H0V7.86816H1.86035V5.90039H5.58105V7.86816ZM31.626 7.86816H33.4863V13.7686H31.626V15.7354H27.9053V13.7686H26.0449V7.86816H27.9053V5.90039H31.626V7.86816ZM19.7871 12.7217H13.6992V10.5674H19.7871V12.7217ZM13.9521 1.9668H15.8125V7.86816H13.9521V9.83496H10.2314V7.86816H8.37109V1.9668H10.2314V0H13.9521V1.9668ZM23.2539 1.9668H25.1143V7.86816H23.2539V9.83496H19.5332V7.86816H17.6729V1.9668H19.5332V0H23.2539V1.9668ZM12.0918 3.93359H12.0928V1.9668H12.0918V3.93359Z"
-        fill="currentColor"
-      />
-    </svg>
-  )
-}
+/** 발바닥 — 빈 프로필 아바타 등. 그림은 NAV_ICON_DATA(앱 탭 바와 공유)에서 가져온다. */
+const PawPrintIcon = (props: SVGProps<SVGSVGElement>) => (
+  <NavIconSvg data={NAV_ICON_DATA.paw} width="34" height="28" {...props} />
+)
 
 export { PawPrintIcon }
