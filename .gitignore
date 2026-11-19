@@ -46,3 +46,7 @@ servers.local.md
 
 # Isolated local mobile integration builds
 /.next-mobile-integration/
+
+# playwright
+/test-results
+/playwright-report
