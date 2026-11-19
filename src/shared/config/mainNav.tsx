@@ -85,7 +85,6 @@ const NAV_ITEMS: Omit<MainNavItem, 'Icon'>[] = [
   {
     href: '/chat',
     label: '채팅',
-    bottomLabel: '채팅방',
     glyphs: pair(NAV_ICON_DATA.chat, NAV_ICON_DATA.chatActive),
     isActive: (p) => p.startsWith('/chat'),
   },
@@ -101,7 +100,14 @@ const NAV_ITEMS: Omit<MainNavItem, 'Icon'>[] = [
     glyphs: pair(NAV_ICON_DATA.sparkle, NAV_ICON_DATA.sparkleActive),
     isActive: (p) => p.startsWith('/playground') || p.startsWith('/ai-filter'),
   },
-  { href: '/home', label: '마이홈', glyphs: 'avatar', isActive: (p) => p.startsWith('/home') },
+  {
+    href: '/home',
+    label: '마이홈',
+    // 하단 탭은 칸이 좁아 두 글자로 줄인다 (헤더는 마이홈)
+    bottomLabel: '마이',
+    glyphs: 'avatar',
+    isActive: (p) => p.startsWith('/home'),
+  },
 ]
 
 export const MAIN_NAV: MainNavItem[] = NAV_ITEMS.map((item) => ({
