@@ -8,6 +8,7 @@ export interface NavItem {
 }
 
 // 데스크탑 상단 nav는 shared/config/mainNav(HEADER_NAV)로 통일 (BottomNav와 공유)
+// 놀이터는 모바일 하단 탭(BOTTOM_NAV)에서 빠져 있어 전체 메뉴에서 들어간다.
 //
 // 전체 메뉴 순서: 내 것(관심 → 신청, 입양 흐름 순) → 둘러보기 → 소식 → 설정(맨 끝).
 // 문구는 마이홈 사이드 링크·각 페이지 제목과 같게 둔다.
@@ -20,6 +21,7 @@ export const MOBILE_MENU_ITEMS: NavItem[] = [
   { name: '관심 목록', href: '/bookmarks', requiresAuth: true },
   { name: '신청·후기', href: '/activity', requiresAuth: true },
   { name: '나의 활동', href: '/my-activity', requiresAuth: true, requiresActivity: true },
+  { name: '놀이터', href: '/playground' },
   { name: '우리 동네 돌봄 지도', href: '/care-map' },
   { name: '명예의 전당', href: '/hall-of-fame' },
   { name: '공지사항', href: '/notices' },

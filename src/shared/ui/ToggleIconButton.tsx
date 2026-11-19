@@ -3,6 +3,7 @@
 import type { ComponentType, MouseEvent, SVGProps } from 'react'
 import Link from 'next/link'
 import { tv } from '@/shared/lib/tv'
+import { nativeHaptic } from '@/shared/lib/nativeBridge'
 
 // 좋아요·관심·저장처럼 눌림 상태가 있는 아이콘 버튼 (구 FavoriteToggle·FavoriteButton·PostActionButton 통합).
 // onClick → 버튼, href → 링크(댓글 아이콘 등), 둘 다 없으면 표시 전용.
@@ -154,6 +155,7 @@ const ToggleIconButton = ({
   const handleClick = (e: MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
+    nativeHaptic('light')
     onClick()
   }
 

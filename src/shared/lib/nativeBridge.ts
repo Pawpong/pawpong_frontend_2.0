@@ -5,11 +5,39 @@ type NativeCapability =
   | 'notificationSettings'
   | 'appBadge'
   | 'inAppPurchase'
+  | 'haptics'
 type NativeWindow = Window & {
   ReactNativeWebView?: { postMessage: (message: string) => void }
   __PAWPONG_APP__?: { platform?: string; capabilities?: Partial<Record<NativeCapability, boolean>> }
 }
 let requestSequence = 0
+
+/**
+ * 앱과 주고받는 탭 바·진동 메시지 이름. 앱(pawpong_rn features/native-tabs)의 NATIVE_MESSAGE 와 같아야 하고,
+ * 양쪽 테스트가 같은 예시(tests/fixtures/native-tab-messages.json)로 이 약속을 확인한다.
+ */
+export const NATIVE_MESSAGE = {
+  /** 웹 → 앱: 탭 목록·라벨·아이콘 그림 (페이지를 열 때 한 번) */
+  TAB_CONFIG: 'TAB_CONFIG',
+  /** 웹 → 앱: 지금 탭·보임 여부·채팅 수·프로필 사진 (화면이 바뀔 때마다) */
+  TAB_STATE: 'TAB_STATE',
+  /** 앱 → 웹: 탭을 눌렀다 */
+  NAVIGATE_TAB: 'NAVIGATE_TAB',
+  /** 웹 → 앱: 손끝 진동 */
+  HAPTIC: 'HAPTIC',
+} as const
+
+// [refactored] requestNative·subscribeNativeMessage 가 같이 쓰는 앱 메시지 확인 — 같은 창·같은 출처의 JSON 만 받는다
+const readNativeMessage = (event: MessageEvent): Record<string, unknown> | null => {
+  if (event.source && event.source !== window) return null
+  if (event.origin && event.origin !== window.location?.origin) return null
+  try {
+    const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data
+    return data && typeof data === 'object' ? data : null
+  } catch {
+    return null // 다른 프레임 메시지는 무시한다.
+  }
+}
 
 export function hasNativeCapability(capability: NativeCapability): boolean {
   if (typeof window === 'undefined') return false
@@ -42,16 +70,10 @@ export function requestNative(
       reject(new DOMException('Aborted', 'AbortError'))
     }
     const onMessage = (event: MessageEvent) => {
-      if (event.source && event.source !== window) return
-      if (event.origin && event.origin !== window.location?.origin) return
-      try {
-        const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data
-        if (!data || data.type !== responseType || data.requestId !== requestId) return
-        cleanup()
-        resolve(data)
-      } catch {
-        /* 다른 프레임 메시지는 무시한다. */
-      }
+      const data = readNativeMessage(event) // [refactored]
+      if (!data || data.type !== responseType || data.requestId !== requestId) return
+      cleanup()
+      resolve(data)
     }
     const timer = setTimeout(() => {
       cleanup()
@@ -102,6 +124,46 @@ export async function shareNatively(payload: {
   const response = await requestNative('nativeShare', 'SHARE', 'SHARE_RESULT', payload, 60_000)
   if (response.status === 'shared' || response.status === 'dismissed') return response.status
   throw new Error('공유하지 못했습니다. URL 복사로 다시 시도해주세요.')
+}
+
+/** 앱이 하단 탭 바를 직접 그리는지 (UA 의 PawpongTabs/ — 루트 레이아웃이 data-native-tabs 로 표시한다). */
+export function hasNativeTabBar(): boolean {
+  if (typeof window === 'undefined') return false
+  return Boolean(
+    (window as NativeWindow).ReactNativeWebView &&
+    document.documentElement.dataset.nativeTabs !== undefined,
+  )
+}
+
+/** 좋아요처럼 누른 순간을 손끝으로 알린다. 지원하지 않는 앱·브라우저에서는 아무것도 하지 않는다. */
+export function nativeHaptic(style: 'selection' | 'light'): void {
+  if (hasNativeCapability('haptics')) postNativeMessage({ type: NATIVE_MESSAGE.HAPTIC, style })
+}
+
+/** 응답을 기다리지 않는 알림. 앱이 받는지는 호출부가 hasNativeTabBar 등으로 먼저 확인한다. */
+export function postNativeMessage(payload: { type: string } & Record<string, unknown>): void {
+  try {
+    ;(window as NativeWindow).ReactNativeWebView?.postMessage(JSON.stringify(payload))
+  } catch {
+    /* 앱이 닫히는 중이면 보내지 못해도 화면에는 영향이 없다. */
+  }
+}
+
+/** 앱이 먼저 보내는 메시지(type 일치)를 받는다. iOS/Android 의 두 수신 경로를 모두 듣는다. */
+export function subscribeNativeMessage(
+  type: string,
+  onMessage: (data: Record<string, unknown>) => void,
+): () => void {
+  const listener = (event: MessageEvent) => {
+    const data = readNativeMessage(event) // [refactored]
+    if (data?.type === type) onMessage(data)
+  }
+  window.addEventListener('message', listener)
+  document.addEventListener('message', listener as EventListener)
+  return () => {
+    window.removeEventListener('message', listener)
+    document.removeEventListener('message', listener as EventListener)
+  }
 }
 
 export function subscribeNativeCapabilities(onChange: () => void): () => void {
