@@ -1,0 +1,38 @@
+{
+  "_comment": "웹(pawpong_frontend)과 앱(pawpong_rn)이 같은 내용으로 두는 탭 바 메시지 예시. 한쪽을 바꾸면 다른 쪽도 같이 바꾼다.",
+  "TAB_CONFIG": {
+    "type": "TAB_CONFIG",
+    "pillOverhang": 9,
+    "tabs": [
+      {
+        "href": "/chat",
+        "label": "채팅방",
+        "avatar": false,
+        "badge": true,
+        "icon": { "viewBox": "0 0 30 30", "paths": [{ "d": "M5 6H25V22H5Z" }] },
+        "activeIcon": {
+          "viewBox": "0 0 18 18",
+          "paths": [{ "d": "M0 0h18v18h-18Z", "fill": "#FFFE72" }],
+          "scale": 0.6
+        }
+      },
+      {
+        "href": "/home",
+        "label": "마이홈",
+        "avatar": true,
+        "badge": false,
+        "icon": { "viewBox": "0 0 33.4863 27.8037", "paths": [{ "d": "M0 0H10V10H0Z" }] },
+        "activeIcon": { "viewBox": "0 0 33.4863 27.8037", "paths": [{ "d": "M0 0H10V10H0Z" }] }
+      }
+    ]
+  },
+  "TAB_STATE": {
+    "type": "TAB_STATE",
+    "href": "/chat",
+    "visible": true,
+    "chatUnread": 3,
+    "avatarUrl": "https://cdn.pawpong.kr/profile.png"
+  },
+  "NAVIGATE_TAB": { "type": "NAVIGATE_TAB", "href": "/community" },
+  "HAPTIC": { "type": "HAPTIC", "style": "light" }
+}

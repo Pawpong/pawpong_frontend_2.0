@@ -3,6 +3,7 @@ import { BottomNav } from '@/widgets/bottom-nav'
 import { SiteFooter } from '@/widgets/site-footer'
 import { AppContentRightsNotice } from './(narrow)/account/content-rights/_ui/AppContentRightsNotice'
 import { PlaygroundPayments } from './_ui/PlaygroundPayments'
+import { AppPullToRefresh } from './_ui/AppPullToRefresh'
 
 // min-h-screen(100vh) 은 주소창이 보이거나 키보드가 올라와도 줄지 않아, 모바일에서 화면보다
 // 긴 문서가 된다. 채팅처럼 한 화면을 꽉 채우는 쪽은 그만큼이 통째로 빈 자리로 남으므로
@@ -17,6 +18,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
       </main>
       <SiteFooter />
       <BottomNav />
+      <AppPullToRefresh />
     </div>
   )
 }

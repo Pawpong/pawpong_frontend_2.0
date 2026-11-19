@@ -29,6 +29,7 @@ function renderFavoriteButton(props) {
   })
   const { ToggleIconButton } = load('src/shared/ui/ToggleIconButton.tsx', {
     '@/shared/lib/tv': { tv },
+    '@/shared/lib/nativeBridge': { nativeHaptic: () => {} },
   })
   const { FavoriteIcon } = load('src/shared/assets/icons/FavoriteIcon.tsx')
   return renderToStaticMarkup(

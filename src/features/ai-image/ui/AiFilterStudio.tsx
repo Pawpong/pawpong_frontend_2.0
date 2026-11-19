@@ -621,7 +621,7 @@ export function AiFilterStudio({
 
       {showFloatingCta && (
         // 하단 메뉴 바로 위에 띄운다. 누르면 진행 상황이 보이는 자리로 옮긴 뒤 만든다.
-        <div className="fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-sticky bg-gradient-to-t from-base-white via-base-white/95 to-transparent px-4 pt-6 pb-3 tab:hidden">
+        <div className="fixed inset-x-0 bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-sticky bg-gradient-to-t from-base-white via-base-white/95 to-transparent px-4 pt-6 pb-3 tab:hidden">
           <Button
             size="lg"
             width="full"
