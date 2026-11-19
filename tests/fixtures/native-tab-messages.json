@@ -3,7 +3,7 @@
   "TAB_CONFIG": {
     "type": "TAB_CONFIG",
     "pillOverhang": 0,
-    "showLabels": false,
+    "showLabels": true,
     "tabs": [
       {
         "href": "/chat",

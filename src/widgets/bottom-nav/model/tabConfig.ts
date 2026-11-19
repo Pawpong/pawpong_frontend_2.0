@@ -16,8 +16,8 @@ export const PILL_OVERHANG = 0
 export const buildTabConfig = () => ({
   type: NATIVE_MESSAGE.TAB_CONFIG,
   pillOverhang: PILL_OVERHANG,
-  // 아이콘만 보인다 (웹 하단바와 같다). 라벨은 앱에서도 화면 읽기용 이름으로만 쓴다
-  showLabels: false,
+  // 아이콘 아래 라벨을 보인다 (웹 하단바와 같다)
+  showLabels: true,
   tabs: BOTTOM_NAV.map(({ href, label, bottomLabel, glyphs }) =>
     glyphs === 'avatar'
       ? {
