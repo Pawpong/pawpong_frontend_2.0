@@ -101,39 +101,15 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
   }, [queryClient])
 
   useEffect(() => {
-    let scheduledFrame: number | null = null
     const handleIdentityChange = createAuthQueryBoundary(queryClient)
 
-    const recoverActiveQueries = (framesUntilRecovery = 1) => {
-      if (scheduledFrame !== null) window.cancelAnimationFrame(scheduledFrame)
-
-      const schedule = (remainingFrames: number) => {
-        scheduledFrame = window.requestAnimationFrame(() => {
-          if (remainingFrames > 1) {
-            schedule(remainingFrames - 1)
-            return
-          }
-
-          scheduledFrame = null
-          // resetQueries가 진행 중 요청 취소와 active query 재요청을 원자적으로 처리한다.
-          // 먼저 cancelQueries를 호출하면 라우트 구독 교체 시점에 reset 대상이 사라져
-          // 복원 화면이 pending 상태로 남을 수 있다.
-          void queryClient.resetQueries({ type: 'active' }, { cancelRefetch: true })
-        })
-      }
-
-      schedule(framesUntilRecovery)
-    }
-
+    // BFCache 로 얼었다 풀린 문서는 진행 중이던 요청이 끝나지 않고 남을 수 있다.
+    // cancelRefetch 가 그 요청을 끊고 다시 보내되, 보이던 데이터는 지우지 않는다.
+    // 문서를 새로 불러온 뒤로가기는 QueryClient 도 새로 생겨 알아서 조회하고,
+    // Next 클라이언트 뒤로가기는 refetchOnMount: 'always' 가 맡으므로 여기서 다루지 않는다.
     const handlePageShow = (event: PageTransitionEvent) => {
       if (!event.persisted) return
-      recoverActiveQueries()
-    }
-
-    const handlePopState = () => {
-      // Next.js 클라이언트 히스토리 탐색은 pageshow 없이 popstate만 발생한다.
-      // 새 route segment가 active query를 구독한 뒤 재시작하도록 두 프레임을 기다린다.
-      recoverActiveQueries(2)
+      void queryClient.refetchQueries({ type: 'active' }, { cancelRefetch: true })
     }
 
     const handleAppActive = () => {
@@ -147,27 +123,17 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
       )
     }
 
-    const navigation = performance.getEntriesByType('navigation')[0] as
-      PerformanceNavigationTiming | undefined
-
-    // BFCache 복원은 기존 listener가 pageshow를 받고, 문서 자체가 다시 로드된
-    // back/forward 탐색은 effect가 pageshow 이후 붙으므로 navigation type으로 보완한다.
-    if (navigation?.type === 'back_forward') recoverActiveQueries()
-
     window.addEventListener('pageshow', handlePageShow)
-    window.addEventListener('popstate', handlePopState)
     window.addEventListener('pawpong:app-active', handleAppActive)
     window.addEventListener(AUTH_STATE_CHANGED, handleIdentityChange)
     window.addEventListener('focus', handleIdentityChange)
     document.addEventListener('visibilitychange', handleIdentityChange)
     return () => {
       window.removeEventListener('pageshow', handlePageShow)
-      window.removeEventListener('popstate', handlePopState)
       window.removeEventListener('pawpong:app-active', handleAppActive)
       window.removeEventListener(AUTH_STATE_CHANGED, handleIdentityChange)
       window.removeEventListener('focus', handleIdentityChange)
       document.removeEventListener('visibilitychange', handleIdentityChange)
-      if (scheduledFrame !== null) window.cancelAnimationFrame(scheduledFrame)
     }
   }, [queryClient])
 
