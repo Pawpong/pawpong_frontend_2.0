@@ -63,7 +63,7 @@ test('AI 필터는 모바일에서 사진 칸을 낮추고 만들기 버튼이 �
   assert.match(studio, /<div ref=\{ctaRef\}>/)
   assert.match(
     studio,
-    /fixed inset-x-0 bottom-\[calc\(3\.5rem\+env\(safe-area-inset-bottom\)\)\][^"]*tab:hidden/,
+    /fixed inset-x-0 bottom-\[calc\(4\.75rem\+env\(safe-area-inset-bottom\)\)\][^"]*tab:hidden/,
   )
   // 두 버튼은 같은 문구와 같은 만들기 동작을 쓴다.
   assert.equal(studio.match(/\{generateLabel\}/g).length, 2)

@@ -9,7 +9,9 @@ import { SessionRecoveryBridge } from '@/shared/lib/SessionRecoveryBridge'
 import { NativePhotoPickerBridge } from '@/shared/lib/NativePhotoPickerBridge'
 import { NativeViewportBridge } from '@/shared/lib/NativeViewportBridge'
 import { PawpongAnalytics } from '@/shared/lib/PawpongAnalytics'
+import { Suspense } from 'react'
 import { AppFlagBridge } from '@/shared/lib/AppFlagBridge'
+import { NativeTabSync } from '@/widgets/bottom-nav'
 import { MakerCreditConsole } from '@/shared/lib/MakerCreditConsole'
 import { MAKER_AUTHORS, WEBSITE_STRUCTURED_DATA } from '@/shared/lib/makerCredit'
 import { StructuredData } from '@/shared/ui/StructuredData'
@@ -22,8 +24,9 @@ export const metadata: Metadata = {
   creator: MAKER_AUTHORS.map(({ name }) => name).join(', '),
 }
 
-// RN 웹뷰는 UA 에 PawpongApp/ 을 붙인다. 첫 페인트 전에 표시해 앱 전용 숨김(in-data-app:hidden)이 깜빡이지 않게 한다
-const APP_DETECT_SCRIPT = `if(/PawpongApp\\//.test(navigator.userAgent))document.documentElement.dataset.app=''`
+// RN 웹뷰는 UA 에 PawpongApp/ 을 붙인다. 첫 페인트 전에 표시해 앱 전용 숨김(in-data-app:hidden)이 깜빡이지 않게 한다.
+// 앱이 하단 탭 바를 직접 그리면 PawpongTabs/ 도 붙인다 — 웹 하단바를 첫 페인트부터 숨긴다(in-data-native-tabs:hidden)
+const APP_DETECT_SCRIPT = `var u=navigator.userAgent,d=document.documentElement.dataset;if(/PawpongApp\\//.test(u))d.app='';if(/PawpongTabs\\//.test(u))d.nativeTabs=''`
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -48,6 +51,9 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         <NativePushSession />
         <QueryProvider>
           <NavigationGuardProvider>{children}</NavigationGuardProvider>
+          <Suspense fallback={null}>
+            <NativeTabSync />
+          </Suspense>
         </QueryProvider>
       </body>
     </html>

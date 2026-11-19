@@ -57,7 +57,7 @@ test('날짜·통계·작성자·하단 메뉴 같은 공통 보조 글자도 �
     ],
     ['src/shared/ui/ListingStats.tsx', /base: 'flex items-center font-medium text-neutral-700'/],
     ['src/shared/config/typography.ts', /meta: '[^']*text-neutral-700/],
-    ['src/widgets/bottom-nav/ui/BottomNav.tsx', /justify-center text-neutral-700 focus-ring-inset/],
+    ['src/widgets/bottom-nav/ui/BottomNav.tsx', /rounded-full text-neutral-850 focus-ring-inset/],
     ['src/shared/ui/SectionHeader.tsx', /text-xs font-bold text-neutral-700/],
   ])
     assert.match(source(file), pattern, file)
