@@ -7,24 +7,30 @@ import { CareMapEntry } from '@/widgets/care-map-entry'
 import { HomeSectionHeader } from './HomeSectionHeader'
 import { PreviewBanner } from './PreviewBanner'
 import { PreviewCommunity, PreviewPets, PreviewHallOfFame, PreviewPlayground } from './PreviewFeeds'
+// 정적 import 는 파일 해시가 붙은 주소로 immutable 캐시된다. public 경로 문자열은
+// max-age=0 이라 홈으로 돌아올 때마다 서버 확인을 기다리느라 아이콘이 깜빡였다.
+import catImage from '../../../../../public/images/onboarding/animal-cat-v3.png'
+import dogImage from '../../../../../public/images/onboarding/animal-dog-v3.png'
+import lizardImage from '../../../../../public/images/onboarding/animal-lizard-v3.png'
+import breederImage from '../../../../../public/images/onboarding/member-breeder-v3.png'
 
 export const species = [
   {
     name: '고양이',
     href: '/explore?type=adoption&category=cat',
-    image: '/images/onboarding/animal-cat-v3.png',
+    image: catImage,
     tone: 'bg-secondary-100',
   },
   {
     name: '강아지',
     href: '/explore?type=adoption&category=dog',
-    image: '/images/onboarding/animal-dog-v3.png',
+    image: dogImage,
     tone: 'bg-primary-50',
   },
   {
     name: '도마뱀',
     href: '/explore?type=adoption&category=lizard',
-    image: '/images/onboarding/animal-lizard-v3.png',
+    image: lizardImage,
     tone: 'bg-point-100',
   },
 ] as const
@@ -36,7 +42,7 @@ export function SpeciesLinks() {
       name: '브리더',
       label: '브리더 탐색',
       href: '/explore?type=breeder',
-      image: '/images/onboarding/member-breeder-v3.png',
+      image: breederImage,
     },
   ]
   return (
@@ -52,6 +58,9 @@ export function SpeciesLinks() {
             alt=""
             width={112}
             height={112}
+            // 홈 첫 화면에 보이는 작은 아이콘이라 지연 로드·비동기 디코딩을 끈다 (다시 마운트될 때 한 박자 비지 않게)
+            loading="eager"
+            decoding="sync"
             className="size-16 object-contain tab:size-24"
           />
           <span className="text-body-s font-semibold text-neutral-850">{item.label}</span>
