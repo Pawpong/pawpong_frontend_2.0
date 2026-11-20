@@ -106,7 +106,7 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
     // BFCache 로 얼었다 풀린 문서는 진행 중이던 요청이 끝나지 않고 남을 수 있다.
     // cancelRefetch 가 그 요청을 끊고 다시 보내되, 보이던 데이터는 지우지 않는다.
     // 문서를 새로 불러온 뒤로가기는 QueryClient 도 새로 생겨 알아서 조회하고,
-    // Next 클라이언트 뒤로가기는 refetchOnMount: 'always' 가 맡으므로 여기서 다루지 않는다.
+    // Next 클라이언트 뒤로가기는 refetchOnMount 가 맡으므로(신선한 캐시는 그대로, 오래된 것만 재조회) 여기서 다루지 않는다.
     const handlePageShow = (event: PageTransitionEvent) => {
       if (!event.persisted) return
       void queryClient.refetchQueries({ type: 'active' }, { cancelRefetch: true })
