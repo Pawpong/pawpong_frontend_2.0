@@ -52,6 +52,6 @@ test('FAQ 에서 다른 페이지로 갔다가 뒤로가면 목록이 사라지�
   const firstShown = samples.indexOf(true)
   expect(firstShown).toBeGreaterThanOrEqual(0)
   expect(samples.slice(firstShown)).not.toContain(false)
-  // 화면은 유지하되 서버 데이터는 다시 확인한다 (createQuery 의 refetchOnMount: 'always').
+  // 화면은 유지하되 서버 데이터는 다시 확인한다 (FaqContent 가 직접 지정한 refetchOnMount: 'always').
   expect(faqRequests).toBeGreaterThan(requestsBeforeBack)
 })

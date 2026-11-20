@@ -13,13 +13,14 @@ const DEFAULT_STALE_TIME = STALE_TIME.DEFAULT
 type RefetchOnMount = boolean | 'always'
 
 /**
- * 페이지 재진입은 서버 상태를 다시 확인하되, 품종·지역·필터처럼 세션 동안 변하지 않는
- * STATIC 참조 데이터는 네트워크 요청을 반복하지 않는다.
+ * 화면에 다시 들어올 때는 staleTime 이 지난 데이터만 다시 받는다 (TanStack 기본값 true).
+ * 신선한 캐시는 그대로 쓰고, 쓰기 후에는 각 mutation 의 invalidateQueries 가 새로 받게 한다.
+ * 실시간 데이터는 STALE_TIME.REALTIME(0) 이라 들어올 때마다 받는다.
+ * 'always' 로 기본값을 두면 신선한 캐시도 매번 다시 받고, 무한 목록은 불러온 페이지를 전부 다시 받았다.
+ * 수정 폼처럼 들어올 때 반드시 최신이어야 하는 화면만 refetchOnMount: 'always' 를 직접 넘긴다.
  */
-const resolveRefetchOnMount = (
-  staleTime: number,
-  refetchOnMount?: RefetchOnMount,
-): RefetchOnMount => refetchOnMount ?? (staleTime === STALE_TIME.STATIC ? false : 'always')
+const resolveRefetchOnMount = (refetchOnMount?: RefetchOnMount): RefetchOnMount =>
+  refetchOnMount ?? true
 
 /**
  * 단순 쿼리 옵션 생성 헬퍼.
@@ -41,7 +42,7 @@ export function createQuery<TData>(config: {
     queryFn: config.queryFn,
     enabled: config.enabled,
     staleTime,
-    refetchOnMount: resolveRefetchOnMount(staleTime, config.refetchOnMount),
+    refetchOnMount: resolveRefetchOnMount(config.refetchOnMount),
     ...(config.throwOnError !== undefined && { throwOnError: config.throwOnError }),
   })
 }
@@ -69,7 +70,7 @@ export function createInfiniteQuery<TData>(config: {
       last.pagination.hasNextPage ? last.pagination.currentPage + 1 : undefined,
     enabled: config.enabled,
     staleTime,
-    refetchOnMount: resolveRefetchOnMount(staleTime, config.refetchOnMount),
+    refetchOnMount: resolveRefetchOnMount(config.refetchOnMount),
   })
 }
 
@@ -95,6 +96,6 @@ export function createInfiniteQueryWithHasMore<TData>(config: {
     getNextPageParam: (last, all) => (last.hasMore ? all.length + 1 : undefined),
     enabled: config.enabled,
     staleTime,
-    refetchOnMount: resolveRefetchOnMount(staleTime, config.refetchOnMount),
+    refetchOnMount: resolveRefetchOnMount(config.refetchOnMount),
   })
 }
