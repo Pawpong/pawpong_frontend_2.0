@@ -27,10 +27,12 @@ const collectErrors = (page: Page) => {
 }
 
 for (const path of PAGES) {
-  test(`${path} 이 오류 없이 열린다`, async ({ page }) => {
+  test(`${path} 이 오류 없이 열린다`, async ({ page, baseURL }) => {
     const errors = collectErrors(page)
     const response = await page.goto(path)
     expect(response?.status()).toBeLessThan(400)
+    // Vercel 배포 보호에 걸리면 vercel.com 로그인 화면(200)으로 넘어간다 — 그 화면을 통과로 보지 않는다
+    expect(new URL(page.url()).origin).toBe(new URL(baseURL as string).origin)
     await expect(page.locator('body')).not.toBeEmpty()
     // hydration 과 첫 데이터 요청이 끝날 시간
     await page.waitForTimeout(2000)
