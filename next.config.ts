@@ -39,6 +39,15 @@ const nextConfig: NextConfig = {
         source: '/.well-known/assetlinks.json',
         headers: [{ key: 'Content-Type', value: 'application/json' }],
       },
+      // public 이미지는 기본이 max-age=0, must-revalidate 라 화면이 다시 붙을 때마다 서버 확인을
+      // 기다리느라 비었다가 나타났다(탐색 필터 아이콘·레벨 배지·상태 라벨 등). /_next/image 도 원본의
+      // max-age 를 따른다. 파일은 v1·v2 처럼 새 이름으로 바꿔 넣으므로 하루 캐시 + 일주일 뒤 갱신으로 둔다.
+      ...['/images/:path*', '/gamification/:path*', '/playground/:path*'].map((source) => ({
+        source,
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=86400, stale-while-revalidate=604800' },
+        ],
+      })),
     ]
   },
   images: {
