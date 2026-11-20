@@ -160,9 +160,10 @@ test('generated request IDs are distinct UUIDs accepted by the optional server f
     assert.match(id, /^[\da-f]{8}-[\da-f]{4}-4[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/)
 })
 
-test('only my confirmed room read resets notification inbox and badge', () => {
+test('only my confirmed room read refreshes notification inbox and badge without clearing them', () => {
   let callbacks
   const reset = []
+  const refreshed = []
   const { useChatRoom } = load('src/features/chat-realtime/model/useChatRoom.ts', {
     react: {
       useCallback: (fn) => fn,
@@ -173,7 +174,10 @@ test('only my confirmed room read resets notification inbox and badge', () => {
       useQuery: () => ({ data: [] }),
       useQueryClient: () => ({
         setQueryData: () => {},
-        invalidateQueries: () => Promise.resolve(),
+        invalidateQueries: (query) => {
+          refreshed.push(query.queryKey)
+          return Promise.resolve()
+        },
         resetQueries: (query) => {
           reset.push(query.queryKey)
           return Promise.resolve()
@@ -200,7 +204,12 @@ test('only my confirmed room read resets notification inbox and badge', () => {
   useChatRoom('room', 'me')
   callbacks.onMessagesRead({ roomId: 'another', readBy: 'me' })
   callbacks.onMessagesRead({ roomId: 'room', readBy: 'other' })
-  assert.equal(reset.length, 0)
+  assert.equal(refreshed.filter((key) => key[0] === 'notification').length, 0)
   callbacks.onMessagesRead({ roomId: 'room', readBy: 'me' })
-  assert.deepEqual(reset, [['notification']])
+  assert.deepEqual(
+    refreshed.filter((key) => key[0] === 'notification'),
+    [['notification']],
+  )
+  // 보이던 배지·목록을 비우는 reset 은 쓰지 않는다 (깜빡임)
+  assert.equal(reset.length, 0)
 })

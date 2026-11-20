@@ -20,8 +20,9 @@ export function FeatureHighlights({
   const query = useQuery({
     queryKey: ['feature-highlights', placement],
     queryFn: ({ signal }) => getFeatureHighlights(placement, signal),
+    // 관리자 설정은 화면에 들어올 때마다 다시 확인하되(staleTime 0 + refetchOnMount),
+    // 캐시는 남겨 돌아온 화면에서 영역이 비었다가 생기며 아래 내용이 밀리지 않게 한다.
     staleTime: 0,
-    gcTime: 0,
     retry: 1,
     // 선택적 소개 영역의 잘못된 응답이 전체 페이지 오류 경계로 전파되지 않게 한다.
     throwOnError: false,
