@@ -9,6 +9,7 @@ import { BOTTOM_NAV } from '@/shared/config'
 import { UnreadCountBadge } from '@/shared/ui'
 import { useMe } from '@/features/auth'
 import { shouldShowBottomNav } from '../model/visibility'
+import { resolveActiveHref } from '../model/activeTab'
 import { useChatUnreadCount } from '../model/useChatUnreadCount'
 import { PILL_OVERHANG } from '../model/tabConfig'
 
@@ -27,7 +28,8 @@ const BottomNavView = ({ pathname }: { pathname: string }) => {
   // 주소가 바뀌면 from 이 달라져 저절로 무시되고, 그때부터는 주소 기준으로 그린다
   const [tapped, setTapped] = useState<{ index: number; from: string } | null>(null)
   const pendingIndex = tapped?.from === pathname ? tapped.index : null
-  const activeIndex = pendingIndex ?? BOTTOM_NAV.findIndex((item) => item.isActive(pathname))
+  const activeHref = resolveActiveHref(pathname)
+  const activeIndex = pendingIndex ?? BOTTOM_NAV.findIndex((item) => item.href === activeHref)
 
   // 알약은 모든 탭이 같은 크기 — 한 칸보다 양옆으로 PILL_OVERHANG 만큼 넓어 '커뮤니티'처럼 긴 라벨도 여유 있게 감싼다.
   // 양 끝 탭에서는 캡슐 밖으로 나가지 않게 안쪽으로 붙인다.
