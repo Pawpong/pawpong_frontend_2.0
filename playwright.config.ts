@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test'
+import { BYPASS_STATE } from './e2e/global-setup'
 
 const PORT = 3100
 const bypass = process.env.VERCEL_AUTOMATION_BYPASS_SECRET
@@ -18,11 +19,10 @@ export default defineConfig({
     ...devices['iPhone 15 Pro'],
     baseURL: process.env.E2E_BASE_URL ?? `http://localhost:${PORT}`,
     trace: 'retain-on-failure',
-    // Vercel 배포 보호를 넘는 헤더. 첫 응답이 쿠키를 심으므로 이후 요청과 API(다른 출처) 요청에는 붙지 않아도 된다.
-    extraHTTPHeaders: bypass
-      ? { 'x-vercel-protection-bypass': bypass, 'x-vercel-set-bypass-cookie': 'true' }
-      : undefined,
+    // Vercel 배포 보호를 넘는 쿠키 (e2e/global-setup.ts 가 받아 둔다)
+    storageState: bypass ? BYPASS_STATE : undefined,
   },
+  globalSetup: './e2e/global-setup.ts',
   webServer: process.env.E2E_BASE_URL
     ? undefined
     : {
