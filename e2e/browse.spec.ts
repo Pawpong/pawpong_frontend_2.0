@@ -2,12 +2,22 @@ import { expect, test, type Page } from '@playwright/test'
 
 // 서비스의 핵심 동선을 실제 데이터로 따라간다. 보기만 하므로 운영에서도 돈다.
 
+// 목록 카드는 데이터가 온 뒤에 그려지므로, 맞는 링크가 나타날 때까지 기다린다 (머리글 링크는 먼저 뜬다)
 const firstHref = async (page: Page, pattern: RegExp) => {
-  const link = page.locator('a[href]').filter({ visible: true })
-  await expect(link.first()).toBeVisible()
-  const hrefs = await link.evaluateAll((links) => links.map((a) => a.getAttribute('href') ?? ''))
-  const href = hrefs.find((value) => pattern.test(value))
-  expect(href, `${pattern} 에 맞는 링크가 없다`).toBeTruthy()
+  let href: string | undefined
+  await expect
+    .poll(
+      async () => {
+        const hrefs = await page
+          .locator('a[href]')
+          .filter({ visible: true })
+          .evaluateAll((links) => links.map((a) => a.getAttribute('href') ?? ''))
+        href = hrefs.find((value) => pattern.test(value))
+        return href
+      },
+      { message: `${pattern} 에 맞는 링크가 없다` },
+    )
+    .toBeTruthy()
   return href as string
 }
 
