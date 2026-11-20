@@ -1,0 +1,58 @@
+name: 배포 E2E
+
+# Vercel 이 배포를 만들면(도메인에 붙이기 전) 그 주소에 E2E 를 돌리고 결과를 커밋 상태로 남긴다.
+# - main: Vercel Deployment Checks 에 이 상태를 필수로 지정해, 통과해야 pawpong.kr 로 교체된다.
+# - dev: 막지는 않고 결과만 남긴다 (dev.pawpong.kr 는 이미 바뀌어 있다).
+# repository_dispatch 는 기본 브랜치(dev)에 있는 이 파일로 돈다. 테스트 코드는 배포된 커밋으로 받는다.
+on:
+  repository_dispatch:
+    types: [vercel.deployment.ready]
+
+run-name: 배포 E2E · ${{ github.event.client_payload.git.ref }} · ${{ github.event.client_payload.git.shortSha }}
+
+permissions:
+  contents: read
+  actions: read
+  statuses: write
+
+concurrency:
+  group: e2e-${{ github.event.client_payload.git.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # WebKit 과 시스템 의존성이 들어 있는 공식 이미지 — 브라우저 설치 시간을 쓰지 않는다
+    # @playwright/test 를 올리면 이 태그도 같은 버전으로 올린다 (다르면 브라우저를 찾지 못해 실패한다)
+    container: mcr.microsoft.com/playwright:v1.65.1-noble
+    env:
+      HUSKY: '0'
+    steps:
+      # 이 단계가 커밋 상태를 '진행 중'으로 만들고, 잡이 끝나면 성공·실패로 바꾼다
+      - uses: vercel/repository-dispatch/actions/status@v1
+        with:
+          name: E2E (${{ github.event.client_payload.environment }})
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.client_payload.git.sha }}
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: 배포 주소에 E2E
+        run: pnpm test:e2e
+        env:
+          E2E_BASE_URL: ${{ github.event.client_payload.url }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+          E2E_REVIEW_EMAIL: ${{ secrets.E2E_REVIEW_EMAIL }}
+          E2E_REVIEW_PASSWORD: ${{ secrets.E2E_REVIEW_PASSWORD }}
+      - name: 실패 기록 보관
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-trace-${{ github.event.client_payload.git.shortSha }}
+          path: test-results/
+          retention-days: 7
