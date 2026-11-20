@@ -103,7 +103,8 @@ const useChatRoom = (roomId: string, currentUserId: string) => {
       void queryClient.invalidateQueries({ queryKey: chatQueries.rooms().queryKey })
       if (event.readBy === currentUserId) {
         // 서버가 읽은 방의 알림을 정리한 다음 배지·누적 목록도 함께 갱신한다.
-        void queryClient.resetQueries({ queryKey: notificationQueries.all() })
+        // reset 은 떠 있는 배지·목록을 비웠다가 다시 채워 깜빡였다. invalidate 는 보이던 값을 둔 채 새로 받는다.
+        void queryClient.invalidateQueries({ queryKey: notificationQueries.all() })
       }
     },
     [currentUserId, queryClient, queryKey, roomId],
