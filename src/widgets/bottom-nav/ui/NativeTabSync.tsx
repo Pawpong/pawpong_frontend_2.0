@@ -14,6 +14,7 @@ import {
   subscribeNativeMessage,
 } from '@/shared/lib/nativeBridge'
 import { buildTabConfig } from '../model/tabConfig'
+import { resolveActiveHref } from '../model/activeTab'
 
 /**
  * 앱이 하단 탭 바를 직접 그릴 때(PawpongTabs/) 웹과 앱의 탭 상태를 맞춘다. 화면에는 아무것도 그리지 않는다.
@@ -31,7 +32,7 @@ const NativeTabSync = () => {
   const profileImageUrl = me?.profileImageUrl ?? null
   const chatUnread = useChatUnreadCount() // [refactored] 웹 하단바와 같은 조회를 훅으로
   const isChatRoom = pathname === '/chat' && searchParams.has('roomId')
-  const activeHref = BOTTOM_NAV.find((item) => item.isActive(pathname))?.href ?? null
+  const activeHref = resolveActiveHref(pathname)
 
   useEffect(() => {
     if (hasNativeTabBar()) postNativeMessage(buildTabConfig())
@@ -53,10 +54,11 @@ const NativeTabSync = () => {
     if (!hasNativeTabBar()) return
     return subscribeNativeMessage(NATIVE_MESSAGE.NAVIGATE_TAB, ({ href }) => {
       if (typeof href !== 'string' || !BOTTOM_NAV.some((item) => item.href === href)) return
-      if (href === activeHref) window.scrollTo({ top: 0, behavior: 'smooth' })
+      // 브리더 프로필처럼 탐색 탭에 머무는 화면에서 탐색을 누르면 맨 위가 아니라 탐색으로 돌아간다
+      if (href === pathname) window.scrollTo({ top: 0, behavior: 'smooth' })
       else router.push(href)
     })
-  }, [activeHref, router])
+  }, [pathname, router])
 
   return null
 }
