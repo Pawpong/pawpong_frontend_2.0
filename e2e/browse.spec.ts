@@ -29,6 +29,12 @@ const expectShareMeta = async (page: Page) => {
 
 test('탐색 → 분양 상세 → 브리더 홈', async ({ page }) => {
   await page.goto('/explore?type=adoption')
+  // 분양글이 하나도 없으면(운영은 2026-11 기준 0건) 빈 화면이 제대로 뜨는 것까지만 본다
+  const empty = page.getByText('분양글이 없어요')
+  const card = page.locator('a[href^="/adoption/"]:not([href="/adoption/create"])')
+  await expect(card.or(empty).first()).toBeVisible()
+  test.skip(await empty.isVisible(), '분양글이 없어 상세 흐름은 건너뛴다')
+
   const pet = await firstHref(page, /^\/adoption\/(?!create$)[\w-]+$/)
   await page.locator(`a[href="${pet}"]`).first().click()
   await page.waitForURL((url) => url.pathname === pet)
