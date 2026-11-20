@@ -106,7 +106,8 @@ const NAV_ITEMS: Omit<MainNavItem, 'Icon'>[] = [
     // 하단 탭은 칸이 좁아 두 글자로 줄인다 (헤더는 마이홈)
     bottomLabel: '마이',
     glyphs: 'avatar',
-    isActive: (p) => p.startsWith('/home'),
+    // /home/{userId} 는 남의 홈(내 ID 면 /home 으로 보낸다) — 마이 탭이 아니다
+    isActive: (p) => p === '/home',
   },
 ]
 
