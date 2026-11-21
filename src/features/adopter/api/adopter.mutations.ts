@@ -13,6 +13,8 @@ import { breederQueries } from '@/entities/breeder'
 import { communityQueries } from '@/entities/community'
 import { profileQueries } from '@/entities/profile'
 import { patchCachedItem } from '@/shared/lib/patchCachedItem'
+import { postStackChange, subscribeStackChanges } from '@/shared/lib/nativeStack'
+import { useEffect } from 'react'
 import {
   updateAdopterProfile,
   deleteAdopterAccount,
@@ -160,6 +162,8 @@ const useFavoriteMutation = (nextFavorited: boolean) => {
         qc.setQueriesData(scope, (data) => patchBreederFavorite(data, breederId, nextFavorited)),
       )
       if (!nextFavorited) dropFromFavoriteList(qc, breederId)
+      // 앱이 쌓은 아래 화면에도 최종 값을 남긴다(앱이 보관했다가 다시 보일 때 넘긴다)
+      postStackChange({ kind: 'breeder-favorite', id: breederId, isFavorited: nextFavorited })
       // 아직 데이터가 없는 새 화면의 최초 조회만 재개한다. 보이는 기존 목록은 유지한다.
       await qc.refetchQueries({
         ...breederFavoriteScope,
@@ -202,6 +206,25 @@ const useFavoriteMutation = (nextFavorited: boolean) => {
 
 export const useAddFavorite = () => useFavoriteMutation(true)
 export const useRemoveFavorite = () => useFavoriteMutation(false)
+
+/**
+ * 앱이 쌓은 위 화면에서 바뀐 브리더 즐겨찾기를 이 화면 캐시에 반영한다 — 같은 화면에서 누른 것과 같은 규칙.
+ * 탐색·인기·프로필 카드는 그 값만 고치고(재조회 없음), 즐겨찾는 브리더 목록은 해제면 빼고 등록이면 다시 받는다.
+ */
+export const useBreederFavoriteStackSync = () => {
+  const qc = useQueryClient()
+  useEffect(
+    () =>
+      subscribeStackChanges('breeder-favorite', ({ id, isFavorited }) => {
+        favoriteScopes.forEach((scope) =>
+          qc.setQueriesData(scope, (data) => patchBreederFavorite(data, id, isFavorited)),
+        )
+        if (!isFavorited) dropFromFavoriteList(qc, id)
+        void invalidateFavoriteCaches(qc)
+      }),
+    [qc],
+  )
+}
 
 export const useCreateReview = () => {
   const qc = useQueryClient()
