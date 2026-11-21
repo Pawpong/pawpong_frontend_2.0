@@ -78,47 +78,109 @@ test('변경은 최종 값으로 보내고, 받은 변경은 종류별로만 넘
   assert.deepEqual(breeder, ['b'])
 })
 
-test('상세 WebView 히스토리 위치: push 는 +1, replace 는 그대로, 뒤로는 기록된 값으로', () => {
-  const entries = []
-  const listeners = []
+// 상세 WebView 한 개를 흉내 낸다: history 기록·sessionStorage 는 문서가 바뀌어도 남고, 모듈(문서)은 새로 뜬다
+const detailWebView = () => {
+  const store = new Map()
+  const sessionStorage = {
+    getItem: (key) => (store.has(key) ? store.get(key) : null),
+    setItem: (key, value) => store.set(key, String(value)),
+    removeItem: (key) => store.delete(key),
+  }
+  const entries = [{ url: '/app-shell', state: null }]
+  let cursor = 0
+  let listeners = []
   const history = {
-    state: null,
-    pushState(data) {
-      this.state = data
-      entries.push(data)
+    get state() {
+      return entries[cursor].state
     },
-    replaceState(data) {
-      this.state = data
-      entries[entries.length - 1] = data
+    pushState(state, _u, url) {
+      entries.splice(cursor + 1)
+      entries.push({ url: url ?? entries[cursor].url, state })
+      cursor += 1
+    },
+    replaceState(state, _u, url) {
+      entries[cursor] = { url: url ?? entries[cursor].url, state }
     },
   }
-  const win = {
-    history,
-    location: { origin: 'https://pawpong.kr', pathname: '/app-shell' },
-    addEventListener: (type, fn) => type === 'popstate' && listeners.push(fn),
-    __PAWPONG_STACK_LAYER__: 'detail',
+  const back = () => {
+    cursor -= 1
+    listeners.forEach((fn) => fn({ state: entries[cursor].state }))
   }
-  entries.push(null)
-  const doc = { documentElement: { dataset: {} } }
-  const bridge = loadTypescript(
-    'src/shared/lib/nativeBridge.ts',
-    {},
-    { window: win, document: doc },
-  )
-  const nativeStack = loadTypescript(
-    'src/shared/lib/nativeStack.ts',
-    { './nativeBridge': bridge },
-    { window: win, document: doc },
-  )
+  // 새 문서: 리스너와 모듈 상태는 사라지고, 기록과 sessionStorage 는 남는다
+  const loadDocument = (url) => {
+    if (url) history.pushState(null, '', url)
+    listeners = []
+    const win = {
+      history,
+      sessionStorage,
+      location: { origin: 'https://pawpong.kr', pathname: entries[cursor].url, search: '' },
+      addEventListener: (type, fn) => type === 'popstate' && listeners.push(fn),
+      __PAWPONG_STACK_LAYER__: 'detail',
+    }
+    const doc = { documentElement: { dataset: {} } }
+    const bridge = loadTypescript(
+      'src/shared/lib/nativeBridge.ts',
+      {},
+      { window: win, document: doc },
+    )
+    return loadTypescript(
+      'src/shared/lib/nativeStack.ts',
+      { './nativeBridge': bridge },
+      { window: win, document: doc, sessionStorage },
+    )
+  }
+  return { history, back, loadDocument }
+}
 
-  assert.equal(nativeStack.isDetailLayer(), true)
-  nativeStack.installHistoryIndex()
-  const base = nativeStack.getHistoryIndex()
-  history.replaceState({ __NA: true }, '', `/home/${id}`) // 대기 화면을 바꿔 끼움 — 처음 연 화면
-  assert.equal(nativeStack.getHistoryIndex(), base)
-  history.pushState({ __NA: true }, '', `/adoption/${id}`)
-  assert.equal(nativeStack.getHistoryIndex(), base + 1)
-  assert.equal(history.state.__NA, true) // Next 의 기록 값은 그대로 둔다
-  listeners.forEach((fn) => fn({ state: entries[0] })) // 뒤로
-  assert.equal(nativeStack.getHistoryIndex(), base)
+test('상세 WebView 히스토리 위치: push 는 +1, replace 는 그대로, 뒤로는 기록된 값으로', () => {
+  const view = detailWebView()
+  const stack = view.loadDocument()
+  let changes = 0
+  stack.installHistoryIndex(() => changes++)
+  stack.setStackBase(stack.getHistoryIndex())
+  view.history.replaceState({ __NA: true }, '', `/home/${id}`) // 대기 화면을 바꿔 끼움 — 처음 연 화면
+  assert.equal(stack.isAtStackBase(), true)
+  view.history.pushState({ __NA: true }, '', `/adoption/${id}`)
+  assert.equal(stack.isAtStackBase(), false)
+  assert.equal(view.history.state.__NA, true) // Next 의 기록 값은 그대로 둔다
+  view.back()
+  assert.equal(stack.isAtStackBase(), true)
+  assert.equal(changes, 3)
+})
+
+test('쿼리만 바뀌는 이동도 위치가 바뀌고 앱에 알린다', () => {
+  const view = detailWebView()
+  const stack = view.loadDocument()
+  let changes = 0
+  stack.installHistoryIndex(() => changes++)
+  stack.setStackBase(stack.getHistoryIndex())
+  view.history.pushState({ __NA: true }, '', `/home/${id}?tab=reviews`)
+  assert.equal(changes, 1)
+  assert.equal(stack.isAtStackBase(), false)
+  view.back()
+  assert.equal(changes, 2)
+  assert.equal(stack.isAtStackBase(), true)
+})
+
+test('로그인 완료처럼 문서가 바뀌어도 처음 연 화면 기준이 남는다', () => {
+  const view = detailWebView()
+  const first = view.loadDocument()
+  first.installHistoryIndex(() => {})
+  first.setStackBase(first.getHistoryIndex())
+  view.history.replaceState({ __NA: true }, '', `/home/${id}`)
+
+  // 상세에서 로그인 페이지로 문서 이동 → 새 문서는 마지막 위치 +1 로 이어 센다
+  const login = view.loadDocument('/login')
+  login.installHistoryIndex(() => {})
+  assert.equal(login.isAtStackBase(), false)
+
+  // 뒤로 가서 처음 연 화면 문서가 다시 뜨면(기록에 위치가 남아 있음) 기준과 같다
+  view.back()
+  const again = view.loadDocument()
+  again.installHistoryIndex(() => {})
+  assert.equal(again.isAtStackBase(), true)
+
+  // 닫히면 기준이 지워진다
+  again.setStackBase(null)
+  assert.equal(again.isAtStackBase(), false)
 })
