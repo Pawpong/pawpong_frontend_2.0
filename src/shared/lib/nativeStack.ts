@@ -89,6 +89,10 @@ const INDEX_KEY = '__pawpongIdx'
 // sessionStorage 는 WebView 마다 따로이고 문서가 바뀌어도(로그인 완료 이동 등) 남는다
 const LAST_INDEX_KEY = 'pawpong:stack-index'
 const BASE_INDEX_KEY = 'pawpong:stack-base'
+// 로그인 흐름에 들어가기 직전 화면의 위치 / 로그인 완료 후 그 위치에 도착하면 할 일
+const LOGIN_START_KEY = 'pawpong:stack-login-start'
+const LOGIN_RETURN_KEY = 'pawpong:stack-login-return'
+const AUTH_PATH = /^\/login(\/|$)/
 let historyIndex = 0
 let historyIndexInstalled = false
 let onHistoryChange: (() => void) | null = null
@@ -116,6 +120,23 @@ const setHistoryIndex = (index: number) => {
   writeStored(LAST_INDEX_KEY, index)
 }
 
+const isAuthUrl = (url: string | URL | null | undefined): boolean => {
+  if (url === null || url === undefined) return false
+  try {
+    return AUTH_PATH.test(new URL(url, window.location.href).pathname)
+  } catch {
+    return false
+  }
+}
+
+/** 로그인 흐름에 막 들어갈 때 돌아올 화면 위치를 남긴다. 상세를 처음 연 화면보다 앞으로는 가지 않는다 */
+const markLoginStart = (index: number) => {
+  if (readStoredNumber(LOGIN_START_KEY) !== null || isAuthUrl(window.location.href)) return
+  const base = readStoredNumber(BASE_INDEX_KEY)
+  if (base === null) return
+  writeStored(LOGIN_START_KEY, Math.max(index, base))
+}
+
 /**
  * 상세 WebView 의 히스토리 위치를 센다. 다시 쓰는 WebView 라 canGoBack 은 대기 화면 이전 기록까지 포함해
  * '처음 연 화면인지' 판단에 쓸 수 없다. Next 의 이동도 window.history.pushState 를 거치므로
@@ -135,22 +156,36 @@ export const installHistoryIndex = (onChange: () => void): void => {
     [INDEX_KEY]: index,
   })
   history.pushState = (data, unused, url) => {
+    if (isAuthUrl(url)) markLoginStart(historyIndex)
     setHistoryIndex(historyIndex + 1)
     push(withIndex(data, historyIndex), unused, url)
     onHistoryChange?.()
   }
   history.replaceState = (data, unused, url) => {
+    // 보호 화면이 자기 자리를 로그인으로 바꿔 끼우면 그 앞 화면으로 돌아온다
+    if (isAuthUrl(url)) markLoginStart(historyIndex - 1)
     replace(withIndex(data, historyIndex), unused, url)
     onHistoryChange?.()
   }
-  window.addEventListener('popstate', (event) => {
-    const index: unknown = event.state?.[INDEX_KEY]
+  const syncFromState = (state: unknown) => {
+    const index: unknown = (state as Record<string, unknown> | null)?.[INDEX_KEY]
     if (typeof index === 'number') setHistoryIndex(index)
+    // 로그인 직전 화면이나 그 앞으로 돌아왔으면(취소·완료) 로그인 흐름은 끝났다
+    const start = readStoredNumber(LOGIN_START_KEY)
+    if (start !== null && historyIndex <= start) writeStored(LOGIN_START_KEY, null)
     onHistoryChange?.()
+  }
+  window.addEventListener('popstate', (event) => syncFromState(event.state))
+  // 다른 문서에서 history.go 로 돌아왔을 때 저장된 페이지가 그대로 복원되면 popstate 대신 pageshow 만 온다
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted) syncFromState(history.state)
   })
   const current: unknown = history.state?.[INDEX_KEY]
   const last = readStoredNumber(LAST_INDEX_KEY)
-  setHistoryIndex(typeof current === 'number' ? current : last === null ? 0 : last + 1)
+  const isNewEntry = typeof current !== 'number'
+  // 로그인 화면이 새 문서로 열렸으면(앱 로그인·리다이렉트) 바로 앞 화면이 돌아올 곳이다
+  if (isNewEntry && last !== null && isAuthUrl(window.location.href)) markLoginStart(last)
+  setHistoryIndex(isNewEntry ? (last === null ? 0 : last + 1) : Number(current))
   replace(withIndex(history.state, historyIndex), '')
 }
 
@@ -163,4 +198,48 @@ export const setStackBase = (index: number | null): void => writeStored(BASE_IND
 export const isAtStackBase = (): boolean => {
   const base = readStoredNumber(BASE_INDEX_KEY)
   return base !== null && base === historyIndex
+}
+
+/**
+ * 로그인 완료 이동. 상세 WebView 에서 로그인 흐름에 들어온 기록이 있으면 returnUrl 로 새 기록을 쌓지 않고
+ * 로그인 직전 화면으로 history.go 해, 로그인 전 뒤로가기 관계(목록 → A → B)를 그대로 되살린다.
+ * 도착하면 서버 화면을 새로 받고, returnUrl 이 기본값(/)이 아니고 그 화면과 다르면 그때 이동한다.
+ * 기록이 없으면(루트·브라우저) 지금처럼 fallback 으로 이동한다.
+ */
+export const completeLoginNavigation = (returnUrl: string, fallback: () => void): void => {
+  const start = isDetailLayer() ? readStoredNumber(LOGIN_START_KEY) : null
+  if (start === null || start >= historyIndex) {
+    fallback()
+    return
+  }
+  try {
+    sessionStorage.setItem(LOGIN_RETURN_KEY, JSON.stringify({ index: start, target: returnUrl }))
+  } catch {
+    fallback()
+    return
+  }
+  writeStored(LOGIN_START_KEY, null)
+  window.history.go(start - historyIndex)
+}
+
+/** 로그인 완료로 돌아온 화면이면 할 일을 꺼낸다 (한 번만). 아니면 null */
+export const takeLoginReturn = (): { target: string | null } | null => {
+  try {
+    const raw = sessionStorage.getItem(LOGIN_RETURN_KEY)
+    if (!raw) return null
+    const pending: unknown = JSON.parse(raw)
+    if (
+      !pending ||
+      typeof pending !== 'object' ||
+      !('index' in pending) ||
+      pending.index !== historyIndex
+    )
+      return null
+    sessionStorage.removeItem(LOGIN_RETURN_KEY)
+    const target = 'target' in pending && typeof pending.target === 'string' ? pending.target : '/'
+    const here = window.location.pathname + window.location.search
+    return { target: target === '/' || target === here ? null : target }
+  } catch {
+    return null
+  }
 }
