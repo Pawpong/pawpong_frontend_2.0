@@ -48,6 +48,9 @@ const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
           className={cn(
             'fixed inset-0 z-modal flex min-w-0 flex-col overflow-y-auto bg-white',
             'data-[state=closed]:opacity-0 data-[state=open]:opacity-100',
+            // 앱 탭 바는 WebView 위에 앱이 그려 z-index 로 덮을 수 없다. 탭 바 높이(BottomNav 빈 자리와 같은 값)만큼
+            // 아래를 비워 맨 아래 로그아웃이 가려지지 않게 한다.
+            'in-data-native-tabs:pb-[calc(4.75rem+env(safe-area-inset-bottom))]',
             // pc: 링크 8개 때문에 1440px 화면을 통째로 덮을 이유가 없다 — 우측 상단 패널로 띄운다.
             // right 는 뷰포트가 페이지 틀보다 넓을 때 ☰ 버튼을 따라가도록 틀의 우측 여백 기준으로 계산한다:
             // max(여백, (100vw - 틀 폭)/2 + 여백)
