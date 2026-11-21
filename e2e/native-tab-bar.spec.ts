@@ -44,6 +44,9 @@ test.describe('앱 탭 바', () => {
   }) => {
     await page.goto('/')
     await expect.poll(() => lastTabState(page)).toMatchObject({ href: '/' })
+    // 홈은 배너·목록이 늦게 들어오며 위쪽 높이가 바뀐다. 다 불러오기 전에 내리면 맨 위로 가는 부드러운 스크롤이
+    // 도중에 끊긴다(배포 E2E 에서 1316·2275 에 멈춘 적이 있다, #642).
+    await page.waitForLoadState('networkidle')
 
     // 모바일 WebKit 은 마우스 휠을 지원하지 않는다
     await page.evaluate(() => window.scrollTo(0, 2000))
