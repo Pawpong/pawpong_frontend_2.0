@@ -101,10 +101,31 @@ const detailWebView = () => {
     replaceState(state, _u, url) {
       entries[cursor] = { url: url ?? entries[cursor].url, state }
     },
+    // 실제 브라우저처럼 위치만 옮긴다. 같은 문서면 popstate 를, 다른 문서면 테스트가 새 문서를 띄운다
+    go(delta) {
+      goes.push(delta)
+      cursor += delta
+    },
   }
+  const goes = []
+  const fire = (type, event) => listeners.forEach((l) => l.type === type && l.fn(event))
   const back = () => {
     cursor -= 1
-    listeners.forEach((fn) => fn({ state: entries[cursor].state }))
+    fire('popstate', { state: entries[cursor].state })
+  }
+  const popstate = () => fire('popstate', { state: entries[cursor].state })
+  const location = {
+    origin: 'https://pawpong.kr',
+    get href() {
+      return `https://pawpong.kr${entries[cursor].url}`
+    },
+    get pathname() {
+      return entries[cursor].url.split('?')[0]
+    },
+    get search() {
+      const query = entries[cursor].url.split('?')[1]
+      return query ? `?${query}` : ''
+    },
   }
   // 새 문서: 리스너와 모듈 상태는 사라지고, 기록과 sessionStorage 는 남는다
   const loadDocument = (url) => {
@@ -113,8 +134,8 @@ const detailWebView = () => {
     const win = {
       history,
       sessionStorage,
-      location: { origin: 'https://pawpong.kr', pathname: entries[cursor].url, search: '' },
-      addEventListener: (type, fn) => type === 'popstate' && listeners.push(fn),
+      location,
+      addEventListener: (type, fn) => listeners.push({ type, fn }),
       __PAWPONG_STACK_LAYER__: 'detail',
     }
     const doc = { documentElement: { dataset: {} } }
@@ -129,7 +150,17 @@ const detailWebView = () => {
       { window: win, document: doc, sessionStorage },
     )
   }
-  return { history, back, loadDocument }
+  const url = () => entries[cursor].url
+  return { history, back, popstate, loadDocument, goes, url }
+}
+
+// 목록에서 상세 A 를 연 상태로 시작한다 (대기 화면을 A 로 바꿔 끼움)
+const openDetail = (view, href) => {
+  const stack = view.loadDocument()
+  stack.installHistoryIndex(() => {})
+  stack.setStackBase(stack.getHistoryIndex())
+  view.history.replaceState({ __NA: true }, '', href)
+  return stack
 }
 
 test('상세 WebView 히스토리 위치: push 는 +1, replace 는 그대로, 뒤로는 기록된 값으로', () => {
@@ -183,4 +214,88 @@ test('로그인 완료처럼 문서가 바뀌어도 처음 연 화면 기준이 
   // 닫히면 기준이 지워진다
   again.setStackBase(null)
   assert.equal(again.isAtStackBase(), false)
+})
+
+const A = `/home/${id}`
+const B = `/adoption/${id}`
+
+test('목록 → A → 로그인 → 완료: A 로 돌아오고, 뒤로는 목록(닫기)', () => {
+  const view = detailWebView()
+  const stack = openDetail(view, A)
+  view.history.pushState(null, '', '/login')
+  view.history.pushState(null, '', '/login/review')
+  let fallback = 0
+  stack.completeLoginNavigation('/', () => fallback++)
+  assert.deepEqual(view.goes, [-2])
+  assert.equal(fallback, 0)
+  view.popstate()
+  assert.equal(view.url(), A)
+  assert.deepEqual(stack.takeLoginReturn(), { target: null })
+  assert.equal(stack.isAtStackBase(), true)
+})
+
+test('목록 → A → B → 로그인 → 완료: B 로 돌아오고, 뒤로는 A', () => {
+  const view = detailWebView()
+  const stack = openDetail(view, A)
+  view.history.pushState(null, '', B)
+  view.history.pushState(null, '', '/login')
+  stack.completeLoginNavigation('/', () => {})
+  view.popstate()
+  assert.equal(view.url(), B)
+  assert.equal(stack.isAtStackBase(), false)
+  view.back()
+  assert.equal(view.url(), A)
+  assert.equal(stack.isAtStackBase(), true)
+})
+
+test('로그인 취소(웹 뒤로)는 로그인 직전 화면으로, 그 뒤 완료 기록은 남지 않는다', () => {
+  const view = detailWebView()
+  const stack = openDetail(view, A)
+  view.history.pushState(null, '', '/login')
+  view.back()
+  assert.equal(view.url(), A)
+  let fallback = 0
+  stack.completeLoginNavigation('/', () => fallback++)
+  assert.equal(fallback, 1)
+  assert.deepEqual(view.goes, [])
+})
+
+test('로그인 중 문서가 바뀌어도(앱 로그인 완료 이동) 로그인 직전 화면으로 돌아온다', () => {
+  const view = detailWebView()
+  openDetail(view, A)
+  // 로그인 화면과 완료 화면이 각각 새 문서로 뜬다
+  view.loadDocument('/login').installHistoryIndex(() => {})
+  const success = view.loadDocument('/login/success?returnUrl=%2F')
+  success.installHistoryIndex(() => {})
+  success.completeLoginNavigation('/', () => {})
+  assert.deepEqual(view.goes, [-2])
+  // A 의 문서가 다시 뜬다 (저장된 페이지가 없을 때)
+  const back = view.loadDocument()
+  back.installHistoryIndex(() => {})
+  assert.equal(view.url(), A)
+  assert.deepEqual(back.takeLoginReturn(), { target: null })
+  assert.equal(back.isAtStackBase(), true)
+})
+
+test('가려던 곳이 따로 있으면(보호 화면이 로그인으로 바꿔 끼움) 직전 화면으로 돌아온 뒤 그곳으로 간다', () => {
+  const view = detailWebView()
+  const stack = openDetail(view, B)
+  view.history.pushState(null, '', `${B}/apply`)
+  view.history.replaceState(null, '', `/login?returnUrl=${encodeURIComponent(`${B}/apply`)}`)
+  stack.completeLoginNavigation(`${B}/apply`, () => {})
+  assert.deepEqual(view.goes, [-1])
+  view.popstate()
+  assert.equal(view.url(), B)
+  assert.deepEqual(stack.takeLoginReturn(), { target: `${B}/apply` })
+  assert.equal(stack.takeLoginReturn(), null)
+})
+
+test('루트 WebView 의 로그인 완료는 지금처럼 바로 이동한다', () => {
+  const view = detailWebView()
+  const stack = view.loadDocument()
+  stack.installHistoryIndex(() => {})
+  view.history.pushState(null, '', '/login')
+  let fallback = 0
+  stack.completeLoginNavigation('/', () => fallback++)
+  assert.equal(fallback, 1)
 })

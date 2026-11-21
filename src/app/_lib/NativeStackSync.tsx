@@ -16,6 +16,7 @@ import {
   isStackHref,
   isStackPath,
   setStackBase,
+  takeLoginReturn,
 } from '@/shared/lib/nativeStack'
 
 /**
@@ -53,6 +54,12 @@ const NativeStackSync = () => {
     if (!hasNativeStack() || !isDetailLayer()) return
     let lastReport = ''
     const reportRoute = () => {
+      // 로그인 완료로 로그인 직전 화면에 돌아왔으면 로그인한 상태로 다시 받고, 따로 가려던 곳이 있으면 이어서 간다
+      const loginReturn = takeLoginReturn()
+      if (loginReturn) {
+        router.refresh()
+        if (loginReturn.target) router.push(loginReturn.target)
+      }
       const url = window.location.pathname + window.location.search
       const atBase = isAtStackBase()
       const report = `${url}|${atBase}`
