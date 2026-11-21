@@ -118,6 +118,7 @@ function setup(api) {
     '@/entities/application': {},
     '@/entities/community': {},
     '@/shared/lib/patchCachedItem': patch,
+    '@/shared/lib/nativeStack': { postStackChange() {}, subscribeStackChanges: () => () => {} },
     './adopter.api': { addFavorite: api, removeFavorite: api },
   })
   return { client, ...hooks }
@@ -413,6 +414,7 @@ for (const fails of [false, true])
         },
       },
       '@/shared/lib/patchCachedItem': patch,
+      '@/shared/lib/nativeStack': { postStackChange() {}, subscribeStackChanges: () => () => {} },
       './adoption.api': {},
     })
     const { toggleFavorite } = useToggleAdoptionFavorite('pet-a', false)

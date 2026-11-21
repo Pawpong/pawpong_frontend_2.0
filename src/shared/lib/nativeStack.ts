@@ -1,0 +1,245 @@
+import { postNativeMessage, subscribeNativeMessage } from './nativeBridge'
+
+/**
+ * 앱(UA PawpongStack/)이 상세 WebView 를 하나 미리 띄워 두고 목록 위로 밀어 올리는 약속.
+ * 앱(pawpong_rn features/native-stack/model/stackProtocol)의 이름·경로 규칙과 같아야 한다.
+ * WebView 는 목록(루트) 1개 + 상세 1개. 상세 안에서 다른 상세로 가면 같은 WebView 안에서 이동한다.
+ */
+export const STACK_MESSAGE = {
+  /** 웹(루트) → 앱: 상세 링크를 눌렀다. 루트 문서는 이동하지 않는다 */
+  OPEN_SCREEN: 'OPEN_SCREEN',
+  /** 웹 → 앱: 뒤로 버튼. 웹 뒤로 / 화면 닫기는 앱이 고른다 */
+  BACK: 'BACK',
+  /** 웹 → 앱: 변경 성공 직후의 최종 값 */
+  STACK_CHANGE: 'STACK_CHANGE',
+  /** 앱 → 웹: 다른 WebView 에서 생긴 변경들 */
+  STACK_CHANGES: 'STACK_CHANGES',
+  /** 웹(상세) → 앱: 대기 화면에서 준비됐다 */
+  STACK_READY: 'STACK_READY',
+  /** 웹(상세) → 앱: 화면이 바뀌었다. atBase 면 처음 연 화면이다 */
+  STACK_ROUTE: 'STACK_ROUTE',
+  /** 앱 → 웹(상세): 이 화면으로 SPA 이동 */
+  STACK_NAVIGATE: 'STACK_NAVIGATE',
+  /** 앱 → 웹(상세): 닫혔다. 대기 화면으로 돌아가 페이지 메모리를 비운다 */
+  STACK_RESET: 'STACK_RESET',
+} as const
+
+/** 상세 WebView 의 대기 화면 (app/app-shell) */
+export const STACK_SHELL_PATH = '/app-shell'
+
+// 브리더 홈·분양 상세만. id 가 ObjectId 라 /adoption/create 같은 경로와 섞이지 않는다
+const STACK_PATH = /^\/(home|adoption)\/[0-9a-f]{24}$/
+
+export type StackChange =
+  | { kind: 'breeder-favorite'; id: string; isFavorited: boolean }
+  | { kind: 'adoption-favorite'; id: string; isFavorited: boolean; favoriteCount: number }
+
+type StackWindow = Window & {
+  ReactNativeWebView?: unknown
+  __PAWPONG_STACK_LAYER__?: string
+}
+
+/** 앱이 상세 WebView 를 쓰는지 (루트 레이아웃이 UA 를 보고 data-native-stack 으로 표시한다) */
+export const hasNativeStack = (): boolean =>
+  typeof window !== 'undefined' &&
+  Boolean((window as StackWindow).ReactNativeWebView) &&
+  document.documentElement.dataset.nativeStack !== undefined
+
+/** 이 문서가 앱이 미리 띄운 상세 WebView 인지 (앱이 문서 시작 전에 표시를 심는다) */
+export const isDetailLayer = (): boolean =>
+  typeof window !== 'undefined' && (window as StackWindow).__PAWPONG_STACK_LAYER__ === 'detail'
+
+export const isStackPath = (href: string): boolean => {
+  try {
+    return STACK_PATH.test(new URL(href, window.location.origin).pathname)
+  } catch {
+    return false
+  }
+}
+
+/** 상세 WebView 로 열 주소인지 — 같은 출처, 허용 경로, 지금 화면이 아닌 곳 */
+export const isStackHref = (url: URL): boolean =>
+  url.origin === window.location.origin &&
+  STACK_PATH.test(url.pathname) &&
+  url.pathname !== window.location.pathname
+
+/** 뒤로 버튼 — 앱이 상세 WebView 를 쓰면 판단을 앱에 맡기고, 아니면 웹 뒤로 */
+export const goBackFromScreen = (fallback: () => void): void => {
+  if (hasNativeStack()) postNativeMessage({ type: STACK_MESSAGE.BACK })
+  else fallback()
+}
+
+export const postStackChange = (change: StackChange): void => {
+  if (hasNativeStack()) postNativeMessage({ type: STACK_MESSAGE.STACK_CHANGE, ...change })
+}
+
+/** 다른 WebView 에서 생긴 변경 중 이 종류만 받는다 */
+export const subscribeStackChanges = <K extends StackChange['kind']>(
+  kind: K,
+  onChange: (change: Extract<StackChange, { kind: K }>) => void,
+): (() => void) =>
+  subscribeNativeMessage(STACK_MESSAGE.STACK_CHANGES, ({ changes }) => {
+    if (!Array.isArray(changes)) return
+    for (const change of changes as StackChange[]) {
+      if (change?.kind === kind) onChange(change as Extract<StackChange, { kind: K }>)
+    }
+  })
+
+const INDEX_KEY = '__pawpongIdx'
+// sessionStorage 는 WebView 마다 따로이고 문서가 바뀌어도(로그인 완료 이동 등) 남는다
+const LAST_INDEX_KEY = 'pawpong:stack-index'
+const BASE_INDEX_KEY = 'pawpong:stack-base'
+// 로그인 흐름에 들어가기 직전 화면의 위치 / 로그인 완료 후 그 위치에 도착하면 할 일
+const LOGIN_START_KEY = 'pawpong:stack-login-start'
+const LOGIN_RETURN_KEY = 'pawpong:stack-login-return'
+const AUTH_PATH = /^\/login(\/|$)/
+let historyIndex = 0
+let historyIndexInstalled = false
+let onHistoryChange: (() => void) | null = null
+
+const readStoredNumber = (key: string): number | null => {
+  try {
+    const value = Number(sessionStorage.getItem(key))
+    return sessionStorage.getItem(key) !== null && Number.isInteger(value) ? value : null
+  } catch {
+    return null
+  }
+}
+
+const writeStored = (key: string, value: number | null) => {
+  try {
+    if (value === null) sessionStorage.removeItem(key)
+    else sessionStorage.setItem(key, String(value))
+  } catch {
+    /* 저장소가 막힌 WebView 는 이 문서 안의 값만 쓴다 */
+  }
+}
+
+const setHistoryIndex = (index: number) => {
+  historyIndex = index
+  writeStored(LAST_INDEX_KEY, index)
+}
+
+const isAuthUrl = (url: string | URL | null | undefined): boolean => {
+  if (url === null || url === undefined) return false
+  try {
+    return AUTH_PATH.test(new URL(url, window.location.href).pathname)
+  } catch {
+    return false
+  }
+}
+
+/** 로그인 흐름에 막 들어갈 때 돌아올 화면 위치를 남긴다. 상세를 처음 연 화면보다 앞으로는 가지 않는다 */
+const markLoginStart = (index: number) => {
+  if (readStoredNumber(LOGIN_START_KEY) !== null || isAuthUrl(window.location.href)) return
+  const base = readStoredNumber(BASE_INDEX_KEY)
+  if (base === null) return
+  writeStored(LOGIN_START_KEY, Math.max(index, base))
+}
+
+/**
+ * 상세 WebView 의 히스토리 위치를 센다. 다시 쓰는 WebView 라 canGoBack 은 대기 화면 이전 기록까지 포함해
+ * '처음 연 화면인지' 판단에 쓸 수 없다. Next 의 이동도 window.history.pushState 를 거치므로
+ * 한 번 감싸 두면 push 는 +1, replace 는 그대로, 뒤로·앞으로는 기록된 값으로 돌아간다.
+ * 새 문서가 뜨면 기록에 값이 있으면(새로고침·앞뒤 이동) 그 값, 없으면(새로 쌓인 이동) 마지막 위치 +1 로 잇는다.
+ * 위치가 바뀔 때마다 onChange 를 부른다 — 쿼리만 바뀌는 이동도 포함한다.
+ */
+export const installHistoryIndex = (onChange: () => void): void => {
+  onHistoryChange = onChange
+  if (historyIndexInstalled) return
+  historyIndexInstalled = true
+  const { history } = window
+  const push = history.pushState.bind(history)
+  const replace = history.replaceState.bind(history)
+  const withIndex = (data: unknown, index: number) => ({
+    ...(data && typeof data === 'object' ? data : {}),
+    [INDEX_KEY]: index,
+  })
+  history.pushState = (data, unused, url) => {
+    if (isAuthUrl(url)) markLoginStart(historyIndex)
+    setHistoryIndex(historyIndex + 1)
+    push(withIndex(data, historyIndex), unused, url)
+    onHistoryChange?.()
+  }
+  history.replaceState = (data, unused, url) => {
+    // 보호 화면이 자기 자리를 로그인으로 바꿔 끼우면 그 앞 화면으로 돌아온다
+    if (isAuthUrl(url)) markLoginStart(historyIndex - 1)
+    replace(withIndex(data, historyIndex), unused, url)
+    onHistoryChange?.()
+  }
+  const syncFromState = (state: unknown) => {
+    const index: unknown = (state as Record<string, unknown> | null)?.[INDEX_KEY]
+    if (typeof index === 'number') setHistoryIndex(index)
+    // 로그인 직전 화면이나 그 앞으로 돌아왔으면(취소·완료) 로그인 흐름은 끝났다
+    const start = readStoredNumber(LOGIN_START_KEY)
+    if (start !== null && historyIndex <= start) writeStored(LOGIN_START_KEY, null)
+    onHistoryChange?.()
+  }
+  window.addEventListener('popstate', (event) => syncFromState(event.state))
+  // 다른 문서에서 history.go 로 돌아왔을 때 저장된 페이지가 그대로 복원되면 popstate 대신 pageshow 만 온다
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted) syncFromState(history.state)
+  })
+  const current: unknown = history.state?.[INDEX_KEY]
+  const last = readStoredNumber(LAST_INDEX_KEY)
+  const isNewEntry = typeof current !== 'number'
+  // 로그인 화면이 새 문서로 열렸으면(앱 로그인·리다이렉트) 바로 앞 화면이 돌아올 곳이다
+  if (isNewEntry && last !== null && isAuthUrl(window.location.href)) markLoginStart(last)
+  setHistoryIndex(isNewEntry ? (last === null ? 0 : last + 1) : Number(current))
+  replace(withIndex(history.state, historyIndex), '')
+}
+
+export const getHistoryIndex = (): number => historyIndex
+
+/** 상세를 연 순간의 위치를 기준으로 남긴다. 닫히면 null */
+export const setStackBase = (index: number | null): void => writeStored(BASE_INDEX_KEY, index)
+
+/** 처음 연 화면인지 — 여기서 뒤로 가면 앱이 상세를 닫는다 */
+export const isAtStackBase = (): boolean => {
+  const base = readStoredNumber(BASE_INDEX_KEY)
+  return base !== null && base === historyIndex
+}
+
+/**
+ * 로그인 완료 이동. 상세 WebView 에서 로그인 흐름에 들어온 기록이 있으면 returnUrl 로 새 기록을 쌓지 않고
+ * 로그인 직전 화면으로 history.go 해, 로그인 전 뒤로가기 관계(목록 → A → B)를 그대로 되살린다.
+ * 도착하면 서버 화면을 새로 받고, returnUrl 이 기본값(/)이 아니고 그 화면과 다르면 그때 이동한다.
+ * 기록이 없으면(루트·브라우저) 지금처럼 fallback 으로 이동한다.
+ */
+export const completeLoginNavigation = (returnUrl: string, fallback: () => void): void => {
+  const start = isDetailLayer() ? readStoredNumber(LOGIN_START_KEY) : null
+  if (start === null || start >= historyIndex) {
+    fallback()
+    return
+  }
+  try {
+    sessionStorage.setItem(LOGIN_RETURN_KEY, JSON.stringify({ index: start, target: returnUrl }))
+  } catch {
+    fallback()
+    return
+  }
+  writeStored(LOGIN_START_KEY, null)
+  window.history.go(start - historyIndex)
+}
+
+/** 로그인 완료로 돌아온 화면이면 할 일을 꺼낸다 (한 번만). 아니면 null */
+export const takeLoginReturn = (): { target: string | null } | null => {
+  try {
+    const raw = sessionStorage.getItem(LOGIN_RETURN_KEY)
+    if (!raw) return null
+    const pending: unknown = JSON.parse(raw)
+    if (
+      !pending ||
+      typeof pending !== 'object' ||
+      !('index' in pending) ||
+      pending.index !== historyIndex
+    )
+      return null
+    sessionStorage.removeItem(LOGIN_RETURN_KEY)
+    const target = 'target' in pending && typeof pending.target === 'string' ? pending.target : '/'
+    const here = window.location.pathname + window.location.search
+    return { target: target === '/' || target === here ? null : target }
+  } catch {
+    return null
+  }
+}

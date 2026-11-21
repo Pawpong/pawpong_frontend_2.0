@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import {
   useMutation,
   useQueryClient,
@@ -9,6 +9,7 @@ import {
 } from '@tanstack/react-query'
 import { adoptionQueries } from '@/entities/adoption'
 import { patchCachedItem } from '@/shared/lib/patchCachedItem'
+import { postStackChange, subscribeStackChanges } from '@/shared/lib/nativeStack'
 import type {
   AdoptionFavoriteResponse,
   AdoptionPetCard,
@@ -208,6 +209,13 @@ const useToggleFavoriteMutation = () => {
           favoriteCount: result.favoriteCount,
         })),
       )
+      // 앱이 쌓은 아래 화면에도 서버가 확정한 최종 값을 남긴다
+      postStackChange({
+        kind: 'adoption-favorite',
+        id: result.petId,
+        isFavorited: nextFavorited,
+        favoriteCount: result.favoriteCount,
+      })
 
       if (nextFavorited) return
 
@@ -270,6 +278,25 @@ export const useToggleAdoptionFavorite = (petId: string, isFavorite: boolean) =>
         })
     },
   }
+}
+
+/**
+ * 앱이 쌓은 위 화면에서 바뀐 분양글 관심을 이 화면 캐시에 반영한다.
+ * 목록·인기·상세 카드는 그 값만 고치고(재조회 없음), 관심 목록은 순서·페이지가 서버 기준이라 다시 받는다.
+ */
+export const useAdoptionFavoriteStackSync = () => {
+  const qc = useQueryClient()
+  useEffect(
+    () =>
+      subscribeStackChanges('adoption-favorite', ({ id, isFavorited, favoriteCount }) => {
+        qc.setQueriesData({ queryKey: adoptionQueries.all() }, (data) =>
+          patchAdoptionCache(data, id, (pet) => ({ ...pet, isFavorited, favoriteCount })),
+        )
+        void qc.invalidateQueries({ queryKey: adoptionQueries.myFavoritesAll() })
+        void qc.invalidateQueries({ queryKey: adoptionQueries.all(), refetchType: 'none' })
+      }),
+    [qc],
+  )
 }
 
 export const useCreateAdoptionApplication = () => {

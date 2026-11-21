@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { NavigationBar } from '@/shared/ui'
+import { goBackFromScreen } from '@/shared/lib/nativeStack'
 import type { AdopterPublicProfile, BreederPublicProfile } from '@/shared/types'
 import { PublicProfileActions } from '../../_ui/PublicProfileActions'
 
@@ -19,7 +20,7 @@ const PublicHomeProfileSection = ({ kind, profile }: PublicHomeProfileSectionPro
   return (
     <NavigationBar
       title={`${profile.nickname}의 홈`}
-      onBack={kind === 'breeder' ? () => router.back() : undefined}
+      onBack={kind === 'breeder' ? () => goBackFromScreen(() => router.back()) : undefined}
       right={<PublicProfileActions profile={profile} />}
       className="page-shell tab:hidden"
     />

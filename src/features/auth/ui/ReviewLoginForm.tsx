@@ -6,6 +6,7 @@ import { Button } from '@/shared/ui/Button'
 import { Input } from '@/shared/ui/Input'
 import { Label } from '@/shared/ui/Label'
 import { normalizeReturnUrl } from '@/shared/lib/normalizeReturnUrl'
+import { completeLoginNavigation } from '@/shared/lib/nativeStack'
 import { reviewLoginErrorMessage, reviewLoginRequestSchema } from '@/shared/lib/reviewLogin'
 import { signInReviewAccount } from '../api/review-login'
 
@@ -42,8 +43,11 @@ export function ReviewLoginForm({ returnUrl }: { returnUrl: string }) {
         setError('로그인 세션을 저장하지 못했어요. 다시 로그인해 주세요.')
         return
       }
-      router.replace(normalizeReturnUrl(returnUrl))
-      router.refresh()
+      // 앱 상세 화면에서 들어온 로그인이면 로그인 직전 화면으로 되돌아간다 (뒤로가기 관계 유지)
+      completeLoginNavigation(normalizeReturnUrl(returnUrl), () => {
+        router.replace(normalizeReturnUrl(returnUrl))
+        router.refresh()
+      })
     } catch (cause) {
       if (!controller.signal.aborted) {
         setError(cause instanceof Error ? cause.message : reviewLoginErrorMessage(503))
