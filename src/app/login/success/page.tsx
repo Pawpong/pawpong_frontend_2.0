@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { normalizeReturnUrl } from '@/shared/lib/normalizeReturnUrl'
+import { completeLoginNavigation } from '@/shared/lib/nativeStack'
 import { saveAuthTokens } from '@/shared/lib/saveAuthTokens'
 
 /**
@@ -45,7 +46,8 @@ const LoginSuccessContent = () => {
           throw new Error('인증 쿠키 저장 실패')
         }
 
-        router.replace(returnUrl)
+        // 앱 상세 화면에서 들어온 로그인이면 로그인 직전 화면으로 되돌아간다 (뒤로가기 관계 유지)
+        completeLoginNavigation(returnUrl, () => router.replace(returnUrl))
       } catch (err) {
         if (cancelled) return
         console.error('로그인 처리 중 오류:', err)
