@@ -28,7 +28,7 @@ const Gnb = () => {
       <header
         data-gnb
         className={cn(
-          'sticky top-0 z-header flex h-12 w-full items-center justify-center tab:py-2 pc:h-16',
+          'fixed inset-x-0 top-0 z-header flex h-12 w-full items-center justify-center tab:py-2 pc:h-16',
           TINTED_HEADER_PATTERN.test(pathname) ? 'bg-point-50' : 'bg-white',
         )}
       >
@@ -57,6 +57,9 @@ const Gnb = () => {
           </div>
         </div>
       </header>
+      {/* 헤더는 fixed 라 흐름에서 빠지므로 같은 높이만큼 자리를 비워 둔다.
+          sticky 였을 때 iOS 앱에서 뒤로 돌아오면 헤더가 1~2프레임 사라졌다(fixed 는 시뮬레이터 9회 모두 0프레임, #640). */}
+      <div aria-hidden className="h-12 shrink-0 pc:h-16" />
 
       <MobileMenu open={menuOpen} onOpenChange={setMenuOpen} />
       <AppBadgeSync />
