@@ -86,15 +86,45 @@ export const subscribeStackChanges = <K extends StackChange['kind']>(
   })
 
 const INDEX_KEY = '__pawpongIdx'
+// sessionStorage 는 WebView 마다 따로이고 문서가 바뀌어도(로그인 완료 이동 등) 남는다
+const LAST_INDEX_KEY = 'pawpong:stack-index'
+const BASE_INDEX_KEY = 'pawpong:stack-base'
 let historyIndex = 0
 let historyIndexInstalled = false
+let onHistoryChange: (() => void) | null = null
+
+const readStoredNumber = (key: string): number | null => {
+  try {
+    const value = Number(sessionStorage.getItem(key))
+    return sessionStorage.getItem(key) !== null && Number.isInteger(value) ? value : null
+  } catch {
+    return null
+  }
+}
+
+const writeStored = (key: string, value: number | null) => {
+  try {
+    if (value === null) sessionStorage.removeItem(key)
+    else sessionStorage.setItem(key, String(value))
+  } catch {
+    /* 저장소가 막힌 WebView 는 이 문서 안의 값만 쓴다 */
+  }
+}
+
+const setHistoryIndex = (index: number) => {
+  historyIndex = index
+  writeStored(LAST_INDEX_KEY, index)
+}
 
 /**
  * 상세 WebView 의 히스토리 위치를 센다. 다시 쓰는 WebView 라 canGoBack 은 대기 화면 이전 기록까지 포함해
  * '처음 연 화면인지' 판단에 쓸 수 없다. Next 의 이동도 window.history.pushState 를 거치므로
  * 한 번 감싸 두면 push 는 +1, replace 는 그대로, 뒤로·앞으로는 기록된 값으로 돌아간다.
+ * 새 문서가 뜨면 기록에 값이 있으면(새로고침·앞뒤 이동) 그 값, 없으면(새로 쌓인 이동) 마지막 위치 +1 로 잇는다.
+ * 위치가 바뀔 때마다 onChange 를 부른다 — 쿼리만 바뀌는 이동도 포함한다.
  */
-export const installHistoryIndex = (): void => {
+export const installHistoryIndex = (onChange: () => void): void => {
+  onHistoryChange = onChange
   if (historyIndexInstalled) return
   historyIndexInstalled = true
   const { history } = window
@@ -104,13 +134,33 @@ export const installHistoryIndex = (): void => {
     ...(data && typeof data === 'object' ? data : {}),
     [INDEX_KEY]: index,
   })
-  history.pushState = (data, unused, url) => push(withIndex(data, ++historyIndex), unused, url)
-  history.replaceState = (data, unused, url) => replace(withIndex(data, historyIndex), unused, url)
+  history.pushState = (data, unused, url) => {
+    setHistoryIndex(historyIndex + 1)
+    push(withIndex(data, historyIndex), unused, url)
+    onHistoryChange?.()
+  }
+  history.replaceState = (data, unused, url) => {
+    replace(withIndex(data, historyIndex), unused, url)
+    onHistoryChange?.()
+  }
   window.addEventListener('popstate', (event) => {
     const index: unknown = event.state?.[INDEX_KEY]
-    if (typeof index === 'number') historyIndex = index
+    if (typeof index === 'number') setHistoryIndex(index)
+    onHistoryChange?.()
   })
-  history.replaceState(history.state, '')
+  const current: unknown = history.state?.[INDEX_KEY]
+  const last = readStoredNumber(LAST_INDEX_KEY)
+  setHistoryIndex(typeof current === 'number' ? current : last === null ? 0 : last + 1)
+  replace(withIndex(history.state, historyIndex), '')
 }
 
 export const getHistoryIndex = (): number => historyIndex
+
+/** 상세를 연 순간의 위치를 기준으로 남긴다. 닫히면 null */
+export const setStackBase = (index: number | null): void => writeStored(BASE_INDEX_KEY, index)
+
+/** 처음 연 화면인지 — 여기서 뒤로 가면 앱이 상세를 닫는다 */
+export const isAtStackBase = (): boolean => {
+  const base = readStoredNumber(BASE_INDEX_KEY)
+  return base !== null && base === historyIndex
+}
