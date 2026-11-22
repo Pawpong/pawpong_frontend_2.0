@@ -63,10 +63,10 @@ const MY_HOME_LISTINGS_PANEL = 'py-5 tab:py-10'
 const CARD_GRID =
   'gap-x-5 grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))] tab:grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))] lap:grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))] pc:grid-cols-4'
 
-// 게시글 사진 그리드. 모바일 3열 정사각은 시안 스펙이라 그대로 두고, 2단 컬럼(tab+)에서만
+// 브리더 공개 홈 피드 사진 그리드. 모바일은 페이지 여백 안에서 2열로 크게 보이고, 2단 컬럼(tab+)에서는
 // 컬럼 폭에 맞춰 채운다.
 const PHOTO_GRID =
-  'tab:max-w-none tab:justify-normal tab:gap-x-5 tab:grid-cols-[repeat(auto-fill,minmax(12rem,1fr))] pc:grid-cols-[repeat(auto-fill,minmax(12rem,1fr))]'
+  'max-w-none grid-cols-2 gap-x-3 tab:max-w-none tab:justify-normal tab:gap-x-5 tab:grid-cols-[repeat(auto-fill,minmax(12rem,1fr))] pc:grid-cols-[repeat(auto-fill,minmax(12rem,1fr))]'
 
 // 마이홈 게시글 탭은 분양 목록·AI 사진 탭과 같은 PageShell 여백 안에 들어가므로
 // 모바일에서도 375px 상한 대신 폭을 꽉 채워 제목 줄과 그리드 양끝을 맞춘다 (AI 사진 그리드와 같은 3열)

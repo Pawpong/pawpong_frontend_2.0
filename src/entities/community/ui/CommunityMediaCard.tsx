@@ -46,7 +46,7 @@ const CommunityMediaCard = ({
       alt={alt}
       count={imageCount}
       preload={preload}
-      sizes={isProfileGrid ? '(max-width: 767px) 33vw, 25vw' : '(min-width: 768px) 20vw, 122px'}
+      sizes={isProfileGrid ? '(max-width: 767px) 50vw, 25vw' : '(min-width: 768px) 20vw, 122px'}
       onClick={onClick}
       status={aiReview?.state === 'held' && <CommunityReviewLabel review={aiReview} />}
       hoverContent={

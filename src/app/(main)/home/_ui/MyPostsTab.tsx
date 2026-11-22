@@ -6,7 +6,7 @@ import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { communityQueries } from '@/entities/community'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
 import { flattenPages, getTotalItems } from '@/shared/lib/infiniteList'
-import { FilterTab, ListHeader } from '@/shared/ui'
+import { CtaBanner, FilterTab } from '@/shared/ui'
 import { EmptyStateLink } from '@/shared/ui/EmptyStateLink'
 import { useAuthReadSession } from '@/shared/lib/useAuthReadSession'
 import type { AuthReadSession } from '@/shared/api'
@@ -143,25 +143,35 @@ const MyPostsTab = ({ enabled, gridClassName }: { enabled: boolean; gridClassNam
     POST_FILTERS.find((option) => option.value === requestedFilter)?.value ?? 'written',
   )
 
-  // 분양 목록 탭과 같은 '제목 n건' 줄 + 칩. 새 글은 커뮤니티 글쓰기로 바로 간다
+  // 임시저장 글은 저장한 글(북마크)과 다른 목록이다 — 있을 때만 작성한 글 위에 이어쓰기 배너를 띄운다
+  const draftsQuery = useQuery({ ...communityQueries.drafts(enabled), throwOnError: false })
+  const draftCount = draftsQuery.data?.pagination.totalItems ?? 0
+
+  // 탭 바로 아래 칩 줄만 둔다 — '게시글 n건 +' 제목 줄은 상단 바의 작성 메뉴(+)와 겹쳐 없앴다.
+  // 개수는 고른 칩에만 붙인다 (칩마다 조회 결과에서 나온다)
   const renderHeader = (count?: number) => (
-    <ListHeader
-      title="게시글"
-      count={count}
-      create={{ href: '/community/write', label: '새 글 쓰기' }}
-    >
-      <div role="group" aria-label="내 글 보기" className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-col gap-3">
+      <div
+        role="group"
+        aria-label="내 글 보기"
+        className="-mx-1 flex items-center gap-1.5 overflow-x-auto px-1 py-0.5"
+      >
         {POST_FILTERS.map((option) => (
           <FilterTab
             key={option.value}
+            look="chip"
             selected={filter === option.value}
             onClick={() => setFilter(option.value)}
           >
             {option.label}
+            {filter === option.value && count !== undefined && ` ${count}`}
           </FilterTab>
         ))}
       </div>
-    </ListHeader>
+      {filter === 'written' && draftCount > 0 && (
+        <CtaBanner text={`임시저장 중인 글 ${draftCount}개 · 이어쓰기`} href="/drafts" />
+      )}
+    </div>
   )
 
   return filter === 'written' ? (

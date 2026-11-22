@@ -18,9 +18,15 @@ interface CategoryFilterProps {
   className?: string
 }
 
+// 탐색 1차 분류 (Option 3) — 46px 원 + 11px 라벨.
+// 활성은 테두리가 아니라 면을 바꿔(버터 면 + 링) 1차 선택으로 읽히게 한다. 2차 필터는 테두리 칩이라 무게가 갈린다.
 const CategoryFilter = ({ selected, onChange, className }: CategoryFilterProps) => {
   return (
-    <div className={cn('grid w-full max-w-[24rem] grid-cols-4 gap-2 tab:gap-4', className)}>
+    <div
+      role="group"
+      aria-label="동물 분류"
+      className={cn('grid w-full max-w-[24rem] grid-cols-4 gap-1', className)}
+    >
       {ANIMAL_CATEGORIES.map((category) => {
         const active = selected === category
 
@@ -30,28 +36,34 @@ const CategoryFilter = ({ selected, onChange, className }: CategoryFilterProps) 
             type="button"
             aria-pressed={active}
             onClick={() => onChange(category)}
-            className={cn(
-              'flex min-w-0 flex-col items-center gap-1 rounded-2xl py-1 text-sm focus-ring',
-              active ? 'font-semibold text-brand' : 'text-text-primary hover:text-brand',
-            )}
+            className="group flex min-w-0 flex-col items-center gap-2 rounded-2xl focus-ring"
           >
             <span
               className={cn(
-                'flex size-16 items-center justify-center rounded-full border tab:size-18',
-                active ? 'border-primary-200 bg-brand-subtle' : 'border-transparent',
+                'flex size-[2.875rem] items-center justify-center rounded-full border-[0.09375rem] transition-colors',
+                active
+                  ? 'border-secondary-500 bg-secondary-300'
+                  : 'border-transparent bg-neutral-100 group-hover:bg-neutral-150',
               )}
             >
               <Image
                 src={CATEGORY_ICON[category]}
                 alt=""
-                width={48}
-                height={48}
-                sizes="48px"
+                width={26}
+                height={26}
+                sizes="26px"
                 loading="eager"
-                className={cn('size-12 object-contain', category === 'all' && 'size-8')}
+                className="size-[1.625rem] object-contain"
               />
             </span>
-            <span>{CATEGORY_LABEL[category]}</span>
+            <span
+              className={cn(
+                'text-[0.6875rem] leading-none transition-colors',
+                active ? 'font-bold text-neutral-850' : 'font-semibold text-neutral-700',
+              )}
+            >
+              {CATEGORY_LABEL[category]}
+            </span>
           </button>
         )
       })}

@@ -144,8 +144,14 @@
     calc(-16px * var(--sprite-scale));
   vertical-align: middle;
 }
+.original[data-size='sm'] {
+  --sprite-scale: 0.21;
+}
 @media (min-width: 768px) {
   .original {
     --sprite-scale: 0.3;
+  }
+  .original[data-size='sm'] {
+    --sprite-scale: 0.23;
   }
 }

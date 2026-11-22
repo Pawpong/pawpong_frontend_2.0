@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { RetryButton, buttonVariants, PageShell, NavigationBar } from '@/shared/ui'
+import { RetryButton, buttonVariants, PageShell } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { transientQueryRecoveryOptions } from '@/shared/api'
 import { profileQueries } from '@/entities/profile'
@@ -65,7 +65,6 @@ const MyHomeContent = () => {
   if (!profileCardProps) {
     return (
       <div className="flex w-full flex-col">
-        <NavigationBar title="마이홈" className="page-shell" />
         {profileQuery.isPending ? (
           <HomeSkeleton />
         ) : (
@@ -92,21 +91,7 @@ const MyHomeContent = () => {
 
   return (
     <div className="flex w-full flex-col">
-      {/* 스크롤 시 GNB 아래 고정(sticky) — tab+만. PC는 사이드바가 프로필/현재 위치를 이미 보여줘
-          타이틀 바가 GNB의 '마이홈' 활성 표시와 겹쳐 위계가 흐트러지므로 숨긴다 */}
-      <div className="bg-white tab:hidden">
-        <NavigationBar
-          title="마이홈"
-          titleVariant="page"
-          titleClassName="px-10"
-          className="relative page-shell min-h-12"
-          right={
-            <div className="absolute top-1/2 right-4 -translate-y-1/2">
-              <MyHomeActionMenu isBreeder={isBreeder} />
-            </div>
-          }
-        />
-      </div>
+      {/* 모바일은 로고 바 바로 아래 프로필부터 — '마이홈' 제목 줄과 작성 메뉴(+)는 두지 않는다 */}
 
       <HomeTabs
         tabs={tabs}

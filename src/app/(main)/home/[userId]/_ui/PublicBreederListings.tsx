@@ -63,8 +63,8 @@ const PublicBreederListings = ({ breederId, gridClassName }: PublicBreederListin
       <div className="mx-auto flex w-full max-w-[74.625rem] flex-col gap-5">
         {/* 라벨 + 상태 필터 — 마이홈 분양 목록(MyPetPostingList)과 같은 배치 */}
         <div className="flex items-center justify-between gap-2">
-          <p className="px-0.5 text-sm leading-6 font-semibold text-neutral-850 tab:text-base">
-            전체 분양건 {totalItems}
+          <p className="shrink-0 px-0.5 text-sm leading-6 font-medium text-neutral-700">
+            총 {totalItems}건
           </p>
 
           <PetStatusFilter value={status} onChange={setStatus} />

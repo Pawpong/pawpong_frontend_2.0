@@ -8,6 +8,8 @@ type StatusTone = 'available' | 'waiting' | 'talk' | 'done' | 'neutral' | 'writi
 interface StatusLabelProps {
   tone: StatusTone
   children: string
+  /** sm: 목록 카드처럼 좁은 자리 — 원본 배지 에셋을 한 단계 작게 그린다 */
+  size?: 'md' | 'sm'
 }
 
 function StatusSymbol({ tone }: { tone: StatusTone }) {
@@ -52,14 +54,22 @@ const ORIGINAL_BADGES: Record<string, { x: number; width: number }> = {
   상담완료: { x: 1584, width: 344 },
 }
 
-const StatusLabel = ({ tone, children }: StatusLabelProps) => {
+const StatusLabel = ({ tone, children, size = 'md' }: StatusLabelProps) => {
   const original = ORIGINAL_BADGES[children.replace(/\s/g, '')]
   if (original) {
     const spriteStyle = {
       '--sprite-x': `${original.x}px`,
       '--sprite-width': `${original.width}px`,
     } as CSSProperties
-    return <span className={styles.original} style={spriteStyle} role="img" aria-label={children} />
+    return (
+      <span
+        className={styles.original}
+        data-size={size}
+        style={spriteStyle}
+        role="img"
+        aria-label={children}
+      />
+    )
   }
   return (
     <span className={styles.label} data-tone={tone}>

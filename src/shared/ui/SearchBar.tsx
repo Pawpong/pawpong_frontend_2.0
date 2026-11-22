@@ -18,6 +18,11 @@ interface SearchBarProps {
   onSubmit?: (keyword: string) => void
   /** 타이핑마다 실시간으로 필요한 화면(채팅 목록 필터 등)에서만 넘긴다 */
   onChange?: (keyword: string) => void
+  /**
+   * outline: 흰 바탕 + 테두리 알약 (홈·탐색 큰 검색, 기본)
+   * soft: 테두리 없는 웜 아이보리 면, 돋보기를 앞에 둔 38px 슬림 검색 (채팅 대화 상대 검색)
+   */
+  appearance?: 'outline' | 'soft'
   className?: string
 }
 
@@ -35,9 +40,11 @@ export const SearchBar = ({
   maxLength,
   onSubmit,
   onChange,
+  appearance = 'outline',
   className,
 }: SearchBarProps) => {
   const isTablet = useBreakpoint('tab')
+  const isSoft = appearance === 'soft'
   const router = useRouter()
   const resolvedPlaceholder = placeholder ?? DEFAULT_PLACEHOLDER
 
@@ -63,10 +70,12 @@ export const SearchBar = ({
       role="search"
       onSubmit={handleSubmit}
       className={cn(
-        'group flex h-11 w-full items-center gap-2 rounded-full border border-neutral-300 bg-white py-1 pr-1 pl-4 tab:h-12 tab:pr-1.5 tab:pl-5 pc:h-14 pc:pl-6',
-        'transition-[border-color,box-shadow] duration-150',
-        // 포커스: 브랜드 테두리 + 옐로우 글로우 (파란 시스템 색은 쓰지 않는다)
-        'focus-within:border-primary-500 focus-within:shadow-[0_0_0_0.25rem_rgba(255,254,114,0.45)]',
+        'group flex w-full items-center gap-2 border transition-[border-color,box-shadow] duration-150',
+        isSoft
+          ? // 돋보기(제출 버튼)를 앞에 두려고 순서만 뒤집는다. 포커스는 테두리만 브랜드 색으로
+            'h-[2.375rem] flex-row-reverse rounded-[0.6875rem] border-transparent bg-neutral-100 pr-3 pl-1 focus-within:border-primary-500'
+          : // 포커스: 브랜드 테두리 + 옐로우 글로우 (파란 시스템 색은 쓰지 않는다)
+            'h-11 rounded-full border-neutral-300 bg-white py-1 pr-1 pl-4 focus-within:border-primary-500 focus-within:shadow-[0_0_0_0.25rem_rgba(255,254,114,0.45)] tab:h-12 tab:pr-1.5 tab:pl-5 pc:h-14 pc:pl-6',
         className,
       )}
     >
@@ -78,16 +87,21 @@ export const SearchBar = ({
         aria-label={resolvedPlaceholder.desktop}
         onChange={onChange ? (event) => onChange(event.target.value) : undefined}
         placeholder={isTablet ? resolvedPlaceholder.desktop : resolvedPlaceholder.mobile}
-        className="min-w-0 flex-1 bg-transparent text-base leading-[1.5] font-medium text-neutral-850 outline-none placeholder:text-sm placeholder:text-neutral-500 tab:placeholder:text-base"
+        className={cn(
+          'min-w-0 flex-1 bg-transparent font-medium text-neutral-850 outline-none placeholder:text-neutral-500',
+          isSoft
+            ? 'text-sm leading-[1.5]'
+            : 'text-base leading-[1.5] placeholder:text-sm tab:placeholder:text-base',
+        )}
       />
       <IconButton
         tone="muted"
-        size="sm"
+        size={isSoft ? 'xs' : 'sm'}
         type="submit"
         aria-label="검색"
         //QA: 검색 아이콘 상태 — 평소에는 회색, 포커스 시 브랜드 색으로 함께 바뀐다.
       >
-        <SearchIcon className="size-6 tab:size-7 pc:size-8" />
+        <SearchIcon className={isSoft ? 'size-5' : 'size-6 tab:size-7 pc:size-8'} />
       </IconButton>
     </form>
   )

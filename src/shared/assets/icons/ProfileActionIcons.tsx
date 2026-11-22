@@ -8,7 +8,7 @@ export const ProfileStarIcon = ({
   <svg width="30" height="30" viewBox="0 0 30 30" fill="currentColor" aria-hidden="true" {...props}>
     {filled && (
       <path
-        fill="var(--color-point-500)"
+        fill="var(--color-accent-sun)"
         d="M14 6h2v2h-2ZM14 8h2v2h-2ZM12 10h6v2h-6ZM6 12h18v2h-18ZM8 14h14v2h-14ZM10 16h10v2h-10ZM10 18h10v2h-10ZM8 20h6v2h-6ZM16 20h6v2h-6ZM8 22h2v2h-2ZM20 22h2v2h-2Z"
       />
     )}

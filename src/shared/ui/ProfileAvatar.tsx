@@ -10,6 +10,7 @@ interface ProfileAvatarProps {
     | 'xsmall'
     | 'small'
     | 'medium'
+    | 'list'
     | 'large'
     | 'xlarge'
     | 'responsive'
@@ -27,6 +28,8 @@ const AVATAR_SIZE = {
   xsmall: { box: 'size-6', glyph: 'h-3.5 w-[0.8125rem]', width: 24 }, // 24 / 14×13
   small: { box: 'size-8', glyph: 'size-5', width: 32 }, // 32 / 20
   medium: { box: 'size-10', glyph: 'h-[1.625rem] w-[1.5625rem]', width: 40 }, // 40 / 26×25
+  // 48: 목록 행 (채팅방 목록)
+  list: { box: 'size-12', glyph: 'h-8 w-[1.9375rem]', width: 48 }, // 48 / 32×31
   large: { box: 'size-[3.25rem]', glyph: 'h-[2.125rem] w-[2.0625rem]', width: 52 }, // 52 / 34×33
   xlarge: { box: 'size-[6.25rem]', glyph: 'h-[4rem] w-[3.875rem]', width: 100 }, // 100 / 64×62
   // small(32) → medium(40): 태블릿+ 커짐 (피드 카드)

@@ -63,7 +63,7 @@ export function FeatureHighlights({
                     }
                   />
                   <path
-                    fill="var(--color-point-500)"
+                    fill="var(--color-accent-sun)"
                     d={
                       card.icon === 'heart'
                         ? 'M4 8h8v4h8V8h8v12h-4v4h-4v4h-8v-4H8v-4H4Z'

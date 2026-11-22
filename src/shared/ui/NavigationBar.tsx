@@ -21,8 +21,16 @@ interface NavigationBarProps {
   /** 타이틀 타이포 — page 는 브랜드 서체(최상위 화면). 미세 조정은 titleClassName 으로 */
   titleVariant?: VariantProps<typeof navigationTitle>['variant']
   titleClassName?: string
+  /**
+   * default: 내용 높이 + 위아래 여백 (서브 화면)
+   * top: 로고 바를 대신해 맨 위에 붙는 52px 한 줄 (채팅 목록·공개 홈 모바일)
+   */
+  height?: 'default' | 'top'
+  /** 배치용 (page-shell·sticky·노출 구간) — 모양은 variant 로 정한다 */
   className?: string
 }
+
+const BAR_HEIGHT = { default: 'py-1 tab:py-2', top: 'h-13' } as const
 
 // [refactored] 브랜드 타이틀 클래스가 호출부 네 곳에 복제되며 세 가지 값으로 갈라져 있었다
 // (마이홈은 pc 없음 / 커뮤니티·명예의전당은 pc:text-2xl / 공지사항은 모바일부터 2xl).
@@ -34,6 +42,8 @@ const navigationTitle = tv({
       default: 'text-sm tab:text-base',
       /** 하단 네비로 오가는 최상위 화면 (마이홈·커뮤니티·명예의 전당·공지사항) */
       page: 'font-cafe24 text-lg text-neutral-850 tab:text-xl pc:text-2xl',
+      /** 로고 바를 대신하는 루트 탭 머리 (채팅) — 왼쪽 정렬 일반 볼드 제목, 뒤로가기 없이 쓴다 */
+      root: 'text-left text-lg font-bold text-neutral-850',
     },
   },
   defaultVariants: { variant: 'default' },
@@ -49,6 +59,7 @@ const NavigationBar = ({
   right,
   titleVariant,
   titleClassName,
+  height = 'default',
   className,
 }: NavigationBarProps) => {
   const isClose = icon === 'close'
@@ -61,7 +72,7 @@ const NavigationBar = ({
   return (
     // 화면 맨 위 제목 바(data-page-top) — 폭·여백은 페이지 틀이 정하고, 틀 위 여백 자리에 붙는다.
     // 틀 밖(띠 페이지)에서 쓸 때는 감싸는 쪽이 PageShell 로 여백을 준다.
-    <div data-page-top className={cn('flex items-center bg-white py-1 tab:py-2', className)}>
+    <div data-page-top className={cn('flex items-center bg-white', BAR_HEIGHT[height], className)}>
       <div className="flex min-w-0 flex-1 items-center">
         {onBack && (
           <IconButton edge="both" onClick={onBack} aria-label={backLabel}>

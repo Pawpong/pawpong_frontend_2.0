@@ -19,7 +19,7 @@
   right: 12%;
   width: 14%;
   aspect-ratio: 1;
-  background: var(--color-point-500, #ffff70);
+  background: var(--color-accent-sun);
   box-shadow:
     0 0 0 4px #ffe08a,
     6px 6px 0 4px #f5c95c;
@@ -62,7 +62,7 @@
   aspect-ratio: 3 / 4;
   transform: translate(-50%, -50%) rotate(-4deg);
   border: 3px solid var(--color-primary-500, #ad651d);
-  background: var(--color-point-500, #ffff70);
+  background: var(--color-accent-sun);
   color: var(--color-primary-600, #94591f);
   box-shadow: 4px 4px 0 #c4a86c;
   /* 답을 고를 때마다 key 가 바뀌어 한 번 통 튀고, 그 뒤로는 둥실 떠 있다. */
@@ -151,13 +151,13 @@
   opacity: 0;
   pointer-events: none;
   box-shadow:
-    0 -56px 0 var(--color-point-500, #ffff70),
+    0 -56px 0 var(--color-accent-sun),
     40px -40px 0 var(--accent-edge, #ad651d),
-    64px -6px 0 var(--color-point-500, #ffff70),
+    64px -6px 0 var(--color-accent-sun),
     -40px -40px 0 var(--accent-edge, #ad651d),
-    -64px -6px 0 var(--color-point-500, #ffff70),
+    -64px -6px 0 var(--color-accent-sun),
     22px -70px 0 var(--accent-edge, #ad651d),
-    -22px -70px 0 var(--color-point-500, #ffff70);
+    -22px -70px 0 var(--color-accent-sun);
   animation: sparkle 760ms ease-out 180ms;
 }
 /* 결과 카드 머리 줄 오른쪽에 찍히는 도장 */

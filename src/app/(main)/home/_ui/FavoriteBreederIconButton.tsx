@@ -8,13 +8,13 @@ import { IconButton } from '@/shared/ui'
 interface FavoriteBreederIconButtonProps {
   breederId: string
   isFavorited: boolean
-  size?: 'action' | 'profile' | 'card'
+  size?: 'inline' | 'profile' | 'card'
 }
 
 // 별 주변은 투명하게 유지하면서 누를 수 있는 영역은 최소 44px를 확보한다.
-// action 은 프로필의 팔로우·메시지 옆 정사각 버튼 — 메시지 버튼과 같은 테두리·높이(h-10)로 한 줄을 이룬다.
+// inline 은 프로필 아바타 줄 끝의 테두리 없는 별 — 이름 줄 글자 크기에 맞춰 작게 둔다.
 const VARIANT = {
-  action: { tone: 'outline', size: 'md', icon: 'size-6' },
+  inline: { tone: 'favorite', size: 'touch', icon: 'size-6' },
   profile: { tone: 'favorite', size: 'lg', icon: 'size-7.5' },
   card: { tone: 'favorite', size: 'touch', icon: 'size-7.5' },
 } as const

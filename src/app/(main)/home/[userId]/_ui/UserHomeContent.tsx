@@ -6,7 +6,6 @@ import { HomeSkeleton } from '../../_ui/HomeSkeleton'
 import { transientQueryRecoveryOptions } from '@/shared/api'
 import { useGnbHeight } from '@/shared/lib/useGnbHeight'
 import { adopterQueries } from '@/entities/adopter'
-import { PHOTO_GRID } from '../../_lib/constants'
 import { HomeColumns } from '../../_ui/HomeColumns'
 import { ProfileCard } from '../../_ui/ProfileCard'
 import { PublicHomePosts } from './PublicHomePosts'
@@ -47,7 +46,8 @@ const UserHomeContent = ({ userId }: UserHomeContentProps) => {
         stickyTop={gnbH}
         sidebar={<ProfileCard profile={profile} mode="other" layout="sidebar" />}
       >
-        <PublicHomePosts userId={userId} gridClassName={PHOTO_GRID} />
+        {/* 입양자 홈은 탭 없이 피드 하나 — 후기·함께하는 아이는 공개 API 가 없어 두지 않는다 */}
+        <PublicHomePosts userId={userId} layout="feed" />
       </HomeColumns>
     </div>
   )
