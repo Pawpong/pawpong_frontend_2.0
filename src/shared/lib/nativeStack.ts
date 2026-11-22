@@ -63,6 +63,21 @@ export const isStackHref = (url: URL): boolean =>
   STACK_PATH.test(url.pathname) &&
   url.pathname !== window.location.pathname
 
+/**
+ * 루트에서 상세를 새 화면으로 열어 달라고 앱에 보낸다. 보냈으면 true — 호출부는 이동하지 않는다.
+ * 상세 WebView 안이거나 앱이 쌓지 않으면(브라우저·안드로이드) false 라 원래대로 이동한다.
+ */
+export const requestOpenScreen = (url: URL): boolean => {
+  if (!hasNativeStack() || isDetailLayer() || !isStackHref(url)) return false
+  postNativeMessage({ type: STACK_MESSAGE.OPEN_SCREEN, href: url.pathname + url.search })
+  return true
+}
+
+/** 링크가 아닌 버튼에서 상세로 갈 때 — 앱 루트면 새 화면으로, 아니면 fallback(웹 이동) */
+export const openScreen = (href: string, fallback: () => void): void => {
+  if (!requestOpenScreen(new URL(href, window.location.origin))) fallback()
+}
+
 /** 뒤로 버튼 — 앱이 상세 WebView 를 쓰면 판단을 앱에 맡기고, 아니면 웹 뒤로 */
 export const goBackFromScreen = (fallback: () => void): void => {
   if (hasNativeStack()) postNativeMessage({ type: STACK_MESSAGE.BACK })
