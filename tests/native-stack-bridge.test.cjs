@@ -6,10 +6,11 @@ const { loadTypescript } = require('./helpers/load-typescript.cjs')
 // 경로 규칙은 앱(pawpong_rn tests/nativeStack.test.cjs)과 같아야 한다.
 const id = '69b0aab0bb7113dab1531ebb'
 
-const load = ({ stack = true, pathname = '/explore' } = {}) => {
+const load = ({ stack = true, pathname = '/explore', layer } = {}) => {
   const posted = []
   const listeners = []
   const win = {
+    __PAWPONG_STACK_LAYER__: layer,
     location: { origin: 'https://pawpong.kr', pathname },
     ReactNativeWebView: { postMessage: (message) => posted.push(JSON.parse(message)) },
     addEventListener: (_type, fn) => listeners.push(fn),
@@ -43,6 +44,25 @@ test('브리더 홈·분양 상세만, 지금 화면이 아닐 때 새 화면으
   assert.equal(nativeStack.isStackHref(url('/adoption/create')), false)
   assert.equal(nativeStack.isStackHref(url(`/adoption/${id}/apply`)), false)
   assert.equal(nativeStack.isStackHref(new URL(`https://evil.example/adoption/${id}`)), false)
+})
+
+test('버튼으로 상세를 열 때도 앱 루트면 새 화면으로, 아니면 웹 이동', () => {
+  let webMoves = 0
+  const move = () => webMoves++
+
+  const root = load()
+  root.nativeStack.openScreen(`/adoption/${id}`, move)
+  assert.deepEqual(root.posted, [{ type: 'OPEN_SCREEN', href: `/adoption/${id}` }])
+  assert.equal(webMoves, 0)
+
+  // 상세 화면이 아닌 곳·브라우저·이미 쌓인 상세 화면 안에서는 원래대로 이동한다
+  root.nativeStack.openScreen('/chat', move)
+  load({ stack: false }).nativeStack.openScreen(`/adoption/${id}`, move)
+  const detail = load({ layer: 'detail' })
+  detail.nativeStack.openScreen(`/adoption/${id}`, move)
+  assert.equal(webMoves, 3)
+  assert.equal(root.posted.length, 1)
+  assert.deepEqual(detail.posted, [])
 })
 
 test('쌓는 앱에서만 뒤로 버튼을 앱에 맡기고, 아니면 웹 뒤로', () => {
