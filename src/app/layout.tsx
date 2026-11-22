@@ -28,7 +28,9 @@ export const metadata: Metadata = {
 // RN 웹뷰는 UA 에 PawpongApp/ 을 붙인다. 첫 페인트 전에 표시해 앱 전용 숨김(in-data-app:hidden)이 깜빡이지 않게 한다.
 // 앱이 하단 탭 바를 직접 그리면 PawpongTabs/ 도 붙인다 — 웹 하단바를 첫 페인트부터 숨긴다(in-data-native-tabs:hidden)
 // 상세를 새 네이티브 화면으로 쌓는 앱은 PawpongStack/ 을 붙인다(NativeStackSync)
-const APP_DETECT_SCRIPT = `var u=navigator.userAgent,d=document.documentElement.dataset;if(/PawpongApp\\//.test(u))d.app='';if(/PawpongTabs\\//.test(u))d.nativeTabs='';if(/PawpongStack\\//.test(u))d.nativeStack=''`
+// 마지막 입력이 터치·마우스면 data-input="pointer" 를 둬 focus-ring 을 숨긴다. Radix 탭처럼 누를 때 코드로 포커스를
+// 주는 부품을 iOS WebKit 이 키보드 포커스(:focus-visible)로 보고 테두리를 그리기 때문이다. 키를 누르면 다시 보인다.
+const APP_DETECT_SCRIPT = `var u=navigator.userAgent,d=document.documentElement.dataset;if(/PawpongApp\\//.test(u))d.app='';if(/PawpongTabs\\//.test(u))d.nativeTabs='';if(/PawpongStack\\//.test(u))d.nativeStack='';addEventListener('pointerdown',function(){document.documentElement.dataset.input='pointer'},true);addEventListener('keydown',function(){delete document.documentElement.dataset.input},true)`
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
