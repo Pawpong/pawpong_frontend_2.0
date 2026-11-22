@@ -45,7 +45,7 @@ const AdoptionGridCard = ({
           <PopularBadge variant="primaryOutline" size="responsive" iconSize="responsive" />
         )
       }
-      status={<AdoptionStatusBadge status={status} />}
+      status={<AdoptionStatusBadge status={status} size="sm" />}
       action={
         onToggle && (
           <ToggleIconButton

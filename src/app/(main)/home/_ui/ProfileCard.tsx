@@ -2,6 +2,7 @@
 
 import { MyLevelBadge, PublicActivityLevel } from '@/features/gamification'
 import { useState, type ReactNode } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
   useInfiniteQuery,
@@ -10,6 +11,7 @@ import {
 } from '@tanstack/react-query'
 import {
   Button,
+  buttonVariants,
   ShareButton,
   LocationText,
   ProfileAvatar,
@@ -239,21 +241,20 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip', menu }: Profile
   const following = toFollowUsers(followingsQuery)
   const mutualFollowers = isVisitor ? toMutualFollowers(followersQuery) : []
 
-  // 공유(+남의 브리더 홈은 ⋯ 신고) — 2단(tab+)은 아바타 줄 오른쪽.
-  // 모바일에서 남의 홈은 상단 바가 같은 묶음을 갖고, 내 홈만 이름 줄에 공유를 둔다
-  const profileActions = isVisitor ? (
-    <PublicProfileActions profile={profile} />
-  ) : (
-    <ShareButton
-      url={`/home/${profileUserId}`}
-      title={`${profile.nickname}님의 홈`}
-      description={profile.bio}
-      imageUrl={profile.profileImageUrl}
-      ariaLabel="프로필 공유하기"
+  // 남의 홈 공유(+브리더 홈은 ⋯ 신고) — 2단(tab+)은 아바타 줄 오른쪽, 모바일은 상단 바가 같은 묶음을 갖는다.
+  // 내 홈 공유는 아이콘 대신 프로필 편집 옆 '내 홈 공유' 버튼이 맡는다
+  const profileActions = isVisitor && <PublicProfileActions profile={profile} />
+  // 즐겨찾기(남의 브리더 홈) — 테두리 없는 별. 모바일은 아바타 줄 맨 오른쪽, 2단(tab+)은 공유·신고 옆
+  const favoriteButton = favoriteBreeder && (
+    <FavoriteBreederIconButton
+      breederId={favoriteBreeder.breederId}
+      isFavorited={favoriteBreeder.isFavorited}
+      size="inline"
     />
   )
   const cornerActions = (
     <div className="flex items-center gap-1">
+      {favoriteButton}
       {profileActions}
       {menu}
     </div>
@@ -261,33 +262,31 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip', menu }: Profile
 
   return (
     <>
-      {/* [refactored] 아바타 + (이름·카운트·소개) + 액션을 한 행으로.
-          모바일에서는 액션만 다음 줄로 감싸(w-full) 두 버튼이 눌리기 좋은 폭을 갖는다.
-          sidebar 레이아웃은 PC 에서만 세로로 쌓는다.
-          즐겨찾기는 팔로우·메시지 옆 정사각 아이콘 버튼으로 둔다 — 두 버튼은 폭을 나눠 갖고
-          별만 고정 폭이라 위계가 유지된다. 이름 줄에 공유·별·신고를 늘어놓으면 모바일에서
-          긴 이름이 잘리고 어수선해서 옮겼다 (공유·신고는 상단 바·아바타 줄의 PublicProfileActions). */}
+      {/* 브리더 홈 A2 — 아바타 줄(아바타 · 이름/메타 · 즐겨찾기 별) → 소개(풀폭) → 팔로우·메시지 알약 두 개.
+          소개를 아바타 옆 좁은 칸에 두면 한 줄로 잘려서, 아바타 줄 아래 전체 폭으로 내렸다.
+          공유·신고는 모바일 상단 바, 2단(tab+)은 아바타 줄 오른쪽의 PublicProfileActions 가 맡는다.
+          sidebar 레이아웃은 2단(tab+)에서만 세로로 쌓는다. */}
       <div
         className={cn(
-          'mx-auto flex w-full max-w-168 flex-wrap items-start gap-x-4 gap-y-3',
-          isSidebar ? 'tab:max-w-none tab:flex-col tab:gap-4' : 'pc:max-w-[48.75rem]',
+          'mx-auto flex w-full max-w-168 flex-col gap-3',
+          isSidebar ? 'tab:max-w-none tab:gap-4' : 'pc:max-w-[48.75rem]',
         )}
       >
         <div
           className={cn(
-            'flex min-w-0 flex-1 items-start gap-3 pc:gap-4',
-            isSidebar && 'tab:w-full tab:flex-none tab:flex-col',
+            'flex min-w-0 items-center gap-3 pc:gap-4',
+            isSidebar && 'tab:flex-col tab:items-stretch',
           )}
         >
           {isSidebar ? (
-            <div className="flex items-start gap-3 tab:w-full tab:justify-between">
+            <div className="flex shrink-0 items-start tab:w-full tab:justify-between">
               <ProfileAvatar
                 size="responsiveProfile"
                 src={profile.profileImageUrl}
                 alt={profile.nickname}
                 className="shrink-0 tab:size-20 pc:size-24"
               />
-              {cornerActions && <div className="hidden tab:block">{cornerActions}</div>}
+              <div className="hidden tab:block">{cornerActions}</div>
             </div>
           ) : (
             <ProfileAvatar
@@ -298,48 +297,82 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip', menu }: Profile
             />
           )}
           <div className="flex w-full min-w-0 flex-1 flex-col gap-0.5">
-            {/* 내 홈만 모바일 이름 줄에 공유를 둔다 (2단에서는 아바타 줄로 옮겨가 숨긴다).
-                남의 홈은 이름만 — 공유·더보기는 상단 바(모바일)와 아바타 줄(tab+)이 맡는다 */}
-            <div className="flex items-start gap-1">
-              {/* 이름 앞에 레벨 배지 그림만 붙인다 (남의 홈도 같은 자리). 긴 이름은 이름만 줄인다 */}
-              <div className="flex min-w-0 flex-1 items-center gap-1.5">
-                {/* 입양자 'mine'·브리더 'mine-breeder' 모두 내 홈이다 */}
-                {isVisitor ? (
-                  <PublicActivityLevel
-                    owner={{ ownerId: profileUserId, role: breederProfile ? 'breeder' : 'adopter' }}
-                  />
-                ) : (
-                  <MyLevelBadge userId={profileUserId} />
-                )}
-                <p className="min-w-0 truncate text-lg leading-[1.5] font-semibold text-neutral-850 pc:text-xl">
-                  {profile.nickname}
-                </p>
-              </div>
-              {!isVisitor && <div className={cn(isSidebar && 'tab:hidden')}>{profileActions}</div>}
+            {/* 이름 앞에 레벨 배지 그림만 붙인다 (남의 홈도 같은 자리). 긴 이름은 이름만 줄인다 */}
+            <div className="flex min-w-0 items-center gap-1.5">
+              {/* 입양자 'mine'·브리더 'mine-breeder' 모두 내 홈이다 */}
+              {isVisitor ? (
+                <PublicActivityLevel
+                  owner={{ ownerId: profileUserId, role: breederProfile ? 'breeder' : 'adopter' }}
+                />
+              ) : (
+                <MyLevelBadge userId={profileUserId} />
+              )}
+              <p className="min-w-0 truncate text-lg leading-[1.5] font-semibold text-neutral-850 pc:text-xl">
+                {profile.nickname}
+              </p>
             </div>
-            {/* 위치 → 카운트 순으로 이름 아래에 각각 한 줄씩 (같은 줄에 묶지 않는다) */}
-            {locationText && <LocationText location={locationText} />}
-            <div className="flex">
+            {/* 메타 한 줄 — 지역 · 팔로워 N · 팔로잉 N (좁으면 다음 줄로 넘긴다) */}
+            <div className="flex min-w-0 flex-wrap items-center gap-x-1">
+              {locationText && (
+                <>
+                  <LocationText location={locationText} tone="muted" />
+                  <span aria-hidden className="text-neutral-300">
+                    ·
+                  </span>
+                </>
+              )}
               <FollowCounts
                 followerCount={profile.followerCount}
                 followingCount={profile.followingCount}
                 onClick={() => setFollowOpen(true)}
               />
             </div>
-            {/* 스트립은 한 줄, 사이드바는 폭이 좁으니 세 줄까지 편다 */}
-            <p
-              className={cn(
-                'text-sm leading-[1.5] font-medium break-words text-neutral-700',
-                isSidebar ? 'truncate tab:line-clamp-3 tab:text-clip' : 'truncate',
-              )}
-            >
-              {profile.bio}
-            </p>
           </div>
+          {/* 아바타 줄 맨 오른쪽 — 남의 브리더 홈 즐겨찾기 별. 2단(tab+)은 아바타 위 모서리 묶음으로 옮겨간다 */}
+          {favoriteButton && (
+            <div className={cn('shrink-0 self-start', isSidebar && 'tab:hidden')}>
+              {favoriteButton}
+            </div>
+          )}
         </div>
 
-        {/* 팔로우 + 메시지 — 동급 액션 두 개가 폭을 반씩 나눠 갖는다(ACTION_SIZE의 flex-1).
-            남의 브리더 홈은 끝에 즐겨찾기 정사각 버튼이 붙는다 */}
+        {/* 소개 — 아바타 줄 아래 전체 폭, 세 줄까지 */}
+        {profile.bio && (
+          <p className="line-clamp-3 text-sm leading-[1.5] font-medium break-words whitespace-pre-line text-neutral-700">
+            {profile.bio}
+          </p>
+        )}
+
+        {/* 내 홈 — 프로필 편집 · 내 홈 공유. 남의 홈 팔로우·메시지 줄과 같은 배치·버튼 모양(secondary) */}
+        {!isVisitor && (
+          <div
+            className={cn(
+              'flex w-full shrink-0 items-center gap-2.5 pc:gap-3',
+              isSidebar ? 'tab:w-full' : 'pc:w-auto',
+            )}
+          >
+            <div className={ACTION_LAYOUT}>
+              <Link
+                href="/profile/edit"
+                className={buttonVariants({ intent: 'secondary', size: 'md', width: 'full' })}
+              >
+                프로필 편집
+              </Link>
+            </div>
+            <div className={ACTION_LAYOUT}>
+              <ShareButton
+                trigger="button"
+                label="내 홈 공유"
+                url={`/home/${profileUserId}`}
+                title={`${profile.nickname}님의 홈`}
+                description={profile.bio}
+                imageUrl={profile.profileImageUrl}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* 팔로우 + 메시지 — 동급 액션 두 개가 폭을 반씩 나눠 갖는다(ACTION_SIZE의 flex-1) */}
         {isVisitor && (
           <div
             className={cn(
@@ -349,13 +382,6 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip', menu }: Profile
             )}
           >
             <VisitorActions targetId={profileUserId} isFollowing={isFollowing} />
-            {favoriteBreeder && (
-              <FavoriteBreederIconButton
-                breederId={favoriteBreeder.breederId}
-                isFavorited={favoriteBreeder.isFavorited}
-                size="action"
-              />
-            )}
           </div>
         )}
       </div>

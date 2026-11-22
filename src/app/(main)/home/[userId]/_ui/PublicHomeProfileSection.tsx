@@ -11,18 +11,20 @@ type PublicHomeProfileSectionProps =
   | { kind: 'breeder'; profile: BreederPublicProfile }
 
 /**
- * 공개 사용자 홈의 상단 내비게이션 바 — 모바일 전용 뒤로가기 + 공유·더보기(신고).
+ * 공개 사용자 홈의 상단 바 — 모바일 전용 한 줄(뒤로 · 이름 · 공유·더보기(신고)).
+ * 모바일은 로고 바(GNB)를 숨기고 이 바가 맨 위에 붙어 있다 (52px).
  * 2단(tab+)에서는 좌측 프로필 카드 아바타 줄이 같은 공유·더보기를 갖고 있어 숨긴다.
  */
-const PublicHomeProfileSection = ({ kind, profile }: PublicHomeProfileSectionProps) => {
+const PublicHomeProfileSection = ({ profile }: PublicHomeProfileSectionProps) => {
   const router = useRouter()
 
   return (
     <NavigationBar
-      title={`${profile.nickname}의 홈`}
-      onBack={kind === 'breeder' ? () => goBackFromScreen(() => router.back()) : undefined}
+      title=""
+      onBack={() => goBackFromScreen(() => router.back())}
       right={<PublicProfileActions profile={profile} />}
-      className="page-shell tab:hidden"
+      height="top"
+      className="sticky top-0 z-sticky page-shell tab:hidden"
     />
   )
 }

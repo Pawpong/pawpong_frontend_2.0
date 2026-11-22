@@ -1,9 +1,9 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useSearchParams, usePathname } from 'next/navigation'
+import { useMemo } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import {
+  Button,
   InfiniteScrollTrigger,
   ListState,
   ListingCardGridSkeleton,
@@ -15,62 +15,25 @@ import { CATEGORY_TO_PET_TYPE } from '@/shared/lib/petCategory'
 import { adoptionQueries } from '@/entities/adoption'
 import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
-import { SearchSection } from '@/features/search'
 import { CategorySection } from '@/features/category-filter'
-import { cn } from '@/shared/lib/cn'
-import { useBreakpoint } from '@/shared/lib/useBreakpoint'
 import { useGnbHeight } from '@/shared/lib/useGnbHeight'
-import { ANIMAL_CATEGORIES } from '@/shared/types'
-import type { AnimalCategory } from '@/shared/types'
 import { AdoptionCardGrid } from '@/features/adoption'
 import { BreederExploreContent } from './BreederExploreContent'
 import { ExploreFilterBar } from './ExploreFilterBar'
-import { ExploreListFilters } from './ExploreListFilters'
-import type { ExploreListFilter } from './ExploreListFilters'
-import { EXPLORE_SECTION_CONTAINER, EXPLORE_TABS, SEARCH_PLACEHOLDERS } from '../_lib/constants'
+import { ALL_REGIONS, EXPLORE_SECTION_CONTAINER, EXPLORE_TABS } from '../_lib/constants'
 import type { ExploreType } from '../_lib/constants'
+import { hasNarrowedQuery, useExploreQuery } from '../_lib/useExploreQuery'
 import { flattenPages } from '@/shared/lib/infiniteList'
 
-// 필터 칩 → v2 /adoption 쿼리 파라미터 (서버 필터링 — 클라이언트 slice 금지)
-const FILTER_TO_QUERY = {
-  all: { sort: 'latest', status: undefined },
-  available: { sort: 'latest', status: 'available' },
-  popular: { sort: 'popular', status: undefined },
-} as const
-
+// 탐색 상단 (Option 3) — 헤더(검색은 헤더 돋보기) · 탭 · 원형 카테고리 · 드롭다운 필터 칩 · 목록.
+// 헤더와 탭만 붙어 있고 카테고리·필터는 스크롤로 지나가 카드가 먼저 보이게 한다.
 const ExploreContent = () => {
-  const searchParams = useSearchParams()
-  const pathname = usePathname()
+  const { query, setQuery } = useExploreQuery()
+  const selectedType = query.type
+  const gnbHeight = useGnbHeight()
+  const narrowed = hasNarrowedQuery(query)
 
-  // 탭·카테고리·검색어는 서버 데이터가 아니라 클라이언트 조회 조건이라 URL만 얕게 바꾼다.
-  // 정적 프리렌더된 이 페이지에서 같은 pathname 의 searchParams-only router.replace 는
-  // 프로덕션에서 라우터가 현재 URL 로 되돌려 무시되므로(개발 모드는 동적 렌더라 정상),
-  // Next 가 지원하는 네이티브 history.replaceState 를 쓴다 — useSearchParams 가 자동 동기화된다.
-  const replaceSearch = useCallback(
-    (params: URLSearchParams) => {
-      const query = params.toString()
-      window.history.replaceState(null, '', `${pathname}${query ? `?${query}` : ''}`)
-    },
-    [pathname],
-  )
-
-  // 기본 탭은 브리더 탐색 — 입양 탐색은 type=adoption 으로 명시해야 열린다
-  const typeParam = searchParams.get('type')
-  const selectedType: ExploreType = typeParam === 'adoption' ? 'adoption' : 'breeder'
-  const [adoptionListFilter, setAdoptionListFilter] = useState<ExploreListFilter>('all')
-
-  const keyword = searchParams.get('keyword') ?? undefined
-
-  const categoryParam = searchParams.get('category')
-  const selectedCategory: AnimalCategory =
-    categoryParam && ANIMAL_CATEGORIES.includes(categoryParam as AnimalCategory)
-      ? (categoryParam as AnimalCategory)
-      : 'all'
-
-  // 입양 탐색 실데이터 — 카테고리 칩은 petType, 필터 칩은 sort/status로 매핑해 v2 API 조회
-  // (입양 탭에서만 활성화). 필터가 바뀌면 queryKey가 바뀌어 서버에서 다시 받아온다.
-  const petType = CATEGORY_TO_PET_TYPE[selectedCategory]
-  const { sort, status } = FILTER_TO_QUERY[adoptionListFilter]
+  // 입양 탐색 실데이터 — 카테고리는 petType, 필터 칩은 sort/status 로 v2 API 조회 (서버 필터링)
   const {
     data: listData,
     fetchNextPage,
@@ -79,8 +42,13 @@ const ExploreContent = () => {
     isPending,
     isError,
   } = useInfiniteQuery({
-    ...adoptionQueries.list(sort, petType, status, keyword),
-    enabled: selectedType === 'adoption',
+    ...adoptionQueries.list(
+      query.sort,
+      CATEGORY_TO_PET_TYPE[query.category],
+      query.status === 'all' ? undefined : query.status,
+      query.keyword || undefined,
+    ),
+    enabled: query.type === 'adoption',
   })
 
   // 무한스크롤 페이지 병합 시 listingId 중복 제거 — 서버 페이지네이션이 경계에서 항목을
@@ -90,81 +58,32 @@ const ExploreContent = () => {
     [listData],
   )
 
-  const handleTypeChange = useCallback(
-    (type: ExploreType) => {
-      const params = new URLSearchParams()
-      if (type === 'adoption') {
-        params.set('type', 'adoption')
-      }
-      // 탭을 바꾸면 카테고리 칩(URL 파라미터)이 초기화되므로 목록 필터도 같이 되돌린다
-      // (브리더 탭 필터는 컴포넌트가 언마운트되며 저절로 초기화된다)
-      setAdoptionListFilter('all')
-      replaceSearch(params)
-    },
-    [replaceSearch],
-  )
-
-  const handleCategoryChange = useCallback(
-    (category: AnimalCategory) => {
-      const params = new URLSearchParams(searchParams.toString())
-      if (category === 'all') {
-        params.delete('category')
-      } else {
-        params.set('category', category)
-      }
-      replaceSearch(params)
-    },
-    [searchParams, replaceSearch],
-  )
-
-  // 검색어는 카테고리·필터와 함께 URL에 실어 서버 조회 조건으로 합류시킨다
-  const handleSearch = useCallback(
-    (nextKeyword: string) => {
-      const params = new URLSearchParams(searchParams.toString())
-      if (nextKeyword) {
-        params.set('keyword', nextKeyword)
-      } else {
-        params.delete('keyword')
-      }
-      replaceSearch(params)
-    },
-    [searchParams, replaceSearch],
-  )
-
-  // 스크롤 인터랙션: 픽셀 카테고리+큰 검색바가 스크롤로 벗어나면 컴팩트 필터바를
-  // 탭바와 같은 sticky 영역 안에 노출한다. absolute 배치로 레이아웃 점프를 막는다.
-  const headerRef = useRef<HTMLDivElement>(null)
-  const sentinelRef = useRef<HTMLDivElement>(null)
-  // [refactored] GNB 높이는 공통 훅 재사용 (직접 querySelector 측정 제거)
-  const gnbH = useGnbHeight()
-  const [headerH, setHeaderH] = useState(0)
-  const [isStuck, setIsStuck] = useState(false)
-  // 모바일은 탭바 높이만큼 위로 보내 필터만 GNB 아래에 남긴다.
-  const isTabUp = useBreakpoint('tab')
-  const stickyBarTop = gnbH + (isTabUp ? headerH : 0)
-  const stickyHeaderTop = isTabUp ? gnbH : gnbH - headerH
-
-  useEffect(() => {
-    const el = headerRef.current
-    if (!el) return
-    // ResizeObserver로 탭바 높이 상시 추적 (window resize만으론 폰트로드·HMR·동적변경 시
-    // 높이 변화를 못 잡아 headerH가 stale → 컴팩트바가 탭바에 겹쳐 칩이 잘림)
-    const measure = () => setHeaderH(el.offsetHeight)
-    measure()
-    const observer = new ResizeObserver(measure)
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [])
-
-  useEffect(() => {
-    const el = sentinelRef.current
-    if (!el) return
-    const observer = new IntersectionObserver(([entry]) => setIsStuck(!entry.isIntersecting), {
-      rootMargin: `-${stickyBarTop}px 0px 0px 0px`,
+  // 탭을 바꾸면 조건을 처음으로 — 분양 상태·지역은 탭마다 고를 수 있는 값이 다르다
+  const handleTypeChange = (type: ExploreType) =>
+    setQuery({
+      type,
+      category: 'all',
+      status: 'all',
+      sort: 'popular',
+      region: ALL_REGIONS,
+      keyword: '',
     })
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [stickyBarTop])
+
+  // 필터로 비었을 때만 되돌아갈 길을 준다. 초기화는 뒤로가기 한 번에 목록으로 돌아오게 히스토리를 쌓지 않는다
+  const emptyAction = narrowed ? (
+    <Button
+      intent="secondary"
+      size="md"
+      onClick={() =>
+        setQuery(
+          { category: 'all', status: 'all', region: ALL_REGIONS, keyword: '' },
+          { replace: true },
+        )
+      }
+    >
+      필터 초기화
+    </Button>
+  ) : undefined
 
   return (
     // 탭이 가리키는 목록 패널이 같은 Tabs 안에 있어야 하므로 Tabs 루트가 sticky 머리와 목록을 함께 감싼다.
@@ -173,76 +92,50 @@ const ExploreContent = () => {
       onValueChange={(value) => handleTypeChange(value as ExploreType)}
       className="w-full"
     >
-      {/* 탭과 필터를 하나의 sticky 영역에 묶어 스크롤 중에도 서로 붙어 있게 한다. */}
       <div
-        ref={headerRef}
         data-page-top
         className="sticky z-sticky frame-bleed bg-white"
-        style={{ top: stickyHeaderTop }}
+        style={{ top: gnbHeight }}
       >
         <TabBarList items={EXPLORE_TABS} ariaLabel="탐색 유형" />
-        <div className={cn('absolute top-full right-0 left-0 hidden bg-white', isStuck && 'block')}>
-          <div className="page-gutter-x">
-            <ExploreFilterBar
-              selected={selectedCategory}
-              onChange={handleCategoryChange}
-              keyword={keyword}
-              onSearch={handleSearch}
-            />
-          </div>
-        </div>
       </div>
 
       <TabsContent value={selectedType}>
-        {/* ══════ 콘텐츠 영역 — 좌우 폭·여백은 페이지 틀이 정한다 ══════ */}
-        {/* 검색바를 위에, 카테고리를 아래에 둔다 */}
-        <div>
-          {/* 검색바: 홈과 동작 공유 — 화면별 placeholder와 스타일은 SearchSection variant로 분리한다. */}
-          <SearchSection
-            placeholder={SEARCH_PLACEHOLDERS[selectedType]}
-            defaultValue={keyword}
-            onSubmit={handleSearch}
-            showPopularKeywords
-          />
-          {/* //QA: 상단 카테고리 수정 — 모바일도 4개 한 줄 가운데 정렬, 스크롤 시 컴팩트 칩바로 전환한다. */}
-          <CategorySection selected={selectedCategory} onChange={handleCategoryChange} />
-        </div>
-        {/* 스크롤 트리거 sentinel (상단 영역 끝) */}
-        <div ref={sentinelRef} aria-hidden />
+        <CategorySection
+          selected={query.category}
+          onChange={(category) => setQuery({ category })}
+        />
+        <ExploreFilterBar query={query} onChange={setQuery} />
 
-        {selectedType === 'breeder' ? (
-          <BreederExploreContent category={selectedCategory} keyword={keyword} />
+        {query.type === 'breeder' ? (
+          <BreederExploreContent
+            query={query}
+            emptyText={narrowed ? '조건에 맞는 브리더가 없어요.' : '등록된 브리더가 없어요.'}
+            emptyAction={emptyAction}
+          />
         ) : (
-          <>
-            <div className={EXPLORE_SECTION_CONTAINER}>
-              <section className="flex flex-col gap-3">
-                <div className="mb-1">
-                  <ExploreListFilters
-                    value={adoptionListFilter}
-                    onChange={setAdoptionListFilter}
-                    ariaLabel="분양 소식 필터"
-                  />
-                </div>
-                <ListState
-                  appPublicContent
-                  isPending={isPending}
-                  isError={isError}
-                  isEmpty={listings.length === 0}
-                  loadingText="분양글을 불러오는 중이에요."
-                  loadingFallback={<ListingCardGridSkeleton label="분양글을 불러오는 중이에요." />}
-                  errorText="분양글을 불러오지 못했어요."
-                  emptyText="등록된 분양글이 없어요."
-                >
-                  <AdoptionCardGrid listings={listings} />
-                </ListState>
-              </section>
-              <InfiniteScrollTrigger
-                onIntersect={fetchNextPage}
-                hasNextPage={hasNextPage ?? false}
-                isFetchingNextPage={isFetchingNextPage}
-              />
-            </div>
-          </>
+          <div className={EXPLORE_SECTION_CONTAINER}>
+            <section className="flex flex-col gap-3">
+              <ListState
+                appPublicContent
+                isPending={isPending}
+                isError={isError}
+                isEmpty={listings.length === 0}
+                loadingText="분양글을 불러오는 중이에요."
+                loadingFallback={<ListingCardGridSkeleton label="분양글을 불러오는 중이에요." />}
+                errorText="분양글을 불러오지 못했어요."
+                emptyText={narrowed ? '조건에 맞는 분양글이 없어요.' : '등록된 분양글이 없어요.'}
+                emptyAction={emptyAction}
+              >
+                <AdoptionCardGrid listings={listings} />
+              </ListState>
+            </section>
+            <InfiniteScrollTrigger
+              onIntersect={fetchNextPage}
+              hasNextPage={hasNextPage ?? false}
+              isFetchingNextPage={isFetchingNextPage}
+            />
+          </div>
         )}
       </TabsContent>
     </Tabs>

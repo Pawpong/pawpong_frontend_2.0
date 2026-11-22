@@ -61,6 +61,7 @@ test('틀 안의 화면·컴포넌트는 틀을 직접 만들지 않는다 (예�
     'src/shared/ui/FooterCtaBar.tsx', // 하단 고정 바
     'src/shared/ui/PageShell.tsx',
     'src/shared/ui/ShowcaseSection.tsx', // 띠 페이지(홈) 섹션
+    'src/widgets/gnb/ui/ExploreHeaderSearch.tsx', // 상단바 검색 (탐색)
     'src/widgets/gnb/ui/Gnb.tsx', // 상단바
     'src/widgets/gnb/ui/MobileMenu.tsx', // 상단바 메뉴
     'src/widgets/hall-of-fame/ui/HallOfFame.tsx', // 띠 페이지(홈) 섹션

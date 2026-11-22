@@ -242,13 +242,13 @@
   opacity: 0;
   pointer-events: none;
   box-shadow:
-    0 -26px 0 var(--color-point-500, #ffff70),
+    0 -26px 0 var(--color-accent-sun),
     22px -18px 0 var(--accent-edge, #55784d),
-    30px 4px 0 var(--color-point-500, #ffff70),
+    30px 4px 0 var(--color-accent-sun),
     -22px -18px 0 var(--accent-edge, #55784d),
-    -28px 6px 0 var(--color-point-500, #ffff70),
+    -28px 6px 0 var(--color-accent-sun),
     12px 24px 0 var(--accent-edge, #55784d),
-    -12px 24px 0 var(--color-point-500, #ffff70);
+    -12px 24px 0 var(--color-accent-sun);
   animation: burst 760ms ease-out 120ms;
 }
 .success svg {

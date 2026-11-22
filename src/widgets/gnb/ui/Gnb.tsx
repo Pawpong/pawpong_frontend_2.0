@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { useRoutePathname } from '@/shared/lib/useRoutePathname'
 import { MenuIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { AppBadgeSync } from './AppBadgeSync'
 import { AuthActions } from './AuthActions'
+import { ExploreHeaderSearch } from './ExploreHeaderSearch'
 import { LogoButton } from './LogoButton'
 import { NavBar } from './NavBar'
 import { NotificationBell } from './NotificationBell'
@@ -17,9 +18,16 @@ import { IconButton } from '@/shared/ui'
 // 분양글 작성(/adoption/create)과 수정(/adoption/:id/edit)은 같은 폼 화면이라 함께 칠한다.
 const TINTED_HEADER_PATTERN = /^\/adoption\/(create|[^/]+\/edit)$/
 
+// 자기 상단 바가 한 줄로 대신하는 화면은 모바일에서 로고 바를 겹쳐 두지 않는다.
+// - 남의 홈(/home/:id): 뒤로·이름·공유. 내 홈(/home)은 로고 바를 그대로 둔다
+// - 채팅(/chat): 하단 내비 루트 탭이라 '채팅' 제목·새 채팅·알림 한 줄 (방을 열면 방 헤더가 맡는다)
+// 2단(tab+)은 로고 바를 그대로 보인다
+const OWN_TOP_BAR_PATTERN = /^\/(home\/[^/]+|chat)$/
+
 const Gnb = () => {
   const [menuOpen, setMenuOpen] = useState(false)
   const pathname = useRoutePathname()
+  const hasOwnTopBar = OWN_TOP_BAR_PATTERN.test(pathname)
 
   return (
     <>
@@ -28,8 +36,9 @@ const Gnb = () => {
       <header
         data-gnb
         className={cn(
-          'fixed inset-x-0 top-0 z-header flex h-12 w-full items-center justify-center tab:py-2 pc:h-16',
+          'fixed inset-x-0 top-0 z-header h-12 w-full items-center justify-center tab:py-2 pc:h-16',
           TINTED_HEADER_PATTERN.test(pathname) ? 'bg-point-50' : 'bg-white',
+          hasOwnTopBar ? 'hidden tab:flex' : 'flex',
         )}
       >
         <div className="page-shell flex items-center justify-between">
@@ -41,6 +50,12 @@ const Gnb = () => {
             {/* [refactored] 노출 조건은 AuthActions 가 판단한다. PC 는 NavBar 안 마이홈 자리에서 렌더 */}
             <AuthActions placement="header-mobile" className="pc:hidden" />
             <NavBar className="hidden pc:flex" />
+            {/* 탐색 화면은 본문 검색창 대신 헤더 돋보기로 찾는다 (Option 3). URL 을 읽으므로 Suspense 로 감싼다 */}
+            {pathname === '/explore' && (
+              <Suspense fallback={null}>
+                <ExploreHeaderSearch />
+              </Suspense>
+            )}
             {/* 알림은 상시 확인하는 정보라 메뉴 안에 숨기지 않고 헤더에 상주시킨다.
                 pc 는 NavBar 안 마이홈 옆에서 렌더하므로 여기는 pc 미만 전용 (AuthActions 와 같은 방식) */}
             <NotificationBell className="pc:hidden" />
@@ -59,7 +74,10 @@ const Gnb = () => {
       </header>
       {/* 헤더는 fixed 라 흐름에서 빠지므로 같은 높이만큼 자리를 비워 둔다.
           sticky 였을 때 iOS 앱에서 뒤로 돌아오면 헤더가 1~2프레임 사라졌다(fixed 는 시뮬레이터 9회 모두 0프레임, #640). */}
-      <div aria-hidden className="h-12 shrink-0 pc:h-16" />
+      <div
+        aria-hidden
+        className={cn('h-12 shrink-0 pc:h-16', hasOwnTopBar && 'hidden tab:block')}
+      />
 
       <MobileMenu open={menuOpen} onOpenChange={setMenuOpen} />
       <AppBadgeSync />

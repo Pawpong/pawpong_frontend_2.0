@@ -37,19 +37,17 @@ const ChatRoomFilterableList = ({
     isFetching: isRetrying,
   } = useChatRoomFilter()
   const [search, setSearch] = useState('')
+  // 스와이프로 액션을 연 행 — 한 번에 한 행만 열린다
+  const [swipedRoomId, setSwipedRoomId] = useState<string | null>(null)
   const visibleRooms = filteredRooms.filter((room) =>
     room.counterpart.nickname.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase()),
   )
 
   return (
     <>
-      <div
-        className={cn(
-          'flex shrink-0 flex-col gap-3 border-b border-neutral-150 py-4',
-          gutterClassName,
-        )}
-      >
+      <div className={cn('flex shrink-0 flex-col gap-3 pt-2 pb-3', gutterClassName)}>
         <SearchBar
+          appearance="soft"
           placeholder={{ mobile: '대화 상대 검색', desktop: '대화 상대 검색' }}
           defaultValue={search}
           onChange={setSearch}
@@ -79,13 +77,8 @@ const ChatRoomFilterableList = ({
           className="py-20"
         />
       ) : (
-        <div
-          className={cn(
-            'divide-y divide-neutral-150 overflow-hidden bg-white py-2 pc:py-3',
-            gutterClassName,
-            listClassName,
-          )}
-        >
+        // 행 사이 1px 헤어라인. 스와이프 액션이 행 끝까지 닿도록 좌우 여백은 행 안이 아니라 목록이 갖는다
+        <div className={cn('divide-y divide-neutral-150 bg-white', gutterClassName, listClassName)}>
           {visibleRooms.map((room) => (
             <ChatRoomItem
               key={room.roomId}
@@ -94,6 +87,12 @@ const ChatRoomFilterableList = ({
               unreadCount={room.unreadCount}
               onClick={() => onSelectRoom(room)}
               onRoomClosed={() => onRoomClosed?.(room.roomId)}
+              swipeOpen={swipedRoomId === room.roomId}
+              onSwipeOpenChange={(open) =>
+                setSwipedRoomId((current) =>
+                  open ? room.roomId : current === room.roomId ? null : current,
+                )
+              }
             />
           ))}
         </div>

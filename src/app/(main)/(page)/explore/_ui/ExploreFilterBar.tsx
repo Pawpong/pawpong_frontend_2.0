@@ -1,79 +1,56 @@
 'use client'
 
-import { useState } from 'react'
-import Image from 'next/image'
-import { Chip, SearchButton } from '@/shared/ui'
-import { cn } from '@/shared/lib/cn'
-import { ANIMAL_CATEGORIES, CATEGORY_LABEL } from '@/shared/types'
-import type { AnimalCategory } from '@/shared/types'
+import { useDistrictOptions } from '@/entities/district'
+import { Dropdown } from '@/shared/ui'
+import type { AdoptionSortType } from '@/shared/types'
+import { ALL_REGIONS, SORT_OPTIONS, STATUS_OPTIONS } from '../_lib/constants'
+import type { ExploreStatus } from '../_lib/constants'
+import type { ExploreQuery } from '../_lib/useExploreQuery'
 
 interface ExploreFilterBarProps {
-  selected: AnimalCategory
-  onChange: (category: AnimalCategory) => void
-  /** 현재 적용된 검색어 — 검색바를 펼칠 때 초기값으로 채운다 */
-  keyword?: string
-  onSearch: (keyword: string) => void
-  className?: string
+  query: ExploreQuery
+  onChange: (patch: Partial<ExploreQuery>) => void
 }
 
-/* ═══════════════════════════════════════════════
-   탭/모바일 카테고리 + 검색 한 줄 (Figma 1652-75035 / 1652-81824)
-   - 기본: 카테고리 칩(badge) + 작은 "검색" 버튼
-   - 검색 클릭 → 펼침: 필터 버튼 + 전체폭 검색바
-   - 필터 클릭 → 다시 칩(뱃지) 형태로 복귀
-   (모바일·태블릿 동일 로직)
-   ═══════════════════════════════════════════════ */
-const ExploreFilterBar = ({
-  selected,
-  onChange,
-  keyword = '',
-  onSearch,
-  className,
-}: ExploreFilterBarProps) => {
-  const [searchExpanded, setSearchExpanded] = useState(false)
-  const [query, setQuery] = useState(keyword)
+// 탐색 2차 필터 (Option 3) — 드롭다운 칩. 1차 분류(원형 카테고리)보다 가볍게 테두리 칩으로 둔다.
+// 상태는 행을 지우고 정렬은 순서만 바꾸므로 한 그룹에 섞지 않고 칩을 나눈다.
+// '전체'는 칩 이름(분양 상태·지역)으로 보여 아무것도 고르지 않은 상태가 곧 전체임을 알린다.
+const ExploreFilterBar = ({ query, onChange }: ExploreFilterBarProps) => {
+  const isBreeder = query.type === 'breeder'
+  // 지역은 브리더 탐색만 거를 수 있다 (입양 목록 API 에 지역 조건이 없다)
+  const { cityOptions } = useDistrictOptions('', isBreeder)
 
   return (
-    <div className={cn('flex items-center justify-between gap-3 py-3', className)}>
-      {searchExpanded ? (
-        /* 필터 버튼 — 클릭 시 칩(뱃지) 형태로 복귀 */
-        <Chip onClick={() => setSearchExpanded(false)}>
-          <Image
-            src="/images/category/filter.svg"
-            alt=""
-            width={20}
-            height={20}
-            className="size-5"
-          />
-          필터
-        </Chip>
-      ) : (
-        /* 카테고리 칩 — 공통 Badge(primary 채움/아웃라인, Figma 1652-81786) */
-        <div className="flex flex-wrap items-center gap-2">
-          {ANIMAL_CATEGORIES.map((category) => (
-            <Chip
-              key={category}
-              selected={selected === category}
-              onClick={() => onChange(category)}
-            >
-              {CATEGORY_LABEL[category]}
-            </Chip>
-          ))}
-        </div>
-      )}
-
-      <SearchButton
-        active={searchExpanded}
-        value={query}
-        onChange={setQuery}
-        // 펼칠 때마다 현재 적용된 검색어로 되맞춘다 (상단 큰 검색바로 검색해도 어긋나지 않도록)
-        onClick={() => {
-          setQuery(keyword)
-          setSearchExpanded(true)
-        }}
-        onSubmit={() => onSearch(query.trim())}
-        className={cn(searchExpanded ? 'max-w-none min-w-0 flex-1' : 'shrink-0')}
+    <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 py-[0.4375rem]">
+      <Dropdown
+        appearance="chip"
+        ariaLabel="분양 상태"
+        placeholder="분양 상태"
+        options={[...STATUS_OPTIONS[query.type]]}
+        // Radix Select 는 빈 값이면 placeholder 를 보여 준다
+        value={query.status === 'all' ? '' : query.status}
+        onValueChange={(status) => onChange({ status: status as ExploreStatus })}
+        active={query.status !== 'all'}
       />
+      <Dropdown
+        appearance="chip"
+        ariaLabel="정렬"
+        options={[...SORT_OPTIONS]}
+        value={query.sort}
+        onValueChange={(sort) => onChange({ sort: sort as AdoptionSortType })}
+        active={query.sort !== 'popular'}
+      />
+      {isBreeder && (
+        <Dropdown
+          appearance="chip"
+          ariaLabel="지역"
+          placeholder="지역"
+          options={[{ value: ALL_REGIONS, label: '전체' }, ...cityOptions]}
+          value={query.region === ALL_REGIONS ? '' : query.region}
+          onValueChange={(region) => onChange({ region })}
+          active={query.region !== ALL_REGIONS}
+        />
+      )}
     </div>
   )
 }
