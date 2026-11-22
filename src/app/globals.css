@@ -349,11 +349,15 @@ main:has([data-page-tint='point']) {
   }
 }
 
-/* 키보드 포커스 링 — 버튼류와 클릭 가능한 카드/행이 공통으로 쓴다 */
+/* 키보드 포커스 링 — 버튼류와 클릭 가능한 카드/행이 공통으로 쓴다.
+   마지막 입력이 터치·마우스면(<html data-input="pointer">, 루트 레이아웃 스크립트) 그리지 않는다 */
 @utility focus-ring {
   &:focus-visible {
     outline: 2px solid var(--color-focus);
     outline-offset: 2px;
+  }
+  &:focus-visible:where([data-input='pointer'] *) {
+    outline: none;
   }
 }
 
@@ -380,6 +384,9 @@ main:has([data-page-tint='point']) {
   &:focus-visible {
     outline: 2px solid var(--color-focus);
     outline-offset: -2px;
+  }
+  &:focus-visible:where([data-input='pointer'] *) {
+    outline: none;
   }
 }
 
