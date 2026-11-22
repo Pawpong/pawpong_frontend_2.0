@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { PawPrintIcon } from '@/shared/assets'
 import { Badge, Button, CtaModal, ListingStats } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
+import { openScreen } from '@/shared/lib/nativeStack'
 import type { AdoptedListingCard as AdoptedListingCardType } from '@/shared/types'
 import { GENDER_LABEL } from '@/shared/types'
 import { AdoptionStatusBadge } from '@/entities/adoption'
@@ -161,7 +162,11 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
           {
             label: '입양 상세 보기',
             intent: 'primary',
-            onClick: () => router.push(`/adoption/${listing.listingId}`),
+            // 링크가 아니라 앱의 상세 화면 쌓기가 가로채지 못하므로 직접 맡긴다
+            onClick: () => {
+              const href = `/adoption/${listing.listingId}`
+              openScreen(href, () => router.push(href))
+            },
           },
           { label: '대화중인채팅', intent: 'secondary', onClick: () => router.push('/chat') },
         ]}
