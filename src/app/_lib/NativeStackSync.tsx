@@ -13,8 +13,8 @@ import {
   installHistoryIndex,
   isAtStackBase,
   isDetailLayer,
-  isStackHref,
   isStackPath,
+  requestOpenScreen,
   setStackBase,
   takeLoginReturn,
 } from '@/shared/lib/nativeStack'
@@ -40,11 +40,9 @@ const NativeStackSync = () => {
       const anchor = event.target instanceof Element ? event.target.closest('a[href]') : null
       if (!(anchor instanceof HTMLAnchorElement) || (anchor.target && anchor.target !== '_self'))
         return
-      const url = new URL(anchor.href)
-      if (!isStackHref(url)) return
+      if (!requestOpenScreen(new URL(anchor.href))) return
       event.preventDefault()
       event.stopPropagation()
-      postNativeMessage({ type: STACK_MESSAGE.OPEN_SCREEN, href: url.pathname + url.search })
     }
     document.addEventListener('click', handleClick, true)
     return () => document.removeEventListener('click', handleClick, true)
