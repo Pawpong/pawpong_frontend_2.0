@@ -38,7 +38,6 @@ export function PreviewPets({ title = '지금 만날 수 있는 친구들' }: { 
         linkLabel="전체 보기"
       />
       <ListState
-        appPublicContent
         isPending={isPending}
         isError={isError}
         isEmpty={pets.length === 0}
@@ -51,7 +50,7 @@ export function PreviewPets({ title = '지금 만날 수 있는 친구들' }: { 
           />
         }
         errorText="친구들을 불러오지 못했어요."
-        emptyText="지금 소개 중인 친구가 없어요."
+        emptyText="현재 분양 가능한 동물이 없어요. 브리더에게 문의해 보세요."
       >
         <ListingCardGrid
           className={PET_GRID}
