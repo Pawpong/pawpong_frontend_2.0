@@ -33,7 +33,6 @@ import type {
   FollowUserCard,
   PaginationResponse,
 } from '@/shared/types'
-import { FavoriteBreederIconButton } from './FavoriteBreederIconButton'
 import { PublicProfileActions } from './PublicProfileActions'
 
 // 백엔드 FollowUserCard → 모달이 쓰는 FollowUser (맞팔 여부는 두 플래그 조합)
@@ -127,7 +126,7 @@ const MessageButton = ({ targetId }: { targetId: string }) => {
       <div className={ACTION_LAYOUT}>
         <Button
           intent="secondary"
-          size="md"
+          size="sm"
           disabled={isPending}
           onClick={guard(() =>
             startChat(
@@ -177,7 +176,7 @@ const FollowActionButton = ({ targetId, isFollowing }: VisitorActionsProps) => {
     <div className={cn(ACTION_LAYOUT, 'flex-col gap-1')}>
       <Button
         intent={isFollowing ? 'secondary' : 'primary'}
-        size="md"
+        size="sm"
         disabled={isPending}
         onClick={guard(() => (isFollowing ? unfollow : follow).mutate(targetId))}
         width="full"
@@ -226,8 +225,6 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip', menu }: Profile
   )
   const { mutate: unfollow } = useUnfollowUser()
   const { mutate: removeFollower } = useRemoveFollower()
-  // 남의 브리더 홈에서만 팔로우·메시지 옆에 즐겨찾기 버튼을 둔다
-  const favoriteBreeder = mode === 'breeder' ? breederProfile : null
   // 특별시·광역시는 city/district 가 사실상 같은 지역이라(서울특별시/서울시) 그대로
   // 이어 붙이면 중복 표시된다 — 브리더 탐색 카드에서 고친 것과 같은 기준을 여기서도 적용
   const locationText = breederProfile
@@ -244,17 +241,9 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip', menu }: Profile
   // 남의 홈 공유(+브리더 홈은 ⋯ 신고) — 2단(tab+)은 아바타 줄 오른쪽, 모바일은 상단 바가 같은 묶음을 갖는다.
   // 내 홈 공유는 아이콘 대신 프로필 편집 옆 '내 홈 공유' 버튼이 맡는다
   const profileActions = isVisitor && <PublicProfileActions profile={profile} />
-  // 즐겨찾기(남의 브리더 홈) — 테두리 없는 별. 모바일은 아바타 줄 맨 오른쪽, 2단(tab+)은 공유·신고 옆
-  const favoriteButton = favoriteBreeder && (
-    <FavoriteBreederIconButton
-      breederId={favoriteBreeder.breederId}
-      isFavorited={favoriteBreeder.isFavorited}
-      size="inline"
-    />
-  )
+  // 즐겨찾기(남의 브리더 홈)는 PublicProfileActions 가 공유 앞에 둔다 — 모바일 상단 바와 2단 모서리에 같이 보인다
   const cornerActions = (
     <div className="flex items-center gap-1">
-      {favoriteButton}
       {profileActions}
       {menu}
     </div>
@@ -262,9 +251,9 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip', menu }: Profile
 
   return (
     <>
-      {/* 브리더 홈 A2 — 아바타 줄(아바타 · 이름/메타 · 즐겨찾기 별) → 소개(풀폭) → 팔로우·메시지 알약 두 개.
+      {/* 브리더 홈 A2 — 아바타 줄(아바타 · 이름/메타) → 소개(풀폭) → 팔로우·메시지 알약 두 개.
           소개를 아바타 옆 좁은 칸에 두면 한 줄로 잘려서, 아바타 줄 아래 전체 폭으로 내렸다.
-          공유·신고는 모바일 상단 바, 2단(tab+)은 아바타 줄 오른쪽의 PublicProfileActions 가 맡는다.
+          즐겨찾기·공유·신고는 모바일 상단 바, 2단(tab+)은 아바타 줄 오른쪽의 PublicProfileActions 가 맡는다.
           sidebar 레이아웃은 2단(tab+)에서만 세로로 쌓는다. */}
       <div
         className={cn(
@@ -328,12 +317,6 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip', menu }: Profile
               />
             </div>
           </div>
-          {/* 아바타 줄 맨 오른쪽 — 남의 브리더 홈 즐겨찾기 별. 2단(tab+)은 아바타 위 모서리 묶음으로 옮겨간다 */}
-          {favoriteButton && (
-            <div className={cn('shrink-0 self-start', isSidebar && 'tab:hidden')}>
-              {favoriteButton}
-            </div>
-          )}
         </div>
 
         {/* 소개 — 아바타 줄 아래 전체 폭, 세 줄까지 */}
