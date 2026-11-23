@@ -23,7 +23,7 @@ const fakeApp = (page: Page, layer?: 'detail') =>
     })
   }, layer === 'detail')
 
-// 브리더 홈 링크 — 운영에도 브리더는 있다(분양글은 0건일 수 있다)
+// 브리더 홈 링크 — 운영에도 브리더는 있다(분양글은 0건일 수 있다). 탐색 카드에서 고른다
 const breederLink = (page: Page) =>
   page.locator('a[href^="/home/"]').filter({ visible: true }).first()
 
@@ -59,15 +59,31 @@ test('상세 화면: 열기 → 안에서 이동 → 뒤로 → 닫기까지 처
   await page.waitForURL((url) => url.pathname === href)
   await expect.poll(() => lastOf(page, 'STACK_ROUTE')).toMatchObject({ url: href, atBase: true })
 
-  // 상세 안에서 한 번 더 들어가면 처음 연 화면이 아니다 (여기서 뒤로는 웹 뒤로)
-  await page.getByRole('link', { name: '홈으로 이동' }).click()
-  await page.waitForURL((url) => url.pathname === '/')
-  await expect.poll(() => lastOf(page, 'STACK_ROUTE')).toMatchObject({ url: '/', atBase: false })
+  // 상세 안에서 한 번 더 들어가면 처음 연 화면이 아니다 (여기서 뒤로는 웹 뒤로).
+  // 남의 홈은 모바일에서 자기 상단 바만 두어(로고 바 없음, #645) 안에서 갈 곳은 분양글 카드뿐이다.
+  // 분양글이 없는 브리더(운영은 2026-11 기준 0건)면 이 단계만 건너뛴다 — dev 배포 E2E 가 확인한다.
+  const listing = page.locator('a[href^="/adoption/"]').filter({ visible: true }).first()
+  const hasListing = await listing
+    .waitFor({ timeout: 5_000 })
+    .then(() => true)
+    .catch(() => false)
+  if (hasListing) {
+    const inner = (await listing.getAttribute('href')) as string
+    await listing.click()
+    await page.waitForURL((url) => url.pathname === inner)
+    await expect
+      .poll(() => lastOf(page, 'STACK_ROUTE'))
+      .toMatchObject({ url: inner, atBase: false })
 
-  // 뒤로 오면 다시 처음 연 화면이다 (여기서 뒤로는 앱이 화면을 닫는다)
-  await page.goBack()
-  await page.waitForURL((url) => url.pathname === href)
-  await expect.poll(() => lastOf(page, 'STACK_ROUTE')).toMatchObject({ url: href, atBase: true })
+    // 뒤로 오면 다시 처음 연 화면이다 (여기서 뒤로는 앱이 화면을 닫는다)
+    await page.goBack()
+    await page.waitForURL((url) => url.pathname === href)
+    await expect.poll(() => lastOf(page, 'STACK_ROUTE')).toMatchObject({ url: href, atBase: true })
+  } else {
+    test
+      .info()
+      .annotations.push({ type: 'skip-step', description: '분양글이 없어 안에서 이동은 건너뜀' })
+  }
 
   // 화면의 뒤로 버튼은 판단을 앱에 맡긴다
   await page.getByRole('button', { name: '뒤로 가기' }).click()
