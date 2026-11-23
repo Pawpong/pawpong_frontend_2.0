@@ -11,45 +11,49 @@ const CATEGORIES = [
   { label: '브리더 탐색', href: '/explore?type=breeder', src: 'explore' },
 ] as const
 
+const CATEGORY_IMAGE_SIZES = '(max-width: 767px) 202px, (max-width: 1439px) 154px, 192px'
+
 const HomeCategoryButton = ({ label, href, src }: (typeof CATEGORIES)[number]) => (
   <Link
     href={href}
     aria-label={label}
-    className="group relative block aspect-[192/177] w-full max-w-[6.640625rem] pc:h-[10.3996rem] pc:w-[11.991rem] pc:max-w-none"
+    className="group relative block aspect-[192/177] w-full rounded-lg focus-ring pc:max-w-[11.991rem]"
   >
     <Image
       src={`/images/category/${src}-default-md.svg`}
       alt={label}
       fill
-      sizes="(max-width: 1439px) 106px, 192px"
-      className="object-contain transition-opacity group-hover:opacity-0"
+      sizes={CATEGORY_IMAGE_SIZES}
+      className="object-contain transition-opacity group-hover:opacity-0 group-focus-visible:opacity-0"
       loading="eager"
     />
     <Image
       src={`/images/category/${src}-hover-md.svg`}
       alt=""
       fill
-      sizes="(max-width: 1439px) 106px, 192px"
-      className="object-contain opacity-0 transition-opacity group-hover:opacity-100"
+      sizes={CATEGORY_IMAGE_SIZES}
+      className="object-contain opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
     />
   </Link>
 )
 
 const CategoryBrowse = () => {
   return (
-    <>
-      {/*
-        //QA: 모바일 카테고리 배치 수정 — 375~767px에서는 2x2, 탭·PC에서는 4개 한 줄로 정렬한다.
-        //QA: 버튼 크기 수정 — 각 SVG의 원본 비율을 유지하면서 태블릿·PC 간격을 적용한다.
-      */}
-      <PageShell className="px-4 py-4 pc:py-[0.625rem]">
-        <div className="mx-auto grid w-full grid-cols-[repeat(2,6.640625rem)] place-items-center justify-center gap-x-[2.1875rem] gap-y-2 tab:grid-cols-[repeat(4,6.640625rem)] tab:gap-[2.1875rem] pc:min-h-[10.4621rem] pc:max-w-[60.526rem] pc:grid-cols-[repeat(4,11.991rem)] pc:gap-[4.1875rem]">
+    <section aria-labelledby="category-browse-title" className="bg-primary-50/40">
+      <PageShell className="px-4 pt-7 pb-9 tab:pt-9 tab:pb-11 pc:pt-12 pc:pb-14">
+        <h1
+          id="category-browse-title"
+          className="mb-5 text-center font-cafe24 text-2xl leading-[1.4] text-primary-800 tab:mb-7 tab:text-3xl pc:mb-9 pc:text-4xl"
+        >
+          새로운 가족을 찾아볼까요?
+        </h1>
+        <div className="mx-auto grid w-full max-w-[26rem] grid-cols-2 items-center gap-3 tab:max-w-[44rem] tab:grid-cols-4 tab:gap-6 pc:max-w-[60.526rem] pc:gap-[4.1875rem]">
           {CATEGORIES.map((category) => (
             <HomeCategoryButton key={category.label} {...category} />
           ))}
         </div>
       </PageShell>
-    </>
+    </section>
   )
 }
 
