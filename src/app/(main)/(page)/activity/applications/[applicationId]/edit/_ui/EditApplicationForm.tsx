@@ -43,7 +43,7 @@ const EditApplicationFormFields = ({ applicationId, detail }: EditApplicationFor
     <div>
       <div
         data-page-top
-        className="sticky top-12 z-sticky frame-bleed border-b border-neutral-150 bg-white tab:top-14"
+        className="sticky top-(--header-h) z-sticky frame-bleed border-b border-neutral-150 bg-white tab:top-14"
       >
         <NavigationBar title="신청서 수정" icon="close" onBack={handleCloseClick} />
         <div className="py-3">

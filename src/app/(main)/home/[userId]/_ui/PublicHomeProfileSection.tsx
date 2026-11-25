@@ -24,7 +24,7 @@ const PublicHomeProfileSection = ({ profile }: PublicHomeProfileSectionProps) =>
       onBack={() => goBackFromScreen(() => router.back())}
       right={<PublicProfileActions profile={profile} />}
       height="top"
-      className="sticky top-12 z-sticky page-shell in-data-app:top-0 tab:hidden"
+      className="sticky top-(--header-h) z-sticky page-shell tab:hidden"
     />
   )
 }
