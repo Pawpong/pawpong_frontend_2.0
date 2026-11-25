@@ -14,8 +14,6 @@ interface PhotoTileProps {
   onClick?: MouseEventHandler<HTMLAnchorElement>
   /** 사진 아래쪽에 얹는 상태 (공개 보류 등) */
   status?: ReactNode
-  /** PC 에서 마우스를 올렸을 때 덮는 내용 (좋아요·댓글 수) */
-  hoverContent?: ReactNode
 }
 
 // [refactored] function 선언 → 화살표 함수, 인라인 props 타입 → interface, 주석 한국어화
@@ -29,7 +27,6 @@ const PhotoTile = ({
   sizes,
   onClick,
   status,
-  hoverContent,
 }: PhotoTileProps) => (
   <Link
     href={href}
@@ -42,11 +39,6 @@ const PhotoTile = ({
     {count > 1 && (
       <span className="absolute top-2 right-2 rounded bg-neutral-850/85 px-2 py-0.5 text-body-sm font-medium text-white">
         {count}장
-      </span>
-    )}
-    {hoverContent && (
-      <span className="pointer-events-none absolute inset-0 hidden items-center justify-center gap-2 bg-neutral-850/70 text-body-md font-semibold text-white opacity-0 transition-opacity group-focus-visible:opacity-100 pc:flex pc:group-hover:opacity-100">
-        {hoverContent}
       </span>
     )}
     {status && <span className="absolute right-2 bottom-2 left-2">{status}</span>}

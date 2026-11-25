@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { RetryButton, buttonVariants, PageShell } from '@/shared/ui'
-import { cn } from '@/shared/lib/cn'
 import { transientQueryRecoveryOptions } from '@/shared/api'
 import { profileQueries } from '@/entities/profile'
 import { activityConfigOptions } from '@/entities/gamification'
@@ -15,7 +14,6 @@ import { PetResultLink } from '@/features/playground-pet'
 import { MyPetPostingList } from '@/widgets/my-pet-postings'
 import { toMyProfileCardProps } from '../_lib/toMyProfileCardProps'
 import { ProfileCard } from './ProfileCard'
-import { MyHomeActionMenu } from './MyHomeActionMenu'
 import { BreederIntroduction } from './BreederIntroduction'
 import { HomeTabs, TabsContent } from './HomeTabs'
 import { MyPostsTab } from './MyPostsTab'
@@ -26,7 +24,6 @@ import {
   MY_ACTIVITY_HREF,
   MY_HOME_SIDE_LINKS,
   BREEDER_MY_HOME_SIDE_LINKS,
-  MY_PHOTO_GRID,
   MY_HOME_TAB_PANEL,
   MY_HOME_LISTINGS_PANEL,
 } from '../_lib/constants'
@@ -99,11 +96,7 @@ const MyHomeContent = () => {
         onTabChange={setSelectedTab}
         sidebar={
           <>
-            <ProfileCard
-              {...profileCardProps}
-              layout="sidebar"
-              menu={<MyHomeActionMenu isBreeder={isBreeder} />}
-            />
+            <ProfileCard {...profileCardProps} layout="sidebar" />
             {isBreeder && <BreederIntroduction {...introProps} placement="profile" />}
           </>
         }
@@ -116,16 +109,14 @@ const MyHomeContent = () => {
           <TabsContent value="listings">
             <BreederIntroduction {...introProps} placement="tab" />
 
-            {/* 작성 진입점은 + 메뉴(모바일 상단 바·2단 프로필 카드)가 맡는다 */}
+            {/* 새 분양글 작성은 '분양 목록 n건' 제목 줄의 + 가 맡는다 (모든 화면 폭) */}
             <PageShell className={MY_HOME_LISTINGS_PANEL}>
               <MyPetPostingList
                 pageSize={HOME_LISTING_PAGE_SIZE}
                 showTotalCount
+                create={{ href: '/adoption/create', label: '새 분양글 등록' }}
                 emptyAction={
-                  <Link
-                    href="/adoption/create"
-                    className={cn(buttonVariants({ size: 'md' }), 'hidden tab:inline-flex')}
-                  >
+                  <Link href="/adoption/create" className={buttonVariants({ size: 'md' })}>
                     첫 분양글 작성하기
                   </Link>
                 }
@@ -134,12 +125,12 @@ const MyHomeContent = () => {
           </TabsContent>
         )}
 
-        {/* Figma 4145:721426 — 모바일·태블릿 3열, PC 4열의 정사각 미디어 그리드 */}
+        {/* 내가 쓴 글 — 입양자 공개 홈과 같은 1열 피드 카드 */}
         <TabsContent value="posts">
           {/* 작성한 글 / 댓글 단 글 / 좋아요한 글 / 저장한 글 칩 전환 — 내 글 조회는 profile 로드 후 활성화.
               분양 목록·AI 사진 탭과 같은 여백이라 제목 줄이 탭을 바꿔도 같은 자리에 온다 */}
           <PageShell className={MY_HOME_TAB_PANEL}>
-            <MyPostsTab enabled={!!myProfile} gridClassName={MY_PHOTO_GRID} />
+            <MyPostsTab enabled={!!myProfile} />
           </PageShell>
         </TabsContent>
 

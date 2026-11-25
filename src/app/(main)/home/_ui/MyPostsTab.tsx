@@ -59,15 +59,10 @@ const EMPTY_ACTION: Record<PostFilter, ReactNode> = {
 interface PostsViewProps {
   /** 개수는 칩마다 조회 결과에서 나오므로 각 목록이 헤더를 그린다 */
   renderHeader: (count?: number) => ReactNode
-  gridClassName?: string
 }
 
 /** 작성한 글 — 기존 마이홈 '게시글' 목록(authorId=me) 그대로 */
-const WrittenPosts = ({
-  enabled,
-  renderHeader,
-  gridClassName,
-}: PostsViewProps & { enabled: boolean }) => {
+const WrittenPosts = ({ enabled, renderHeader }: PostsViewProps & { enabled: boolean }) => {
   const query = useQuery({
     ...communityQueries.myPosts(enabled),
     refetchOnMount: 'always',
@@ -82,7 +77,6 @@ const WrittenPosts = ({
       onRetry={() => void query.refetch()}
       isRetrying={query.isFetching}
       header={renderHeader(query.data?.pagination.totalItems)}
-      gridClassName={gridClassName}
       emptyAction={EMPTY_ACTION.written}
       {...STATE_TEXT.written}
     />
@@ -95,7 +89,6 @@ const ActivityPosts = ({
   enabled,
   session,
   renderHeader,
-  gridClassName,
 }: PostsViewProps & {
   filter: Exclude<PostFilter, 'written'>
   enabled: boolean
@@ -127,15 +120,17 @@ const ActivityPosts = ({
         isFetchingNextPage: query.isFetchingNextPage,
       }}
       header={renderHeader(query.data ? getTotalItems(query.data) : undefined)}
-      gridClassName={gridClassName}
       emptyAction={EMPTY_ACTION[filter]}
       {...STATE_TEXT[filter]}
     />
   )
 }
 
-/** 마이홈 '내가 쓴 글' 탭 — 작성한 글 / 댓글 단 글 / 좋아요한 글 / 저장한 글을 칩으로 전환한다 */
-const MyPostsTab = ({ enabled, gridClassName }: { enabled: boolean; gridClassName?: string }) => {
+/**
+ * 마이홈 '내가 쓴 글' 탭 — 작성한 글 / 댓글 단 글 / 좋아요한 글 / 저장한 글을 칩으로 전환한다.
+ * 목록은 입양자 공개 홈과 같은 1열 피드 카드 — 글이 적어도 화면이 비어 보이지 않는다
+ */
+const MyPostsTab = ({ enabled }: { enabled: boolean }) => {
   const session = useAuthReadSession()
   // 커뮤니티 상세의 '저장한 글 다시 보기'처럼 특정 칩으로 바로 들어오는 링크(?filter=saved)를 받는다
   const requestedFilter = useSearchParams().get('filter')
@@ -147,7 +142,7 @@ const MyPostsTab = ({ enabled, gridClassName }: { enabled: boolean; gridClassNam
   const draftsQuery = useQuery({ ...communityQueries.drafts(enabled), throwOnError: false })
   const draftCount = draftsQuery.data?.pagination.totalItems ?? 0
 
-  // 탭 바로 아래 칩 줄만 둔다 — '게시글 n건 +' 제목 줄은 상단 바의 작성 메뉴(+)와 겹쳐 없앴다.
+  // 탭 바로 아래 칩 줄만 둔다 — '게시글 n건 +' 제목 줄은 없앴다 (새 글은 빈 목록 버튼·커뮤니티가 맡는다).
   // 개수는 고른 칩에만 붙인다 (칩마다 조회 결과에서 나온다)
   const renderHeader = (count?: number) => (
     <div className="flex flex-col gap-3">
@@ -175,7 +170,7 @@ const MyPostsTab = ({ enabled, gridClassName }: { enabled: boolean; gridClassNam
   )
 
   return filter === 'written' ? (
-    <WrittenPosts enabled={enabled} renderHeader={renderHeader} gridClassName={gridClassName} />
+    <WrittenPosts enabled={enabled} renderHeader={renderHeader} />
   ) : (
     <ActivityPosts
       key={filter}
@@ -183,7 +178,6 @@ const MyPostsTab = ({ enabled, gridClassName }: { enabled: boolean; gridClassNam
       enabled={enabled}
       session={session}
       renderHeader={renderHeader}
-      gridClassName={gridClassName}
     />
   )
 }

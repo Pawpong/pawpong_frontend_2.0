@@ -1,7 +1,7 @@
 'use client'
 
 import { MyLevelBadge, PublicActivityLevel } from '@/features/gamification'
-import { useState, type ReactNode } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
@@ -78,10 +78,7 @@ interface ProfileCardBreederProps {
   layout?: ProfileCardLayout
 }
 
-type ProfileCardProps = (ProfileCardBaseProps | ProfileCardBreederProps) & {
-  /** 내 홈 작성·수정 메뉴 — 2단(tab+)에서 아바타 줄 오른쪽 끝에 둔다 (모바일은 상단 바가 맡는다) */
-  menu?: ReactNode
-}
+type ProfileCardProps = ProfileCardBaseProps | ProfileCardBreederProps
 
 // [refactored] 아바타 미리보기 + "친구 목록" 라벨 → 실제 팔로워/팔로잉 숫자.
 // 카운트는 profile 에 이미 있는데 모달에만 넘기고 있어서, 카드가 공간만 쓰고 정보는 없었다.
@@ -108,12 +105,12 @@ const FollowCounts = ({
 /* ── mode별 하단 액션 (디자인: pill border 버튼) ── */
 
 // 팔로우·메시지 공통 폭 — flex-1 로 컨테이너 폭을 나눠 갖는다.
-// 최소 폭을 두면 PC 사이드바(260px)에서 별 버튼까지 한 줄이 넘쳐 본문을 침범한다
+// 좁은 PC 사이드바에서도 두 버튼이 같은 폭으로 나란히 놓인다
 const ACTION_LAYOUT = 'flex min-w-0 flex-1'
 
 /* ── 남의 홈에서 보이는 액션 (Figma 3349-2026986) ── */
 
-// 흰 배경 + border/secondary(#cacaca) pill
+// 흰 배경 + 테두리(secondary). 팔로우와 나란히 낮은 높이(sm)로 둔다.
 // 누르면 채팅방 생성(또는 기존 방 조회) 후 /chat 으로 이동
 const MessageButton = ({ targetId }: { targetId: string }) => {
   const router = useRouter()
@@ -164,7 +161,8 @@ interface VisitorActionsProps {
   isFollowing: boolean
 }
 
-// 시안의 팔로우는 point 색 BaseButton(최대 258). 처리 중 문구·에러 안내가 있어 공통 FollowButton 대신 직접 쓴다
+// 팔로우는 메시지와 아래 줄의 폭을 반씩 나누고 낮은 높이(sm)를 유지한다.
+// 처리 중 문구·에러 안내가 있어 공통 FollowButton 대신 직접 쓴다
 const FollowActionButton = ({ targetId, isFollowing }: VisitorActionsProps) => {
   const follow = useFollowUser()
   const unfollow = useUnfollowUser()
@@ -197,16 +195,9 @@ const FollowActionButton = ({ targetId, isFollowing }: VisitorActionsProps) => {
   )
 }
 
-const VisitorActions = (props: VisitorActionsProps) => (
-  <>
-    <FollowActionButton {...props} />
-    <MessageButton targetId={props.targetId} />
-  </>
-)
-
 /* ── ProfileCard ── */
 
-const ProfileCard = ({ profile, mode = 'mine', layout = 'strip', menu }: ProfileCardProps) => {
+const ProfileCard = ({ profile, mode = 'mine', layout = 'strip' }: ProfileCardProps) => {
   // 세로 배치는 2단(tab+)에서만 — 모바일은 두 레이아웃 모두 같은 가로 스트립이다
   const isSidebar = layout === 'sidebar'
   const [followOpen, setFollowOpen] = useState(false)
@@ -238,20 +229,13 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip', menu }: Profile
   const following = toFollowUsers(followingsQuery)
   const mutualFollowers = isVisitor ? toMutualFollowers(followersQuery) : []
 
-  // 남의 홈 공유(+브리더 홈은 ⋯ 신고) — 2단(tab+)은 아바타 줄 오른쪽, 모바일은 상단 바가 같은 묶음을 갖는다.
+  // 남의 홈 즐겨찾기·공유(+브리더 홈은 ⋯ 신고) — 2단(tab+)은 아바타 줄 오른쪽, 모바일은 상단 바가 같은 묶음을 갖는다.
   // 내 홈 공유는 아이콘 대신 프로필 편집 옆 '내 홈 공유' 버튼이 맡는다
   const profileActions = isVisitor && <PublicProfileActions profile={profile} />
-  // 즐겨찾기(남의 브리더 홈)는 PublicProfileActions 가 공유 앞에 둔다 — 모바일 상단 바와 2단 모서리에 같이 보인다
-  const cornerActions = (
-    <div className="flex items-center gap-1">
-      {profileActions}
-      {menu}
-    </div>
-  )
 
   return (
     <>
-      {/* 브리더 홈 A2 — 아바타 줄(아바타 · 이름/메타) → 소개(풀폭) → 팔로우·메시지 알약 두 개.
+      {/* 아바타 줄(아바타 · 이름/메타) → 소개(풀폭) → 남의 홈 팔로우·메시지 / 내 홈 편집·공유.
           소개를 아바타 옆 좁은 칸에 두면 한 줄로 잘려서, 아바타 줄 아래 전체 폭으로 내렸다.
           즐겨찾기·공유·신고는 모바일 상단 바, 2단(tab+)은 아바타 줄 오른쪽의 PublicProfileActions 가 맡는다.
           sidebar 레이아웃은 2단(tab+)에서만 세로로 쌓는다. */}
@@ -275,7 +259,7 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip', menu }: Profile
                 alt={profile.nickname}
                 className="shrink-0 tab:size-20 pc:size-24"
               />
-              <div className="hidden tab:block">{cornerActions}</div>
+              <div className="hidden tab:block">{profileActions}</div>
             </div>
           ) : (
             <ProfileAvatar
@@ -355,16 +339,11 @@ const ProfileCard = ({ profile, mode = 'mine', layout = 'strip', menu }: Profile
           </div>
         )}
 
-        {/* 팔로우 + 메시지 — 동급 액션 두 개가 폭을 반씩 나눠 갖는다(ACTION_SIZE의 flex-1) */}
+        {/* 남의 홈 팔로우·메시지 — 같은 폭으로 나란히, 낮은 높이 유지 */}
         {isVisitor && (
-          <div
-            className={cn(
-              'flex w-full shrink-0 items-center gap-2.5 pc:gap-3',
-              // 좁은 컬럼에 팔로우+메시지를 나란히 두면 라벨이 두 줄로 깨진다
-              isSidebar ? 'tab:w-full' : 'pc:w-auto',
-            )}
-          >
-            <VisitorActions targetId={profileUserId} isFollowing={isFollowing} />
+          <div className="flex w-full items-start gap-2.5 pc:gap-3">
+            <FollowActionButton targetId={profileUserId} isFollowing={isFollowing} />
+            <MessageButton targetId={profileUserId} />
           </div>
         )}
       </div>
