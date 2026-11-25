@@ -12,6 +12,7 @@ test('마이홈은 화면을 그리기 전에 서버에서 로그인을 확인�
         return 'adopter'
       },
     },
+    '@/shared/ui': { RootHeader: () => null },
     './_ui/MyHomeContent': { MyHomeContent: () => null },
   })
   await page.default({ searchParams: Promise.resolve({}) })

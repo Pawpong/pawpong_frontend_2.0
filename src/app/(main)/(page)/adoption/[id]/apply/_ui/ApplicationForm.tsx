@@ -70,7 +70,7 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
   } = useApplicationForm(detail)
 
   const stickyHeader = (
-    <div data-page-top className="sticky top-12 z-sticky frame-bleed bg-white tab:top-14">
+    <div data-page-top className="sticky top-(--header-h) z-sticky frame-bleed bg-white tab:top-14">
       <NavigationBar title={APPLY_TITLE} icon="close" onBack={handleCloseClick} />
       <PetInfoCard detail={detail} />
     </div>
@@ -84,7 +84,10 @@ const ApplicationForm = ({ detail }: ApplicationFormProps) => {
     //  모달 플래그만 켜지고 그릴 모달이 없어 X 버튼이 먹통이 된다)
     return (
       <div>
-        <div data-page-top className="sticky top-12 z-sticky frame-bleed bg-white tab:top-14">
+        <div
+          data-page-top
+          className="sticky top-(--header-h) z-sticky frame-bleed bg-white tab:top-14"
+        >
           <NavigationBar title={APPLY_TITLE} icon="close" onBack={() => router.back()} />
           <PetInfoCard detail={detail} />
         </div>

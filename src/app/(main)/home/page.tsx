@@ -2,6 +2,7 @@ import { createPageMetadata } from '@/shared/lib/metadata'
 
 import { Suspense } from 'react'
 import { requireAuth } from '@/features/auth/server'
+import { RootHeader } from '@/shared/ui'
 import { MyHomeContent } from './_ui/MyHomeContent'
 
 export const metadata = createPageMetadata({ title: '마이홈', noIndex: true })
@@ -18,9 +19,13 @@ const MyHomePage = async ({ searchParams }: MyHomePageProps) => {
   await requireAuth(selectedTab ? `/home?tab=${encodeURIComponent(selectedTab)}` : '/home')
 
   return (
-    <Suspense>
-      <MyHomeContent />
-    </Suspense>
+    <>
+      {/* 앱 하단 탭 '마이' 루트 머리 — 앱은 여기서 로고 바를 숨긴다. 웹은 로고 바가 맡아 숨긴다 */}
+      <RootHeader title="마이" className="page-shell hidden in-data-app:flex" />
+      <Suspense>
+        <MyHomeContent />
+      </Suspense>
+    </>
   )
 }
 

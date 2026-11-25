@@ -11,7 +11,7 @@ import { LogoButton } from './LogoButton'
 import { NavBar } from './NavBar'
 import { NotificationBell } from './NotificationBell'
 import { MobileMenu } from './MobileMenu'
-import { RootHeader, IconButton } from '@/shared/ui'
+import { IconButton } from '@/shared/ui'
 
 // 배경이 흰색이 아닌 화면에서는 헤더도 그 배경을 따라간다 (흰 띠가 떠 보이지 않게).
 // BottomNav 의 경로 목록과 같은 방식 — 페이지가 <main> 안에 있어 props 나 CSS 변수로는 닿지 않는다.
@@ -27,12 +27,14 @@ const Gnb = () => {
 
   return (
     <>
-      {/* 높이는 Figma 740-66523 디바이스 프레임 기준 (mo h48 · tab py8 · pc h64).
-          좌우 폭·여백은 본문과 같은 페이지 틀(page-shell)이라 로고와 본문 왼쪽 끝이 맞는다. */}
+      {/* 높이는 Figma 740-66523 디바이스 프레임 기준 (mo h48 · tab py8 · pc h64) — globals.css --header-h.
+          좌우 폭·여백은 본문과 같은 페이지 틀(page-shell)이라 로고와 본문 왼쪽 끝이 맞는다.
+          data-app-hidden 이면 앱에서 --header-h 가 0 이 되어, 아래 sticky·꽉 찬 높이가 같이 따라온다 */}
       <header
         data-gnb
+        data-app-hidden={hideAppHeader || undefined}
         className={cn(
-          'fixed inset-x-0 top-0 z-header flex h-12 w-full items-center justify-center tab:py-2 pc:h-16',
+          'fixed inset-x-0 top-0 z-header flex h-(--header-h) w-full items-center justify-center tab:py-2',
           TINTED_HEADER_PATTERN.test(pathname) ? 'bg-point-50' : 'bg-white',
           hideAppHeader && 'in-data-app:hidden',
         )}
@@ -71,16 +73,7 @@ const Gnb = () => {
       </header>
       {/* 헤더는 fixed 라 흐름에서 빠지므로 같은 높이만큼 자리를 비워 둔다.
           sticky 였을 때 iOS 앱에서 뒤로 돌아오면 헤더가 1~2프레임 사라졌다(fixed 는 시뮬레이터 9회 모두 0프레임, #640). */}
-      <div
-        aria-hidden
-        className={cn('h-12 shrink-0 pc:h-16', hideAppHeader && 'in-data-app:hidden')}
-      />
-
-      {pathname === '/home' && (
-        <div className="hidden in-data-app:block">
-          <RootHeader title="마이" className="page-shell" />
-        </div>
-      )}
+      <div aria-hidden className="h-(--header-h) shrink-0" />
 
       <MobileMenu open={menuOpen} onOpenChange={setMenuOpen} />
       <AppBadgeSync />

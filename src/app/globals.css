@@ -39,6 +39,19 @@
   --page-pad-bottom: 4rem;
   --section-space: 3rem;
   --section-head-gap: 1rem;
+  /* 로고 바(Gnb) 높이 — 로고 바 아래에 붙는 sticky·꽉 찬 높이는 이 값 하나만 쓴다 */
+  --header-h: 3rem;
+}
+
+@media (min-width: 1440px) {
+  :root {
+    --header-h: 4rem;
+  }
+}
+
+/* 앱은 홈·탐색 밖에서 로고 바를 숨긴다(Gnb data-app-hidden) — 그 화면에선 로고 바 높이를 0 으로 본다 */
+html[data-app]:has([data-gnb][data-app-hidden]) {
+  --header-h: 0px;
 }
 
 @media (min-width: 768px) {
