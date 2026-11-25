@@ -1,6 +1,6 @@
 import { createPageMetadata } from '@/shared/lib/metadata'
 
-import { PawPrintIcon, PixelMessageIcon, PixelPencilIcon } from '@/shared/assets'
+import { PawPrintIcon, MessageIcon, PixelPencilIcon } from '@/shared/assets'
 import { NavigationBar } from '@/shared/ui'
 import { FeatureIntro } from '@/shared/ui/FeatureIntro'
 import { TicketLink } from '@/shared/ui/Ticket'
@@ -45,7 +45,7 @@ const STARTS = [
     title: 'FAQ·문의 안내',
     body: '이용이 어렵다면 자주 묻는 질문과 문의 방법을 확인해요.',
     cta: '도움말 보기',
-    Icon: PixelMessageIcon,
+    Icon: MessageIcon,
     accent: 'green',
   },
 ] as const

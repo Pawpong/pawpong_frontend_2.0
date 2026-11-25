@@ -19,7 +19,7 @@ const VARIANT = {
   card: { tone: 'favorite', size: 'touch', icon: 'size-7.5' },
 } as const
 
-/** 브리더 즐겨찾기 — 빈 픽셀 별을 누르면 별 안쪽만 노랗게 채워진다. */
+/** 브리더 즐겨찾기 — 빈 윤곽선 별을 누르면 별 안쪽만 노랗게 채워진다. */
 const FavoriteBreederIconButton = ({
   breederId,
   isFavorited,

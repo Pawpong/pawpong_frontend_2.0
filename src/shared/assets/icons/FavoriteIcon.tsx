@@ -22,11 +22,12 @@ const FavoriteIcon = ({ size = 'md', status = 'default', ...props }: FavoriteIco
       fill={status === 'fill' ? 'currentColor' : 'none'}
       stroke="currentColor"
       strokeWidth={2}
-      strokeLinecap="square"
+      strokeLinecap="round"
+      strokeLinejoin="round"
       aria-hidden="true"
       {...props}
     >
-      <path d="M15 9L12 6H7.5L4.5 9V13.5L15 24L25.5 13.5V9L22.5 6H18Z" />
+      <path d="M15 24s-10.5-6.4-10.5-13a5.5 5.5 0 0 1 10.5-2.3A5.5 5.5 0 0 1 25.5 11C25.5 17.6 15 24 15 24Z" />
     </svg>
   )
 }

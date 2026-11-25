@@ -1,18 +1,23 @@
 import type { SVGProps } from 'react'
 
-// 2px 도트 별. 채움 상태에서는 안쪽만 포인트 색으로 칠하고 윤곽은 currentColor 를 유지한다.
+// 둥근 2px 윤곽. 선택 시 의미 색상 토큰으로 내부만 채운다.
 export const ProfileStarIcon = ({
   filled = false,
   ...props
 }: SVGProps<SVGSVGElement> & { filled?: boolean }) => (
-  <svg width="30" height="30" viewBox="0 0 30 30" fill="currentColor" aria-hidden="true" {...props}>
-    {filled && (
-      <path
-        fill="var(--color-accent-sun)"
-        d="M14 6h2v2h-2ZM14 8h2v2h-2ZM12 10h6v2h-6ZM6 12h18v2h-18ZM8 14h14v2h-14ZM10 16h10v2h-10ZM10 18h10v2h-10ZM8 20h6v2h-6ZM16 20h6v2h-6ZM8 22h2v2h-2ZM20 22h2v2h-2Z"
-      />
-    )}
-    <path d="M14 4h2v2h-2ZM12 6h2v2h-2ZM16 6h2v2h-2ZM12 8h2v2h-2ZM16 8h2v2h-2ZM4 10h8v2h-8ZM18 10h8v2h-8ZM4 12h2v2h-2ZM24 12h2v2h-2ZM6 14h2v2h-2ZM22 14h2v2h-2ZM8 16h2v2h-2ZM20 16h2v2h-2ZM8 18h2v2h-2ZM20 18h2v2h-2ZM6 20h2v2h-2ZM14 20h2v2h-2ZM22 20h2v2h-2ZM6 22h2v2h-2ZM10 22h4v2h-4ZM16 22h4v2h-4ZM22 22h2v2h-2ZM6 24h4v2h-4ZM20 24h4v2h-4Z" />
+  <svg
+    width="30"
+    height="30"
+    viewBox="0 0 30 30"
+    fill={filled ? 'var(--color-accent-sun)' : 'none'}
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+    {...props}
+  >
+    <path d="M14.38 6.08 Q15.00 5.00 15.62 6.08 L18.14 10.46 Q18.47 11.03 19.10 11.16 L24.05 12.20 Q25.27 12.46 24.43 13.39 L21.05 17.14 Q20.61 17.62 20.68 18.27 L21.22 23.29 Q21.35 24.54 20.21 24.03 L15.59 21.97 Q15.00 21.70 14.41 21.97 L9.79 24.03 Q8.65 24.54 8.78 23.29 L9.32 18.27 Q9.39 17.62 8.95 17.14 L5.57 13.39 Q4.73 12.46 5.95 12.20 L10.90 11.16 Q11.53 11.03 11.86 10.46 Z" />
   </svg>
 )
 

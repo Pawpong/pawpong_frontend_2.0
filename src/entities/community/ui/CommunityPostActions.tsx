@@ -1,6 +1,6 @@
 'use client'
 
-import { FavoriteIcon, PixelMessageIcon } from '@/shared/assets'
+import { FavoriteIcon, MessageIcon } from '@/shared/assets'
 import { ToggleIconButton } from '@/shared/ui'
 
 interface CommunityPostActionsProps {
@@ -33,7 +33,7 @@ const CommunityPostActions = ({
         onClick={onToggleLike}
       />
       <ToggleIconButton
-        icon={PixelMessageIcon}
+        icon={MessageIcon}
         size="md"
         count={commentCount}
         aria-label="댓글 보기"
