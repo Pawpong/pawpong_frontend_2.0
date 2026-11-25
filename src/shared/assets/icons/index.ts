@@ -41,3 +41,5 @@ export { EmptyIllustration } from './EmptyIllustration'
 export { ProfileStarIcon, ReportFlagIcon } from './ProfileActionIcons'
 export { NavIconSvg } from './NavIconSvg'
 export { NAV_ICON_DATA, type NavIconData } from './navIconData'
+
+export { MessageIcon } from './MessageIcon'

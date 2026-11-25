@@ -2,7 +2,7 @@
 
 import type { MouseEventHandler } from 'react'
 import Link from 'next/link'
-import { FavoriteIcon, PixelMessageIcon } from '@/shared/assets'
+import { FavoriteIcon, MessageIcon } from '@/shared/assets'
 import { CardImage } from '@/shared/ui'
 import { formatRelativeTime } from '@/shared/lib/formatRelativeTime'
 import type { CommunityPostCard } from '@/shared/types'
@@ -66,7 +66,7 @@ const CommunityProfileFeedCard = ({ post, preload, onClick }: CommunityProfileFe
         <span aria-hidden className="text-neutral-300">
           ·
         </span>
-        <PixelMessageIcon aria-hidden className="size-4" />
+        <MessageIcon aria-hidden className="size-4" />
         <span className="sr-only">댓글</span>
         {post.commentCount}
         <span aria-hidden className="text-neutral-300">

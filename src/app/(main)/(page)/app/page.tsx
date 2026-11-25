@@ -1,10 +1,5 @@
 import Link from 'next/link'
-import {
-  PawPrintIcon,
-  PixelArrowRightIcon,
-  PixelMessageIcon,
-  PixelPencilIcon,
-} from '@/shared/assets'
+import { PawPrintIcon, PixelArrowRightIcon, MessageIcon, PixelPencilIcon } from '@/shared/assets'
 import { MOBILE_APP } from '@/shared/config'
 import { createPageMetadata } from '@/shared/lib/metadata'
 import { createMobileAppStructuredData } from '@/shared/lib/mobileApp'
@@ -38,7 +33,7 @@ const FEATURES = [
     label: '포퐁 이용 방법 보기',
     tag: 'CHAT',
     accent: 'blue',
-    Icon: PixelMessageIcon,
+    Icon: MessageIcon,
   },
   {
     title: '우리 아이의 일상을 함께해요',

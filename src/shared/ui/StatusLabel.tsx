@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react'
-import { PawPrintIcon, PixelCheckIcon, PixelHourglassIcon, PixelMessageIcon } from '@/shared/assets'
+import { PawPrintIcon, PixelCheckIcon, PixelHourglassIcon, MessageIcon } from '@/shared/assets'
 import styles from './StatusLabel.module.css'
 
 // 상태는 작은 픽셀 기호와 옅은 띠로 표시한다. 필터 버튼과는 별도의 읽기 전용 UI다.
@@ -18,7 +18,7 @@ function StatusSymbol({ tone }: { tone: StatusTone }) {
   if (tone === 'talk') {
     return (
       <span className={styles.message}>
-        <PixelMessageIcon />
+        <MessageIcon />
         <PixelCheckIcon className={styles.messageCheck} />
       </span>
     )
