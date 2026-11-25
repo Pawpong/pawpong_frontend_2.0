@@ -1,13 +1,13 @@
 'use client'
 
 import { useEffect, useState, type ReactNode } from 'react'
+import { inNativeAppWebView } from '@/shared/lib/nativeBridge'
 
 /** 앱 공개 권한 때문에 비어 있는 목록을 일반 웹의 빈 목록과 구분해서 안내한다. */
 export function AppPublicEmptyMessage({ children }: { children: ReactNode }) {
   const [isApp, setIsApp] = useState(false)
   useEffect(() => {
-    const detect = () =>
-      setIsApp(Boolean((window as Window & { ReactNativeWebView?: unknown }).ReactNativeWebView))
+    const detect = () => setIsApp(inNativeAppWebView())
     detect()
     window.addEventListener('pawpong:app-ready', detect)
     return () => window.removeEventListener('pawpong:app-ready', detect)

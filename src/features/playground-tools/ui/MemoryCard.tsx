@@ -7,7 +7,7 @@ import { setPendingCommunityCard } from '@/entities/community'
 import { Button, buttonVariants } from '@/shared/ui/Button'
 import { CameraIcon, ShareIcon, PixelArrowRightIcon } from '@/shared/assets'
 import { PHOTO_ACCEPT, preparePhoto } from '@/shared/lib/preparePhoto'
-import { subscribeNativeCapabilities } from '@/shared/lib/nativeBridge'
+import { inNativeAppWebView, subscribeNativeCapabilities } from '@/shared/lib/nativeBridge'
 import {
   MEMORY_THEMES,
   memoryFileName,
@@ -22,8 +22,6 @@ import { cardBlob, drawMemoryCard, loadCardImage } from '../lib/drawMemoryCard'
 import { ToolPage } from './ToolPage'
 import styles from './Tools.module.css'
 
-const inNativeApp = () =>
-  Boolean((window as Window & { ReactNativeWebView?: unknown }).ReactNativeWebView)
 function canShareFile(file: File) {
   try {
     return navigator.canShare?.({ files: [file] }) === true
@@ -63,7 +61,7 @@ function CardMaker({ owner, playId }: { owner: string; playId: string | null }) 
   useEffect(() => {
     const update = () =>
       setNativeExportUnavailable(
-        inNativeApp() && !canShareFile(new File(['png'], 'card.png', { type: 'image/png' })),
+        inNativeAppWebView() && !canShareFile(new File(['png'], 'card.png', { type: 'image/png' })),
       )
     update()
     return subscribeNativeCapabilities(update)
@@ -159,7 +157,7 @@ function CardMaker({ owner, playId }: { owner: string; playId: string | null }) 
       const blob = await cardBlob(canvas.current)
       if (!current()) return
       const file = new File([blob], memoryFileName(input.date), { type: 'image/png' })
-      const mode = memoryCardExportMode(inNativeApp(), canShareFile(file), share)
+      const mode = memoryCardExportMode(inNativeAppWebView(), canShareFile(file), share)
       if (mode === 'unsupported') {
         setNativeExportUnavailable(true)
         setStatus('이 앱에서는 사진 파일 저장·공유를 지원하지 않아요.')
