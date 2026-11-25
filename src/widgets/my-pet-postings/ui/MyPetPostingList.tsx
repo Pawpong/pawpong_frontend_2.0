@@ -29,6 +29,8 @@ interface MyPetPostingListProps {
   emptyAction?: ReactNode
   /** 라벨 옆에 필터 적용 후 전체 개수 표시 (분양 페이지 시안의 '분양 목록 109') */
   showTotalCount?: boolean
+  /** 제목 줄 오른쪽 + (새 분양글 등록) */
+  create?: { href: string; label: string }
 }
 
 /**
@@ -39,6 +41,7 @@ const MyPetPostingList = ({
   pageSize,
   emptyAction,
   showTotalCount = false,
+  create,
 }: MyPetPostingListProps) => {
   const [sort, setSort] = useState<MyPetPostingSort>('latest')
   // 같은 칩을 다시 누르면 해제 -> 전체
@@ -64,6 +67,7 @@ const MyPetPostingList = ({
       <ListHeader
         title="분양 목록"
         count={showTotalCount && data ? getTotalItems(data) : undefined}
+        create={create}
       >
         <PetStatusFilter value={status} onChange={setStatus} />
         <SortOptions

@@ -63,16 +63,6 @@ const MY_HOME_LISTINGS_PANEL = 'py-5 tab:py-10'
 const CARD_GRID =
   'gap-x-5 grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))] tab:grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))] lap:grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))] pc:grid-cols-4'
 
-// 브리더 공개 홈 피드 사진 그리드. 모바일은 페이지 여백 안에서 2열로 크게 보이고, 2단 컬럼(tab+)에서는
-// 컬럼 폭에 맞춰 채운다.
-const PHOTO_GRID =
-  'max-w-none grid-cols-2 gap-x-3 tab:max-w-none tab:justify-normal tab:gap-x-5 tab:grid-cols-[repeat(auto-fill,minmax(12rem,1fr))] pc:grid-cols-[repeat(auto-fill,minmax(12rem,1fr))]'
-
-// 마이홈 게시글 탭은 분양 목록·AI 사진 탭과 같은 PageShell 여백 안에 들어가므로
-// 모바일에서도 375px 상한 대신 폭을 꽉 채워 제목 줄과 그리드 양끝을 맞춘다 (AI 사진 그리드와 같은 3열)
-const MY_PHOTO_GRID =
-  'max-w-none grid-cols-3 tab:max-w-none tab:justify-normal tab:gap-x-5 tab:grid-cols-[repeat(auto-fill,minmax(12rem,1fr))] pc:grid-cols-[repeat(auto-fill,minmax(12rem,1fr))]'
-
 export {
   MY_HOME_TABS,
   BREEDER_HOME_TABS,
@@ -83,6 +73,4 @@ export {
   MY_HOME_TAB_PANEL,
   MY_HOME_LISTINGS_PANEL,
   CARD_GRID,
-  PHOTO_GRID,
-  MY_PHOTO_GRID,
 }

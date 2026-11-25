@@ -47,7 +47,7 @@ const UserHomeContent = ({ userId }: UserHomeContentProps) => {
         sidebar={<ProfileCard profile={profile} mode="other" layout="sidebar" />}
       >
         {/* 입양자 홈은 탭 없이 피드 하나 — 후기·함께하는 아이는 공개 API 가 없어 두지 않는다 */}
-        <PublicHomePosts userId={userId} layout="feed" />
+        <PublicHomePosts userId={userId} heading />
       </HomeColumns>
     </div>
   )

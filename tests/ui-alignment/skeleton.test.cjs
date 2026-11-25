@@ -24,14 +24,14 @@ test('격자 스켈레톤은 실제 격자 틀에 빈 칸을 채우고 안내 �
   assert.match(html, /motion-reduce:animate-none/)
 })
 
-test('마이홈 글 격자와 AI 사진 보관함은 로딩 중에 같은 격자의 스켈레톤을 보여줌', () => {
+test('홈 글 목록과 AI 사진 보관함은 로딩 중에 목록과 같은 틀의 스켈레톤을 보여줌', () => {
   assert.match(
     source('src/shared/ui/ListState.tsx'),
     /loadingFallback \?\? <AsyncState status="loading"/,
   )
   const grid = source('src/app/(main)/home/_ui/HomePostGrid.tsx')
-  assert.match(grid, /loadingFallback=\{\s*<GridSkeleton[\s\S]*?className=\{gridClasses\}/)
-  assert.match(grid, /<div className=\{gridClasses\}>/)
+  assert.match(grid, /loadingFallback=\{[\s\S]*?<GridSkeleton[\s\S]*?className=\{FEED_LIST\}/)
+  assert.match(grid, /<div className=\{FEED_LIST\}>/)
   assert.match(
     source('src/features/ai-image/ui/AiPhotoArchive.tsx'),
     /<GridSkeleton\s+label="보관함을 불러오는 중이에요\."/,
