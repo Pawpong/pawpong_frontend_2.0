@@ -34,14 +34,14 @@ const filterRooms = (
 // 채팅방 콘텐츠 가로 폭·여백 — 페이지 틀(page-shell)과 같다. 섹션 4곳 공유.
 const CHAT_GUTTER_X = 'page-shell'
 
-// 헤더(Gnb) 아래를 꽉 채우는 높이. 모바일은 채팅 화면에서 로고 바를 숨겨 빼지 않고,
-// 태블릿 3rem · PC 4rem 은 로고 바 높이만큼 뺀다 (Gnb OWN_TOP_BAR_PATTERN 과 짝).
-const CHAT_PANEL_HEIGHT = 'h-dvh tab:h-[calc(100dvh-3rem)] pc:h-[calc(100dvh-4rem)]'
+// 헤더(Gnb) 아래를 꽉 채우는 높이 — 모바일·태블릿 3rem · PC 4rem 은 로고 바 높이만큼 뺀다.
+// 앱은 채팅에서 로고 바를 숨기므로(Gnb hideAppHeader) 빼지 않는다.
+const CHAT_PANEL_HEIGHT = 'h-[calc(100dvh-3rem)] pc:h-[calc(100dvh-4rem)] in-data-app:h-dvh'
 
 // 채팅 목록 화면은 하단 내비(모바일·태블릿 3.5rem + 노치)가 있어 그만큼 더 비켜야 한다.
 // PC 는 하단 내비가 없으므로 헤더만 뺀다.
 const CHAT_LIST_HEIGHT =
-  'h-[calc(100dvh-3.5rem-env(safe-area-inset-bottom))] tab:h-[calc(100dvh-3rem-3.5rem-env(safe-area-inset-bottom))] pc:h-[calc(100dvh-4rem)]'
+  'h-[calc(100dvh-3rem-3.5rem-env(safe-area-inset-bottom))] pc:h-[calc(100dvh-4rem)] in-data-app:h-[calc(100dvh-3.5rem-env(safe-area-inset-bottom))]'
 
 // [refactored] 콘텐츠 폭 — 태블릿 이하는 꽉 채우고, PC에서만 880px 가운데 정렬
 const CHAT_CONTENT_WIDTH = 'mx-auto w-full pc:max-w-[55rem]'

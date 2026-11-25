@@ -1,20 +1,19 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { CloseIcon } from '@/shared/assets'
-import { IconButton, SearchIcon } from '@/shared/ui'
+import { IconButton, SearchBar, SearchIcon } from '@/shared/ui'
 
 const PLACEHOLDER = {
   breeder: '브리더·품종·지역으로 검색',
   adoption: '검색해서 원하는 동물 찾기',
 } as const
 
-const OPEN_BUTTON_ID = 'explore-header-search'
-
 // 탐색 화면 전용 헤더 검색 (Option 3) — 돋보기를 누르면 헤더 전체가 검색창으로 바뀐다.
 // 검색어는 탐색 화면이 읽는 URL(?keyword=)에만 쓴다. 탐색 목록과는 URL 로만 이어진다.
 const ExploreHeaderSearch = () => {
+  const openButtonId = useId()
   const searchParams = useSearchParams()
   const pathname = usePathname()
   const keyword = searchParams.get('keyword') ?? ''
@@ -49,13 +48,13 @@ const ExploreHeaderSearch = () => {
     setOpen(false)
     if (keyword) writeKeyword('')
     // 닫은 뒤 키보드 포커스를 돋보기로 돌려준다
-    document.getElementById(OPEN_BUTTON_ID)?.focus()
+    document.getElementById(openButtonId)?.focus()
   }
 
   return (
     <>
       <IconButton
-        id={OPEN_BUTTON_ID}
+        id={openButtonId}
         tone="brand"
         edge="both"
         aria-label="검색"
@@ -71,47 +70,22 @@ const ExploreHeaderSearch = () => {
             <IconButton tone="neutral" edge="both" aria-label="검색 닫기" onClick={close}>
               <CloseIcon className="size-5" />
             </IconButton>
-            <form
-              role="search"
-              onSubmit={(event) => {
-                event.preventDefault()
-                writeKeyword(draft.trim())
+            <SearchBar
+              appearance="soft"
+              inputRef={inputRef}
+              value={draft}
+              maxLength={50}
+              placeholder={{ mobile: PLACEHOLDER[type], desktop: PLACEHOLDER[type] }}
+              onChange={setDraft}
+              onSubmit={writeKeyword}
+              onEscape={close}
+              onClear={() => {
+                setDraft('')
+                if (keyword) writeKeyword('')
+                inputRef.current?.focus()
               }}
-              className="flex h-9 min-w-0 flex-1 items-center gap-2 rounded-full bg-neutral-100 px-3"
-            >
-              <SearchIcon className="size-4 shrink-0 text-neutral-700" />
-              <input
-                ref={inputRef}
-                type="text"
-                inputMode="search"
-                enterKeyHint="search"
-                autoComplete="off"
-                maxLength={50}
-                value={draft}
-                onChange={(event) => setDraft(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Escape') close()
-                }}
-                placeholder={PLACEHOLDER[type]}
-                aria-label={PLACEHOLDER[type]}
-                className="h-full w-full min-w-0 bg-transparent text-sm font-medium text-neutral-850 outline-none placeholder:text-neutral-400"
-              />
-              {draft && (
-                <IconButton
-                  tone="muted"
-                  size="xs"
-                  shape="circle"
-                  aria-label="검색어 지우기"
-                  onClick={() => {
-                    setDraft('')
-                    if (keyword) writeKeyword('')
-                    inputRef.current?.focus()
-                  }}
-                >
-                  <CloseIcon className="size-3.5" />
-                </IconButton>
-              )}
-            </form>
+              className="min-w-0 flex-1"
+            />
           </div>
         </div>
       )}

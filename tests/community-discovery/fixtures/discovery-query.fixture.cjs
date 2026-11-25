@@ -59,7 +59,7 @@ function renderDiscoveryQuery(config, query = 'media=map') {
         'InfiniteScrollTrigger',
         'ListState',
         'LoginPromptModal',
-        'NavigationBar',
+        'RootHeader',
         'SearchBar',
         'SortOptions',
       ].map((name) => [name, nothing]),
