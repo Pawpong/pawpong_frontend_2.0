@@ -8,6 +8,8 @@ import { IconButton } from './IconButton'
 
 interface NavigationBarProps {
   title: string
+  /** 하단 탭 루트 화면 (RootHeader 전용): 앱에서만 52px 높이·왼쪽 제목·뒤로가기 숨김, 웹은 가운데 제목 */
+  appRoot?: boolean
   /** 지정 시 mo 에서만 이 문구를 쓴다 (tab+ 는 title) */
   mobileTitle?: string
   /** 뒤로가기 링크 (없으면 화살표 미표시) */
@@ -42,8 +44,6 @@ const navigationTitle = tv({
       default: 'text-sm tab:text-base',
       /** 하단 네비로 오가는 최상위 화면 (마이홈·커뮤니티·명예의 전당·공지사항) */
       page: 'font-cafe24 text-lg text-neutral-850 tab:text-xl pc:text-2xl',
-      /** 로고 바를 대신하는 루트 탭 머리 (채팅) — 왼쪽 정렬 일반 볼드 제목, 뒤로가기 없이 쓴다 */
-      root: 'text-left text-lg font-bold text-neutral-850',
     },
   },
   defaultVariants: { variant: 'default' },
@@ -52,6 +52,7 @@ const navigationTitle = tv({
 /** 서브 페이지 상단바 (가운데 정렬 타이틀 + 옵션 뒤로가기/오른쪽 액션) — Figma node 976:25817 · 2046:160967 */
 const NavigationBar = ({
   title,
+  appRoot = false,
   mobileTitle,
   backHref,
   onBack,
@@ -72,23 +73,47 @@ const NavigationBar = ({
   return (
     // 화면 맨 위 제목 바(data-page-top) — 폭·여백은 페이지 틀이 정하고, 틀 위 여백 자리에 붙는다.
     // 틀 밖(띠 페이지)에서 쓸 때는 감싸는 쪽이 PageShell 로 여백을 준다.
-    <div data-page-top className={cn('flex items-center bg-white', BAR_HEIGHT[height], className)}>
+    <div
+      data-page-top
+      data-root-header={appRoot || undefined}
+      className={cn(
+        'flex items-center bg-white',
+        BAR_HEIGHT[height],
+        appRoot && 'in-data-app:h-13 in-data-app:py-0',
+        className,
+      )}
+    >
       <div className="flex min-w-0 flex-1 items-center">
         {onBack && (
-          <IconButton edge="both" onClick={onBack} aria-label={backLabel}>
-            {backIcon}
-          </IconButton>
+          <div className={cn(appRoot && 'in-data-app:hidden')}>
+            <IconButton edge="both" onClick={onBack} aria-label={backLabel}>
+              {backIcon}
+            </IconButton>
+          </div>
         )}
         {!onBack && backHref && (
           <Link
             href={backHref}
             aria-label={backLabel}
-            className="-m-2 flex size-10 shrink-0 items-center justify-center rounded-lg focus-ring transition-colors hover:bg-primary-50"
+            className={cn(
+              '-m-2 flex size-10 shrink-0 items-center justify-center rounded-lg focus-ring transition-colors hover:bg-primary-50',
+              appRoot && 'in-data-app:hidden',
+            )}
           >
             {backIcon}
           </Link>
         )}
-        <TextLabel className={cn(navigationTitle({ variant: titleVariant }), titleClassName)}>
+        {/* 웹 루트 화면에 뒤로가기가 없으면 오른쪽 아이콘(24px) 폭만큼 왼쪽을 채워 제목을 가운데로 */}
+        {appRoot && !hasBack && right && (
+          <div aria-hidden className="size-6 shrink-0 in-data-app:hidden" />
+        )}
+        <TextLabel
+          className={cn(
+            navigationTitle({ variant: titleVariant }),
+            appRoot && 'in-data-app:text-left',
+            titleClassName,
+          )}
+        >
           {mobileTitle ? (
             <>
               <span className="tab:hidden">{mobileTitle}</span>

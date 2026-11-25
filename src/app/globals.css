@@ -136,6 +136,10 @@
 .page-frame [data-page-top] {
   margin-bottom: var(--page-pad-top);
 }
+/* 하단 탭 루트 머리(RootHeader)는 바로 아래 검색창·목록과 한 덩어리라 바 밑 여백을 좁힌다 */
+.page-frame [data-page-top][data-root-header] {
+  margin-bottom: 0.5rem;
+}
 .page-frame [data-page-top] [data-page-top] {
   margin-bottom: 0;
 }

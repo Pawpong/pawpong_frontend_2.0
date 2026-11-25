@@ -20,7 +20,7 @@ import {
   InfiniteScrollTrigger,
   ListState,
   LoginPromptModal,
-  NavigationBar,
+  RootHeader,
   SearchBar,
   SortOptions,
 } from '@/shared/ui'
@@ -142,16 +142,15 @@ const CommunityContent = ({
 
   return (
     <>
-      <NavigationBar
+      <RootHeader
         title="커뮤니티"
-        titleVariant="page"
         onBack={goBack}
         right={
           <>
             {/* PC 는 사이드바 글쓰기 버튼이 맡는다 */}
             <div className="flex pc:hidden">
-              <IconButton tone="brand" aria-label="커뮤니티 글쓰기" onClick={writePost}>
-                <PlusIcon aria-hidden className="size-7.5" />
+              <IconButton tone="brand" edge="both" aria-label="커뮤니티 글쓰기" onClick={writePost}>
+                <PlusIcon aria-hidden className="size-6" />
               </IconButton>
             </div>
             {/* PC 에서 + 버튼이 빠진 자리를 뒤로가기 폭만큼 채워 제목을 가운데에 둔다 */}

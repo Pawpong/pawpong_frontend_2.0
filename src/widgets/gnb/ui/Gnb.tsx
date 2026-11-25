@@ -11,23 +11,19 @@ import { LogoButton } from './LogoButton'
 import { NavBar } from './NavBar'
 import { NotificationBell } from './NotificationBell'
 import { MobileMenu } from './MobileMenu'
-import { IconButton } from '@/shared/ui'
+import { RootHeader, IconButton } from '@/shared/ui'
 
 // 배경이 흰색이 아닌 화면에서는 헤더도 그 배경을 따라간다 (흰 띠가 떠 보이지 않게).
 // BottomNav 의 경로 목록과 같은 방식 — 페이지가 <main> 안에 있어 props 나 CSS 변수로는 닿지 않는다.
 // 분양글 작성(/adoption/create)과 수정(/adoption/:id/edit)은 같은 폼 화면이라 함께 칠한다.
 const TINTED_HEADER_PATTERN = /^\/adoption\/(create|[^/]+\/edit)$/
 
-// 자기 상단 바가 한 줄로 대신하는 화면은 모바일에서 로고 바를 겹쳐 두지 않는다.
-// - 남의 홈(/home/:id): 뒤로·이름·공유. 내 홈(/home)은 로고 바를 그대로 둔다
-// - 채팅(/chat): 하단 내비 루트 탭이라 '채팅' 제목·새 채팅·알림 한 줄 (방을 열면 방 헤더가 맡는다)
-// 2단(tab+)은 로고 바를 그대로 보인다
-const OWN_TOP_BAR_PATTERN = /^\/(home\/[^/]+|chat)$/
-
 const Gnb = () => {
   const [menuOpen, setMenuOpen] = useState(false)
   const pathname = useRoutePathname()
-  const hasOwnTopBar = OWN_TOP_BAR_PATTERN.test(pathname)
+  // 웹은 모든 화면에 로고 바를 둔다. 앱은 홈과 탐색(로고·알림·메뉴·검색)에서만 쓰고,
+  // 다른 화면은 각자 머리(RootHeader·공개 홈 상단 바·채팅방 헤더)가 맡는다
+  const hideAppHeader = pathname !== '/' && pathname !== '/explore'
 
   return (
     <>
@@ -36,13 +32,14 @@ const Gnb = () => {
       <header
         data-gnb
         className={cn(
-          'fixed inset-x-0 top-0 z-header h-12 w-full items-center justify-center tab:py-2 pc:h-16',
+          'fixed inset-x-0 top-0 z-header flex h-12 w-full items-center justify-center tab:py-2 pc:h-16',
           TINTED_HEADER_PATTERN.test(pathname) ? 'bg-point-50' : 'bg-white',
-          hasOwnTopBar ? 'hidden tab:flex' : 'flex',
+          hideAppHeader && 'in-data-app:hidden',
         )}
       >
         <div className="page-shell flex items-center justify-between">
           <LogoButton />
+
           {/* Figma 3349:1763537 — pc 는 nav·로그인·메뉴 아이콘 사이 20px.
               mo·tab 은 헤더가 좁아 12px 로 줄인다.
               비로그인은 nav 대신 로그인/회원가입 (Figma GNB '로그인' 상태) */}
@@ -76,8 +73,14 @@ const Gnb = () => {
           sticky 였을 때 iOS 앱에서 뒤로 돌아오면 헤더가 1~2프레임 사라졌다(fixed 는 시뮬레이터 9회 모두 0프레임, #640). */}
       <div
         aria-hidden
-        className={cn('h-12 shrink-0 pc:h-16', hasOwnTopBar && 'hidden tab:block')}
+        className={cn('h-12 shrink-0 pc:h-16', hideAppHeader && 'in-data-app:hidden')}
       />
+
+      {pathname === '/home' && (
+        <div className="hidden in-data-app:block">
+          <RootHeader title="마이" className="page-shell" />
+        </div>
+      )}
 
       <MobileMenu open={menuOpen} onOpenChange={setMenuOpen} />
       <AppBadgeSync />

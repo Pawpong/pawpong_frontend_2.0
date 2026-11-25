@@ -47,8 +47,8 @@ export function ChatUserSearch({
   return (
     <>
       {/* 커뮤니티 글쓰기와 같은 상단바 + 버튼 */}
-      <IconButton tone="brand" aria-label="새 채팅" onClick={() => changeOpen(true)}>
-        <PlusIcon aria-hidden className="size-7.5" />
+      <IconButton tone="brand" edge="both" aria-label="새 채팅" onClick={() => changeOpen(true)}>
+        <PlusIcon aria-hidden className="size-6" />
       </IconButton>
       <Dialog open={open} onOpenChange={changeOpen}>
         <DialogContent

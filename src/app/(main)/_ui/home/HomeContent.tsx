@@ -118,7 +118,7 @@ export function HomeContent({ initial }: { initial: InitialBanners | null }) {
             </p>
           </div>
           <div className="w-full tab:max-w-[25rem]">
-            <SearchBar />
+            <SearchBar appearance="outline" />
           </div>
         </div>
         <SpeciesLinks />
