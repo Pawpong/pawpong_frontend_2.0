@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect } from 'react'
+import { inNativeAppWebView } from './nativeBridge'
 
-type AppWindow = Window & { ReactNativeWebView?: unknown }
 const APP_VIEWPORT =
   'width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover'
 
@@ -11,7 +11,7 @@ export function NativeViewportBridge() {
   useEffect(() => {
     let cleanup: (() => void) | undefined
     const activate = () => {
-      if (cleanup || !(window as AppWindow).ReactNativeWebView) return
+      if (cleanup || !inNativeAppWebView()) return
       const root = document.documentElement
       const previousNativeViewport = root.getAttribute('data-native-viewport')
       root.setAttribute('data-native-viewport', '')
