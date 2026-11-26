@@ -32,12 +32,17 @@ const buttonStyles = tv({
       ghost:
         'text-action-dark hover:bg-action-subtle active:bg-action-subtle-press disabled:bg-transparent',
       link: 'text-action-link hover:text-action-link-hover disabled:bg-transparent',
+      // 도구 모음 글자 버튼 — 배경·여백 없이 hover 에 글자색만 바뀐다 (글쓰기 하단 사진·장소·AI 꾸미기·공개 범위)
+      bare: 'text-action-dark hover:text-brand disabled:bg-transparent',
       // 삭제·탈퇴·언팔로우처럼 되돌릴 수 없는 액션 — secondary 틀에 빨간 글자
       danger:
         'border-action-border bg-base-white text-danger hover:bg-action-subtle hover:text-danger-hover active:bg-action-subtle-press',
     },
     size: {
       // 줄간격 1.3 — text-body-* 가 1.5 를 같이 넣어서 뒤에 다시 지정한다
+      // 도구 모음처럼 한 줄에 버튼 여럿이 폰 폭에 들어가야 할 때 (글쓰기 하단 사진·장소·AI 꾸미기·공개 범위)
+      // 도구 버튼이라 굵게 두면 아래 올리기 버튼과 무게가 겹친다 — medium
+      xs: 'h-8 px-2 text-body-sm leading-[1.3] font-medium',
       sm: 'h-8 px-3 text-body-md leading-[1.3]',
       md: 'h-10 px-4 text-body-md leading-[1.3]',
       lg: 'h-12 px-5 text-body-lg leading-[1.3]',
@@ -46,7 +51,8 @@ const buttonStyles = tv({
     },
     width: BUTTON_WIDTH_CLASSES,
   },
-  compoundVariants: [{ intent: 'link', className: 'px-0' }],
+  // link·bare 는 배경이 없어 안쪽 여백도 두지 않는다 — 글자·아이콘이 옆 줄 내용의 끝에 그대로 맞는다
+  compoundVariants: [{ intent: ['link', 'bare'], className: 'px-0' }],
   // 기본 = 커뮤니티 글쓰기 버튼 (primary · h-48 · 16px)
   defaultVariants: { intent: 'primary', size: 'lg', width: 'auto' },
 })

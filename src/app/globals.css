@@ -149,12 +149,23 @@ html[data-app]:has([data-gnb][data-app-hidden]) {
 .page-frame [data-page-top] {
   margin-bottom: var(--page-pad-top);
 }
-/* 하단 탭 루트 머리(RootHeader)는 바로 아래 검색창·목록과 한 덩어리라 바 밑 여백을 좁힌다 */
-.page-frame [data-page-top][data-root-header] {
+/* 하단 탭 루트 머리(RootHeader)·글쓰기 바(gap="tight")는 바로 아래 내용과 한 덩어리라 바 밑 여백을 좁힌다 */
+.page-frame [data-page-top][data-root-header],
+.page-frame [data-page-top][data-gap='tight'] {
   margin-bottom: 0.5rem;
 }
 .page-frame [data-page-top] [data-page-top] {
   margin-bottom: 0;
+}
+/* PC 에서 숨긴 머리(pc:hidden)는 없는 것과 같으니 틀의 위 여백을 되살린다 */
+@media (min-width: 1440px) {
+  .page-frame:has([data-page-top].pc\:hidden) {
+    padding-top: var(--page-pad-top);
+  }
+}
+/* 화면 맨 아래 고정 바(data-page-bottom)가 있으면 틀의 아래 여백을 두지 않는다 — 바가 안전 영역까지 아래 여백을 갖는다 */
+.page-frame:has([data-page-bottom]) {
+  padding-bottom: 0;
 }
 
 /* 배경색이 있는 화면은 틀 바깥까지 같은 색으로 칠한다 — point: 분양글 작성·수정 */

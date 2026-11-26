@@ -39,6 +39,9 @@ const iconButtonStyles = tv({
       md: 'size-10',
       touch: 'size-11',
       lg: 'size-12',
+      // 아이콘 크기 그대로 — 둘레 여백이 없어 음수 여백 없이 옆 내용과 끝이 맞는다.
+      // 누르는 칸은 touch-target 이 터치 기기에서 44px 로 넓힌다
+      fit: '',
     },
   },
   compoundVariants: [

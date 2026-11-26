@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { COMMUNITY_MAX_ROUTE_POINTS } from '@/entities/community'
 import { SharedRouteMap } from '@/features/care-map'
 import {
@@ -16,7 +16,15 @@ import { CommunityPlaceSearch } from './CommunityPlaceSearch'
 import type { CarePlaceKind } from '@/entities/care-place'
 import { CommunityPhotoPlaces } from './CommunityPhotoPlaces'
 import { CommunityRoutePlaceItem } from './CommunityRoutePlaceItem'
-import { Button } from '@/shared/ui'
+import { Button, Checkbox, Chip } from '@/shared/ui'
+
+const PLACE_KINDS: { id: CarePlaceKind; label: string }[] = [
+  { id: 'travel', label: '공원·여행지' },
+  { id: 'cafe', label: '동반 카페' },
+  { id: 'stay', label: '동반 숙소' },
+  { id: 'hospital', label: '동물병원' },
+  { id: 'shelter', label: '보호소' },
+]
 
 /** 다녀온 장소 연결 — 작성자가 직접 고른 공개 장소만 방문 순서대로 담는다. */
 export function CommunityRoutePicker({
@@ -30,6 +38,7 @@ export function CommunityRoutePicker({
   disabled?: boolean
   photos?: CommunityPhotoLocationOption[]
 }) {
+  const id = useId()
   const [focusPoint, setFocusPoint] = useState<CommunityRoutePoint>()
   const [editingIndex, setEditingIndex] = useState<number | null>(null)
   const [placeKind, setPlaceKind] = useState<CarePlaceKind>(value.clinic ? 'hospital' : 'travel')
@@ -52,6 +61,42 @@ export function CommunityRoutePicker({
   }
   return (
     <div className="space-y-3">
+      <div
+        role="group"
+        aria-label="어떤 곳을 다녀왔나요?"
+        className="-mx-1 flex gap-2 overflow-x-auto p-1"
+      >
+        {PLACE_KINDS.map((kind) => (
+          <Chip
+            key={kind.id}
+            size="responsive"
+            selected={placeKind === kind.id}
+            disabled={disabled}
+            onClick={() => setPlaceKind(kind.id)}
+          >
+            {kind.label}
+          </Chip>
+        ))}
+      </div>
+      <CommunityPlaceSearch
+        key={placeKind}
+        kind={placeKind}
+        label="공개 장소를 찾아 담기"
+        disabled={disabled}
+        canPick={(place) => !full && place.latitude !== null && place.longitude !== null}
+        onPick={(place) => {
+          if (place.latitude === null || place.longitude === null) return
+          setFocusPoint({ name: place.name, latitude: place.latitude, longitude: place.longitude })
+          setRoute([
+            ...route,
+            {
+              name: place.name.slice(0, 60),
+              latitude: Number(place.latitude.toFixed(4)),
+              longitude: Number(place.longitude.toFixed(4)),
+            },
+          ])
+        }}
+      />
       <CommunityPhotoPlaces
         photos={photos}
         route={route}
@@ -98,44 +143,12 @@ export function CommunityRoutePicker({
         </p>
       )}
       <p className="text-xs leading-relaxed text-neutral-700">
-        다녀온 장소를 지도에서 누르고 방문한 순서대로 정리해요. 최대 {COMMUNITY_MAX_ROUTE_POINTS}
-        곳을 담을 수 있어요. 장소 사이의 선은 방문 순서를 이은 참고선이라 실제 걸은 길이나 거리, 길
-        안내가 아니에요.
+        <span className="font-semibold text-neutral-850">
+          담은 장소 {route.length}/{COMMUNITY_MAX_ROUTE_POINTS}
+        </span>{' '}
+        · 순서대로 경로가 이어져요. 선은 방문 순서를 이은 참고선이라 실제 걸은 길이나 길 안내가
+        아니에요.
       </p>
-      <label className="flex items-center justify-between gap-2 text-xs font-bold text-neutral-850">
-        어떤 곳을 다녀왔나요?
-        <select
-          value={placeKind}
-          disabled={disabled}
-          onChange={(event) => setPlaceKind(event.target.value as CarePlaceKind)}
-          className="min-h-11 rounded-lg border border-neutral-200 bg-white px-3 text-sm focus-ring"
-        >
-          <option value="travel">공원·여행지</option>
-          <option value="cafe">동반 카페</option>
-          <option value="stay">동반 숙소</option>
-          <option value="hospital">동물병원</option>
-          <option value="shelter">보호소</option>
-        </select>
-      </label>
-      <CommunityPlaceSearch
-        key={placeKind}
-        kind={placeKind}
-        label="공개 장소를 찾아 담기"
-        disabled={disabled}
-        canPick={(place) => !full && place.latitude !== null && place.longitude !== null}
-        onPick={(place) => {
-          if (place.latitude === null || place.longitude === null) return
-          setFocusPoint({ name: place.name, latitude: place.latitude, longitude: place.longitude })
-          setRoute([
-            ...route,
-            {
-              name: place.name.slice(0, 60),
-              latitude: Number(place.latitude.toFixed(4)),
-              longitude: Number(place.longitude.toFixed(4)),
-            },
-          ])
-        }}
-      />
       {undo && (
         <p role="status" className="rounded-lg bg-secondary-100 p-3 text-sm text-neutral-850">
           담은 장소 {undo.length}곳을 모두 뺐어요. 이 글에는 위치가 공유되지 않아요.
@@ -223,16 +236,21 @@ export function CommunityRoutePicker({
         </ol>
       )}
       {route.length > 0 && (
-        <label className="flex items-start gap-2 rounded-lg bg-white p-3 text-sm leading-relaxed">
-          <input
-            type="checkbox"
+        <div className="flex items-start gap-2 rounded-lg bg-white p-3">
+          <Checkbox
+            id={`${id}-public`}
+            size="medium"
             checked={value.publicPlaceConfirmed}
             disabled={disabled}
-            onChange={(event) => onChange({ route, publicPlaceConfirmed: event.target.checked })}
-            className="mt-1 size-4 shrink-0 accent-primary-700"
+            onCheckedChange={(checked) =>
+              onChange({ route, publicPlaceConfirmed: checked === true })
+            }
           />
-          집·개인 주소가 아닌 공개 장소이며, 글의 공개 범위에 따라 함께 보여진다는 것을 확인했어요.
-        </label>
+          <label htmlFor={`${id}-public`} className="pt-0.5 text-sm leading-relaxed">
+            집·개인 주소가 아닌 공개 장소이며, 글의 공개 범위에 따라 함께 보여진다는 것을
+            확인했어요.
+          </label>
+        </div>
       )}
     </div>
   )

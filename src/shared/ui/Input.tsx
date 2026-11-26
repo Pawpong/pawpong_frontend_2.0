@@ -2,9 +2,9 @@ import * as React from 'react'
 import { tv, type VariantProps } from '@/shared/lib/tv'
 import { cn } from '@/shared/lib/cn'
 
-// [refactored] 글쓰기 화면의 테두리 없는 입력(Input·Textarea composer)이 함께 쓴다 — 여백이 같아야 본문·태그 글자가 한 줄에서 시작한다
-const COMPOSER_FIELD =
-  'border-0 px-4 text-body-lg font-normal focus-visible:ring-2 focus-visible:ring-primary-200'
+// [refactored] 글쓰기 화면의 테두리 없는 입력(Input·Textarea composer)이 함께 쓴다.
+// 좌우 여백 없이 글자가 사진·도구 모음과 같은 왼쪽 끝에서 시작하고, 상자가 없으니 포커스 테두리도 두지 않는다 (깜빡이는 커서가 대신한다)
+const COMPOSER_FIELD = 'border-0 px-0 text-body-lg font-normal'
 
 const inputVariants = tv({
   base: 'flex h-10 w-full rounded-lg border bg-white p-3 text-[0.875rem] font-medium leading-[1.5] text-neutral-850 outline-none placeholder:text-neutral-500 focus:border-info-500 disabled:cursor-not-allowed disabled:border-neutral-200 disabled:bg-neutral-150 disabled:text-neutral-400',

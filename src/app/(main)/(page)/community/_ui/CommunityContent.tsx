@@ -142,20 +142,15 @@ const CommunityContent = ({
 
   return (
     <>
+      {/* PC 는 사이드바가 화면 이름·글쓰기를 맡아 머리를 두지 않는다 */}
       <RootHeader
         title="커뮤니티"
         onBack={goBack}
+        className="pc:hidden"
         right={
-          <>
-            {/* PC 는 사이드바 글쓰기 버튼이 맡는다 */}
-            <div className="flex pc:hidden">
-              <IconButton tone="brand" edge="both" aria-label="커뮤니티 글쓰기" onClick={writePost}>
-                <PlusIcon aria-hidden className="size-6" />
-              </IconButton>
-            </div>
-            {/* PC 에서 + 버튼이 빠진 자리를 뒤로가기 폭만큼 채워 제목을 가운데에 둔다 */}
-            <div aria-hidden className="hidden size-6 pc:block" />
-          </>
+          <IconButton tone="brand" edge="both" aria-label="커뮤니티 글쓰기" onClick={writePost}>
+            <PlusIcon aria-hidden className="size-6" />
+          </IconButton>
         }
       />
       <div>

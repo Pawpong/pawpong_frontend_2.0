@@ -1,18 +1,16 @@
 'use client'
 
-import { useState } from 'react'
 import {
+  COMMUNITY_MAX_ROUTE_POINTS,
   COMMUNITY_TEMPLATES,
-  CommunityPixelIcon,
   EMPTY_COMMUNITY_EXPERIENCE,
   isCommunityTemplateActive,
   type CommunityExperience,
-  type CommunityExperienceConfig,
 } from '@/entities/community'
 import type { CommunityPhotoLocationOption } from '@/features/community'
 import { CommunityRoutePicker } from './CommunityRoutePicker'
 import { CommunityTagField } from './CommunityTagField'
-import { Button } from '@/shared/ui'
+import { Badge, Button, Sheet } from '@/shared/ui'
 
 /** on: 올릴 때 자동으로 붙음 · consent: 동의하면 붙음 · off: 지금은 쓸 수 없음 */
 export type CommunityAutoTagging = 'on' | 'consent' | 'off'
@@ -32,85 +30,73 @@ const AUTO_TAG_COPY: Record<CommunityAutoTagging, { title: string; body: string 
   },
 }
 
-export function CommunityExperienceEditor({
+/**
+ * 다녀온 장소 연결 시트 (A2) — 하단 도구 모음 '장소'에서 화면을 떠나지 않고 연다.
+ * 장소 유형·검색·지도·담은 순서·공개 장소 확인은 CommunityRoutePicker 가 그대로 맡는다.
+ * 담은 장소는 바로 글에 반영되고, 아래 버튼은 시트를 닫기만 한다.
+ */
+export function CommunityPlaceSheet({
+  open,
+  onOpenChange,
   value,
   onChange,
   disabled,
   error,
   photos = [],
 }: {
+  open: boolean
+  onOpenChange: (open: boolean) => void
   value?: CommunityExperience | null
   onChange: (value: CommunityExperience) => void
-  config: CommunityExperienceConfig
   disabled: boolean
-  /** 저장하려면 마저 채워야 하는 기록 칸 안내 */
+  /** 저장하려면 마저 채워야 하는 칸 안내 (공개 장소 확인 등) */
   error?: string | null
   photos?: CommunityPhotoLocationOption[]
 }) {
   const current = value ?? EMPTY_COMMUNITY_EXPERIENCE
-  const update = (patch: Partial<CommunityExperience>) => onChange({ ...current, ...patch })
+  const count = current.route.length
   const wantsPlace = COMMUNITY_TEMPLATES.some(
     (template) =>
       ['walk', 'travel'].includes(template.key) && isCommunityTemplateActive(current, template),
   )
-  const [placeOpen, setPlaceOpen] = useState(current.route.length > 0)
-  const showPlace = placeOpen || current.route.length > 0 || photos.some((photo) => photo.location)
 
   return (
-    <fieldset disabled={disabled} className="min-w-0 space-y-4 border-t border-neutral-150 pt-4">
-      <legend className="sr-only">이야기 종류와 기록</legend>
-
-      <details open={current.route.length > 0 || undefined}>
-        <summary className="flex min-h-11 cursor-pointer items-center justify-between text-body-md font-medium focus-ring">
-          장소 추가 <span aria-hidden>＋</span>
-        </summary>
-        <div className="mt-3">
-          <section aria-label="다녀온 장소 연결">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <h3 className="flex items-center gap-2 text-sm font-bold text-neutral-850">
-                <CommunityPixelIcon name="travel" className="text-primary-500" />
-                다녀온 장소 연결 {current.route.length > 0 && `· ${current.route.length}곳`}
-              </h3>
-              {current.route.length === 0 && (
-                <Button
-                  intent="link"
-                  size="inline"
-                  aria-expanded={showPlace}
-                  onClick={() => setPlaceOpen(!placeOpen)}
-                >
-                  {showPlace ? '지도 접기' : '지도에서 담기'}
-                </Button>
-              )}
-            </div>
-            {showPlace ? (
-              <div className="mt-3">
-                <CommunityRoutePicker
-                  value={current}
-                  onChange={update}
-                  disabled={disabled}
-                  photos={photos}
-                />
-              </div>
-            ) : (
-              <p className="mt-1 text-xs leading-relaxed text-neutral-700">
-                {wantsPlace
-                  ? '다녀온 장소를 지도에 담으면 다른 보호자가 찾아가 보기 쉬워요. 사진 위치는 확인한 것만 담겨요.'
-                  : '함께 가 볼 만한 공개 장소가 있다면 지도에 담아 보세요.'}
-              </p>
-            )}
-          </section>
-        </div>
-      </details>
-      {error && current.route.length > 0 && (
-        <p role="status" className="text-body-sm text-primary-700">
-          {error}
+    <Sheet
+      open={open}
+      onOpenChange={onOpenChange}
+      title="다녀온 장소 연결"
+      badge={<Badge variant="primarySoft">최대 {COMMUNITY_MAX_ROUTE_POINTS}곳</Badge>}
+      footer={
+        <Button size="lg" width="full" onClick={() => onOpenChange(false)}>
+          완료
+        </Button>
+      }
+    >
+      <fieldset disabled={disabled} className="min-w-0 space-y-3">
+        <legend className="sr-only">다녀온 장소</legend>
+        {count === 0 && (
+          <p className="text-xs leading-relaxed text-neutral-700">
+            {wantsPlace
+              ? '다녀온 장소를 지도에 담으면 다른 보호자가 찾아가 보기 쉬워요. 사진 위치는 확인한 것만 담겨요.'
+              : '함께 가 볼 만한 공개 장소가 있다면 지도에 담아 보세요.'}
+          </p>
+        )}
+        <CommunityRoutePicker
+          value={current}
+          onChange={(patch) => onChange({ ...current, ...patch })}
+          disabled={disabled}
+          photos={photos}
+        />
+        {error && count > 0 && (
+          <p role="status" className="text-body-sm text-primary-700">
+            {error}
+          </p>
+        )}
+        <p className="text-xs leading-relaxed text-neutral-700">
+          보호자의 이름·전화번호·진료기록 같은 개인정보는 사진과 글에서 가려 주세요.
         </p>
-      )}
-
-      <p className="text-xs leading-relaxed text-neutral-700">
-        보호자의 이름·전화번호·진료기록 같은 개인정보는 사진과 글에서 가려 주세요.
-      </p>
-    </fieldset>
+      </fieldset>
+    </Sheet>
   )
 }
 

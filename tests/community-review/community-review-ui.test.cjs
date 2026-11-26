@@ -4,7 +4,21 @@ const { createElement } = require('react')
 const { renderToStaticMarkup } = require('react-dom/server')
 const { load, held, post, model } = require('./fixtures/community-review.fixture.cjs')
 const Link = ({ children, href }) => createElement('a', { href }, children)
-const consent = load('src/app/(main)/(page)/community/_ui/CommunityReviewConsent.tsx')
+const consent = load('src/app/(main)/(page)/community/_ui/CommunityReviewConsent.tsx', {
+  '@/shared/assets': { InfoLineIcon: () => null },
+  '@/shared/ui/Checkbox': {
+    Checkbox: ({ size: _size, onCheckedChange, ...props }) =>
+      createElement('input', {
+        type: 'checkbox',
+        onChange: (event) => onCheckedChange(event.target.checked),
+        ...props,
+      }),
+  },
+  '@/shared/ui/IconButton': {
+    IconButton: ({ size: _size, tone: _tone, ...props }) =>
+      createElement('button', { type: 'button', ...props }),
+  },
+})
 
 test('심사 동의 전 자동 카테고리 분류는 호출하지 않고 직접 선택은 유지함', () => {
   const flags = []

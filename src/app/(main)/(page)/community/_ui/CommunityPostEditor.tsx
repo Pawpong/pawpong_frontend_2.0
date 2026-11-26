@@ -1,10 +1,16 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { TicketLink } from '@/shared/ui/Ticket'
-import { PawPrintIcon } from '@/shared/assets'
+import {
+  ChevronDownIcon,
+  LocationLineIcon,
+  LocationOnIcon,
+  PawPrintIcon,
+  SparkleLineIcon,
+} from '@/shared/assets'
 import { useAuthStatus } from '@/shared/lib/useAuthStatus'
 import {
   communityQueries,
@@ -27,7 +33,7 @@ import {
   type CommunityExperience,
 } from '@/entities/community'
 import { CommunityCategoryField } from './CommunityCategoryField'
-import { CommunityExperienceEditor, CommunityEditorTags } from './CommunityExperienceEditor'
+import { CommunityPlaceSheet, CommunityEditorTags } from './CommunityExperienceEditor'
 import { profileQueries } from '@/entities/profile'
 import {
   takePendingCommunityPost,
@@ -49,7 +55,18 @@ import {
   useCommunityEditorConfig,
   useCommunityEditorNavigation,
 } from '@/features/community'
-import { RetryButton, NavigationBar } from '@/shared/ui'
+import {
+  Badge,
+  Button,
+  Chip,
+  RetryButton,
+  NavigationBar,
+  Sheet,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/shared/ui'
 import {
   usePostForm,
   PostFormLayout,
@@ -77,7 +94,7 @@ interface PostFormProps {
 
 // [refactored] postId 유무로 갈리던 문구를 모드별 룩업으로 한 곳에 모음
 const FORM_TEXT = {
-  create: { title: '글 작성', mobileTitle: '게시글 작성', submitLabel: '이야기 올리기' },
+  create: { title: '글 작성', mobileTitle: '게시글 작성', submitLabel: '작성하기' },
   edit: { title: '글 수정', mobileTitle: '게시글 수정', submitLabel: '수정 완료' },
 } as const
 
@@ -250,6 +267,27 @@ const PostForm = ({ postId, post, initialRecord, photoSource, returnTo }: PostFo
   const handleSubmit = () => save('published')
   const handleSaveDraft = () => save('draft')
 
+  // 화면을 떠나지 않고 그 자리에서 여는 것들 — 분류 펼침·장소 시트·AI 꾸미기 시트
+  const [classifyOpen, setClassifyOpen] = useState(false)
+  const classifyId = useId()
+  const [placeOpen, setPlaceOpen] = useState(false)
+  const [aiOpen, setAiOpen] = useState(false)
+  const busy = isSubmitting || form.isProcessingPhotos
+  const placePhotos = currentPhotos.map((photo, photoIndex) =>
+    typeof photo === 'string'
+      ? { photoIndex, previewUrl: form.images[photoIndex], saved: true }
+      : {
+          photoIndex,
+          previewUrl: form.images[photoIndex],
+          location: getCommunityPhotoLocation(photo),
+          takenAt: getCommunityPhotoTakenAt(photo),
+        },
+  )
+  const routeCount = experience?.route.length ?? 0
+  const locatedPhotoCount = placePhotos.filter(
+    (photo) => 'location' in photo && photo.location,
+  ).length
+
   return (
     <>
       <PostFormLayout
@@ -263,11 +301,9 @@ const PostForm = ({ postId, post, initialRecord, photoSource, returnTo }: PostFo
         error={error}
         onBack={navigation.close}
         cta={{
-          submitLabel: reviewEnabled
-            ? aiReviewConsent
-              ? '심사 후 이야기 올리기'
-              : '나만 확인하며 저장하기'
-            : formText.submitLabel,
+          // 공개 범위·동의에 따라 문구를 바꾸면 '전체 공개인데 나만 보기로 저장' 처럼 엇갈려 보여 하나로 둔다.
+          // 동의하지 않으면 공개가 보류된다는 안내는 동의 줄과 공개 범위 팝오버가 맡는다
+          submitLabel: formText.submitLabel,
           onSubmit: handleSubmit,
           isValid: canPublish,
           // 이미 발행된 글을 임시저장으로 되돌리지는 않는다 (작성 중 / 임시저장 이어쓰기에서만 노출)
@@ -276,28 +312,46 @@ const PostForm = ({ postId, post, initialRecord, photoSource, returnTo }: PostFo
           isSubmitting,
         }}
         beforeContent={
-          <div>
-            <PetCategorySuggestion
-              automaticAllowed={
-                !reviewConfig.isPending &&
-                !reviewConfig.isError &&
-                (!reviewEnabled || aiReviewConsent)
-              }
-              text={form.text}
-              photo={form.files[0]}
-              value={petType}
-              onChange={setPetType}
-              disabled={isSubmitting || form.isProcessingPhotos}
-            />
-            {experienceEnabled && experienceConfig.data && (
-              <CommunityCategoryField
-                error={experienceNotice}
-                value={experience}
-                onChange={setExperience}
-                config={experienceConfig.data}
-                disabled={isSubmitting || form.isProcessingPhotos}
+          // 게시판·주제는 'AI 자동 분류' 한 줄로 접어 두고 필요할 때만 편다.
+          // 접어도 자동 분류가 계속 돌도록 지우지 않고 숨기기만 한다
+          <div className="border-b border-neutral-150 pb-3">
+            <Chip
+              size="responsive"
+              selected={classifyOpen}
+              aria-expanded={classifyOpen}
+              aria-controls={classifyId}
+              onClick={() => setClassifyOpen(!classifyOpen)}
+            >
+              <PawPrintIcon aria-hidden className="size-3.5" />
+              {classifyOpen ? '직접 설정' : 'AI 자동 분류 · 직접 설정'}
+              <ChevronDownIcon
+                aria-hidden
+                className={classifyOpen ? 'size-4 rotate-180' : 'size-4'}
               />
-            )}
+            </Chip>
+            <div id={classifyId} hidden={!classifyOpen} className="mt-3">
+              <PetCategorySuggestion
+                automaticAllowed={
+                  !reviewConfig.isPending &&
+                  !reviewConfig.isError &&
+                  (!reviewEnabled || aiReviewConsent)
+                }
+                text={form.text}
+                photo={form.files[0]}
+                value={petType}
+                onChange={setPetType}
+                disabled={busy}
+              />
+              {experienceEnabled && experienceConfig.data && (
+                <CommunityCategoryField
+                  error={experienceNotice}
+                  value={experience}
+                  onChange={setExperience}
+                  config={experienceConfig.data}
+                  disabled={busy}
+                />
+              )}
+            </div>
           </div>
         }
         photoFooter={
@@ -329,77 +383,137 @@ const PostForm = ({ postId, post, initialRecord, photoSource, returnTo }: PostFo
                 )}
               </div>
             )}
-            {experienceEnabled && experienceConfig.data && (
-              <CommunityExperienceEditor
-                value={experience}
-                onChange={setExperience}
-                config={experienceConfig.data}
-                disabled={isSubmitting || form.isProcessingPhotos}
-                error={experienceNotice}
-                photos={currentPhotos.map((photo, photoIndex) =>
-                  typeof photo === 'string'
-                    ? { photoIndex, previewUrl: form.images[photoIndex], saved: true }
-                    : {
-                        photoIndex,
-                        previewUrl: form.images[photoIndex],
-                        location: getCommunityPhotoLocation(photo),
-                        takenAt: getCommunityPhotoTakenAt(photo),
-                      },
-                )}
-              />
-            )}
             {photoSource && !post && !handoff && form.images.length === 0 && (
               <CommunityPhotoRecovery source={photoSource} />
             )}
-            <details
-              className="group border-t border-neutral-150 py-4"
-              open={isMemoryCardHandoff || !!handoff || !!initialComparison || undefined}
-            >
-              <summary className="flex min-h-11 cursor-pointer items-center justify-between text-body-md font-medium focus-ring">
-                사진 꾸미기 · AI 사진 비교 <span aria-hidden>＋</span>
-              </summary>
-              <div className="mt-3 space-y-4">
-                {isMemoryCardHandoff ? (
-                  <p className="text-body-md text-neutral-700">완성한 추억 카드를 담았어요.</p>
-                ) : (
-                  <>
-                    <TicketLink
-                      href="/ai-filter"
-                      label="PLAY CARD"
-                      icon={<PawPrintIcon aria-hidden className="size-4" />}
-                      title={handoff ? 'AI 필터로 만든 사진을 담았어요' : 'AI 필터로 사진 꾸미기'}
-                      body="도트 그림·스티커·수채화로 꾸며보세요. 이동하기 전에 작성 중인 글을 임시저장해 주세요."
-                      cta={handoff ? '다른 필터로 다시 만들기' : 'AI 필터 열기'}
-                      size="sm"
-                    />
-                    <PostAiComparisonEditor
-                      editor={comparison}
-                      photos={currentPhotos}
-                      disabled={isSubmitting || form.isProcessingPhotos}
-                    />
-                  </>
-                )}
+            {/* 사진에서 위치를 찾았는데 아직 장소를 담지 않았으면 한 줄로 알린다 (A2) */}
+            {experienceEnabled && routeCount === 0 && locatedPhotoCount > 0 && (
+              <div>
+                <Button intent="secondary" size="sm" onClick={() => setPlaceOpen(true)}>
+                  <LocationOnIcon aria-hidden className="size-4 text-primary-500" />
+                  사진 촬영 위치 {locatedPhotoCount}곳 감지 · 장소에 담기
+                </Button>
               </div>
-            </details>
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-neutral-150 py-4">
-              <h3 className="mb-2 text-sm font-semibold">공개 범위</h3>
+            )}
+            {/* 분류를 접어 둔 채로 채울 칸이 남으면 올리기 전에 보이게 한다 */}
+            {experienceNotice && !classifyOpen && (
+              <p role="status" className="text-body-sm text-primary-700">
+                {experienceNotice}
+              </p>
+            )}
+          </div>
+        }
+        toolbar={
+          // 하단 도구 모음 — 각자 그 자리에서 시트·팝오버를 연다
+          <>
+            {experienceEnabled && experienceConfig.data && (
+              <Button
+                intent="bare"
+                size="xs"
+                onClick={() => setPlaceOpen(true)}
+                disabled={busy}
+                aria-haspopup="dialog"
+              >
+                <LocationLineIcon className="size-5 text-primary-500" />
+                장소
+                {routeCount > 0 && <Badge variant="pointCount">{routeCount}</Badge>}
+              </Button>
+            )}
+            <Button
+              intent="bare"
+              size="xs"
+              onClick={() => setAiOpen(true)}
+              disabled={busy}
+              aria-haspopup="dialog"
+            >
+              <SparkleLineIcon className="size-5 text-primary-500" />
+              AI 꾸미기
+            </Button>
+            <div className="ml-auto">
               <VisibilitySelect
                 value={visibility}
                 onChange={setVisibility}
                 disabled={isSubmitting}
+                note={
+                  reviewEnabled
+                    ? 'AI 처리에 동의하지 않으면 공개 범위와 상관없이 나만 볼 수 있게 저장돼요.'
+                    : undefined
+                }
               />
             </div>
-            {reviewEnabled && reviewConfig.data && (
-              <CommunityReviewConsent
-                config={reviewConfig.data}
-                consent={aiReviewConsent}
-                onChange={setAiReviewConsent}
-                disabled={isSubmitting || form.isProcessingPhotos}
-              />
-            )}
-          </div>
+          </>
+        }
+        confirm={
+          reviewEnabled &&
+          reviewConfig.data && (
+            <CommunityReviewConsent
+              config={reviewConfig.data}
+              consent={aiReviewConsent}
+              onChange={setAiReviewConsent}
+              disabled={busy}
+            />
+          )
         }
       />
+
+      {experienceEnabled && experienceConfig.data && (
+        <CommunityPlaceSheet
+          open={placeOpen}
+          onOpenChange={setPlaceOpen}
+          value={experience}
+          onChange={setExperience}
+          disabled={busy}
+          error={experienceNotice}
+          photos={placePhotos}
+        />
+      )}
+
+      {/* AI 꾸미기 (A3) — 비교·필터 두 탭, 바꾼 내용은 바로 글에 반영된다.
+          아래 버튼은 닫기만 하므로 '적용하기'가 아니라 '완료'라고 쓴다 (닫아도 되돌아가지 않는다) */}
+      <Sheet
+        open={aiOpen}
+        onOpenChange={setAiOpen}
+        title="AI 꾸미기"
+        footer={
+          <Button size="lg" width="full" onClick={() => setAiOpen(false)}>
+            완료
+          </Button>
+        }
+      >
+        {isMemoryCardHandoff ? (
+          <p className="text-body-md text-neutral-700">완성한 추억 카드를 담았어요.</p>
+        ) : (
+          <Tabs defaultValue="compare">
+            <TabsList variant="underline">
+              <TabsTrigger variant="underline" size="compact" value="compare">
+                비포·애프터 비교
+              </TabsTrigger>
+              <TabsTrigger variant="underline" size="compact" value="filter">
+                AI 필터 만들기
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="compare" className="pt-4">
+              {currentPhotos.length === 0 && !comparison.choice.enabled && (
+                <p className="text-body-md text-neutral-700">
+                  사진을 올리면 원본과 AI 결과를 나란히 비교해 공개할 수 있어요.
+                </p>
+              )}
+              <PostAiComparisonEditor editor={comparison} photos={currentPhotos} disabled={busy} />
+            </TabsContent>
+            <TabsContent value="filter" className="pt-4">
+              <TicketLink
+                href="/ai-filter"
+                label="PLAY CARD"
+                icon={<PawPrintIcon aria-hidden className="size-4" />}
+                title={handoff ? 'AI 필터로 만든 사진을 담았어요' : 'AI 필터로 사진 꾸미기'}
+                body="도트 그림·스티커·수채화로 꾸며보세요. 이동하기 전에 작성 중인 글을 임시저장해 주세요."
+                cta={handoff ? '다른 필터로 다시 만들기' : 'AI 필터 열기'}
+                size="sm"
+              />
+            </TabsContent>
+          </Tabs>
+        )}
+      </Sheet>
 
       <CommunityEditorExitDialog
         open={navigation.showGuard}

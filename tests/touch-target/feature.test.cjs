@@ -16,11 +16,10 @@ test('커뮤니티 알약 버튼은 공통 터치 영역을 씀', () => {
     assert.match(code, /touch-target/, file)
     assert.match(code, /\brelative\b/, file)
   }
-  // 지도 접기·담기 글자 버튼은 공통 Button 으로 옮겨 터치 영역을 Button 이 맡는다
-  assert.match(
-    read(`${ui}/CommunityExperienceEditor.tsx`),
-    /<Button\s+intent="link"\s+size="inline"/,
-  )
+  // 장소 연결 시트의 담기 버튼은 공통 Button 이 터치 영역을 맡는다 — 맨 button 을 새로 두지 않는다
+  const placeSheet = read(`${ui}/CommunityExperienceEditor.tsx`)
+  assert.match(placeSheet, /<Button\b/)
+  assert.doesNotMatch(placeSheet, /<button\b/)
 })
 
 test('가로 스크롤 줄은 터치 영역이 잘리지 않게 여유를 두되 바깥 배치는 그대로 둠', () => {

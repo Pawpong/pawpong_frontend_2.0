@@ -1,6 +1,6 @@
 import { createPageMetadata } from '@/shared/lib/metadata'
 
-import { CommunityPostEditor } from '../../../_ui/CommunityPostEditor'
+import { CommunityPostEditor } from '@/app/(main)/(page)/community/_ui/CommunityPostEditor'
 
 export const metadata = createPageMetadata({ title: '게시글 수정', noIndex: true })
 

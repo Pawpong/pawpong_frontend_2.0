@@ -130,7 +130,8 @@ export const SearchBar = ({
         tone="muted"
         size={isSoft ? 'xs' : 'sm'}
         type="submit"
-        aria-label="검색"
+        // 헤더의 검색 열기 돋보기("검색")와 구분되는 이름
+        aria-label="검색하기"
         //QA: 검색 아이콘 상태 — 평소에는 회색, 포커스 시 브랜드 색으로 함께 바뀐다.
       >
         <SearchIcon className={isSoft ? 'size-5' : 'size-6 tab:size-7 pc:size-8'} />

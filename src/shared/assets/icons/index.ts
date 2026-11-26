@@ -39,6 +39,7 @@ export { RankBadgeIcon } from './RankBadgeIcon'
 export { VoteIcon } from './VoteIcon'
 export { EmptyIllustration } from './EmptyIllustration'
 export { ProfileStarIcon, ReportFlagIcon } from './ProfileActionIcons'
+export { ImageLineIcon, InfoLineIcon, LocationLineIcon, SparkleLineIcon } from './ToolLineIcons'
 export { NavIconSvg } from './NavIconSvg'
 export { NAV_ICON_DATA, type NavIconData } from './navIconData'
 
