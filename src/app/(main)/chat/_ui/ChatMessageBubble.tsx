@@ -159,18 +159,20 @@ const ChatMessageBubble = ({
     )
   }
 
-  // 받은 메시지 (왼쪽 정렬, 회색 말풍선 + 프로필)
+  // 받은 메시지 (왼쪽 정렬, 흰 말풍선). 프로필은 말풍선 왼쪽에 붙이고 이름은 헤더에 맡긴다.
+  // 연속 메시지는 프로필 자리만큼 비워 말풍선 줄을 맞춘다.
   return (
-    <div className="flex w-full flex-col items-start gap-1.5">
-      {showProfile && (
-        <div className="flex items-center gap-2">
-          <ProfileAvatar src={senderProfileImageUrl} alt={`${senderName} 프로필`} size="small" />
-          <span className="text-sm leading-[1.5] font-semibold text-neutral-850">{senderName}</span>
+    <div className="flex w-full flex-col items-start gap-1">
+      <div className="flex max-w-[85%] items-start gap-2 pc:max-w-[26rem]">
+        <span className="w-8 shrink-0">
+          {showProfile && (
+            <ProfileAvatar src={senderProfileImageUrl} alt={`${senderName} 프로필`} size="small" />
+          )}
+        </span>
+        <div className="flex min-w-0 items-end gap-2">
+          <AttachmentBubble message={message} isMine={false} />
+          <RelativeTime dateStr={message.createdAt} className="text-neutral-500" />
         </div>
-      )}
-      <div className="flex max-w-[85%] items-end gap-2 pc:max-w-[26rem]">
-        <AttachmentBubble message={message} isMine={false} />
-        <RelativeTime dateStr={message.createdAt} className="text-neutral-500" />
       </div>
       {readMarker}
     </div>

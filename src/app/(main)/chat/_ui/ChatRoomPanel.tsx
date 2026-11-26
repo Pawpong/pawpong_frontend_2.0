@@ -13,7 +13,6 @@ import { findCounterpartReadIndex } from '../_lib/readMarker'
 import { isPinnedToBottom, shouldFollowNewMessage } from '../_lib/autoScroll'
 import { ChatRoomHeader } from './ChatRoomHeader'
 import { PetInfoCard } from './PetInfoCard'
-import { ChatNoticeBanner } from './ChatNoticeBanner'
 import { ChatMessageBubble } from './ChatMessageBubble'
 import { ChatMessageInput } from './ChatMessageInput'
 
@@ -41,7 +40,6 @@ const ChatRoomPanel = ({ room, currentUserId, onBack, onRoomClosed }: ChatRoomPa
   const pinnedToBottom = React.useRef(true)
   const paintedCount = React.useRef(0)
   const displayName = room.counterpart.nickname
-  const [showNotice, setShowNotice] = React.useState(true)
 
   // 상단 펫 카드 — room.petId(신청서 없이 분양글에서 바로 문의한 방)가 있으면 그걸 바로 쓰고,
   // 없으면(신청서 기반 구방) 신청 -> 펫 상세 순으로 조회해 채운다.
@@ -111,27 +109,12 @@ const ChatRoomPanel = ({ room, currentUserId, onBack, onRoomClosed }: ChatRoomPa
       {/* Pet Info Card */}
       {petQuery.data && <PetInfoCard detail={petQuery.data} />}
 
-      {/* 모바일 알림 — 펫 카드 바로 아래, 나머지 화면과 같은 가로 여백 + 둥근 카드로 노출한다. */}
-      {showNotice && (
-        <div className={cn(CHAT_GUTTER_X, 'pt-3 pc:hidden')}>
-          <ChatNoticeBanner onClose={() => setShowNotice(false)} className="rounded-lg" />
-        </div>
-      )}
-
-      {/* PC 알림은 Figma chatting-room 영역 안에서 대화 목록과 스크롤 면을 공유한다. */}
       <div
         ref={scrollRef}
         onScroll={handleScroll}
         className={cn('flex-1 overflow-y-auto py-5 tab:py-7', CHAT_GUTTER_X)}
       >
         <div className={cn(CHAT_CONTENT_WIDTH, 'flex flex-col gap-6')}>
-          {showNotice && (
-            <ChatNoticeBanner
-              onClose={() => setShowNotice(false)}
-              className="hidden rounded-lg pc:flex"
-            />
-          )}
-
           <div className="flex flex-col gap-2.5">
             {isLoading ? (
               <p className="py-10 text-center text-sm text-neutral-700">
