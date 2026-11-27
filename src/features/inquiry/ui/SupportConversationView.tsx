@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { PawPrintIcon } from '@/shared/assets'
-import { Button } from '@/shared/ui'
+import { Button, ChatBubble } from '@/shared/ui'
 import type { SupportSession } from '../model/supportChatController'
 import type { SUPPORT_TOPICS } from '../model/supportTopics'
 
@@ -57,9 +57,9 @@ export function SupportConversationView({
         <div className="flex items-center gap-2 text-xs font-semibold text-primary-700">
           <PawPrintIcon aria-hidden className="size-5" /> 포퐁 AI
         </div>
-        <p className="max-w-[92%] rounded-xl rounded-tl-none border border-primary-100 bg-white p-3 text-sm leading-relaxed text-neutral-850">
-          {topic.greeting}
-        </p>
+        <div className="max-w-[92%]">
+          <ChatBubble side="other">{topic.greeting}</ChatBubble>
+        </div>
         {messages.length === 0 && !pendingTurn && (
           <div className="flex flex-wrap gap-2" aria-label="질문 예시">
             {topic.suggestions.map((suggestion) => (
@@ -85,11 +85,9 @@ export function SupportConversationView({
               >
                 {message.role === 'user' ? '나' : '포퐁 AI'}
               </p>
-              <p
-                className={`rounded-xl p-3 text-sm leading-relaxed break-words whitespace-pre-wrap ${message.role === 'user' ? 'rounded-tr-none bg-point-500 text-neutral-850' : 'rounded-tl-none border border-primary-100 bg-white text-neutral-850'}`}
-              >
+              <ChatBubble side={message.role === 'user' ? 'mine' : 'other'}>
                 {message.content}
-              </p>
+              </ChatBubble>
               {message.role === 'assistant' &&
                 index === messages.length - 1 &&
                 !!conversation?.sources.length && (
@@ -122,9 +120,9 @@ export function SupportConversationView({
         {pendingTurn && (
           <div className="ml-auto max-w-[88%]">
             <p className="mb-1 text-right text-xs font-semibold text-neutral-700">나</p>
-            <p className="rounded-xl rounded-tr-none border border-primary-100 bg-point-100 p-3 text-sm leading-relaxed break-words whitespace-pre-wrap">
+            <ChatBubble side="mine" pending>
               {pendingTurn.message}
-            </p>
+            </ChatBubble>
             <p className="mt-1 text-right text-xs text-neutral-700">
               {phase === 'sending' ? '답변을 기다리고 있어요' : '전송 결과 확인이 필요해요'}
             </p>

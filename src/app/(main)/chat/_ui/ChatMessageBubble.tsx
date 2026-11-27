@@ -1,4 +1,4 @@
-import { ProfileAvatar } from '@/shared/ui'
+import { ChatBubble, ProfileAvatar } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { optimizedImageUrl } from '@/shared/lib/optimizedImageUrl'
 import { FileIcon, LocationPinIcon } from '@/shared/assets'
@@ -34,28 +34,13 @@ const ReadMarker = ({
   </span>
 )
 
-// [refactored] 내 것은 노랑, 상대 것은 흰 바탕 — 말풍선·위치·사진·파일이 같은 색 조합을 쓴다
+// [refactored] 내 것은 노랑, 상대 것은 흰 바탕 — 위치·사진·파일 카드가 글 말풍선(shared ChatBubble)과 같은 색 조합을 쓴다
 const surface = (isMine: boolean) =>
   isMine ? 'border-point-500 bg-point-500' : 'border-neutral-150 bg-white'
 
 // [refactored] 위치·파일 카드의 공통 모양 — 기본 224px, 좁은 폰에서는 줄어든다
 const CARD =
   'flex w-56 min-w-0 items-center gap-3 rounded-2xl border px-4 py-3 shadow-[0_1px_2px_rgba(55,55,55,0.04)]'
-
-const Bubble = ({ content, isMine }: { content: string; isMine: boolean }) => (
-  <div
-    className={cn(
-      'min-w-0 rounded-2xl px-3.5 py-2.5 pc:px-4 pc:py-3',
-      surface(isMine),
-      // 글 말풍선은 받은 쪽만 테두리를 그린다 (노란 말풍선은 테두리 없이 면만)
-      isMine ? 'rounded-br-md' : 'rounded-bl-md border',
-    )}
-  >
-    <p className="text-sm leading-[1.5] font-medium break-words whitespace-pre-wrap text-neutral-850 pc:text-base">
-      {content}
-    </p>
-  </div>
-)
 
 const AttachmentBubble = ({
   message,
@@ -65,7 +50,8 @@ const AttachmentBubble = ({
   isMine: boolean
 }) => {
   const attachment = parseChatAttachment(message.content, message.messageType)
-  if (!attachment) return <Bubble content={message.content} isMine={isMine} />
+  if (!attachment)
+    return <ChatBubble side={isMine ? 'mine' : 'other'}>{message.content}</ChatBubble>
 
   if (attachment.kind === 'location') {
     return (
