@@ -112,7 +112,9 @@ const ChatRoomPanel = ({ room, currentUserId, onBack, onRoomClosed }: ChatRoomPa
       <div
         ref={scrollRef}
         onScroll={handleScroll}
-        className={cn('flex-1 overflow-y-auto py-5 tab:py-7', CHAT_GUTTER_X)}
+        // relative: 안쪽 sr-only(읽음 표시 문장) 같은 absolute 요소의 기준을 이 스크롤 상자로 잡는다.
+        // 없으면 기준이 body 가 돼 스크롤 상자에 잘리지 않고, 메시지 길이만큼 문서가 늘어나 화면 아래가 빈다
+        className={cn('relative flex-1 overflow-y-auto py-5 tab:py-7', CHAT_GUTTER_X)}
       >
         <div className={cn(CHAT_CONTENT_WIDTH, 'flex flex-col gap-6')}>
           <div className="flex flex-col gap-2.5">
