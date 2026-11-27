@@ -163,13 +163,14 @@ const ChatMessageBubble = ({
   // 연속 메시지는 프로필 자리만큼 비워 말풍선 줄을 맞춘다.
   return (
     <div className="flex w-full flex-col items-start gap-1">
-      <div className="flex max-w-[85%] items-start gap-2 pc:max-w-[26rem]">
+      <div className="flex w-full items-start gap-2">
         <span className="w-8 shrink-0">
           {showProfile && (
             <ProfileAvatar src={senderProfileImageUrl} alt={`${senderName} 프로필`} size="small" />
           )}
         </span>
-        <div className="flex min-w-0 items-end gap-2">
+        {/* 폭 제한은 말풍선·시간 묶음에만 건다 — 프로필 자리까지 포함하면 작은 폰에서 위치·파일 카드(최소 224px)가 넘친다 */}
+        <div className="flex max-w-[85%] min-w-0 items-end gap-2 pc:max-w-[26rem]">
           <AttachmentBubble message={message} isMine={false} />
           <RelativeTime dateStr={message.createdAt} className="text-neutral-500" />
         </div>
