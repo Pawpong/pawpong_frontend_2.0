@@ -36,7 +36,7 @@ const ChatAttachMenu = ({ disabled, onSelectFile, onSelectLocation }: ChatAttach
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <IconButton tone="brandSoft" aria-label="첨부" disabled={disabled}>
+          <IconButton tone="primary" aria-label="첨부" disabled={disabled}>
             <PlusIcon className="size-5" />
           </IconButton>
         </DropdownMenuTrigger>

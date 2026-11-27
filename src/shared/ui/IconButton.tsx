@@ -20,7 +20,9 @@ const iconButtonStyles = tv({
       neutral: 'text-action-dark hover:bg-action-subtle',
       muted: 'text-action-muted-fg hover:bg-action-subtle hover:text-action-dark',
       brand: 'text-brand hover:bg-brand-subtle hover:text-brand-hover',
-      brandSoft: 'bg-brand-subtle text-brand hover:text-brand-hover',
+      // 버튼 노랑(Button primary 와 같은 action-primary #fff0af) 위에 브랜드색 아이콘 — 채팅 첨부
+      primary:
+        'bg-action-primary text-brand hover:bg-action-primary-hover active:bg-action-primary-press',
       danger: 'text-action-muted-fg hover:bg-action-subtle hover:text-danger',
       // 사진 위에 얹는 버튼
       overlay: 'bg-action-dark/60 text-base-white hover:bg-action-dark/80',
