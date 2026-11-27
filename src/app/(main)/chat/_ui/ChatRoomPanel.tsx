@@ -11,6 +11,7 @@ import type { ChatRoomResponseDto } from '@/shared/types'
 import { CHAT_CONTENT_WIDTH, CHAT_GUTTER_X, CHAT_PANEL_HEIGHT } from '../_lib/constants'
 import { findCounterpartReadIndex } from '../_lib/readMarker'
 import { isPinnedToBottom, shouldFollowNewMessage } from '../_lib/autoScroll'
+import { formatChatDayLabel, startsNewChatDay } from '../_lib/utils'
 import { ChatRoomHeader } from './ChatRoomHeader'
 import { PetInfoCard } from './PetInfoCard'
 import { ChatMessageBubble } from './ChatMessageBubble'
@@ -128,18 +129,29 @@ const ChatRoomPanel = ({ room, currentUserId, onBack, onRoomClosed }: ChatRoomPa
                 <RetryButton onRetry={() => void refetch()} isRetrying={isRetrying} />
               </div>
             ) : (
-              messages.map((msg, idx) => (
-                <ChatMessageBubble
-                  key={msg.messageId}
-                  message={msg}
-                  isMine={msg.isMine}
-                  senderName={displayName}
-                  senderProfileImageUrl={room.counterpart.profileImageUrl}
-                  // 상대 메시지가 연속되면 첫 말풍선에만 프로필을 노출한다.
-                  showProfile={!msg.isMine && messages[idx - 1]?.isMine !== false}
-                  readByCounterpart={idx === counterpartReadIndex}
-                />
-              ))
+              messages.map((msg, idx) => {
+                const previous = messages[idx - 1]
+                // 카카오톡처럼 날이 바뀌면 그 사이에 날짜 구분선을 넣는다
+                const newDay = startsNewChatDay(msg.createdAt, previous?.createdAt)
+                return (
+                  <React.Fragment key={msg.messageId}>
+                    {newDay && (
+                      <p className="my-2 self-center rounded-full bg-white px-3 py-1 text-xs leading-[1.5] font-medium text-neutral-700">
+                        {formatChatDayLabel(msg.createdAt)}
+                      </p>
+                    )}
+                    <ChatMessageBubble
+                      message={msg}
+                      isMine={msg.isMine}
+                      senderName={displayName}
+                      senderProfileImageUrl={room.counterpart.profileImageUrl}
+                      // 상대 메시지가 연속되면 첫 말풍선에만 프로필을 노출한다. 날이 바뀌면 다시 보인다.
+                      showProfile={!msg.isMine && (newDay || previous?.isMine !== false)}
+                      readByCounterpart={idx === counterpartReadIndex}
+                    />
+                  </React.Fragment>
+                )
+              })
             )}
           </div>
         </div>

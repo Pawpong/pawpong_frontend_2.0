@@ -8,7 +8,7 @@ import { getChatMessagePreview } from '../_lib/attachment'
 import { isAdoptionRoom, isGeneralRoom } from '../_lib/constants'
 import { useChatRoomActions } from './ChatRoomActionsMenu'
 import { formatChatListTime } from '../_lib/utils'
-import { RelativeTime } from './RelativeTime'
+import { ChatTime } from './ChatTime'
 
 interface ChatRoomItemProps {
   room: ChatRoomResponseDto
@@ -84,7 +84,7 @@ const ChatRoomItem = ({
                 <Badge variant="primarySoft" className="shrink-0">
                   {roomType}
                 </Badge>
-                <RelativeTime
+                <ChatTime
                   dateStr={room.lastMessageAt}
                   format={formatChatListTime}
                   className="ml-auto shrink-0 text-neutral-700"

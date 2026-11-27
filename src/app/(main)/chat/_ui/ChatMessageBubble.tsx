@@ -4,7 +4,8 @@ import { optimizedImageUrl } from '@/shared/lib/optimizedImageUrl'
 import { FileIcon, LocationPinIcon } from '@/shared/assets'
 import type { ChatMessageResponseDto } from '@/shared/types'
 import { formatFileSize, getLocationMapUrl, parseChatAttachment } from '../_lib/attachment'
-import { RelativeTime } from './RelativeTime'
+import { formatChatMessageTime } from '../_lib/utils'
+import { ChatTime } from './ChatTime'
 
 interface ChatMessageBubbleProps {
   message: ChatMessageResponseDto
@@ -151,7 +152,11 @@ const ChatMessageBubble = ({
     return (
       <div className="flex w-full flex-col items-end gap-1">
         <div className="flex max-w-[85%] items-end gap-2 pc:max-w-[26rem]">
-          <RelativeTime dateStr={message.createdAt} className="text-neutral-500" />
+          <ChatTime
+            dateStr={message.createdAt}
+            format={formatChatMessageTime}
+            className="text-neutral-500"
+          />
           <AttachmentBubble message={message} isMine />
         </div>
         {readMarker}
@@ -172,7 +177,11 @@ const ChatMessageBubble = ({
         {/* 폭 제한은 말풍선·시간 묶음에만 건다 — 프로필 자리까지 포함하면 작은 폰에서 위치·파일 카드(최소 224px)가 넘친다 */}
         <div className="flex max-w-[85%] min-w-0 items-end gap-2 pc:max-w-[26rem]">
           <AttachmentBubble message={message} isMine={false} />
-          <RelativeTime dateStr={message.createdAt} className="text-neutral-500" />
+          <ChatTime
+            dateStr={message.createdAt}
+            format={formatChatMessageTime}
+            className="text-neutral-500"
+          />
         </div>
       </div>
       {readMarker}
