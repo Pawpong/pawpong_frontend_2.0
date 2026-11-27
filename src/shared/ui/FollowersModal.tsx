@@ -114,7 +114,7 @@ const FollowersModal = ({
             // 설명 텍스트가 없는 모달 — Radix의 aria-describedby 누락 경고를 명시적으로 끔
             aria-describedby={undefined}
             onOpenAutoFocus={(e) => e.preventDefault()}
-            className="fixed inset-0 z-modal flex h-full w-full flex-col overflow-hidden bg-white pc:inset-auto pc:top-1/2 pc:left-1/2 pc:h-[min(40.875rem,90vh)] pc:w-[min(46.0625rem,calc(100vw-2rem))] pc:-translate-x-1/2 pc:-translate-y-1/2 pc:rounded-[1.25rem] pc:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]"
+            className="fixed inset-0 z-modal flex h-full w-full flex-col overflow-hidden bg-white lap:inset-auto lap:top-1/2 lap:left-1/2 lap:h-[min(40.875rem,90vh)] lap:w-[min(46.0625rem,calc(100vw-2rem))] lap:-translate-x-1/2 lap:-translate-y-1/2 lap:rounded-[1.25rem] lap:shadow-[0_7px_7px_0_rgba(55,55,55,0.1)]"
           >
             <DialogPrimitive.Title className="sr-only">
               {isMutual ? '함께 팔로우하는 사람' : '팔로워·팔로잉 목록'}
@@ -125,11 +125,11 @@ const FollowersModal = ({
               title={isMutual ? '함께 팔로우하는 사람' : '친구 목록'}
               onBack={() => onOpenChange(false)}
               // 상단 여백 — Figma header 영역 (모바일 48px / 탭 64px). 좌우는 아래 목록과 같은 모달 안쪽 여백
-              className="mt-12 shrink-0 px-4 tab:mt-16 tab:px-12 pc:hidden"
+              className="mt-12 shrink-0 px-4 tab:mt-16 tab:px-12 lap:hidden"
             />
 
             {/* pc: 닫기 */}
-            <div className="hidden h-12 shrink-0 items-center justify-end px-6 py-3 pc:flex">
+            <div className="hidden h-12 shrink-0 items-center justify-end px-6 py-3 lap:flex">
               <DialogClose aria-label="닫기">
                 <CloseIcon className="size-6 text-neutral-850" />
               </DialogClose>
@@ -154,11 +154,11 @@ const FollowersModal = ({
                     onClick={() => setTab(value)}
                     className={cn(
                       // 모바일·탭: 한 줄(라벨 개수) / pc: 라벨 위, 개수 아래
-                      'flex flex-1 items-center justify-center gap-1 p-3 focus-ring-inset pc:flex-col pc:gap-0 pc:py-2',
+                      'flex flex-1 items-center justify-center gap-1 p-3 focus-ring-inset lap:flex-col lap:gap-0 lap:py-2',
                       active && 'border-b border-neutral-850',
                     )}
                   >
-                    <span className={cn(textClass, 'pc:text-base')}>{label}</span>
+                    <span className={cn(textClass, 'lap:text-base')}>{label}</span>
                     {!isMutual && <span className={textClass}>{LISTS[value].count}</span>}
                   </button>
                 )
@@ -166,7 +166,7 @@ const FollowersModal = ({
             </div>
 
             {/* 목록 */}
-            <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-4 py-5 tab:px-12 pc:py-8">
+            <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-4 py-5 tab:px-12 lap:py-8">
               {users.map((user) => (
                 <div key={user.id} className="flex w-full items-center gap-3">
                   <div className="flex min-w-0 flex-1 items-center gap-2">

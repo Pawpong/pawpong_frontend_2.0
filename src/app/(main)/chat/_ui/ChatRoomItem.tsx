@@ -61,7 +61,7 @@ const ChatRoomItem = ({
       >
         <div
           className={cn(
-            'flex items-center transition-colors hover:bg-primary-50 pc:rounded-xl pc:px-3',
+            'flex items-center transition-colors hover:bg-primary-50 lap:rounded-xl lap:px-3',
             isActive && 'bg-point-50 hover:bg-point-50',
           )}
         >

@@ -25,7 +25,7 @@ test('커뮤니티 알약 버튼은 공통 터치 영역을 씀', () => {
 test('가로 스크롤 줄은 터치 영역이 잘리지 않게 여유를 두되 바깥 배치는 그대로 둠', () => {
   const discovery = read(`${ui}/CommunityDiscovery.tsx`)
   // 동물 타일 줄은 포커스 테두리가 잘리지 않게 띠 안쪽 여유(p-1.5)를 둔다 — PC 는 사이드바가 맡는다
-  assert.match(discovery, /grid grid-cols-4 gap-0\.5 bg-secondary-50 p-1\.5 pc:hidden/)
+  assert.match(discovery, /grid grid-cols-4 gap-0\.5 bg-secondary-50 p-1\.5 lap:hidden/)
   // 띠 안 카테고리(윗줄)·말머리(아랫줄) 탭은 모두 공통 터치 영역을 쓴다
   assert.match(
     discovery,

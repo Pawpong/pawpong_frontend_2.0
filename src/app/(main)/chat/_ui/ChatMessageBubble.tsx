@@ -71,7 +71,7 @@ const AttachmentBubble = ({
           <LocationPinIcon className="size-7 text-primary-500" />
         </span>
         <span className="min-w-0">
-          <span className="block text-sm font-semibold text-neutral-850 pc:text-base">
+          <span className="block text-sm font-semibold text-neutral-850 lap:text-base">
             공유한 위치
           </span>
           <span className="block text-xs font-medium text-neutral-700">지도에서 확인하기</span>
@@ -114,7 +114,7 @@ const AttachmentBubble = ({
     >
       <FileIcon className="size-8 shrink-0 text-neutral-850" />
       <span className="min-w-0">
-        <span className="block truncate text-sm font-semibold text-neutral-850 pc:text-base">
+        <span className="block truncate text-sm font-semibold text-neutral-850 lap:text-base">
           {attachment.name}
         </span>
         {attachment.size > 0 && (
@@ -149,7 +149,7 @@ const ChatMessageBubble = ({
   if (message.isMine) {
     return (
       <div className="flex w-full flex-col items-end gap-1">
-        <div className="flex max-w-[85%] items-end gap-2 pc:max-w-[26rem]">
+        <div className="flex max-w-[85%] items-end gap-2 lap:max-w-[26rem]">
           {time}
           <AttachmentBubble message={message} isMine />
         </div>
@@ -169,7 +169,7 @@ const ChatMessageBubble = ({
           )}
         </span>
         {/* 폭 제한은 말풍선·시간 묶음에만 건다 — 프로필 자리까지 포함하면 작은 폰에서 위치·파일 카드(최소 224px)가 넘친다 */}
-        <div className="flex max-w-[85%] min-w-0 items-end gap-2 pc:max-w-[26rem]">
+        <div className="flex max-w-[85%] min-w-0 items-end gap-2 lap:max-w-[26rem]">
           <AttachmentBubble message={message} isMine={false} />
           {time}
         </div>

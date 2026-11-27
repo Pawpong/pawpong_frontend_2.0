@@ -79,7 +79,7 @@ const ChatRoomFilterableList = ({
         <div
           className={cn(
             // [refactored] 검색·필터는 고정, 방 목록만 스크롤 — 목록 화면·사이드바가 같다
-            'flex-1 divide-y divide-neutral-150 overflow-y-auto bg-white pc:space-y-1 pc:divide-y-0',
+            'flex-1 divide-y divide-neutral-150 overflow-y-auto bg-white lap:space-y-1 lap:divide-y-0',
             gutterClassName,
           )}
         >

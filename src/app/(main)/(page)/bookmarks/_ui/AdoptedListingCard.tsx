@@ -43,7 +43,7 @@ const CardImage = ({
         role="img"
         aria-label={`${listing.name} 이미지 없음`}
       >
-        <PawPrintIcon className="size-9 pc:size-11" />
+        <PawPrintIcon className="size-9 lap:size-11" />
       </div>
     )}
     {isCompleted && <div className="absolute inset-0 bg-white/70" />}
@@ -87,7 +87,7 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
       <button
         type="button"
         onClick={() => setModalOpen(true)}
-        className="mx-auto flex w-full max-w-[37.5rem] items-center gap-4 rounded-lg bg-neutral-50 p-2 text-left focus-ring pc:hidden"
+        className="mx-auto flex w-full max-w-[37.5rem] items-center gap-4 rounded-lg bg-neutral-50 p-2 text-left focus-ring lap:hidden"
       >
         {/* [refactored] CardImage — 110×110 rounded-4 */}
         <CardImage
@@ -112,7 +112,7 @@ const AdoptedListingCard = ({ listing }: AdoptedListingCardProps) => {
 
       {/* PC 카드 (Figma 797-87156 · Card2 large) — pc 전용. bg #f6f6f6, 이미지 280×210, 제목+상태배지/설명 3줄, stats + 대화중인 채팅
           카드 고정폭 920px 중앙정렬 (콘텐츠 폭이 더 넓으면 좌우 여백) */}
-      <div className="mx-auto hidden w-full max-w-[57.5rem] gap-7 rounded-lg bg-neutral-50 px-5 py-3 pc:flex pc:items-center">
+      <div className="mx-auto hidden w-full max-w-[57.5rem] gap-7 rounded-lg bg-neutral-50 px-5 py-3 lap:flex lap:items-center">
         {/* [refactored] CardImage — 280×210 rounded-8 */}
         <CardImage
           listing={listing}

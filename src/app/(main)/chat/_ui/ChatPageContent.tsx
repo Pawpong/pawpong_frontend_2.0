@@ -32,7 +32,7 @@ const ChatPageContent = () => {
   const queryClient = useQueryClient()
   const searchParams = useSearchParams()
   const activeRoomId = searchParams.get('roomId')
-  const isPC = useBreakpoint('pc')
+  const isPC = useBreakpoint('lap')
   // activeRoomId로 방을 찾기 위한 캐시 구독만 한다. 폴링은 useChatRoomFilter가 담당.
   const roomsQuery = useQuery({
     ...chatQueries.rooms(),

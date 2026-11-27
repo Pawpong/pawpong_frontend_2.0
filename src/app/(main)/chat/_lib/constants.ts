@@ -40,10 +40,10 @@ const CHAT_PANEL_HEIGHT = 'h-[calc(100dvh-var(--header-h))]'
 // 채팅 목록 화면은 하단 내비(모바일·태블릿 3.5rem + 노치)가 있어 그만큼 더 비켜야 한다.
 // PC 는 하단 내비가 없으므로 헤더만 뺀다.
 const CHAT_LIST_HEIGHT =
-  'h-[calc(100dvh-var(--header-h)-3.5rem-env(safe-area-inset-bottom))] pc:h-[calc(100dvh-var(--header-h))]'
+  'h-[calc(100dvh-var(--header-h)-3.5rem-env(safe-area-inset-bottom))] lap:h-[calc(100dvh-var(--header-h))]'
 
 // [refactored] 콘텐츠 폭 — 태블릿 이하는 꽉 채우고, PC에서만 880px 가운데 정렬
-const CHAT_CONTENT_WIDTH = 'mx-auto w-full pc:max-w-[55rem]'
+const CHAT_CONTENT_WIDTH = 'mx-auto w-full lap:max-w-[55rem]'
 
 export {
   FILTER_TABS,

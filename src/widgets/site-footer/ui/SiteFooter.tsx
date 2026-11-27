@@ -40,8 +40,8 @@ const SiteFooter = () => {
 
   return (
     <footer className="bg-secondary-50 in-data-app:hidden">
-      <PageShell className="py-8 tab:py-10 pc:py-12">
-        <div className="flex flex-col gap-8 pc:flex-row pc:items-start pc:justify-between">
+      <PageShell className="py-8 tab:py-10 lap:py-12">
+        <div className="flex flex-col gap-8 lap:flex-row lap:items-start lap:justify-between">
           <div className="flex max-w-md flex-col gap-3">
             <Link href="/" aria-label="Pawpong 서비스 홈" className="w-fit rounded focus-ring">
               <Image src="/logo.svg" alt="Pawpong" width={108} height={36} className="h-9 w-auto" />

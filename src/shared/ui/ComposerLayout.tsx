@@ -47,7 +47,7 @@ export function ComposerLayout({
           </header>
         ) : (
           <header className="relative mb-6 overflow-hidden rounded-xl bg-point-100 px-5 py-6 tab:mb-8 tab:px-8 tab:py-8">
-            <div className="relative z-10 pc:pr-28">
+            <div className="relative z-10 lap:pr-28">
               {category && (
                 <p className="mb-3 flex items-center gap-2 text-sm font-semibold text-primary-600">
                   <PawPrintIcon aria-hidden="true" className="size-6" />
@@ -61,7 +61,7 @@ export function ComposerLayout({
             </div>
             <PawPrintIcon
               aria-hidden="true"
-              className="pointer-events-none absolute right-8 bottom-5 hidden size-28 -rotate-12 text-point-300 pc:block"
+              className="pointer-events-none absolute right-8 bottom-5 hidden size-28 -rotate-12 text-point-300 lap:block"
             />
           </header>
         )}
@@ -73,7 +73,7 @@ export function ComposerLayout({
 
 export function ComposerColumns({ children }: { children: ReactNode }) {
   return (
-    <div className="grid gap-8 pc:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] pc:gap-12">
+    <div className="grid gap-8 lap:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lap:gap-12">
       {children}
     </div>
   )

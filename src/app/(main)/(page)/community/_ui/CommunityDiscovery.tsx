@@ -64,7 +64,7 @@ export function CommunityPetTiles<T extends string>({
       role="group"
       aria-label="동물별 이야기"
       className={cn(
-        'grid grid-cols-4 gap-0.5 bg-secondary-50 p-1.5 pc:hidden',
+        'grid grid-cols-4 gap-0.5 bg-secondary-50 p-1.5 lap:hidden',
         connected ? 'rounded-t-xl border-b border-secondary-200' : 'mb-4 rounded-xl',
       )}
     >
@@ -107,7 +107,7 @@ export function CommunityCategoryBand({
   const current = categoryOf(value)?.key
   return (
     // [refactored] 늘 동물 타일 아래에 붙어 그려져(connected) 위는 각지고 아래만 둥글다 — 쓰이지 않던 분기 제거
-    <div className="mb-4 rounded-b-xl bg-secondary-50 pc:hidden">
+    <div className="mb-4 rounded-b-xl bg-secondary-50 lap:hidden">
       <div
         role="group"
         aria-label="카테고리"
@@ -217,7 +217,7 @@ export function CommunitySubTopics({
 }) {
   if (!subTopicsOf(value)) return null // [refactored]
   return (
-    <div className="mb-4 hidden rounded-xl bg-secondary-50 pc:block">
+    <div className="mb-4 hidden rounded-xl bg-secondary-50 lap:block">
       <SubTopicTabs value={value} onChange={onChange} topicLabel={topicLabel} />
     </div>
   )

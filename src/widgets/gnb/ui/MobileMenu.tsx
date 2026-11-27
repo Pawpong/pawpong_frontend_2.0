@@ -42,7 +42,7 @@ const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
       <DialogPortal>
         {/* mo·tab 은 전체화면 시트라 뒤 페이지가 비치지 않게 불투명 base 를 깐다.
             pc 는 우측 상단 드롭다운이라 화면을 가리지 않고 흐릿한 딤만 둔다. */}
-        <DialogOverlay className="bg-base-white pc:bg-neutral-850/20" />
+        <DialogOverlay className="bg-base-white lap:bg-neutral-850/20" />
         <DialogBareContent
           aria-describedby={undefined}
           className={cn(
@@ -54,12 +54,12 @@ const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
             // pc: 링크 8개 때문에 1440px 화면을 통째로 덮을 이유가 없다 — 우측 상단 패널로 띄운다.
             // right 는 뷰포트가 페이지 틀보다 넓을 때 ☰ 버튼을 따라가도록 틀의 우측 여백 기준으로 계산한다:
             // max(여백, (100vw - 틀 폭)/2 + 여백)
-            'pc:inset-auto pc:top-[4.5rem] pc:right-[max(var(--page-gutter),calc(50vw_-_var(--page-max-width)/2_+_var(--page-gutter)))] pc:h-auto pc:w-[18rem] pc:rounded-2xl pc:border pc:border-neutral-150 pc:shadow-[0_12px_24px_rgba(55,55,55,0.12)]',
+            'lap:inset-auto lap:top-[4.5rem] lap:right-[max(var(--page-gutter),calc(50vw_-_var(--page-max-width)/2_+_var(--page-gutter)))] lap:h-auto lap:w-[18rem] lap:rounded-2xl lap:border lap:border-neutral-150 lap:shadow-[0_12px_24px_rgba(55,55,55,0.12)]',
           )}
         >
           <DialogBareTitle className="sr-only">전체 메뉴</DialogBareTitle>
           {/* QA: border-b 제거 */}
-          <header className="sticky top-0 z-10 bg-white pc:hidden">
+          <header className="sticky top-0 z-10 bg-white lap:hidden">
             <div className="page-shell flex h-12 items-center justify-between tab:h-16">
               {/* 다른 메뉴 항목과 같이 이동하면서 시트도 닫는다 — 안 닫으면 홈으로 가도 메뉴가 덮는다 */}
               <LogoButton onNavigate={close} />
@@ -77,8 +77,8 @@ const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
 
           {/* Figma 3555:416834 — 카드 없이 항목만 32px 간격으로 세운다 (본문 px16 / py40) */}
           {/* pc 는 18rem 패널이라 여백만 20px 로 줄인다 */}
-          <div className="page-shell flex flex-1 flex-col gap-8 py-10 pc:gap-5 pc:py-5 pc:[--page-gutter:1.25rem]">
-            <nav className="flex flex-col gap-8 pc:gap-4" aria-label="설정">
+          <div className="page-shell flex flex-1 flex-col gap-8 py-10 lap:gap-5 lap:py-5 lap:[--page-gutter:1.25rem]">
+            <nav className="flex flex-col gap-8 lap:gap-4" aria-label="설정">
               {items.map((item) => (
                 <Link
                   key={item.href}
@@ -92,7 +92,7 @@ const MobileMenu = ({ open, onOpenChange }: MobileMenuProps) => {
             </nav>
             {/* pc 는 드롭다운이라 뒤로 헤더가 그대로 보인다 — 헤더에 이미 있는 로그아웃을 또 두지 않는다.
                 mo·tab 은 전체화면 시트가 헤더를 덮으므로 여기에도 있어야 한다. */}
-            <div className="flex flex-1 items-end justify-center pc:hidden">
+            <div className="flex flex-1 items-end justify-center lap:hidden">
               <AuthActions placement="menu-footer" />
             </div>
           </div>

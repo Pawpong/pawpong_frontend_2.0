@@ -122,7 +122,7 @@ const NotificationBell = ({ className }: { className?: string }) => {
           <BellIcon className="size-7" filled={open} />
           <UnreadCountBadge count={unreadCount} />
         </span>
-        <span className="hidden pc:inline">알림</span>
+        <span className="hidden lap:inline">알림</span>
       </button>
 
       {/* 전체 알림 화면과 같은 grouped-list 톤의 드롭다운 패널 */}
@@ -132,7 +132,7 @@ const NotificationBell = ({ className }: { className?: string }) => {
         <div
           className={cn(
             'fixed top-12 right-4 left-4 z-dropdown overflow-hidden rounded-xl border border-neutral-150 bg-white shadow-[0_8px_24px_rgba(73,45,20,0.14)]',
-            'pc:absolute pc:top-full pc:right-0 pc:left-auto pc:mt-1 pc:w-[22.5rem]',
+            'lap:absolute lap:top-full lap:right-0 lap:left-auto lap:mt-1 lap:w-[22.5rem]',
           )}
         >
           <div className="flex items-center justify-between gap-3 border-b border-neutral-150 bg-primary-50/60 px-4 py-3">

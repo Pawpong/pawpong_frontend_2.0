@@ -45,10 +45,10 @@ const Gnb = () => {
           {/* Figma 3349:1763537 — pc 는 nav·로그인·메뉴 아이콘 사이 20px.
               mo·tab 은 헤더가 좁아 12px 로 줄인다.
               비로그인은 nav 대신 로그인/회원가입 (Figma GNB '로그인' 상태) */}
-          <div className="flex items-center gap-3 pc:gap-5">
+          <div className="flex items-center gap-3 lap:gap-5">
             {/* [refactored] 노출 조건은 AuthActions 가 판단한다. PC 는 NavBar 안 마이홈 자리에서 렌더 */}
-            <AuthActions placement="header-mobile" className="pc:hidden" />
-            <NavBar className="hidden pc:flex" />
+            <AuthActions placement="header-mobile" className="lap:hidden" />
+            <NavBar className="hidden lap:flex" />
             {/* 탐색 화면은 본문 검색창 대신 헤더 돋보기로 찾는다 (Option 3). URL 을 읽으므로 Suspense 로 감싼다 */}
             {pathname === '/explore' && (
               <Suspense fallback={null}>
@@ -57,7 +57,7 @@ const Gnb = () => {
             )}
             {/* 알림은 상시 확인하는 정보라 메뉴 안에 숨기지 않고 헤더에 상주시킨다.
                 pc 는 NavBar 안 마이홈 옆에서 렌더하므로 여기는 pc 미만 전용 (AuthActions 와 같은 방식) */}
-            <NotificationBell className="pc:hidden" />
+            <NotificationBell className="lap:hidden" />
             {/* 햄버거 메뉴 — 탭·모바일은 nav 대체, 데스크탑은 보조 메뉴 (전 브레이크포인트) */}
             <IconButton
               tone="brand"
