@@ -8,11 +8,11 @@ import type { ChatRoomResponseDto } from '@/shared/types'
 import { ChatRoomFilterableList } from './ChatRoomFilterableList'
 
 interface ChatRoomListProps {
-  activeRoomId: string | null
   onSelectRoom: (room: ChatRoomResponseDto) => void
 }
 
-const ChatRoomList = ({ activeRoomId, onSelectRoom }: ChatRoomListProps) => {
+// 방을 고르기 전의 전체 목록 화면 — 고른 방이 없으니 강조할 행도 없다
+const ChatRoomList = ({ onSelectRoom }: ChatRoomListProps) => {
   return (
     // 상단바 + 필터 탭은 고정, 방 목록만 스크롤 (고정 높이 flex 컬럼)
     <div className={cn(CHAT_LIST_HEIGHT, 'page-width flex flex-col bg-white')}>
@@ -24,11 +24,7 @@ const ChatRoomList = ({ activeRoomId, onSelectRoom }: ChatRoomListProps) => {
       />
 
       {/* 검색·필터 칩(고정) + 방 목록(스크롤) */}
-      <ChatRoomFilterableList
-        activeRoomId={activeRoomId}
-        onSelectRoom={onSelectRoom}
-        listClassName="flex-1 overflow-y-auto"
-      />
+      <ChatRoomFilterableList activeRoomId={null} onSelectRoom={onSelectRoom} />
     </div>
   )
 }

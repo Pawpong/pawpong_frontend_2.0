@@ -13,7 +13,6 @@ import { ChatTime } from './ChatTime'
 interface ChatRoomItemProps {
   room: ChatRoomResponseDto
   isActive: boolean
-  unreadCount?: number
   onClick: () => void
   onRoomClosed?: () => void
   /** 스와이프로 액션이 열려 있는지 — 목록이 한 번에 한 행만 열리게 관리한다 */
@@ -30,7 +29,6 @@ interface ChatRoomItemProps {
 const ChatRoomItem = ({
   room,
   isActive,
-  unreadCount = 0,
   onClick,
   onRoomClosed,
   swipeOpen,
@@ -46,6 +44,7 @@ const ChatRoomItem = ({
     onClosed: onRoomClosed,
   })
   const roomType = isGeneralRoom(room, userRole) ? '일반' : isAdoptionRoom(room) ? '입양' : '상담'
+  const unreadCount = room.unreadCount
   const hasUnread = unreadCount > 0
 
   return (

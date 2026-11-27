@@ -9,7 +9,6 @@ import { ChatTime } from './ChatTime'
 
 interface ChatMessageBubbleProps {
   message: ChatMessageResponseDto
-  isMine: boolean
   senderName: string
   senderProfileImageUrl?: string
   showProfile?: boolean
@@ -35,12 +34,21 @@ const ReadMarker = ({
   </span>
 )
 
-// [refactored] 말풍선 박스+텍스트를 단일 컴포넌트로 추출 — 배경·모서리만 isMine으로 분기
+// [refactored] 내 것은 노랑, 상대 것은 흰 바탕 — 말풍선·위치·사진·파일이 같은 색 조합을 쓴다
+const surface = (isMine: boolean) =>
+  isMine ? 'border-point-500 bg-point-500' : 'border-neutral-150 bg-white'
+
+// [refactored] 위치·파일 카드의 공통 모양 — 기본 224px, 좁은 폰에서는 줄어든다
+const CARD =
+  'flex w-56 min-w-0 items-center gap-3 rounded-2xl border px-4 py-3 shadow-[0_1px_2px_rgba(55,55,55,0.04)]'
+
 const Bubble = ({ content, isMine }: { content: string; isMine: boolean }) => (
   <div
     className={cn(
       'min-w-0 rounded-2xl px-3.5 py-2.5 pc:px-4 pc:py-3',
-      isMine ? 'rounded-br-md bg-point-500' : 'rounded-bl-md border border-neutral-150 bg-white',
+      surface(isMine),
+      // 글 말풍선은 받은 쪽만 테두리를 그린다 (노란 말풍선은 테두리 없이 면만)
+      isMine ? 'rounded-br-md' : 'rounded-bl-md border',
     )}
   >
     <p className="text-sm leading-[1.5] font-medium break-words whitespace-pre-wrap text-neutral-850 pc:text-base">
@@ -66,10 +74,10 @@ const AttachmentBubble = ({
         target="_blank"
         rel="noreferrer"
         className={cn(
-          'flex w-56 min-w-0 items-center gap-3 rounded-2xl border px-4 py-3 shadow-[0_1px_2px_rgba(55,55,55,0.04)] transition-colors',
-          isMine
-            ? 'border-point-500 bg-point-500 hover:bg-point-300'
-            : 'border-neutral-150 bg-white hover:bg-primary-50',
+          CARD,
+          surface(isMine),
+          'transition-colors',
+          isMine ? 'hover:bg-point-300' : 'hover:bg-primary-50',
         )}
         aria-label="공유한 위치를 지도에서 열기"
       >
@@ -94,7 +102,7 @@ const AttachmentBubble = ({
         rel="noreferrer"
         className={cn(
           'block max-w-72 overflow-hidden rounded-2xl border shadow-[0_1px_2px_rgba(55,55,55,0.04)]',
-          isMine ? 'border-point-500 bg-point-500' : 'border-neutral-150 bg-white',
+          surface(isMine),
         )}
         aria-label={`${attachment.name} 원본 이미지 열기`}
       >
@@ -116,10 +124,7 @@ const AttachmentBubble = ({
       target="_blank"
       rel="noreferrer"
       download={attachment.name}
-      className={cn(
-        'flex w-56 min-w-0 items-center gap-3 rounded-2xl border px-4 py-3 shadow-[0_1px_2px_rgba(55,55,55,0.04)]',
-        isMine ? 'border-point-500 bg-point-500' : 'border-neutral-150 bg-white',
-      )}
+      className={cn(CARD, surface(isMine))}
     >
       <FileIcon className="size-8 shrink-0 text-neutral-850" />
       <span className="min-w-0">
@@ -136,7 +141,6 @@ const AttachmentBubble = ({
 
 const ChatMessageBubble = ({
   message,
-  isMine,
   senderName,
   senderProfileImageUrl,
   showProfile = false,
@@ -146,17 +150,21 @@ const ChatMessageBubble = ({
   const readMarker = readByCounterpart && (
     <ReadMarker senderName={senderName} senderProfileImageUrl={senderProfileImageUrl} />
   )
+  // [refactored] 보낸 쪽·받은 쪽이 같은 시각 표시를 쓴다 — 놓는 자리만 다르다
+  const time = (
+    <ChatTime
+      dateStr={message.createdAt}
+      format={formatChatMessageTime}
+      className="text-neutral-500"
+    />
+  )
 
   // 보낸 메시지 (오른쪽 정렬, 노란 말풍선)
-  if (isMine) {
+  if (message.isMine) {
     return (
       <div className="flex w-full flex-col items-end gap-1">
         <div className="flex max-w-[85%] items-end gap-2 pc:max-w-[26rem]">
-          <ChatTime
-            dateStr={message.createdAt}
-            format={formatChatMessageTime}
-            className="text-neutral-500"
-          />
+          {time}
           <AttachmentBubble message={message} isMine />
         </div>
         {readMarker}
@@ -177,11 +185,7 @@ const ChatMessageBubble = ({
         {/* 폭 제한은 말풍선·시간 묶음에만 건다 — 프로필 자리까지 포함하면 작은 폰에서 위치·파일 카드(최소 224px)가 넘친다 */}
         <div className="flex max-w-[85%] min-w-0 items-end gap-2 pc:max-w-[26rem]">
           <AttachmentBubble message={message} isMine={false} />
-          <ChatTime
-            dateStr={message.createdAt}
-            format={formatChatMessageTime}
-            className="text-neutral-500"
-          />
+          {time}
         </div>
       </div>
       {readMarker}

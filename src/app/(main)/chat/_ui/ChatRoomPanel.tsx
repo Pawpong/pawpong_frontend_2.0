@@ -142,7 +142,6 @@ const ChatRoomPanel = ({ room, currentUserId, onBack, onRoomClosed }: ChatRoomPa
                     )}
                     <ChatMessageBubble
                       message={msg}
-                      isMine={msg.isMine}
                       senderName={displayName}
                       senderProfileImageUrl={room.counterpart.profileImageUrl}
                       // 상대 메시지가 연속되면 첫 말풍선에만 프로필을 노출한다. 날이 바뀌면 다시 보인다.

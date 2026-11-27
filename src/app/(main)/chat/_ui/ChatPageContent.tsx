@@ -1,5 +1,6 @@
 'use client'
 
+import type * as React from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { chatQueries } from '@/entities/chat'
@@ -12,6 +13,19 @@ import { ChatRoomList } from './ChatRoomList'
 import { ChatSidebar } from './ChatSidebar'
 import { ChatRoomPanel } from './ChatRoomPanel'
 import { RetryButton, Button } from '@/shared/ui'
+
+// [refactored] 방을 띄우기 전 상태(불러오는 중·실패·방 없음)는 같은 자리에 같은 모양으로 보인다
+const ChatPanelState = ({ message, children }: { message: string; children?: React.ReactNode }) => (
+  <div
+    className={cn(
+      CHAT_PANEL_HEIGHT,
+      'flex flex-col items-center justify-center gap-3 px-5 text-center',
+    )}
+  >
+    <p className="text-sm text-neutral-700">{message}</p>
+    {children}
+  </div>
+)
 
 const ChatPageContent = () => {
   const router = useRouter()
@@ -48,26 +62,16 @@ const ChatPageContent = () => {
 
   // No room selected: full-width room list page
   if (!activeRoomId) {
-    return <ChatRoomList activeRoomId={null} onSelectRoom={handleSelectRoom} />
+    return <ChatRoomList onSelectRoom={handleSelectRoom} />
   }
 
   if (roomsQuery.isLoading || profileQuery.isLoading) {
-    return (
-      <div className={cn(CHAT_PANEL_HEIGHT, 'flex items-center justify-center')}>
-        <p className="text-sm text-neutral-700">채팅을 불러오는 중입니다.</p>
-      </div>
-    )
+    return <ChatPanelState message="채팅을 불러오는 중입니다." />
   }
 
   if (roomsQuery.isError || profileQuery.isError) {
     return (
-      <div
-        className={cn(
-          CHAT_PANEL_HEIGHT,
-          'flex flex-col items-center justify-center gap-3 px-5 text-center',
-        )}
-      >
-        <p className="text-sm text-neutral-700">채팅방을 불러오지 못했습니다.</p>
+      <ChatPanelState message="채팅방을 불러오지 못했습니다.">
         <div className="flex items-center gap-2">
           <Button intent="secondary" size="sm" onClick={handleBack}>
             목록으로
@@ -80,18 +84,17 @@ const ChatPageContent = () => {
             isRetrying={roomsQuery.isFetching || profileQuery.isFetching}
           />
         </div>
-      </div>
+      </ChatPanelState>
     )
   }
 
   if (!activeRoom || !profileQuery.data) {
     return (
-      <div className={cn(CHAT_PANEL_HEIGHT, 'flex flex-col items-center justify-center gap-3')}>
-        <p className="text-sm text-neutral-700">채팅방을 불러오지 못했습니다.</p>
+      <ChatPanelState message="채팅방을 불러오지 못했습니다.">
         <Button intent="dark" size="sm" onClick={handleBack}>
           목록으로
         </Button>
-      </div>
+      </ChatPanelState>
     )
   }
 
