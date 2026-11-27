@@ -24,7 +24,7 @@ interface ChatRoomActionsProps {
 
 /**
  * 채팅방 차단·차단 해제·나가기 — 확인 모달과 요청을 한 곳에서 갖는다.
- * 여는 방법만 자리마다 다르다: 방 헤더·PC 목록 호버는 ⋮ 메뉴, 모바일 목록은 행 스와이프 버튼.
+ * 여는 방법만 자리마다 다르다: 방 헤더는 ⋮ 메뉴, 모바일 목록은 행 스와이프 버튼.
  */
 const useChatRoomActions = ({
   roomId,
@@ -162,59 +162,43 @@ const useChatRoomActions = ({
   return { openBlockDialog, openLeaveDialog, dialogs }
 }
 
-type ChatRoomActions = ReturnType<typeof useChatRoomActions>
-
-/** ⋮ 메뉴 — 서버의 blockedByMe 로 차단·해제 중 하나만 보인다. 값이 없으면 상태를 모르니 둘 다 둔다
+/** 채팅방 헤더의 ⋮ 메뉴 + 확인 흐름.
+    서버의 blockedByMe 로 차단·해제 중 하나만 보인다. 값이 없으면 상태를 모르니 둘 다 둔다
     (차단·해제 명령은 멱등이라 잘못 눌러도 상태가 꼬이지 않는다). */
-const ChatRoomActionsDropdown = ({
-  actions,
-  counterpartName,
-  blockedByMe,
-}: {
-  actions: ChatRoomActions
-  counterpartName: string
-  blockedByMe?: boolean
-}) => (
-  <DropdownMenu>
-    <DropdownMenuTrigger asChild>
-      <IconButton edge="both" aria-label={`${counterpartName} 채팅방 더보기`}>
-        <MoreVertIcon className="size-6" />
-      </IconButton>
-    </DropdownMenuTrigger>
-    <DropdownMenuContent align="end">
-      {blockedByMe !== true && (
-        <DropdownMenuItem onSelect={() => actions.openBlockDialog('block')}>
-          사용자 차단
-        </DropdownMenuItem>
-      )}
-      {blockedByMe !== false && (
-        <DropdownMenuItem onSelect={() => actions.openBlockDialog('unblock')}>
-          사용자 차단 해제
-        </DropdownMenuItem>
-      )}
-      <DropdownMenuItem
-        onSelect={actions.openLeaveDialog}
-        className="text-error-500 focus:text-error-600"
-      >
-        채팅방 나가기
-      </DropdownMenuItem>
-    </DropdownMenuContent>
-  </DropdownMenu>
-)
-
-/** 채팅방 헤더의 ⋮ 메뉴 + 확인 흐름. */
+// [refactored] ⋮ 드롭다운을 쓰는 곳이 이 메뉴 하나뿐이라 따로 두지 않고 합쳤다
 const ChatRoomActionsMenu = (props: ChatRoomActionsProps) => {
   const actions = useChatRoomActions(props)
+  const { counterpartName, blockedByMe } = props
   return (
     <>
-      <ChatRoomActionsDropdown
-        actions={actions}
-        counterpartName={props.counterpartName}
-        blockedByMe={props.blockedByMe}
-      />
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <IconButton edge="both" aria-label={`${counterpartName} 채팅방 더보기`}>
+            <MoreVertIcon className="size-6" />
+          </IconButton>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          {blockedByMe !== true && (
+            <DropdownMenuItem onSelect={() => actions.openBlockDialog('block')}>
+              사용자 차단
+            </DropdownMenuItem>
+          )}
+          {blockedByMe !== false && (
+            <DropdownMenuItem onSelect={() => actions.openBlockDialog('unblock')}>
+              사용자 차단 해제
+            </DropdownMenuItem>
+          )}
+          <DropdownMenuItem
+            onSelect={actions.openLeaveDialog}
+            className="text-error-500 focus:text-error-600"
+          >
+            채팅방 나가기
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
       {actions.dialogs}
     </>
   )
 }
 
-export { ChatRoomActionsMenu, ChatRoomActionsDropdown, useChatRoomActions }
+export { ChatRoomActionsMenu, useChatRoomActions }

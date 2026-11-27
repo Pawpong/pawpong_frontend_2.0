@@ -36,7 +36,8 @@ const ChatRoomHeader = ({
       <div className={cn(CHAT_CONTENT_WIDTH, 'flex min-h-12 items-center justify-between')}>
         <div className="flex min-w-0 items-center gap-5 pc:gap-7">
           <div className="flex items-center gap-1">
-            <span className="pc:hidden">
+            {/* flex: 버튼(inline-flex)이 글줄 기준선에 얹혀 이름보다 위로 뜨지 않게 */}
+            <span className="flex pc:hidden">
               <IconButton edge="both" onClick={onBack} aria-label="뒤로 가기">
                 <ArrowBackIcon className="size-6" />
               </IconButton>
@@ -47,18 +48,15 @@ const ChatRoomHeader = ({
             <Link
               href={`/home/${counterpartUserId}`}
               aria-label={`${displayName} 프로필 보기`}
-              className="flex min-w-0 items-center gap-3 rounded-lg px-1 py-0.5 focus-ring transition-colors hover:bg-primary-50"
+              className="flex min-w-0 items-center gap-3 rounded-lg focus-ring"
             >
               <ProfileAvatar
                 src={profileImageUrl}
                 alt={`${displayName} 프로필`}
                 size="responsive"
               />
-              <span className="flex min-w-0 flex-col">
-                <span className="max-w-36 truncate text-body-s font-semibold text-neutral-850 pc:max-w-[21.625rem]">
-                  {displayName}
-                </span>
-                <span className="text-xs font-medium text-neutral-500">프로필 보기</span>
+              <span className="max-w-36 truncate text-body-s font-semibold text-neutral-850 pc:max-w-[21.625rem]">
+                {displayName}
               </span>
             </Link>
           </div>

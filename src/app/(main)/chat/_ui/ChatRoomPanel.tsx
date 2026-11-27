@@ -11,9 +11,9 @@ import type { ChatRoomResponseDto } from '@/shared/types'
 import { CHAT_CONTENT_WIDTH, CHAT_GUTTER_X, CHAT_PANEL_HEIGHT } from '../_lib/constants'
 import { findCounterpartReadIndex } from '../_lib/readMarker'
 import { isPinnedToBottom, shouldFollowNewMessage } from '../_lib/autoScroll'
+import { formatChatDayLabel, startsNewChatDay } from '../_lib/utils'
 import { ChatRoomHeader } from './ChatRoomHeader'
 import { PetInfoCard } from './PetInfoCard'
-import { ChatNoticeBanner } from './ChatNoticeBanner'
 import { ChatMessageBubble } from './ChatMessageBubble'
 import { ChatMessageInput } from './ChatMessageInput'
 
@@ -41,7 +41,6 @@ const ChatRoomPanel = ({ room, currentUserId, onBack, onRoomClosed }: ChatRoomPa
   const pinnedToBottom = React.useRef(true)
   const paintedCount = React.useRef(0)
   const displayName = room.counterpart.nickname
-  const [showNotice, setShowNotice] = React.useState(true)
 
   // 상단 펫 카드 — room.petId(신청서 없이 분양글에서 바로 문의한 방)가 있으면 그걸 바로 쓰고,
   // 없으면(신청서 기반 구방) 신청 -> 펫 상세 순으로 조회해 채운다.
@@ -111,27 +110,14 @@ const ChatRoomPanel = ({ room, currentUserId, onBack, onRoomClosed }: ChatRoomPa
       {/* Pet Info Card */}
       {petQuery.data && <PetInfoCard detail={petQuery.data} />}
 
-      {/* 모바일 알림 — 펫 카드 바로 아래, 나머지 화면과 같은 가로 여백 + 둥근 카드로 노출한다. */}
-      {showNotice && (
-        <div className={cn(CHAT_GUTTER_X, 'pt-3 pc:hidden')}>
-          <ChatNoticeBanner onClose={() => setShowNotice(false)} className="rounded-lg" />
-        </div>
-      )}
-
-      {/* PC 알림은 Figma chatting-room 영역 안에서 대화 목록과 스크롤 면을 공유한다. */}
       <div
         ref={scrollRef}
         onScroll={handleScroll}
-        className={cn('flex-1 overflow-y-auto py-5 tab:py-7', CHAT_GUTTER_X)}
+        // relative: 안쪽 sr-only(읽음 표시 문장) 같은 absolute 요소의 기준을 이 스크롤 상자로 잡는다.
+        // 없으면 기준이 body 가 돼 스크롤 상자에 잘리지 않고, 메시지 길이만큼 문서가 늘어나 화면 아래가 빈다
+        className={cn('relative flex-1 overflow-y-auto py-5 tab:py-7', CHAT_GUTTER_X)}
       >
         <div className={cn(CHAT_CONTENT_WIDTH, 'flex flex-col gap-6')}>
-          {showNotice && (
-            <ChatNoticeBanner
-              onClose={() => setShowNotice(false)}
-              className="hidden rounded-lg pc:flex"
-            />
-          )}
-
           <div className="flex flex-col gap-2.5">
             {isLoading ? (
               <p className="py-10 text-center text-sm text-neutral-700">
@@ -143,18 +129,28 @@ const ChatRoomPanel = ({ room, currentUserId, onBack, onRoomClosed }: ChatRoomPa
                 <RetryButton onRetry={() => void refetch()} isRetrying={isRetrying} />
               </div>
             ) : (
-              messages.map((msg, idx) => (
-                <ChatMessageBubble
-                  key={msg.messageId}
-                  message={msg}
-                  isMine={msg.isMine}
-                  senderName={displayName}
-                  senderProfileImageUrl={room.counterpart.profileImageUrl}
-                  // 상대 메시지가 연속되면 첫 말풍선에만 프로필을 노출한다.
-                  showProfile={!msg.isMine && messages[idx - 1]?.isMine !== false}
-                  readByCounterpart={idx === counterpartReadIndex}
-                />
-              ))
+              messages.map((msg, idx) => {
+                const previous = messages[idx - 1]
+                // 카카오톡처럼 날이 바뀌면 그 사이에 날짜 구분선을 넣는다
+                const newDay = startsNewChatDay(msg.createdAt, previous?.createdAt)
+                return (
+                  <React.Fragment key={msg.messageId}>
+                    {newDay && (
+                      <p className="my-2 self-center rounded-full bg-white px-3 py-1 text-xs leading-[1.5] font-medium text-neutral-700">
+                        {formatChatDayLabel(msg.createdAt)}
+                      </p>
+                    )}
+                    <ChatMessageBubble
+                      message={msg}
+                      senderName={displayName}
+                      senderProfileImageUrl={room.counterpart.profileImageUrl}
+                      // 상대 메시지가 연속되면 첫 말풍선에만 프로필을 노출한다. 날이 바뀌면 다시 보인다.
+                      showProfile={!msg.isMine && (newDay || previous?.isMine !== false)}
+                      readByCounterpart={idx === counterpartReadIndex}
+                    />
+                  </React.Fragment>
+                )
+              })
             )}
           </div>
         </div>

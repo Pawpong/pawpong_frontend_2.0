@@ -1,14 +1,14 @@
-import { ProfileAvatar } from '@/shared/ui'
+import { ChatBubble, ProfileAvatar } from '@/shared/ui'
 import { cn } from '@/shared/lib/cn'
 import { optimizedImageUrl } from '@/shared/lib/optimizedImageUrl'
 import { FileIcon, LocationPinIcon } from '@/shared/assets'
 import type { ChatMessageResponseDto } from '@/shared/types'
 import { formatFileSize, getLocationMapUrl, parseChatAttachment } from '../_lib/attachment'
-import { RelativeTime } from './RelativeTime'
+import { formatChatMessageTime } from '../_lib/utils'
+import { ChatTime } from './ChatTime'
 
 interface ChatMessageBubbleProps {
   message: ChatMessageResponseDto
-  isMine: boolean
   senderName: string
   senderProfileImageUrl?: string
   showProfile?: boolean
@@ -34,19 +34,13 @@ const ReadMarker = ({
   </span>
 )
 
-// [refactored] 말풍선 박스+텍스트를 단일 컴포넌트로 추출 — 배경·모서리만 isMine으로 분기
-const Bubble = ({ content, isMine }: { content: string; isMine: boolean }) => (
-  <div
-    className={cn(
-      'min-w-0 rounded-2xl px-3.5 py-2.5 pc:px-4 pc:py-3',
-      isMine ? 'rounded-br-md bg-point-500' : 'rounded-bl-md border border-neutral-150 bg-white',
-    )}
-  >
-    <p className="text-sm leading-[1.5] font-medium break-words whitespace-pre-wrap text-neutral-850 pc:text-base">
-      {content}
-    </p>
-  </div>
-)
+// [refactored] 내 것은 노랑, 상대 것은 흰 바탕 — 위치·사진·파일 카드가 글 말풍선(shared ChatBubble)과 같은 색 조합을 쓴다
+const surface = (isMine: boolean) =>
+  isMine ? 'border-point-500 bg-point-500' : 'border-neutral-150 bg-white'
+
+// [refactored] 위치·파일 카드의 공통 모양 — 기본 224px, 좁은 폰에서는 줄어든다
+const CARD =
+  'flex w-56 min-w-0 items-center gap-3 rounded-2xl border px-4 py-3 shadow-[0_1px_2px_rgba(55,55,55,0.04)]'
 
 const AttachmentBubble = ({
   message,
@@ -56,7 +50,8 @@ const AttachmentBubble = ({
   isMine: boolean
 }) => {
   const attachment = parseChatAttachment(message.content, message.messageType)
-  if (!attachment) return <Bubble content={message.content} isMine={isMine} />
+  if (!attachment)
+    return <ChatBubble side={isMine ? 'mine' : 'other'}>{message.content}</ChatBubble>
 
   if (attachment.kind === 'location') {
     return (
@@ -65,10 +60,10 @@ const AttachmentBubble = ({
         target="_blank"
         rel="noreferrer"
         className={cn(
-          'flex min-w-56 items-center gap-3 rounded-2xl border px-4 py-3 shadow-[0_1px_2px_rgba(55,55,55,0.04)] transition-colors',
-          isMine
-            ? 'border-point-500 bg-point-500 hover:bg-point-300'
-            : 'border-neutral-150 bg-white hover:bg-primary-50',
+          CARD,
+          surface(isMine),
+          'transition-colors',
+          isMine ? 'hover:bg-point-300' : 'hover:bg-primary-50',
         )}
         aria-label="공유한 위치를 지도에서 열기"
       >
@@ -93,7 +88,7 @@ const AttachmentBubble = ({
         rel="noreferrer"
         className={cn(
           'block max-w-72 overflow-hidden rounded-2xl border shadow-[0_1px_2px_rgba(55,55,55,0.04)]',
-          isMine ? 'border-point-500 bg-point-500' : 'border-neutral-150 bg-white',
+          surface(isMine),
         )}
         aria-label={`${attachment.name} 원본 이미지 열기`}
       >
@@ -115,10 +110,7 @@ const AttachmentBubble = ({
       target="_blank"
       rel="noreferrer"
       download={attachment.name}
-      className={cn(
-        'flex min-w-56 items-center gap-3 rounded-2xl border px-4 py-3 shadow-[0_1px_2px_rgba(55,55,55,0.04)]',
-        isMine ? 'border-point-500 bg-point-500' : 'border-neutral-150 bg-white',
-      )}
+      className={cn(CARD, surface(isMine))}
     >
       <FileIcon className="size-8 shrink-0 text-neutral-850" />
       <span className="min-w-0">
@@ -135,7 +127,6 @@ const AttachmentBubble = ({
 
 const ChatMessageBubble = ({
   message,
-  isMine,
   senderName,
   senderProfileImageUrl,
   showProfile = false,
@@ -145,13 +136,21 @@ const ChatMessageBubble = ({
   const readMarker = readByCounterpart && (
     <ReadMarker senderName={senderName} senderProfileImageUrl={senderProfileImageUrl} />
   )
+  // [refactored] 보낸 쪽·받은 쪽이 같은 시각 표시를 쓴다 — 놓는 자리만 다르다
+  const time = (
+    <ChatTime
+      dateStr={message.createdAt}
+      format={formatChatMessageTime}
+      className="text-neutral-500"
+    />
+  )
 
   // 보낸 메시지 (오른쪽 정렬, 노란 말풍선)
-  if (isMine) {
+  if (message.isMine) {
     return (
       <div className="flex w-full flex-col items-end gap-1">
         <div className="flex max-w-[85%] items-end gap-2 pc:max-w-[26rem]">
-          <RelativeTime dateStr={message.createdAt} className="text-neutral-500" />
+          {time}
           <AttachmentBubble message={message} isMine />
         </div>
         {readMarker}
@@ -159,18 +158,21 @@ const ChatMessageBubble = ({
     )
   }
 
-  // 받은 메시지 (왼쪽 정렬, 회색 말풍선 + 프로필)
+  // 받은 메시지 (왼쪽 정렬, 흰 말풍선). 프로필은 말풍선 왼쪽에 붙이고 이름은 헤더에 맡긴다.
+  // 연속 메시지는 프로필 자리만큼 비워 말풍선 줄을 맞춘다.
   return (
-    <div className="flex w-full flex-col items-start gap-1.5">
-      {showProfile && (
-        <div className="flex items-center gap-2">
-          <ProfileAvatar src={senderProfileImageUrl} alt={`${senderName} 프로필`} size="small" />
-          <span className="text-sm leading-[1.5] font-semibold text-neutral-850">{senderName}</span>
+    <div className="flex w-full flex-col items-start gap-1">
+      <div className="flex w-full items-start gap-2">
+        <span className="w-8 shrink-0">
+          {showProfile && (
+            <ProfileAvatar src={senderProfileImageUrl} alt={`${senderName} 프로필`} size="small" />
+          )}
+        </span>
+        {/* 폭 제한은 말풍선·시간 묶음에만 건다 — 프로필 자리까지 포함하면 작은 폰에서 위치·파일 카드(최소 224px)가 넘친다 */}
+        <div className="flex max-w-[85%] min-w-0 items-end gap-2 pc:max-w-[26rem]">
+          <AttachmentBubble message={message} isMine={false} />
+          {time}
         </div>
-      )}
-      <div className="flex max-w-[85%] items-end gap-2 pc:max-w-[26rem]">
-        <AttachmentBubble message={message} isMine={false} />
-        <RelativeTime dateStr={message.createdAt} className="text-neutral-500" />
       </div>
       {readMarker}
     </div>

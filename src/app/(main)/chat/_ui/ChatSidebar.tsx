@@ -23,7 +23,6 @@ const ChatSidebar = ({ activeRoomId, onSelectRoom, onRoomClosed }: ChatSidebarPr
         activeRoomId={activeRoomId}
         onSelectRoom={onSelectRoom}
         onRoomClosed={onRoomClosed}
-        listClassName="flex-1 overflow-y-auto"
         gutterClassName="px-3"
       />
     </aside>
