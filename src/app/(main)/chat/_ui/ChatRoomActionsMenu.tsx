@@ -217,4 +217,4 @@ const ChatRoomActionsMenu = (props: ChatRoomActionsProps) => {
   )
 }
 
-export { ChatRoomActionsMenu, ChatRoomActionsDropdown, useChatRoomActions }
+export { ChatRoomActionsMenu, useChatRoomActions }

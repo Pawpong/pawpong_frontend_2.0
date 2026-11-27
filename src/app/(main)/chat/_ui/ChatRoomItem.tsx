@@ -6,7 +6,8 @@ import type { ChatRoomResponseDto } from '@/shared/types'
 import { Badge, ProfileAvatar, SwipeableRow } from '@/shared/ui'
 import { getChatMessagePreview } from '../_lib/attachment'
 import { isAdoptionRoom, isGeneralRoom } from '../_lib/constants'
-import { ChatRoomActionsDropdown, useChatRoomActions } from './ChatRoomActionsMenu'
+import { useChatRoomActions } from './ChatRoomActionsMenu'
+import { formatChatListTime } from '../_lib/utils'
 import { RelativeTime } from './RelativeTime'
 
 interface ChatRoomItemProps {
@@ -22,8 +23,9 @@ interface ChatRoomItemProps {
 
 /**
  * 채팅방 목록 행 (A안) — 48px 아바타 + 두 줄.
- * 1줄: 닉네임 + 종류 배지(입양·상담·일반) | 시간 / 2줄: 마지막 메시지 | 안읽음 수.
- * 차단·나가기는 평소에 보이지 않는다 — 손가락은 행을 왼쪽으로 밀어서, 마우스는 행에 올리면 나오는 ⋮ 로 연다.
+ * 1줄: 닉네임 + 종류 배지(입양·상담·일반) | 마지막 대화 날짜 / 2줄: 마지막 메시지 | 안읽음 수.
+ * 차단·나가기는 손가락으로 행을 왼쪽으로 밀어서 연다. PC 는 채팅방 머리의 ⋮ 에서 한다.
+ * PC 사이드바에서 고른 방은 위아래 여백이 있는 둥근 카드로 표시한다.
  */
 const ChatRoomItem = ({
   room,
@@ -60,7 +62,7 @@ const ChatRoomItem = ({
       >
         <div
           className={cn(
-            'group relative flex items-center transition-colors hover:bg-primary-50',
+            'flex items-center transition-colors hover:bg-primary-50 pc:rounded-xl pc:px-3',
             isActive && 'bg-point-50 hover:bg-point-50',
           )}
         >
@@ -84,6 +86,7 @@ const ChatRoomItem = ({
                 </Badge>
                 <RelativeTime
                   dateStr={room.lastMessageAt}
+                  format={formatChatListTime}
                   className="ml-auto shrink-0 text-neutral-700"
                 />
               </div>
@@ -104,15 +107,6 @@ const ChatRoomItem = ({
               </div>
             </div>
           </button>
-          {/* 마우스로 올렸을 때만 보이는 ⋮ — 시간·안읽음 자리를 같은 바탕으로 덮는다.
-              hover 가 없는 터치 기기에서는 숨기고 스와이프가 대신한다. 메뉴가 열려 있거나 키보드로 들어오면 남긴다 */}
-          <div className="absolute top-1/2 right-0 hidden -translate-y-1/2 bg-primary-50 pl-2 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100 has-[[data-state=open]]:opacity-100 [@media(hover:hover)]:block">
-            <ChatRoomActionsDropdown
-              actions={actions}
-              counterpartName={counterpartName}
-              blockedByMe={room.blockedByMe}
-            />
-          </div>
         </div>
       </SwipeableRow>
       {actions.dialogs}

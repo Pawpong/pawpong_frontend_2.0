@@ -77,8 +77,15 @@ const ChatRoomFilterableList = ({
           className="py-20"
         />
       ) : (
-        // 행 사이 1px 헤어라인. 스와이프 액션이 행 끝까지 닿도록 좌우 여백은 행 안이 아니라 목록이 갖는다
-        <div className={cn('divide-y divide-neutral-150 bg-white', gutterClassName, listClassName)}>
+        // 행 사이 1px 헤어라인. 스와이프 액션이 행 끝까지 닿도록 좌우 여백은 행 안이 아니라 목록이 갖는다.
+        // PC 사이드바는 헤어라인 대신 행 사이를 띄워, 고른 방이 둥근 카드로 떨어져 보이게 한다
+        <div
+          className={cn(
+            'divide-y divide-neutral-150 bg-white pc:space-y-1 pc:divide-y-0',
+            gutterClassName,
+            listClassName,
+          )}
+        >
           {visibleRooms.map((room) => (
             <ChatRoomItem
               key={room.roomId}
