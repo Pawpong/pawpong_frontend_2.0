@@ -65,7 +65,7 @@ const AttachmentBubble = ({
         target="_blank"
         rel="noreferrer"
         className={cn(
-          'flex min-w-56 items-center gap-3 rounded-2xl border px-4 py-3 shadow-[0_1px_2px_rgba(55,55,55,0.04)] transition-colors',
+          'flex w-56 min-w-0 items-center gap-3 rounded-2xl border px-4 py-3 shadow-[0_1px_2px_rgba(55,55,55,0.04)] transition-colors',
           isMine
             ? 'border-point-500 bg-point-500 hover:bg-point-300'
             : 'border-neutral-150 bg-white hover:bg-primary-50',
@@ -116,7 +116,7 @@ const AttachmentBubble = ({
       rel="noreferrer"
       download={attachment.name}
       className={cn(
-        'flex min-w-56 items-center gap-3 rounded-2xl border px-4 py-3 shadow-[0_1px_2px_rgba(55,55,55,0.04)]',
+        'flex w-56 min-w-0 items-center gap-3 rounded-2xl border px-4 py-3 shadow-[0_1px_2px_rgba(55,55,55,0.04)]',
         isMine ? 'border-point-500 bg-point-500' : 'border-neutral-150 bg-white',
       )}
     >
