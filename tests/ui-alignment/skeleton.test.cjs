@@ -74,7 +74,7 @@ test('탐색 목록은 불러오는 동안 같은 격자에 카드 모양 스켈
     'src/app/(main)/(page)/explore/_ui/ExploreContent.tsx',
     'src/app/(main)/(page)/explore/_ui/BreederExploreContent.tsx',
   ])
-    assert.match(source(file), /loadingFallback=\{<ListingCardGridSkeleton label=/, file)
+    assert.match(source(file), /loadingFallback=\{\s*<ListingCardGridSkeleton\s+label=/, file)
 })
 
 test('홈 분양·자랑하기 영역은 불러온 카드와 같은 배치의 스켈레톤으로 자리를 잡아 둠', () => {

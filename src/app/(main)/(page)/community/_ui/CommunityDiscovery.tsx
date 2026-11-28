@@ -11,6 +11,7 @@ import type { CommunityDiscoveryFilters } from '@/shared/types'
 import { cn } from '@/shared/lib/cn'
 import { Button } from '@/shared/ui/Button'
 import { Dialog, DialogContent, DialogTrigger } from '@/shared/ui/Dialog'
+import { SideNav } from '@/shared/ui/SideNav'
 import { CommunityDiscoveryPanel } from './discovery/CommunityDiscoveryPanel'
 import {
   categoryOf,
@@ -152,56 +153,16 @@ export function CommunityCategoryNav({
 }) {
   const current = categoryOf(value)?.key
   return (
-    <CommunitySideNav
+    <SideNav
       label="카테고리"
       items={CATEGORY_ITEMS.map(({ key, label, icon }) => ({
         key: label,
         label,
-        icon,
+        icon: <CommunityPixelIcon name={icon} className="size-5" />,
         selected: current === key,
         onSelect: () => onChange(withCategory(value, key)),
       }))}
     />
-  )
-}
-
-/** PC 사이드바 목록 — 동물·카테고리가 같은 결(도트 아이콘 + 이름)을 쓴다 */
-export function CommunitySideNav({
-  label,
-  items,
-  iconClassName = 'size-5',
-}: {
-  label: string
-  // [refactored] 아이콘 크기를 라벨 글자 비교 대신 prop 으로 받는다 (동물 그림은 size-8)
-  iconClassName?: string
-  items: readonly {
-    key: string
-    label: string
-    icon: CommunityPixelIconName
-    selected: boolean
-    onSelect: () => void
-  }[]
-}) {
-  return (
-    <nav aria-label={label} className="flex flex-col gap-0.5">
-      {items.map((item) => (
-        <button
-          key={item.key}
-          type="button"
-          aria-pressed={item.selected}
-          onClick={item.onSelect}
-          className={cn(
-            'flex min-h-10 items-center gap-2.5 rounded-xl px-4 text-left text-body-md focus-ring transition-colors',
-            item.selected
-              ? 'bg-neutral-100 font-semibold text-neutral-850'
-              : 'font-medium text-neutral-700 hover:bg-neutral-50 hover:text-neutral-850',
-          )}
-        >
-          <CommunityPixelIcon name={item.icon} className={iconClassName} />
-          {item.label}
-        </button>
-      ))}
-    </nav>
   )
 }
 

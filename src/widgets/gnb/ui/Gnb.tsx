@@ -1,12 +1,11 @@
 'use client'
 
-import { Suspense, useState } from 'react'
+import { useState } from 'react'
 import { useRoutePathname } from '@/shared/lib/useRoutePathname'
 import { MenuIcon } from '@/shared/assets'
 import { cn } from '@/shared/lib/cn'
 import { AppBadgeSync } from './AppBadgeSync'
 import { AuthActions } from './AuthActions'
-import { ExploreHeaderSearch } from './ExploreHeaderSearch'
 import { LogoButton } from './LogoButton'
 import { NavBar } from './NavBar'
 import { NotificationBell } from './NotificationBell'
@@ -49,12 +48,6 @@ const Gnb = () => {
             {/* [refactored] 노출 조건은 AuthActions 가 판단한다. PC 는 NavBar 안 마이홈 자리에서 렌더 */}
             <AuthActions placement="header-mobile" className="lap:hidden" />
             <NavBar className="hidden lap:flex" />
-            {/* 탐색 화면은 본문 검색창 대신 헤더 돋보기로 찾는다 (Option 3). URL 을 읽으므로 Suspense 로 감싼다 */}
-            {pathname === '/explore' && (
-              <Suspense fallback={null}>
-                <ExploreHeaderSearch />
-              </Suspense>
-            )}
             {/* 알림은 상시 확인하는 정보라 메뉴 안에 숨기지 않고 헤더에 상주시킨다.
                 pc 는 NavBar 안 마이홈 옆에서 렌더하므로 여기는 pc 미만 전용 (AuthActions 와 같은 방식) */}
             <NotificationBell className="lap:hidden" />

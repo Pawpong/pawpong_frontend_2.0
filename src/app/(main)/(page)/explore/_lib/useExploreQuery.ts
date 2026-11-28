@@ -4,16 +4,16 @@ import { useCallback, useMemo } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { ANIMAL_CATEGORIES } from '@/shared/types'
 import type { AdoptionSortType, AnimalCategory } from '@/shared/types'
-import { ALL_REGIONS } from './constants'
-import type { ExploreStatus, ExploreType } from './constants'
+import { ALL_REGIONS, REGION_GROUPS } from './constants'
+import type { ExploreRegion, ExploreStatus, ExploreType } from './constants'
 
 export interface ExploreQuery {
   type: ExploreType
   category: AnimalCategory
   status: ExploreStatus
   sort: AdoptionSortType
-  /** 'all' 이면 지역 미선택 (브리더 탐색 전용) */
-  region: string
+  /** 시·도 묶음. 'all' 이면 지역 미선택 (브리더 탐색 전용) */
+  region: ExploreRegion
   keyword: string
 }
 
@@ -30,6 +30,7 @@ const parseQuery = (params: URLSearchParams): ExploreQuery => {
   const type: ExploreType = params.get('type') === 'adoption' ? 'adoption' : 'breeder'
   const category = params.get('category') as AnimalCategory | null
   const status = params.get('status')
+  const region = REGION_GROUPS.find((group) => group.value === params.get('region'))
   return {
     type,
     category: category && ANIMAL_CATEGORIES.includes(category) ? category : 'all',
@@ -37,7 +38,7 @@ const parseQuery = (params: URLSearchParams): ExploreQuery => {
     status:
       status === 'available' || (status === 'reserved' && type === 'adoption') ? status : 'all',
     sort: params.get('sort') === 'latest' ? 'latest' : 'popular',
-    region: (type === 'breeder' && params.get('region')) || ALL_REGIONS,
+    region: (type === 'breeder' && region?.value) || ALL_REGIONS,
     keyword: params.get('keyword') ?? '',
   }
 }
@@ -48,6 +49,11 @@ export const hasNarrowedQuery = (query: ExploreQuery) =>
   query.status !== 'all' ||
   query.region !== ALL_REGIONS ||
   query.keyword !== ''
+
+/** 필터 버튼의 숫자 — 정렬·분양 상태·지역 중 기본값에서 바꾼 개수 (동물 종류·검색어는 화면에 늘 보여 뺀다) */
+export const countExploreFilters = (query: ExploreQuery) =>
+  [query.sort !== 'popular', query.status !== 'all', query.region !== ALL_REGIONS].filter(Boolean)
+    .length
 
 /**
  * 탐색 조회 조건은 URL 이 단일 출처다 — 뒤로가기·새로고침·공유가 같은 화면을 복원한다.

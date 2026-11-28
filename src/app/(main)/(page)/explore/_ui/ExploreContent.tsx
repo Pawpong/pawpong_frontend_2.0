@@ -4,36 +4,52 @@ import { useMemo } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import {
   Button,
+  Dropdown,
   InfiniteScrollTrigger,
   ListState,
   ListingCardGridSkeleton,
+  SearchBar,
   TabBarList,
   Tabs,
   TabsContent,
 } from '@/shared/ui'
-import { CATEGORY_TO_PET_TYPE } from '@/shared/lib/petCategory'
-import { adoptionQueries } from '@/entities/adoption'
+import { TEXT } from '@/shared/config'
 import { mapAdoptionCard } from '@/shared/lib/mapAdoptionCard'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
-import { CategorySection } from '@/features/category-filter'
 import { useGnbHeight } from '@/shared/lib/useGnbHeight'
 import { AdoptionCardGrid } from '@/features/adoption'
+import type { AdoptionSortType } from '@/shared/types'
 import { BreederExploreContent } from './BreederExploreContent'
-import { ExploreFilterBar } from './ExploreFilterBar'
-import { ALL_REGIONS, EXPLORE_SECTION_CONTAINER, EXPLORE_TABS } from '../_lib/constants'
+import { ExploreMobileFilters, ExploreSideFilters } from './ExploreFilters'
+import {
+  ALL_REGIONS,
+  EXPLORE_GRID,
+  EXPLORE_SECTION_CONTAINER,
+  EXPLORE_TABS,
+  SORT_OPTIONS,
+} from '../_lib/constants'
 import type { ExploreType } from '../_lib/constants'
+import { adoptionExploreQuery } from '../_lib/exploreQueries'
 import { hasNarrowedQuery, useExploreQuery } from '../_lib/useExploreQuery'
-import { flattenPages } from '@/shared/lib/infiniteList'
+import { flattenPages, getTotalItems } from '@/shared/lib/infiniteList'
 
-// 탐색 상단 (Option 3) — 헤더(검색은 헤더 돋보기) · 탭 · 원형 카테고리 · 드롭다운 필터 칩 · 목록.
-// 헤더와 탭만 붙어 있고 카테고리·필터는 스크롤로 지나가 카드가 먼저 보이게 한다.
+const SEARCH_PLACEHOLDER = {
+  breeder: {
+    mobile: '브리더·품종·지역 검색',
+    desktop: '브리더 이름, 품종, 지역으로 검색해 보세요',
+  },
+  adoption: { mobile: '검색해서 원하는 동물 찾기', desktop: '검색해서 원하는 동물 찾기' },
+} as const
+
+// 탐색 — 탭 · 검색 · 필터(PC 왼쪽 칸 / 모바일 칩 + 펼침) · 목록.
+// 헤더와 탭만 붙어 있고 검색·필터는 스크롤로 지나가 카드가 먼저 보이게 한다.
 const ExploreContent = () => {
   const { query, setQuery } = useExploreQuery()
   const selectedType = query.type
   const gnbHeight = useGnbHeight()
   const narrowed = hasNarrowedQuery(query)
 
-  // 입양 탐색 실데이터 — 카테고리는 petType, 필터 칩은 sort/status 로 v2 API 조회 (서버 필터링)
+  // 입양 탐색 실데이터 — 카테고리는 petType, 필터는 sort/status 로 v2 API 조회 (서버 필터링)
   const {
     data: listData,
     fetchNextPage,
@@ -42,12 +58,7 @@ const ExploreContent = () => {
     isPending,
     isError,
   } = useInfiniteQuery({
-    ...adoptionQueries.list(
-      query.sort,
-      CATEGORY_TO_PET_TYPE[query.category],
-      query.status === 'all' ? undefined : query.status,
-      query.keyword || undefined,
-    ),
+    ...adoptionExploreQuery(query),
     enabled: query.type === 'adoption',
   })
 
@@ -101,42 +112,73 @@ const ExploreContent = () => {
       </div>
 
       <TabsContent value={selectedType}>
-        <CategorySection
-          selected={query.category}
-          onChange={(category) => setQuery({ category })}
-        />
-        <ExploreFilterBar query={query} onChange={setQuery} />
+        <div className="grid min-w-0 grid-cols-1 lap:grid-cols-[13rem_minmax(0,1fr)] lap:items-start lap:gap-12">
+          <ExploreSideFilters query={query} onChange={setQuery} />
 
-        {query.type === 'breeder' ? (
-          <BreederExploreContent
-            query={query}
-            emptyText={narrowed ? '조건에 맞는 브리더가 없어요.' : '등록된 브리더가 없어요.'}
-            emptyAction={emptyAction}
-          />
-        ) : (
-          <div className={EXPLORE_SECTION_CONTAINER}>
-            <section className="flex flex-col gap-3">
-              <ListState
-                appPublicContent
-                isPending={isPending}
-                isError={isError}
-                isEmpty={listings.length === 0}
-                loadingText="분양글을 불러오는 중이에요."
-                loadingFallback={<ListingCardGridSkeleton label="분양글을 불러오는 중이에요." />}
-                errorText="분양글을 불러오지 못했어요."
-                emptyText={narrowed ? '조건에 맞는 분양글이 없어요.' : '등록된 분양글이 없어요.'}
+          <div className="flex min-w-0 flex-col gap-3">
+            <div className="flex items-center gap-4">
+              {/* 탭을 바꾸거나 초기화로 검색어가 비면 입력칸도 비운다 */}
+              <SearchBar
+                key={`${query.type}-${query.keyword}`}
+                defaultValue={query.keyword}
+                placeholder={SEARCH_PLACEHOLDER[query.type]}
+                onSubmit={(keyword) => setQuery({ keyword })}
+              />
+              {/* 모바일 정렬은 필터 펼침 칸에 있다 */}
+              <div className="hidden lap:block">
+                <Dropdown
+                  appearance="bare"
+                  ariaLabel="정렬"
+                  options={[...SORT_OPTIONS]}
+                  value={query.sort}
+                  onValueChange={(sort) => setQuery({ sort: sort as AdoptionSortType })}
+                />
+              </div>
+            </div>
+            <ExploreMobileFilters query={query} onChange={setQuery} />
+
+            {query.type === 'breeder' ? (
+              <BreederExploreContent
+                query={query}
+                emptyText={narrowed ? '조건에 맞는 브리더가 없어요.' : '등록된 브리더가 없어요.'}
                 emptyAction={emptyAction}
-              >
-                <AdoptionCardGrid listings={listings} />
-              </ListState>
-            </section>
-            <InfiniteScrollTrigger
-              onIntersect={fetchNextPage}
-              hasNextPage={hasNextPage ?? false}
-              isFetchingNextPage={isFetchingNextPage}
-            />
+              />
+            ) : (
+              <div className={EXPLORE_SECTION_CONTAINER}>
+                <section className="flex flex-col gap-3">
+                  <ListState
+                    appPublicContent
+                    isPending={isPending}
+                    isError={isError}
+                    isEmpty={listings.length === 0}
+                    loadingText="분양글을 불러오는 중이에요."
+                    loadingFallback={
+                      <ListingCardGridSkeleton
+                        label="분양글을 불러오는 중이에요."
+                        className={EXPLORE_GRID}
+                      />
+                    }
+                    errorText="분양글을 불러오지 못했어요."
+                    emptyText={
+                      narrowed ? '조건에 맞는 분양글이 없어요.' : '등록된 분양글이 없어요.'
+                    }
+                    emptyAction={emptyAction}
+                  >
+                    <p className={TEXT.meta}>
+                      총 {getTotalItems(listData).toLocaleString()}개의 분양글
+                    </p>
+                    <AdoptionCardGrid listings={listings} className={EXPLORE_GRID} />
+                  </ListState>
+                </section>
+                <InfiniteScrollTrigger
+                  onIntersect={fetchNextPage}
+                  hasNextPage={hasNextPage ?? false}
+                  isFetchingNextPage={isFetchingNextPage}
+                />
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </TabsContent>
     </Tabs>
   )
