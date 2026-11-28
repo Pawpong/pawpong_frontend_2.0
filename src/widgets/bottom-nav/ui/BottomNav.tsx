@@ -67,12 +67,12 @@ const BottomNavView = ({ pathname }: { pathname: string }) => {
     <>
       <div
         aria-hidden
-        className="h-[calc(4.75rem+env(safe-area-inset-bottom))] shrink-0 pc:hidden"
+        className="h-[calc(4.75rem+env(safe-area-inset-bottom))] shrink-0 lap:hidden"
       />
       {/* 밝은 유리 표면에 아이콘과 라벨의 대비를 유지하는 하단 바. 바깥 nav 는 클릭을 통과시키고 캡슐만 받는다 */}
       <nav
         aria-label="하단 주요 메뉴"
-        className="pointer-events-none fixed inset-x-0 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-sticky px-3 in-data-native-tabs:hidden pc:hidden"
+        className="pointer-events-none fixed inset-x-0 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-sticky px-3 in-data-native-tabs:hidden lap:hidden"
       >
         {/* 뒤 화면이 비치는 캡슐 + 가장자리 하이라이트. 선택 탭은 같은 유리를 한 겹 더 밝게 얹은 알약 */}
         {/* 넷플릭스·토스 탭 바처럼 뒤 화면 색이 비치는 맑은 유리: 옅은 흰색 + 흐림·밝기·채도, 위아래 빛 반사, 머리카락 테두리 */}

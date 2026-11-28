@@ -32,12 +32,12 @@ const ChatRoomHeader = ({
   onRoomClosed,
 }: ChatRoomHeaderProps) => {
   return (
-    <header className="shrink-0 border-b border-neutral-150 bg-white page-gutter-x py-2 pc:py-3 pc:[--page-gutter:1.25rem]">
+    <header className="shrink-0 border-b border-neutral-150 bg-white page-gutter-x py-2 lap:py-3 lap:[--page-gutter:1.25rem]">
       <div className={cn(CHAT_CONTENT_WIDTH, 'flex min-h-12 items-center justify-between')}>
-        <div className="flex min-w-0 items-center gap-5 pc:gap-7">
+        <div className="flex min-w-0 items-center gap-5 lap:gap-7">
           <div className="flex items-center gap-1">
             {/* flex: 버튼(inline-flex)이 글줄 기준선에 얹혀 이름보다 위로 뜨지 않게 */}
-            <span className="flex pc:hidden">
+            <span className="flex lap:hidden">
               <IconButton edge="both" onClick={onBack} aria-label="뒤로 가기">
                 <ArrowBackIcon className="size-6" />
               </IconButton>
@@ -55,7 +55,7 @@ const ChatRoomHeader = ({
                 alt={`${displayName} 프로필`}
                 size="responsive"
               />
-              <span className="max-w-36 truncate text-body-s font-semibold text-neutral-850 pc:max-w-[21.625rem]">
+              <span className="max-w-36 truncate text-body-s font-semibold text-neutral-850 lap:max-w-[21.625rem]">
                 {displayName}
               </span>
             </Link>

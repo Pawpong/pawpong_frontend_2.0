@@ -14,9 +14,9 @@ export const ActivityDetailFlow = ({
 }) => (
   <div className="flex min-w-0 flex-col gap-8 tab:gap-10">
     {header}
-    <div className="grid min-w-0 gap-8 pc:grid-cols-[20rem_minmax(0,1fr)] pc:gap-16">
-      <aside className="min-w-0 border-b border-neutral-150 pb-8 pc:border-r pc:border-b-0 pc:pr-8 pc:pb-0">
-        <div className="flex flex-col gap-6 pc:sticky pc:top-24">{summary}</div>
+    <div className="grid min-w-0 gap-8 lap:grid-cols-[20rem_minmax(0,1fr)] lap:gap-16">
+      <aside className="min-w-0 border-b border-neutral-150 pb-8 lap:border-r lap:border-b-0 lap:pr-8 lap:pb-0">
+        <div className="flex flex-col gap-6 lap:sticky lap:top-24">{summary}</div>
       </aside>
       <div className="flex min-w-0 flex-col gap-10">{children}</div>
     </div>

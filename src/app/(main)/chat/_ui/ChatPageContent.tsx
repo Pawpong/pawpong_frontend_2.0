@@ -32,7 +32,7 @@ const ChatPageContent = () => {
   const queryClient = useQueryClient()
   const searchParams = useSearchParams()
   const activeRoomId = searchParams.get('roomId')
-  const isPC = useBreakpoint('pc')
+  const isPC = useBreakpoint('lap')
   // activeRoomId로 방을 찾기 위한 캐시 구독만 한다. 폴링은 useChatRoomFilter가 담당.
   const roomsQuery = useQuery({
     ...chatQueries.rooms(),
@@ -112,26 +112,24 @@ const ChatPageContent = () => {
   }
 
   // PC + room selected: sidebar + chat panel
+  // 테두리 상자는 페이지 틀(page-shell) 여백 안쪽에 둬서 상단바 로고·메뉴 끝과 맞춘다
   return (
-    <div
-      className={cn(
-        CHAT_PANEL_HEIGHT,
-        'page-width flex overflow-hidden border-x border-neutral-150 bg-white',
-      )}
-    >
-      <ChatSidebar
-        activeRoomId={activeRoomId}
-        onSelectRoom={handleSelectRoom}
-        onRoomClosed={handleRoomClosed}
-      />
-      <div className="min-w-0 flex-1">
-        <ChatRoomPanel
-          key={activeRoom.roomId}
-          room={activeRoom}
-          currentUserId={profileQuery.data.userId}
-          onBack={handleBack}
-          onRoomClosed={() => handleRoomClosed(activeRoom.roomId)}
+    <div className={cn(CHAT_PANEL_HEIGHT, 'page-shell')}>
+      <div className="flex h-full overflow-hidden border-x border-neutral-150 bg-white">
+        <ChatSidebar
+          activeRoomId={activeRoomId}
+          onSelectRoom={handleSelectRoom}
+          onRoomClosed={handleRoomClosed}
         />
+        <div className="min-w-0 flex-1">
+          <ChatRoomPanel
+            key={activeRoom.roomId}
+            room={activeRoom}
+            currentUserId={profileQuery.data.userId}
+            onBack={handleBack}
+            onRoomClosed={() => handleRoomClosed(activeRoom.roomId)}
+          />
+        </div>
       </div>
     </div>
   )

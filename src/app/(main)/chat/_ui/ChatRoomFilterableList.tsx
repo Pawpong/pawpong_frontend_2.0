@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { cn } from '@/shared/lib/cn'
 import type { ChatRoomResponseDto } from '@/shared/types'
 import { RetryButton, EmptyState, SearchBar } from '@/shared/ui'
-import { CHAT_GUTTER_X } from '../_lib/constants'
 import { useChatRoomFilter } from '../_lib/useChatRoomFilter'
 import { ChatFilterTabs } from './ChatFilterTabs'
 import { ChatRoomItem } from './ChatRoomItem'
@@ -22,7 +21,7 @@ const ChatRoomFilterableList = ({
   activeRoomId,
   onSelectRoom,
   onRoomClosed,
-  gutterClassName = CHAT_GUTTER_X,
+  gutterClassName,
 }: ChatRoomFilterableListProps) => {
   const {
     filter,
@@ -79,7 +78,7 @@ const ChatRoomFilterableList = ({
         <div
           className={cn(
             // [refactored] 검색·필터는 고정, 방 목록만 스크롤 — 목록 화면·사이드바가 같다
-            'flex-1 divide-y divide-neutral-150 overflow-y-auto bg-white pc:space-y-1 pc:divide-y-0',
+            'flex-1 divide-y divide-neutral-150 overflow-y-auto bg-white lap:space-y-1 lap:divide-y-0',
             gutterClassName,
           )}
         >

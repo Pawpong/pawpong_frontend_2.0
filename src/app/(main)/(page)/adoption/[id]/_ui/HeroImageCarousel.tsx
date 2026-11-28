@@ -37,7 +37,7 @@ const HeroImageCarousel = ({
         role="img"
         aria-label={`${alt} 이미지 없음`}
       >
-        <PawPrintIcon className="size-20 opacity-70 pc:size-24" />
+        <PawPrintIcon className="size-20 opacity-70 lap:size-24" />
       </div>
     )
   }
@@ -95,7 +95,7 @@ const HeroImageCarousel = ({
       )}
 
       {/* 인디케이터 — 활성 pill(20x8 #fffa94), 비활성 dot(8 #a9835a) */}
-      <div className="pointer-events-none absolute bottom-[1rem] left-1/2 z-10 flex -translate-x-1/2 items-center gap-[0.25rem] pc:bottom-[1.5rem]">
+      <div className="pointer-events-none absolute bottom-[1rem] left-1/2 z-10 flex -translate-x-1/2 items-center gap-[0.25rem] lap:bottom-[1.5rem]">
         {images.map((url, index) => (
           <span
             key={`${url}-${index}`}
@@ -121,7 +121,7 @@ const SlideNavButton = ({
   onClick: () => void
   className: string
 }) => (
-  <span className={`absolute top-1/2 z-10 hidden -translate-y-1/2 pc:flex ${className}`}>
+  <span className={`absolute top-1/2 z-10 hidden -translate-y-1/2 lap:flex ${className}`}>
     <IconButton size="lg" onClick={onClick} aria-label={label}>
       <PixelArrowRightIcon className="size-12 text-neutral-50" />
     </IconButton>
