@@ -222,9 +222,9 @@ export const ExploreMobileFilters = ({ query, onChange }: ExploreFiltersProps) =
               초기화
             </Button>
             <div className="flex flex-[2]">
-              <Button intent="dark" size="md" width="fill" onClick={() => setOpen(false)}>
-                {total.toLocaleString()}
-                {isBreeder ? '명의 브리더 보기' : '개의 분양글 보기'}
+              {/* 주요 동작은 공통 primary(노랑) — 팔로우·글쓰기와 같은 버튼 */}
+              <Button intent="primary" size="md" width="fill" onClick={() => setOpen(false)}>
+                {`${total.toLocaleString()}${isBreeder ? '명의 브리더 보기' : '개의 분양글 보기'}`}
               </Button>
             </div>
           </div>
