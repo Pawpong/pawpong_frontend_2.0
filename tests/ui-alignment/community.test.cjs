@@ -33,8 +33,8 @@ test('이야기 찾기의 세부 조건은 공통 버튼이고 카테고리·말
   assert.match(discovery, /<DialogTrigger asChild>[\s\S]*?<Button\s+intent="ghost"\s+size="sm"/)
   assert.match(discovery, /role="group"\s+aria-label="카테고리"/)
   // PC 사이드바의 동물·카테고리 목록은 같은 공통 목록(도트 아이콘 + 이름)을 쓴다
-  assert.match(discovery, /<CommunitySideNav\s+label="카테고리"/)
-  assert.match(source(`${ui}/CommunityContent.tsx`), /<CommunitySideNav\s+label="동물별 이야기"/)
+  assert.match(discovery, /<SideNav\s+label="카테고리"/)
+  assert.match(source(`${ui}/CommunityContent.tsx`), /<SideNav\s+label="동물별 이야기"/)
   assert.match(discovery, /aria-label=\{`\$\{category\.label\} 말머리`\}/)
   assert.match(
     source(`${ui}/discovery/AppliedFilters.tsx`),

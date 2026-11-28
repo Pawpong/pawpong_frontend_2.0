@@ -42,7 +42,8 @@ const dropdownVariants = tv({
         trigger:
           'focus-ring touch-target relative h-8 gap-1 text-body-sm leading-[1.3] font-medium whitespace-nowrap text-action-dark transition-colors hover:text-brand',
         icon: 'size-4',
-        content: 'w-64',
+        // 목록 글자만큼 — 짧은 목록(정렬)은 칩 목록과 같은 최소 폭, 설명·안내가 붙는 목록(공개 범위)은 16rem 에서 줄바꿈
+        content: 'w-max max-w-64 min-w-[9.75rem]',
       },
     },
     active: { true: '', false: '' },

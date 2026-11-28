@@ -22,12 +22,14 @@ import {
   LoginPromptModal,
   RootHeader,
   SearchBar,
+  SideNav,
   SortOptions,
 } from '@/shared/ui'
 import { PlusIcon } from '@/shared/assets'
 import {
   COMMUNITY_LOGIN_PROMPT,
   CommunityFeedCardSkeleton,
+  CommunityPixelIcon,
   communityQueries,
   getFirstPhotoPostId,
   toCommunityPreviewProps,
@@ -45,7 +47,6 @@ import {
   CommunityCategoryBand,
   CommunityDetailFilter,
   CommunityPetTiles,
-  CommunitySideNav,
   CommunitySubTopics,
   discoveryTitle,
 } from './CommunityDiscovery'
@@ -159,13 +160,13 @@ const CommunityContent = ({
             <p aria-hidden className="mb-2 px-4 text-xs font-semibold text-neutral-700">
               동물
             </p>
-            <CommunitySideNav
+            <SideNav
               label="동물별 이야기"
-              iconClassName="size-8" // [refactored] 동물 그림은 도트 아이콘보다 크게
               items={PET_OPTIONS.map((option) => ({
                 key: option.value || 'all',
                 label: option.label,
-                icon: option.icon,
+                // 동물 그림은 도트 아이콘보다 크게
+                icon: <CommunityPixelIcon name={option.icon} className="size-8" />,
                 selected: petType === option.value,
                 onSelect: () => changeNavigation({ petType: option.value }),
               }))}

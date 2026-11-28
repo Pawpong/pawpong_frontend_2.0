@@ -10,17 +10,14 @@ import {
   ListingCardGrid,
   ListingCardGridSkeleton,
 } from '@/shared/ui'
-import { breederQueries } from '@/entities/breeder'
 import { dedupeBy } from '@/shared/lib/dedupeBy'
-import { flattenPages } from '@/shared/lib/infiniteList'
-import { CATEGORY_TO_PET_TYPE } from '@/shared/lib/petCategory'
+import { flattenPages, getTotalItems } from '@/shared/lib/infiniteList'
 import { BreederCard } from '@/app/(main)/home/_ui/BreederCard'
-import { ALL_REGIONS, EXPLORE_SECTION_CONTAINER } from '../_lib/constants'
+import { EXPLORE_GRID, EXPLORE_SECTION_CONTAINER } from '../_lib/constants'
+import { breederExploreQuery } from '../_lib/exploreQueries'
+import { TEXT } from '@/shared/config'
 import type { ExploreQuery } from '../_lib/useExploreQuery'
 import type { Breeder, FavoriteBreeder } from '@/shared/types'
-
-// 인기순 → 찜 많은 순 (브리더 탐색 API 에는 popular 대신 favorite 이 있다)
-const SORT_TO_BREEDER_SORT = { popular: 'favorite', latest: 'latest' } as const
 
 // Breeder(API) → BreederCard 뷰 모델. 카드는 즐겨찾는 브리더 탭과 같은 것을 쓴다.
 const toBreederCardModel = (breeder: Breeder): FavoriteBreeder => ({
@@ -45,15 +42,7 @@ interface BreederExploreContentProps {
 // 목록 레이아웃은 입양 탐색과 동일 — 공용 그리드 / 무한스크롤.
 const BreederExploreContent = ({ query, emptyText, emptyAction }: BreederExploreContentProps) => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending, isError } =
-    useInfiniteQuery(
-      breederQueries.explore({
-        petType: CATEGORY_TO_PET_TYPE[query.category],
-        keyword: query.keyword || undefined,
-        sortBy: SORT_TO_BREEDER_SORT[query.sort],
-        isAdoptionAvailable: query.status === 'available' || undefined,
-        province: query.region === ALL_REGIONS ? undefined : [query.region],
-      }),
-    )
+    useInfiniteQuery(breederExploreQuery(query))
 
   // 서버 페이지 경계에서 항목이 겹쳐도 React key가 중복되지 않도록 방어 (입양 탭과 동일)
   const breeders = useMemo(
@@ -73,12 +62,16 @@ const BreederExploreContent = ({ query, emptyText, emptyAction }: BreederExplore
           isError={isError}
           isEmpty={breeders.length === 0}
           loadingText="브리더를 불러오는 중이에요."
-          loadingFallback={<ListingCardGridSkeleton label="브리더를 불러오는 중이에요." />}
+          loadingFallback={
+            <ListingCardGridSkeleton label="브리더를 불러오는 중이에요." className={EXPLORE_GRID} />
+          }
           errorText="브리더를 불러오지 못했어요."
           emptyText={emptyText}
           emptyAction={emptyAction}
         >
+          <p className={TEXT.meta}>총 {getTotalItems(data).toLocaleString()}명의 브리더</p>
           <ListingCardGrid
+            className={EXPLORE_GRID}
             items={breeders}
             getKey={(breeder) => breeder.id}
             renderItem={(breeder, index) => (
