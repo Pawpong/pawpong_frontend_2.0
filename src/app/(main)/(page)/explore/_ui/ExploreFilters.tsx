@@ -36,7 +36,7 @@ const CategoryIcon = ({ category, className }: { category: AnimalCategory; class
 // 브리더 탐색은 '분양중' 하나만 거를 수 있어 스위치로, 입양 탐색은 상태가 셋이라 고르기로 둔다
 const AvailableSwitch = ({ query, onChange }: ExploreFiltersProps) => (
   <label className="flex min-h-10 cursor-pointer items-center justify-between gap-3 text-body-md font-medium text-neutral-700">
-    분양중인 아이만 보기
+    분양중인 브리더만 보기
     <Switch
       checked={query.status === 'available'}
       onCheckedChange={(checked) => onChange({ status: checked ? 'available' : 'all' })}
