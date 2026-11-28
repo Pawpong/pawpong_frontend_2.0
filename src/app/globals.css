@@ -98,11 +98,6 @@ html[data-app]:has([data-gnb][data-app-hidden]) {
 @utility page-gutter-x {
   padding-inline: var(--page-gutter);
 }
-@utility page-width {
-  margin-inline: auto;
-  width: 100%;
-  max-width: var(--page-max-width);
-}
 /* 틀 안에서 배경·밑줄만 틀 가장자리까지 넓힌다(내용 정렬은 그대로) — 탭 바·고정 머리.
    틀 밖에서는 페이지 여백만 둔다. 안쪽 블록은 다시 넓히지 않는다. */
 @utility frame-bleed {

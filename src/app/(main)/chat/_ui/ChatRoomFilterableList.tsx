@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { cn } from '@/shared/lib/cn'
 import type { ChatRoomResponseDto } from '@/shared/types'
 import { RetryButton, EmptyState, SearchBar } from '@/shared/ui'
-import { CHAT_GUTTER_X } from '../_lib/constants'
 import { useChatRoomFilter } from '../_lib/useChatRoomFilter'
 import { ChatFilterTabs } from './ChatFilterTabs'
 import { ChatRoomItem } from './ChatRoomItem'
@@ -22,7 +21,7 @@ const ChatRoomFilterableList = ({
   activeRoomId,
   onSelectRoom,
   onRoomClosed,
-  gutterClassName = CHAT_GUTTER_X,
+  gutterClassName,
 }: ChatRoomFilterableListProps) => {
   const {
     filter,
