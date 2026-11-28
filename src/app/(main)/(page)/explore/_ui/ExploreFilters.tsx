@@ -151,12 +151,14 @@ export const ExploreMobileFilters = ({ query, onChange }: ExploreFiltersProps) =
   const isBreeder = query.type === 'breeder'
 
   return (
-    <div className="flex flex-col gap-3 lap:hidden">
+    // 검색창과의 간격은 탭 바 → 검색창 간격(페이지 위 여백)과 같게 — 부모 줄 간격(gap-3)만큼 빼서 맞춘다
+    <div className="mt-[calc(var(--page-pad-top)-0.75rem)] flex flex-col gap-3 lap:hidden">
       <div className="flex items-center gap-2">
+        {/* 포커스 테두리가 잘리지 않게 둔 위아래 여백(py-1)은 바깥 간격에 셈하지 않는다(-my-1) */}
         <div
           role="group"
           aria-label="동물 종류"
-          className="-mx-1 flex min-w-0 flex-1 gap-1.5 overflow-x-auto px-1 py-1"
+          className="-mx-1 -my-1 flex min-w-0 flex-1 gap-1.5 overflow-x-auto px-1 py-1"
         >
           {ANIMAL_CATEGORIES.map((category) => (
             <FilterTab

@@ -29,6 +29,8 @@ interface SearchBarProps {
    * soft: 흰 바탕 + 옅은 테두리(Input 과 같은 색), 돋보기를 앞에 둔 38px 슬림 검색 (채팅·헤더 공통 기본)
    */
   appearance?: 'outline' | 'soft'
+  /** soft 높이 — md 38px(채팅·헤더), lg 44px(탐색처럼 화면의 주 검색) */
+  size?: 'md' | 'lg'
   className?: string
 }
 
@@ -51,6 +53,7 @@ export const SearchBar = ({
   onSubmit,
   onChange,
   appearance = 'soft',
+  size = 'md',
   className,
 }: SearchBarProps) => {
   const isTablet = useBreakpoint('tab')
@@ -83,7 +86,10 @@ export const SearchBar = ({
         'group flex w-full flex-row-reverse items-center gap-2 border transition-[border-color,box-shadow] duration-150',
         isSoft
           ? // 돋보기(제출 버튼)를 앞에 두려고 순서만 뒤집는다. 포커스는 테두리만 브랜드 색으로
-            'h-[2.375rem] rounded-[0.6875rem] border-neutral-150 bg-white pr-3 pl-1 focus-within:border-primary-500'
+            cn(
+              'border-neutral-150 bg-white pr-3 pl-1 focus-within:border-primary-500',
+              size === 'lg' ? 'h-11 rounded-xl pl-2' : 'h-[2.375rem] rounded-[0.6875rem]',
+            )
           : // 포커스: 브랜드 테두리 + 옐로우 글로우 (파란 시스템 색은 쓰지 않는다)
             'h-11 rounded-full border-neutral-300 bg-white py-1 pr-4 pl-1 focus-within:border-primary-500 focus-within:shadow-[0_0_0_0.25rem_rgba(255,254,114,0.45)] tab:h-12 tab:pr-5 tab:pl-1.5 pc:h-14 pc:pr-6',
         className,

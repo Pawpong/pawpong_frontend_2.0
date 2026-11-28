@@ -119,6 +119,7 @@ const ExploreContent = () => {
             <div className="flex items-center gap-4">
               {/* 탭을 바꾸거나 초기화로 검색어가 비면 입력칸도 비운다 */}
               <SearchBar
+                size="lg"
                 key={`${query.type}-${query.keyword}`}
                 defaultValue={query.keyword}
                 placeholder={SEARCH_PLACEHOLDER[query.type]}
